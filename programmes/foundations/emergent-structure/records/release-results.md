@@ -18,17 +18,27 @@ Scientific qualification remains NOT_ESTABLISHED.
 
 ## Evidence availability
 
+The retained reports are public in [Zenodo record 23914232](https://doi.org/10.5281/zenodo.23914232), version 1.0.0.
+[Download the original report bundle](https://zenodo.org/records/23914232/files/matrix-completed-reports.zip?download=1).
+
 The original delivery is `matrix-completed-reports.zip`, 463,637,963 bytes,
 SHA-256 `b159bccbc819636033b6f98df8afb385d84a63dffab84c285548cbac73e811ec`.
 Its `delivery-acceptance.json`, `report-bundle-receipt.json` and `report-index.json`
 retain the delivery scope, exact report digests and original source identities.
-They belong to the external `goal-direct-completed-report-delivery-20261102-01`
-packet. This repository does not distribute that packet or a public download.
+The deposit supplies these original records, a deposit manifest, checksums and a CC-BY-4.0 license.
+Download `SHA256SUMS` and all seven other files into one directory.
+Run `sha256sum -c SHA256SUMS` in that directory.
+The original receipt also identifies all ten ZIP members and their SHA-256 hashes.
 
-The owner selected retention of the original raw evidence and use of the report
-bundle. The bundle is not a completed raw-evidence replica or a new scientific
-reconstruction. Documentation consolidation performs no native acquisition,
-fit or result recalculation.
+The recorded raw-file census describes 264,186 files and 50,095,970,946 bytes in external custody.
+The deposit does not include those underlying files or the complete external delivery packet.
+Historical local paths identify original custody, not public download locations.
+The bundle alone does not provide a complete raw-evidence replay.
+Publication preserves the original report bytes and performs no native acquisition, fit or result recalculation.
+
+The [software DOI](https://doi.org/10.5281/zenodo.23902832) identifies the associated 0.3.0 source release.
+The report DOI identifies this separate evidence deposit.
+Neither publication changes the scientific qualification status.
 
 See the [scientific design](matrix-programme.md),
 [programme run guide](../workflows/matrix-programme/guide.md) and

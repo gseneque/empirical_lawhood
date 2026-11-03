@@ -59,6 +59,16 @@ configuration, source and seed roster, independent-unit definition, output
 hashes, receipts and adjudication. Use the [provenance template](configs/templates/evidence-provenance.yaml)
 as a starting point and state absent fields explicitly.
 
+## Public Matrix report deposit
+
+The [retained Matrix reports](programmes/foundations/emergent-structure/records/release-results.md) are available at [DOI 10.5281/zenodo.23914232](https://doi.org/10.5281/zenodo.23914232).
+The deposit preserves the exact six-report bundle, original delivery records and complete report-member checksums.
+It covers E1, E2, TRAIN, E3, E4 development and E4 revision.
+Twelve dependent phases retain conditional nonentry, and scientific qualification remains `NOT_ESTABLISHED`.
+The recorded census describes 264,186 underlying files and 50,095,970,946 bytes, which remain outside this public deposit.
+The report bundle alone does not provide a complete raw-evidence replay.
+Use its original source identities and denominators when interpreting results.
+
 ## Provenance and reviewed derivatives
 
 The repository ships a provenance template, not historical raw trajectories,

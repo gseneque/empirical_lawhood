@@ -8,7 +8,9 @@ Use it to find the selected identity, its evidence and any remaining prerequisit
 
 ## Prerequisites and first action
 
-This checkout does not distribute a release-evidence packet or provide a public download for one.
+The [retained Matrix reports](../../programmes/foundations/emergent-structure/records/release-results.md) have a [public Zenodo deposit](https://doi.org/10.5281/zenodo.23914232).
+That deposit contains the report bundle and selected delivery records, not the underlying raw evidence or complete release-selection packet.
+The complete selection packet remains in external custody.
 Historical packet paths identify external custody; they are not public retrieval links.
 The contract below explains how to inspect a separately supplied packet.
 Without that packet, release acceptance for a selected source remains unverified by the reader.
