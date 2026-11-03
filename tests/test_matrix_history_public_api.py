@@ -24,7 +24,8 @@ ROOT = Path(__file__).resolve().parents[1]
 def plane(tmp_path):
     path = tmp_path / "exposed-software-store"
     path.mkdir()
-    contract = ExternalRootContract("test.matrix-history-root", "fictional test store", str(path), "/", "empirical-lawhood/test/local-root", 1)
+    contract = ExternalRootContract("test.matrix-history-root", "fictional test store", str(path),
+        str(next(parent for parent in (path, *path.parents) if parent.is_mount())), "empirical-lawhood/test/local-root", 1)
     return ExternalArtifactPlane(GuardedExternalRoot(contract))
 
 

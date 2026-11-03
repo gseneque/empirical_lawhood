@@ -354,9 +354,10 @@ class SourcePipelineProfile(CanonicalRecord):
             value = getattr(self, field_name)
             if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
                 raise ValueError(f"{field_name} must be a positive integer")
-        if self.resource_ceiling.source_scan_bytes < self.expected_source_size_bytes:
+        if (self.resource_ceiling.source_scan_bytes is None
+            or self.resource_ceiling.source_scan_bytes < self.expected_source_size_bytes):
             raise ValueError("source size exceeds the source-pipeline resource ceiling")
-        if self.resource_ceiling.output_bytes <= 0:
+        if self.resource_ceiling.output_bytes is None or self.resource_ceiling.output_bytes <= 0:
             raise ValueError("source pipeline requires a positive output-byte ceiling")
         for field_name in (
             "evidence_world_id",

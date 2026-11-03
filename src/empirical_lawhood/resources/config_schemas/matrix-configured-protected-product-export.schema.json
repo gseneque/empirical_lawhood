@@ -1,0 +1,113 @@
+{
+  "$defs": {
+    "ConfiguredProtectedE3ProductExportSelection_bdb2d93675c1": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-experiment/configured-protected-product-export-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "frozen_package_record_id": {
+              "description": "frozen package record id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "original_package": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "original package; constructor checks semantics and units."
+            },
+            "output_relative_path": {
+              "description": "output relative path; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "reveal_authority_id": {
+              "description": "reveal authority id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "run_id": {
+              "description": "run id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "record_id",
+            "run_id",
+            "original_package",
+            "reveal_authority_id",
+            "frozen_package_record_id",
+            "output_relative_path"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-configured-protected-product-export",
+  "$ref": "#/$defs/ConfiguredProtectedE3ProductExportSelection_bdb2d93675c1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Configured Protected Product Export",
+  "x-consumer": "matrix-configured-protected-product-export",
+  "x-consumer-maximum-bytes": 1048576,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

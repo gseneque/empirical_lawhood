@@ -1,0 +1,1186 @@
+{
+  "authority": "Ordinary engineering/source metadata; no ArtifactPlane issue/qualification authority",
+  "base": "9c670a3127cb652f839e56463758226749b07c73",
+  "branch": "recchain",
+  "conservative_charged_wall_seconds": 1494.955017,
+  "conservative_startup_reserve_seconds": 300,
+  "correction_exists": "Authentic whole archived relaxed coordinates; no new relaxation needed to reuse them",
+  "documentation": "184 Markdown files/32 guides PASS, including ignored RUBISCO.md",
+  "engineering_ceiling_seconds": 7200,
+  "engineering_clock": "Whole wall plus300s startup reserve; no scientific clock reset",
+  "environment_syncs": 0,
+  "first_observed_utc": "2026-10-10T04:40:19+00:00",
+  "focused_tests": {
+    "evidence": "/tmp/rubisco-redirection-work-v1/root-software-checks.json",
+    "passed": 23,
+    "runner_seconds": 1.4,
+    "whole_CPU_unknown": true
+  },
+  "independent_diagnosis_member_verification": "35/35 files and every recorded digest PASS",
+  "independent_prospective_source_review": "All12 historical helper ASTs/constants unchanged; guards follow complete raw capture",
+  "measured_diagnostic_outer_CPU_seconds": 14.68,
+  "native_carried_costs": {
+    "actual_QMMM_xtb_processes": 33,
+    "callback_reservations": 34,
+    "closed38_root_output_bytes": 787643240,
+    "older_separate_electrostatic_processes": 39,
+    "outer_CPU_seconds": "373.33",
+    "parent_CPU_seconds": "181.063327",
+    "parent_remaining_CPU_seconds": "18.936673",
+    "separate_closed_v3_audit_bytes": 358300,
+    "worker_CPU_seconds": "192.266673"
+  },
+  "native_park_reasons": [
+    "Unselected common relaxed-source reactive-preparation identity",
+    "No concrete matched productive/return decision-relevant assessment/model scope",
+    "Complete native allocation under carried parent ceiling not demonstrated"
+  ],
+  "new_acquisitions": 0,
+  "new_fits": 0,
+  "new_mutant_runs": 0,
+  "new_native_calls": 0,
+  "new_native_protocols_frozen": 0,
+  "new_reaction_paths": 0,
+  "observed_elapsed_wall_seconds": 1194.955017,
+  "original_joint_objective_amended": false,
+  "other_resources": [
+    "/tmp/rubisco-redirection-work-v1/preservation-outer-resource.txt",
+    "/tmp/rubisco-redirection-work-v1/documentation-outer-resource.txt"
+  ],
+  "physical_bytes_including_self": 3452454,
+  "physical_files_including_self": 223,
+  "preservation_archive": {
+    "all_members_byte_exact": true,
+    "expanded_bytes": 5705316,
+    "members": 96,
+    "stored_bytes": 1080339
+  },
+  "recorded_utc": "2026-10-10T05:00:13.955017+00:00",
+  "retained_output_ceiling_bytes": 16777216,
+  "retained_output_census_scope": "Explicit current engineering roots, whole selected maintained files, whole shared pytest/Ruff caches conservatively, new source/test bytecode and current uv writes; not all-project or total bytes ever written",
+  "ruff": "PASS",
+  "schema": "ordinary-bounded-redirection-completion-v1",
+  "selected_members_excluding_self": [
+    {
+      "bytes": 37,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.pytest_cache/.gitignore",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd"
+    },
+    {
+      "bytes": 191,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.pytest_cache/CACHEDIR.TAG",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4"
+    },
+    {
+      "bytes": 302,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.pytest_cache/README.md",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad"
+    },
+    {
+      "bytes": 5152,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.pytest_cache/v/cache/lastfailed",
+      "sha256": "4fc56f25882ed815d51d890e8cd4e950f1df5340d9c48b217b0631d24c158a29"
+    },
+    {
+      "bytes": 343070,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.pytest_cache/v/cache/nodeids",
+      "sha256": "47e23ee68769d4a62d31330661520452565a51d346c089f212d620d685a96fc6"
+    },
+    {
+      "bytes": 35,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/.gitignore",
+      "sha256": "9e3a60f1e6ec4ae60215c11d54b171392745ec25e9dded433d5bd921363af316"
+    },
+    {
+      "bytes": 319,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.14.11/17146403707191272767",
+      "sha256": "ad46fca372c550ec60afb0dc00e86095146d6e8817553cbec86d0ae2cdceb780"
+    },
+    {
+      "bytes": 3920,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.14.11/3013192436486189682",
+      "sha256": "a277880e155f1dd44098ae8ba0196f43bd594f01c4335d596fb69d757086e5e9"
+    },
+    {
+      "bytes": 174652,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/10062972275180218052",
+      "sha256": "e3ac3baba18289c69fab55e8fb6bd263a83007e9a3484e6bcabc42cfa28947d8"
+    },
+    {
+      "bytes": 1164,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/10130515065096922585",
+      "sha256": "900e1d17e2218026370d7de5218dccf8a0069daf616b1df6b1d04efe26cef114"
+    },
+    {
+      "bytes": 252,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/10454398024453699806",
+      "sha256": "4c43f47b26a69ed49b3aee5554f512845dd688f0e2f48d15e9f8488737393420"
+    },
+    {
+      "bytes": 380,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/10575885377040192850",
+      "sha256": "302451623f6facf83af30622f5482b74057a22b4cf8be7859608d69b44dab863"
+    },
+    {
+      "bytes": 188,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/10628600036218033868",
+      "sha256": "88fbfb1eb4c6d7c195aacca102a6e2bf6ee8b9b276d8fee588115b8b3b89508a"
+    },
+    {
+      "bytes": 212,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/10786387937665285292",
+      "sha256": "9a6b79486782185fa3681a0af8371ae4167de664fbb25a946737a19a944ec79e"
+    },
+    {
+      "bytes": 220,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/10868592771374571127",
+      "sha256": "6c5232f58f7bf46b0cf94330d55c54097f4dbe8451c54b0fe0e4a11d067b0663"
+    },
+    {
+      "bytes": 1532,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/11000278486732450544",
+      "sha256": "0e1c5f0937b3458997cb541018921df4227b10bd1e336e664cf54b3104fdb6ac"
+    },
+    {
+      "bytes": 388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/1106827468566530659",
+      "sha256": "1a21785cf3361ec1858b0d4839a930765973aa305f1409dabff1dea9c847e73e"
+    },
+    {
+      "bytes": 380,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/11360507106613781715",
+      "sha256": "64e4ceea8800b1d33b81bcc9813108a4f82cfba656b25a1a9a8a01ba82982d3c"
+    },
+    {
+      "bytes": 22228,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/1189984110440720356",
+      "sha256": "f50ded16f32076989885a1ce68508c712071a17767d0fdfd671afc5dd8cb817d"
+    },
+    {
+      "bytes": 348,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/11959135420539338928",
+      "sha256": "ea88082303199adb35e3dcea1c66e648ff989ddb43f35372cc198ea551e385b1"
+    },
+    {
+      "bytes": 612,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/11985713458731129023",
+      "sha256": "a678101bf4758c802280733b0f474b56cb1b7e28094c533e82bc24c16a4b1a3b"
+    },
+    {
+      "bytes": 2140,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/11997264718475020593",
+      "sha256": "1e66e1703240cea35590eeca8fa09195dbc4795cb38647a71c900823acebeae2"
+    },
+    {
+      "bytes": 364,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/12089813160254450596",
+      "sha256": "f842e3d55e4d7c6f9c8b5231737183ae19e3defc708bf5ebd1f2ea91e7d37d6a"
+    },
+    {
+      "bytes": 388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/12114952291613500649",
+      "sha256": "ad18bdd35453b845e0fd22cb08bd64c5d57045a9d892edb4bcdf8f0daf1c280f"
+    },
+    {
+      "bytes": 388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/12143470176123517563",
+      "sha256": "101776d7f4ff79b39dc2ce731fe02b57642330ca8667903943d4003e5b5e864f"
+    },
+    {
+      "bytes": 188,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/12208609391467367076",
+      "sha256": "409871161aaf352f054ffc52bd7f9ccc1b0d5a2522de9a8216b805023fdf4d24"
+    },
+    {
+      "bytes": 324,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/12649794110572167090",
+      "sha256": "6ed64b2394418b95ce378c3ced2a823afbbeb1b3012a1044f510f3595f44bd9d"
+    },
+    {
+      "bytes": 388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/12718777255392258819",
+      "sha256": "8e6a0c339da3eada34dbddf1cdab9f180483aa7b8f237dc925352870d399cb1c"
+    },
+    {
+      "bytes": 844,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/12893878518917002027",
+      "sha256": "afbf443384cd495da62396537509b8338b349c51c963999f59a8e64801089218"
+    },
+    {
+      "bytes": 188,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/1311905473418792518",
+      "sha256": "359cc0b6694cb48ab8de0ef8368dc4eb4265b64d48ef4b9aeeb9b508f756190d"
+    },
+    {
+      "bytes": 316,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/1352016743857043490",
+      "sha256": "fa20ef837b202f11813d5f5b6a158fdc0537cccd8ee3982995dda70fa4b7e835"
+    },
+    {
+      "bytes": 196,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/13715215224560388936",
+      "sha256": "521e82c79cdf826a734f25c721fbffcf24caf0b1f6099d7ccb885d2364567e78"
+    },
+    {
+      "bytes": 20124,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/13893012915860671309",
+      "sha256": "b16afdf51c0517ff1aab1f29ee96513360f33cfbae08b831ac0f542c431cbd91"
+    },
+    {
+      "bytes": 188,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/13909577787823493470",
+      "sha256": "01281ee1dd34c0e98faa673baad899c3d33c2d4a1739a50e20da26cf5c1e2a86"
+    },
+    {
+      "bytes": 268,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/14390178494484379971",
+      "sha256": "740499adc68f496619fc9078fa59b67afa3ac6cfbc1ccf3a51f69cc2e07bd614"
+    },
+    {
+      "bytes": 388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/14416806398392902752",
+      "sha256": "fdd063c98ef5228190264677eefc2b5304a3468dc06c002d9eb3172b45ebe127"
+    },
+    {
+      "bytes": 1932,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/14453639311900219568",
+      "sha256": "bb7806bd35b6e4a8833ee2dfa48d8c9e5c7738f727020f9cc260aab09169a960"
+    },
+    {
+      "bytes": 252,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/14728218689269161318",
+      "sha256": "fd03e7a7d6d629beff73e24e0dc163dcc7db1f252f0e1d2909dce87fd74fa675"
+    },
+    {
+      "bytes": 388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/14790050416038196132",
+      "sha256": "b293e3f3b70593780747385452fd3098b0d976265edadb3b426691add1956ca3"
+    },
+    {
+      "bytes": 388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/15374403848264684895",
+      "sha256": "c47769ed67b23bf8b447c2f91a9d7df48a2a6eda71a8c7780dae3c2eb1d01a14"
+    },
+    {
+      "bytes": 332,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/15840525414639808622",
+      "sha256": "84a0fd032e4a19bc01d4114558b76366391ee902725deb16b81067d13d461538"
+    },
+    {
+      "bytes": 236,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/15858375362311190141",
+      "sha256": "0bb216d59561e45026232fd8bdb34c9705031aa92773980c0914fb8f84eba948"
+    },
+    {
+      "bytes": 276,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/16028761793824650177",
+      "sha256": "35833aab924bb5712efc002edb7b6a561b17e8e9075ec53019af93c9e40cfadd"
+    },
+    {
+      "bytes": 508,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/16132815358279522406",
+      "sha256": "6db16da53f17fbde764bcd5092fb9446096214433c031dfb349a8172f1f0eb48"
+    },
+    {
+      "bytes": 212,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/16177334034748003801",
+      "sha256": "79cae1dc967b9cd50f1231da894d6b31cca492e5cd80e1a2f8eab637e70baa44"
+    },
+    {
+      "bytes": 252,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/16215538252333075809",
+      "sha256": "f15b642f3e908a3dac8c9182b5123c956293c6c81cdb25c72460861937635f64"
+    },
+    {
+      "bytes": 204,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/16459459456461095572",
+      "sha256": "1ca9204f06717c684d586b8d67c0f33999e39e0195c1ed8f9beffde8dec19c7b"
+    },
+    {
+      "bytes": 276,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/16746716438052409786",
+      "sha256": "c7e48d80601337e323b38f2e25eee1a491dd2ee2973452d66d76c0c632edb8e1"
+    },
+    {
+      "bytes": 396,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/16748282340253451647",
+      "sha256": "6bf192c6f07bb7f77db1238651e02f9d9bb0b88fa8ef6ab29beec96ff10401c8"
+    },
+    {
+      "bytes": 188,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/16748991744188863416",
+      "sha256": "aa49eebb7edfb559324a737c94d6a6f95734ea528cc65fa9765bfbbf33b38090"
+    },
+    {
+      "bytes": 460,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/16757031357324773364",
+      "sha256": "89ab6d010b2a69d8eafbb6580c7b4732dc04775638ee1c92e32413f199898924"
+    },
+    {
+      "bytes": 316,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/16880164783520273235",
+      "sha256": "5bb81ed0a87c61e2fe2fa78f7add6acb2814bd1f41d8cec475ff98cd40200209"
+    },
+    {
+      "bytes": 388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/17113360299560935529",
+      "sha256": "a13719a42bb98ec8bafbdcddbe4db1002492cbec17912c5dd7654e4bdd374c97"
+    },
+    {
+      "bytes": 596,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/17767568691640809901",
+      "sha256": "b2e94b6e7e525e40f8524403190efb644c5470aa088c791bb88cafce5d3042f5"
+    },
+    {
+      "bytes": 436,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/17822884112771381506",
+      "sha256": "6af936ae4ba4c4d946d3f361effa48dbb774ce2a8b5f68fc74318b70849295e0"
+    },
+    {
+      "bytes": 180,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/18094912689832168446",
+      "sha256": "742714541faa62ea37177565b1b76f22fa81ed0b242e7c37476a1ebcf6f82daa"
+    },
+    {
+      "bytes": 4524,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/18239974164826605422",
+      "sha256": "b9bcfe8d1e1f9693b1bdefb6725ae280f57ecc4a3eafa7310c20465fe6a76c49"
+    },
+    {
+      "bytes": 388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/1976393629590104834",
+      "sha256": "644086686b4e356f9cca90ef11805aaae5f7431d3a89638996fbadcbd25e3363"
+    },
+    {
+      "bytes": 252,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/2142610287654110857",
+      "sha256": "48e9fae172e728044e96cca961da3631c67023f7d47237a4fe0373b9e98d164b"
+    },
+    {
+      "bytes": 276,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/2500135210673917351",
+      "sha256": "944b0706e085e1f25088d8d8239127823d1304031f1d04946379d531770ab6a9"
+    },
+    {
+      "bytes": 196,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/2662240324327506400",
+      "sha256": "0898a9cf21304ee7c0a2c4def7d9a55297600b2e978dd718530e86d4a719d702"
+    },
+    {
+      "bytes": 236,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/2709085842086873081",
+      "sha256": "4b331b91195d7467c39592907bffdc4cfb8d2521a02f3350f0074236a0d9cbd0"
+    },
+    {
+      "bytes": 316,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3046309366504020294",
+      "sha256": "66559a7e62f47407deaac709db9a9d2f0d3c193125567acb0fa847acfc1d5db1"
+    },
+    {
+      "bytes": 1532,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3335175154560856301",
+      "sha256": "906b2da4cf40c4c4ba90a05a8f1a8769abb9be8498aad6a4cd5729874bf88559"
+    },
+    {
+      "bytes": 300,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3446452524051496742",
+      "sha256": "a07868a194f050297a84b837c775831a53a36ab8cca35d1f78206bab4bb653ea"
+    },
+    {
+      "bytes": 388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3521726914817010252",
+      "sha256": "ccdba3ec3ce4d471e3d8748b9540d24561e2ffffa9b486b71f29656b9b893289"
+    },
+    {
+      "bytes": 180,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3591550721051585821",
+      "sha256": "e6ab6e838f8678586ed6d6a1dee6a6f6e7bcb90910a095f9a03a0638377273df"
+    },
+    {
+      "bytes": 316,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3671982149275208401",
+      "sha256": "0f9738b83188c59d22396b576f4f1eb1f37a94182469e5948f8073db8685bd04"
+    },
+    {
+      "bytes": 316,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3686959935497849673",
+      "sha256": "9e3eead4ceac085681fc8ea9638e0e6057d9ccffc7779186c4011801150799d3"
+    },
+    {
+      "bytes": 236,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3705437348670486019",
+      "sha256": "7127e0d38693ad1305526044dd07010366cbce88c9db12a347b646fc90d73482"
+    },
+    {
+      "bytes": 332,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3747281731084272621",
+      "sha256": "eac2c9fcab5f9fcc1d4e8b97534a3b45524eb97011eeac683957ac76d9d9da94"
+    },
+    {
+      "bytes": 188,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3781934975845379596",
+      "sha256": "0ab0f1054395b710084dd637097cfe928c193b07e218b0e7dd8459bde6f23fdc"
+    },
+    {
+      "bytes": 2452,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3788908866482949348",
+      "sha256": "ef47c7d7b50e6deccb90f112e792f5b0cc92d4d44df8623c060f38506882d23c"
+    },
+    {
+      "bytes": 948,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3827641538645481644",
+      "sha256": "82aaa58b4cb7f362927bcc12c2712bc657a6f2644766a21025cb422a92f425ec"
+    },
+    {
+      "bytes": 2828,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/3879928636597807930",
+      "sha256": "11834dc2a9e4654b0581019ed99e2e686feaa52f8c3753aae4ebb726141314a2"
+    },
+    {
+      "bytes": 820,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/4232821237312958339",
+      "sha256": "60fc8364ab68b581f3b748c57fcebc400aa8c88b421c87a733130311548937dc"
+    },
+    {
+      "bytes": 228,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/4395766706959728072",
+      "sha256": "b2ef79bb3b070dde2f66814cfd0c433d6565d181adda09184fbc047a900f95b5"
+    },
+    {
+      "bytes": 1284,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/4529619898049010343",
+      "sha256": "69bd94b4bc06183682ee3eac27b885840b6d855544291e2fa024a731de86872a"
+    },
+    {
+      "bytes": 460,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/4698950497640562163",
+      "sha256": "4332a3ed73242654e90c73cbd97721310079418303cc5e0e5bea19a589a787fc"
+    },
+    {
+      "bytes": 388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/482695308355216390",
+      "sha256": "a4393a8c6af10f00c50af49ba5067c274aab6ec9544d452aa6c9599478be2283"
+    },
+    {
+      "bytes": 188,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/5088457137677189735",
+      "sha256": "081280197331f19ca3546c2d66ebbf20c3eb2bd2b7f43ea3e0ac282428c2f59e"
+    },
+    {
+      "bytes": 308,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/5710078773011246753",
+      "sha256": "0809f8c9aafb31e1c6db0c4b31182a3c070ea3f3f714c21b9f0d4a11b6973c8d"
+    },
+    {
+      "bytes": 612,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/6210574762005478458",
+      "sha256": "d442a510ed65cffaa0c93ef3362c1b3b8eaf1fe669c1da83b7a0a452da03bfc3"
+    },
+    {
+      "bytes": 244,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/6629329463719196712",
+      "sha256": "2c7d5668152ebd9f012bd1f1699f1eadb13c5cd736717eec9cff8fcb2ed2bf2e"
+    },
+    {
+      "bytes": 1388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/6679973125508036034",
+      "sha256": "ef123e6c8bc0516a0aa46989f2ebcc52fda701c7f5009e88c5c679c75cc5b7a1"
+    },
+    {
+      "bytes": 244,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/7483723554671787972",
+      "sha256": "7122181730a7ec654f1b87ddc0ee46b85f42111da3fae766f80bda47535c5eb8"
+    },
+    {
+      "bytes": 343684,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/7496755920062798437",
+      "sha256": "3f45778ffe1b29f4bda5a145f4e84589259d0b1b6074a4e59080a7a9ad21c069"
+    },
+    {
+      "bytes": 4588,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/7532686500564123655",
+      "sha256": "019f8ad3f9e68b1bd24870534364ed560ff849ae90999c46da2a9a70a76b5462"
+    },
+    {
+      "bytes": 188,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/76709809630584565",
+      "sha256": "2cbe16984ebf8cf28817764c3659cf965450174feea8a15c0ca2de665a089a2d"
+    },
+    {
+      "bytes": 332,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/7725565816452741567",
+      "sha256": "1ebcdb8ea78fc8a62565a6a8eb9b81682ebd71fcd24a9fce738636e886a52e06"
+    },
+    {
+      "bytes": 180,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/7785676737793326559",
+      "sha256": "a11bd348f01b61e627717355b9c819b8e6c86685e277b7b64aff296a189d3e37"
+    },
+    {
+      "bytes": 396,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/7990175320430405041",
+      "sha256": "275d9eb919af6d0c4f07f56cb4aa6cd49f3f230dee0a7fa5cf81dc297a794fdc"
+    },
+    {
+      "bytes": 244,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/8250049022776535617",
+      "sha256": "419ab606366e0529964c918c07a755e2ca3b4a883652a6eac43eb5e33e7b9972"
+    },
+    {
+      "bytes": 188,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/8494081954176035514",
+      "sha256": "a0ab8156fab3b612a09a1301cf372fec36cc566567cd402777fad77000c4271a"
+    },
+    {
+      "bytes": 356,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/849803955896503642",
+      "sha256": "0f32b551df6fed1f125ab690f0b657027a58074d24c3073b3b75a4b3674aecd6"
+    },
+    {
+      "bytes": 340,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/872691329375995809",
+      "sha256": "7018dc66b33db98acb673d9a543a3d6c27dbf3213ac511cba92d45889502b7bc"
+    },
+    {
+      "bytes": 174796,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/8752326331886935176",
+      "sha256": "5e429cbb3fbf3e01504cdca97155491cf13ac13e7fdff0bc9721f9976b1c10e0"
+    },
+    {
+      "bytes": 252,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/8938075263621729281",
+      "sha256": "3ff1c223804dcdeb0462cf24d33e55e047b7e15ece2a5014fc93f0164d610dd8"
+    },
+    {
+      "bytes": 252,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/9186765912218930835",
+      "sha256": "09c6b7c17892a27f117efd9670ce1e6a01fc8658edf21025e022b48037286b9b"
+    },
+    {
+      "bytes": 212,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/9251143517489500823",
+      "sha256": "d216785636df8df7cd3578af37a047269b5121f3d09ac42aa5538fdd9d0ea1dc"
+    },
+    {
+      "bytes": 244,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/9280197139948559343",
+      "sha256": "59be9ac5fc8c31f04be2f9a8e4dc0414eeab907bc9531f9fe347c57734d75094"
+    },
+    {
+      "bytes": 244,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/9538810155223988912",
+      "sha256": "24489013385089379fc382e9622e4fc907f71416cf01e0e135e5c55bc1965637"
+    },
+    {
+      "bytes": 212,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/9906868607750692515",
+      "sha256": "49107882da324d71ce8d6d73f0b3114015619547a5fbb059442eb99199bb43ee"
+    },
+    {
+      "bytes": 388,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/0.16.9/9922053171234049088",
+      "sha256": "c54d24f6d1f1ef6a782a1d5a549e726b2d6019dcb79d2df7920caf36047c375c"
+    },
+    {
+      "bytes": 43,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.ruff_cache/CACHEDIR.TAG",
+      "sha256": "5953156d7e0c564a427251316eaf26f8870e6483ae2197f916b630e4f93e31ae"
+    },
+    {
+      "bytes": 247895,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/RUBISCO.md",
+      "sha256": "f36f51fb462dff3283d6759ebbc7cb50266d73705212b3f9f915fe15130e0ff2"
+    },
+    {
+      "bytes": 27788,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/docs/rubisco-inquiry/architecture-state.md",
+      "sha256": "c2a9e868748163688192256e3475d99dbada97b5f10d873cf0330fc0482c881d"
+    },
+    {
+      "bytes": 31991,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/docs/rubisco-inquiry/preservation/redirection-v1/member-index.json",
+      "sha256": "338bd82e08919a1dc6786d051ba51608e5c338d955b81e9ebb48389488508c44"
+    },
+    {
+      "bytes": 1080339,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/docs/rubisco-inquiry/preservation/redirection-v1/source-metadata.zip",
+      "sha256": "23a5b28b35ec8260d4780d388f245a6872f3e4d1c536df94f47bf6f54b5c7a78"
+    },
+    {
+      "bytes": 9380,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/docs/rubisco-inquiry/redirection-decision-v1.md",
+      "sha256": "f6e46c1f2b79cc7922b9119e76b4b024ce3d8c51c15bbf36b773cad267082fb9"
+    },
+    {
+      "bytes": 8568,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/docs/rubisco-inquiry/redirection-preservation-v1.md",
+      "sha256": "254673d5e835279591ed6281a9a396664244f4cabd171c1d80b1756fb46a42ff"
+    },
+    {
+      "bytes": 10162,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/docs/rubisco-inquiry/redirection-result-v1.md",
+      "sha256": "8710768c4cbecb52000f619c2e4fc555bfcd423f8446e1af6a1d0d5b3e201e50"
+    },
+    {
+      "bytes": 19112,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/docs/rubisco-inquiry/rr-coupled-assessment-design.md",
+      "sha256": "ffecd913c2d2cf144d10c0930548945848ac3e99f003d05aec131148fd80bc77"
+    },
+    {
+      "bytes": 15428,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/docs/rubisco-inquiry/scientific-redirection-v1.md",
+      "sha256": "96fe6a5fa1c3c8093d8e64a2ed5aab1b168f18c0256c697eea80eaabc2db4c39"
+    },
+    {
+      "bytes": 14212,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/simulators/rubisco_electronic/__pycache__/coupled_return.cpython-311.pyc",
+      "sha256": "3d35af1111fe7a7749cc9919c0d5e4afc3913be4ea60aa3ac555320d011f9729"
+    },
+    {
+      "bytes": 9399,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/simulators/rubisco_electronic/coupled_return.py",
+      "sha256": "76deb33acafb87eb89de990913d55e0984bdc9ae597f5fd473725f6e1f9d02a9"
+    },
+    {
+      "bytes": 36425,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/tests/__pycache__/test_rubisco_coupled_return.cpython-311-pytest-9.1.1.pyc",
+      "sha256": "b6a7ccffd090b5d394c750a0618bd82d3cab5b39313027f411022ba38113b1ef"
+    },
+    {
+      "bytes": 6284,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/tests/test_rubisco_coupled_return.py",
+      "sha256": "e64a83981e2dea5fd28ef5b1022bcfc8101959bc1960a4ff6db5bc14ebbb6d01"
+    },
+    {
+      "bytes": 520,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_complete_raw_energy_and_g0/evaluation-001-unverified-return.json.gz",
+      "sha256": "2c38279fe8aba97337c08d4a174c4df132a819f0c1cbdd1a81593385878b801b"
+    },
+    {
+      "bytes": 518,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_complete_raw_energy_and_g1/evaluation-001-unverified-return.json.gz",
+      "sha256": "a7c66d6bb6d2af5fde2035a3721507f031ef662fee4b7de577d15945fe4f09cd"
+    },
+    {
+      "bytes": 527,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_complete_raw_energy_and_g2/evaluation-001-unverified-return.json.gz",
+      "sha256": "1dd4a62d47bff53d104c02106f03a4b7b015bb2c85b669878928a44c2a727855"
+    },
+    {
+      "bytes": 536,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_complete_raw_energy_and_g3/evaluation-001-unverified-return.json.gz",
+      "sha256": "1219c6d50687446c67249348ebe1fe77e1e776368982b027b43d3c7cb48d9f34"
+    },
+    {
+      "bytes": 532,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_complete_raw_energy_and_g4/evaluation-001-unverified-return.json.gz",
+      "sha256": "d637428b8a435287980192e02c5f3919af346943b46ac98c8eaf7a579317f69a"
+    },
+    {
+      "bytes": 539,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_complete_raw_energy_and_g5/evaluation-001-unverified-return.json.gz",
+      "sha256": "562dfcf4216d2da3bfb8220152ee56e7a2aa69c4fc9814ee733598ca7affbff7"
+    },
+    {
+      "bytes": 506,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_complete_raw_energy_and_g6/evaluation-001-unverified-return.json.gz",
+      "sha256": "081a1d05cdf0dcbe616b5672341d76da527fa285ede40920cbcb3e8eb45ac862"
+    },
+    {
+      "bytes": 208,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_fake_optimizer_integratio0/output/evaluation-001-input.json.gz",
+      "sha256": "4edf249eeebe993faf2150397cd0e8c5c241b68af0cb226e4751c8d7c0fa8d38"
+    },
+    {
+      "bytes": 1128,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_fake_optimizer_integratio0/output/evaluation-001-refusal.json",
+      "sha256": "0142cc9c8db36d1f9ccb952ba939d285ebb6c65ff668e059e0427a43865a4230"
+    },
+    {
+      "bytes": 799,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_fake_optimizer_integratio0/output/evaluation-001-unverified-return.json.gz",
+      "sha256": "65cc6d73ce95afd34ad583fbbba286835a14a3aa72e10cf6386254d1c559632f"
+    },
+    {
+      "bytes": 2923,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_fake_optimizer_integratio0/output/reference-report.json",
+      "sha256": "4533489c1d5f6fd077593e9f0f2cca07f628e0c62b9f3edbd165ed969726ca72"
+    },
+    {
+      "bytes": 208,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_fake_optimizer_integratio1/output/evaluation-001-input.json.gz",
+      "sha256": "4edf249eeebe993faf2150397cd0e8c5c241b68af0cb226e4751c8d7c0fa8d38"
+    },
+    {
+      "bytes": 749,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_fake_optimizer_integratio1/output/evaluation-001-refusal.json",
+      "sha256": "a56935751311d54c2c26891777a0398f0abac0c9e274c166059aa1ed446f65fe"
+    },
+    {
+      "bytes": 2526,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_fake_optimizer_integratio1/output/reference-report.json",
+      "sha256": "d8690e4ebff7833480292e7b8b0ce3e242789fe2cb46470a722b5ea1b5d60f63"
+    },
+    {
+      "bytes": 66864,
+      "path": "/tmp/pytest-of-chevre/pytest-197/test_finite_acceptance_preserv0/evaluation-001-unverified-return.json.gz",
+      "sha256": "addba6ed81a2dbfb0374ab77f4b391adfc81de6a76ecec88032a11f417a25a98"
+    },
+    {
+      "bytes": 520,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_complete_raw_energy_and_g0/evaluation-001-unverified-return.json.gz",
+      "sha256": "0b0a7afe1748d26f08b79a14d12174fe609d12de218ae65ea1ef31827b89f137"
+    },
+    {
+      "bytes": 518,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_complete_raw_energy_and_g1/evaluation-001-unverified-return.json.gz",
+      "sha256": "ef23cbb5e05eb5628f3abaef2e59d606e1047175a68846aa036a9bff2385f4c2"
+    },
+    {
+      "bytes": 526,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_complete_raw_energy_and_g2/evaluation-001-unverified-return.json.gz",
+      "sha256": "11c6eb94e4f39256780d618a8d0b0be06911ab8fa7ef3ab7fb4a888b23c21dfa"
+    },
+    {
+      "bytes": 536,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_complete_raw_energy_and_g3/evaluation-001-unverified-return.json.gz",
+      "sha256": "e6bdb012d96ef2f320846c4780bbff8e453f560697fe22cbfe461bec38ae0cb4"
+    },
+    {
+      "bytes": 531,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_complete_raw_energy_and_g4/evaluation-001-unverified-return.json.gz",
+      "sha256": "950f9442b740f13ef71d90d57a0131919c1feca9fd896dd99c01badca997fa71"
+    },
+    {
+      "bytes": 538,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_complete_raw_energy_and_g5/evaluation-001-unverified-return.json.gz",
+      "sha256": "9ee11f18990751a12c26716ddcf46d77ae2ab079affb6e207880376a952c6e67"
+    },
+    {
+      "bytes": 506,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_complete_raw_energy_and_g6/evaluation-001-unverified-return.json.gz",
+      "sha256": "a2ead2ff68f0d8aa428adf68e677e411ba68404dc148bef9490209963ce026df"
+    },
+    {
+      "bytes": 208,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_fake_optimizer_integratio0/output/evaluation-001-input.json.gz",
+      "sha256": "4edf249eeebe993faf2150397cd0e8c5c241b68af0cb226e4751c8d7c0fa8d38"
+    },
+    {
+      "bytes": 1128,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_fake_optimizer_integratio0/output/evaluation-001-refusal.json",
+      "sha256": "1676cb875b0a9dcd01d586a75deac159ee92ab94b9dc1dc4b0ad91fe7b107693"
+    },
+    {
+      "bytes": 829,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_fake_optimizer_integratio0/output/evaluation-001-unverified-return.json.gz",
+      "sha256": "74dce42e2d925f7ab4b733670c908fefd1b8005a8776e3072b1cb84d477bc111"
+    },
+    {
+      "bytes": 2923,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_fake_optimizer_integratio0/output/reference-report.json",
+      "sha256": "b2c4f2573f68bbac8734920f0e126aa0fd88ab2ddac313fc278f22b91af7649a"
+    },
+    {
+      "bytes": 208,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_fake_optimizer_integratio1/output/evaluation-001-input.json.gz",
+      "sha256": "4edf249eeebe993faf2150397cd0e8c5c241b68af0cb226e4751c8d7c0fa8d38"
+    },
+    {
+      "bytes": 749,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_fake_optimizer_integratio1/output/evaluation-001-refusal.json",
+      "sha256": "7bd8530d864f89ccdf9b610b4dfbf3b538c29e28c631d686a5018c0e5211e754"
+    },
+    {
+      "bytes": 2526,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_fake_optimizer_integratio1/output/reference-report.json",
+      "sha256": "3c32ecc7ad1afa4acd3c4281c5c265fbfbdfc26032324a835f7143a84b07fbf2"
+    },
+    {
+      "bytes": 107596,
+      "path": "/tmp/pytest-of-chevre/pytest-198/test_finite_acceptance_preserv0/evaluation-001-unverified-return.json.gz",
+      "sha256": "194cae9cedccb30566deb094b32ea740751fa44de6e0b8e9eeebbafdd9f50dbf"
+    },
+    {
+      "bytes": 520,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_complete_raw_energy_and_g0/evaluation-001-unverified-return.json.gz",
+      "sha256": "0b0a7afe1748d26f08b79a14d12174fe609d12de218ae65ea1ef31827b89f137"
+    },
+    {
+      "bytes": 518,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_complete_raw_energy_and_g1/evaluation-001-unverified-return.json.gz",
+      "sha256": "ef23cbb5e05eb5628f3abaef2e59d606e1047175a68846aa036a9bff2385f4c2"
+    },
+    {
+      "bytes": 526,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_complete_raw_energy_and_g2/evaluation-001-unverified-return.json.gz",
+      "sha256": "11c6eb94e4f39256780d618a8d0b0be06911ab8fa7ef3ab7fb4a888b23c21dfa"
+    },
+    {
+      "bytes": 536,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_complete_raw_energy_and_g3/evaluation-001-unverified-return.json.gz",
+      "sha256": "e6bdb012d96ef2f320846c4780bbff8e453f560697fe22cbfe461bec38ae0cb4"
+    },
+    {
+      "bytes": 531,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_complete_raw_energy_and_g4/evaluation-001-unverified-return.json.gz",
+      "sha256": "950f9442b740f13ef71d90d57a0131919c1feca9fd896dd99c01badca997fa71"
+    },
+    {
+      "bytes": 538,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_complete_raw_energy_and_g5/evaluation-001-unverified-return.json.gz",
+      "sha256": "9ee11f18990751a12c26716ddcf46d77ae2ab079affb6e207880376a952c6e67"
+    },
+    {
+      "bytes": 506,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_complete_raw_energy_and_g6/evaluation-001-unverified-return.json.gz",
+      "sha256": "a2ead2ff68f0d8aa428adf68e677e411ba68404dc148bef9490209963ce026df"
+    },
+    {
+      "bytes": 208,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_fake_optimizer_integratio0/output/evaluation-001-input.json.gz",
+      "sha256": "4edf249eeebe993faf2150397cd0e8c5c241b68af0cb226e4751c8d7c0fa8d38"
+    },
+    {
+      "bytes": 1128,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_fake_optimizer_integratio0/output/evaluation-001-refusal.json",
+      "sha256": "1ca97323904b4bde2c2eca7eead454780387c45ef8329b12a4db56cbfbaf8f63"
+    },
+    {
+      "bytes": 829,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_fake_optimizer_integratio0/output/evaluation-001-unverified-return.json.gz",
+      "sha256": "74dce42e2d925f7ab4b733670c908fefd1b8005a8776e3072b1cb84d477bc111"
+    },
+    {
+      "bytes": 2923,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_fake_optimizer_integratio0/output/reference-report.json",
+      "sha256": "49f17757b3363dce964d579b661e1a4f3efde336a7cd311010ed82e94c40fd9a"
+    },
+    {
+      "bytes": 208,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_fake_optimizer_integratio1/output/evaluation-001-input.json.gz",
+      "sha256": "4edf249eeebe993faf2150397cd0e8c5c241b68af0cb226e4751c8d7c0fa8d38"
+    },
+    {
+      "bytes": 749,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_fake_optimizer_integratio1/output/evaluation-001-refusal.json",
+      "sha256": "525feee9f8ee19910f24f4f69ba5fdd06da09a6ff087c711317070193702b47f"
+    },
+    {
+      "bytes": 2526,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_fake_optimizer_integratio1/output/reference-report.json",
+      "sha256": "31725d07ff5e10da4785b7a54c9c045bb741d2a12cfb58f34bcdf8b431c87076"
+    },
+    {
+      "bytes": 107596,
+      "path": "/tmp/pytest-of-chevre/pytest-199/test_finite_acceptance_preserv0/evaluation-001-unverified-return.json.gz",
+      "sha256": "194cae9cedccb30566deb094b32ea740751fa44de6e0b8e9eeebbafdd9f50dbf"
+    },
+    {
+      "bytes": 2727,
+      "path": "/tmp/rubisco-qmmm-redirection-v1/README.md",
+      "sha256": "affafffb2d2d7146b77018fc2687535b9bb2c88fb88a18f526d48c32b396e706"
+    },
+    {
+      "bytes": 46963,
+      "path": "/tmp/rubisco-qmmm-redirection-v1/__pycache__/reference_assessment.cpython-311.pyc",
+      "sha256": "7af00658957c4c2fc65ee3f4ec7b402dd79dfb2c0b398e5878217d1e55732be5"
+    },
+    {
+      "bytes": 29290,
+      "path": "/tmp/rubisco-qmmm-redirection-v1/__pycache__/test_reference_assessment.cpython-311-pytest-9.1.1.pyc",
+      "sha256": "ed4e05df8a409c63d3f513ddf1404a00c9630b9b11071eeed67ef3985e182948"
+    },
+    {
+      "bytes": 7115,
+      "path": "/tmp/rubisco-qmmm-redirection-v1/assessment-successor.diff",
+      "sha256": "e3d4ecf30ec294b9f97a0ad12b4e1d6dc7f03c068edff0a1bcd507580efcee9b"
+    },
+    {
+      "bytes": 3281,
+      "path": "/tmp/rubisco-qmmm-redirection-v1/implementation-handoff.json",
+      "sha256": "9cd8923e6595840edf475a7ce8dd0bcd287dce0449211df2f390098c219b2861"
+    },
+    {
+      "bytes": 27907,
+      "path": "/tmp/rubisco-qmmm-redirection-v1/reference_assessment.py",
+      "sha256": "96ae3533a422ca116ab42cf470e70b9251bf8b2760f26133aa63878f64dd381b"
+    },
+    {
+      "bytes": 7299,
+      "path": "/tmp/rubisco-qmmm-redirection-v1/test_reference_assessment.py",
+      "sha256": "c276f90e12a193f65f8967a314468b02e6f4fba81c453c7e4ceaf60db4d40d1e"
+    },
+    {
+      "bytes": 1,
+      "path": "/tmp/rubisco-qmmm-software-uv-cache/.gitignore",
+      "sha256": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1"
+    },
+    {
+      "bytes": 0,
+      "path": "/tmp/rubisco-qmmm-software-uv-cache/.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 43,
+      "path": "/tmp/rubisco-qmmm-software-uv-cache/CACHEDIR.TAG",
+      "sha256": "5953156d7e0c564a427251316eaf26f8870e6483ae2197f916b630e4f93e31ae"
+    },
+    {
+      "bytes": 1634,
+      "path": "/tmp/rubisco-qmmm-software-uv-cache/interpreter-v4/3e71a46ca6b20fa6/9e41bafe26451852.msgpack",
+      "sha256": "135ed4cdd1707236d6c30378c045f73d2d4d3469d399f99e72a44ddd0b1f5daa"
+    },
+    {
+      "bytes": 0,
+      "path": "/tmp/rubisco-qmmm-software-uv-cache/sdists-v9/.git",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "path": "/tmp/rubisco-qmmm-software-uv-cache/sdists-v9/.gitignore",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 7986,
+      "path": "/tmp/rubisco-redirection-provenance-v1/README.md",
+      "sha256": "80fd49051221d99edcd63dda74799fe89450cf5c4d69d937ee4ab36782b81d4a"
+    },
+    {
+      "bytes": 8900,
+      "path": "/tmp/rubisco-redirection-provenance-v1/authenticated-parent-archive-census-v2.json",
+      "sha256": "005562864b9c9180718a3d17af8783ac7763a5cd40b5e3116ee171628829ba1b"
+    },
+    {
+      "bytes": 8900,
+      "path": "/tmp/rubisco-redirection-provenance-v1/authenticated-parent-archive-census.json",
+      "sha256": "005562864b9c9180718a3d17af8783ac7763a5cd40b5e3116ee171628829ba1b"
+    },
+    {
+      "bytes": 2907,
+      "path": "/tmp/rubisco-redirection-provenance-v1/close.py",
+      "sha256": "f6dfbf92df3dcc6367b35b2913d0bca898a3608ec20d534bf32048df18d616a6"
+    },
+    {
+      "bytes": 5605,
+      "path": "/tmp/rubisco-redirection-provenance-v1/closed-register.json",
+      "sha256": "4da18e423fdd4befeb353473c03363a768a6935056591bb4840a949f09fd5aaf"
+    },
+    {
+      "bytes": 22682,
+      "path": "/tmp/rubisco-redirection-provenance-v1/diagnose-v2.py",
+      "sha256": "7c267fdf728c534568778b5ca554010107b195ca88908ee822503c2ec84f8199"
+    },
+    {
+      "bytes": 22624,
+      "path": "/tmp/rubisco-redirection-provenance-v1/diagnose.py",
+      "sha256": "b829b0bbc125cc78acc6af6af886a69484503f8fa454416e4a07edcc549436d4"
+    },
+    {
+      "bytes": 99198,
+      "path": "/tmp/rubisco-redirection-provenance-v1/observation.json",
+      "sha256": "6a767764855a0ee66d38d85dc13215eafe9f86b73eb3654659bba92086f2b692"
+    },
+    {
+      "bytes": 836,
+      "path": "/tmp/rubisco-redirection-provenance-v1/outer-resource-v1.txt",
+      "sha256": "f1b3a6c1076e37054d76a106671ee8028c22aaab6f3af56dd4f053a5839d75b5"
+    },
+    {
+      "bytes": 799,
+      "path": "/tmp/rubisco-redirection-provenance-v1/outer-resource-v2.txt",
+      "sha256": "87dd65defa17d29041ff041c2e1b5239b612a4fffca9e171383d5620f36414ea"
+    },
+    {
+      "bytes": 38001,
+      "path": "/tmp/rubisco-redirection-provenance-v1/parent-v5-native.py",
+      "sha256": "808c461ab657e3385e8a72b596bd1f8d9d16e84193ff591c3b7d5df9fe7d1ad5"
+    },
+    {
+      "bytes": 11948,
+      "path": "/tmp/rubisco-redirection-provenance-v1/parent-v5-preparation.py",
+      "sha256": "90f98f2a0888ba30b7d3e9b6510c41f522585ad8e59bcf578fda406560215fa0"
+    },
+    {
+      "bytes": 1988,
+      "path": "/tmp/rubisco-redirection-provenance-v1/resource-summary.json",
+      "sha256": "72cf438fc61f266f2e7f2b37e48f188b45a4287b9c90cfe68b167f46379fa121"
+    },
+    {
+      "bytes": 765,
+      "path": "/tmp/rubisco-redirection-provenance-v1/selection.json",
+      "sha256": "0186aaef6f76202884bb2ea64ce972369c1cdeb8655e08921731f8c94a6c74a7"
+    },
+    {
+      "bytes": 686,
+      "path": "/tmp/rubisco-redirection-provenance-v1/stderr-v1.txt",
+      "sha256": "3ca680a52f01d5432becb9c57e8c7d4511f82ab39de292b4095dc61b36c3ec08"
+    },
+    {
+      "bytes": 0,
+      "path": "/tmp/rubisco-redirection-provenance-v1/stderr-v2.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "path": "/tmp/rubisco-redirection-provenance-v1/stdout-v1.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 389,
+      "path": "/tmp/rubisco-redirection-provenance-v1/stdout-v2.txt",
+      "sha256": "787a7548f27a0a07e957fb9786aba4441d3ed74c25c3a60b2c95599fadb2a241"
+    },
+    {
+      "bytes": 7852,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-observation-v4.json",
+      "sha256": "1c1215450cf0df0250dafe79c2de1d660025e90930b3744cf8c7d8c423f56119"
+    },
+    {
+      "bytes": 834,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-resource-v2.txt",
+      "sha256": "847e65d25eab52052324a15328013aa9797d965d5ad7f2326a656b4857d7edea"
+    },
+    {
+      "bytes": 837,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-resource-v3.txt",
+      "sha256": "01bc5f4b5c3edb544159bca2f3a41c98a5e547ec65ce26de453829bad53d058d"
+    },
+    {
+      "bytes": 800,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-resource-v4.txt",
+      "sha256": "899f3db934d528b7ecde3491be23ac6664761d0bdd6c35c4c979bcbed60ca756"
+    },
+    {
+      "bytes": 831,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-resource.txt",
+      "sha256": "b1f6dccc40e0bbd6727d6d5ab2ce18e5f8b7cd8e715e4304ed4524dad69a9d10"
+    },
+    {
+      "bytes": 421,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-stderr-v2.txt",
+      "sha256": "39b83ba9044372943ff87606f9cf0aa0a8291d62d8d35736f50d71877504c1e7"
+    },
+    {
+      "bytes": 455,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-stderr-v3.txt",
+      "sha256": "8cabb3210a8652e3ab586c9169226a4f44a74db3dbbeeb67038222c3b00027f2"
+    },
+    {
+      "bytes": 0,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-stderr-v4.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 179,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-stderr.txt",
+      "sha256": "e770f4a527cb7913a300272cbd2ec3718728ca2efda5a390fac39f3e5e7e58d6"
+    },
+    {
+      "bytes": 0,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-stdout-v2.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-stdout-v3.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 169,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-stdout-v4.txt",
+      "sha256": "73f27025fcf4c4ea7f0006be1fbcffe71ac2282fbea283cb6f112645ed6fcf26"
+    },
+    {
+      "bytes": 0,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 8910,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-v2.py",
+      "sha256": "3dd0e06daeba3eda5fd7cf529b0830bbb0d3563d30b6b8b536772883fc4aa7e8"
+    },
+    {
+      "bytes": 8923,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-v3.py",
+      "sha256": "69079f276c7e5498af21f47dbb614b9de0cb1764853724ade8be23742d8351b9"
+    },
+    {
+      "bytes": 8927,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement-v4.py",
+      "sha256": "00c8e642e7a103152f1fefea663f6156fec2d42f062fdd7b1f4540f5af80fc4d"
+    },
+    {
+      "bytes": 8874,
+      "path": "/tmp/rubisco-redirection-provenance-v1/supplement.py",
+      "sha256": "7b52bc3b2583a598fc0b7579ac0a66f6af0690dade2a012f47f605a5f7797e12"
+    },
+    {
+      "bytes": 5047,
+      "path": "/tmp/rubisco-redirection-work-v1/build_preservation.py",
+      "sha256": "2d013695da7bb712bdae7beff8b8e73042795cdb0c744a683dd3b596d9d82dc7"
+    },
+    {
+      "bytes": 578,
+      "path": "/tmp/rubisco-redirection-work-v1/check_documentation.py",
+      "sha256": "2ac25e3d26d6acf2a3ae6e62e52541a4eaa3034ae2c39667d96d23cfdcfd6c01"
+    },
+    {
+      "bytes": 7616,
+      "path": "/tmp/rubisco-redirection-work-v1/complete.py",
+      "sha256": "0013239f7355ddb53e636eb5141e4672fde0091d8393da329a08ea91e9a28570"
+    },
+    {
+      "bytes": 778,
+      "path": "/tmp/rubisco-redirection-work-v1/documentation-outer-resource.txt",
+      "sha256": "3d52a170e0e90b99a42a8c97468f4e024e458a6b892371b054ec7327bde9b6ab"
+    },
+    {
+      "bytes": 0,
+      "path": "/tmp/rubisco-redirection-work-v1/documentation-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 403,
+      "path": "/tmp/rubisco-redirection-work-v1/documentation-stdout.txt",
+      "sha256": "ad4162b26f4b81ad4bfa53988b37efecef7671f32238e13c077e53855be58489"
+    },
+    {
+      "bytes": 779,
+      "path": "/tmp/rubisco-redirection-work-v1/preservation-outer-resource.txt",
+      "sha256": "f225ba4efcd3d2c5007057f56486e0756d3a6c6b0f7fa444ccced7f24f2a49ed"
+    },
+    {
+      "bytes": 0,
+      "path": "/tmp/rubisco-redirection-work-v1/preservation-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 431,
+      "path": "/tmp/rubisco-redirection-work-v1/preservation-stdout.json",
+      "sha256": "612be8b7024f7222cf9416bd70782927b6b07373c7f3341082fec948addc7f48"
+    },
+    {
+      "bytes": 1257,
+      "path": "/tmp/rubisco-redirection-work-v1/root-software-checks.json",
+      "sha256": "508e6f14bb86345c17f5fb3466d7356dc458479e6a3d6191ed23e41357b25cce"
+    },
+    {
+      "bytes": 903,
+      "path": "/tmp/rubisco-redirection-work-v1/start.json",
+      "sha256": "a1c511909ec7ca2b443dbe33c5c37a90161f4cb7def58e57d87732bf1c57b9f6"
+    }
+  ],
+  "self_digest_rule": "No self hash; exact self byte count participates in fixed-point physical denominator",
+  "status": "R0_R1_R2_COMPLETE_PARK_NATIVE",
+  "unknown_costs": [
+    "Historical engineering/human guidance",
+    "Initial preclock startup actual duration",
+    "Diagnostic source reading/closure CPU",
+    "Implementation/peer review CPU",
+    "Earlier auto-cleaned synthetic pytest outputs and write volumes",
+    "Final delivery/recording tail after this timestamp"
+  ],
+  "whitespace": "Tracked diff and nine selected maintained files PASS"
+}

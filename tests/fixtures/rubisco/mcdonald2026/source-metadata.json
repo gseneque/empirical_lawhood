@@ -1,0 +1,31 @@
+{
+  "role": "EXPOSED_ORIGINAL_PUBLICATION_BYTES_FOR_SOFTWARE_DECODER_TESTS_NOT_QUALIFICATION",
+  "doi": "10.1126/sciadv.aeh3246",
+  "authors": "McDonald et al.",
+  "primary": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13644767/fullTextXML",
+  "supplement_collection": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13644767/supplementaryFiles",
+  "license": "CC BY 4.0, native primary XML permissions statement; original journal assets unchanged",
+  "extraction": "Exact S4/S5/S8 member copies from original supplement table ZIP; no formula execution or preprocessing",
+  "files": [
+    {
+      "member": "primary.xml",
+      "bytes": 198187,
+      "sha256": "6c37fa27a8a0e1a98442544ecc7fd5113edaa5adebbe7fc96fbe893cfbe2b621"
+    },
+    {
+      "member": "sciadv.aeh3246_table_s4.xlsx",
+      "bytes": 37981,
+      "sha256": "dde3da450f7747952dc67f2c8562d28fa27ba183f39bb608f5acfaaa2d237451"
+    },
+    {
+      "member": "sciadv.aeh3246_table_s5.xlsx",
+      "bytes": 50681,
+      "sha256": "bebe5d372c3dbc479cfc1f6a3b4ea36158cd690b4ea27225b27937565e782f31"
+    },
+    {
+      "member": "sciadv.aeh3246_table_s8.xlsx",
+      "bytes": 29639,
+      "sha256": "d328da05d4d330f0ca95722d1a7b84cf1a38a284e50cbebf53d2bf370ebbb0f5"
+    }
+  ]
+}

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import multiprocessing
 import os
 import resource
 import threading
@@ -41,6 +42,12 @@ from empirical_lawhood.infrastructure.execution import (
     TaskProcessError,
     _bounded_scratch_bytes,
 )
+from empirical_lawhood.infrastructure.external_execution import (
+    ExternalExecutionBackendKind,
+    ExternalExecutionError,
+    RegisteredExecutionBackend,
+    RegisteredExternalTaskExecutor,
+)
 from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
 from empirical_lawhood.infrastructure.sql import (
     SQLiteOperationalRepository,
@@ -64,6 +71,7 @@ from empirical_lawhood.kernel.status import OperationalStatus
 from empirical_lawhood.planning.discovery import DiagnosticMeasureKind, ThresholdDirection
 from empirical_lawhood.runtime.artifacts import (
     ArtifactLineageParent,
+    ArtifactManifest,
     ArtifactMaterialization,
     ArtifactProfile,
     ArtifactSemanticValidationRegistry,
@@ -2018,6 +2026,7 @@ def test_local_process_executor_isolates_worker_and_reports_typed_failure(
     assert facts["affinity_count"] <= context.resource_budget.cpu_cores
     assert facts["environment_keys"] == [
         "HOME",
+        "KMP_DUPLICATE_LIB_OK",
         "LANG",
         "LC_ALL",
         "MKL_NUM_THREADS",
@@ -2545,6 +2554,32 @@ def test_streamed_output_requires_matching_registered_profile_schema_before_publ
     repository.engine.dispose()
 
 
+def test_scheduler_publishes_streamed_unlimited_output_under_actual_identity(tmp_path, protocol_fixture):
+    scheduler, repository, plane, receipts, original_plan = _streaming_runtime(tmp_path, protocol_fixture)
+    original_task = original_plan.tasks[0]
+    resources = replace(original_task.capability.requested_resources, memory_bytes=None,
+                        wall_time_seconds=None, output_bytes=None, source_scan_bytes=None)
+    task = replace(original_task, capability=replace(original_task.capability, requested_resources=resources))
+    plan = replace(original_plan, tasks=(task,))
+    original_runner = scheduler.runner_registry.resolve(original_task)
+    runner = GeneratedJsonlStreamingRunner(replace(original_runner.manifest, resource_ceiling=resources),
+                                          record_count=2_000)
+    scheduler.runner_registry = RunnerRegistry((runner,), registry_sha256=plan.registry_sha256)
+    scheduler.recovery_index, scheduler.recovery_store = _recovery(plane, plan)
+    try:
+        result = scheduler.execute(plan.source_plan.object_id, plan)
+        assert result.status is OperationalStatus.SUCCEEDED
+        receipt = result.receipts[0]
+        materialization = receipt.output_materializations[0]
+        assert materialization.size_bytes > original_task.capability.requested_resources.output_bytes
+        plane.verify(materialization)
+        assert receipts.read(receipt.run_id, receipt.task_id, receipt.attempt_id) == receipt
+        replay = scheduler.execute(plan.source_plan.object_id, plan)
+        assert replay.receipts == result.receipts
+    finally:
+        repository.engine.dispose()
+
+
 def test_scheduler_requires_exact_authorized_bounded_input_ports(
     tmp_path: Path,
     protocol_fixture: ProtocolFixture,
@@ -2825,7 +2860,7 @@ def test_privileged_truth_requires_reveal_capability_and_evaluator_access(
     )
 
 
-def test_resource_admission_covers_compute_scratch_and_exploration_isolation(
+def test_resource_admission_keeps_compute_and_does_not_invent_scratch_from_output(
     protocol_fixture: ProtocolFixture,
 ) -> None:
     capacity = ExecutionResourceCapacity(
@@ -2840,11 +2875,13 @@ def test_resource_admission_covers_compute_scratch_and_exploration_isolation(
     plan = protocol_fixture.execution_plan
     admitted = admitter.assess(
         plan,
-        available_scratch_bytes=10_000,
+        available_scratch_bytes=1,
         executor_enforces_resources=True,
         executor_enforces_no_network=False,
     )
     assert admitted.admitted
+    assert admitted.required_scratch_bytes is None
+    assert admitted.required_output_bytes == 3_000
 
     first = plan.tasks[0]
     excessive = replace(
@@ -2873,7 +2910,6 @@ def test_resource_admission_covers_compute_scratch_and_exploration_isolation(
         "EXECUTOR_RESOURCE_ENFORCEMENT_UNAVAILABLE",
         "GPU_CAPACITY_UNAVAILABLE",
         "MEMORY_CAPACITY_UNAVAILABLE",
-        "SCRATCH_CAPACITY_UNAVAILABLE",
     }
 
     exploration = admitter.assess(
@@ -2898,6 +2934,158 @@ def test_resource_admission_covers_compute_scratch_and_exploration_isolation(
         "NETWORK_PERMISSION_NOT_REQUESTED",
         "OS_NETWORK_ISOLATION_NOT_ENFORCED",
     )
+
+
+@pytest.mark.parametrize('deadline_free', (False, True))
+def test_worker_scratch_uses_actual_root_without_an_output_reservation_floor(
+    tmp_path, protocol_fixture, monkeypatch, deadline_free,
+):
+    task = next(row for row in protocol_fixture.execution_plan.tasks if row.task_id == 'prepare')
+    manifest = protocol_fixture.registry.resolve(task.capability.capability_key, task.capability.capability_version)
+    plane = _plane(tmp_path)
+    state = replace(plane.root.inspector.inspect(plane.root.contract), free_bytes=1_000)
+    monkeypatch.setattr(plane.root.inspector, 'inspect', lambda _: state)
+    budget = replace(task.capability.requested_resources, memory_bytes=512 * 1024**2,
+        output_bytes=1024**3, wall_time_seconds=None if deadline_free else 5)
+    context = TaskContext(run_id=protocol_fixture.run_plan.run_plan_id, task_id=task.task_id,
+        attempt_id=protocol_fixture.run_plan.run_plan_id + '.prepare.advisory-output',
+        config=task.capability.config, input_bindings=(), input_ports=(),
+        output_ports=tuple(WorkerOutputPort(output.output_id, output.payload_schema, output.profile,
+            output.media_type) for output in task.outputs), permissions=task.capability.required_permissions,
+        outcome_access=task.capability.requested_outcome_access, resource_budget=budget,
+        isolation_profile=WorkerIsolationProfile.TRUSTED_LOCAL)
+    executor = LocalProcessExecutor(scratch_root=plane.root)
+    runner = ProcessIdentityRunner(manifest)
+    result = executor.execute(runner, context, timeout_seconds=budget.wall_time_seconds)
+    assert int(result.outputs[0].payload) != os.getpid()
+    assert sum(len(output.payload) for output in result.outputs) < state.free_bytes
+
+
+def test_unlimited_local_resource_admission_preserves_placement_checks(protocol_fixture) -> None:
+    plan = replace(protocol_fixture.execution_plan, tasks=tuple(
+        replace(task, capability=replace(task.capability, requested_resources=replace(
+            task.capability.requested_resources, memory_bytes=None, wall_time_seconds=None,
+            source_scan_bytes=None, output_bytes=None,
+        ))) for task in protocol_fixture.execution_plan.tasks
+    ))
+    capacity = ExecutionResourceCapacity(1, 1, 0, False, False, False)
+    admitter = LocalExecutionResourceAdmitter(capacity)
+    admitted = admitter.assess(
+        plan, available_scratch_bytes=0, executor_enforces_resources=True,
+        executor_enforces_no_network=False,
+    )
+    assert admitted.admitted
+    assert admitted.required_memory_bytes is None
+    assert admitted.required_scratch_bytes is None
+    assert admitted.required_source_scan_bytes is None
+    assert admitted.required_output_bytes is None
+    assert admitted.assurance_codes == (
+        "MEMORY_BYTES_UNLIMITED", "OUTPUT_BYTES_UNLIMITED",
+        "SOURCE_SCAN_BYTES_UNLIMITED", "WALL_TIME_SECONDS_UNLIMITED",
+    )
+    oversized = replace(plan.tasks[0], capability=replace(
+        plan.tasks[0].capability, requested_resources=replace(
+            plan.tasks[0].capability.requested_resources, cpu_cores=2,
+        ),
+    ))
+    refused = admitter.assess(
+        replace(plan, tasks=(oversized, *plan.tasks[1:])), available_scratch_bytes=0,
+        executor_enforces_resources=True, executor_enforces_no_network=False,
+    )
+    assert refused.reason_codes == ("CPU_CAPACITY_UNAVAILABLE",)
+
+
+def test_local_process_unlimited_budget_keeps_inherited_limits_and_streams_output(
+    tmp_path, protocol_fixture,
+) -> None:
+    task = next(value for value in protocol_fixture.execution_plan.tasks if value.task_id == "prepare")
+    unlimited = replace(task.capability.requested_resources, memory_bytes=None,
+                        wall_time_seconds=None, source_scan_bytes=None, output_bytes=None)
+    manifest = replace(protocol_fixture.registry.resolve(
+        task.capability.capability_key, task.capability.capability_version,
+    ), resource_ceiling=unlimited)
+    context = TaskContext(
+        run_id=protocol_fixture.run_plan.run_plan_id, task_id=task.task_id,
+        attempt_id=f"{protocol_fixture.run_plan.run_plan_id}.prepare.attempt-001",
+        config=task.capability.config, input_bindings=(), input_ports=(),
+        output_ports=tuple(WorkerOutputPort(
+            output_id=output.output_id, payload_schema=output.payload_schema,
+            profile=output.profile, media_type=output.media_type,
+        ) for output in task.outputs),
+        permissions=task.capability.required_permissions,
+        outcome_access=task.capability.requested_outcome_access,
+        resource_budget=unlimited, isolation_profile=WorkerIsolationProfile.TRUSTED_LOCAL,
+    )
+    inherited = {
+        "cpu_limit": resource.getrlimit(resource.RLIMIT_CPU)[0],
+        "memory_limit": resource.getrlimit(resource.RLIMIT_AS)[0],
+        "file_limit": resource.getrlimit(resource.RLIMIT_FSIZE)[0],
+    }
+    executor = LocalProcessExecutor(scratch_root=_plane(tmp_path).root)
+    result = executor.execute(ProcessBoundaryProbeRunner(manifest), context, timeout_seconds=None)
+    facts = json.loads(result.outputs[0].payload)["value"]
+    assert {name: facts[name] for name in inherited} == inherited
+    assert facts["affinity_count"] <= unlimited.cpu_cores
+    streamed = executor.execute(LargeLegacyOutputRunner(manifest), replace(
+        context, attempt_id=f"{protocol_fixture.run_plan.run_plan_id}.prepare.attempt-002",
+    ), timeout_seconds=None)
+    output = streamed.outputs[0]
+    assert isinstance(output, StreamedTaskOutput)
+    try:
+        assert b"".join(output.source.chunks(4096)) == b"x" * (STREAM_CHUNK_BYTES + 1)
+    finally:
+        output.source.close()
+    with pytest.raises(ResourceAdmissionError, match="differs from frozen budget"):
+        executor.execute(ProcessBoundaryProbeRunner(manifest), context, timeout_seconds=5)
+    with pytest.raises(ResourceAdmissionError, match="differs from frozen budget"):
+        executor.execute(ProcessBoundaryProbeRunner(manifest), replace(context,
+            resource_budget=replace(unlimited, wall_time_seconds=5)), timeout_seconds=None)
+
+
+def test_finite_external_backend_refuses_unlimited_request_before_transport(protocol_fixture) -> None:
+    task = next(value for value in protocol_fixture.execution_plan.tasks if value.task_id == "prepare")
+    manifest = protocol_fixture.registry.resolve(
+        task.capability.capability_key, task.capability.capability_version,
+    )
+    context = TaskContext(
+        run_id=protocol_fixture.run_plan.run_plan_id, task_id=task.task_id,
+        attempt_id=f"{protocol_fixture.run_plan.run_plan_id}.prepare.attempt-001",
+        config=task.capability.config, input_bindings=(), input_ports=(),
+        output_ports=tuple(WorkerOutputPort(
+            output_id=output.output_id, payload_schema=output.payload_schema,
+            profile=output.profile, media_type=output.media_type,
+        ) for output in task.outputs),
+        permissions=task.capability.required_permissions,
+        outcome_access=task.capability.requested_outcome_access,
+        resource_budget=task.capability.requested_resources,
+        isolation_profile=WorkerIsolationProfile.TRUSTED_LOCAL,
+    )
+
+    class Transport:
+        transport_id = "exposed-finite-transport"
+        implementation_sha256 = digest("exposed-finite-transport")
+        calls = 0
+
+        def execute(self, backend, runner, context, *, timeout_seconds):
+            self.calls += 1
+            return runner.execute(context)
+
+    transport = Transport()
+    backend = RegisteredExecutionBackend(
+        "exposed-finite-backend", ExternalExecutionBackendKind.REMOTE_REGISTERED,
+        transport.transport_id, transport.implementation_sha256, (manifest.registry_id,),
+        10, 10_000, True, True,
+    )
+    executor = RegisteredExternalTaskExecutor(backend, transport)
+    executor.execute(ProcessIdentityRunner(manifest), context,
+                     timeout_seconds=context.resource_budget.wall_time_seconds)
+    assert transport.calls == 1
+    for coordinate in ("memory_bytes", "wall_time_seconds", "source_scan_bytes", "output_bytes"):
+        changed = replace(context, resource_budget=replace(context.resource_budget, **{coordinate: None}))
+        with pytest.raises(ExternalExecutionError):
+            executor.execute(ProcessIdentityRunner(manifest), changed,
+                             timeout_seconds=changed.resource_budget.wall_time_seconds)
+    assert transport.calls == 1
 
 
 def test_trusted_local_assurance_is_persisted_in_task_receipts(
@@ -2997,6 +3185,66 @@ def test_failed_branch_does_not_suppress_sibling_and_blocks_join(
     repository.engine.dispose()
 
 
+@pytest.mark.parametrize('mode', ('complete', 'interrupt', 'refusal'))
+def test_parallel_dispatch_overlaps_next_preparation_and_renews_owned_leases(
+    tmp_path, protocol_fixture, monkeypatch, mode,
+):
+    from empirical_lawhood.runtime.native_effects import NativeEntryRefused
+
+    started, release = threading.Event(), threading.Event()
+    heartbeats = []
+
+    class Executor:
+        def execute(self, runner, context, *, timeout_seconds):
+            if context.task_id == 'develop-a':
+                started.set()
+                assert release.wait(10), 'next preparation did not release the admitted worker'
+            return runner.execute(context)
+
+    scheduler, repository, _, receipts, runners = _runtime(tmp_path, protocol_fixture,
+        executor=Executor(), maximum_parallel_tasks=2,
+        parallel_resource_capacity=ExecutionResourceCapacity(2, 2_000_000, 0, True, True, False))
+    prepare, refresh = scheduler._prepare_task, scheduler._refresh_owned_attempt_lease
+
+    def heartbeat(run_id, task_id, attempt_id):
+        heartbeats.append(task_id)
+        return refresh(run_id, task_id, attempt_id)
+
+    def prepare_next(run_id, task, *args):
+        if task.task_id == 'develop-b':
+            try:
+                assert started.wait(5), 'ready task waited for its sibling preparation'
+                assert 'develop-a' in heartbeats, 'coordinator skipped the running lease between preparations'
+                if mode == 'interrupt':
+                    raise KeyboardInterrupt
+                if mode == 'refusal':
+                    scheduler._native_entry_refusal = NativeEntryRefused('exposed current-entry refusal')
+                    scheduler._worker_preflight_refused.set()
+            finally:
+                release.set()
+        return prepare(run_id, task, *args)
+
+    monkeypatch.setattr(scheduler, '_prepare_task', prepare_next)
+    monkeypatch.setattr(scheduler, '_refresh_owned_attempt_lease', heartbeat)
+    run_id = protocol_fixture.run_plan.run_plan_id
+    try:
+        if mode == 'complete':
+            result = scheduler.execute(run_id, protocol_fixture.execution_plan)
+            assert result.status is OperationalStatus.SUCCEEDED
+            assert len(result.receipts) == len(protocol_fixture.execution_plan.tasks)
+        else:
+            error = KeyboardInterrupt if mode == 'interrupt' else NativeEntryRefused
+            with pytest.raises(error):
+                scheduler.execute(run_id, protocol_fixture.execution_plan)
+            candidate = scheduler.recovery_index.task('develop-a').attempts[0]
+            assert receipts.read(run_id, 'develop-a', candidate.attempt_id) is not None
+            assert not _runner(runners, 'reference.develop-b').contexts
+            assert scheduler.recovery_store.read_terminal(scheduler.recovery_index) is None
+    finally:
+        release.set()
+        repository.engine.dispose()
+
+
 def test_parallel_scheduler_runs_independent_ready_tasks_concurrently(
     tmp_path: Path,
     protocol_fixture: ProtocolFixture,
@@ -3030,6 +3278,36 @@ def test_parallel_scheduler_runs_independent_ready_tasks_concurrently(
     )
     assert len(result.receipts) == len(protocol_fixture.execution_plan.tasks)
     repository.engine.dispose()
+
+
+def test_parallel_scheduler_accepts_unlimited_memory_and_time_without_changing_cpu_placement(
+    tmp_path, protocol_fixture,
+) -> None:
+    registry = replace(protocol_fixture.registry, capabilities=tuple(
+        replace(manifest, resource_ceiling=replace(manifest.resource_ceiling,
+            memory_bytes=None, wall_time_seconds=None))
+        for manifest in protocol_fixture.registry.capabilities
+    ))
+    plan = replace(protocol_fixture.execution_plan, tasks=tuple(
+        replace(task, capability=replace(task.capability, requested_resources=replace(
+            task.capability.requested_resources, memory_bytes=None, wall_time_seconds=None,
+        ))) for task in protocol_fixture.execution_plan.tasks
+    ), registry_sha256=registry.fingerprint())
+    executor = ConcurrencyObservingExecutor()
+    scheduler, repository, _, _, _ = _runtime(
+        tmp_path, replace(protocol_fixture, execution_plan=plan, registry=registry), executor=executor,
+        maximum_parallel_tasks=2,
+        parallel_resource_capacity=ExecutionResourceCapacity(2, 1, 0, False, False, False),
+    )
+    try:
+        result = scheduler.execute(protocol_fixture.run_plan.run_plan_id, plan)
+        assert result.status is OperationalStatus.SUCCEEDED
+        assert executor.peak_development == 2
+        assert not set(executor.development_affinities["develop-a"]).intersection(
+            executor.development_affinities["develop-b"],
+        )
+    finally:
+        repository.engine.dispose()
 
 
 def test_parallel_scheduler_unlocks_dependent_task_before_unrelated_sibling_finishes(
@@ -3473,3 +3751,119 @@ def test_receipt_decoder_rejects_noncanonical_and_partial_pairs(
     with pytest.raises(ArtifactIdentityConflict, match="partial"):
         receipts.read(attempt.run_id, attempt.task_id, attempt.attempt_id)
     repository.engine.dispose()
+
+
+class FourReadyProcessProbeRunner:
+    """Synthetic child observations; no native adapter or scientific claim."""
+
+    def __init__(self, manifest, rendezvous, first_wave):
+        self.manifest, self.rendezvous, self.first_wave = manifest, rendezvous, first_wave
+
+    def execute(self, context):
+        if context.task_id in self.first_wave:
+            self.rendezvous.wait(timeout=20)
+        started = time.monotonic_ns()
+        if context.task_id in self.first_wave:
+            # Every selected child records its start before any can finish;
+            # this proves overlap without a scheduler-sensitive sleep window.
+            self.rendezvous.wait(timeout=20)
+        stopped = time.monotonic_ns()
+        values = {
+            "pid": os.getpid(), "task_id": context.task_id,
+            "cpu_affinity": tuple(sorted(os.sched_getaffinity(0))),
+            "declared_cpu_affinity": context.cpu_affinity,
+            "started_ns": started, "stopped_ns": stopped,
+        }
+        return RunnerResult(outputs=tuple(TaskOutputPayload(port.output_id, canonical_json_bytes({
+            "schema": port.payload_schema, "version": "1.0.0", "value": values,
+        })) for port in context.output_ports),
+            checks=(ReceiptCheck("actual-four-ready-process-probe", True, ()),))
+
+
+def test_parallel_scheduler_runs_four_ready_real_children_with_disjoint_affinity_and_recovery(tmp_path, protocol_fixture):
+    # Four tasks remain in the census on small portable hosts. The actual
+    # selected four-core acceptance requires this readout to report workers=4.
+    available = tuple(sorted(os.sched_getaffinity(0)))
+    workers = min(4, len(available))
+    registry = replace(protocol_fixture.registry, capabilities=tuple(
+        replace(manifest, resource_ceiling=replace(manifest.resource_ceiling,
+            memory_bytes=None, wall_time_seconds=30)) for manifest in protocol_fixture.registry.capabilities))
+    template = next(task for task in protocol_fixture.execution_plan.tasks if task.task_id == "prepare")
+    tasks = tuple(replace(template, task_id="four-ready." + str(index), maximum_attempts=1,
+        capability=replace(template.capability, requested_resources=replace(template.capability.requested_resources,
+            memory_bytes=None, wall_time_seconds=30)),
+        resource_lock_ids=(), dependency_task_ids=(),
+        outputs=tuple(replace(output, output_id=output.output_id + "." + str(index),
+            logical_artifact_id=output.logical_artifact_id + "." + str(index),
+            relative_path="runs/" + protocol_fixture.run_plan.run_plan_id + "/outputs/four-ready." + str(index)
+                + "/" + output.output_id + ".json") for output in template.outputs))
+        for index in range(4))
+    plan = replace(protocol_fixture.execution_plan, tasks=tasks, registry_sha256=registry.fingerprint())
+    fixture = replace(protocol_fixture, execution_plan=plan, registry=registry)
+    capacity = ExecutionResourceCapacity(workers, 2_000_000, 0, True, False, False)
+    scheduler, repository, plane, _, _ = _runtime(tmp_path, fixture,
+        maximum_parallel_tasks=workers, parallel_resource_capacity=capacity if workers > 1 else None)
+    first_wave = tuple(task.task_id for task in tasks[:workers])
+    rendezvous = multiprocessing.get_context("spawn").Barrier(workers)
+    manifest = next(value for value in registry.capabilities
+        if value.capability_key == template.capability.capability_key)
+    scheduler.runner_registry = RunnerRegistry((FourReadyProcessProbeRunner(manifest, rendezvous, first_wave),),
+        registry_sha256=registry.fingerprint())
+    scheduler.executor = LocalProcessExecutor(scratch_root=plane.root)
+    try:
+        result = scheduler.execute(fixture.run_plan.run_plan_id, plan)
+        assert result.status is OperationalStatus.SUCCEEDED and len(result.receipts) == 4
+        observations = {}
+        for receipt in result.receipts:
+            logical, = receipt.output_logical_artifacts
+            materialization, = receipt.output_materializations
+            plane.verify_manifest(ArtifactManifest(logical, materialization))
+            observations[receipt.task_id] = json.loads(plane.root.resolve(
+                materialization.relative_path, for_write=False).read_bytes())["value"]
+        assert set(observations) == {task.task_id for task in tasks}
+        assert len({row["pid"] for row in observations.values()}) == 4
+        assert all(row["pid"] != os.getpid() and len(row["cpu_affinity"]) == 1 for row in observations.values())
+        if workers > 1:
+            assert all(row["cpu_affinity"] == row["declared_cpu_affinity"] for row in observations.values())
+        else:
+            assert all(row["declared_cpu_affinity"] == [] and row["cpu_affinity"] == list(available)
+                for row in observations.values())
+        wave = tuple(observations[task_id] for task_id in first_wave)
+        assert len({tuple(row["cpu_affinity"]) for row in wave}) == workers
+        assert max(row["started_ns"] for row in wave) < min(row["stopped_ns"] for row in wave)
+        topology = {}
+        for row in wave:
+            cpu, = row["cpu_affinity"]
+            directory = Path("/sys/devices/system/cpu") / ("cpu" + str(cpu)) / "topology"
+            if (directory / "physical_package_id").is_file() and (directory / "core_id").is_file():
+                topology[str(cpu)] = ((directory / "physical_package_id").read_text().strip(),
+                    (directory / "core_id").read_text().strip())
+
+        def forbidden(*_args, **_kwargs):
+            raise AssertionError("receipt recovery attempted another child")
+
+        scheduler.executor.execute = forbidden
+        recovered = scheduler.execute(fixture.run_plan.run_plan_id, plan)
+        assert recovered.receipts == result.receipts and recovered.status is OperationalStatus.SUCCEEDED
+        (tmp_path / "four-ready-process-proof.json").write_text(json.dumps({
+            "scope": "SYNTHETIC_SCHEDULER_CONFORMANCE", "native_acquisitions": 0,
+            "selected_workers": workers, "task_count": 4, "observations": observations,
+            "physical_topology": topology, "distinct_physical_cores": len(set(topology.values())),
+            "receipt_recovery_child_entries": 0,
+        }, sort_keys=True, indent=2) + "\n")
+    finally:
+        repository.engine.dispose()
+
+
+def test_parallel_batch_requires_selected_capacity_before_any_admission(monkeypatch):
+    scheduler = object.__new__(LocalScheduler)
+    scheduler.parallel_resource_capacity = None
+    scheduler.parallel_cpu_ids = ()
+    scheduler._batch_memory_ceiling = None
+    scheduler.maximum_parallel_tasks = 2
+    def forbidden():
+        pytest.fail("ordinary parallel entry inferred a missing resource selection")
+    monkeypatch.setattr(LocalExecutionResourceAdmitter, "detect_capacity", staticmethod(forbidden))
+    with pytest.raises(SchedulerConsistencyError, match="capacity is unavailable"):
+        scheduler._start_parallel_batch("run.disclosed-capacity", (),
+            outputs={}, receipts={}, failed=set(), blocked=set())

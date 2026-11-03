@@ -19,6 +19,7 @@ from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_author
     load_fresh_reactor_profile,
 )
 from empirical_lawhood.api.reactor_authoring import author_fresh_reactor
+from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
 from empirical_lawhood.api.reactor_preissue import prove_fresh_reactor
 from empirical_lawhood.adapters.physical.mast_archive.fresh_source import (
     load_fair_mast_selection,
@@ -96,7 +97,7 @@ from empirical_lawhood.cli.presentation import render_campaign_status, render_do
 from empirical_lawhood.infrastructure.artifacts import GuardedExternalRoot
 from empirical_lawhood.infrastructure.source_origin import (
     ExecutingSourceMismatch,
-    require_executing_target_source,
+    require_selected_implementation,
 )
 from empirical_lawhood.kernel.time import InformationCutoff
 from empirical_lawhood.runtime.operator_profile import (
@@ -289,6 +290,9 @@ EnumT = TypeVar("EnumT", bound=StrEnum)
 API_FACTORY: ApiFactory = create_cli_api
 CLI_PROJECT_ROOT: Path | None = None
 CLI_OPERATOR_PROFILE: Path | None = None
+CLI_ARTIFACT_VERIFICATION = 'reduced'
+CLI_ARTIFACT_ROOT_CONTRACT: Path | None = None
+CLI_CATALOG_RELATIVE_PATH: str | None = None
 CLI_DATASET_PROJECTION_TRUST: Path | None = None
 CLI_APPROVAL_CHECKER_TRUST: Path | None = None
 CLI_REACTOR_AUTHORING_DIR: Path | None = None
@@ -303,14 +307,19 @@ def set_cli_inputs(
     project_root: Path | None,
     operator_profile: Path | None,
     dataset_projection_trust: Path | None,
+    catalog_relative_path: str | None = None,
     approval_checker_trust: Path | None,
     reactor_authoring_dir: Path | None = None,
     circuit_authoring_dir: Path | None = None,
     electron_gas_authoring_dir: Path | None = None,
     synthetic_material_authoring_dir: Path | None = None,
     authoring_dir: Path | None = None,
+    artifact_root_contract: Path | None = None,
+    artifact_verification: str = 'reduced',
 ) -> None:
-    global CLI_PROJECT_ROOT, CLI_OPERATOR_PROFILE, CLI_AUTHORING_DIR
+    global CLI_PROJECT_ROOT, CLI_OPERATOR_PROFILE, CLI_AUTHORING_DIR, CLI_CATALOG_RELATIVE_PATH
+    global CLI_ARTIFACT_ROOT_CONTRACT
+    global CLI_ARTIFACT_VERIFICATION
     global CLI_DATASET_PROJECTION_TRUST, CLI_APPROVAL_CHECKER_TRUST
     global \
         CLI_REACTOR_AUTHORING_DIR, \
@@ -319,6 +328,10 @@ def set_cli_inputs(
         CLI_SYNTHETIC_MATERIAL_AUTHORING_DIR
     CLI_PROJECT_ROOT = project_root
     CLI_OPERATOR_PROFILE = operator_profile
+    from empirical_lawhood.runtime.operational_configuration import ArtifactVerificationMode
+    CLI_ARTIFACT_VERIFICATION = ArtifactVerificationMode(artifact_verification)
+    CLI_ARTIFACT_ROOT_CONTRACT = artifact_root_contract
+    CLI_CATALOG_RELATIVE_PATH = catalog_relative_path
     CLI_DATASET_PROJECTION_TRUST = dataset_projection_trust
     CLI_APPROVAL_CHECKER_TRUST = approval_checker_trust
     CLI_REACTOR_AUTHORING_DIR = reactor_authoring_dir
@@ -526,10 +539,24 @@ def source_design_input(
     typer.echo(record.canonical_bytes().decode("utf-8"), nl=False)
 
 
+
+def _selected_artifact_root_contract():
+    """Load a typed operator selection; this does not authenticate evidence."""
+    if CLI_ARTIFACT_ROOT_CONTRACT is None:
+        return None
+    from empirical_lawhood.runtime.artifacts import ExternalRootContract
+
+    return load_registered_authoring(CLI_ARTIFACT_ROOT_CONTRACT,
+        root_schemas={ExternalRootContract.SCHEMA: ExternalRootContract})
+
+
 def _api(*, storage_required: bool = True) -> EmpiricalLawhoodApi:
     root = CLI_PROJECT_ROOT
     profile_path = CLI_OPERATOR_PROFILE
     if API_FACTORY is not create_cli_api:
+        if CLI_CATALOG_RELATIVE_PATH is not None:
+            raise typer.BadParameter("catalog selection requires the installed CLI composition",
+                param_hint="--catalog-relative-path")
         return API_FACTORY()
     if not storage_required:
         try:
@@ -544,7 +571,9 @@ def _api(*, storage_required: bool = True) -> EmpiricalLawhoodApi:
                 )
             )
             return create_inspection_api(
-                repo_root=root, operator_storage_profile=profile
+                repo_root=root, operator_storage_profile=profile,
+                operator_artifact_root_contract=_selected_artifact_root_contract(),
+                catalog_relative_path=CLI_CATALOG_RELATIVE_PATH,
             )
         except (OSError, PermissionError, RuntimeError, TypeError, ValueError) as error:
             raise typer.BadParameter(
@@ -555,7 +584,7 @@ def _api(*, storage_required: bool = True) -> EmpiricalLawhoodApi:
             "this command requires --project-root", param_hint="--project-root"
         )
     try:
-        require_executing_target_source(root)
+        require_selected_implementation(root)
     except ExecutingSourceMismatch as error:
         raise typer.BadParameter(str(error), param_hint="--project-root") from error
     if profile_path is None:
@@ -572,6 +601,9 @@ def _api(*, storage_required: bool = True) -> EmpiricalLawhoodApi:
         return create_cli_api(
             repo_root=root,
             operator_storage_profile=profile,
+            artifact_verification=CLI_ARTIFACT_VERIFICATION,
+            catalog_relative_path=CLI_CATALOG_RELATIVE_PATH,
+            operator_artifact_root_contract=_selected_artifact_root_contract(),
             dataset_projection_trust_path=CLI_DATASET_PROJECTION_TRUST,
             approval_checker_trust_path=CLI_APPROVAL_CHECKER_TRUST,
             reactor_authoring_dir=CLI_REACTOR_AUTHORING_DIR,
@@ -621,7 +653,7 @@ def _response_parent_store():
     )
     guard = GuardedExternalRoot(contract)
     guard.verify(for_write=False)
-    return ResponseExternalParentAuthorityStore(ExternalArtifactPlane(guard))
+    return ResponseExternalParentAuthorityStore(ExternalArtifactPlane(guard, artifact_verification=CLI_ARTIFACT_VERIFICATION))
 
 
 def _exit_code(result: ApiResult[CliPayloadT]) -> int:
@@ -1339,7 +1371,7 @@ def campaign_bind_elapsed_budget(
 @retained_command("campaign rc-ladder-native-check", closed_output=False, native=True)
 def campaign_rc_ladder_native_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/rc-ladder-response/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/measurement-and-response/workflows/rc-ladder-response/guide.md for the accepted schema and constraints.')
     ],
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
 ) -> None:
@@ -1364,7 +1396,7 @@ def campaign_rc_ladder_native_check(
 @retained_command("campaign electron-gas-reference-check", closed_output=False, native=False)
 def campaign_electron_gas_reference_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/electron-gas-response/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/materials/superconductivity/workflows/electron-gas-response/guide.md for the accepted schema and constraints.')
     ],
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
 ) -> None:
@@ -1399,7 +1431,7 @@ def campaign_electron_gas_reference_check(
 @retained_command("campaign brian2-native-check", closed_output=False, native=True)
 def campaign_brian2_native_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/neuron-current-response/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/biology/cell-responses/workflows/neuron-current-response/guide.md for the accepted schema and constraints.')
     ],
     native_python: Annotated[
         Path, typer.Option("--native-python", exists=True, dir_okay=False)
@@ -1444,7 +1476,7 @@ def campaign_brian2_native_check(
 @retained_command("campaign reaction-response-native-check", closed_output=False, native=True)
 def campaign_reaction_response_native_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/reactor-flow-response/guide.md and experiments/reaction-diffusion-response/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/measurement-and-response/workflows/reactor-flow-response/guide.md and programmes/foundations/measurement-and-response/workflows/reaction-diffusion-response/guide.md for the accepted schema and constraints.')
     ],
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
 ) -> None:
@@ -1476,7 +1508,7 @@ def campaign_reaction_response_native_check(
 @retained_command("campaign grid2op-native-check", closed_output=False, native=True)
 def campaign_grid2op_native_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/grid-response-inputs/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/energy/electricity-grids/workflows/grid-response-inputs/guide.md for the accepted schema and constraints.')
     ],
     source_root: Annotated[Path, typer.Option("--source-root")],
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
@@ -1518,7 +1550,7 @@ def campaign_grid2op_native_check(
 @retained_command("campaign gym-torax-native-check", closed_output=False, native=True)
 def campaign_gym_torax_native_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/tokamak-control-response/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/energy/fusion/workflows/tokamak-control-response/guide.md for the accepted schema and constraints.')
     ],
     source_checkout: Annotated[Path, typer.Option("--source-checkout")],
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
@@ -1549,7 +1581,7 @@ def campaign_gym_torax_native_check(
 @retained_command("campaign torax-native-check", closed_output=False, native=True)
 def campaign_torax_native_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/tokamak-heat-response/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/energy/fusion/workflows/tokamak-heat-response/guide.md for the accepted schema and constraints.')
     ],
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
 ) -> None:
@@ -1588,7 +1620,7 @@ def campaign_torax_native_check(
 @retained_command("campaign material-workflow-input-check", closed_output=False, native=False)
 def campaign_material_workflow_input_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/material-control-inputs/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/materials/superconductivity/workflows/material-control-inputs/guide.md for the accepted schema and constraints.')
     ],
     source_root: Annotated[Path, typer.Option("--source-root")],
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
@@ -1663,7 +1695,7 @@ def campaign_material_workflow_wrap_raw(
 @retained_command("campaign scale-morphism-reference-check", closed_output=False, native=False)
 def campaign_scale_morphism_reference_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/response-method-reference/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/measurement-and-response/workflows/response-method-reference/guide.md for the accepted schema and constraints.')
     ],
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
 ) -> None:
@@ -1697,7 +1729,7 @@ def campaign_scale_morphism_reference_check(
 @retained_command("campaign propulsion-reference-check", closed_output=False, native=False)
 def campaign_propulsion_reference_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/propulsion-reliability-reference/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/measurement-and-response/workflows/propulsion-reliability-reference/guide.md for the accepted schema and constraints.')
     ],
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
 ) -> None:
@@ -1729,7 +1761,7 @@ def campaign_propulsion_reference_check(
 @retained_command("campaign glenn-import-check", closed_output=False, native=False)
 def campaign_glenn_import_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/laser-archive-inspection/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/measurement-and-response/workflows/laser-archive-inspection/guide.md for the accepted schema and constraints.')
     ],
     source_root: Annotated[Path | None, typer.Option("--source-root")] = None,
     preview: Annotated[bool, typer.Option("--preview")] = False,
@@ -1769,7 +1801,7 @@ def campaign_glenn_import_check(
 @retained_command("campaign battery-native-check", closed_output=False, native=True)
 def campaign_battery_native_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/battery-response-and-restart/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/energy/battery-charging/workflows/battery-response-and-restart/guide.md for the accepted schema and constraints.')
     ],
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
 ) -> None:
@@ -1799,7 +1831,7 @@ def campaign_battery_native_check(
 @retained_command("campaign reactor-batch-input-check", closed_output=False, native=False)
 def campaign_reactor_batch_input_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/reactor-response/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/measurement-and-response/workflows/reactor-response/guide.md for the accepted schema and constraints.')
     ],
     source_root: Annotated[
         Path | None,
@@ -1833,7 +1865,7 @@ def campaign_reactor_batch_input_check(
 @retained_command("campaign reactor-prepared-input-check", closed_output=False, native=False)
 def campaign_reactor_prepared_input_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/reactor-response/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/measurement-and-response/workflows/reactor-response/guide.md for the accepted schema and constraints.')
     ],
     source_root: Annotated[
         Path | None,
@@ -1900,7 +1932,7 @@ def campaign_reactor_prepared_input_check(
 @retained_command("campaign prepared-response-native-check", closed_output=False, native=True)
 def campaign_prepared_response_native_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/prepared-response/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/emergent-structure/workflows/prepared-response/guide.md for the accepted schema and constraints.')
     ],
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
 ) -> None:
@@ -1932,7 +1964,7 @@ def campaign_prepared_response_native_check(
 @retained_command("campaign matrix-response-author", closed_output=True, native=False)
 def campaign_matrix_response_author(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/prepared-response/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/emergent-structure/workflows/prepared-response/guide.md for the accepted schema and constraints.')
     ],
     source_root: Annotated[
         Path | None,
@@ -2002,7 +2034,7 @@ def campaign_matrix_response_author(
 @retained_command("campaign dependent-response-input-check", closed_output=False, native=False)
 def campaign_dependent_response_input_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/prepared-response/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/emergent-structure/workflows/prepared-response/guide.md for the accepted schema and constraints.')
     ],
     source_root: Annotated[Path | None, typer.Option("--source-root")] = None,
     parent_manifest: Annotated[Path | None, typer.Option("--parent-manifest")] = None,
@@ -2056,7 +2088,7 @@ def campaign_dependent_response_input_check(
 @retained_command("campaign response-composition-input-check", closed_output=False, native=False)
 def campaign_response_composition_input_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/causal-transfer-audit/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/emergent-structure/workflows/causal-transfer-audit/guide.md for the accepted schema and constraints.')
     ],
     source_root: Annotated[Path | None, typer.Option("--source-root")] = None,
     parent_manifest: Annotated[Path | None, typer.Option("--parent-manifest")] = None,
@@ -2099,7 +2131,7 @@ def campaign_response_composition_input_check(
 @retained_command("campaign finite-response-input-check", closed_output=False, native=False)
 def campaign_finite_response_input_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/finite-response-law/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/emergent-structure/workflows/finite-response-law/guide.md for the accepted schema and constraints.')
     ],
     source_root: Annotated[
         Path | None, typer.Option("--source-root", help="Held finite exposure root.")
@@ -2171,7 +2203,7 @@ def campaign_finite_response_input_check(
 @retained_command("campaign finite-response-stage-input-check", closed_output=False, native=False)
 def campaign_finite_response_stage_input_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/finite-response-law/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/emergent-structure/workflows/finite-response-law/guide.md for the accepted schema and constraints.')
     ],
     source_root: Annotated[Path | None, typer.Option("--source-root")] = None,
     plan: Annotated[Path | None, typer.Option("--plan")] = None,
@@ -2265,7 +2297,7 @@ def campaign_response_composition_power(
 @retained_command("campaign finite-response-native-check", closed_output=False, native=True)
 def campaign_finite_response_native_check(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/finite-response-law/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/foundations/emergent-structure/workflows/finite-response-law/guide.md for the accepted schema and constraints.')
     ],
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
 ) -> None:
@@ -2333,6 +2365,7 @@ def campaign_reactor_author(
             root=CLI_PROJECT_ROOT,
             profile=load_fresh_reactor_profile(profile),
             output_dir=output,
+            artifact_writer=ExternalArtifactPlane(guard, artifact_verification=CLI_ARTIFACT_VERIFICATION),
         )
     except (OSError, PermissionError, RuntimeError, TypeError, ValueError) as error:
         typer.echo(f"fresh reactor authoring refused: {error}", err=True)
@@ -2382,6 +2415,7 @@ def campaign_circuit_author(
             study=load_rc_study(study),
             experiment_id=experiment_id,
             output_dir=output,
+            artifact_writer=ExternalArtifactPlane(guard, artifact_verification=CLI_ARTIFACT_VERIFICATION),
         )
     except (OSError, PermissionError, RuntimeError, TypeError, ValueError) as error:
         typer.echo(f"RC authoring refused: {error}", err=True)
@@ -2393,7 +2427,7 @@ def campaign_circuit_author(
 @retained_command("campaign electron-gas-author", closed_output=True, native=False)
 def campaign_electron_gas_author(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/electron-gas-response/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/materials/superconductivity/workflows/electron-gas-response/guide.md for the accepted schema and constraints.')
     ],
     experiment_id: Annotated[str, typer.Option("--experiment-id")],
     output_dir: Annotated[Path, typer.Option("--output-dir")],
@@ -2431,6 +2465,7 @@ def campaign_electron_gas_author(
             config=load_uniform_electron_gas_analytic_config(config),
             experiment_id=experiment_id,
             output_dir=output,
+            artifact_writer=ExternalArtifactPlane(guard, artifact_verification=CLI_ARTIFACT_VERIFICATION),
         )
     except (OSError, PermissionError, RuntimeError, TypeError, ValueError) as error:
         typer.echo(f"uniform electron gas authoring refused: {error}", err=True)
@@ -2442,7 +2477,7 @@ def campaign_electron_gas_author(
 @retained_command("campaign synthetic-material-author", closed_output=True, native=False)
 def campaign_synthetic_material_author(
     config: Annotated[
-        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read experiments/lattice-pairing-method/guide.md for the accepted schema and constraints.')
+        Path, typer.Option('--config', exists=True, dir_okay=False, readable=True, help='Configuration input. Read programmes/materials/superconductivity/workflows/lattice-pairing-method/guide.md for the accepted schema and constraints.')
     ],
     experiment_id: Annotated[str, typer.Option("--experiment-id")],
     output_dir: Annotated[Path, typer.Option("--output-dir")],
@@ -2480,6 +2515,7 @@ def campaign_synthetic_material_author(
             config=load_synthetic_material_response_config(config),
             experiment_id=experiment_id,
             output_dir=output,
+            artifact_writer=ExternalArtifactPlane(guard, artifact_verification=CLI_ARTIFACT_VERIFICATION),
         )
     except (OSError, PermissionError, RuntimeError, TypeError, ValueError) as error:
         typer.echo(f"Lattice-pairing authoring refused: {error}", err=True)
@@ -2511,6 +2547,7 @@ def campaign_reactor_preissue_proof() -> None:
             storage_profile=storage_profile,
             directory=CLI_REACTOR_AUTHORING_DIR,
             approval_checker_trust_path=CLI_APPROVAL_CHECKER_TRUST,
+            catalog_relative_path=CLI_CATALOG_RELATIVE_PATH,
         )
     except (OSError, PermissionError, RuntimeError, TypeError, ValueError) as error:
         typer.echo(f"fresh reactor proof refused: {error}", err=True)

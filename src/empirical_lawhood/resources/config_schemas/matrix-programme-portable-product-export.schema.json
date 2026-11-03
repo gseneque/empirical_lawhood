@@ -1,0 +1,205 @@
+{
+  "$defs": {
+    "ExternalRootContract_e5748e778b4d": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/runtime/external-root-contract"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "allowed_filesystem_types": {
+              "description": "allowed filesystem types; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "canonical_path": {
+              "description": "canonical path; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "expected_mount_source": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "expected mount source; constructor checks semantics and units."
+            },
+            "expected_volume_identity": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "expected volume identity; constructor checks semantics and units."
+            },
+            "logical_name": {
+              "description": "logical name; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "minimum_free_bytes": {
+              "description": "minimum free bytes; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "mount_contract_schema": {
+              "description": "mount contract schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "required_mount_path": {
+              "description": "required mount path; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "storage_root_id": {
+              "description": "storage root id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "storage_root_id",
+            "logical_name",
+            "canonical_path",
+            "required_mount_path",
+            "mount_contract_schema",
+            "minimum_free_bytes",
+            "expected_mount_source",
+            "expected_volume_identity",
+            "allowed_filesystem_types"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MatrixProgrammePortableProductExportSelection_fbc843785e00": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-programme/portable-product-export-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "maximum_bytes": {
+              "description": "maximum bytes; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "maximum_files": {
+              "description": "maximum files; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "output_relative_path": {
+              "description": "output relative path; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "programme": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "programme; constructor checks semantics and units."
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "replica_receipt_path": {
+              "description": "replica receipt path; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "replica_root": {
+              "$ref": "#/$defs/ExternalRootContract_e5748e778b4d",
+              "description": "replica root; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "record_id",
+            "programme",
+            "output_relative_path",
+            "replica_root",
+            "replica_receipt_path",
+            "maximum_bytes",
+            "maximum_files"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-programme-portable-product-export",
+  "$ref": "#/$defs/MatrixProgrammePortableProductExportSelection_fbc843785e00",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Programme Portable Product Export",
+  "x-consumer": "matrix-programme-portable-product-export",
+  "x-consumer-maximum-bytes": 1048576,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

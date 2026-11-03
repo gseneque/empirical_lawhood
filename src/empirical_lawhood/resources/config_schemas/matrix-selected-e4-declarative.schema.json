@@ -1,0 +1,132 @@
+{
+  "$defs": {
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "SelectedE4DeclarativeSpecification_1dcc73aec8c2": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-selected-e4/declarative-specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "bank": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "bank; constructor checks semantics and units."
+            },
+            "bank_recipe": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "bank recipe; constructor checks semantics and units."
+            },
+            "cases_per_group": {
+              "description": "cases per group; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "independent_group_count": {
+              "description": "independent group count; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "population_phase": {
+              "description": "population phase; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "question": {
+              "description": "question; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "specification_id",
+            "bank",
+            "bank_recipe",
+            "population_phase",
+            "independent_group_count",
+            "cases_per_group",
+            "question"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-selected-e4-declarative",
+  "$ref": "#/$defs/SelectedE4DeclarativeSpecification_1dcc73aec8c2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Selected E4 Declarative",
+  "x-consumer": "matrix-selected-e4-declarative",
+  "x-consumer-maximum-bytes": 67108864,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

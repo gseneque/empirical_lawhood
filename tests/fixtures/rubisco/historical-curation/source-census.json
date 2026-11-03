@@ -1,0 +1,32 @@
+{
+  "archive_bytes": 101450,
+  "archive_sha256": "ce61eadcef4189ab51d367d85ba3f7523c52eb8d57efd10718bdc57dc6aad339",
+  "members": [
+    {
+      "bytes": 188172,
+      "member": "spreitzer2005-primary.html",
+      "role": "EXACT_COPY_OF_ALREADY_HELD_PRIMARY_ORIGINAL_EXPOSED_NO_NEW_ACQUISITION",
+      "sha256": "6341e81481cf81db96a44533be83971b407f1fc5fcaed559a827d0a2ff09e86c",
+      "source_id": "spreitzer2005"
+    },
+    {
+      "bytes": 203124,
+      "member": "genkov2009-primary.html",
+      "role": "EXACT_COPY_OF_ALREADY_HELD_PRIMARY_ORIGINAL_EXPOSED_NO_NEW_ACQUISITION",
+      "sha256": "865aacfbf37c0b7ef5b467649c0fa4bb5da60390a126e0a71e5f99ce584598e5",
+      "source_id": "genkov2009"
+    },
+    {
+      "bytes": 104161,
+      "member": "zhou2014-primary.xml",
+      "role": "EXACT_COPY_OF_ALREADY_HELD_PRIMARY_ORIGINAL_EXPOSED_NO_NEW_ACQUISITION",
+      "sha256": "9ef682ed154bcae7e390965eacd5f412c69ea6dfeccdfb84259b4505b3fbf025",
+      "source_id": "zhou2014"
+    }
+  ],
+  "other_retained_studies": "Wilson, McDonald, potato, Iqbal, RR2018 and reference compilations remain preserved separate owners; not projected by this slice.",
+  "schema": "empirical-lawhood/rubisco/historical-curation/fixture-census",
+  "scope": "THREE_SELECTED_PRIMARY_STOCKS_ONLY_NO_FIT_NO_CANDIDATE_QUALIFICATION",
+  "stock_audit_sha256": "19cea59a6262f88c244086aa3ca1b9b43821f21623bef1cb763b66c5c0a46795",
+  "version": "1.0.0"
+}

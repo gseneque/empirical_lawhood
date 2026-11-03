@@ -840,7 +840,7 @@ def reduce_matrix_response_study_reactive_source(
                     eligible_thresholds,
                     key=lambda value: (-value[0], -value[1], value[2]),
                 )[0]
-                panel_digest = sha256(canonical_json_bytes([(row[0], row[2].checkpoint_step, row[3], row[4], row[5]) for row in rows])).hexdigest()
+                panel_digest = sha256(canonical_json_bytes(tuple((row[0], row[2].checkpoint_step, row[3], row[4], row[5]) for row in rows))).hexdigest()
                 score = MatrixResponseProspectiveReactiveSourceLawFrozenScore(
                     score_id=f"matrix-response-prospective-reactive-source-law.frozen-score.{panel_digest[:16]}", scientific_fingerprint=method.scientific_fingerprint,
                     development_source_config=source_identity, fit_panel_sha256=panel_digest,

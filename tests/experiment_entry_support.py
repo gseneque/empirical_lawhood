@@ -188,6 +188,9 @@ def standard_authoring_for_draft(
         for value in entry.register.gaps
     )
     register = replace(entry.register, gaps=gaps)
+    declared_units = draft.development_unit_ids or draft.evaluation_unit_ids
+    if not declared_units:
+        raise ValueError("standard authoring fixture requires an actual declared independent unit")
     inventory = FormalGapSourceCapabilityInventory(
         inventory_id="formal-source-inventory.reference",
         denominator_id=draft.system.system_id,
@@ -200,7 +203,7 @@ def standard_authoring_for_draft(
         ),
         present_operand_ids=("operand.fixture",),
         satisfied_prerequisite_ids=("support.fixture",),
-        independent_unit_ids=(draft.development_unit_ids[0],),
+        independent_unit_ids=(declared_units[0],),
         independent_unit_scope=EvidenceUnitScope.PHYSICAL_INDEPENDENT_UNIT,
         numerical_view_ids=(),
         available_estimator_family_ids=("estimator.fixture",),

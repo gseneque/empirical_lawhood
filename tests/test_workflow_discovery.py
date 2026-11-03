@@ -26,14 +26,22 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_catalogue_accounts_for_every_bundle_and_input():
     workflows = list_workflows()
     ids = [w.workflow_id for w in workflows]
-    expected = {p.parent.name for p in (ROOT / "experiments").glob("*/guide.md")}
+    programme_guides = set((ROOT / "programmes").glob("*/*/workflows/*/guide.md"))
+    # These are domain introductions to the same shared workflow, or a source
+    # acquisition guide whose commands have their own source-selection owner.
+    supporting_guides = {"recursive-rc", "recursive-battery", "recursive-materials", "fair-mast-source"}
+    expected = {p.parent.name for p in programme_guides if p.parent.name not in supporting_guides}
+    expected.add("recursive-inquiry")
     assert len(ids) == len(set(ids))
     assert set(ids) == expected
     declared = {item.path: item for workflow in workflows for item in workflow.inputs}
-    files = sorted((ROOT / "experiments").rglob("*.json"))
+    source_selection = ROOT / "programmes/energy/fusion/workflows/fair-mast-source/fair-mast-level2.json"
+    files = sorted(p for p in (ROOT / "programmes").glob("*/*/workflows/**/*.json")
+                   if p != source_selection)
     assert len(files) == len(declared)
     assert set(declared) == {p.relative_to(ROOT).as_posix() for p in files}
-    for path in files:
+    for name in declared:
+        path = ROOT / name
         assert (
             json.loads(path.read_text())["schema"]
             == declared[path.relative_to(ROOT).as_posix()].schema_id
@@ -82,7 +90,7 @@ def test_discovery_from_unrelated_directory_reads_no_inputs_and_writes_nothing(
 
     def guarded_open(file, mode="r", *args, **kwargs):
         assert not any(flag in mode for flag in "wax+")
-        assert "experiments/" not in str(file)
+        assert "programmes/" not in str(file)
         return original_open(file, mode, *args, **kwargs)
 
     def refuse(*args, **kwargs):
@@ -153,7 +161,7 @@ print(json.dumps([workflow_details(w)['workflow_id'] for w in list_workflows()])
 
 
 def test_index_matches_its_single_owner_and_all_paper_families_are_mapped():
-    text = (ROOT / "experiments/README.md").read_text()
+    text = (ROOT / "docs/reference/workflows.md").read_text()
     assert render_table() in text
     paper = (ROOT / "paper/SOURCES.md").read_text()
     claims = json.loads(

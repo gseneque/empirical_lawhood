@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 @contextmanager
-def exclusive_file_lock(path: Path) -> Iterator[None]:
+def exclusive_file_lock(path: Path, *, blocking: bool = True) -> Iterator[None]:
     """Hold a regular, no-follow lock file, retaining NFS write-mode support.
 
     Local Linux flock accepts a read-only descriptor. Avoiding FMODE_WRITE
@@ -21,6 +21,9 @@ def exclusive_file_lock(path: Path) -> Iterator[None]:
     that refusal permits reopening for writing. Every other lock error escapes.
     """
 
+    if type(blocking) is not bool:
+        raise TypeError("file-lock blocking selection must be boolean")
+    lock_operation = fcntl.LOCK_EX | (0 if blocking else fcntl.LOCK_NB)
     flags = os.O_CREAT | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
     descriptor: int | None = None
     locked = False
@@ -30,7 +33,7 @@ def exclusive_file_lock(path: Path) -> Iterator[None]:
             if not stat.S_ISREG(os.fstat(descriptor).st_mode):
                 raise ValueError("advisory lock is not a regular file")
             try:
-                fcntl.flock(descriptor, fcntl.LOCK_EX)
+                fcntl.flock(descriptor, lock_operation)
             except OSError as error:
                 if mode != os.O_RDONLY or error.errno != errno.EBADF:
                     raise

@@ -70,3 +70,39 @@ def test_existing_prepare_output_refuses_before_source_or_native_contact(tmp_pat
     result = runner.invoke(app, ["campaign", "matrix-geometry-prepare", "--config-id", "test.refused", "--master-seed", "91562", "--output", str(output)])
     assert result.exit_code == 2 and "exist" in result.stderr.lower()
     assert output.read_bytes() == b"preserved"
+
+
+def test_completed_paper_result_commands_use_read_only_storage_without_git(tmp_path, monkeypatch):
+    from empirical_lawhood.api import matrix_geometry, selected_events
+    from empirical_lawhood.cli import integrations, paper_analysis_integrations, platform
+
+    outside = tmp_path / "outside-source"
+    outside.mkdir()
+    monkeypatch.chdir(outside)
+    selected = outside / "selected.json"
+    selected.write_text("{}")
+    config, plane = object(), object()
+    calls = []
+
+    def storage(*, read_only=False):
+        assert read_only is True
+        assert platform.CLI_PROJECT_ROOT is None
+        return outside, None, plane
+
+    def read(*, config, artifact_writer):
+        calls.append((config, artifact_writer))
+        return {"summary": {"status": "retained-software-control"}}
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("completed public result reader consulted Git")
+
+    monkeypatch.setattr(integrations, "_storage", storage)
+    monkeypatch.setattr(integrations, "_configuration", lambda *args: config)
+    monkeypatch.setattr(paper_analysis_integrations, "_commit", forbidden)
+    monkeypatch.setattr(matrix_geometry, "read_matrix_geometry_result", read)
+    monkeypatch.setattr(selected_events, "read_selected_event_result", read)
+    for command in ("matrix-geometry-result", "selected-events-result"):
+        report = invoke(["campaign", command, "--input", str(selected),
+                         "--attempt-dir", str(outside / command)])
+        assert report == {"status": "retained-software-control"}
+    assert calls == [(config, plane), (config, plane)]

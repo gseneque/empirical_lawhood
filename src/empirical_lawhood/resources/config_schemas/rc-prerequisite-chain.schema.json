@@ -1,0 +1,681 @@
+{
+  "$defs": {
+    "RCChainProtocol_a27baea873c4": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/methods/rc-prerequisite-chain/protocol"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "available_seconds": {
+              "additionalProperties": false,
+              "description": "available seconds; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "s"
+            },
+            "backward_euler_maximum_step_seconds": {
+              "additionalProperties": false,
+              "description": "backward euler maximum step seconds; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "s"
+            },
+            "biased_error_volts": {
+              "additionalProperties": false,
+              "description": "biased error volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "capacitance_farads": {
+              "additionalProperties": false,
+              "description": "capacitance farads; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "F"
+            },
+            "coarsened_radius_volts": {
+              "additionalProperties": false,
+              "description": "coarsened radius volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "completion_deadline_seconds": {
+              "additionalProperties": false,
+              "description": "completion deadline seconds; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "s"
+            },
+            "conflict_deadline_seconds": {
+              "additionalProperties": false,
+              "description": "conflict deadline seconds; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "s"
+            },
+            "decision_seconds": {
+              "additionalProperties": false,
+              "description": "decision seconds; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "s"
+            },
+            "late_available_seconds": {
+              "additionalProperties": false,
+              "description": "late available seconds; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "s"
+            },
+            "left_source_resistance_ohms": {
+              "additionalProperties": false,
+              "description": "left source resistance ohms; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "ohm"
+            },
+            "maximum_aggregate_output_bytes": {
+              "description": "maximum aggregate output bytes; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "maximum_analytic_current_defect_amperes": {
+              "additionalProperties": false,
+              "description": "maximum analytic current defect amperes; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "A"
+            },
+            "maximum_analytic_defect_volts": {
+              "additionalProperties": false,
+              "description": "maximum analytic defect volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "maximum_charge_rate_defect_amperes": {
+              "additionalProperties": false,
+              "description": "maximum charge rate defect amperes; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "A"
+            },
+            "maximum_elapsed_seconds": {
+              "additionalProperties": false,
+              "description": "maximum elapsed seconds; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "s"
+            },
+            "maximum_native_steps": {
+              "description": "maximum native steps; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "maximum_observation_radius_volts": {
+              "additionalProperties": false,
+              "description": "maximum observation radius volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "maximum_output_bytes": {
+              "description": "maximum output bytes; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "maximum_task_error_volts": {
+              "additionalProperties": false,
+              "description": "maximum task error volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "maximum_view_defect_volts": {
+              "additionalProperties": false,
+              "description": "maximum view defect volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "minimum_free_bytes": {
+              "description": "minimum free bytes; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "observation_error_volts": {
+              "additionalProperties": false,
+              "description": "observation error volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "observation_radius_volts": {
+              "additionalProperties": false,
+              "description": "observation radius volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "output_step_seconds": {
+              "additionalProperties": false,
+              "description": "output step seconds; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "s"
+            },
+            "prediction_initial_voltage_volts": {
+              "additionalProperties": false,
+              "description": "prediction initial voltage volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "preparation_durations_seconds": {
+              "description": "preparation durations seconds; constructor checks semantics and units.",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "decimal": {
+                    "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "decimal"
+                ],
+                "type": "object"
+              },
+              "type": "array",
+              "x-unit": "s"
+            },
+            "protocol_id": {
+              "description": "protocol id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "quantity_id": {
+              "description": "quantity id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "receiver_id": {
+              "description": "receiver id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "response_coefficient_a": {
+              "additionalProperties": false,
+              "description": "response coefficient a; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "response_coefficient_b_volts": {
+              "additionalProperties": false,
+              "description": "response coefficient b volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "response_horizon_seconds": {
+              "additionalProperties": false,
+              "description": "response horizon seconds; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "s"
+            },
+            "response_left_voltage_volts": {
+              "additionalProperties": false,
+              "description": "response left voltage volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "response_right_voltage_volts": {
+              "additionalProperties": false,
+              "description": "response right voltage volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "right_source_resistance_ohms": {
+              "additionalProperties": false,
+              "description": "right source resistance ohms; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "ohm"
+            },
+            "sample_seconds": {
+              "additionalProperties": false,
+              "description": "sample seconds; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "s"
+            },
+            "support_guard_volts": {
+              "additionalProperties": false,
+              "description": "support guard volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "support_lower_volts": {
+              "additionalProperties": false,
+              "description": "support lower volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "support_upper_volts": {
+              "additionalProperties": false,
+              "description": "support upper volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "voltage_unit": {
+              "description": "voltage unit; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "protocol_id",
+            "capacitance_farads",
+            "left_source_resistance_ohms",
+            "right_source_resistance_ohms",
+            "receiver_id",
+            "quantity_id",
+            "voltage_unit",
+            "sample_seconds",
+            "available_seconds",
+            "decision_seconds",
+            "observation_error_volts",
+            "observation_radius_volts",
+            "maximum_observation_radius_volts",
+            "coarsened_radius_volts",
+            "biased_error_volts",
+            "late_available_seconds",
+            "preparation_durations_seconds",
+            "support_lower_volts",
+            "support_upper_volts",
+            "support_guard_volts",
+            "response_left_voltage_volts",
+            "response_right_voltage_volts",
+            "response_horizon_seconds",
+            "prediction_initial_voltage_volts",
+            "response_coefficient_a",
+            "response_coefficient_b_volts",
+            "maximum_task_error_volts",
+            "completion_deadline_seconds",
+            "conflict_deadline_seconds",
+            "output_step_seconds",
+            "backward_euler_maximum_step_seconds",
+            "maximum_view_defect_volts",
+            "maximum_charge_rate_defect_amperes",
+            "maximum_analytic_defect_volts",
+            "maximum_analytic_current_defect_amperes",
+            "maximum_elapsed_seconds",
+            "maximum_native_steps",
+            "maximum_output_bytes",
+            "maximum_aggregate_output_bytes",
+            "minimum_free_bytes"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RCChainUnit_36360c766479": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/methods/rc-prerequisite-chain/unit"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "initial_voltage_volts": {
+              "additionalProperties": false,
+              "description": "initial voltage volts; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-unit": "V"
+            },
+            "unit_id": {
+              "description": "unit id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "unit_id",
+            "initial_voltage_volts"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RCPrerequisiteChainConfig_a49af11a7110": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/methods/rc-prerequisite-chain/config"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "config_id": {
+              "description": "config id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "protocol": {
+              "$ref": "#/$defs/RCChainProtocol_a27baea873c4",
+              "description": "protocol; constructor checks semantics and units."
+            },
+            "units": {
+              "description": "units; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/RCChainUnit_36360c766479"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "config_id",
+            "protocol",
+            "units"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:rc-prerequisite-chain",
+  "$ref": "#/$defs/RCPrerequisiteChainConfig_a49af11a7110",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Rc Prerequisite Chain",
+  "x-consumer": "rc-prerequisite-chain",
+  "x-consumer-maximum-bytes": 65536,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

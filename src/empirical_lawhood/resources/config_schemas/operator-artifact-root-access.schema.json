@@ -1,0 +1,100 @@
+{
+  "$defs": {
+    "ExternalRootContract_e5748e778b4d": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/runtime/external-root-contract"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "allowed_filesystem_types": {
+              "description": "allowed filesystem types; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "canonical_path": {
+              "description": "canonical path; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "expected_mount_source": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "expected mount source; constructor checks semantics and units."
+            },
+            "expected_volume_identity": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "expected volume identity; constructor checks semantics and units."
+            },
+            "logical_name": {
+              "description": "logical name; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "minimum_free_bytes": {
+              "description": "minimum free bytes; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "mount_contract_schema": {
+              "description": "mount contract schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "required_mount_path": {
+              "description": "required mount path; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "storage_root_id": {
+              "description": "storage root id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "storage_root_id",
+            "logical_name",
+            "canonical_path",
+            "required_mount_path",
+            "mount_contract_schema",
+            "minimum_free_bytes",
+            "expected_mount_source",
+            "expected_volume_identity",
+            "allowed_filesystem_types"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:operator-artifact-root-access",
+  "$ref": "#/$defs/ExternalRootContract_e5748e778b4d",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Operator Artifact Root Access",
+  "x-consumer": "operator-artifact-root-access",
+  "x-consumer-maximum-bytes": 134217728,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

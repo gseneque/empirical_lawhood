@@ -169,7 +169,7 @@ def test_issue_preparation_is_deterministic_complete_and_write_free() -> None:
     assert first.manifest.raw_draft.object_fingerprint != raw_member.physical_sha256
 
 
-def test_issue_member_capacity_accepts_256_and_refuses_257() -> None:
+def test_issue_member_inventory_preserves_identity_and_namespace_beyond_256() -> None:
     preparation = prepare_draft_candidate_issue(**_issue_inputs())  # type: ignore[arg-type]
     manifest = preparation.manifest
     first = manifest.members[0]
@@ -181,10 +181,17 @@ def test_issue_member_capacity_accepts_256_and_refuses_257() -> None:
         )
         for index in range(257)
     )
-    accepted = replace(manifest, members=members[:256])
-    assert len(accepted.members) == 256
-    with pytest.raises(ValueError, match="member count"):
-        replace(manifest, members=members)
+    accepted = replace(manifest, members=members)
+    assert len(accepted.members) == 257
+    with pytest.raises(ValueError, match="member"):
+        replace(manifest, members=())
+    with pytest.raises(ValueError, match="unique"):
+        replace(manifest, members=(members[0], members[0]))
+    with pytest.raises(ValueError, match="sorted"):
+        replace(manifest, members=tuple(reversed(members)))
+    with pytest.raises(ValueError, match="escapes"):
+        replace(manifest, members=(replace(members[0],
+            relative_path="issued-programmes/another-issue/capacity.json"), *members[1:]))
 
 
 @pytest.mark.parametrize(

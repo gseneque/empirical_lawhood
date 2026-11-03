@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import re
+from bisect import bisect_left
+from operator import attrgetter
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import ClassVar
 
 from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling, inherited_visibility
+from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling, inherited_visibility
 from empirical_lawhood.kernel.provenance import ObjectIdentity
 from empirical_lawhood.kernel.serialization import (
     CanonicalRecord,
@@ -23,7 +25,7 @@ from empirical_lawhood.kernel.serialization import (
 )
 from empirical_lawhood.kernel.worlds import WorldKind
 
-from .artifacts import ArtifactProfile
+from .artifacts import ArtifactProfile, derived_outcome_access
 from .capabilities import (
     CapabilityConfigRef,
     CapabilityPermission,
@@ -35,6 +37,7 @@ from .execution_envelope import validate_optional_jit_identities
 class PlanLane(StrEnum):
     PROSPECTIVE = "PROSPECTIVE"
     EXPLORATORY = "EXPLORATORY"
+    DEVELOPMENT = "DEVELOPMENT"
 
 
 class ScientificStage(StrEnum):
@@ -55,6 +58,7 @@ class ScientificStage(StrEnum):
 
 
 class ScientificInputRole(StrEnum):
+    CONFIGURATION = "CONFIGURATION"
     SOURCE = "SOURCE"
     PREPARED_MEDIUM = "PREPARED_MEDIUM"
     DENOMINATOR = "DENOMINATOR"
@@ -66,6 +70,18 @@ class ScientificInputRole(StrEnum):
     AUTHORITY = "AUTHORITY"
     OUTCOME = "OUTCOME"
     PARENT_RECEIPT = "PARENT_RECEIPT"
+
+
+def derived_development_custody(declared_access, declared_visibility, parent_accesses, parent_visibilities):
+    """Keep a new operation's lane separate from private original input custody.
+
+    This projects immutable data restrictions only. Actual access still needs
+    its existing permission rule or the exact authenticated original-input owner.
+    """
+    access = derived_outcome_access(declared_access, *parent_accesses)
+    visibility = VisibilityCeiling.most_restrictive(declared_visibility,
+        inherited_visibility(parent_visibilities, access))
+    return access, visibility
 
 
 class BarrierKind(StrEnum):
@@ -147,12 +163,17 @@ class ProtocolStepTemplate(CanonicalRecord):
             raise ValueError("protocol step maximum attempts must be positive")
         if CapabilityPermission.APPROVE_NONACTUATING in self.required_permissions:
             raise ValueError("protocol workers cannot request approval authority")
-        if self.stage is ScientificStage.FREEZE and self.barrier is not BarrierKind.FREEZE:
-            raise ValueError("freeze stage requires a freeze barrier")
-        if self.stage in {ScientificStage.EVALUATE, ScientificStage.REVEAL} and (
-            self.barrier is not BarrierKind.REVEAL
-        ):
-            raise ValueError("evaluation/reveal stages require a reveal barrier")
+        validate_scientific_stage_barrier(self.stage, self.barrier)
+
+
+def validate_scientific_stage_barrier(stage: ScientificStage, barrier: BarrierKind) -> None:
+    """One stage/barrier contract for declarations and their lowered plans."""
+    if type(stage) is not ScientificStage or type(barrier) is not BarrierKind:
+        raise TypeError("scientific stage and barrier require their exact typed contracts")
+    if stage is ScientificStage.FREEZE and barrier is not BarrierKind.FREEZE:
+        raise ValueError("freeze stage requires a freeze barrier")
+    if stage in {ScientificStage.EVALUATE, ScientificStage.REVEAL} and barrier is not BarrierKind.REVEAL:
+        raise ValueError("evaluation/reveal stages require a reveal barrier")
 
 
 @dataclass(frozen=True, slots=True)
@@ -297,7 +318,7 @@ class ScientificInputSpec(CanonicalRecord):
     operational_logical_artifact_id: str
     payload_schema: str
     media_type: str
-    maximum_size_bytes: int
+    maximum_size_bytes: int | None
     outcome_access: OutcomeAccess
     visibility_ceiling: VisibilityCeiling
     barrier: BarrierKind
@@ -327,7 +348,7 @@ class ScientificInputSpec(CanonicalRecord):
             validate_stable_id(self.external_input_id, field_name="external_input_id")
         validate_schema(self.payload_schema)
         validate_nonempty(self.media_type, field_name="media_type")
-        if self.maximum_size_bytes <= 0:
+        if self.maximum_size_bytes is not None and self.maximum_size_bytes <= 0:
             raise ValueError("scientific input requires a positive size bound")
 
 
@@ -710,29 +731,41 @@ class ProtocolExecutionPlan(CanonicalRecord):
             {task.task_id: task.dependency_task_ids for task in self.tasks},
         )
 
+    def task(self, task_id: str) -> ProtocolExecutionTask:
+        """Select from the constructor-validated sorted, unique task census."""
+        position = bisect_left(self.tasks, task_id, key=attrgetter('task_id'))
+        if position == len(self.tasks) or self.tasks[position].task_id != task_id:
+            raise KeyError(task_id)
+        return self.tasks[position]
+
     @property
     def minimum_free_bytes(self) -> int:
-        """Frozen operation-specific floor from the complete output allocation."""
+        """Report output allowances without adding a reservation-based disk floor."""
 
-        return sum(task.capability.requested_resources.output_bytes for task in self.tasks)
+        from .output_reservations import execution_output_floor
+        return execution_output_floor(self)
 
     def parallel_ready_groups(self) -> tuple[tuple[str, ...], ...]:
-        dependencies = {task.task_id: set(task.dependency_task_ids) for task in self.tasks}
-        completed: set[str] = set()
-        groups: list[tuple[str, ...]] = []
-        while len(completed) < len(self.tasks):
-            ready = tuple(
-                sorted(
-                    task_id
-                    for task_id, required in dependencies.items()
-                    if task_id not in completed and required.issubset(completed)
-                )
-            )
-            if not ready:
-                raise ValueError("execution plan graph has no ready task")
-            groups.append(ready)
-            completed.update(ready)
-        return tuple(groups)
+        return tuple(_topological_generations(
+            tuple(task.task_id for task in self.tasks),
+            {task.task_id: task.dependency_task_ids for task in self.tasks},
+            cycle_message="execution plan graph has no ready task"))
+
+
+@dataclass(frozen=True, slots=True)
+class DevelopmentExecutionPlan(ProtocolExecutionPlan):
+    """Authority-free numerical development lowering with exact input edges."""
+
+    SCHEMA: ClassVar[str] = "empirical-lawhood/runtime/development-execution-plan"
+    tasks: tuple[ExecutionTask, ...]
+
+    def __post_init__(self) -> None:
+        super(DevelopmentExecutionPlan, self).__post_init__()
+        if self.lane is not PlanLane.DEVELOPMENT or self.source_plan.object_schema != DevelopmentRunPlan.SCHEMA:
+            raise ValueError("development execution requires its genuine development root")
+        if not self.nonactuating or not all(isinstance(task, ExecutionTask) for task in self.tasks):
+            raise ValueError("development execution requires exact nonactuating tasks")
+        _validate_development_capabilities(self.tasks)
 
 
 @dataclass(frozen=True, slots=True)
@@ -857,22 +890,36 @@ def _topological_order(
     identifiers: tuple[str, ...],
     dependencies: dict[str, tuple[str, ...]],
 ) -> tuple[str, ...]:
-    remaining = set(identifiers)
-    completed: set[str] = set()
-    ordered: list[str] = []
-    while remaining:
-        ready = sorted(
-            identifier
-            for identifier in remaining
-            if set(dependencies[identifier]).issubset(completed)
-        )
-        if not ready:
-            raise ValueError("task dependency graph contains a cycle")
+    return tuple(identifier for generation in _topological_generations(identifiers, dependencies)
+        for identifier in generation)
+
+
+def _topological_generations(identifiers, dependencies, *, cycle_message="task dependency graph contains a cycle"):
+    """Visit each edge once, preserving the original sorted-generation order."""
+    known = set(identifiers)
+    successors = {identifier: [] for identifier in known}
+    unresolved = {}
+    for identifier in known:
+        parents = set(dependencies[identifier])
+        if not parents <= known:
+            raise ValueError(cycle_message)
+        unresolved[identifier] = len(parents)
+        for parent in parents:
+            successors[parent].append(identifier)
+    ready = tuple(sorted(identifier for identifier, count in unresolved.items() if count == 0))
+    visited = 0
+    while ready:
+        yield ready
+        visited += len(ready)
+        following = []
         for identifier in ready:
-            ordered.append(identifier)
-            completed.add(identifier)
-            remaining.remove(identifier)
-    return tuple(ordered)
+            for child in successors[identifier]:
+                unresolved[child] -= 1
+                if unresolved[child] == 0:
+                    following.append(child)
+        ready = tuple(sorted(following))
+    if visited != len(known):
+        raise ValueError(cycle_message)
 
 
 def _validate_output_uniqueness(
@@ -893,27 +940,19 @@ def _validate_freeze_reveal(
         identifier: getattr(step, "dependency_step_ids", getattr(step, "dependency_task_ids", ()))
         for identifier, step in identifiers.items()
     }
+    if not any(step.stage in {ScientificStage.EVALUATE, ScientificStage.REVEAL}
+            for step in identifiers.values()):
+        return
     freeze_ids = {
         identifier for identifier, step in identifiers.items() if step.barrier is BarrierKind.FREEZE
     }
-    for identifier, step in identifiers.items():
-        if step.stage not in {ScientificStage.EVALUATE, ScientificStage.REVEAL}:
-            continue
-        ancestors = _ancestors(identifier, dependencies)
-        if not freeze_ids.intersection(ancestors):
+    has_freeze = {}
+    for identifier in _topological_order(tuple(identifiers), dependencies):
+        has_freeze[identifier] = any(parent in freeze_ids or has_freeze[parent]
+            for parent in dependencies[identifier])
+        if (identifiers[identifier].stage in {ScientificStage.EVALUATE, ScientificStage.REVEAL}
+                and not has_freeze[identifier]):
             raise ValueError("evaluation/reveal task lacks an upstream freeze barrier")
-
-
-def _ancestors(identifier: str, dependencies: dict[str, tuple[str, ...]]) -> set[str]:
-    pending = list(dependencies[identifier])
-    observed: set[str] = set()
-    while pending:
-        current = pending.pop()
-        if current in observed:
-            continue
-        observed.add(current)
-        pending.extend(dependencies[current])
-    return observed
 
 
 @dataclass(frozen=True, slots=True)
@@ -944,3 +983,89 @@ def _validate_historical_preparations(plan: ProtocolRunPlan) -> None:
     )
     if plan.controller_requested or plan.robust_model_set_required or not plan.nonactuating:
         raise ValueError("historical reanalysis is nonactuating and cannot qualify a controller")
+
+
+@dataclass(frozen=True, slots=True)
+class DevelopmentRunPlan(CanonicalRecord):
+    """A frozen development study, without issue or execution authorization."""
+
+    SCHEMA: ClassVar[str] = "empirical-lawhood/runtime/development-run-plan"
+    run_plan_id: str
+    campaign: ObjectIdentity
+    study: ObjectIdentity
+    draft: ObjectIdentity
+    scientific_projection: ObjectIdentity
+    template: ObjectIdentity
+    registry_sha256: str
+    implementation_commit: str
+    steps: tuple[RunPlanStep, ...]
+    nonactuating: bool = True
+    frozen: bool = True
+
+    def __post_init__(self) -> None:
+        validate_stable_id(self.run_plan_id, field_name="run_plan_id")
+        if self.study.object_schema != "empirical-lawhood/kernel/development-study-spec":
+            raise ValueError("development run requires its actual development study")
+        if self.draft.object_schema != "empirical-lawhood/planning/recursive-study-draft":
+            raise ValueError("development run requires its actual authored programme")
+        validate_sha256(self.registry_sha256, field_name="registry_sha256")
+        _validate_git_commit(self.implementation_commit)
+        require_sorted_unique_ids(self.steps, attribute="step_id", field_name="steps")
+        if not self.steps or not all(isinstance(step, RunPlanStep) for step in self.steps):
+            raise ValueError("development run requires exact scientific steps")
+        _validate_step_graph(self.steps)
+        _validate_output_uniqueness(self.steps)
+        _validate_freeze_reveal(self.steps)
+        _validate_development_capabilities(self.steps)
+        if not self.frozen or not self.nonactuating:
+            raise ValueError("development run must be frozen and nonactuating")
+
+    def topological_step_ids(self) -> tuple[str, ...]:
+        return _topological_order(tuple(step.step_id for step in self.steps),
+                                  {step.step_id: step.dependency_step_ids for step in self.steps})
+
+
+def _validate_development_capabilities(values) -> None:
+    forbidden = {CapabilityPermission.COMMAND_ACTUATOR, CapabilityPermission.APPROVE_NONACTUATING,
+                 CapabilityPermission.REVEAL_OUTCOMES, CapabilityPermission.READ_SEALED_OUTCOMES}
+    for value in values:
+        if value.capability.requested_evidence_ceiling is not EvidenceCeiling.NON_PROMOTABLE:
+            raise ValueError("development tasks cannot request scientific promotion")
+        if forbidden.intersection(value.capability.required_permissions):
+            raise ValueError("development tasks cannot receive issue, reveal or actuator authority")
+        access = value.capability.requested_outcome_access
+        if access not in {OutcomeAccess.OUTCOME_BLIND, OutcomeAccess.DEVELOPMENT_VISIBLE, OutcomeAccess.EVALUATION_REVEALED}:
+            raise ValueError("development tasks must retain exposed access")
+        if access is OutcomeAccess.EVALUATION_REVEALED:
+            if any((output.outcome_access, output.visibility_ceiling) !=
+                   (OutcomeAccess.EVALUATION_REVEALED, VisibilityCeiling.OUTCOME_VISIBLE) for output in value.outputs):
+                raise ValueError("revealed follow-up outputs must retain their exact exposed access pair")
+            if value.barrier is not BarrierKind.NONE:
+                raise ValueError("revealed follow-up cannot authorize an execution barrier")
+        else:
+            expected_access, expected_visibility = development_task_output_custody(value)
+            if any((output.outcome_access, output.visibility_ceiling) != (expected_access, expected_visibility)
+                    for output in value.outputs):
+                raise ValueError("development outputs must retain their exact parent-derived custody")
+
+
+def development_task_output_custody(value):
+    """Compute output restrictions from the actual frozen input contracts.
+
+    Requested development effect permission remains unchanged. This structural
+    closure supplies no permission to open any of its protected input operands.
+    """
+    selected = {}
+    for spec in value.external_inputs:
+        if spec.expected_outcome_access is None or spec.expected_visibility_ceiling is None:
+            continue
+        selected[spec.logical_artifact_id] = (spec.expected_outcome_access, spec.expected_visibility_ceiling)
+    if isinstance(value, (RunPlanStep, ExecutionTask)):
+        for edge in value.scientific_inputs:
+            pair = (edge.outcome_access, edge.visibility_ceiling)
+            previous = selected.setdefault(edge.operational_logical_artifact_id, pair)
+            if previous != pair:
+                raise ValueError("development input changes exact frozen scientific custody")
+    return derived_development_custody(value.capability.requested_outcome_access,
+        VisibilityCeiling.DEVELOPMENT_ONLY, tuple(pair[0] for pair in selected.values()),
+        tuple(pair[1] for pair in selected.values()))

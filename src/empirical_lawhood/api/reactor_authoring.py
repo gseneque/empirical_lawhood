@@ -23,7 +23,8 @@ from empirical_lawhood.kernel.serialization import CanonicalRecord
 from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_run_plan
 from empirical_lawhood.runtime.study_issue import MAX_ISSUE_PAYLOAD_BYTES, project_standard_study_extensions
 from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import FreshReactorAuthoringProfile, fresh_assignment_status
-from empirical_lawhood.infrastructure.source_closure import capture_clean_target_closure
+from empirical_lawhood.api.recursive_prospective_authoring import _capture_prospective_source, _publish_source_provenance
+from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
 
 
 def _save_new(directory: Path, name: str, record: CanonicalRecord) -> Path:
@@ -35,13 +36,16 @@ def _save_new(directory: Path, name: str, record: CanonicalRecord) -> Path:
 
 
 def author_fresh_reactor(
-    *, root: Path, profile: FreshReactorAuthoringProfile, output_dir: Path
+    *, root: Path, profile: FreshReactorAuthoringProfile, output_dir: Path, artifact_writer
 ) -> dict[str, object]:
     """Create strict inputs and pure preissue plan projections; no native task runs."""
 
-    closure = capture_clean_target_closure(
-        root, f"{profile.experiment_id}.source-closure"
-    )
+    artifact_writer.root.verify(for_write=True)
+    output_dir = Path(output_dir).absolute()
+    relative = output_dir.relative_to(Path(artifact_writer.root.contract.canonical_path)).as_posix()
+    artifact_writer.root.resolve(relative+'/source-closure.json', for_write=True)
+    captured = _capture_prospective_source(root, f"{profile.experiment_id}.source-closure", artifact_writer=artifact_writer)
+    closure = captured.closure
     source: ReactorSourceBundle = load_packaged_reactor_source()
     if source.fingerprint() != profile.public_source_sha256:
         raise ValueError(
@@ -131,6 +135,8 @@ def author_fresh_reactor(
     _save_new(output_dir, "preissue-run-plan.json", projected)
     _save_new(output_dir, "preissue-execution-plan.json", lowered)
     _save_new(output_dir, "evidence-profile.json", bundle.evidence_profile)
+    _publish_source_provenance(captured=captured, destination=output_dir, artifact_writer=artifact_writer)
+    GitStudySourceClosureInspector(Path(root)).observe(closure)
     return {
         "experiment_id": profile.experiment_id,
         "implementation_commit": closure.implementation_commit,

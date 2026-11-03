@@ -21,11 +21,13 @@
                 "PARQUET",
                 "AUDITED_HDF5",
                 "NUMPY_NO_PICKLE",
+                "MATRIX_ARRAY_NPZ",
                 "JSONL_CHUNKS",
                 "ONNX",
                 "SAFETENSORS",
                 "TEXT_PARAMETERS",
-                "RAW_SOURCE_BYTES"
+                "RAW_SOURCE_BYTES",
+                "NATIVE_SUBWORK_PREFIX"
               ],
               "type": "string"
             },
@@ -546,11 +548,13 @@
                 "PARQUET",
                 "AUDITED_HDF5",
                 "NUMPY_NO_PICKLE",
+                "MATRIX_ARRAY_NPZ",
                 "JSONL_CHUNKS",
                 "ONNX",
                 "SAFETENSORS",
                 "TEXT_PARAMETERS",
-                "RAW_SOURCE_BYTES"
+                "RAW_SOURCE_BYTES",
+                "NATIVE_SUBWORK_PREFIX"
               ],
               "type": "string"
             },
@@ -1403,11 +1407,13 @@
                 "PARQUET",
                 "AUDITED_HDF5",
                 "NUMPY_NO_PICKLE",
+                "MATRIX_ARRAY_NPZ",
                 "JSONL_CHUNKS",
                 "ONNX",
                 "SAFETENSORS",
                 "TEXT_PARAMETERS",
-                "RAW_SOURCE_BYTES"
+                "RAW_SOURCE_BYTES",
+                "NATIVE_SUBWORK_PREFIX"
               ],
               "type": "string"
             },

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "empirical-lawhood"
-version = "0.2.0"
+version = "0.3.0"
 description = "Auditable empirical response-law research software"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
@@ -31,9 +31,9 @@ dependencies = [
 empirical-lawhood = "empirical_lawhood.cli.entry:main"
 
 [project.urls]
-Repository = "https://github.com/jokebroker/empirical_lawhood"
-Documentation = "https://github.com/jokebroker/empirical_lawhood/blob/main/README.md"
-Issues = "https://github.com/jokebroker/empirical_lawhood/issues"
+Repository = "https://github.com/gseneque/empirical_lawhood"
+Documentation = "https://github.com/gseneque/empirical_lawhood/blob/main/README.md"
+Issues = "https://github.com/gseneque/empirical_lawhood/issues"
 
 [dependency-groups]
 dev = [
@@ -51,6 +51,7 @@ paper = [
   "cairosvg==2.9.1",
 ]
 reactor-example = ["numpy==2.4.6"]
+battery-recursion = ["pybamm==26.6.2.0", "numpy==2.4.6", "scipy==1.17.1"]
 open-simulators = [
   "gymtorax==1.1.1",
   "torax==1.4.2",
@@ -80,6 +81,13 @@ virtual-cell = [
   "scikit-learn>=1.6,<1.8",
 ]
 standard-discovery = ["botorch==0.18.1", "scikit-learn>=1.6,<1.8"]
+rubisco-prediction = ["rapidfuzz==3.14.3", "numpy==2.4.6", "scipy==1.17.1"]
+rubisco-electronic = [
+  "pyscf==2.14.0; sys_platform == 'linux' and platform_machine == 'x86_64'",
+  "numpy==2.4.6",
+  "scipy==1.17.1",
+  "h5py==3.14.0",
+]
 mast-torax-response = [
   "botorch==0.18.1",
   "scikit-learn>=1.6,<1.8",
@@ -104,8 +112,45 @@ name = "pytorch-cu124"
 url = "https://download.pytorch.org/whl/cu124"
 explicit = true
 
+[tool.hatch.build]
+# Local operational records remain in the checkout. Current scientific
+# specifications live with their programmes and remain public source inputs.
+exclude = [
+  "/DOCSTRUCTCONSOL.md",
+  "/APPLIED-EL-REVIEW-WORKING.md", "/CONSOLIDATE.md", "/CONSOLIDATION.md",
+  "/ELSC.md", "/ELTOP5.md", "/MATRIX-FINALOPTIM.md", "/MATRIXAUDIT.md",
+  "/E1-ANALYSIS.md", "/E3-ANALYSIS.md",
+  "/E-RECCHAIN-FINALANALYSIS.md",
+  "/E2-CONTROLPRELIM.md", "/E2-PRELIM.md", "/E2-MECHANISM-ANALYSIS.md",
+  "/E2-MECHANISM-ANALYSIS-RESULTS.md",
+  "/E4-PRELIM.md", "/E4-POSTANALYSIS.md",
+  "/EL-MECHANISM-DENOMINATORS-RECURSION-AND-APPLICATIONS.md",
+  "/EL-PREP-H64-LITERATURE-AUDIT-AND-DESIGN.md", "/RLS-INTEGAUDIT.md",
+  "/RUBCAND-1.md", "/RUBCAND-1-LINEAGE.md",
+  "/PAPERMIGRATION.md", "/RECHAIN-OPTIM-CURRENTSTATE.md", "/THEMATRIX-NOVELTY-E3-E6-REVIEW.md",
+  "/PREPRINTNOVELTY.md", "/RECCHAIN-CURRENT.md", "/RECURARCH.md", "/RUBISCO-FINALSE.md", "/RUBISCO-FINALSE-UPDATED.md", "/RUBISCO-LOOP.md",
+  "/RUBISCO-PRIZE-REFINED-PLAN.md", "/THEMATRIX-AUDIT-EXPDESIGN.md", "/THEMATRIX-LEAN.md",
+  "/THEMATRIX-MIDFIXES.md", "/THEMATRIX-OPTIM-DEFERRED.md", "/THEMATRIX-OPTIM.md",
+  "/THEMATRIX.md", "/WTF.md", "/WTF-FINALDESIGN.md", "/WTF-OPTIMPRIO.md", "/docs/plans", "/PROREVIEW", "/docs/blog",
+  "/FINAL*.md", "/DERPCHAIN*.md", "/LOWFRICTION*.md", "/SCIREVIEW*.md", "/DOCFINALISE*.md",
+  "/docs/applied-el-handoff.md",
+  "/docs/applied-el/architecture-finalisation.md",
+  "/docs/applied-el/battery-controller-composition.md",
+  "/docs/applied-el/battery-interface-selection.md",
+  "/docs/applied-el/ra0-selection.md",
+  "/docs/applied-el/consolidation-c4-progress.md",
+  "/docs/applied-el/matrix-factor-development-progress.md",
+  "/docs/applied-el/battery-remediation-progress.md",
+  "/docs/rubisco-inquiry/scientific-redirection-v1.md",
+  "/src/empirical_lawhood/adapters/methods/preparation_applicability/frozen_specification.md",
+  "/src/empirical_lawhood/adapters/methods/constructed_preparation_applicability/frozen_specification.md",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/empirical_lawhood"]
+
+[tool.hatch.build.hooks.custom]
+path = "scripts/hatch_build.py"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

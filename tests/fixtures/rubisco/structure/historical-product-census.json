@@ -1,0 +1,40 @@
+{
+  "contains_execution_receipts": false,
+  "evidence_role": "EXPOSED_SOFTWARE_CONFORMANCE_ONLY",
+  "fresh_independent_units": 0,
+  "members": {
+    "assessment-historical-v1.json.gz": {
+      "compressed_bytes": 1587,
+      "compressed_sha256": "19ff049c401580b6c8af92ba269a56dfa3b1384c88e7bfda7e599260e9111a7b",
+      "original_path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/rubisco-insilico01/working/check2-structure-execution01/runs/recursive.fd9dbedcb5bdf18092d9042e/outputs/rubisco-insilico-structure.assess/assessment.json",
+      "original_receipt_path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/rubisco-insilico01/working/check2-structure-execution01/runs/recursive.fd9dbedcb5bdf18092d9042e/receipts/rubisco-insilico-structure.assess/recursive.fd9dbedcb5bdf18092d9042e.rubisco-insilico-structure.assess.attempt-001.json",
+      "original_receipt_sha256": "d21f69036e16da3bb831972ce85f5a1f800e7b2365f4258b5d0a28598ab9c917",
+      "raw_bytes": 5017,
+      "raw_sha256": "a6e3c37015f4572ac8c971c1e6dc505e60b7849ed70f8cc2e8fc99333e79786c",
+      "receipt_id": "receipt.recursive.fd9dbedcb5bdf18092d9042e.rubisco-insilico-structure.assess.attempt-001"
+    },
+    "coordinates-historical-v1.json.gz": {
+      "compressed_bytes": 1847172,
+      "compressed_sha256": "59df0efae1437eb2c81eb05820cd15bac39ba87ab17b1beca80c6408140adbc8",
+      "original_path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/rubisco-insilico01/working/check2-structure-execution01/runs/recursive.fd9dbedcb5bdf18092d9042e/outputs/rubisco-insilico-structure.analyze/coordinates.json",
+      "original_receipt_path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/rubisco-insilico01/working/check2-structure-execution01/runs/recursive.fd9dbedcb5bdf18092d9042e/receipts/rubisco-insilico-structure.analyze/recursive.fd9dbedcb5bdf18092d9042e.rubisco-insilico-structure.analyze.attempt-001.json",
+      "original_receipt_sha256": "670099f5634c25b4ae74cdf37aba93f5721f26965a16692d2493cf42c34d17ac",
+      "raw_bytes": 9769594,
+      "raw_sha256": "95d9f2237457e55fa11499b4bccf3d7a67b74b09f16e6a2747ebb03b9f799b8f",
+      "receipt_id": "receipt.recursive.fd9dbedcb5bdf18092d9042e.rubisco-insilico-structure.analyze.attempt-001"
+    },
+    "inventory-historical-v1.json.gz": {
+      "compressed_bytes": 1651245,
+      "compressed_sha256": "42ce590ab4065f56002a7e21b0bb555b54473825fd0e250e1f73e50d1609b141",
+      "original_path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/rubisco-insilico01/working/check2-structure-execution01/runs/recursive.fd9dbedcb5bdf18092d9042e/outputs/rubisco-insilico-structure.analyze/inventory.json",
+      "original_receipt_path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/rubisco-insilico01/working/check2-structure-execution01/runs/recursive.fd9dbedcb5bdf18092d9042e/receipts/rubisco-insilico-structure.analyze/recursive.fd9dbedcb5bdf18092d9042e.rubisco-insilico-structure.analyze.attempt-001.json",
+      "original_receipt_sha256": "670099f5634c25b4ae74cdf37aba93f5721f26965a16692d2493cf42c34d17ac",
+      "raw_bytes": 35799258,
+      "raw_sha256": "a6d7af1a6f0e772ad857e5d3f9d313e2ff77c26bae0912a60b4740bedc966d8c",
+      "receipt_id": "receipt.recursive.fd9dbedcb5bdf18092d9042e.rubisco-insilico-structure.analyze.attempt-001"
+    }
+  },
+  "scientific_qualification": "NOT_PERFORMED",
+  "source_operands": "tests/fixtures/rubisco/nomination/source-operands.tar.gz (existing authenticated complete archive)",
+  "thinning": "NONE_COMPLETE_CANONICAL_PRODUCTS"
+}

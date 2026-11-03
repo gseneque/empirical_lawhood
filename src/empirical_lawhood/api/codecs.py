@@ -60,7 +60,7 @@ from empirical_lawhood.runtime.candidate_compiler import CandidateCompilationRep
 from empirical_lawhood.runtime.study_issue import MAX_COMPOSED_PROGRAMME_CONTROL_BYTES, IssuedDraftManifest, StudyPublicationReceipt, ExtensionPublicationReceipt, StudyExtensionDecoderRegistration, IssuedStudyManifest, IssuedExecutableStudyManifest
 from empirical_lawhood.runtime.study_bundle_compiler import StudyBundleCandidate, StudyBundleCompilationInput, StudyBundleCompilationReport
 
-from .models import CampaignPackage, DualLoopPackage, ExplorationExecutionPackage, IssuedCampaignPackage, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage, ElapsedExperimentPackage
+from empirical_lawhood.api.models import CampaignPackage, DualLoopPackage, ExplorationExecutionPackage, IssuedCampaignPackage, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage, ElapsedExperimentPackage
 
 
 @dataclass
@@ -146,6 +146,9 @@ RootRecord = (
 )
 RecordT = TypeVar("RecordT", bound=CanonicalRecord)
 MAX_AUTHORING_BYTES = 128 * 1024**2
+# Closed executable definitions use the existing composed-control capacity.
+# Generic editable authoring and its complexity limits remain unchanged.
+MAX_EXECUTABLE_STUDY_AUTHORING_BYTES = MAX_COMPOSED_PROGRAMME_CONTROL_BYTES
 MAX_CAMPAIGN_PACKAGE_BYTES = MAX_COMPOSED_PROGRAMME_CONTROL_BYTES
 MAX_AUTHORING_ROOT_SCHEMAS = 128
 MAX_AUTHORING_NESTING = 128
@@ -277,8 +280,8 @@ class LoadedAuthoringMaterialization:
 
 
 def _snapshot_root_schemas(
-    root_schemas: Mapping[str, type[RecordT]],
-) -> Mapping[str, type[RecordT]]:
+    root_schemas: Mapping[str | tuple[str, str], type[RecordT]],
+) -> Mapping[str | tuple[str, str], type[RecordT]]:
     """Validate one small, closed, implementation-owned authoring registry."""
 
     if not isinstance(root_schemas, Mapping):
@@ -287,17 +290,21 @@ def _snapshot_root_schemas(
         raise ValueError(
             f"authoring root registry size must be in [1, {MAX_AUTHORING_ROOT_SCHEMAS}]"
         )
-    snapshot: dict[str, type[RecordT]] = {}
+    snapshot: dict[str | tuple[str, str], type[RecordT]] = {}
     for schema, record_type in tuple(root_schemas.items()):
         if (
-            not isinstance(schema, str)
+            not (isinstance(schema, str) or type(schema) is tuple and len(schema) == 2
+                and all(type(part) is str for part in schema))
             or not isinstance(record_type, type)
             or not issubclass(record_type, CanonicalRecord)
             or not is_dataclass(record_type)
-            or schema != record_type.SCHEMA
+            or schema != (record_type.SCHEMA if isinstance(schema, str) else
+                (record_type.SCHEMA, record_type.VERSION))
         ):
             raise ValueError("authoring root registry contains an invalid schema binding")
         snapshot[schema] = record_type
+    if any(type(key) is tuple and key[0] in snapshot for key in snapshot):
+        raise ValueError("authoring root registry mixes ambiguous schema and exact-revision families")
     if len(snapshot) != len(root_schemas):
         raise ValueError("authoring root registry changed during validation")
     return types.MappingProxyType(snapshot)
@@ -572,7 +579,7 @@ def loads_registered_authoring(
     text: str,
     *,
     media_type: str,
-    root_schemas: Mapping[str, type[RecordT]],
+    root_schemas: Mapping[str | tuple[str, str], type[RecordT]],
     maximum_bytes: int = MAX_AUTHORING_BYTES,
 ) -> RecordT:
     """Decode one root from an explicit closed schema registry.
@@ -595,7 +602,7 @@ def _loads_registered_authoring(
     text: str,
     *,
     media_type: str,
-    root_schemas: Mapping[str, type[RecordT]],
+    root_schemas: Mapping[str | tuple[str, str], type[RecordT]],
     maximum_bytes: int,
     maximum_allowed_bytes: int,
     maximum_nodes: int | None = None,
@@ -621,9 +628,16 @@ def _loads_registered_authoring(
             raise AuthoringCodecError(f"unsupported authoring media type: {media_type}")
         document = _mapping(raw, where="document")
         schema = document.get("schema")
-        if not isinstance(schema, str) or schema not in schema_registry:
+        if not isinstance(schema, str):
             raise AuthoringCodecError("unsupported authoring root schema")
-        record_type = schema_registry[schema]
+        revision = document.get("version")
+        key = (schema, revision) if type(revision) is str else None
+        if key is not None and key in schema_registry:
+            record_type = schema_registry[key]
+        elif schema in schema_registry:
+            record_type = schema_registry[schema]
+        else:
+            raise AuthoringCodecError("unsupported authoring root schema or revision")
         if (
             issubclass(record_type, (ProtocolRunPlan, ProtocolExecutionPlan))
             and encoded_size > MAX_RUNTIME_PLAN_JSON_BYTES
@@ -645,7 +659,7 @@ def loads_authoring(text: str, *, media_type: str) -> RootRecord:
 def load_registered_authoring(
     path: Path,
     *,
-    root_schemas: Mapping[str, type[RecordT]],
+    root_schemas: Mapping[str | tuple[str, str], type[RecordT]],
     maximum_bytes: int = MAX_AUTHORING_BYTES,
 ) -> RecordT:
     materialization = load_registered_authoring_materialization(
@@ -659,7 +673,7 @@ def load_registered_authoring(
 def load_registered_authoring_materialization(
     path: Path,
     *,
-    root_schemas: Mapping[str, type[RecordT]],
+    root_schemas: Mapping[str | tuple[str, str], type[RecordT]],
     maximum_bytes: int = MAX_AUTHORING_BYTES,
 ) -> LoadedAuthoringMaterialization:
     return _load_registered_authoring_materialization(
@@ -673,7 +687,7 @@ def load_registered_authoring_materialization(
 def _load_registered_authoring_materialization(
     path: Path,
     *,
-    root_schemas: Mapping[str, type[RecordT]],
+    root_schemas: Mapping[str | tuple[str, str], type[RecordT]],
     maximum_bytes: int,
     maximum_allowed_bytes: int,
     maximum_nodes: int | None = None,
@@ -754,6 +768,28 @@ def loads_campaign_package_authoring(
         maximum_allowed_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
         maximum_nodes=MAX_COMPOSED_CONTROL_NODES,
     )
+
+
+def load_executable_study_authoring_materialization(path: Path) -> LoadedAuthoringMaterialization:
+    """Load only the closed executable definition roots under their public capacity.
+
+    Retain the generic strict parser, schema/revision checks, node and nesting
+    limits. This grants no extension decoder capacity or issue authority.
+    """
+    return _load_registered_authoring_materialization(
+        path,
+        root_schemas={
+            ExecutableStudyDefinition.SCHEMA: ExecutableStudyDefinition,
+            RetrospectiveAuthoringPackage.SCHEMA: RetrospectiveAuthoringPackage,
+        },
+        maximum_bytes=MAX_EXECUTABLE_STUDY_AUTHORING_BYTES,
+        maximum_allowed_bytes=MAX_EXECUTABLE_STUDY_AUTHORING_BYTES,
+    )
+
+
+def load_executable_study_authoring(path: Path) -> ExecutableStudyDefinition:
+    """Return the same closed executable root, preserving exact parsed bytes."""
+    return cast(ExecutableStudyDefinition, load_executable_study_authoring_materialization(path).record)
 
 
 def load_standard_study_candidate(path: Path) -> ExecutableStudyCandidate:

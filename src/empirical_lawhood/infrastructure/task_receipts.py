@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections.abc import Mapping
+from dataclasses import replace
 from pathlib import Path
 
 from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
@@ -26,14 +28,15 @@ from empirical_lawhood.runtime.artifacts import (
     CanonicalTaskReceipt,
     LogicalArtifactIdentity,
     ReceiptCheck,
+    artifact_publication_batch_id,
+    artifact_publication_commit_relative_path,
+    artifact_publication_intent_relative_path,
+    artifact_publication_member,
 )
 
 from .artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
 from .bounded_io import (
     BoundedFileIOError,
-    MAX_ARTIFACT_MANIFEST_BYTES,
-    MAX_ARTIFACT_PUBLICATION_INTENT_BYTES,
-    MAX_CONTROL_PLANE_JSON_BYTES,
     read_bounded_bytes,
 )
 
@@ -49,9 +52,9 @@ from .bounded_io import (
 
 
 
-def _read_control_plane_json(path: Path) -> bytes:
+def _read_control_plane_json(path: Path, *, maximum_bytes: int | None = None) -> bytes:
     try:
-        return read_bounded_bytes(path, maximum_bytes=MAX_CONTROL_PLANE_JSON_BYTES)
+        return read_bounded_bytes(path, maximum_bytes=maximum_bytes)
     except (BoundedFileIOError, OSError) as error:
         raise ArtifactIdentityConflict("task receipt control-plane file is invalid") from error
 
@@ -153,8 +156,8 @@ def _receipt_check(document: object) -> ReceiptCheck:
     )
 
 
-def _json_document(payload: bytes, label: str) -> object:
-    if not payload or len(payload) > MAX_CONTROL_PLANE_JSON_BYTES:
+def _json_document(payload: bytes, label: str, *, maximum_bytes: int | None = None) -> object:
+    if not payload or (maximum_bytes is not None and len(payload) > maximum_bytes):
         raise CanonicalizationError(f"{label} violates its control-plane byte limit")
     try:
         return json.loads(payload.decode("utf-8"))
@@ -162,8 +165,8 @@ def _json_document(payload: bytes, label: str) -> object:
         raise CanonicalizationError(f"{label} is not canonical UTF-8 JSON") from error
 
 
-def decode_task_receipt(payload: bytes) -> CanonicalTaskReceipt:
-    document = _json_document(payload, "task receipt")
+def decode_task_receipt(payload: bytes, *, maximum_bytes: int | None = None) -> CanonicalTaskReceipt:
+    document = _json_document(payload, "task receipt", maximum_bytes=maximum_bytes)
     mapping = _mapping(document, "task receipt")
     observed_schema = _string(mapping.get("schema"), "schema")
     if observed_schema != CanonicalTaskReceipt.SCHEMA:
@@ -475,10 +478,10 @@ def _publication_scope(document: object) -> ArtifactPublicationScope:
     )
 
 
-def decode_artifact_publication_intent(payload: bytes) -> ArtifactPublicationIntent:
-    if len(payload) > MAX_ARTIFACT_PUBLICATION_INTENT_BYTES:
+def decode_artifact_publication_intent(payload: bytes, *, maximum_bytes: int | None = None) -> ArtifactPublicationIntent:
+    if maximum_bytes is not None and len(payload) > maximum_bytes:
         raise CanonicalizationError("artifact publication intent exceeds its byte limit")
-    document = _json_document(payload, "artifact publication intent")
+    document = _json_document(payload, "artifact publication intent", maximum_bytes=maximum_bytes)
     value = _record(
         document,
         schema=ArtifactPublicationIntent.SCHEMA,
@@ -545,10 +548,71 @@ def _lineage_parent(document: object) -> ArtifactLineageParent:
     )
 
 
-def decode_artifact_manifest(payload: bytes) -> ArtifactManifest:
-    if len(payload) > MAX_ARTIFACT_MANIFEST_BYTES:
+def _manifest_publication_tail() -> bytes:
+    return b'},"version":"' + ArtifactManifest.VERSION.encode("ascii") + b'"}\n'
+
+
+def encode_artifact_manifest(
+    logical: LogicalArtifactIdentity,
+    materialization: ArtifactMaterialization,
+    publication: ArtifactPublicationBinding,
+) -> bytes:
+    """Compose the exact existing canonical sidecar with one shared binding."""
+    if type(publication) is not ArtifactPublicationBinding:
+        raise TypeError("artifact manifest requires a typed publication binding")
+    # Retain the canonical record's own logical/materialization/membership checks.
+    ArtifactManifest(logical, materialization, publication)
+    metadata = ArtifactManifest(logical, materialization).canonical_bytes()
+    tail = _manifest_publication_tail()
+    null_suffix = b',"publication":null' + tail
+    if not metadata.endswith(null_suffix):
+        raise CanonicalizationError("artifact manifest metadata envelope differs")
+    return (metadata[:-len(null_suffix)] + b',"publication":'
+        + publication.canonical_bytes()[:-1] + tail)
+
+
+def _decode_artifact_manifest_with_publication(
+    payload: bytes,
+    publication: ArtifactPublicationBinding,
+) -> ArtifactManifest:
+    if type(publication) is not ArtifactPublicationBinding:
+        raise TypeError("artifact manifest requires a typed publication binding")
+    # The canonical publication is the last value field. Compare its exact
+    # bounded span, without parsing or copying the repeated member roster.
+    key = b',"publication":'
+    tail = _manifest_publication_tail()
+    binding_bytes = publication.canonical_bytes()
+    start = len(payload) - len(key) - (len(binding_bytes) - 1) - len(tail)
+    binding_start = start + len(key)
+    binding_end = len(payload) - len(tail)
+    if (start < 0 or payload[start:binding_start] != key
+            or not payload.endswith(tail)
+            or not payload.startswith(memoryview(binding_bytes)[:-1], binding_start, binding_end)):
+        raise CanonicalizationError("artifact manifest publication differs from known binding")
+    metadata_payload = payload[:start] + key + b"null" + tail
+    document = _json_document(metadata_payload, "artifact manifest")
+    value = _record(document, schema=ArtifactManifest.SCHEMA, version=ArtifactManifest.VERSION,
+        fields=frozenset({"logical", "materialization", "publication"}))
+    metadata = ArtifactManifest(
+        logical=_logical_identity(value["logical"]),
+        materialization=_materialization(value["materialization"]),
+    )
+    if value["publication"] is not None or metadata.canonical_bytes() != metadata_payload:
+        raise CanonicalizationError("artifact manifest bytes are not canonical")
+    return ArtifactManifest(metadata.logical, metadata.materialization, publication)
+
+
+def decode_artifact_manifest(
+    payload: bytes,
+    *,
+    maximum_bytes: int | None = None,
+    publication: ArtifactPublicationBinding | None = None,
+) -> ArtifactManifest:
+    if maximum_bytes is not None and len(payload) > maximum_bytes:
         raise CanonicalizationError("artifact manifest exceeds its byte limit")
-    document = _json_document(payload, "artifact manifest")
+    if publication is not None:
+        return _decode_artifact_manifest_with_publication(payload, publication)
+    document = _json_document(payload, "artifact manifest", maximum_bytes=maximum_bytes)
     mapping = _mapping(document, "artifact manifest")
     observed_schema = _string(mapping.get("schema"), "schema")
     if observed_schema != ArtifactManifest.SCHEMA:
@@ -599,6 +663,8 @@ class ExternalTaskReceiptStore:
         visibility_ceiling: VisibilityCeiling,
         outcome_access: OutcomeAccess,
     ) -> ArtifactWriteResult:
+        if self.plane.custody_limits.exceeds("control_record_bytes", len(receipt.canonical_bytes())):
+            raise ArtifactIdentityConflict("task receipt exceeds its selected byte bound")
         if len(receipt.output_logical_artifacts) != len(receipt.output_materializations):
             raise ArtifactIdentityConflict(
                 "new task receipts require exact logical output identities"
@@ -624,29 +690,77 @@ class ExternalTaskReceiptStore:
                 ),
             )
         )
-        return self.plane.write(
-            ArtifactWriteRequest(
-                logical_artifact_id=f"task-receipt.{receipt.receipt_id}",
-                relative_path=self._relative_path(
-                    receipt.run_id,
-                    receipt.task_id,
-                    receipt.attempt_id,
-                ),
-                payload_schema=receipt.SCHEMA,
-                profile=ArtifactProfile.CANONICAL_JSON,
-                media_type="application/json",
-                publication_scope_id=f"task-receipts.{receipt.run_id}",
-                publication_scope_relative_root=f"runs/{receipt.run_id}/receipts",
-                payload=receipt.canonical_bytes(),
-                visibility_ceiling=visibility_ceiling,
-                parent_visibility_ceilings=tuple(
-                    parent.visibility_ceiling for parent in lineage_parents
-                ),
-                outcome_access=outcome_access,
-                lineage_parents=lineage_parents,
-                minimum_free_bytes=self.minimum_free_bytes,
-            )
+        request = ArtifactWriteRequest(
+            logical_artifact_id=f"task-receipt.{receipt.receipt_id}",
+            relative_path=self._relative_path(
+                receipt.run_id,
+                receipt.task_id,
+                receipt.attempt_id,
+            ),
+            payload_schema=receipt.SCHEMA,
+            profile=ArtifactProfile.CANONICAL_JSON,
+            media_type="application/json",
+            publication_scope_id=f"task-receipts.{receipt.run_id}",
+            publication_scope_relative_root=f"runs/{receipt.run_id}/receipts/{receipt.task_id}",
+            payload=receipt.canonical_bytes(),
+            visibility_ceiling=visibility_ceiling,
+            parent_visibility_ceilings=tuple(
+                parent.visibility_ceiling for parent in lineage_parents
+            ),
+            outcome_access=outcome_access,
+            lineage_parents=lineage_parents,
+            minimum_free_bytes=self.minimum_free_bytes,
         )
+        return self.plane.write(self._publication_request(request))
+
+    def _publication_request(self, request: ArtifactWriteRequest) -> ArtifactWriteRequest:
+        """Keep original custody; new receipts use their task's control directory.
+
+        A run-wide publication scope accumulates ordinary and nested receipt
+        markers and locks in one directory. Task-local scopes preserve receipt
+        bytes and locators while avoiding that shared directory's entry limit.
+        Existing sidecars and interrupted legacy batch controls retain their
+        original exact scope; this selection neither repairs nor removes them.
+        """
+        task_root = request.publication_scope_relative_root
+        legacy_root = task_root.rsplit('/', 1)[0]
+        sidecar = self.plane.root.resolve(request.relative_path + '.manifest.json', for_write=False)
+        if sidecar.exists():
+            manifest = decode_artifact_manifest(
+                _read_control_plane_json(sidecar, maximum_bytes=self.plane.custody_limits.manifest_bytes),
+                maximum_bytes=self.plane.custody_limits.manifest_bytes,
+            )
+            scope = manifest.publication.publication_scope
+            if (scope.publication_scope_id != request.publication_scope_id
+                    or scope.relative_root not in (legacy_root, task_root)):
+                raise ArtifactIdentityConflict('task receipt has a foreign publication scope')
+            return replace(request, publication_scope_relative_root=scope.relative_root)
+
+        logical, materialization, _, _ = self.plane._prepare_identity(
+            request, physical_sha256=hashlib.sha256(request.payload).hexdigest(),
+            size_bytes=len(request.payload),
+        )
+        members = (artifact_publication_member(logical, materialization),)
+        retained_roots = []
+        for root in (legacy_root, task_root):
+            scope = ArtifactPublicationScope(request.publication_scope_id,
+                self.plane.root.contract.storage_root_id, root,
+                request.visibility_ceiling, request.outcome_access)
+            batch_id = artifact_publication_batch_id(scope, members)
+            if any(self.plane.root.resolve(relative, for_write=False).exists() for relative in (
+                    artifact_publication_commit_relative_path(scope, batch_id),
+                    artifact_publication_intent_relative_path(scope, batch_id))):
+                retained_roots.append(root)
+        if len(retained_roots) > 1:
+            raise ArtifactIdentityConflict('task receipt has competing publication scopes')
+        if retained_roots:
+            return replace(request, publication_scope_relative_root=retained_roots[0])
+        if self.plane.root.resolve(request.relative_path, for_write=False).exists():
+            # An older uncommitted payload has no reliable new-scope witness.
+            # Preserve its legacy publication path and the writer's existing
+            # conflict/partial-publication rules instead of inferring success.
+            return replace(request, publication_scope_relative_root=legacy_root)
+        return request
 
     def read_by_receipt_id(
         self,
@@ -671,8 +785,9 @@ class ExternalTaskReceiptStore:
             raise ArtifactIdentityConflict("current receipt lacks its scheduler locator")
         attempt_id = receipt_id.removeprefix("receipt.")
         validate_stable_id(attempt_id, field_name="attempt_id")
-        if not attempt_id.startswith(f"{run_id}.{task_id}."):
-            raise ArtifactIdentityConflict("receipt locator substitutes its run or task")
+        # Attempt identifiers are opaque. Additive recovery uses bounded IDs
+        # which need not embed the run and task. The selected path and decoded
+        # canonical receipt below authenticate all three identities together.
         receipt = self.read(run_id, task_id, attempt_id)
         if receipt is not None and receipt.receipt_id != receipt_id:
             raise ArtifactIdentityConflict("receipt locator differs from committed identity")
@@ -684,24 +799,38 @@ class ExternalTaskReceiptStore:
         task_id: str,
         attempt_id: str,
     ) -> CanonicalTaskReceipt | None:
+        selected = self._read_envelope(run_id, task_id, attempt_id)
+        if selected is None:
+            return None
+        path, manifest = selected
+        self.plane.verify_manifest(manifest)
+        return self._read_body(run_id, task_id, attempt_id, path, manifest)
+
+    def _read_envelope(self, run_id, task_id, attempt_id, *, _paths=None):
+        """Resolve only the original bounded pair; no reusable custody proof."""
         relative_path = self._relative_path(run_id, task_id, attempt_id)
-        path = self.plane.root.resolve(relative_path, for_write=False)
-        manifest_path = self.plane.root.resolve(f"{relative_path}.manifest.json", for_write=False)
+        path = (self.plane.root.resolve(relative_path, for_write=False)
+            if _paths is None else _paths[relative_path])
+        manifest_path = (self.plane.root.resolve(f"{relative_path}.manifest.json", for_write=False)
+            if _paths is None else _paths[relative_path + '.manifest.json'])
         if not path.exists() and not manifest_path.exists():
             return None
         if not path.is_file() or not manifest_path.is_file():
             raise ArtifactIdentityConflict("task receipt/manifest pair is partial")
-        manifest = decode_artifact_manifest(_read_control_plane_json(manifest_path))
+        manifest = decode_artifact_manifest(_read_control_plane_json(manifest_path, maximum_bytes=self.plane.custody_limits.manifest_bytes), maximum_bytes=self.plane.custody_limits.manifest_bytes)
         if (
             manifest.materialization.relative_path != relative_path
-            or manifest.materialization.size_bytes > MAX_CONTROL_PLANE_JSON_BYTES
+            or self.plane.custody_limits.exceeds("control_record_bytes", manifest.materialization.size_bytes)
             or manifest.logical.payload_schema != CanonicalTaskReceipt.SCHEMA
             or manifest.logical.profile is not ArtifactProfile.CANONICAL_JSON
             or manifest.logical.media_type != "application/json"
         ):
             raise ArtifactIdentityConflict("task receipt manifest violates its bounded contract")
-        self.plane.verify_manifest(manifest)
-        receipt = decode_task_receipt(_read_control_plane_json(path))
+        return path, manifest
+
+    def _read_body(self, run_id, task_id, attempt_id, path, manifest):
+        """Decode inside the caller's live authenticated member boundary."""
+        receipt = decode_task_receipt(_read_control_plane_json(path, maximum_bytes=manifest.materialization.size_bytes), maximum_bytes=self.plane.custody_limits.control_record_bytes)
         if (receipt.run_id, receipt.task_id, receipt.attempt_id) != (
             run_id,
             task_id,
@@ -714,3 +843,40 @@ class ExternalTaskReceiptStore:
         if manifest.logical.content_sha256 != receipt.fingerprint():
             raise ArtifactIdentityConflict("task receipt content identity differs")
         return receipt
+
+
+class ExternalNativeContinuationReceiptStore(ExternalTaskReceiptStore):
+    """Disjoint storage for the frozen native owner's original receipt names."""
+
+    def __init__(self, plane, *, continuation_scope, minimum_free_bytes=0):
+        from empirical_lawhood.runtime.native_continuation_execution import NativeContinuationCustodyScope
+        if type(continuation_scope) is not NativeContinuationCustodyScope:
+            raise TypeError('separate native receipt custody requires its exact continuation scope')
+        continuation_scope.__post_init__()
+        super().__init__(plane, minimum_free_bytes=minimum_free_bytes)
+        self.continuation_scope = continuation_scope
+
+    def _relative_path(self, run_id, task_id, attempt_id):
+        from empirical_lawhood.kernel.serialization import validate_stable_id
+        for value in (run_id, task_id, attempt_id):
+            validate_stable_id(value)
+        if (run_id != self.continuation_scope.original_contact.run_id or not task_id.startswith('native-subwork.')
+                or attempt_id != f'{run_id}.{task_id}.attempt-001'):
+            raise ValueError('separate native receipts cannot redirect ordinary parent custody')
+        return f'{self.continuation_scope.relative_root}/receipts/{task_id}/{attempt_id}.json'
+
+    def _publication_request(self, request):
+        return super()._publication_request(replace(request,
+            publication_scope_relative_root=request.relative_path.rsplit('/', 1)[0]))
+
+
+_STOCK_TASK_RECEIPT_READ_METHODS = tuple((name, getattr(ExternalTaskReceiptStore, name))
+    for name in ("read", "_read_envelope", "_read_body", "_relative_path"))
+
+
+def _has_stock_task_receipt_reads(store):
+    """Preserve serial hooks; this is only an invocation-local route selection."""
+    return (type(store) is ExternalTaskReceiptStore
+        and set(vars(store)) == {"plane", "minimum_free_bytes"}
+        and all(getattr(type(store), name) is original
+            for name, original in _STOCK_TASK_RECEIPT_READ_METHODS))

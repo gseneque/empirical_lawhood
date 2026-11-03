@@ -1,0 +1,16 @@
+{
+  "role": "EXPOSED_ORIGINAL_PUBLICATION_BYTES_FOR_SOFTWARE_SOURCE_TESTS_NOT_KINETIC_QUALIFICATION",
+  "doi": "10.1126/sciadv.aeh3246",
+  "authors": "McDonald et al.",
+  "primary": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13644767/fullTextXML",
+  "supplement_collection": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13644767/supplementaryFiles",
+  "license": "CC BY 4.0, unchanged primary XML permissions statement in ../mcdonald2026/primary.xml",
+  "extraction": "Exact original S1 member copy from retained supplement table ZIP; no formula execution or preprocessing",
+  "files": [
+    {
+      "member": "sciadv.aeh3246_table_s1.xlsx",
+      "bytes": 698031,
+      "sha256": "01c58e35fa43a8cc1a363d58ca4e4c5e3ff2c262c5c4f3b10002ceb3c869ff26"
+    }
+  ]
+}

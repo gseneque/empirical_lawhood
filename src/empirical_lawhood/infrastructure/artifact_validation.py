@@ -7,6 +7,7 @@ import functools
 import hashlib
 import io
 import itertools
+import inspect
 import json
 import math
 import re
@@ -19,93 +20,61 @@ from importlib.metadata import distribution
 from pathlib import Path
 from typing import BinaryIO, Iterator, TypeVar
 
-import h5py  # type: ignore[import-untyped]
-import numpy as np
-import numpy.typing as npt
-import onnx
-import pyarrow as pa  # type: ignore[import-untyped]
-import pyarrow.parquet as pq  # type: ignore[import-untyped]
-from safetensors import SafetensorError, safe_open
-from safetensors.numpy import load as load_safetensors
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import h5py
+    import numpy as np
+    import numpy.typing as npt
+    import onnx
+    import pyarrow as pa
+    import pyarrow.parquet as pq
 
 from empirical_lawhood.kernel.serialization import (
     canonical_json_bytes,
-    validate_nonempty,
     validate_schema,
-    validate_sha256,
 )
 from empirical_lawhood.runtime.artifacts import (
+    ArtifactCustodyLimits,
     ArtifactGenericValidation,
     ArtifactProfile,
     ArtifactStreamWriteRequest,
     ArtifactWriteRequest,
 )
 
+from empirical_lawhood.runtime.recursive_storage_codecs import (
+    RecursiveStorageCodec, resolve_storage_codec, validate_storage_codecs,
+)
+
+from .artifact_stream_primitives import (
+    ArtifactPlaneError as ArtifactPlaneError,
+    ExternalRootUnavailable as ExternalRootUnavailable,
+    ArtifactIdentityConflict as ArtifactIdentityConflict,
+    ArtifactInputLimitExceeded as ArtifactInputLimitExceeded,
+    STREAM_CHUNK_BYTES as STREAM_CHUNK_BYTES,
+)
 from .bounded_io import (
     BoundedFileIOError,
     read_bounded_bytes,
 )
 
 
-class ArtifactPlaneError(RuntimeError):
-    "Base error for guarded artifact operations."
 
 
-class ExternalRootUnavailable(ArtifactPlaneError):
-    pass
 
 
-class ArtifactIdentityConflict(ArtifactPlaneError):
-    pass
 
 
-class ArtifactInputLimitExceeded(ArtifactPlaneError):
-    pass
 
 
 MAX_TEXT_PARAMETER_BYTES = 64 * 1024**2
 MAX_MODEL_PAYLOAD_BYTES = 256 * 1024**2
 MAX_SAFETENSORS_HEADER_BYTES = 1024 * 1024
-STREAM_CHUNK_BYTES = 1024 * 1024
 MAX_IN_MEMORY_ARTIFACT_BYTES = 32 * 1024**2
 MAX_JSONL_RECORD_BYTES = 1024 * 1024
 MAX_CANONICAL_JSON_TOKEN_BYTES = 1024 * 1024
 MAX_CANONICAL_JSON_DEPTH = 128
 MAX_VALIDATOR_IMPLEMENTATION_SOURCE_BYTES = 2 * 1024**2
-MAX_GENERIC_VALIDATION_COMPATIBILITIES = 64
-GenericValidationCompatibility = tuple[
-    ArtifactGenericValidation,
-    ArtifactGenericValidation,
-]
-
-
-@dataclass(frozen=True, slots=True)
-class GenericValidatorImplementationCompatibility:
-    """One exact predecessor implementation admitted for schema-generic replay."""
-
-    validator_key: str
-    validator_version: str
-    validator_implementation_sha256: str
-    profile: ArtifactProfile
-
-    def __post_init__(self) -> None:
-        validate_nonempty(self.validator_key, field_name="validator_key")
-        validate_nonempty(self.validator_version, field_name="validator_version")
-        validate_sha256(
-            self.validator_implementation_sha256,
-            field_name="validator_implementation_sha256",
-        )
-
-    @property
-    def key(self) -> tuple[str, str, str, ArtifactProfile]:
-        return (
-            self.validator_key,
-            self.validator_version,
-            self.validator_implementation_sha256,
-            self.profile,
-        )
-
-
 @dataclass(frozen=True, slots=True)
 class NumpyArrayContract:
     """Exact safe-array semantics registered by infrastructure composition."""
@@ -115,6 +84,7 @@ class NumpyArrayContract:
     shape: tuple[int | None, ...]
 
     def __post_init__(self) -> None:
+        import numpy as np
         validate_schema(self.payload_schema)
         dtype = np.dtype(self.dtype)
         if dtype.hasobject:
@@ -386,6 +356,7 @@ class HDF5ObjectContract:
     required: bool = True
 
     def __post_init__(self) -> None:
+        import numpy as np
         if type(self.required) is not bool:
             raise ValueError("HDF5 object required policy must be boolean")
         if self.path != "/" and (
@@ -570,6 +541,82 @@ def _decoded_json_bytes(value: object) -> bytes:
 
 _CONTAINER_VALUE = object()
 _CANONICAL_READ_CHUNK_BYTES = 64 * 1024
+_CANONICAL_PUNCTUATION = {ord(value): value for value in "{}[]:,"}
+_CANONICAL_NUMBER_END = re.compile(rb"[^+0-9.eE-]")
+_CANONICAL_INTEGER = re.compile(rb"(?:0|-?[1-9][0-9]*)")
+# Large retained campaign controls still fit the selected bounded metadata
+# reader. Keep their exact-byte inspection in the C codec instead of scanning
+# each token in Python. Explicit smaller memory/token/depth limits still win.
+_CANONICAL_C_DECODE_BYTES = 256 * 1024**2
+
+
+@dataclass(frozen=True, slots=True)
+class CanonicalJsonHeader:
+    """Structural facts from the complete current canonical scanner, not access."""
+
+    top_level_keys: tuple[str, ...] | None
+    schema: object
+    version: object
+
+
+def _validate_json_semantics(request, decoded):
+    contract = request.semantic_validation
+    if contract is None or contract.profile is not ArtifactProfile.CANONICAL_JSON:
+        return
+    if not isinstance(decoded, dict) or tuple(sorted(decoded)) != contract.top_level_keys:
+        raise ArtifactIdentityConflict("artifact document shape differs from its semantic contract")
+    if decoded.get("schema") != contract.payload_schema:
+        raise ArtifactIdentityConflict("artifact payload schema differs from its semantic contract")
+    if contract.value_keys:
+        value = decoded.get("value")
+        if not isinstance(value, dict) or tuple(sorted(value)) != contract.value_keys:
+            raise ArtifactIdentityConflict("artifact value shape differs from its semantic contract")
+        expected_version = dict(contract.field_bindings).get("version", "1.0.0")
+        if decoded.get("version") != expected_version:
+            raise ArtifactIdentityConflict("artifact record version differs from its semantic contract")
+    for field_name, expected in contract.field_bindings:
+        if decoded.get(field_name) != expected:
+            raise ArtifactIdentityConflict("artifact context binding differs from its semantic contract")
+
+
+def _inspect_canonical_json_file(handle, request, *, size, custody_limits=None):
+    """Use the stdlib C codec for bounded records; stream larger members.
+
+    Re-encoding must equal every original byte. That rejects duplicate keys,
+    unsorted keys, alternate escapes/numbers, whitespace and extra data without
+    a Python callback for every JSON object or token. Explicit token/depth
+    selections retain the streaming validator's early refusal behavior.
+    """
+    limits = custody_limits or ArtifactCustodyLimits()
+    if (size > _CANONICAL_C_DECODE_BYTES or limits.canonical_json_token_bytes is not None
+            or limits.canonical_json_depth is not None or limits.exceeds('in_memory_payload_bytes', size)):
+        return _CanonicalJsonFileInspector(handle, request, custody_limits=limits).validate()
+    raw = handle.read(size + 1)
+    if len(raw) != size:
+        raise ArtifactIdentityConflict('canonical JSON file size changed during inspection')
+    if not raw.endswith(b'\n'):
+        raise ArtifactIdentityConflict('canonical JSON payload requires exactly one terminal newline')
+
+    def number(text, convert):
+        if len(text) > 128:
+            raise ArtifactIdentityConflict('canonical JSON number exceeds its byte bound')
+        return convert(text)
+
+    try:
+        decoded = json.loads(raw.decode('utf-8'), parse_int=lambda text: number(text, int),
+            parse_float=lambda text: number(text, float))
+        if _decoded_json_bytes(decoded) != raw:
+            raise ArtifactIdentityConflict('canonical JSON bytes are not canonical')
+    except (UnicodeDecodeError, ValueError, RecursionError) as error:
+        if isinstance(error, ArtifactIdentityConflict):
+            raise
+        raise ArtifactIdentityConflict('canonical JSON validator rejected the payload') from error
+    if not isinstance(decoded, dict) or decoded.get('schema') != request.payload_schema:
+        raise ArtifactIdentityConflict('canonical JSON payload schema differs')
+    _validate_json_semantics(request, decoded)
+    version = decoded.get('version')
+    return CanonicalJsonHeader(tuple(decoded) if len(decoded) <= 3 else None, decoded['schema'],
+        _CONTAINER_VALUE if isinstance(version, (dict, list)) else version)
 
 
 class _CanonicalJsonFileInspector:
@@ -579,7 +626,10 @@ class _CanonicalJsonFileInspector:
         self,
         handle: BinaryIO,
         request: ArtifactWriteRequest | ArtifactStreamWriteRequest,
+        *,
+        custody_limits: ArtifactCustodyLimits | None = None,
     ) -> None:
+        self._limits = custody_limits or ArtifactCustodyLimits()
         self._handle = handle
         self._pending: int | None = None
         self._buffer = b""
@@ -587,8 +637,9 @@ class _CanonicalJsonFileInspector:
         self._string_special = re.compile(rb'["\\\x00-\x1f\x7f-\xff]')
         self._request = request
         self._semantic = request.semantic_validation
+        self.header = None
 
-    def validate(self) -> None:
+    def validate(self) -> CanonicalJsonHeader:
         expected_top_level = None if self._semantic is None else self._semantic.top_level_keys
         token, _value = self._next_token()
         if token != "{":
@@ -607,6 +658,7 @@ class _CanonicalJsonFileInspector:
         token, _value = self._next_token()
         if token != "eof":
             raise ArtifactIdentityConflict("canonical JSON payload contains trailing bytes")
+        return self.header
 
     def _parse_value(
         self,
@@ -617,7 +669,7 @@ class _CanonicalJsonFileInspector:
         expected_object_keys: tuple[str, ...] | None = None,
         is_value_object: bool = False,
     ) -> object:
-        if depth > MAX_CANONICAL_JSON_DEPTH:
+        if self._limits.exceeds("canonical_json_depth", depth):
             raise ArtifactIdentityConflict("canonical JSON nesting exceeds its depth bound")
         if token == "{":
             self._parse_object(
@@ -651,6 +703,8 @@ class _CanonicalJsonFileInspector:
         observed_schema = False
         observed_version = False
         observed_bindings: set[str] = set()
+        top_keys = [] if is_top_level else None
+        header_schema = header_version = None
         bindings = (
             {}
             if not is_top_level or self._semantic is None
@@ -665,6 +719,12 @@ class _CanonicalJsonFileInspector:
             if token != "string" or not isinstance(value, str):
                 raise ArtifactIdentityConflict("canonical JSON object key is invalid")
             key = value
+            if top_keys is not None:
+                top_keys.append(key)
+                if len(top_keys) > 3:
+                    # Authored record headers have exactly three keys. Keep
+                    # this optional projection bounded for other JSON shapes.
+                    top_keys = None
             if previous_key is not None and key <= previous_key:
                 raise ArtifactIdentityConflict(
                     "canonical JSON object keys are not sorted and unique"
@@ -700,11 +760,14 @@ class _CanonicalJsonFileInspector:
                 is_value_object=expected_value_keys is not None,
             )
             if is_top_level and key == "schema":
+                header_schema = decoded
                 observed_schema = True
                 if decoded != self._request.payload_schema:
                     raise ArtifactIdentityConflict(
                         "artifact payload schema differs from its semantic contract"
                     )
+            if is_top_level and key == "version":
+                header_version = decoded
             if is_top_level and key == "version" and self._semantic is not None:
                 observed_version = True
                 expected_version = bindings.get("version", "1.0.0")
@@ -740,6 +803,8 @@ class _CanonicalJsonFileInspector:
                     raise ArtifactIdentityConflict(
                         "artifact context binding differs from its semantic contract"
                     )
+            self.header = CanonicalJsonHeader(None if top_keys is None else tuple(top_keys),
+                header_schema, header_version)
 
     def _parse_array(self, *, depth: int) -> None:
         token, value = self._next_token(retain_string=False)
@@ -786,22 +851,31 @@ class _CanonicalJsonFileInspector:
         self._pending = value
 
     def _next_token(self, *, retain_string: bool = True) -> tuple[str, object]:
-        value = self._read_byte()
+        if self._pending is None and self._buffer_offset < len(self._buffer):
+            value = self._buffer[self._buffer_offset]
+            self._buffer_offset += 1
+        else:
+            value = self._read_byte()
         if value is None:
             return "eof", None
-        punctuation = {
-            ord("{"): "{",
-            ord("}"): "}",
-            ord("["): "[",
-            ord("]"): "]",
-            ord(":"): ":",
-            ord(","): ",",
-        }
-        if value in punctuation:
-            return punctuation[value], None
+        punctuation = _CANONICAL_PUNCTUATION.get(value)
+        if punctuation is not None:
+            return punctuation, None
         if value == ord("\n"):
             return "newline", None
         if value == ord('"'):
+            # Most metadata keys and values are plain ASCII in the current
+            # chunk. Validate that whole token in C; retain the original
+            # bounded scanner for escapes, non-ASCII and chunk boundaries.
+            end = self._string_special.search(self._buffer, self._buffer_offset)
+            if end is not None and self._buffer[end.start()] == 34:
+                start = self._buffer_offset
+                self._buffer_offset = end.start() + 1
+                if not retain_string:
+                    return "string", _CONTAINER_VALUE
+                if self._limits.exceeds("canonical_json_token_bytes", end.start() - start + 2):
+                    raise ArtifactIdentityConflict("canonical JSON token exceeds its byte bound")
+                return "string", self._buffer[start:end.start()].decode("ascii")
             return "string", self._string_token() if retain_string else self._skip_string_token()
         if value in b"-0123456789":
             self._unread_byte(value)
@@ -844,17 +918,18 @@ class _CanonicalJsonFileInspector:
             escape = self._read_byte()
             if escape is None:
                 raise ArtifactIdentityConflict("canonical JSON escape is unterminated")
-            raw = b'"\\' + bytes((escape,))
             if escape == ord("u"):
                 digits = self._read_token_bytes(4)
                 if len(digits) != 4 or any(digit not in b"0123456789abcdef" for digit in digits):
                     raise ArtifactIdentityConflict("canonical JSON unicode escape is invalid")
-                raw += digits
+                codepoint = int(digits, 16)
+                # Canonical ASCII is literal except controls. The five named
+                # controls use their short escape; non-ASCII uses lowercase
+                # Unicode escapes, including individual surrogate code units.
+                if codepoint < 0x7F and (codepoint >= 0x20 or codepoint in (8, 9, 10, 12, 13)):
+                    raise ArtifactIdentityConflict("canonical JSON string encoding is not canonical")
             elif escape not in b'"\\bfnrt':
                 raise ArtifactIdentityConflict("canonical JSON escape is invalid")
-            raw += b'"'
-            if json.dumps(json.loads(raw), ensure_ascii=True).encode("ascii") != raw:
-                raise ArtifactIdentityConflict("canonical JSON string encoding is not canonical")
 
     def _string_token(self) -> str:
         raw = bytearray(b'"')
@@ -865,7 +940,7 @@ class _CanonicalJsonFileInspector:
             if self._pending is None and self._fill_buffer():
                 special = self._string_special.search(self._buffer, self._buffer_offset)
                 end = len(self._buffer) if special is None else special.start()
-                if len(raw) + end - self._buffer_offset > MAX_CANONICAL_JSON_TOKEN_BYTES:
+                if self._limits.exceeds("canonical_json_token_bytes", len(raw) + end - self._buffer_offset):
                     raise ArtifactIdentityConflict("canonical JSON token exceeds its byte bound")
                 raw.extend(self._buffer[self._buffer_offset : end])
                 self._buffer_offset = end
@@ -875,7 +950,7 @@ class _CanonicalJsonFileInspector:
             if value is None:
                 raise ArtifactIdentityConflict("canonical JSON string is unterminated")
             raw.append(value)
-            if len(raw) > MAX_CANONICAL_JSON_TOKEN_BYTES:
+            if self._limits.exceeds("canonical_json_token_bytes", len(raw)):
                 raise ArtifactIdentityConflict("canonical JSON token exceeds its byte bound")
             if value >= 0x7F or value < 0x20:
                 raise ArtifactIdentityConflict("canonical JSON string bytes are invalid")
@@ -912,16 +987,22 @@ class _CanonicalJsonFileInspector:
 
     def _number_token(self) -> int | float:
         raw = bytearray()
-        while True:
-            value = self._read_byte()
-            if value is None:
-                break
-            if value not in b"+-0123456789.eE":
-                self._unread_byte(value)
-                break
-            raw.append(value)
-            if len(raw) > 128:
+        if self._pending is not None:
+            raw.append(self._pending)
+            self._pending = None
+        while self._fill_buffer():
+            # Scan numeric spans in C. Leave the delimiter in the buffer for
+            # the next token, and retain the same finite numeric token bound.
+            delimiter = _CANONICAL_NUMBER_END.search(self._buffer, self._buffer_offset)
+            end = len(self._buffer) if delimiter is None else delimiter.start()
+            if len(raw) + end - self._buffer_offset > 128:
                 raise ArtifactIdentityConflict("canonical JSON number exceeds its byte bound")
+            raw.extend(self._buffer[self._buffer_offset:end])
+            self._buffer_offset = end
+            if delimiter is not None:
+                break
+        if _CANONICAL_INTEGER.fullmatch(raw) is not None:
+            return int(raw)
         try:
             decoded = json.loads(bytes(raw))
         except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as error:
@@ -994,6 +1075,8 @@ def _profile_implementation_sha256(profile: ArtifactProfile) -> str:
         ArtifactProfile.PARQUET: ("pyarrow",),
         ArtifactProfile.AUDITED_HDF5: ("h5py", "numpy"),
         ArtifactProfile.NUMPY_NO_PICKLE: ("numpy",),
+        ArtifactProfile.MATRIX_ARRAY_NPZ: ("numpy",),
+        ArtifactProfile.NATIVE_SUBWORK_PREFIX: (),
         ArtifactProfile.ONNX: ("onnx", "protobuf"),
         ArtifactProfile.SAFETENSORS: ("safetensors", "numpy"),
     }.get(profile, ())
@@ -1025,28 +1108,27 @@ def _registered_implementation_sha256(profile: ArtifactProfile, contract: object
 
 @dataclass(frozen=True, slots=True, init=False, eq=False)
 class ArtifactProfileValidatorRegistry:
-    """Closed decoder owner with immutable contracts and startup implementation identity.
+    """Closed current decoders and exact producing implementation stamps.
 
-    Runtime monkeypatching or subclass substitution is not a validator registration.
-    New decoder behavior changes this code owner and its frozen source identity.
+    Writes retain their validator source identity as provenance. Reads require
+    current format validation; a producing stamp cannot select an old decoder.
+    Runtime monkeypatching or subclass substitution is not a registration.
     """
 
     _arrow_contracts: Mapping[str, ArrowTableContract]
     _parquet_contracts: Mapping[str, ParquetTableContract]
     _hdf5_contracts: Mapping[str, HDF5InventoryContract]
     _numpy_contracts: Mapping[str, NumpyArrayContract]
-    _generic_validation_compatibilities: Mapping[str, GenericValidationCompatibility]
-    _generic_validator_implementation_compatibilities: Mapping[
-        tuple[str, str, str, ArtifactProfile], GenericValidatorImplementationCompatibility
-    ]
     _implementation_hashes: Mapping[tuple[ArtifactProfile, str], str]
+    _binary_codecs: tuple[RecursiveStorageCodec, ...]
+    _binary_implementations: Mapping[tuple[ArtifactProfile, str], str]
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         raise TypeError(
             "artifact validators are closed registrations, not subclass extension points"
         )
 
-    REGISTRY_VERSION = "1.0.0"
+    REGISTRY_VERSION = "1.7.0"
     _BASE_ENABLED = frozenset(
         {
             ArtifactProfile.CANONICAL_JSON,
@@ -1055,21 +1137,38 @@ class ArtifactProfileValidatorRegistry:
             ArtifactProfile.SAFETENSORS,
             ArtifactProfile.TEXT_PARAMETERS,
             ArtifactProfile.RAW_SOURCE_BYTES,
+            ArtifactProfile.MATRIX_ARRAY_NPZ,
+            ArtifactProfile.NATIVE_SUBWORK_PREFIX,
         }
     )
 
     def __init__(
         self,
         *,
+        binary_codecs: tuple[RecursiveStorageCodec, ...] = (),
         arrow_contracts: tuple[ArrowTableContract, ...] = (),
         parquet_contracts: tuple[ParquetTableContract, ...] = (),
         hdf5_contracts: tuple[HDF5InventoryContract, ...] = (),
         numpy_contracts: tuple[NumpyArrayContract, ...] = (),
-        generic_validation_compatibilities: tuple[GenericValidationCompatibility, ...] = (),
-        generic_validator_implementation_compatibilities: tuple[
-            GenericValidatorImplementationCompatibility, ...
-        ] = (),
     ) -> None:
+        validate_storage_codecs(binary_codecs)
+        object.__setattr__(self, "_binary_codecs", binary_codecs)
+        binary_contracts = {}
+        for codec in binary_codecs:
+            source_path = inspect.getsourcefile(codec.validate_stream)
+            if source_path is None:
+                raise ValueError("binary codec validator lacks its code-owned source")
+            source_bytes = read_bounded_bytes(Path(source_path).resolve(strict=True),
+                maximum_bytes=MAX_VALIDATOR_IMPLEMENTATION_SOURCE_BYTES)
+            binary_contracts.setdefault((codec.profile, codec.payload_schema), []).append(
+                {"codec_id": codec.codec_id, "payload_schema": codec.payload_schema,
+                    "record_version": codec.record_version, "media_type": codec.media_type,
+                    "maximum_bytes": codec.maximum_bytes,
+                    "validator_name": codec.validate_stream.__qualname__,
+                    "validator_source_sha256": hashlib.sha256(source_bytes).hexdigest()})
+        binary_implementations = {key: _registered_implementation_sha256(key[0], tuple(contracts))
+            for key, contracts in binary_contracts.items()}
+        object.__setattr__(self, "_binary_implementations", MappingProxyType(binary_implementations))
         for label, contracts in (
             ("Arrow", arrow_contracts),
             ("Parquet", parquet_contracts),
@@ -1099,46 +1198,6 @@ class ArtifactProfileValidatorRegistry:
             "_numpy_contracts",
             MappingProxyType({contract.payload_schema: contract for contract in numpy_contracts}),
         )
-        source_fingerprints = tuple(
-            source.fingerprint() for source, _target in generic_validation_compatibilities
-        )
-        implementation_compatibility_keys = tuple(
-            value.key for value in generic_validator_implementation_compatibilities
-        )
-        if (
-            len(generic_validation_compatibilities)
-            + len(generic_validator_implementation_compatibilities)
-            > MAX_GENERIC_VALIDATION_COMPATIBILITIES
-            or tuple(sorted(set(source_fingerprints))) != source_fingerprints
-            or tuple(sorted(set(implementation_compatibility_keys)))
-            != implementation_compatibility_keys
-        ):
-            raise ValueError(
-                "artifact generic validation compatibility sources must be bounded, sorted, "
-                "and unique"
-            )
-        target_fingerprints = {
-            target.fingerprint() for _source, target in generic_validation_compatibilities
-        }
-        if set(source_fingerprints).intersection(target_fingerprints):
-            raise ValueError("artifact generic validation compatibility chains are forbidden")
-        object.__setattr__(
-            self,
-            "_generic_validation_compatibilities",
-            MappingProxyType(
-                {
-                    source.fingerprint(): (source, target)
-                    for source, target in generic_validation_compatibilities
-                }
-            ),
-        )
-        object.__setattr__(
-            self,
-            "_generic_validator_implementation_compatibilities",
-            MappingProxyType(
-                {value.key: value for value in generic_validator_implementation_compatibilities}
-            ),
-        )
         implementations = {
             (profile, ""): _registered_implementation_sha256(profile, None)
             for profile in self._BASE_ENABLED
@@ -1154,55 +1213,14 @@ class ArtifactProfileValidatorRegistry:
                     _registered_implementation_sha256(profile, asdict(contract))
                 )
         object.__setattr__(self, "_implementation_hashes", MappingProxyType(implementations))
-        for source, target in generic_validation_compatibilities:
-            if (
-                source.validator_key != target.validator_key
-                or source.profile is not target.profile
-                or source.payload_schema != target.payload_schema
-                or source == target
-            ):
-                raise ValueError(
-                    "artifact generic validation compatibility changes identity domain"
-                )
-            expected_target = self.generic_validation(
-                profile=source.profile,
-                payload_schema=source.payload_schema,
-            )
-            if target != expected_target:
-                raise ValueError(
-                    "artifact generic validation compatibility target differs from "
-                    "the current registration"
-                )
-        for value in generic_validator_implementation_compatibilities:
-            if (
-                value.validator_key != self._generic_validator_key(value.profile)
-                or value.validator_version == self.REGISTRY_VERSION
-            ):
-                raise ValueError(
-                    "artifact generic implementation compatibility changes identity domain"
-                )
-
     @property
-    def generic_validation_compatibilities(
-        self,
-    ) -> tuple[GenericValidationCompatibility, ...]:
-        return tuple(
-            self._generic_validation_compatibilities[key]
-            for key in sorted(self._generic_validation_compatibilities)
-        )
-
-    @property
-    def generic_validator_implementation_compatibilities(
-        self,
-    ) -> tuple[GenericValidatorImplementationCompatibility, ...]:
-        return tuple(
-            self._generic_validator_implementation_compatibilities[key]
-            for key in sorted(self._generic_validator_implementation_compatibilities)
-        )
+    def binary_codecs(self):
+        return self._binary_codecs
 
     @property
     def enabled_profiles(self) -> tuple[ArtifactProfile, ...]:
         profiles = set(self._BASE_ENABLED)
+        profiles.update(codec.profile for codec in self._binary_codecs)
         if self._arrow_contracts:
             profiles.add(ArtifactProfile.ARROW_IPC)
         if self._parquet_contracts:
@@ -1263,6 +1281,9 @@ class ArtifactProfileValidatorRegistry:
     def _generic_validator_implementation_sha256(
         self, profile: ArtifactProfile, payload_schema: str
     ) -> str:
+        binary = self._binary_implementations.get((profile, payload_schema))
+        if binary is not None:
+            return binary
         try:
             return self._implementation_hashes[
                 profile, "" if profile in self._BASE_ENABLED else payload_schema
@@ -1305,67 +1326,46 @@ class ArtifactProfileValidatorRegistry:
         self,
         observed: ArtifactGenericValidation,
     ) -> ArtifactGenericValidation:
-        """Reject manifest-owned generic validator substitution or drift."""
+        """Preserve producing provenance in a recognized current identity domain.
 
-        expected = self.generic_validation(
-            profile=observed.profile,
-            payload_schema=observed.payload_schema,
-        )
-        if observed == expected:
-            return expected
-        compatibility = self._generic_validation_compatibilities.get(observed.fingerprint())
-        if (
-            compatibility is not None
-            and compatibility[0] == observed
-            and compatibility[1] == expected
-        ):
-            return expected
-        implementation_compatibility = self._generic_validator_implementation_compatibilities.get(
-            (
-                observed.validator_key,
-                observed.validator_version,
-                observed.validator_implementation_sha256,
-                observed.profile,
-            )
-        )
-        if (
-            implementation_compatibility is not None
-            and observed.validator_key == expected.validator_key
-            and observed.profile is expected.profile
-            and observed.payload_schema == expected.payload_schema
-        ):
-            return expected
-        if (
-            observed.validator_key != expected.validator_key
-            or observed.validator_version != expected.validator_version
-        ):
-            raise ArtifactIdentityConflict(
-                "artifact generic validator identity differs from its registration"
-            )
-        if observed.validator_implementation_sha256 != expected.validator_implementation_sha256:
-            raise ArtifactIdentityConflict(
-                "artifact generic validator implementation differs from its registration"
-            )
-        if observed != expected:
-            raise ArtifactIdentityConflict(
-                "artifact generic validation differs from its registration"
-            )
-        return expected
+        This is not byte or scientific validation. The artifact reader must
+        authenticate the original publication and run the current registered
+        decoder against the actual profile/schema/media and semantic contract.
+        Producing versions and source hashes never select an implementation.
+        """
 
-    def validate(self, request: ArtifactWriteRequest) -> None:
+        if type(observed) is not ArtifactGenericValidation or type(observed.profile) is not ArtifactProfile:
+            raise ArtifactIdentityConflict("artifact generic validation requires its exact typed producing stamp")
+        observed.__post_init__()
+        current = self.generic_validation(profile=observed.profile, payload_schema=observed.payload_schema)
+        if observed.validator_key != current.validator_key:
+            raise ArtifactIdentityConflict("artifact generic validator identity differs from its current domain")
+        return observed
+
+    def validate(self, request: ArtifactWriteRequest, *, custody_limits: ArtifactCustodyLimits | None = None) -> None:
         if request.profile not in self.enabled_profiles:
             raise ArtifactIdentityConflict(
                 f"artifact profile validator is unavailable for {request.profile.value}"
             )
+        codec = resolve_storage_codec(self._binary_codecs, payload_schema=request.payload_schema,
+            profile=request.profile, media_type=request.media_type)
+        if codec is not None:
+            with io.BytesIO(request.payload) as source:
+                self._registered_binary_stream(source, request, size=len(request.payload), custody_limits=custody_limits)
+            return
+        if request.profile is ArtifactProfile.RAW_SOURCE_BYTES:
+            self._raw_source_contract(request, len(request.payload), custody_limits=custody_limits)
+            return
         if request.profile is ArtifactProfile.CANONICAL_JSON:
             with io.BytesIO(request.payload) as handle:
-                _CanonicalJsonFileInspector(handle, request).validate()
+                _inspect_canonical_json_file(handle, request, size=len(request.payload), custody_limits=custody_limits)
             return
         validators = {
             ArtifactProfile.ARROW_IPC: self._arrow_ipc,
             ArtifactProfile.PARQUET: self._parquet,
             ArtifactProfile.AUDITED_HDF5: self._hdf5,
             ArtifactProfile.NUMPY_NO_PICKLE: self._numpy,
+            ArtifactProfile.NATIVE_SUBWORK_PREFIX: self._native_subwork_prefix,
             ArtifactProfile.JSONL_CHUNKS: self._jsonl,
             ArtifactProfile.ONNX: self._onnx,
             ArtifactProfile.SAFETENSORS: self._safetensors,
@@ -1380,11 +1380,45 @@ class ArtifactProfileValidatorRegistry:
         validator(request)
         self._validate_semantic_payload(request, request.payload)
 
+    def decode_canonical_record(self, payload, request, record_type, *, custody_limits=None, expected_sha256=None):
+        """Combine the registered canonical format and exact typed-byte checks.
+
+        Selection belongs to the guarded record reader. Explicit streaming
+        limits and custom codecs keep their ordinary format owner instead.
+        The result proves byte/type correspondence, never current custody.
+        """
+        from empirical_lawhood.kernel.decoding import decode_canonical_bytes_with_identity
+
+        limits = custody_limits or ArtifactCustodyLimits()
+        if (request.profile is not ArtifactProfile.CANONICAL_JSON
+                or request.profile not in self.enabled_profiles
+                or resolve_storage_codec(self._binary_codecs, payload_schema=request.payload_schema,
+                    profile=request.profile, media_type=request.media_type) is not None
+                or len(payload) > _CANONICAL_C_DECODE_BYTES
+                or limits.canonical_json_token_bytes is not None or limits.canonical_json_depth is not None
+                or limits.exceeds('in_memory_payload_bytes', len(payload))):
+            raise ArtifactIdentityConflict('combined canonical read requires its bounded standard format contract')
+        headers = []
+
+        def inspect_document(document):
+            if not isinstance(document, dict) or document.get('schema') != request.payload_schema:
+                raise ArtifactIdentityConflict('canonical JSON payload schema differs')
+            _validate_json_semantics(request, document)
+            version = document.get('version')
+            headers.append(CanonicalJsonHeader(tuple(sorted(document)) if len(document) <= 3 else None,
+                document['schema'], _CONTAINER_VALUE if isinstance(version, (dict, list)) else version))
+
+        accepted = decode_canonical_bytes_with_identity(payload, record_type, maximum_bytes=len(payload),
+            inspect_document=inspect_document, maximum_integer_bytes=128, expected_sha256=expected_sha256)
+        return headers[0], accepted
+
     def validate_file(
         self,
         path: Path,
         request: ArtifactWriteRequest | ArtifactStreamWriteRequest,
-    ) -> None:
+        *,
+        custody_limits: ArtifactCustodyLimits | None = None,
+    ) -> CanonicalJsonHeader | None:
         """Validate a bounded on-disk payload without whole-file materialization."""
 
         size = path.stat().st_size
@@ -1394,12 +1428,24 @@ class ArtifactProfileValidatorRegistry:
             raise ArtifactIdentityConflict(
                 f"artifact profile validator is unavailable for {request.profile.value}"
             )
+        codec = resolve_storage_codec(self._binary_codecs, payload_schema=request.payload_schema,
+            profile=request.profile, media_type=request.media_type)
+        if codec is not None:
+            with path.open("rb") as source:
+                self._registered_binary_stream(source, request, size=size, custody_limits=custody_limits)
+            return
         if request.profile is ArtifactProfile.CANONICAL_JSON:
             with path.open("rb", buffering=STREAM_CHUNK_BYTES) as handle:
-                _CanonicalJsonFileInspector(handle, request).validate()
-            return
+                from .parallel_verification import canonical_validation_pool
+                pool = canonical_validation_pool.get()
+                if pool is not None:
+                    return pool.validate(handle, request, custody_limits)
+                return _inspect_canonical_json_file(handle, request, size=size, custody_limits=custody_limits)
         if request.profile is ArtifactProfile.RAW_SOURCE_BYTES:
-            self._raw_source_contract(request, size)
+            self._raw_source_contract(request, size, custody_limits=custody_limits)
+            return
+        if request.profile is ArtifactProfile.NATIVE_SUBWORK_PREFIX:
+            self._native_subwork_prefix_contract(request, size)
             return
         self._validate_semantic_file(path, request)
         if request.profile is ArtifactProfile.JSONL_CHUNKS:
@@ -1432,7 +1478,8 @@ class ArtifactProfileValidatorRegistry:
 
     @staticmethod
     def _raw_source_contract(
-        request: ArtifactWriteRequest | ArtifactStreamWriteRequest, size: int
+        request: ArtifactWriteRequest | ArtifactStreamWriteRequest, size: int,
+        *, custody_limits: ArtifactCustodyLimits | None = None,
     ) -> None:
         """Custody-only bytes; no parser, executable deserializer or format claim."""
 
@@ -1441,7 +1488,8 @@ class ArtifactProfileValidatorRegistry:
                 'empirical-lawhood/source/checksummed-uninterpreted-public-bytes',
                 'empirical-lawhood/source/capture-assured-uninterpreted-public-bytes',
             }
-            or not 0 < size <= 64 * 1024**2
+            or size <= 0
+            or (custody_limits or ArtifactCustodyLimits()).exceeds("raw_source_bytes", size)
             or request.media_type not in {
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "text/csv", "text/plain", "application/pdf", "application/zip",
@@ -1456,6 +1504,17 @@ class ArtifactProfileValidatorRegistry:
         self._raw_source_contract(request, len(request.payload))
 
     @staticmethod
+    def _native_subwork_prefix_contract(request, size):
+        """Exact received prefix custody; no complete output or parsing claim."""
+        if (request.payload_schema != "empirical-lawhood/runtime/native-subwork-received-prefix"
+                or request.media_type != "application/octet-stream"
+                or size < 0 or request.semantic_validation is not None):
+            raise ArtifactIdentityConflict("native subwork prefix changes its custody-only contract")
+
+    def _native_subwork_prefix(self, request):
+        self._native_subwork_prefix_contract(request, len(request.payload))
+
+    @staticmethod
     def _validate_semantic_payload(
         request: ArtifactWriteRequest | ArtifactStreamWriteRequest,
         payload: bytes,
@@ -1464,30 +1523,7 @@ class ArtifactProfileValidatorRegistry:
         if contract is None or contract.profile is not ArtifactProfile.CANONICAL_JSON:
             return
         decoded = _strict_json(payload, label="registered artifact semantics")
-        if not isinstance(decoded, dict) or tuple(sorted(decoded)) != contract.top_level_keys:
-            raise ArtifactIdentityConflict(
-                "artifact document shape differs from its semantic contract"
-            )
-        if decoded.get("schema") != contract.payload_schema:
-            raise ArtifactIdentityConflict(
-                "artifact payload schema differs from its semantic contract"
-            )
-        if contract.value_keys:
-            value = decoded.get("value")
-            if not isinstance(value, dict) or tuple(sorted(value)) != contract.value_keys:
-                raise ArtifactIdentityConflict(
-                    "artifact value shape differs from its semantic contract"
-                )
-            expected_version = dict(contract.field_bindings).get("version", "1.0.0")
-            if decoded.get("version") != expected_version:
-                raise ArtifactIdentityConflict(
-                    "artifact record version differs from its semantic contract"
-                )
-        for field_name, expected in contract.field_bindings:
-            if decoded.get(field_name) != expected:
-                raise ArtifactIdentityConflict(
-                    "artifact context binding differs from its semantic contract"
-                )
+        _validate_json_semantics(request, decoded)
 
     @classmethod
     def _validate_semantic_file(
@@ -1568,6 +1604,7 @@ class ArtifactProfileValidatorRegistry:
         self._require_arrow_contract(schema, contract)
 
     def _arrow_ipc(self, request: ArtifactWriteRequest) -> None:
+        import pyarrow as pa  # type: ignore[import-untyped]
         try:
             source = pa.BufferReader(request.payload)
             try:
@@ -1582,6 +1619,8 @@ class ArtifactProfileValidatorRegistry:
         self._require_arrow_contract(schema, self.arrow_contract(request.payload_schema))
 
     def _parquet(self, request: ArtifactWriteRequest) -> None:
+        import pyarrow as pa  # type: ignore[import-untyped]
+        import pyarrow.parquet as pq  # type: ignore[import-untyped]
         try:
             parquet = pq.ParquetFile(pa.BufferReader(request.payload))
             schema = parquet.schema_arrow
@@ -1599,6 +1638,7 @@ class ArtifactProfileValidatorRegistry:
         path: Path,
         request: ArtifactWriteRequest | ArtifactStreamWriteRequest,
     ) -> None:
+        import pyarrow as pa  # type: ignore[import-untyped]
         try:
             with pa.memory_map(str(path), "r") as source:
                 try:
@@ -1621,6 +1661,8 @@ class ArtifactProfileValidatorRegistry:
         path: Path,
         request: ArtifactWriteRequest | ArtifactStreamWriteRequest,
     ) -> None:
+        import pyarrow as pa  # type: ignore[import-untyped]
+        import pyarrow.parquet as pq  # type: ignore[import-untyped]
         try:
             parquet = pq.ParquetFile(path)
             schema = parquet.schema_arrow
@@ -1636,6 +1678,7 @@ class ArtifactProfileValidatorRegistry:
 
     @staticmethod
     def _hdf5_attribute_identity(value: object) -> tuple[HDF5AttributeKind, str]:
+        import numpy as np
         if isinstance(value, (str, np.str_)):
             return HDF5AttributeKind.UTF8, str(value)
         if isinstance(value, (bytes, np.bytes_)):
@@ -1659,6 +1702,7 @@ class ArtifactProfileValidatorRegistry:
         *,
         maximum_name_bytes: int,
     ) -> tuple[str, ...]:
+        import h5py  # type: ignore[import-untyped]
         expected_names = frozenset(attribute.name for attribute in expected)
         observed: list[str] = []
         observed_bytes = 0
@@ -1702,6 +1746,7 @@ class ArtifactProfileValidatorRegistry:
         *,
         remaining_attribute_bytes: int,
     ) -> int:
+        import h5py  # type: ignore[import-untyped]
         names = cls._bounded_hdf5_attribute_names(
             value,
             expected,
@@ -1781,6 +1826,7 @@ class ArtifactProfileValidatorRegistry:
         maximum_names: int,
         maximum_name_bytes: int,
     ) -> tuple[tuple[str, ...], int]:
+        import h5py  # type: ignore[import-untyped]
         observed: list[str] = []
         observed_bytes = 0
         failure: str | None = None
@@ -1820,6 +1866,7 @@ class ArtifactProfileValidatorRegistry:
         value: h5py.Group | h5py.Dataset,
         contract: HDF5ObjectContract,
     ) -> None:
+        import h5py  # type: ignore[import-untyped]
         creation = value.id.get_create_plist()
         if isinstance(value, h5py.Group):
             flags = int(creation.get_link_creation_order())
@@ -1842,6 +1889,7 @@ class ArtifactProfileValidatorRegistry:
 
     @staticmethod
     def _canonical_hdf5_filter_options(value: object) -> str:
+        import numpy as np
         def normalize(item: object) -> object:
             if isinstance(item, np.generic):
                 return item.item()
@@ -1870,6 +1918,7 @@ class ArtifactProfileValidatorRegistry:
         value: h5py.Dataset,
         contract: HDF5DatasetStorageContract,
     ) -> None:
+        import numpy as np
         if value.chunks != contract.chunk_shape:
             raise ArtifactIdentityConflict("HDF5 dataset chunk shape differs from contract")
         if value.compression != contract.compression_filter:
@@ -1932,6 +1981,8 @@ class ArtifactProfileValidatorRegistry:
         handle: h5py.File,
         contract: HDF5InventoryContract,
     ) -> None:
+        import h5py  # type: ignore[import-untyped]
+        import numpy as np
         expected = {item.path: item for item in contract.objects}
         observed_paths: list[str] = []
         visited: set[int] = set()
@@ -2051,6 +2102,7 @@ class ArtifactProfileValidatorRegistry:
         inspect(handle, "/")
 
     def _hdf5(self, request: ArtifactWriteRequest) -> None:
+        import h5py  # type: ignore[import-untyped]
         try:
             with h5py.File(io.BytesIO(request.payload), "r") as handle:
                 self._require_hdf5_contract(
@@ -2067,6 +2119,7 @@ class ArtifactProfileValidatorRegistry:
         path: Path,
         request: ArtifactWriteRequest | ArtifactStreamWriteRequest,
     ) -> None:
+        import h5py  # type: ignore[import-untyped]
         try:
             # A sealed memfd has no filesystem realpath for HDF5's native
             # driver. Reopen the supplied descriptor path as a Python stream:
@@ -2083,6 +2136,7 @@ class ArtifactProfileValidatorRegistry:
             raise ArtifactIdentityConflict("HDF5 validator rejected the payload") from error
 
     def _numpy(self, request: ArtifactWriteRequest) -> None:
+        import numpy as np
         contract = self._numpy_contracts.get(request.payload_schema)
         if contract is None:
             raise ArtifactIdentityConflict("NumPy payload schema has no registered contract")
@@ -2098,11 +2152,24 @@ class ArtifactProfileValidatorRegistry:
         if value.dtype != np.dtype(contract.dtype) or not contract.accepts_shape(value.shape):
             raise ArtifactIdentityConflict("NumPy dtype or shape differs from its contract")
 
+    def _registered_binary_stream(self, source, request, *, size, custody_limits=None):
+        codec = resolve_storage_codec(self._binary_codecs, payload_schema=request.payload_schema,
+            profile=request.profile, media_type=request.media_type)
+        if codec is None:
+            raise ArtifactIdentityConflict("binary payload lacks its exact registered storage codec")
+        if (size <= 0 or codec.maximum_bytes is not None and size > codec.maximum_bytes
+                or (request.profile is ArtifactProfile.RAW_SOURCE_BYTES
+                    and (custody_limits or ArtifactCustodyLimits()).exceeds("raw_source_bytes", size))):
+            raise ArtifactIdentityConflict("binary payload exceeds its exact registered byte contract")
+        if codec.validate_stream(source, request, size=size) is not None:
+            raise ArtifactIdentityConflict("registered binary validator must return None or refuse")
+
     def _numpy_file(
         self,
         path: Path,
         request: ArtifactWriteRequest | ArtifactStreamWriteRequest,
     ) -> None:
+        import numpy as np
         contract = self._numpy_contracts.get(request.payload_schema)
         if contract is None:
             raise ArtifactIdentityConflict("NumPy payload schema has no registered contract")
@@ -2119,49 +2186,17 @@ class ArtifactProfileValidatorRegistry:
 
     @staticmethod
     def _jsonl(request: ArtifactWriteRequest) -> None:
-        if not request.payload.endswith(b"\n") or b"\r" in request.payload:
-            raise ArtifactIdentityConflict("JSONL bytes require canonical LF termination")
-        lines = request.payload.splitlines()
-        if not lines:
-            raise ArtifactIdentityConflict("JSONL payload must contain records")
-        for index, line in enumerate(lines):
-            value = _strict_json(line, label="JSONL profile")
-            if _decoded_json_bytes(value).rstrip(b"\n") != line:
-                raise ArtifactIdentityConflict("JSONL record bytes are not canonical")
-            if not isinstance(value, dict) or value.get("schema") != request.payload_schema:
-                raise ArtifactIdentityConflict("JSONL payload schema differs")
-            if value.get("sequence") != index:
-                raise ArtifactIdentityConflict("JSONL sequence is not contiguous")
+        with io.BytesIO(request.payload) as source:
+            validate_jsonl_stream(source, request, size=len(request.payload))
 
     @staticmethod
-    def _jsonl_file(
-        path: Path,
-        request: ArtifactWriteRequest | ArtifactStreamWriteRequest,
-    ) -> None:
-        count = 0
-        with path.open("rb") as handle:
-            while True:
-                line = handle.readline(MAX_JSONL_RECORD_BYTES + 1)
-                if not line:
-                    break
-                if len(line) > MAX_JSONL_RECORD_BYTES:
-                    raise ArtifactIdentityConflict("JSONL record exceeds its byte bound")
-                if not line.endswith(b"\n") or b"\r" in line:
-                    raise ArtifactIdentityConflict("JSONL bytes require canonical LF termination")
-                record = line.removesuffix(b"\n")
-                value = _strict_json(record, label="JSONL profile")
-                if _decoded_json_bytes(value).rstrip(b"\n") != record:
-                    raise ArtifactIdentityConflict("JSONL record bytes are not canonical")
-                if not isinstance(value, dict) or value.get("schema") != request.payload_schema:
-                    raise ArtifactIdentityConflict("JSONL payload schema differs")
-                if value.get("sequence") != count:
-                    raise ArtifactIdentityConflict("JSONL sequence is not contiguous")
-                count += 1
-        if count == 0:
-            raise ArtifactIdentityConflict("JSONL payload must contain records")
+    def _jsonl_file(path, request) -> None:
+        with path.open("rb") as source:
+            validate_jsonl_stream(source, request, size=path.stat().st_size)
 
     @staticmethod
     def _onnx_graph_tensors(graph: onnx.GraphProto) -> tuple[onnx.TensorProto, ...]:
+        import onnx
         tensors: list[onnx.TensorProto] = list(graph.initializer)
         for sparse in graph.sparse_initializer:
             tensors.extend((sparse.values, sparse.indices))
@@ -2189,6 +2224,7 @@ class ArtifactProfileValidatorRegistry:
 
     @staticmethod
     def _onnx(request: ArtifactWriteRequest) -> None:
+        import onnx
         if len(request.payload) > MAX_MODEL_PAYLOAD_BYTES:
             raise ArtifactIdentityConflict("ONNX payload exceeds its safe byte budget")
         try:
@@ -2206,6 +2242,7 @@ class ArtifactProfileValidatorRegistry:
         path: Path,
         request: ArtifactWriteRequest | ArtifactStreamWriteRequest,
     ) -> None:
+        import onnx
         try:
             model = onnx.load(path, load_external_data=False)
             onnx.checker.check_model(model, full_check=True)
@@ -2218,6 +2255,7 @@ class ArtifactProfileValidatorRegistry:
 
     @staticmethod
     def _validate_onnx_model(model: onnx.ModelProto, payload_schema: str) -> None:
+        import onnx
         metadata: dict[str, str] = {}
         for item in model.metadata_props:
             if item.key in metadata:
@@ -2233,6 +2271,8 @@ class ArtifactProfileValidatorRegistry:
 
     @staticmethod
     def _safetensors(request: ArtifactWriteRequest) -> None:
+        from safetensors import SafetensorError
+        from safetensors.numpy import load as load_safetensors
         if len(request.payload) > MAX_MODEL_PAYLOAD_BYTES:
             raise ArtifactIdentityConflict("SafeTensors payload exceeds its safe byte budget")
         if len(request.payload) < 8:
@@ -2274,6 +2314,8 @@ class ArtifactProfileValidatorRegistry:
         path: Path,
         request: ArtifactWriteRequest | ArtifactStreamWriteRequest,
     ) -> None:
+        from safetensors import SafetensorError
+        from safetensors import safe_open
         if path.stat().st_size > MAX_MODEL_PAYLOAD_BYTES:
             raise ArtifactIdentityConflict("SafeTensors payload exceeds its safe byte budget")
         with path.open("rb") as handle:
@@ -2348,6 +2390,8 @@ class ArtifactProfileValidatorRegistry:
 
 
 def parquet_bytes(table: pa.Table) -> bytes:
+    import pyarrow as pa  # type: ignore[import-untyped]
+    import pyarrow.parquet as pq  # type: ignore[import-untyped]
     sink = pa.BufferOutputStream()
     pq.write_table(
         table,
@@ -2360,14 +2404,58 @@ def parquet_bytes(table: pa.Table) -> bytes:
 
 
 def numpy_no_pickle_bytes(array: npt.NDArray[np.generic]) -> bytes:
+    import numpy as np
     buffer = io.BytesIO()
     np.save(buffer, array, allow_pickle=False)
     return buffer.getvalue()
 
 
 def validate_numpy_no_pickle(payload: bytes) -> npt.NDArray[np.generic]:
+    import numpy as np
     buffer = io.BytesIO(payload)
     value = np.load(buffer, allow_pickle=False)
     if not isinstance(value, np.ndarray):
         raise ValueError("safe NumPy payload did not decode to an array")
     return value
+
+def validate_jsonl_stream(source, request, *, size, record_version=None):
+    """Existing canonical JSONL structure through one bounded stream parser."""
+    count, observed_size = 0, 0
+    while True:
+        line = source.readline(MAX_JSONL_RECORD_BYTES + 1)
+        if not line:
+            break
+        observed_size += len(line)
+        if observed_size > size or len(line) > MAX_JSONL_RECORD_BYTES:
+            raise ArtifactIdentityConflict("JSONL record exceeds its byte bound")
+        if not line.endswith(b"\n") or b"\r" in line:
+            raise ArtifactIdentityConflict("JSONL bytes require canonical LF termination")
+        record = line.removesuffix(b"\n")
+        value = _strict_json(record, label="JSONL profile")
+        if _decoded_json_bytes(value).rstrip(b"\n") != record:
+            raise ArtifactIdentityConflict("JSONL record bytes are not canonical")
+        if not isinstance(value, dict) or value.get("schema") != request.payload_schema:
+            raise ArtifactIdentityConflict("JSONL payload schema differs")
+        if record_version is not None and value.get("version") != record_version:
+            raise ArtifactIdentityConflict("JSONL record version differs")
+        if type(value.get("sequence")) is not int or value["sequence"] != count:
+            raise ArtifactIdentityConflict("JSONL sequence is not contiguous")
+        count += 1
+    if not count or observed_size != size:
+        raise ArtifactIdentityConflict("JSONL payload must contain its complete declared records")
+
+
+_STOCK_PAYLOAD_VALIDATION_FUNCTIONS = tuple((name, globals()[name]) for name in (
+    '_inspect_canonical_json_file', '_validate_json_semantics', '_strict_json', '_decoded_json_bytes'))
+_STOCK_PAYLOAD_VALIDATION_METHODS = (
+    (ArtifactProfileValidatorRegistry, 'validate', ArtifactProfileValidatorRegistry.validate),
+    (ArtifactProfileValidatorRegistry, 'validate_file', ArtifactProfileValidatorRegistry.validate_file),
+    *((_CanonicalJsonFileInspector, name, getattr(_CanonicalJsonFileInspector, name))
+        for name, value in vars(_CanonicalJsonFileInspector).items() if callable(value)),
+)
+
+
+def stock_payload_validation_policy():
+    """Select producer-local format reuse only under the unchanged validator."""
+    return (all(globals()[name] is original for name, original in _STOCK_PAYLOAD_VALIDATION_FUNCTIONS)
+        and all(getattr(owner, name) is original for owner, name, original in _STOCK_PAYLOAD_VALIDATION_METHODS))

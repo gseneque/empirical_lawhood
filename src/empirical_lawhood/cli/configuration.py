@@ -68,10 +68,13 @@ def config_prepare(
 
 
 @config_app.command("schema")
-def config_schema(schema_id: Annotated[str, typer.Option("--schema-id", help="Exact declared configuration root ID.")]) -> None:
+def config_schema(
+    schema_id: Annotated[str, typer.Option("--schema-id", help="Exact declared configuration root ID.")],
+    consumer: Annotated[str | None, typer.Option("--consumer", help="Explicit closed input role; required if the root is ambiguous.")] = None,
+) -> None:
     """Emit one packaged Draft2020-12 structural schema with local references."""
     try:
-        schema = configuration_schema(schema_id)
+        schema = configuration_schema(schema_id, consumer=consumer)
     except ValueError as error:
         typer.echo(str(error), err=True)
         raise typer.Exit(code=2) from error

@@ -13,7 +13,7 @@ from empirical_lawhood.adapters.methods import synthetic_propulsion_exact_compar
 from empirical_lawhood.adapters.methods.synthetic_propulsion_development_input import SyntheticPropulsionDevelopmentInput, run_native_development_check
 from empirical_lawhood.api.codecs import load_registered_authoring
 
-STARTER = Path("experiments/propulsion-reliability-reference/config.json")
+STARTER = Path("programmes/foundations/measurement-and-response/workflows/propulsion-reliability-reference/config.json")
 
 
 def _config() -> SyntheticPropulsionDevelopmentInput:

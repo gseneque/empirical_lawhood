@@ -1,0 +1,563 @@
+{
+  "$defs": {
+    "CampaignNode_8990b93767fa": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/planning/campaign-node"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "description": "kind; constructor checks semantics and units.",
+              "enum": [
+                "EVIDENCE_SNAPSHOT",
+                "ANALYSIS_PROPOSAL",
+                "EXPLORATION_PLAN",
+                "EXPLORATORY_FINDING",
+                "HYPOTHESIS_SET",
+                "PROSPECTIVE_NOMINATION",
+                "EXPERIMENT_PROPOSAL",
+                "DECISION",
+                "AUTHORIZATION",
+                "EXPERIMENT_SPEC",
+                "RUN",
+                "CLAIM"
+              ],
+              "type": "string"
+            },
+            "lane": {
+              "description": "lane; constructor checks semantics and units.",
+              "enum": [
+                "EXPLORATORY",
+                "PROSPECTIVE"
+              ],
+              "type": "string"
+            },
+            "lifecycle_status": {
+              "description": "lifecycle status; constructor checks semantics and units.",
+              "enum": [
+                "ACTIVE",
+                "TERMINAL",
+                "SUPERSEDED",
+                "INVALIDATED"
+              ],
+              "type": "string"
+            },
+            "node_id": {
+              "description": "node id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_identity": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "object identity; constructor checks semantics and units."
+            },
+            "parent_node_ids": {
+              "description": "parent node ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "node_id",
+            "kind",
+            "lane",
+            "object_identity",
+            "parent_node_ids",
+            "lifecycle_status"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "CampaignSpec_4e4ff1bfaf20": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/planning/campaign-spec"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "active_node_ids": {
+              "description": "active node ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "authority_policy": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "authority policy; constructor checks semantics and units."
+            },
+            "budget": {
+              "$ref": "#/$defs/ResourceBudget_c7b1ab18aa7a",
+              "description": "budget; constructor checks semantics and units."
+            },
+            "campaign_id": {
+              "description": "campaign id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "decision_rights": {
+              "description": "decision rights; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/DecisionRight_4f68c377b772"
+              },
+              "type": "array"
+            },
+            "evidence_state": {
+              "description": "evidence state; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "extensions": {
+              "description": "extensions; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ExtensionBinding_d34345d4218d"
+              },
+              "type": "array"
+            },
+            "lifecycle_status": {
+              "description": "lifecycle status; constructor checks semantics and units.",
+              "enum": [
+                "ACTIVE",
+                "TERMINAL",
+                "SUPERSEDED",
+                "INVALIDATED"
+              ],
+              "type": "string"
+            },
+            "nodes": {
+              "description": "nodes; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/CampaignNode_8990b93767fa"
+              },
+              "type": "array"
+            },
+            "objective": {
+              "description": "objective; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "predecessor_campaign_ids": {
+              "description": "predecessor campaign ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "root_node_ids": {
+              "description": "root node ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "system_ids": {
+              "description": "system ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "target_claim_ids": {
+              "description": "target claim ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "world_ids": {
+              "description": "world ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "campaign_id",
+            "objective",
+            "system_ids",
+            "world_ids",
+            "target_claim_ids",
+            "budget",
+            "authority_policy",
+            "decision_rights",
+            "nodes",
+            "root_node_ids",
+            "active_node_ids",
+            "evidence_state",
+            "lifecycle_status",
+            "predecessor_campaign_ids",
+            "extensions"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "DecisionRight_4f68c377b772": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/planning/decision-right"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "description": "action; constructor checks semantics and units.",
+              "enum": [
+                "REPOSITORY_IMPLEMENTATION",
+                "REFERENCE_WORLD_EXECUTION",
+                "SIMULATION_EXECUTION",
+                "READ_ONLY_EXPLORATION",
+                "PUBLIC_SOURCE_ACQUISITION",
+                "DATASET_REGISTRATION",
+                "DATASET_TRANSFORMATION",
+                "DATASET_BINDING",
+                "DATASET_PROJECTION_REBUILD",
+                "NONACTUATING_PROSPECTIVE_FREEZE",
+                "EVALUATOR_REVEAL",
+                "HIL_ACTUATION",
+                "LIVE_ACTUATION",
+                "FACILITY_OR_INSTRUMENT_COMMAND",
+                "SAFETY_SIGNIFICANT_OPERATION",
+                "HUMAN_OR_ANIMAL_INTERVENTION",
+                "PAID_OR_EXTERNALLY_BILLED_RESOURCE"
+              ],
+              "type": "string"
+            },
+            "authority_policy_id": {
+              "description": "authority policy id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "decision_maker_id": {
+              "description": "decision maker id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "decision_right_id": {
+              "description": "decision right id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "delegated": {
+              "description": "delegated; constructor checks semantics and units.",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "decision_right_id",
+            "action",
+            "decision_maker_id",
+            "authority_policy_id",
+            "delegated"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ExtensionBinding_d34345d4218d": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/extension-binding"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "namespace": {
+              "description": "namespace; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "payload_sha256": {
+              "description": "payload sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "schema": {
+              "description": "schema; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "namespace",
+            "schema",
+            "payload_sha256"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MatrixProgrammeE2AssemblyRequest_e1ec7be603a1": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-programme/e2-assembly-request"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "campaign": {
+              "$ref": "#/$defs/CampaignSpec_4e4ff1bfaf20",
+              "description": "campaign; constructor checks semantics and units."
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "resources": {
+              "$ref": "#/$defs/NativeTrainingResources_c512d626f780",
+              "description": "resources; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "record_id",
+            "resources",
+            "campaign"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "2.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "NativeTrainingResources_c512d626f780": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-experiment/native-training-resources"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "budgets": {
+              "description": "budgets; constructor checks semantics and units.",
+              "items": {
+                "items": false,
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/$defs/ResourceBudget_c7b1ab18aa7a"
+                  }
+                ],
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "maximum_parallel_tasks": {
+              "description": "maximum parallel tasks; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "record_id",
+            "budgets",
+            "maximum_parallel_tasks"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ResourceBudget_c7b1ab18aa7a": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/resource-budget"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "cpu_cores": {
+              "description": "cpu cores; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "gpu_devices": {
+              "description": "gpu devices; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "memory_bytes": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "memory bytes; constructor checks semantics and units."
+            },
+            "output_bytes": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "output bytes; constructor checks semantics and units."
+            },
+            "source_scan_bytes": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "source scan bytes; constructor checks semantics and units."
+            },
+            "wall_time_seconds": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "wall time seconds; constructor checks semantics and units.",
+              "x-unit": "s"
+            }
+          },
+          "required": [
+            "cpu_cores",
+            "memory_bytes",
+            "gpu_devices",
+            "wall_time_seconds",
+            "source_scan_bytes",
+            "output_bytes"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-programme-e2-assembly-request",
+  "$ref": "#/$defs/MatrixProgrammeE2AssemblyRequest_e1ec7be603a1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Programme E2 Assembly Request",
+  "x-consumer": "matrix-programme-e2-assembly-request",
+  "x-consumer-maximum-bytes": 16777216,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

@@ -6,11 +6,12 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import StrEnum
-from typing import Protocol
+from typing import Callable, ClassVar, Protocol, TYPE_CHECKING
 
 from empirical_lawhood.kernel.authority import ResourceBudget
 from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
 from empirical_lawhood.kernel.serialization import (
+    CanonicalRecord,
     require_sorted_unique_ids,
     require_sorted_unique_strings,
     validate_nonempty,
@@ -18,7 +19,11 @@ from empirical_lawhood.kernel.serialization import (
     validate_sha256,
     validate_stable_id,
 )
+if TYPE_CHECKING:
+    from .prepared_native_invocation import PreparedInvocationContract, WorkerPreflightResult
 from empirical_lawhood.kernel.status import OperationalStatus
+from empirical_lawhood.runtime.native_subwork import NativeSubworkProgress
+from empirical_lawhood.runtime.native_effects import NativeEffectContact
 
 from .artifacts import (
     ArtifactMaterialization,
@@ -35,7 +40,7 @@ from .capabilities import (
     CapabilityPermission,
     CapabilityRegistry,
 )
-from .plans import ProtocolExecutionPlan, ProtocolExecutionTask
+from .plans import ExecutionTask, ProtocolExecutionPlan, ProtocolExecutionTask
 from .execution_envelope import ExecutionResourceTaskCellSpec
 
 
@@ -56,6 +61,7 @@ class OperationalFailureClass(StrEnum):
     TRANSIENT_INFRASTRUCTURE_FAILURE = "TRANSIENT_INFRASTRUCTURE_FAILURE"
     RETRY_EXHAUSTION = "RETRY_EXHAUSTION"
     RECOVERY_OBSTRUCTION = "RECOVERY_OBSTRUCTION"
+    NATIVE_RETURN_FAILURE = "NATIVE_RETURN_FAILURE"
 
     @property
     def retryable(self) -> bool:
@@ -135,9 +141,15 @@ class BoundedInputReader(Protocol):
 
     def close(self) -> None: ...
 
+    def cursor(self) -> BoundedInputReader: ...
+
+    def seek(self, offset: int, whence: int = 0) -> int: ...
+
+    def tell(self) -> int: ...
+
 
 @dataclass(frozen=True, slots=True)
-class WorkerInputBinding:
+class WorkerInputBinding(CanonicalRecord):
     """Immutable input identity safe to expose across the worker boundary.
 
     The binding deliberately excludes storage roots and relative locators.  It
@@ -145,6 +157,7 @@ class WorkerInputBinding:
     port, not a means of locating the underlying artifact.
     """
 
+    SCHEMA: ClassVar[str] = "empirical-lawhood/runtime/worker-input-binding"
     artifact_id: str
     materialization_id: str
     payload_schema: str
@@ -159,7 +172,7 @@ class WorkerInputBinding:
         validate_stable_id(self.materialization_id, field_name="materialization_id")
         validate_schema(self.payload_schema)
         validate_nonempty(self.media_type, field_name="media_type")
-        if self.size_bytes < 0:
+        if type(self.size_bytes) is not int or self.size_bytes < 0:
             raise ValueError("worker input binding size must be nonnegative")
 
     @classmethod
@@ -230,11 +243,33 @@ class WorkerInputPort:
     def close(self) -> None:
         self._reader.close()
 
+    def cursor(self) -> WorkerInputPort:
+        """Independent bounded view of the same authenticated immutable input."""
+        callback = getattr(self._reader, "cursor", None)
+        if not callable(callback):
+            raise ValueError("worker input lacks an immutable independent cursor")
+        return WorkerInputPort(self.binding, callback())
+
+    def seek(self, offset: int, whence: int = 0) -> int:
+        return self._reader.seek(offset, whence)
+
+    def tell(self) -> int:
+        return self._reader.tell()
+
+    def readable(self) -> bool:
+        self.read(0)
+        return True
+
+    def seekable(self) -> bool:
+        self.read(0)
+        return callable(getattr(self._reader, "seek", None))
+
 
 @dataclass(frozen=True, slots=True)
-class WorkerOutputPort:
+class WorkerOutputPort(CanonicalRecord):
     """Path-free output contract exposed to an isolated task runner."""
 
+    SCHEMA: ClassVar[str] = "empirical-lawhood/runtime/worker-output-port"
     output_id: str
     payload_schema: str
     profile: ArtifactProfile
@@ -268,10 +303,41 @@ class VerifiedArtifactInput:
         return self.logical.logical_artifact_id
 
 
+def dependency_artifact_inputs(
+    task: ProtocolExecutionTask,
+    outputs: dict[str, tuple[VerifiedArtifactInput, ...]],
+) -> tuple[VerifiedArtifactInput, ...]:
+    """Select the original task's exact-edge or legacy dependency operands."""
+    if type(task) not in (ExecutionTask, ProtocolExecutionTask):
+        raise TypeError("dependency input selection requires a supported exact task type")
+    if any(dependency not in outputs for dependency in task.dependency_task_ids):
+        raise ValueError("ready task lacks dependency materializations")
+    if type(task) is ExecutionTask:
+        selected: dict[str, VerifiedArtifactInput] = {}
+        for spec in task.scientific_inputs:
+            if spec.producer_task_id is None:
+                continue
+            matches = tuple(value for value in outputs[spec.producer_task_id]
+                if value.logical.logical_artifact_id == spec.operational_logical_artifact_id)
+            if len(matches) != 1:
+                raise ValueError("exact scientific dependency output is unavailable")
+            value, = matches
+            if (value.logical.payload_schema != spec.payload_schema
+                    or value.logical.media_type != spec.media_type
+                    or (spec.maximum_size_bytes is not None
+                        and value.materialization.size_bytes > spec.maximum_size_bytes)):
+                raise ValueError("scientific dependency materialization differs from its edge")
+            selected[value.materialization.materialization_id] = value
+        return tuple(sorted(selected.values(), key=lambda value: value.materialization.materialization_id))
+    return tuple(sorted((value for dependency in task.dependency_task_ids for value in outputs[dependency]),
+        key=lambda value: value.materialization.materialization_id))
+
+
 @dataclass(frozen=True, slots=True)
-class DependencyReceiptBinding:
+class DependencyReceiptBinding(CanonicalRecord):
     """Path-free proof that dependency materializations came from one receipt."""
 
+    SCHEMA: ClassVar[str] = "empirical-lawhood/runtime/dependency-receipt-binding"
     receipt_id: str
     task_id: str
     output_materialization_ids: tuple[str, ...]
@@ -308,6 +374,7 @@ class TaskContext:
     dependency_receipts: tuple[DependencyReceiptBinding, ...] = ()
     scientific_adjudication_context: ScientificAdjudicationContext | None = None
     cpu_affinity: tuple[int, ...] = ()
+    prepared_invocation: "PreparedInvocationContract | None" = field(default=None, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         for name, value in (
@@ -364,6 +431,12 @@ class TaskContext:
             raise ValueError("worker dependency inputs differ from receipt-bound materializations")
         if tuple(port.binding for port in self.input_ports) != self.input_bindings:
             raise ValueError("worker input ports differ from the exact frozen input bindings")
+        if self.prepared_invocation is not None:
+            from .prepared_native_invocation import PreparedInvocationContract
+            if type(self.prepared_invocation) is not PreparedInvocationContract:
+                raise ValueError("worker requires its exact typed prepared invocation")
+            self.prepared_invocation.require_complete()
+            self.prepared_invocation.validate_context(self)
 
     @property
     def external_input_artifact_ids(self) -> tuple[str, ...]:
@@ -463,6 +536,98 @@ class TaskRunner(Protocol):
     def execute(self, context: TaskContext) -> RunnerResult: ...
 
 
+@dataclass(frozen=True, slots=True)
+class ParentPreparedTaskRunner:
+    """Installed runner preparation retained only in the parent process.
+
+    Construction and provider proof perform no preparation. The installed API
+    callback authenticates current authority and custody at execution, then
+    returns a plain runner with its bounded, immutable domain evidence. Stores
+    and callbacks are never added to TaskContext or sent to the child.
+    """
+
+    manifest: CapabilityManifest
+    prepare_callback: Callable[[TaskContext], TaskRunner]
+    native_effect: bool = False
+
+    def __post_init__(self) -> None:
+        if not callable(self.prepare_callback) or type(self.native_effect) is not bool:
+            raise TypeError('runner preparation must be an installed code callback')
+
+    @property
+    def execute_with_native_subwork(self):
+        # Advertise the installed resource interface without preparing authority
+        # or passing the parent callback into any child process.
+        return self._unprepared_native if self.native_effect else None
+
+    def _unprepared_native(self, context, native_subwork, progress=None):
+        raise PermissionError('PARENT_RUNNER_PREPARATION_REQUIRED')
+
+    def prepare_execution(self, context: TaskContext) -> TaskRunner:
+        return self.prepare_callback(context)
+
+    def execute(self, context: TaskContext) -> RunnerResult:
+        raise PermissionError('PARENT_RUNNER_PREPARATION_REQUIRED')
+
+
+def prepare_task_runner(runner: TaskRunner, context: TaskContext) -> TaskRunner:
+    """Prepare only the explicit installed wrapper; retain legacy runners exact."""
+    if not isinstance(runner, ParentPreparedTaskRunner):
+        return runner
+    if type(context) is not TaskContext:
+        raise TypeError('runner preparation requires the exact current task context')
+    if runner.native_effect:
+        from .prepared_native_invocation import PreparedInvocationContract
+        contract = context.prepared_invocation
+        if (type(contract) is not PreparedInvocationContract or not contract.native_effect
+                or contract.manifest != runner.manifest):
+            raise ValueError('native parent preparation requires its exact prepared native invocation')
+        contract.__post_init__()
+        contract.require_complete()
+        contract.validate_context(context)
+    prepared = runner.prepare_execution(context)
+    if (isinstance(prepared, ParentPreparedTaskRunner)
+            or getattr(prepared, 'manifest', None) != runner.manifest
+            or not callable(getattr(prepared, 'execute', None))):
+        raise ValueError('prepared runner changes its installed manifest or remains unprepared')
+    if (any(callable(getattr(prepared, method, None)) for method in (
+            'jit_signature_projection', 'execute_with_progress'))
+            or getattr(prepared, 'worker_chunk_limit', None) is not None):
+        raise ValueError('parent preparation requires a dedicated pure task runner')
+    native_interfaces = any(callable(getattr(prepared, method, None)) for method in (
+        'execute_with_native_subwork', 'execute_streaming_with_native_subwork'))
+    if native_interfaces != runner.native_effect:
+        raise ValueError('parent preparation requires a dedicated pure task runner or its declared native runner')
+    return prepared
+
+
+class NativeSubworkTaskRunner(Protocol):
+    """Installed adapter seam for progress inside an already authorized task.
+
+    The progress port is passed by the executor separately from TaskContext.
+    The context still contains no stores, database sessions or filesystem paths.
+    Scientific configuration and complete subcall census remain adapter-owned.
+    """
+
+    manifest: CapabilityManifest
+
+    def execute_with_native_subwork(
+        self, context: TaskContext, native_subwork: NativeSubworkProgress,
+        progress: TaskProgressEmitter | None = None,
+    ) -> RunnerResult: ...
+
+
+class NativeSubworkStreamingTaskRunner(Protocol):
+    """Compose native progress and existing ordinary bounded output emission."""
+
+    manifest: CapabilityManifest
+
+    def execute_streaming_with_native_subwork(
+        self, context: TaskContext, native_subwork: NativeSubworkProgress,
+        emitter: StreamingOutputEmitter, progress: TaskProgressEmitter | None = None,
+    ) -> tuple[ReceiptCheck, ...]: ...
+
+
 def validate_runner_resource_interface(
     runner: TaskRunner,
     cell: ExecutionResourceTaskCellSpec,
@@ -474,7 +639,8 @@ def validate_runner_resource_interface(
         raise ValueError("runner JIT applicability differs from its declared task cell")
     if cell.progress_liveness is not None and not callable(
         getattr(runner, "execute_with_progress", None)
-    ):
+    ) and not (cell.native_simulator_launch and any(callable(getattr(runner, method, None))
+        for method in ("execute_with_native_subwork", "execute_streaming_with_native_subwork"))):
         raise ValueError("runner lacks its declared progress interface")
 
 
@@ -528,12 +694,19 @@ class TaskExecutor(Protocol):
 
     enforcement_capability: ExecutorEnforcementCapability
 
+    def preflight(
+        self, runner: TaskRunner, context: TaskContext, *,
+        prepared_contract: PreparedInvocationContract, timeout_seconds: int,
+    ) -> WorkerPreflightResult: ...
+
     def execute(
         self,
         runner: TaskRunner,
         context: TaskContext,
         *,
         timeout_seconds: int,
+        prepared_contract: PreparedInvocationContract | None = None,
+        native_entry: Callable[[], tuple[NativeEffectContact, NativeSubworkProgress | None]] | None = None,
     ) -> RunnerResult: ...
 
 
@@ -638,6 +811,18 @@ class OperationalRepository(Protocol):
 
     def attempts(self, run_id: str) -> tuple[OperationalAttempt, ...]: ...
 
+    def current_attempt_lease(
+        self,
+        *,
+        run_id: str,
+        execution_plan_sha256: str,
+        task_id: str,
+        attempt_id: str,
+        lease_id: str,
+        owner_id: str,
+        at_epoch_seconds: int,
+    ) -> OperationalAttempt: ...
+
     def start_attempt(
         self,
         *,
@@ -647,6 +832,12 @@ class OperationalRepository(Protocol):
         lease_id: str,
         owner_id: str,
         expires_epoch_seconds: int,
+    ) -> None: ...
+
+    def refresh_attempt_lease(
+        self, *, run_id: str, execution_plan_sha256: str, task_id: str,
+        attempt_id: str, lease_id: str, owner_id: str,
+        at_epoch_seconds: int, expires_epoch_seconds: int,
     ) -> None: ...
 
     def complete_attempt(self, attempt_id: str) -> None: ...
@@ -680,7 +871,7 @@ class WorkerInputPortFactory(Protocol):
         values: tuple[VerifiedArtifactInput, ...],
         *,
         bindings: tuple[WorkerInputBinding, ...],
-        maximum_bytes: int,
+        maximum_bytes: int | None,
     ) -> tuple[WorkerInputPort, ...]: ...
 
     def open(
@@ -688,7 +879,7 @@ class WorkerInputPortFactory(Protocol):
         value: VerifiedArtifactInput,
         *,
         binding: WorkerInputBinding | None = None,
-        maximum_bytes: int,
+        maximum_bytes: int | None,
     ) -> WorkerInputPort: ...
 
 

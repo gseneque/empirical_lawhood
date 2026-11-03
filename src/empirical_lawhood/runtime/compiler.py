@@ -13,7 +13,6 @@ from empirical_lawhood.kernel.evidence import (
     EvidenceCeiling,
     OutcomeAccess,
     VisibilityCeiling,
-    inherited_visibility,
 )
 from empirical_lawhood.kernel.experiments import ExperimentSpec, validate_experiment_against_system
 from empirical_lawhood.kernel.models import ViewModelSetSpec, ModelSetSpec
@@ -53,7 +52,7 @@ from .candidate_compiler import CandidateGraphEdge, CandidateGraphExternalInput,
 from .execution_envelope import ExecutionEnvelopeSpec, ExecutionResourceEnvelopeSpec, JitGraphSignatureManifest, PredevelopmentJitSignatureCensus, validate_execution_jit_evidence
 from .exploration import ExplorationWaveInput
 from .dataset_binding import dataset_external_inputs_for_stage
-from .plans import ArtifactOutputSpec, BarrierKind, ProtocolExecutionPlan, CandidateExecutionPlan, EnvelopeExecutionPlan, ExecutionPlan, ProtocolExecutionTask, ExecutionTask, ExternalInputSpec, PlanLane, ProtocolStepTemplate, ProtocolTemplate, ProtocolRunPlan, CandidateRunPlan, EnvelopeRunPlan, RunPlan, ProtocolPlanStep, RunPlanStep, ScientificInputSpec, ScientificStage, SnapshotVerification
+from .plans import DevelopmentRunPlan, DevelopmentExecutionPlan, ArtifactOutputSpec, BarrierKind, ProtocolExecutionPlan, CandidateExecutionPlan, EnvelopeExecutionPlan, ExecutionPlan, ProtocolExecutionTask, ExecutionTask, ExternalInputSpec, PlanLane, ProtocolStepTemplate, ProtocolTemplate, ProtocolRunPlan, CandidateRunPlan, EnvelopeRunPlan, RunPlan, ProtocolPlanStep, RunPlanStep, ScientificInputRole, ScientificInputSpec, ScientificStage, SnapshotVerification
 from .study_issue import IssuedExtensionSet
 
 
@@ -74,18 +73,45 @@ def _config_input(
     *,
     visibility_ceiling: VisibilityCeiling | None = None,
     outcome_access: OutcomeAccess | None = None,
+    graph_input: CandidateGraphExternalInput | None = None,
 ) -> ExternalInputSpec:
+    media_type = size_bytes = None
+    if graph_input is not None:
+        from .candidate_compiler import ContentIdentityPolicy
+        from .plans import ScientificInputRole
+        if (type(graph_input) is not CandidateGraphExternalInput
+                or graph_input.scientific_role is not ScientificInputRole.CONFIGURATION
+                or graph_input.content_identity_policy is not ContentIdentityPolicy.EXACT_SHA256
+                or (graph_input.logical_artifact_id, graph_input.expected_content_sha256, graph_input.payload_schema,
+                    graph_input.media_type) != (config.artifact_id, config.content_sha256, config.config_schema, "application/json")
+                or graph_input.maximum_size_bytes is None
+                or visibility_ceiling is not None and visibility_ceiling is not graph_input.visibility_ceiling
+                or outcome_access is not None and outcome_access is not graph_input.outcome_access):
+            raise ProtocolCompilationError("configuration graph changes its exact owning bytes or custody")
+        media_type, size_bytes = graph_input.media_type, graph_input.maximum_size_bytes
+        visibility_ceiling, outcome_access = graph_input.visibility_ceiling, graph_input.outcome_access
     return ExternalInputSpec(
         input_id="config",
         logical_artifact_id=config.artifact_id,
         expected_content_sha256=config.content_sha256,
         expected_payload_schema=config.config_schema,
-        expected_media_type=None,
-        expected_size_bytes=None,
+        expected_media_type=media_type,
+        expected_size_bytes=size_bytes,
         expected_visibility_ceiling=visibility_ceiling,
         expected_outcome_access=outcome_access,
         identity_scope_sha256=None,
     )
+
+
+def _configuration_input_for_step(template, incoming_edges, external_by_id):
+    from .plans import ScientificInputRole
+    edges = tuple(edge for edge in incoming_edges if edge.scientific_role is ScientificInputRole.CONFIGURATION)
+    if not edges:
+        return _config_input(template.config)
+    if (len(edges) != 1 or edges[0].consumer_input_id != "config" or edges[0].producer_node_id is not None
+            or edges[0].external_input_id not in external_by_id):
+        raise ProtocolCompilationError("scientific graph changes its exact compiler-owned config edge")
+    return _config_input(template.config, graph_input=external_by_id[edges[0].external_input_id])
 
 
 def _sealed_dependency_outcome_ids(
@@ -123,14 +149,7 @@ def _sealed_dependency_outcome_ids(
 
 
 def _aggregate_budget(steps: tuple[ProtocolStepTemplate, ...]) -> ResourceBudget:
-    return ResourceBudget(
-        cpu_cores=max(step.resource_budget.cpu_cores for step in steps),
-        memory_bytes=max(step.resource_budget.memory_bytes for step in steps),
-        gpu_devices=max(step.resource_budget.gpu_devices for step in steps),
-        wall_time_seconds=sum(step.resource_budget.wall_time_seconds for step in steps),
-        source_scan_bytes=sum(step.resource_budget.source_scan_bytes for step in steps),
-        output_bytes=sum(step.resource_budget.output_bytes for step in steps),
-    )
+    return ResourceBudget.aggregate(step.resource_budget for step in steps)
 
 
 def _validate_campaign_bindings(
@@ -258,6 +277,46 @@ def _step_input_schemas(
     )
 
 
+def _project_output_custody(
+    template: ProtocolStepTemplate,
+    *,
+    parent_visibility_ceilings: tuple[VisibilityCeiling, ...],
+    parent_outcome_accesses: tuple[OutcomeAccess, ...],
+    scientific_graph: bool,
+) -> tuple[tuple[OutcomeAccess, VisibilityCeiling], ...]:
+    """Project output custody identically for scientific and executable graphs."""
+    # An explicitly prospective evaluator may commit evaluator-only operands
+    # for a later qualification. Entering its protected read is not a public
+    # release of those operands. REVEAL and exposed evaluation still publish
+    # revealed outputs; inherited exposed lineage below can never be resealed.
+    evaluator_only = (
+        scientific_graph
+        and template.stage is ScientificStage.EVALUATE
+        and template.requested_outcome_access is OutcomeAccess.EVALUATOR_REVEAL
+        and template.visibility_ceiling is VisibilityCeiling.PROSPECTIVE
+    )
+    declared_output_access = (
+        OutcomeAccess.EVALUATION_REVEALED
+        if template.stage in {ScientificStage.EVALUATE, ScientificStage.REVEAL}
+        and not evaluator_only
+        else template.requested_outcome_access
+    )
+    from .plans import derived_development_custody
+    output_access, output_visibility = derived_development_custody(declared_output_access,
+        template.visibility_ceiling, parent_outcome_accesses, parent_visibility_ceilings)
+    return tuple(
+        (
+            derived_outcome_access(OutcomeAccess.EVALUATION_REVEALED, output_access)
+            if evaluator_only and output.payload_schema == ScientificAdjudicationRecord.SCHEMA
+            else output_access,
+            VisibilityCeiling.most_restrictive(output_visibility, VisibilityCeiling.OUTCOME_VISIBLE)
+            if evaluator_only and output.payload_schema == ScientificAdjudicationRecord.SCHEMA
+            else output_visibility,
+        )
+        for output in template.outputs
+    )
+
+
 def _compile_step(
     *,
     run_plan_id: str,
@@ -334,22 +393,6 @@ def _compile_step(
                 key=lambda ceiling: ceiling.value,
             )
         )
-    # An explicitly prospective evaluator may commit evaluator-only operands
-    # for a later qualification. Entering its protected read is not a public
-    # release of those operands. REVEAL and exposed evaluation still publish
-    # revealed outputs; inherited exposed lineage below can never be resealed.
-    evaluator_only = (
-        scientific_graph is not None
-        and template.stage is ScientificStage.EVALUATE
-        and template.requested_outcome_access is OutcomeAccess.EVALUATOR_REVEAL
-        and template.visibility_ceiling is VisibilityCeiling.PROSPECTIVE
-    )
-    declared_output_access = (
-        OutcomeAccess.EVALUATION_REVEALED
-        if template.stage in {ScientificStage.EVALUATE, ScientificStage.REVEAL}
-        and not evaluator_only
-        else template.requested_outcome_access
-    )
     parent_outcome_accesses = tuple(
         (edge.outcome_access for edge in incoming_edges)
         if scientific_graph is not None
@@ -359,52 +402,29 @@ def _compile_step(
             for output in compiled_steps[dependency_id].outputs
         )
     )
-    output_access = derived_outcome_access(
-        declared_output_access,
-        *parent_outcome_accesses,
-        *(
-            value.expected_outcome_access
-            for value in dataset_inputs
+    custody = _project_output_custody(
+        template,
+        parent_visibility_ceilings=parent_visibility_ceilings,
+        parent_outcome_accesses=(*parent_outcome_accesses, *(
+            value.expected_outcome_access for value in dataset_inputs
             if value.expected_outcome_access is not None
-        ),
-    )
-    inherited_output_visibility = inherited_visibility(
-        parent_visibility_ceilings,
-        output_access,
-    )
-    output_visibility = VisibilityCeiling.most_restrictive(
-        template.visibility_ceiling,
-        inherited_output_visibility,
+        )),
+        scientific_graph=scientific_graph is not None,
     )
     outputs = tuple(
         ArtifactOutputSpec(
             output_id=f"{template.step_id}.{output.output_id}",
-            logical_artifact_id=(f"artifact.{run_plan_id}.{template.step_id}.{output.output_id}"),
-            relative_path=(
-                f"runs/{run_plan_id}/outputs/{template.step_id}/"
-                f"{output.output_id}{output.filename_suffix}"
-            ),
+            logical_artifact_id=f"artifact.{run_plan_id}.{template.step_id}.{output.output_id}",
+            relative_path=(f"runs/{run_plan_id}/outputs/{template.step_id}/"
+                f"{output.output_id}{output.filename_suffix}"),
             payload_schema=output.payload_schema,
             profile=output.profile,
             media_type=output.media_type,
-            # A terminal adjudication is the completed reveal, even when its
-            # sibling scientific operands stay private to the next evaluator.
-            # Its existing record contract forbids an in-reveal context.
-            visibility_ceiling=(
-                VisibilityCeiling.most_restrictive(
-                    output_visibility, VisibilityCeiling.OUTCOME_VISIBLE
-                )
-                if evaluator_only and output.payload_schema == ScientificAdjudicationRecord.SCHEMA
-                else output_visibility
-            ),
+            visibility_ceiling=visibility,
             parent_visibility_ceilings=parent_visibility_ceilings,
-            outcome_access=(
-                derived_outcome_access(OutcomeAccess.EVALUATION_REVEALED, output_access)
-                if evaluator_only and output.payload_schema == ScientificAdjudicationRecord.SCHEMA
-                else output_access
-            ),
+            outcome_access=access,
         )
-        for output in template.outputs
+        for output, (access, visibility) in zip(template.outputs, custody, strict=True)
     )
     scientific_external_inputs = (
         ()
@@ -417,7 +437,7 @@ def _compile_step(
         )
     )
     external_inputs = [
-        _config_input(template.config),
+        _configuration_input_for_step(template, incoming_edges, external_by_id),
         *dataset_inputs,
         *scientific_external_inputs,
     ]
@@ -546,6 +566,8 @@ def _scientific_external_inputs_for_step(
     for edge in incoming_edges:
         if edge.external_input_id is None:
             continue
+        if edge.scientific_role is ScientificInputRole.CONFIGURATION:
+            continue
         external = external_by_id[edge.external_input_id]
         values.append(
             ExternalInputSpec(
@@ -573,6 +595,12 @@ def _validate_stage_capability(
     *,
     historical: bool = False,
 ) -> None:
+    from .stage_contracts import stage_kind_allowed
+
+    # Historical replay retains its original stage meaning. Current prospective
+    # lowering uses the same kind table as candidate authoring.
+    if not historical and not stage_kind_allowed(template.stage, kind):
+        raise ProtocolCompilationError("capability kind is forbidden for the scientific stage")
     permissions = set(template.required_permissions)
     sealed_read_permission = CapabilityPermission.READ_SEALED_OUTCOMES
     reveal_permission = CapabilityPermission.REVEAL_OUTCOMES
@@ -1061,13 +1089,13 @@ def _template_order(template: ProtocolTemplate) -> tuple[str, ...]:
     return tuple(order)
 
 
-def lower_run_plan(run_plan: ProtocolRunPlan, registry: CapabilityRegistry) -> ProtocolExecutionPlan:
+def lower_run_plan(run_plan: ProtocolRunPlan | DevelopmentRunPlan, registry: CapabilityRegistry) -> ProtocolExecutionPlan:
     if run_plan.registry_sha256 != registry.fingerprint():
         raise ProtocolCompilationError("capability registry drifted after scientific freeze")
     tasks: list[ProtocolExecutionTask] = []
     for step in run_plan.steps:
         manifest = registry.require(step.capability)
-        if isinstance(run_plan, CandidateRunPlan):
+        if isinstance(run_plan, (CandidateRunPlan, DevelopmentRunPlan)):
             if not isinstance(step, RunPlanStep):
                 raise ProtocolCompilationError("candidate run plan contains a step outside its contract")
             tasks.append(
@@ -1103,6 +1131,14 @@ def lower_run_plan(run_plan: ProtocolRunPlan, registry: CapabilityRegistry) -> P
                 )
             )
     source_plan = ObjectIdentity.from_record(run_plan.run_plan_id, run_plan)
+    if isinstance(run_plan, DevelopmentRunPlan):
+        return DevelopmentExecutionPlan(
+            execution_plan_id=f"execution.{run_plan.run_plan_id}",
+            lane=PlanLane.DEVELOPMENT, source_plan=source_plan,
+            registry_sha256=registry.fingerprint(),
+            implementation_commit=run_plan.implementation_commit,
+            tasks=cast(tuple[ExecutionTask, ...], tuple(tasks)), nonactuating=True,
+        )
     if isinstance(run_plan, CandidateRunPlan):
         if not all(isinstance(value, ExecutionTask) for value in tasks):
             raise ProtocolCompilationError("candidate run plan lowering produced a task outside its execution contract")
@@ -1848,11 +1884,4 @@ def compile_exploration_wave_execution_plan(
 def _aggregate_resource_budgets(
     budgets: tuple[ResourceBudget, ...],
 ) -> ResourceBudget:
-    return ResourceBudget(
-        cpu_cores=max(budget.cpu_cores for budget in budgets),
-        memory_bytes=max(budget.memory_bytes for budget in budgets),
-        gpu_devices=max(budget.gpu_devices for budget in budgets),
-        wall_time_seconds=sum(budget.wall_time_seconds for budget in budgets),
-        source_scan_bytes=sum(budget.source_scan_bytes for budget in budgets),
-        output_bytes=sum(budget.output_bytes for budget in budgets),
-    )
+    return ResourceBudget.aggregate(budgets)

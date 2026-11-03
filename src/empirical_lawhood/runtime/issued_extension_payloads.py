@@ -424,6 +424,27 @@ class IssuedExtensionPayloadResolver:
                         "selected executable bindings overlap issued payload ownership"
                     )
                 schema_owners[schema] = binding
+        # Shared stateless operations consume their configs through exact task
+        # ports. Their separately issued scientific selection still receives
+        # the ordinary bounded decoder/member replay, without constructor capture.
+        from .executable_bindings import ExternalConfigExecutableCapabilityBinding, ExecutableBindingRole
+        from empirical_lawhood.planning.recursive_authoring import RecursiveScientificSelection
+        if any(isinstance(binding, ExternalConfigExecutableCapabilityBinding) for binding in bindings):
+            proposed_science = {ObjectIdentity.from_record(value.extension_id, value)
+                for value in manifest.candidate.authoring_package.extension_set.extensions
+                if value.payload.object_schema == RecursiveScientificSelection.SCHEMA}
+            issued_science_decoders = {value.decoder_registration for value in manifest.issued_extensions.bindings
+                if value.proposed_extension in proposed_science}
+            owners = tuple(binding for binding in aggregate.bindings
+                           if binding.role is ExecutableBindingRole.PROGRAMME_AUTHOR
+                           and any(decoder.payload_schema == RecursiveScientificSelection.SCHEMA
+                                   and ObjectIdentity.from_record(decoder.registration_id, decoder) in issued_science_decoders
+                                   for decoder in binding.issued_decoder_registrations))
+            if (len(issued_science_decoders) != 1 or len(owners) != 1
+                    or RecursiveScientificSelection.SCHEMA in schema_owners):
+                raise ValueError('shared operation roster lacks its unique issued scientific-selection owner')
+            schema_owners[RecursiveScientificSelection.SCHEMA] = owners[0]
+            required_schemas.add(RecursiveScientificSelection.SCHEMA)
         if not schema_owners:
             raise ValueError("selected executable bindings require no issued payloads")
 
@@ -482,9 +503,12 @@ class IssuedExtensionPayloadResolver:
                 matched_decoder
             ):
                 raise ValueError("issued decoder differs from the executable binding")
-            codec = self.codecs.registration(proposed.payload.object_schema)
+            codec = self.codecs.registration(proposed.payload.object_schema,
+                decoder_key=matched_decoder.decoder_key, decoder_version=matched_decoder.decoder_version)
             if (
-                codec.record_version != proposed.payload.object_version
+                (codec.record_schema, codec.decoder_key, codec.decoder_version) != (
+                    proposed.payload.object_schema, matched_decoder.decoder_key, matched_decoder.decoder_version)
+                or codec.record_version != proposed.payload.object_version
                 or codec.maximum_bytes > matched_decoder.maximum_payload_bytes
                 or codec.decoder_implementation_sha256 != matched_decoder.implementation_sha256
             ):
@@ -667,9 +691,10 @@ class IssuedExtensionPayloadResolver:
                 for value in owner.issued_decoder_registrations
                 if value.payload_schema == schema
             )
-            codec = self.codecs.registration(schema)
+            codec = self.codecs.registration(schema, decoder_key=decoder.decoder_key, decoder_version=decoder.decoder_version)
             if (
-                codec.record_version != proposed.payload.object_version
+                (codec.record_schema, codec.decoder_key, codec.decoder_version) != (schema, decoder.decoder_key, decoder.decoder_version)
+                or codec.record_version != proposed.payload.object_version
                 or codec.maximum_bytes > decoder.maximum_payload_bytes
                 or codec.decoder_implementation_sha256 != decoder.implementation_sha256
                 or not owner.accepts_issued_decoder_registration(decoder)
@@ -782,15 +807,25 @@ def reconstruct_executable_provider(
         raise ValueError("authenticated executable record roster differs from its bindings")
     if set(authenticated_schemas) & {value.SCHEMA for value in resolved.records}:
         raise ValueError("issued and separately authenticated executable records overlap")
+    from empirical_lawhood.planning.recursive_authoring import RecursiveScientificSelection
+    from .executable_bindings import ExternalConfigExecutableCapabilityBinding
+    has_external_config = any(isinstance(binding, ExternalConfigExecutableCapabilityBinding) for binding in selected)
     construction_records = tuple(
         sorted(
             (
-                *resolved.records,
+                *(record for record in resolved.records
+                  if not (has_external_config and isinstance(record, RecursiveScientificSelection))),
                 *(value.record for value in authenticated_records),
             ),
             key=lambda value: value.SCHEMA,
         )
     )
+    if has_external_config:
+        from .recursive_prospective import validate_recursive_issued_selection
+        selections = tuple(record for record in resolved.records if isinstance(record, RecursiveScientificSelection))
+        if len(selections) != 1:
+            raise ValueError('shared operation reconstruction omits its exact issued scientific selection')
+        validate_recursive_issued_selection(selection=selections[0], candidate=manifest.candidate, registry=registry)
     provider = provider_resolver.resolve(
         registry,
         decoded_records=construction_records,

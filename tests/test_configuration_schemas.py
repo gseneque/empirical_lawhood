@@ -9,6 +9,7 @@ from typing import ClassVar
 
 from jsonschema import Draft202012Validator
 import pytest
+import yaml
 from referencing import Registry
 from typer.testing import CliRunner
 
@@ -17,9 +18,14 @@ from empirical_lawhood.api.configuration_registry import CONSUMERS
 from empirical_lawhood.api.configuration_schemas import RESOURCE_PACKAGE, configuration_schema, generated_resources, project_record
 from empirical_lawhood.cli.configuration import config_app
 from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.runtime.recursive_inquiry import (
+    InquiryDecisionRequest, InquiryStateSources, RobustInquiryDecisionRequest, WorkBoundInquiryDecisionRequest,
+)
+from tests.test_recursive_inquiry import episode as episode
+from tests.test_recursive_inquiry_policy import policy_case, work_bound_case
 
 ROOT = Path(__file__).resolve().parents[1]
-RC = ROOT / "experiments/rc-ladder-response/model.json"
+RC = ROOT / "programmes/foundations/measurement-and-response/workflows/rc-ladder-response/model.json"
 
 
 def _offline(schema):
@@ -40,9 +46,52 @@ def test_generated_resource_inventory_and_bytes_are_current():
 
 @pytest.mark.parametrize("consumer", [item for item in CONSUMERS if item.schema_id], ids=lambda item: item.consumer)
 def test_emitted_schemas_accept_all_supplied_inputs_offline(consumer):
-    validator = _offline(configuration_schema(consumer.schema_id))
+    validator = _offline(configuration_schema(consumer.schema_id, consumer=consumer.consumer))
     for locator in consumer.supplied_inputs:
-        validator.validate(json.loads((ROOT / locator).read_bytes()))
+        path = ROOT / locator
+        document = (yaml.safe_load(path.read_bytes()) if path.suffix in ('.yaml', '.yml')
+            else json.loads(path.read_bytes()))
+        validator.validate(document)
+
+
+def test_shared_inquiry_root_exports_exact_historical_and_current_consumer_versions(episode):
+    old = policy_case("rubisco")
+    current = work_bound_case()
+    requests = (
+        ("recursive-inquiry-decision", InquiryDecisionRequest(
+            episode["specification"], episode["state"], InquiryStateSources(()), episode["menu"],
+            episode["policy"], episode["campaign"], episode["right"], episode["actor_id"])),
+        ("recursive-inquiry-decision-v2", RobustInquiryDecisionRequest(
+            old.specification, old.state, InquiryStateSources(()), old.menu, old.policy,
+            old.campaign, old.right, old.actor_id)),
+        ("recursive-inquiry-decision-v3", WorkBoundInquiryDecisionRequest(
+            current.specification, current.state, InquiryStateSources(()), current.menu, current.policy,
+            current.campaign, current.right, current.actor_id)),
+    )
+    for consumer, request in requests:
+        original = request.canonical_bytes()
+        schema = configuration_schema(request.SCHEMA, consumer=consumer)
+        validator = _offline(schema)
+        validator.validate(json.loads(original))
+        for other_consumer, other in requests:
+            if other_consumer != consumer:
+                assert list(validator.iter_errors(json.loads(other.canonical_bytes())))
+        result = CliRunner().invoke(config_app, ["schema", "--schema-id", request.SCHEMA, "--consumer", consumer])
+        assert result.exit_code == 0 and result.stderr == ""
+        assert json.loads(result.stdout) == schema
+        assert request.canonical_bytes() == original
+
+
+@pytest.mark.parametrize("consumer", (None, "unknown-consumer", "rc-ladder-model"))
+def test_shared_schema_export_refuses_missing_unknown_or_mismatched_consumer(consumer):
+    schema_id = InquiryDecisionRequest.SCHEMA
+    with pytest.raises(ValueError, match="unknown or ambiguous configuration schema"):
+        configuration_schema(schema_id, consumer=consumer)
+    arguments = ["schema", "--schema-id", schema_id]
+    if consumer is not None:
+        arguments.extend(("--consumer", consumer))
+    result = CliRunner().invoke(config_app, arguments)
+    assert result.exit_code == 2 and result.stdout == "" and result.stderr
 
 
 @pytest.mark.parametrize("mutation", [

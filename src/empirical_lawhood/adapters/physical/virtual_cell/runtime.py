@@ -72,7 +72,16 @@ from .config import (
     SUMMARY_CAPABILITY_KEY,
     decode_pipeline_config,
 )
-from .contracts import LeaderboardSnapshot, PlacementAdjudication, PredictionCommitment, VirtualCellContractError, ProvenanceBoundVirtualCellPipelineConfig, VirtualCellSourceManifest, VirtualCellSourceObject, VirtualCellSplit
+from .contracts import (
+    LeaderboardSnapshot,
+    PlacementAdjudication,
+    PredictionCommitment,
+    VirtualCellContractError,
+    ProvenanceBoundVirtualCellPipelineConfig,
+    VirtualCellSourceManifest,
+    VirtualCellSourceObject,
+    VirtualCellSplit,
+)
 from .dataset import (
     ControlReservoirArrays,
     ResponseSummaryArrays,
@@ -300,7 +309,9 @@ class VirtualCellTaskRunner:
     def _validate_context(self, context: TaskContext) -> None:
         if self.manifest.capability_version != CAPABILITY_VERSION:
             raise ValueError("Virtual Cell runner version differs")
-        port = _one_input(context, payload_schema=ProvenanceBoundVirtualCellPipelineConfig.SCHEMA)
+        port = _one_input(
+            context, payload_schema=ProvenanceBoundVirtualCellPipelineConfig.SCHEMA
+        )
         observed = decode_pipeline_config(port.read())
         if (
             observed != self.config
@@ -312,6 +323,7 @@ class VirtualCellTaskRunner:
 
     def execute(self, context: TaskContext) -> RunnerResult:
         self._validate_context(context)
+        self._before_stage(context)
         dispatch = {
             SOURCE_CAPABILITY_KEY: self._prepare_source,
             SUMMARY_CAPABILITY_KEY: self._summarize,
@@ -329,8 +341,123 @@ class VirtualCellTaskRunner:
             raise NotImplementedError("unregistered Virtual Cell capability") from error
         return execute(context)
 
+    def _before_stage(self, context):
+        if self.manifest.capability_key in {
+            SUMMARY_CAPABILITY_KEY,
+            MODEL_CAPABILITY_KEY,
+            PREDICTION_CAPABILITY_KEY,
+            EVALUATOR_CAPABILITY_KEY,
+        }:
+            raise VirtualCellContractError(
+                "SOFTWARE: the historical v1 compiler/evaluator route requires an explicit v2 runtime selection "
+                "before validation/test H5AD or scratch access"
+            )
+
+    def _input_record(self, context, record_type):
+        return _canonical_input(context, record_type)
+
+    def _create_record(self, record_type, **values):
+        return record_type(**values)
+
+    def _record_output(self, context, output_id, record):
+        return _json_output(context, output_id, record)
+
+    def _compiler_contract(self):
+        return self.config.prediction_compiler
+
+    def _configuration_fingerprint(self):
+        return self.config.fingerprint()
+
+    def _prediction_output_id(self):
+        return "predicted-means"
+
+    def _prediction_payload_schema(self):
+        return PREDICTED_MEAN_TABLE_SCHEMA
+
+    def _metrics_payload_schema(self):
+        return OFFICIAL_METRICS_TABLE_SCHEMA
+
+    def _prediction_envelope_identity(self, *, size_bytes, sha256):
+        """Observe a completed envelope without changing historical records."""
+
+    def _compile_prediction_action(
+        self, *, target_ids, predicted_deltas, control_reservoir
+    ):
+        return compile_absolute_prediction_means(
+            target_ids=target_ids,
+            predicted_deltas=predicted_deltas,
+            control_reservoir=control_reservoir,
+            maximum_value=float(self._compiler_contract().maximum_value),
+        )
+
+    def _encode_prediction_action(self, *, target_ids, prediction_action, uncertainty):
+        return encode_predicted_means(
+            target_ids=target_ids,
+            means=prediction_action.absolute_means,
+            uncertainty=uncertainty,
+        )
+
+    def _write_prediction_file(
+        self,
+        *,
+        path,
+        roster,
+        gene_ids,
+        prediction_action,
+        control_reservoir,
+        control_reservoir_sha256,
+    ):
+        compiler = self._compiler_contract()
+        return write_prediction_h5ad(
+            path=path,
+            roster=roster,
+            gene_ids=gene_ids,
+            predicted_means=prediction_action,
+            control_reservoir=control_reservoir,
+            control_reservoir_sha256=control_reservoir_sha256,
+            seed=compiler.compiler_seed,
+            mean_tolerance=float(compiler.mean_tolerance),
+            maximum_value=float(compiler.maximum_value),
+        )
+
+    def _evaluate_arrays(
+        self, *, predicted, real, scratch_directory, num_threads, validation
+    ):
+        from .receiver_observation_v2 import ReceiverObservation
+
+        run = evaluate_official_2025(
+            predicted=predicted,
+            real=real,
+            metric_contract=(
+                self.config.model_selection.validation_metric_contract
+                if validation
+                else self.config.metric_contract
+            ),
+            scratch_directory=scratch_directory,
+            num_threads=num_threads,
+            control_label=self.config.response_summary.comparator_label,
+            perturbation_column=self.config.response_summary.target_field,
+        )
+        return ReceiverObservation.from_historical_run(run)
+
+    def _candidate_validation(self, *, candidate_id, receiver, score_standard_error):
+        if receiver.metrics_schema != OFFICIAL_METRICS_TABLE_SCHEMA:
+            raise ValueError(
+                "historical candidate cannot receive corrected metric bytes"
+            )
+        return CandidateOfficialValidation(
+            candidate_id=candidate_id,
+            target_ids=receiver.target_ids,
+            score=receiver.score,
+            score_standard_error=score_standard_error,
+            metrics_arrow=receiver.metrics_payload,
+            cell_eval_version=receiver.cell_eval_version,
+            pdex_version=receiver.pdex_version,
+            response_outcome_read=receiver.response_outcome_read,
+        )
+
     def _prepare_source(self, context: TaskContext) -> RunnerResult:
-        manifest = _canonical_input(context, VirtualCellSourceManifest)
+        manifest = self._input_record(context, VirtualCellSourceManifest)
         if (
             manifest != self.source_manifest
             or manifest.fingerprint() != self.config.source_manifest_sha256
@@ -355,7 +482,7 @@ class VirtualCellTaskRunner:
             test_content_read=False,
         )
         return _result(
-            (_json_output(context, "prepared-source", record),),
+            (self._record_output(context, "prepared-source", record),),
             "vcc-exact-seven-object-manifest",
             "vcc-segmented-source-byte-closure",
             "vcc-test-content-not-opened",
@@ -394,7 +521,7 @@ class VirtualCellTaskRunner:
         )
 
     def _summarize(self, context: TaskContext) -> RunnerResult:
-        prepared = _canonical_input(context, PreparedSourceRecord)
+        prepared = self._input_record(context, PreparedSourceRecord)
         if prepared.source_manifest_sha256 != self.source_manifest.fingerprint():
             raise ValueError(
                 "prepared source record differs from the provider manifest"
@@ -487,14 +614,16 @@ class VirtualCellTaskRunner:
                     reservoir_table,
                     payload_schema=CONTROL_RESERVOIR_TABLE_SCHEMA,
                 ),
-                _json_output(context, "train-summary-record", train_record),
+                self._record_output(context, "train-summary-record", train_record),
                 _bytes_output(
                     context,
                     "train-summary-table",
                     train_table,
                     payload_schema=RESPONSE_SUMMARY_TABLE_SCHEMA,
                 ),
-                _json_output(context, "validation-summary-record", validation_record),
+                self._record_output(
+                    context, "validation-summary-record", validation_record
+                ),
                 _bytes_output(
                     context,
                     "validation-summary-table",
@@ -703,7 +832,8 @@ class VirtualCellTaskRunner:
                     outcome_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
                 )
             )
-        return ModelDevelopmentRecord(
+        return self._create_record(
+            ModelDevelopmentRecord,
             record_id="development.virtual-cell-2025-tier-l0",
             training_summary_sha256=training_summary_sha256,
             validation_summary_sha256=validation_summary_sha256,
@@ -722,7 +852,7 @@ class VirtualCellTaskRunner:
         )
 
     def _develop(self, context: TaskContext) -> RunnerResult:
-        prepared = _canonical_input(context, PreparedSourceRecord)
+        prepared = self._input_record(context, PreparedSourceRecord)
         if prepared.source_manifest_sha256 != self.source_manifest.fingerprint():
             raise ValueError("development source binding differs from prepared custody")
         (
@@ -761,7 +891,7 @@ class VirtualCellTaskRunner:
             outcome_access=OutcomeAccess.OUTCOME_BLIND,
         ) as roster_stream:
             validation_roster_payload = roster_stream.read()
-        compiler = self.config.prediction_compiler
+        compiler = self._compiler_contract()
         validation_roster = build_prediction_roster(
             validation_roster_payload,
             roster_id="roster.virtual-cell-2025-validation-tournament",
@@ -803,7 +933,10 @@ class VirtualCellTaskRunner:
                 model_features = (
                     None
                     if candidate.model.family
-                    in {ModelFamily.NO_CHANGE_BASELINE, ModelFamily.WEIGHTED_COMMON_RESPONSE_BASELINE}
+                    in {
+                        ModelFamily.NO_CHANGE_BASELINE,
+                        ModelFamily.WEIGHTED_COMMON_RESPONSE_BASELINE,
+                    }
                     else features
                 )
                 deltas = predict_response(
@@ -811,11 +944,10 @@ class VirtualCellTaskRunner:
                     target_ids=validation_target_ids,
                     features=model_features,
                 )
-                means = compile_absolute_prediction_means(
+                means = self._compile_prediction_action(
                     target_ids=validation_target_ids,
                     predicted_deltas=deltas,
                     control_reservoir=reservoir,
-                    maximum_value=float(compiler.maximum_value),
                 )
                 suffix = self._model_output_name(candidate.candidate_id).removeprefix(
                     "model-"
@@ -826,50 +958,40 @@ class VirtualCellTaskRunner:
                 cell_eval_scratch = workspace.reserve_path(
                     f"cell-eval-validation-{suffix}"
                 )
-                write_prediction_h5ad(
+                self._write_prediction_file(
                     path=prediction_path,
                     roster=validation_roster,
                     gene_ids=candidate.model.gene_ids,
-                    predicted_means=means,
+                    prediction_action=means,
                     control_reservoir=reservoir,
                     control_reservoir_sha256=_sha256(reservoir_payload),
-                    seed=compiler.compiler_seed,
-                    mean_tolerance=float(compiler.mean_tolerance),
-                    maximum_value=float(compiler.maximum_value),
                 )
                 with prediction_path.open("rb") as predicted_stream:
                     predicted = read_anndata_h5ad_stream(predicted_stream)
-                run = evaluate_official_2025(
+                run = self._evaluate_arrays(
                     predicted=predicted,
                     real=real_validation,
-                    metric_contract=self.config.model_selection.validation_metric_contract,
+                    validation=True,
                     scratch_directory=cell_eval_scratch,
                     num_threads=min(8, context.resource_budget.cpu_cores),
-                    control_label=self.config.response_summary.comparator_label,
-                    perturbation_column=self.config.response_summary.target_field,
                 )
                 if run.target_ids != validation_target_ids:
                     raise ValueError(
                         "official scorer returned another validation target roster"
                     )
                 standard_error = bootstrap_official_score_standard_error(
-                    des=run.des,
-                    pds=run.pds,
-                    mae=run.mae,
+                    des=np.asarray(run.des, dtype=np.float64),
+                    pds=np.asarray(run.pds, dtype=np.float64),
+                    mae=np.asarray(run.mae, dtype=np.float64),
                     metric_contract=self.config.model_selection.validation_metric_contract,
                     resamples=self.config.model_selection.bootstrap_targets,
                     seed=self.config.model_selection.bootstrap_seed,
                 )
                 official_validations.append(
-                    CandidateOfficialValidation(
+                    self._candidate_validation(
                         candidate_id=candidate.candidate_id,
-                        target_ids=run.target_ids,
-                        score=run.score,
+                        receiver=run,
                         score_standard_error=standard_error,
-                        metrics_arrow=run.metrics_arrow,
-                        cell_eval_version=run.cell_eval_version,
-                        pdex_version=run.pdex_version,
-                        response_outcome_read=run.response_outcome_read,
                     )
                 )
         finally:
@@ -902,7 +1024,7 @@ class VirtualCellTaskRunner:
         validation_metric_payloads = {
             self._validation_metrics_output_name(
                 value.candidate_id
-            ): value.metrics_arrow
+            ): value.metrics_payload
             for value in development.official_validations
         }
         record = self._development_record(
@@ -915,7 +1037,7 @@ class VirtualCellTaskRunner:
             validation_metric_payloads=validation_metric_payloads,
         )
         outputs: list[TaskOutputPayload | StreamedTaskOutput] = [
-            _json_output(context, "model-development", record)
+            self._record_output(context, "model-development", record)
         ]
         outputs.extend(
             _bytes_output(
@@ -931,7 +1053,7 @@ class VirtualCellTaskRunner:
                 context,
                 output_id,
                 payload,
-                payload_schema=OFFICIAL_METRICS_TABLE_SCHEMA,
+                payload_schema=self._metrics_payload_schema(),
             )
             for output_id, payload in validation_metric_payloads.items()
         )
@@ -969,7 +1091,7 @@ class VirtualCellTaskRunner:
         )
 
     def _falsify(self, context: TaskContext) -> RunnerResult:
-        development = _canonical_input(context, ModelDevelopmentRecord)
+        development = self._input_record(context, ModelDevelopmentRecord)
         selected_binding = next(
             value
             for value in development.models
@@ -1020,7 +1142,10 @@ class VirtualCellTaskRunner:
         model_features = (
             None
             if final_model.family
-            in {ModelFamily.NO_CHANGE_BASELINE, ModelFamily.WEIGHTED_COMMON_RESPONSE_BASELINE}
+            in {
+                ModelFamily.NO_CHANGE_BASELINE,
+                ModelFamily.WEIGHTED_COMMON_RESPONSE_BASELINE,
+            }
             else features
         )
         prediction = predict_response(
@@ -1129,15 +1254,15 @@ class VirtualCellTaskRunner:
                 "development record violated protected lineage before falsification"
             )
         return _result(
-            (_json_output(context, "falsifier-panel", panel),),
+            (self._record_output(context, "falsifier-panel", panel),),
             "vcc-gene-and-target-permutation",
             "vcc-leakage-and-cutoff-sentinels",
             "vcc-wrong-control-and-label-shuffle",
         )
 
     def _select(self, context: TaskContext) -> RunnerResult:
-        development = _canonical_input(context, ModelDevelopmentRecord)
-        panel = _canonical_input(context, FalsifierPanel)
+        development = self._input_record(context, ModelDevelopmentRecord)
+        panel = self._input_record(context, FalsifierPanel)
         tournament = development.tournament
         selected_candidate_id = tournament.selected_candidate_id
         integrity_failures = competition_selection_integrity_failures(panel)
@@ -1153,7 +1278,8 @@ class VirtualCellTaskRunner:
         if len(candidates) != 1:
             raise ValueError("selected candidate lacks one exact all-development refit")
         selected = candidates[0]
-        record = ModelSelectionRecord(
+        record = self._create_record(
+            ModelSelectionRecord,
             record_id="selection.virtual-cell-2025-tier-l0",
             tournament=tournament,
             falsifier_panel_sha256=panel.fingerprint(),
@@ -1161,7 +1287,7 @@ class VirtualCellTaskRunner:
             selected_model_sha256=selected.artifact_sha256,
         )
         return _result(
-            (_json_output(context, "model-selection", record),),
+            (self._record_output(context, "model-selection", record),),
             "vcc-frozen-validation-only-selection",
             "vcc-one-standard-error-tie-break",
             "vcc-scientific-falsifiers-do-not-retune-competition",
@@ -1208,7 +1334,7 @@ class VirtualCellTaskRunner:
             )
 
     def _freeze_prediction(self, context: TaskContext) -> RunnerResult:
-        selection = _canonical_input(context, ModelSelectionRecord)
+        selection = self._input_record(context, ModelSelectionRecord)
         model, model_payload = self._selected_model(context, selection)
         reservoir, reservoir_payload = self._control_reservoir(
             context,
@@ -1230,7 +1356,7 @@ class VirtualCellTaskRunner:
         roster_payload = _one_input(
             context, payload_schema=TEST_ROSTER_TEXT_SCHEMA
         ).read()
-        compiler = self.config.prediction_compiler
+        compiler = self._compiler_contract()
         roster = build_prediction_roster(
             roster_payload,
             roster_id="roster.virtual-cell-2025-final-prediction",
@@ -1242,7 +1368,11 @@ class VirtualCellTaskRunner:
         target_ids = tuple(value.target_id for value in roster.targets)
         model_features = (
             None
-            if model.family in {ModelFamily.NO_CHANGE_BASELINE, ModelFamily.WEIGHTED_COMMON_RESPONSE_BASELINE}
+            if model.family
+            in {
+                ModelFamily.NO_CHANGE_BASELINE,
+                ModelFamily.WEIGHTED_COMMON_RESPONSE_BASELINE,
+            }
             else features
         )
         deltas = predict_response(
@@ -1250,15 +1380,14 @@ class VirtualCellTaskRunner:
             target_ids=target_ids,
             features=model_features,
         )
-        compiled = compile_absolute_prediction_means(
+        compiled = self._compile_prediction_action(
             target_ids=target_ids,
             predicted_deltas=deltas,
             control_reservoir=reservoir,
-            maximum_value=float(compiler.maximum_value),
         )
-        predicted_table = encode_predicted_means(
+        predicted_table = self._encode_prediction_action(
             target_ids=target_ids,
-            means=compiled.absolute_means,
+            prediction_action=compiled,
             uncertainty=model.residual_scale,
         )
         workspace = self.scratch_port.allocate(
@@ -1269,16 +1398,13 @@ class VirtualCellTaskRunner:
         inner_path = workspace.reserve_path("prediction.h5ad")
         envelope_path = workspace.reserve_path("prediction-envelope.h5")
         try:
-            h5ad_receipt = write_prediction_h5ad(
+            h5ad_receipt = self._write_prediction_file(
                 path=inner_path,
                 roster=roster,
                 gene_ids=model.gene_ids,
-                predicted_means=compiled,
+                prediction_action=compiled,
                 control_reservoir=reservoir,
                 control_reservoir_sha256=_sha256(reservoir_payload),
-                seed=compiler.compiler_seed,
-                mean_tolerance=float(compiler.mean_tolerance),
-                maximum_value=float(compiler.maximum_value),
             )
             write_h5ad_envelope(
                 inner_h5ad_path=inner_path,
@@ -1291,19 +1417,23 @@ class VirtualCellTaskRunner:
                     "prediction envelope exceeds its frozen byte bound"
                 )
             envelope_sha256 = _file_sha256(envelope_path)
-            predicted_output = _output_port(context, "predicted-means")
+            self._prediction_envelope_identity(
+                size_bytes=envelope_size, sha256=envelope_sha256
+            )
+            predicted_output = _output_port(context, self._prediction_output_id())
             envelope_output = _output_port(context, "prediction-envelope")
             if (
                 predicted_output.logical_artifact_id is None
                 or envelope_output.logical_artifact_id is None
             ):
                 raise ValueError("prediction outputs lack logical artifact identities")
-            commitment = PredictionCommitment(
+            commitment = self._create_record(
+                PredictionCommitment,
                 commitment_id="commitment.virtual-cell-2025-tier-l0",
                 lane_id="lane-h-2025-historical-cutoff-reconstruction",
                 model_id=model.model_id,
                 model_sha256=_sha256(model_payload),
-                config_sha256=self.config.fingerprint(),
+                config_sha256=self._configuration_fingerprint(),
                 source_manifest_sha256=self.source_manifest.fingerprint(),
                 split_contract_sha256=_sha256(
                     canonical_json_bytes(self.config.schema_contract_sha256s)
@@ -1317,7 +1447,8 @@ class VirtualCellTaskRunner:
                 final_outcome_parent_ids=(),
                 leaderboard_parent_ids=(),
             )
-            freeze = PredictionFreezeRecord(
+            freeze = self._create_record(
+                PredictionFreezeRecord,
                 record_id="freeze.virtual-cell-2025-tier-l0",
                 commitment=commitment,
                 predicted_mean_table_artifact_id=predicted_output.logical_artifact_id,
@@ -1341,12 +1472,12 @@ class VirtualCellTaskRunner:
         return _result(
             (
                 stream,
-                _json_output(context, "prediction-freeze", freeze),
+                self._record_output(context, "prediction-freeze", freeze),
                 _bytes_output(
                     context,
-                    "predicted-means",
+                    self._prediction_output_id(),
                     predicted_table,
-                    payload_schema=PREDICTED_MEAN_TABLE_SCHEMA,
+                    payload_schema=self._prediction_payload_schema(),
                 ),
             ),
             "vcc-compiler-mean-preservation",
@@ -1410,7 +1541,7 @@ class VirtualCellTaskRunner:
             or not required_permissions.issubset(context.permissions)
         ):
             raise PermissionError("official evaluator lacks exact reveal authority")
-        test_binding = _canonical_input(context, VirtualCellSourceObject)
+        test_binding = self._input_record(context, VirtualCellSourceObject)
         expected_test = _source_object(
             self.source_manifest,
             split=VirtualCellSplit.TEST,
@@ -1418,7 +1549,7 @@ class VirtualCellTaskRunner:
         )
         if test_binding != expected_test or not test_binding.sealed:
             raise ValueError("evaluator test binding differs from sealed custody")
-        freeze = _canonical_input(context, PredictionFreezeRecord)
+        freeze = self._input_record(context, PredictionFreezeRecord)
         envelope_port = _one_input(
             context,
             payload_schema=PREDICTION_H5AD_ENVELOPE_SCHEMA,
@@ -1459,28 +1590,27 @@ class VirtualCellTaskRunner:
                 outcome_access=OutcomeAccess.EVALUATOR_REVEAL,
             ) as test_stream:
                 real = read_anndata_h5ad_stream(test_stream)
-            run = evaluate_official_2025(
+            run = self._evaluate_arrays(
                 predicted=predicted,
                 real=real,
-                metric_contract=self.config.metric_contract,
+                validation=False,
                 scratch_directory=cell_eval_scratch,
                 num_threads=min(8, context.resource_budget.cpu_cores),
-                control_label=self.config.response_summary.comparator_label,
-                perturbation_column=self.config.response_summary.target_field,
             )
             metrics_output = _output_port(context, "official-metrics")
             if metrics_output.logical_artifact_id is None:
                 raise ValueError(
                     "official metric output lacks logical artifact identity"
                 )
-            evaluation = OfficialEvaluationRecord(
+            evaluation = self._create_record(
+                OfficialEvaluationRecord,
                 evaluation_id="evaluation.virtual-cell-2025-official",
                 prediction_commitment_sha256=freeze.commitment.fingerprint(),
                 scorer_version=run.cell_eval_version,
                 pdex_version=run.pdex_version,
                 score=run.score,
                 per_target_metrics_artifact_id=metrics_output.logical_artifact_id,
-                per_target_metrics_sha256=_sha256(run.metrics_arrow),
+                per_target_metrics_sha256=_sha256(run.metrics_payload),
                 outcome_access=OutcomeAccess.EVALUATOR_REVEAL,
             )
             above_baseline = run.score.average_score > 0
@@ -1502,12 +1632,12 @@ class VirtualCellTaskRunner:
                 ),
             )
             outputs = (
-                _json_output(context, "official-evaluation", evaluation),
+                self._record_output(context, "official-evaluation", evaluation),
                 _bytes_output(
                     context,
                     "official-metrics",
-                    run.metrics_arrow,
-                    payload_schema=OFFICIAL_METRICS_TABLE_SCHEMA,
+                    run.metrics_payload,
+                    payload_schema=self._metrics_payload_schema(),
                 ),
                 _bytes_output(
                     context,
@@ -1536,9 +1666,9 @@ class VirtualCellTaskRunner:
             raise PermissionError(
                 "placement requires post-score outcome-visible access"
             )
-        freeze = _canonical_input(context, PredictionFreezeRecord)
-        evaluation = _canonical_input(context, OfficialEvaluationRecord)
-        snapshot = _canonical_input(context, LeaderboardSnapshot)
+        freeze = self._input_record(context, PredictionFreezeRecord)
+        evaluation = self._input_record(context, OfficialEvaluationRecord)
+        snapshot = self._input_record(context, LeaderboardSnapshot)
         if snapshot.fingerprint() != self.config.leaderboard_snapshot_sha256:
             raise ValueError("placement leaderboard differs from the frozen config")
         if evaluation.prediction_commitment_sha256 != freeze.commitment.fingerprint():
@@ -1557,7 +1687,7 @@ class VirtualCellTaskRunner:
             snapshot=snapshot,
         )
         return _result(
-            (_json_output(context, "placement-adjudication", placement),),
+            (self._record_output(context, "placement-adjudication", placement),),
             "vcc-leaderboard-lineage-post-score-only",
             "vcc-partial-field-placement-bounded",
         )
@@ -1572,9 +1702,9 @@ class VirtualCellTaskRunner:
             for value in context.output_ports
         ):
             return self._report_development(context)
-        freeze = _canonical_input(context, PredictionFreezeRecord)
-        evaluation = _canonical_input(context, OfficialEvaluationRecord)
-        placement = _canonical_input(context, PlacementAdjudication)
+        freeze = self._input_record(context, PredictionFreezeRecord)
+        evaluation = self._input_record(context, OfficialEvaluationRecord)
+        placement = self._input_record(context, PlacementAdjudication)
         if (
             evaluation.prediction_commitment_sha256 != freeze.commitment.fingerprint()
             or placement.prediction_commitment_id != freeze.commitment.commitment_id
@@ -1586,7 +1716,8 @@ class VirtualCellTaskRunner:
                 "closeout prediction, evaluation and placement lineage differ"
             )
         above_baseline = evaluation.score.average_score > 0
-        closeout = VirtualCellRunCloseout(
+        closeout = self._create_record(
+            VirtualCellRunCloseout,
             closeout_id="closeout.virtual-cell-2025-tier-l0",
             prediction_commitment_sha256=freeze.commitment.fingerprint(),
             official_evaluation_sha256=evaluation.fingerprint(),
@@ -1612,8 +1743,8 @@ class VirtualCellTaskRunner:
             ),
         )
         return _result(
-            (_json_output(context, "closeout", closeout),),
-            'virtual-cell-physical-validation-not-promoted',
+            (self._record_output(context, "closeout", closeout),),
+            "virtual-cell-physical-validation-not-promoted",
             "vcc-placement-lineage-bound",
         )
 
@@ -1626,10 +1757,10 @@ class VirtualCellTaskRunner:
             raise PermissionError(
                 "development handoff requires development-only outcome access"
             )
-        development = _canonical_input(context, ModelDevelopmentRecord)
-        panel = _canonical_input(context, FalsifierPanel)
-        selection = _canonical_input(context, ModelSelectionRecord)
-        freeze = _canonical_input(context, PredictionFreezeRecord)
+        development = self._input_record(context, ModelDevelopmentRecord)
+        panel = self._input_record(context, FalsifierPanel)
+        selection = self._input_record(context, ModelSelectionRecord)
+        freeze = self._input_record(context, PredictionFreezeRecord)
         selected = tuple(
             value
             for value in development.models
@@ -1650,7 +1781,8 @@ class VirtualCellTaskRunner:
                 "development handoff lineage differs from the frozen prediction"
             )
         receiver_supported = panel.all_required_pass
-        closeout = VirtualCellDevelopmentCloseout(
+        closeout = self._create_record(
+            VirtualCellDevelopmentCloseout,
             closeout_id="closeout.virtual-cell-2025-tier-l0-development",
             model_development_sha256=development.fingerprint(),
             falsifier_panel_sha256=panel.fingerprint(),
@@ -1692,7 +1824,7 @@ class VirtualCellTaskRunner:
         )
         return _result(
             (
-                _json_output(context, "development-closeout", closeout),
+                self._record_output(context, "development-closeout", closeout),
                 _bytes_output(
                     context,
                     "scientific-adjudication",

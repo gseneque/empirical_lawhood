@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
     inputs:
       profile:
-        description: Explicit additional profile (portable always runs)
+        description: Explicit additional profile (bounded CI always runs)
         type: choice
-        default: portable
-        options: [portable, native-open, native-brian2, held-reactor, held-response]
+        default: ci
+        options: [ci, integration, scale, native-open, native-brian2, held-reactor, held-response]
 permissions:
   contents: read
 concurrency:
@@ -17,9 +17,9 @@ concurrency:
   cancel-in-progress: true
 jobs:
   portable:
-    name: portable-release-check
+    name: portable-ci-check
     runs-on: ubuntu-24.04
-    timeout-minutes: 240
+    timeout-minutes: 45
     env:
       # Keep the frozen RC descriptor recipe on the original numerical dispatch.
       OPENBLAS_CORETYPE: HASWELL
@@ -34,9 +34,9 @@ jobs:
           version: '0.11.28'
           enable-cache: true
           cache-dependency-glob: uv.lock
-      - name: Check exact clean source
-        run: uv run --locked --python 3.11.14 --group build --group reactor-example python scripts/release_check.py --output-dir "$RUNNER_TEMP/portable-packet"
-      - name: Retain manifest, logs, coverage and selected builds
+      - name: Check bounded contracts and exact installed artifacts
+        run: uv run --locked --python 3.11.14 --group build --group reactor-example python scripts/release_check.py --profile ci --output-dir "$RUNNER_TEMP/portable-packet"
+      - name: Retain selection, fixtures, logs and exact builds
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -45,10 +45,50 @@ jobs:
             ${{ runner.temp }}/portable-packet/release-manifest.json
             ${{ runner.temp }}/portable-packet/release-status.json
             ${{ runner.temp }}/portable-packet/logs
-            ${{ runner.temp }}/portable-packet/coverage.json
+            ${{ runner.temp }}/portable-packet/test-selection.json
+            ${{ runner.temp }}/portable-packet/test-artifacts
+            ${{ runner.temp }}/portable-packet/source.tar
+            ${{ runner.temp }}/portable-packet/sdist-source-inventory.json
+            ${{ runner.temp }}/portable-packet/researcher-input-inventory.json
+            ${{ runner.temp }}/portable-packet/installed-smoke
             ${{ runner.temp }}/portable-packet/package-inventory.json
             ${{ runner.temp }}/portable-packet/wheel-requirements.txt
             ${{ runner.temp }}/portable-packet/artifacts
+          if-no-files-found: error
+          retention-days: 30
+  portable-extended:
+    name: selected-${{ inputs.profile }}-${{ matrix.shard }}
+    if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["integration", "scale"]'), inputs.profile)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    env:
+      SELECTED_PROFILE: ${{ inputs.profile }}
+      SELECTED_SHARD: ${{ matrix.shard }}
+      OPENBLAS_CORETYPE: HASWELL
+      NPY_DISABLE_CPU_FEATURES: X86_V4,AVX512_ICL,AVX512_SPR
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4
+        with: {version: '0.11.28', enable-cache: true, cache-dependency-glob: uv.lock}
+      - name: Run selected module shard
+        run: uv run --locked --python 3.11.14 --group build --group reactor-example python scripts/release_check.py --profile "$SELECTED_PROFILE" --shard-index "$SELECTED_SHARD" --shard-count 4 --output-dir "$RUNNER_TEMP/extended-packet"
+      - name: Retain shard evidence and disclosed fixtures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ${{ inputs.profile }}-${{ matrix.shard }}-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/extended-packet/release-manifest.json
+            ${{ runner.temp }}/extended-packet/release-status.json
+            ${{ runner.temp }}/extended-packet/logs
+            ${{ runner.temp }}/extended-packet/test-selection.json
+            ${{ runner.temp }}/extended-packet/test-artifacts
+            ${{ runner.temp }}/extended-packet/source.tar
           if-no-files-found: error
           retention-days: 30
   native:

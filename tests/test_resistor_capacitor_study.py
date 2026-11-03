@@ -15,7 +15,7 @@ from empirical_lawhood.kernel.decoding import decode_canonical_bytes
 from empirical_lawhood.runtime.capabilities import CapabilityRegistry
 
 ROOT = Path(__file__).resolve().parents[1]
-STUDY = ROOT / "experiments/rc-ladder-response/study.json"
+STUDY = ROOT / "programmes/foundations/measurement-and-response/workflows/rc-ladder-response/study.json"
 
 
 def _study() -> ResistorCapacitorLadderStudyConfig:

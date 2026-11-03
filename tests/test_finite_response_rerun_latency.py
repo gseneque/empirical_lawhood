@@ -204,7 +204,7 @@ def test_preparation_authenticates_parent_once_then_preserves_real_operand_joins
     native = synthetic_native(source)
     raw = native.canonical_bytes()
     plane = ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract('synthetic.latency-store',
-        'software-only operand test', str(tmp_path), '/', OperatorStorageProfile.SCHEMA, 1, None, None, ())))
+        'software-only operand test', str(tmp_path), str(next(p for p in (tmp_path, *tmp_path.parents) if p.is_mount())), OperatorStorageProfile.SCHEMA, 1, None, None, ())))
     written = plane.write(ArtifactWriteRequest(logical_artifact_id='synthetic.latency-native',
         relative_path='fictional/native.json', payload_schema=native.SCHEMA, profile=ArtifactProfile.CANONICAL_JSON,
         media_type='application/json', publication_scope_id='synthetic.latency-native', publication_scope_relative_root='fictional',

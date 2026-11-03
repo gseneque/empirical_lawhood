@@ -34,6 +34,48 @@ MAX_ARTIFACT_PUBLICATION_AGGREGATE_BYTES: Final[int] = 1024**4
 MAX_ARTIFACT_SEMANTIC_VALIDATION_REGISTRATIONS: Final[int] = 100_000
 
 
+@dataclass(frozen=True, slots=True)
+class ArtifactCustodyLimits:
+    """Optional operational allowances; exact custody identities are unchanged.
+
+    None imposes no additional ceiling. These execution selections are not
+    canonical scientific records and do not alter historical record bytes.
+    """
+
+    manifest_bytes: int | None = None
+    control_record_bytes: int | None = None
+    recovery_index_bytes: int | None = None
+    recovery_event_bytes: int | None = None
+    recovery_events: int | None = None
+    recovery_tasks: int | None = None
+    recovery_attempts_per_task: int | None = None
+    recovery_candidates: int | None = None
+    raw_source_bytes: int | None = None
+    semantic_validation_registrations: int | None = None
+    publication_members: int | None = None
+    publication_aggregate_bytes: int | None = None
+    publication_marker_bytes: int | None = None
+    publication_intent_bytes: int | None = None
+    in_memory_payload_bytes: int | None = None
+    canonical_json_token_bytes: int | None = None
+    canonical_json_depth: int | None = None
+
+    def __post_init__(self) -> None:
+        for name in self.__dataclass_fields__:
+            value = getattr(self, name)
+            if value is not None and (type(value) is not int or value <= 0):
+                raise ValueError(f"{name} must be a positive integer or None")
+
+    def exceeds(self, field_name: str, actual: int) -> bool:
+        ceiling = getattr(self, field_name)
+        return ceiling is not None and actual > ceiling
+
+
+def artifact_custody_limits(writer: object) -> ArtifactCustodyLimits:
+    """Read optional selections from a custody port, with unrestricted defaults."""
+    return getattr(writer, "custody_limits", ArtifactCustodyLimits())
+
+
 
 
 
@@ -43,11 +85,19 @@ class ArtifactProfile(StrEnum):
     PARQUET = "PARQUET"
     AUDITED_HDF5 = "AUDITED_HDF5"
     NUMPY_NO_PICKLE = "NUMPY_NO_PICKLE"
+    MATRIX_ARRAY_NPZ = "MATRIX_ARRAY_NPZ"
     JSONL_CHUNKS = "JSONL_CHUNKS"
     ONNX = "ONNX"
     SAFETENSORS = "SAFETENSORS"
     TEXT_PARAMETERS = "TEXT_PARAMETERS"
     RAW_SOURCE_BYTES = "RAW_SOURCE_BYTES"
+    NATIVE_SUBWORK_PREFIX = "NATIVE_SUBWORK_PREFIX"
+
+
+def is_canonical_json_media_type(media_type):
+    """Standard JSON media including historical application vendor envelopes."""
+    return type(media_type) is str and (media_type == "application/json"
+        or media_type.startswith("application/") and media_type.endswith("+json"))
 
 
 @dataclass(frozen=True, slots=True)
@@ -130,7 +180,9 @@ def derived_outcome_access(
     or privileged parents cannot be resealed.
     """
 
-    if declared is OutcomeAccess.EVALUATION_SEALED and all(
+    if (declared is OutcomeAccess.EVALUATION_SEALED
+            or declared is OutcomeAccess.DEVELOPMENT_VISIBLE
+            and OutcomeAccess.EVALUATION_SEALED in parent_values) and all(
         value
         in {
             OutcomeAccess.OUTCOME_BLIND,
@@ -193,8 +245,8 @@ class ExternalRootContract(CanonicalRecord):
             if not value.startswith("/"):
                 raise ValueError(f"{name} must be absolute")
         validate_schema(self.mount_contract_schema)
-        if self.minimum_free_bytes <= 0:
-            raise ValueError("external root free-space floor must be positive")
+        if self.minimum_free_bytes < 0:
+            raise ValueError("external root free-space floor must be nonnegative")
         if self.expected_mount_source is not None:
             validate_nonempty(self.expected_mount_source, field_name="expected_mount_source")
             if not self.expected_mount_source.startswith("/"):
@@ -212,7 +264,11 @@ class ExternalRootContract(CanonicalRecord):
 
 @dataclass(frozen=True, slots=True)
 class ArtifactGenericValidation(CanonicalRecord):
-    """Exact infrastructure-owned profile validator bound to one payload contract."""
+    """Producing validator provenance bound to one exact artifact identity.
+
+    Current reads independently validate the supported format and custody.
+    This stamp grants no source, scientific or current access authority.
+    """
 
     SCHEMA: ClassVar[str] = 'empirical-lawhood/runtime/artifact-generic-validation'
 
@@ -304,8 +360,6 @@ class ArtifactSemanticValidationRegistry(CanonicalRecord):
 
     def __post_init__(self) -> None:
         validate_stable_id(self.registry_id, field_name="registry_id")
-        if len(self.registrations) > MAX_ARTIFACT_SEMANTIC_VALIDATION_REGISTRATIONS:
-            raise ValueError("artifact semantic validation registry exceeds its registration limit")
         logical_ids = tuple(item.logical_artifact_id for item in self.registrations)
         if tuple(sorted(set(logical_ids))) != logical_ids:
             raise ValueError(
@@ -334,8 +388,6 @@ class ArtifactSemanticValidationRegistry(CanonicalRecord):
     ) -> ArtifactSemanticValidationRegistry:
         """Canonicalize caller-provided registrations without mutating the registry later."""
 
-        if len(registrations) > MAX_ARTIFACT_SEMANTIC_VALIDATION_REGISTRATIONS:
-            raise ValueError("artifact semantic validation registry exceeds its registration limit")
         by_logical_id: dict[str, ArtifactSemanticValidationRegistration] = {}
         for registration in registrations:
             existing = by_logical_id.get(registration.logical_artifact_id)
@@ -696,8 +748,6 @@ def _validate_publication_members(
     )
     if not members:
         raise ValueError("artifact publication requires at least one member")
-    if len(members) > MAX_ARTIFACT_PUBLICATION_MEMBERS:
-        raise ValueError("artifact publication exceeds its member-count bound")
     paths = tuple(member.relative_path for member in members)
     if len(set(paths)) != len(paths):
         raise ValueError("artifact publication member paths must be unique")
@@ -713,8 +763,6 @@ def _validate_publication_members(
         for member in members
     ):
         raise ValueError("artifact publication members have mixed evidence classes")
-    if sum(member.size_bytes for member in members) > MAX_ARTIFACT_PUBLICATION_AGGREGATE_BYTES:
-        raise ValueError("artifact publication exceeds its aggregate byte bound")
 
 
 @dataclass(frozen=True, slots=True)
@@ -823,6 +871,24 @@ class ArtifactPublicationBinding(CanonicalRecord):
         )
         if self.commit_marker_size_bytes <= 0:
             raise ValueError("publication commit marker size must be positive")
+
+    def member_for_materialization(self, materialization_id: str) -> ArtifactPublicationMember | None:
+        """Find one exact member in the validated immutable ordered roster.
+
+        This is an identity lookup, not a custody or access check. Binary search
+        avoids scanning the full shared roster for every reconstructed sidecar
+        and needs no mutable index or additional canonical fields.
+        """
+        lower, upper = 0, len(self.members)
+        while lower < upper:
+            middle = (lower + upper) // 2
+            if self.members[middle].materialization_id < materialization_id:
+                lower = middle + 1
+            else:
+                upper = middle
+        if lower < len(self.members) and self.members[lower].materialization_id == materialization_id:
+            return self.members[lower]
+        return None
 
 
 @dataclass(frozen=True, slots=True)
@@ -1030,7 +1096,7 @@ class ArtifactManifest(CanonicalRecord):
             raise ValueError("artifact manifest binds different logical/physical IDs")
         if self.publication is not None and (
             artifact_publication_member(self.logical, self.materialization)
-            not in self.publication.members
+            != self.publication.member_for_materialization(self.materialization.materialization_id)
         ):
             raise ValueError("artifact publication does not include its materialization")
 

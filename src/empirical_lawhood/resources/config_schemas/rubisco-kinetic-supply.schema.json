@@ -1,0 +1,467 @@
+{
+  "$defs": {
+    "ApparentKineticConstants_bb187ee14527": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco/kinetic-supply/apparent-constants"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "kc_um": {
+              "additionalProperties": false,
+              "description": "kc um; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "kcat_c_s_inv": {
+              "additionalProperties": false,
+              "description": "kcat c s inv; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "kcat_o_s_inv": {
+              "additionalProperties": false,
+              "description": "kcat o s inv; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "ko_um": {
+              "additionalProperties": false,
+              "description": "ko um; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "kcat_c_s_inv",
+            "kc_um",
+            "kcat_o_s_inv",
+            "ko_um"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "JointKineticSupply_b4d02a27269f": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco/kinetic-supply/joint-supply"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "biological_predictive_calibration": {
+              "description": "biological predictive calibration; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "constant_covariance": {
+              "anyOf": [
+                {
+                  "items": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "decimal": {
+                          "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "decimal"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "constant covariance; constructor checks semantics and units."
+            },
+            "context": {
+              "$ref": "#/$defs/KineticSupplyContext_da45d260e7e3",
+              "description": "context; constructor checks semantics and units."
+            },
+            "dependence_interpretation": {
+              "description": "dependence interpretation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "domain_limitations": {
+              "description": "domain limitations; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "evidence_role": {
+              "description": "evidence role; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "expected_member_ids": {
+              "description": "expected member ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "independent_biological_units": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "independent biological units; constructor checks semantics and units."
+            },
+            "members": {
+              "description": "members; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/KineticSupplyMember_e441d22191a0"
+              },
+              "type": "array"
+            },
+            "supply_id": {
+              "description": "supply id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "uncertainty_sources": {
+              "description": "uncertainty sources; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "supply_id",
+            "context",
+            "expected_member_ids",
+            "members",
+            "evidence_role",
+            "constant_covariance",
+            "uncertainty_sources",
+            "domain_limitations",
+            "independent_biological_units",
+            "dependence_interpretation",
+            "biological_predictive_calibration"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "KineticSupplyContext_da45d260e7e3": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco/kinetic-supply/context"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "assay_conditions": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "assay conditions; constructor checks semantics and units."
+            },
+            "context_id": {
+              "description": "context id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "interpretation": {
+              "description": "interpretation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "material": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "material; constructor checks semantics and units."
+            },
+            "temperature_k": {
+              "additionalProperties": false,
+              "description": "temperature k; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "context_id",
+            "material",
+            "assay_conditions",
+            "temperature_k",
+            "interpretation"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "KineticSupplyMember_e441d22191a0": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco/kinetic-supply/member"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "constants": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ApparentKineticConstants_bb187ee14527"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "constants; constructor checks semantics and units."
+            },
+            "member_id": {
+              "description": "member id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "outcome": {
+              "description": "outcome; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "source_parents": {
+              "description": "source parents; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "specificity": {
+              "$ref": "#/$defs/KineticSupportInterval_decb87988f0b",
+              "description": "specificity; constructor checks semantics and units."
+            },
+            "turnover_s_inv": {
+              "$ref": "#/$defs/KineticSupportInterval_decb87988f0b",
+              "description": "turnover s inv; constructor checks semantics and units."
+            },
+            "unresolved_terms": {
+              "description": "unresolved terms; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "member_id",
+            "outcome",
+            "turnover_s_inv",
+            "specificity",
+            "constants",
+            "unresolved_terms",
+            "source_parents"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "KineticSupportInterval_decb87988f0b": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco/kinetic-supply/support-interval"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "lower": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "lower; constructor checks semantics and units."
+            },
+            "upper": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "upper; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "lower",
+            "upper"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:rubisco-kinetic-supply",
+  "$ref": "#/$defs/JointKineticSupply_b4d02a27269f",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Rubisco Kinetic Supply",
+  "x-consumer": "rubisco-kinetic-supply",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "retained",
+  "x-preparation-allowed": false
+}

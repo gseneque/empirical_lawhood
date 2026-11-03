@@ -9,7 +9,7 @@ experiment_id: ""
 description: ""
 
 code:
-  repository: "https://github.com/jokebroker/empirical_lawhood"
+  repository: "https://github.com/gseneque/empirical_lawhood"
   commit: ""
   release: ""
   entry_point: ""

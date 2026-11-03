@@ -3,6 +3,7 @@
 
 import hashlib
 import json
+import shutil
 
 import pytest
 
@@ -24,7 +25,9 @@ def packet(tmp_path, monkeypatch):
                "sha256": hashlib.sha256(log.read_bytes()).hexdigest()}
     checks = [{"name": name, "exit_code": 0, "disposition": "PASSED", "log": log.name,
                "size_bytes": binding["size_bytes"], "sha256": binding["sha256"],
-               "command": ["uv", "run", "--no-sync", "python", "-m", "coverage", "run", "-m", "pytest", "-q", "-ra", "--fail-on-skip", "-o", f"cache_dir={tmp_path / 'pytest-cache'}", "tests", "-m", "not native and not held"]}
+               "command": ["uv", "run", "--no-sync", "python", "-m", "coverage", "run", "-m", "pytest",
+                           "-q", "-ra", "--fail-on-skip", *evidence.retained_test_options(tmp_path),
+                           "tests", "-m", "not native and not held"]}
               for name in sorted(evidence.REQUIRED_CHECKS)]
     inventory_file = tmp_path / "candidate-inventory.json"
     inventory_file.write_text(json.dumps(inventory))
@@ -34,7 +37,7 @@ def packet(tmp_path, monkeypatch):
               "candidate_tree": "abc123", "inventory_before_sha256": evidence.inventory_digest(inventory),
               "inventory_after_sha256": evidence.inventory_digest(inventory),
               "uv_lock_sha256": hashlib.sha256((root / "uv.lock").read_bytes()).hexdigest(),
-              "test_environment_policy": {"pytest_addopts": None, "coverage_rcfile_sha256": hashlib.sha256((root / ".coveragerc").read_bytes()).hexdigest()},
+              "test_environment_policy": evidence.portable_test_environment_policy(tmp_path, root),
               "checks": checks, "coverage": binding, "candidate_inventory": inventory_binding}
     path = tmp_path / "precommit.json"
     def write():
@@ -46,6 +49,25 @@ def packet(tmp_path, monkeypatch):
 def test_exact_tree_join_authenticates_existing_bytes_without_test_execution(packet):
     root, record, write, _ = packet
     assert evidence.authenticate_portable_evidence(write(), root) == record
+
+
+def test_explicit_selected_scope_reauthenticates_committed_blobs_and_refuses_scope_drift(packet, monkeypatch):
+    root, record, write, _ = packet
+    record["selected_paths"] = ["uv.lock"]
+    monkeypatch.setattr(evidence, "release_input_paths", lambda selected, **kwargs: ("uv.lock",))
+    original = evidence.candidate_inventory
+    calls = []
+
+    def selected_inventory(selected, **kwargs):
+        calls.append(kwargs)
+        return original(selected)
+
+    monkeypatch.setattr(evidence, "candidate_inventory", selected_inventory)
+    assert evidence.authenticate_portable_evidence(write(), root) == record
+    assert calls == [{"selected_paths": ("uv.lock",), "revision": "HEAD", "verify_selected": True}]
+    record["selected_paths"] = []
+    with pytest.raises(ValueError, match="complete release input selection"):
+        evidence.authenticate_portable_evidence(write(), root)
 
 
 @pytest.mark.parametrize("field,value", [("candidate_tree", "other"), ("status", "FAILED"),
@@ -99,3 +121,74 @@ def test_unbound_or_filtered_environment_refuses_full_suite_reuse(packet):
     record["test_environment_policy"]["pytest_addopts"] = "--collect-only"
     with pytest.raises(ValueError, match="environment"):
         evidence.authenticate_portable_evidence(write(), root)
+
+
+def test_copied_evidence_keeps_original_fixture_destination_without_reexecution(packet, tmp_path):
+    root, record, write, _ = packet
+    original = write()
+    copied = tmp_path / "artifact-packet" / "precommit-portable"
+    copied.mkdir(parents=True)
+    for member in {original.name, *(row["log"] for row in record["checks"]),
+                   record["coverage"]["path"], record["candidate_inventory"]["path"]}:
+        shutil.copyfile(original.parent / member, copied / member)
+    assert not (tmp_path / "test-artifacts").exists()
+    assert evidence.authenticate_portable_evidence(copied / original.name, root) == record
+    assert record["test_environment_policy"]["basetemp"] == str(tmp_path / "test-artifacts")
+    assert not (copied / "test-artifacts").exists()
+
+
+@pytest.mark.parametrize("field,value", [
+    ("tmp_path_retention_policy", "failed"), ("tmp_path_retention_count", 2),
+    ("tmp_path_retention_count", True), ("coverage_rcfile_sha256", "0" * 64),
+])
+def test_changed_retention_or_coverage_policy_refuses_current_reuse(packet, field, value):
+    root, record, write, _ = packet
+    record["test_environment_policy"][field] = value
+    with pytest.raises(ValueError, match="environment"):
+        evidence.authenticate_portable_evidence(write(), root)
+
+
+def test_legacy_retention_packet_remains_ineligible_without_relabeling(packet):
+    root, record, write, _ = packet
+    policy = record["test_environment_policy"]
+    record["test_environment_policy"] = {
+        "pytest_addopts": policy["pytest_addopts"],
+        "coverage_rcfile_sha256": policy["coverage_rcfile_sha256"],
+    }
+    with pytest.raises(ValueError, match="current all-retention"):
+        evidence.authenticate_portable_evidence(write(), root)
+
+
+@pytest.mark.parametrize("destination", ["relative/test-artifacts", "/packet/../test-artifacts",
+                                         "/packet/disposable", "/packet/./test-artifacts"])
+def test_noncanonical_fixture_destination_refuses_before_evidence_access(packet, destination):
+    root, record, write, _ = packet
+    record["test_environment_policy"]["basetemp"] = destination
+    with pytest.raises(ValueError, match="fixture destination"):
+        evidence.authenticate_portable_evidence(write(), root)
+
+
+@pytest.mark.parametrize("option,replacement", [
+    ("--basetemp", "/other/test-artifacts"),
+    ("cache_dir=", "cache_dir=/other/pytest-cache"),
+    ("tmp_path_retention_policy=all", "tmp_path_retention_policy=failed"),
+    ("tmp_path_retention_count=1", "tmp_path_retention_count=2"),
+])
+def test_command_cannot_change_bound_fixture_retention_or_paths(packet, option, replacement):
+    root, record, write, _ = packet
+    command = next(row for row in record["checks"] if row["name"] == "tests")["command"]
+    if option == "--basetemp":
+        command[command.index(option) + 1] = replacement
+    else:
+        index = next(index for index, argument in enumerate(command) if argument.startswith(option))
+        command[index] = replacement
+    with pytest.raises(ValueError, match="exact supported"):
+        evidence.authenticate_portable_evidence(write(), root)
+
+
+def test_current_coverage_owner_change_invalidates_reuse(packet):
+    root, _, write, _ = packet
+    path = write()
+    (root / ".coveragerc").write_bytes(b"different owner config")
+    with pytest.raises(ValueError, match="environment"):
+        evidence.authenticate_portable_evidence(path, root)

@@ -1,0 +1,435 @@
+{
+  "$defs": {
+    "ArtifactIdentity_3b360fc69225": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/artifact-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "description": "artifact id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "extensions": {
+              "description": "extensions; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ExtensionBinding_d34345d4218d"
+              },
+              "type": "array"
+            },
+            "media_type": {
+              "description": "media type; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "payload_schema": {
+              "description": "payload schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "role": {
+              "description": "role; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sha256": {
+              "description": "sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "size_bytes": {
+              "description": "size bytes; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "artifact_id",
+            "role",
+            "payload_schema",
+            "sha256",
+            "media_type",
+            "size_bytes",
+            "extensions"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ExperimentFileInputBinding_07dfabf54794": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/experiment-inputs/file-binding"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "identity": {
+              "$ref": "#/$defs/ArtifactIdentity_3b360fc69225",
+              "description": "identity; constructor checks semantics and units."
+            },
+            "key": {
+              "description": "key; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "maximum_bytes": {
+              "description": "maximum bytes; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "record_version": {
+              "description": "record version; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "relative_path": {
+              "description": "relative path; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "identity",
+            "record_version",
+            "relative_path",
+            "maximum_bytes"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ExtensionBinding_d34345d4218d": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/extension-binding"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "namespace": {
+              "description": "namespace; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "payload_sha256": {
+              "description": "payload sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "schema": {
+              "description": "schema; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "namespace",
+            "schema",
+            "payload_sha256"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MatrixProgrammeAllocationRequest_010317479ddd": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-programme/allocation-request"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "e4_streams": {
+              "$ref": "#/$defs/SelectedE4StreamRecipe_f63c6527e9ba",
+              "description": "e4 streams; constructor checks semantics and units."
+            },
+            "e5_future_seed_material_sha256": {
+              "description": "e5 future seed material sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "e5_root_seed_material_sha256": {
+              "description": "e5 root seed material sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "exposure_census": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "exposure census; constructor checks semantics and units."
+            },
+            "files": {
+              "description": "files; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ExperimentFileInputBinding_07dfabf54794"
+              },
+              "type": "array"
+            },
+            "future_seed_material_sha256": {
+              "description": "future seed material sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "metadata_budget": {
+              "$ref": "#/$defs/ResourceBudget_c7b1ab18aa7a",
+              "description": "metadata budget; constructor checks semantics and units."
+            },
+            "namespace": {
+              "description": "namespace; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "root_seed_material_sha256": {
+              "description": "root seed material sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "scientific_design": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "scientific design; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "record_id",
+            "namespace",
+            "scientific_design",
+            "exposure_census",
+            "root_seed_material_sha256",
+            "future_seed_material_sha256",
+            "e4_streams",
+            "e5_root_seed_material_sha256",
+            "e5_future_seed_material_sha256",
+            "files",
+            "metadata_budget"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ResourceBudget_c7b1ab18aa7a": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/resource-budget"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "cpu_cores": {
+              "description": "cpu cores; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "gpu_devices": {
+              "description": "gpu devices; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "memory_bytes": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "memory bytes; constructor checks semantics and units."
+            },
+            "output_bytes": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "output bytes; constructor checks semantics and units."
+            },
+            "source_scan_bytes": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "source scan bytes; constructor checks semantics and units."
+            },
+            "wall_time_seconds": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "wall time seconds; constructor checks semantics and units.",
+              "x-unit": "s"
+            }
+          },
+          "required": [
+            "cpu_cores",
+            "memory_bytes",
+            "gpu_devices",
+            "wall_time_seconds",
+            "source_scan_bytes",
+            "output_bytes"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "SelectedE4StreamRecipe_f63c6527e9ba": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-selected-e4/stream-recipe"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "derivation_rule_id": {
+              "description": "derivation rule id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "family_seed_material_sha256": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "family seed material sha256; constructor checks semantics and units."
+            },
+            "future_seed_material_sha256": {
+              "description": "future seed material sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "prefix_seed_material_sha256": {
+              "description": "prefix seed material sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "record_id",
+            "prefix_seed_material_sha256",
+            "future_seed_material_sha256",
+            "derivation_rule_id",
+            "family_seed_material_sha256"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "2.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-programme-allocation-request",
+  "$ref": "#/$defs/MatrixProgrammeAllocationRequest_010317479ddd",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Programme Allocation Request",
+  "x-consumer": "matrix-programme-allocation-request",
+  "x-consumer-maximum-bytes": 4194304,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

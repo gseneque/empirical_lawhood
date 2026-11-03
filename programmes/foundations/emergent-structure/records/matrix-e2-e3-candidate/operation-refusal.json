@@ -1,0 +1,221 @@
+{
+  "actual_input_bindings": [
+    {
+      "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/working/matrix-factor-response-population-development01/matrix-factor-response-development-batch-remaining183-02/inputs/history.cc1-grr-c2.h064/source.json",
+      "sha256": "dff5e473743c484b55b83b32dabad66cbb20695f23a32be4df8bbdccab40e12a",
+      "size_bytes": 437980
+    },
+    {
+      "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/working/runs/recursive.d71a86f1673d0c61d53fd3d1/outputs/matrix-factor-response-chunked-development-v1.history.cc1-grr-c2.h064.futures/product.json",
+      "sha256": "4f0121ce12c560b4d538904903b4503c451485f5d4546543535c804833f80011",
+      "size_bytes": 780319
+    },
+    {
+      "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/working/matrix-factor-response-population-development01/matrix-factor-response-development-batch-remaining183-02/prepared-entry.json",
+      "sha256": "3f29803e3b643348fcb167a60095b9d3b046ce671707c4f1bd73a51b731b1224",
+      "size_bytes": 7571240
+    }
+  ],
+  "actual_legacy_codec_refusal": {
+    "exception_type": "CanonicalizationError",
+    "message": "unsupported canonical document schema"
+  },
+  "actual_run_id": "recursive.d71a86f1673d0c61d53fd3d1",
+  "actual_task_prefix": "matrix-factor-response-chunked-development-v1.history.cc1-grr-c2.h064",
+  "available_legacy_refinement_capabilities": [
+    "matrix-factor-response-development-refinement.futures",
+    "matrix-factor-response-development-refinement.assess"
+  ],
+  "blocking_owner_predicates": [
+    {
+      "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_factor_response/refinement_records.py",
+      "predicate": "MatrixFactorRefinementSource requires MatrixFactorResponseSource; original coarse subject schema MatrixFactorNativeResponses; original parent task set matrix-factor-response-development.<root>.{origin,forecast,futures,assess}; one full NPZ output per original completed branch."
+    },
+    {
+      "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_factor_response/refinement_bindings.py",
+      "predicate": "HISTORY/config codecs accept legacy origin/forecast/coarse/source records and MATRIX_ARRAY_SCHEMA; they do not accept chunked-retained-source/chunked-origin/chunked-forecast/chunked-native-responses with framed arrays."
+    }
+  ],
+  "chunked_refinement_static_owner_scan": {
+    "matching_refinement_owners": [],
+    "scanned_source_bindings": [
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_factor_response/chunked_frontier.py",
+        "sha256": "9884a797cb1943d00935784457f429c085002bc9254928807a1728b830dcc4a9",
+        "size_bytes": 10454
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_factor_response/chunked_independent.py",
+        "sha256": "911c05eaa67707f46cf745e7cee69e7885721a4a3229c67eb3c76fa2d1dff62c",
+        "size_bytes": 11976
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_factor_response/chunked_independent_records.py",
+        "sha256": "96bc10bbcd556006c8ef90b9851790009c89ff72289157df0922deccfd34ceba",
+        "size_bytes": 5162
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_factor_response/chunked_operation_bindings.py",
+        "sha256": "6c197e05644bd0e6405065171b04442bb2b3e19b30d8c71f31e99468ede17dad",
+        "size_bytes": 40277
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_factor_response/chunked_response_records.py",
+        "sha256": "6b1ff0c973076d325e6098d057b47150265dc4ee01b23ee17cf8dd370d22a268",
+        "size_bytes": 16373
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_factor_response/chunked_response_runtime.py",
+        "sha256": "a1236c926dcb8dabbebc0033b6325f5e937db18efb1212d8c7b6801bb5017b01",
+        "size_bytes": 15302
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_factor_response/chunked_response_science.py",
+        "sha256": "197ea52f3910250afa1d3a97f88dc3d375d500e9778486f3a78b06c37eadb74c",
+        "size_bytes": 11530
+      }
+    ]
+  },
+  "decision": "SCIENTIFIC_STOP_CURRENT_REFINEMENT_CONTRACT_INELIGIBLE",
+  "effects": {
+    "array_payload_reads": 0,
+    "authority_created": 0,
+    "fitting": 0,
+    "issue": 0,
+    "native": 0,
+    "publication": 0,
+    "repository_edits": 0,
+    "rng": 0
+  },
+  "eligible_alternative": "Installed fresh scheduled PRIMARY/FINE response acquisition can collect nominal de-anneal numerical support, after the genuine source/exposure/reservation/human/authority inputs listed inmissing-records.json exist. It has not entered.",
+  "h001_precedent": "Existing paired-dt h001 uses the separate legacy receipt/source contracts and is co-anneal. Its completed refinement cannot qualify de-anneal. No replay or relabeling is allowed.",
+  "native_schema": "empirical-lawhood/matrix-factor-response/chunked-native-responses",
+  "original_branch_and_segment_census": {
+    "all_segment_completions": "SUCCEEDED",
+    "branches": 24,
+    "scope": "Canonical metadata decoded and hashed; original array bytes and guarded custody were not re-opened in this audit.",
+    "segment_interval": [
+      0,
+      128
+    ],
+    "segments": 24
+  },
+  "physical_recipe_and_consumed_streams": {
+    "alpha_x": "0.6666666666666666666666666667",
+    "alpha_y": "7.333333333333333333333333334",
+    "bath_temperature": "1",
+    "cross_coupling_gamma": "1",
+    "cutoff": "0.256",
+    "family_id": "cc1.history.de-anneal",
+    "frame": "exact original PRIMARY/Y origin; no fine eigensolve or re-admission",
+    "friction_gamma": "1",
+    "horizons_primary_steps": [
+      16,
+      64,
+      128
+    ],
+    "independent_group_id": "unit.cc1-grr-c2.h064",
+    "mass_x": "0.5",
+    "mass_y": "0.5",
+    "origin_tick": 256,
+    "panels": [
+      {
+        "effective_seed": 295540666771745530336781556996560847289,
+        "panel_id": "matrix.factor.response.remaining183.development-batch02.h064.independent",
+        "purpose_id": "matrix.factor.response.remaining183.development-batch02.h064.independent-stream",
+        "role": "INDEPENDENT_FUTURE"
+      },
+      {
+        "effective_seed": 142526679545274565202699292243721079095,
+        "panel_id": "matrix.factor.response.remaining183.development-batch02.h064.paired",
+        "purpose_id": "matrix.factor.response.remaining183.development-batch02.h064.paired-stream",
+        "role": "COMMON_NOISE_PANEL"
+      },
+      {
+        "effective_seed": 233148765654286511606065203708872123682,
+        "panel_id": "matrix.factor.response.remaining183.development-batch02.h064.prefix-unused",
+        "purpose_id": "matrix.factor.response.remaining183.development-batch02.h064.prefix-unused-reserve",
+        "role": "PREFIX"
+      }
+    ],
+    "primary_timestep": "0.001",
+    "proposed_paired_timestep": "0.0005",
+    "root_id": "history.cc1-grr-c2.h064",
+    "scope": "EXPOSED_DEVELOPMENT_NONPROMOTABLE; never a fresh E3/E6 cohort"
+  },
+  "read_only_integrity": {
+    "all_selected_inputs_unchanged": true,
+    "input_bindings": [
+      {
+        "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/working/matrix-factor-response-population-development01/matrix-factor-response-development-batch-remaining183-02/inputs/history.cc1-grr-c2.h064/source.json",
+        "sha256": "dff5e473743c484b55b83b32dabad66cbb20695f23a32be4df8bbdccab40e12a",
+        "size_bytes": 437980
+      },
+      {
+        "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/working/runs/recursive.d71a86f1673d0c61d53fd3d1/outputs/matrix-factor-response-chunked-development-v1.history.cc1-grr-c2.h064.futures/product.json",
+        "sha256": "4f0121ce12c560b4d538904903b4503c451485f5d4546543535c804833f80011",
+        "size_bytes": 780319
+      },
+      {
+        "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/working/matrix-factor-response-population-development01/matrix-factor-response-development-batch-remaining183-02/prepared-entry.json",
+        "sha256": "3f29803e3b643348fcb167a60095b9d3b046ce671707c4f1bd73a51b731b1224",
+        "size_bytes": 7571240
+      },
+      {
+        "path": "/tmp/el-matrix-continuation-20261014/scientific-entry-dependencies01/dependency-census.json",
+        "sha256": "25776fea6751561e5ef170fe562bedf503021304b79ed63bc4dbb7bed480aad5",
+        "size_bytes": 23261
+      },
+      {
+        "path": "/tmp/el-matrix-continuation-20261014/scientific-entry-dependencies01/inventory.json",
+        "sha256": "e54cf34e5ae6d1e28b0e5135721593a736d73b33d7668188a172d889c0f2fd9b",
+        "size_bytes": 45204
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_factor_response/refinement_records.py",
+        "sha256": "115d1771ca15efd3a96b528c3c739676c72a799eb28480692104797d88fc2cc5",
+        "size_bytes": 18378
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_factor_response/refinement_bindings.py",
+        "sha256": "f686a3be6dee6ab0e9f7ea1902a85d14c85cb3b742882af12a3de328af7411c3",
+        "size_bytes": 23843
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_scheduled_history/forecast.py",
+        "sha256": "0be17650d9ba4e5603dfdc20a60b467b788af7422af2d59e79e4c0df0388ea23",
+        "size_bytes": 33058
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_scheduled_history/records.py",
+        "sha256": "296c9bb2901a996dcfb60e9795ac33b2c63759175c55303da99ab6e54d7607a3",
+        "size_bytes": 38722
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/planning/study_issue.py",
+        "sha256": "23efcbf353be132d1fcfe940fa80b26c73da16b346947d0de781f3daaf5078ab",
+        "size_bytes": 13158
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/docs/operator-handoff.md",
+        "sha256": "4ee2e45b78426ba5d983d7028bb2d7c561147b75575c03e3face91b36450a620",
+        "size_bytes": 11248
+      },
+      {
+        "path": "/home/chevre/gs-ml/empirical_lawhood/docs/reactor-operator.md",
+        "sha256": "2bc661edf4a3dea84aa5c9159d34c7dc0c4a5f021f483ed11c9941cf4e4f25e5",
+        "size_bytes": 29388
+      }
+    ],
+    "wall_seconds": 0.24486792390234768
+  },
+  "repository_head": "7ef80a5d50da4aee2cdee050751a61495846647c",
+  "schema": "matrix-deanneal/next-numerical-operation-refusal/v1",
+  "scientific_question": "Is the retained nominal de-anneal E128 response error stable under the paired 0.001/0.0005 numerical view?",
+  "size_is_not_the_blocker": {
+    "explanation": "Existing legacy size formula applied to this24branch128step design; does not imply eligibility or an actual planned publication.",
+    "hypothetical_legacy_fine_allocation_bytes_plus_margin": 33169408,
+    "legacy_matrix_array_bound_bytes": 67108864
+  },
+  "source_schema": "empirical-lawhood/matrix-factor-response/chunked-retained-source"
+}

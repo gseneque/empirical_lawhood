@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from enum import StrEnum
 from pathlib import Path
 from typing import ClassVar
@@ -92,9 +92,17 @@ def resolve_external_root_contract(
     home_root: Path,
     temporary_root: Path = Path("/tmp"),
     for_write: bool = True,
+    selected_contract: ExternalRootContract | None = None,
 ) -> ExternalRootContract:
     """Resolve a validated profile; read-only diagnosis never grants write access."""
 
+    if type(profile) is not OperatorStorageProfile:
+        raise TypeError("storage access requires its exact operator profile")
+    profile.__post_init__()
+    if selected_contract is not None:
+        if type(selected_contract) is not ExternalRootContract:
+            raise TypeError("selected storage access requires its exact external root contract")
+        selected_contract.__post_init__()
     if for_write and profile.access_mode is not OperatorStorageAccessMode.READ_WRITE:
         raise PermissionError("scientific execution requires a read/write operator profile")
     external = Path(profile.external_root_locator)
@@ -117,7 +125,7 @@ def resolve_external_root_contract(
     if artifact == scratch or artifact.is_relative_to(scratch) or scratch.is_relative_to(artifact):
         raise ValueError("artifact and scientific scratch namespaces must be disjoint")
     fingerprint = profile.fingerprint()
-    return ExternalRootContract(
+    expected = ExternalRootContract(
         storage_root_id=f"operator-storage.{fingerprint}",
         logical_name=f"operator-selected artifact root for {profile.profile_id}",
         canonical_path=str(artifact),
@@ -128,6 +136,16 @@ def resolve_external_root_contract(
         expected_volume_identity=profile.expected_volume_identity,
         allowed_filesystem_types=profile.allowed_filesystem_types,
     )
+    if selected_contract is None:
+        return expected
+    # Current operational access selection, carrying no historical or authority
+    # claim. Every physical policy field remains exactly profile controlled.
+    for member in fields(ExternalRootContract):
+        if member.name in ("storage_root_id", "logical_name"):
+            continue
+        if getattr(selected_contract, member.name) != getattr(expected, member.name):
+            raise ValueError("selected external root changes operator physical policy: " + member.name)
+    return selected_contract
 
 
 def resolve_scientific_scratch_contract(
@@ -136,6 +154,7 @@ def resolve_scientific_scratch_contract(
     repo_root: Path,
     home_root: Path,
     temporary_root: Path = Path("/tmp"),
+    for_write: bool = True,
 ) -> ExternalRootContract:
     """Resolve the disjoint scientific-scratch namespace under the same profile."""
 
@@ -144,6 +163,7 @@ def resolve_scientific_scratch_contract(
         repo_root=repo_root,
         home_root=home_root,
         temporary_root=temporary_root,
+        for_write=for_write,
     )
     fingerprint = profile.fingerprint()
     return ExternalRootContract(

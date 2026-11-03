@@ -1,0 +1,21 @@
+{
+  "schema": "empirical-lawhood/matrix-selected-e4/protected-programme-specification",
+  "value": {
+    "specification_id": "specification.selected-e4.calibration",
+    "declaration": {
+      "schema": "empirical-lawhood/kernel/object-identity",
+      "value": {
+        "object_id": "replace-with-actual-declaration",
+        "object_schema": "empirical-lawhood/matrix-selected-e4/native-programme-declaration",
+        "object_version": "1.0.0",
+        "object_fingerprint": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "version": "1.0.0"
+    },
+    "population_phase": "CALIBRATION",
+    "independent_group_count": 64,
+    "cases_per_group": 9,
+    "question": "Assess the frozen E4 revision and matched baseline on complete declared calibration groups."
+  },
+  "version": "1.0.0"
+}

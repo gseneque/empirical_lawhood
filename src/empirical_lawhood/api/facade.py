@@ -9,12 +9,13 @@ from empirical_lawhood.planning.study_authoring import DesignInputRecord
 
 from empirical_lawhood.kernel.retrospective_prediction_experiments import RetrospectiveExperimentSpec
 
-from empirical_lawhood.planning.experiment_entry import RetrospectiveAuthoringBase, RetrospectiveAuthoringPackage
+from empirical_lawhood.planning.experiment_entry import RetrospectiveAuthoringBase
 from empirical_lawhood.runtime.candidate_compiler import RetrospectiveStandardCandidate, RetrospectiveStandardReport, RetrospectiveExtensionReport
 from empirical_lawhood.runtime.study_issue import RetrospectiveIssuedBase, RetrospectiveIssuedStudy, RetrospectivePublicationReceipt
 from empirical_lawhood.api.models import RetrospectiveCompilationSummary, RetrospectiveIssueSummary, RetrospectiveBaseCompilationSummary, RetrospectiveBaseIssueSummary, RetrospectiveCampaignBase
 
 from dataclasses import replace
+from contextlib import nullcontext
 import base64
 import binascii
 import hashlib
@@ -41,7 +42,7 @@ from empirical_lawhood.infrastructure.bounded_process import (
 )
 from empirical_lawhood.infrastructure.catalog_projection import MAX_CATALOG_PROJECTION_BYTES
 from empirical_lawhood.infrastructure.dataset_projection import decode_unified_catalog_snapshot
-from empirical_lawhood.infrastructure.execution import ExecutionErrorKind
+from ..infrastructure.execution import ExecutionErrorKind
 from empirical_lawhood.infrastructure.sql import DatasetCatalogQueryWorkLimitExceeded
 from empirical_lawhood.infrastructure.sql.database import (
     ALEMBIC_HEAD,
@@ -175,13 +176,13 @@ from empirical_lawhood.runtime.executable_bindings import (
 from empirical_lawhood.runtime.parameterised_candidate_context import compose_parameterised_candidate_context
 from empirical_lawhood.runtime.profile_compilation import ExecutableBindingRequiredError, LinkedCampaignExecutableCompilation, LinkedCampaignExecutableDisposition, LinkedCampaignProfileCompiler, SourceProfileCompilerRegistry
 from empirical_lawhood.runtime.source_pipelines import SourcePipelineCompilationDisposition, SourcePipelineCompilation
-from empirical_lawhood.runtime.study_issue import StudyPublicationReceipt, ExtensionPublicationReceipt, StudyExtensionDecoderRegistration, StudySourceClosureInspector, IssuedExecutableStudyManifest, prepare_study_issue, prepare_executable_study_issue, project_standard_study_extensions
+from empirical_lawhood.runtime.study_issue import MAX_COMPOSED_PROGRAMME_CONTROL_BYTES, StudyPublicationReceipt, ExtensionPublicationReceipt, StudyExtensionDecoderRegistration, StudySourceClosureInspector, IssuedExecutableStudyManifest, prepare_study_issue, prepare_executable_study_issue, project_standard_study_extensions
 from empirical_lawhood.runtime.study_extensions import StudyExtensionMaterializationReceipt
 from empirical_lawhood.runtime.static_codecs import CanonicalRecordCodecRegistry
 from empirical_lawhood.runtime.scientific_graph_preservation import prove_scientific_graph_parity
 from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher, StudyOperationAuthorityStore
 
-from .codecs import load_standard_issued_study, load_standard_study_candidate, MAX_AUTHORING_BYTES, AuthoringCodecError, load_authoring, load_campaign_package_authoring, load_registered_authoring, load_registered_authoring_materialization, loads_registered_authoring
+from .codecs import load_executable_study_authoring, load_executable_study_authoring_materialization, load_standard_issued_study, load_standard_study_candidate, MAX_AUTHORING_BYTES, MAX_CAMPAIGN_PACKAGE_BYTES, AuthoringCodecError, load_authoring, load_campaign_package_authoring, load_registered_authoring, load_registered_authoring_materialization, loads_registered_authoring
 from .execution import (
     CampaignExecutionError,
     CampaignExecutionService,
@@ -189,14 +190,15 @@ from .execution import (
     CampaignInternalError,
     CampaignValidationError,
     RunExecutionSummary,
+    RunHistoryReconciliationSummary,
     RunStatusSummary,
 )
-from .models import CampaignAuthorityRequired, ExperimentPackageAssemblySummary, CampaignPackage, AuthorizationSummary, CapabilityListSummary, CapabilityShowSummary, CatalogObjectSummary, CatalogQuerySummary, CatalogRebuildSummary, CatalogSummary, StudyCompilationSummary, ExecutableStudyCompilationSummary, CompilationSummary, PreissueReadinessSummary, LinkedCampaignCompilationSummary, DatabaseMutationSummary, DatasetCatalogRecordSummary, DatasetListSummary, DatasetManifestSummary, DatasetOperationPreviewSummary, PublicSourceAcquisitionSummary, PublicSourceCustodySummary, DatasetProjectionRebuildSummary, DatasetRegistrationSummary, DatasetShowSummary, DatasetStoragePreflightSummary, DoctorActionReadiness, DoctorAuthorityBoundary, DoctorBackendSummary, DoctorSummary, DocumentSummary, DualLoopPackage, ExplorationExecutionPackage, IssuedCampaignPackage, IssuedCampaignPackageRoot, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage, SourceProfileCompilationSummary, assemble_experiment_package, bind_issued_execution_package_elapsed_budget, issued_base_candidate, issued_standard_candidate, ExplorationCompilationSummary, ExplorationPortfolioSummary, HypothesisSummary, NominationSummary, StudyIssueSummary, ExecutableStudyIssueSummary, MultiWorldStudyIssueSummary, StudyBundleCompilationSummary, ProposalSummary, ScientificInspectionSummary, SystemSummary, WriteEffectSummary
-from .ports import (
+from empirical_lawhood.api.models import CampaignAuthorityRequired, ExperimentPackageAssemblySummary, CampaignPackage, AuthorizationSummary, CapabilityListSummary, CapabilityShowSummary, CatalogObjectSummary, CatalogQuerySummary, CatalogRebuildSummary, CatalogSummary, StudyCompilationSummary, ExecutableStudyCompilationSummary, CompilationSummary, PreissueReadinessSummary, LinkedCampaignCompilationSummary, DatabaseMutationSummary, DatasetCatalogRecordSummary, DatasetListSummary, DatasetManifestSummary, DatasetOperationPreviewSummary, PublicSourceAcquisitionSummary, PublicSourceCustodySummary, DatasetProjectionRebuildSummary, DatasetRegistrationSummary, DatasetShowSummary, DatasetStoragePreflightSummary, DoctorActionReadiness, DoctorAuthorityBoundary, DoctorBackendSummary, DoctorSummary, DocumentSummary, DualLoopPackage, ExplorationExecutionPackage, IssuedCampaignPackage, IssuedCampaignPackageRoot, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage, SourceProfileCompilationSummary, assemble_experiment_package, bind_issued_execution_package_elapsed_budget, issued_base_candidate, issued_standard_candidate, ExplorationCompilationSummary, ExplorationPortfolioSummary, HypothesisSummary, NominationSummary, StudyIssueSummary, ExecutableStudyIssueSummary, MultiWorldStudyIssueSummary, StudyBundleCompilationSummary, ProposalSummary, ScientificInspectionSummary, SystemSummary, WriteEffectSummary
+from empirical_lawhood.api.ports import (
     DatasetCatalogSessionProvider,
     ProspectiveWorkflow,
 )
-from .results import AdvanceStudyBundleRequest, AssembleExperimentPackageRequest, BindElapsedBudgetRequest, ApiError, ApiResult, CapabilityListRequest, CapabilityShowRequest, CampaignStatusRequest, CampaignMaintenanceStopRequest, CampaignMaintenanceInterruptionRequest, CatalogQueryRequest, CatalogRebuildRequest, CompileCampaignRequest, CompileStudyRequest, CompileCandidateRequest, CompileLinkedCampaignProfileRequest, CompileStudyBundleRequest, CompileSourceProfileRequest, CloseStudyBundleRequest, DatabaseMutationRequest, DatasetListRequest, DatasetManifestRequest, DatasetOperationPreviewRequest, PublicSourceAcquisitionRequest, DatasetProjectionRebuildRequest, DatasetRegistrationRequest, DatasetShowRequest, DocumentRequest, ErrorCategory, IssueStudyRequest, IssueExtensionsRequest, IssueStudyBundleRequest, OperationStatus, CheckReadinessRequest, StudyBundleStatusRequest, ResumeCampaignRequest, RunCampaignRequest
+from empirical_lawhood.api.results import AdvanceStudyBundleRequest, AssembleExperimentPackageRequest, BindElapsedBudgetRequest, ApiError, ApiResult, CapabilityListRequest, CapabilityShowRequest, CampaignStatusRequest, CampaignMaintenanceStopRequest, CampaignMaintenanceInterruptionRequest, CatalogQueryRequest, CatalogRebuildRequest, CompileCampaignRequest, CompileStudyRequest, CompileCandidateRequest, CompileLinkedCampaignProfileRequest, CompileStudyBundleRequest, CompileSourceProfileRequest, CloseStudyBundleRequest, DatabaseMutationRequest, DatasetListRequest, DatasetManifestRequest, DatasetOperationPreviewRequest, PublicSourceAcquisitionRequest, DatasetProjectionRebuildRequest, DatasetRegistrationRequest, DatasetShowRequest, DocumentRequest, ErrorCategory, IssueStudyRequest, IssueExtensionsRequest, IssueStudyBundleRequest, OperationStatus, CheckReadinessRequest, StudyBundleStatusRequest, ResumeCampaignRequest, RunCampaignRequest
 
 
 ResultT = TypeVar("ResultT")
@@ -733,6 +735,16 @@ def _object_id(value: CanonicalRecord) -> str:
     raise TypeError(f"unsupported public record: {type(value).__name__}")
 
 
+def _require_programme_candidate(package, expected_candidate: ObjectIdentity | None) -> None:
+    """Join a programme's outer candidate at the owning package-read boundary."""
+    if expected_candidate is None:
+        return
+    if (type(expected_candidate) is not ObjectIdentity or type(package) is not ExperimentPackage
+            or ObjectIdentity.from_record(package.issued_study.candidate.candidate_id,
+                package.issued_study.candidate) != expected_candidate):
+        raise ValueError("campaign package differs from the programme's exact outer executable candidate")
+
+
 def _validation_error(operation: str, error: Exception) -> ApiResult[object]:
     reason_code = getattr(error, "reason_code", "AUTHORING_DOCUMENT_INVALID")
     return ApiResult(
@@ -814,6 +826,7 @@ class EmpiricalLawhoodApi:
         linked_profile_compiler: LinkedCampaignProfileCompiler | None = None,
         inspection_storage_root: GuardedExternalRoot | None = None,
         inspection_storage_read_only: bool = False,
+        catalog_access: object | None = None,
         external_root: Path | None,
     ) -> None:
         if candidate_compilation_context is not None and candidate_context_provider is not None:
@@ -832,6 +845,17 @@ class EmpiricalLawhoodApi:
         self._repo_root = repo_root.resolve(strict=True)
         self._project_configured = project_configured
         self._execution_service = execution_service
+        selected_catalog = getattr(execution_service, "catalog_access", None)
+        if catalog_access is not None and selected_catalog is not None and catalog_access is not selected_catalog:
+            raise ValueError("facade catalog selection differs from its execution service")
+        self._catalog_access = selected_catalog if catalog_access is None else catalog_access
+        if self._catalog_access is not None:
+            from empirical_lawhood.infrastructure.guarded_catalog import GuardedCatalogAccess
+
+            if type(self._catalog_access) is not GuardedCatalogAccess:
+                raise TypeError("facade requires its exact guarded catalog owner")
+            if execution_service is not None and self._catalog_access.database_path != execution_service.catalog_path:
+                raise ValueError("facade catalog path differs from its execution service")
         self._prospective_workflow = prospective_workflow
         self._approval_service = approval_service or (
             None if execution_service is None else execution_service.approval_service
@@ -889,9 +913,28 @@ class EmpiricalLawhoodApi:
         return self._repo_root
 
     def _catalog_path(self) -> Path:
+        if self._catalog_access is not None:
+            return self._catalog_access.database_path
         if self._execution_service is not None:
             return self._execution_service.catalog_path
         return production_catalog_path(self._repo_root)
+
+    def _catalog_label(self):
+        return (PRODUCTION_RELATIVE_PATH.as_posix() if self._catalog_access is None
+            else self._catalog_access.display_locator)
+
+    def _catalog_effect(self):
+        return ("local:" + PRODUCTION_RELATIVE_PATH.as_posix() if self._catalog_access is None
+            else self._catalog_access.display_locator)
+
+    def _catalog_read_only_engine(self, path):
+        return (create_read_only_catalog_engine(path) if self._catalog_access is None
+            else self._catalog_access.read_only_engine())
+
+    def _catalog_location_refusal(self, operation):
+        return _dataset_catalog_error(operation, status=OperationStatus.BLOCKED,
+            category=ErrorCategory.STORAGE, reason_code="EXTERNAL_CATALOG_OPERATION_UNSUPPORTED",
+            message=operation + " retains its fixed repository-local installation contract")
 
     def validate_document(self, request: DocumentRequest) -> ApiResult[DocumentSummary]:
         operation = "document.validate"
@@ -1302,6 +1345,8 @@ class EmpiricalLawhoodApi:
         """Verify and durably register one exact already-held dataset source."""
 
         operation = "dataset.register"
+        if self._catalog_access is not None:
+            return self._catalog_location_refusal(operation)
         try:
             if not isinstance(request, DatasetRegistrationRequest):
                 raise TypeError("request must be a DatasetRegistrationRequest")
@@ -1416,6 +1461,8 @@ class EmpiricalLawhoodApi:
         """Install one exact unified projection only through dedicated authority."""
 
         operation = "dataset.rebuild"
+        if self._catalog_access is not None:
+            return self._catalog_location_refusal(operation)
         try:
             if not isinstance(request, DatasetProjectionRebuildRequest):
                 raise TypeError("request must be a DatasetProjectionRebuildRequest")
@@ -1473,7 +1520,7 @@ class EmpiricalLawhoodApi:
             )
         effects = (
             "external:authorized-dataset-projection-receipt",
-            "local:.empirical-lawhood/experiment_catalog.sqlite3",
+            self._catalog_effect(),
         )
         if not request.confirmed:
             return ApiResult(
@@ -1979,6 +2026,7 @@ class EmpiricalLawhoodApi:
                     draft_path=request.base_package_path,
                     requested_path=request.emit_path,
                     payload=payload,
+                    maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
                 )
                 payload_sha256 = hashlib.sha256(payload).hexdigest()
                 local_bytes_written = len(payload)
@@ -2080,6 +2128,7 @@ class EmpiricalLawhoodApi:
                     draft_path=request.execution_package_path,
                     requested_path=request.emit_path,
                     payload=payload,
+                    maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
                 )
                 payload_sha256 = hashlib.sha256(payload).hexdigest()
                 local_bytes_written = len(payload)
@@ -2542,11 +2591,49 @@ class EmpiricalLawhoodApi:
                 raise AuthoringCodecError(
                     "extension route requires ProgrammeExtensionDecoderRegistration"
                 )
-            payload = read_bounded_bytes(
-                payload_path,
-                maximum_bytes=registration.maximum_payload_bytes,
+            if (
+                registration.decoder_key != proposal.decoder_key
+                or registration.decoder_version != proposal.decoder_version
+                or registration.payload_schema != proposal.payload.object_schema
+                or registration.payload_version != proposal.payload.object_version
+                or registration.config_sha256 != proposal.decoder_config_sha256
+            ):
+                raise ValueError("extension bytes/decoder differ from their exact proposal")
+            codec = registry.registration(proposal.payload.object_schema)
+            # Additional profiles are explicit installed choices. Schema-only
+            # decoding must keep its original primary allocation; a larger
+            # advertised size cannot select another profile.
+            if any(
+                value.record_schema == proposal.payload.object_schema
+                or value.decoder_key == registration.decoder_key
+                for value in registry.additional_registrations
+            ):
+                codec = registry.registration(
+                    proposal.payload.object_schema,
+                    decoder_key=registration.decoder_key,
+                    decoder_version=registration.decoder_version,
+                )
+                aggregate = self._executable_binding_aggregate
+                if (
+                    codec.record_version != registration.payload_version
+                    or codec.maximum_bytes > registration.maximum_payload_bytes
+                    or codec.decoder_implementation_sha256 != registration.implementation_sha256
+                    or aggregate is None
+                    or not any(
+                        binding.accepts_issued_decoder_registration(registration)
+                        for binding in aggregate.bindings
+                    )
+                ):
+                    raise ValueError("extension decoder differs from its installed codec owner")
+            maximum_bytes = min(codec.maximum_bytes, registration.maximum_payload_bytes)
+            if proposal.payload_size_bytes > maximum_bytes:
+                raise ValueError("extension payload exceeds its installed decoder byte bound")
+            payload = read_bounded_bytes(payload_path, maximum_bytes=maximum_bytes)
+            decoded = decode_canonical_bytes(
+                payload,
+                registry.record_types[proposal.payload.object_schema],
+                maximum_bytes=codec.maximum_bytes,
             )
-            decoded = registry.decode(payload, expected_schema=proposal.payload.object_schema)
             payload_identity = ObjectIdentity.from_record(
                 proposal.payload.object_id,
                 decoded,
@@ -2554,12 +2641,6 @@ class EmpiricalLawhoodApi:
             if (
                 payload_identity != proposal.payload
                 or len(payload) != proposal.payload_size_bytes
-                or registration.decoder_key != proposal.decoder_key
-                or registration.decoder_version != proposal.decoder_version
-                or registration.payload_schema != proposal.payload.object_schema
-                or registration.payload_version != proposal.payload.object_version
-                or registration.config_sha256 != proposal.decoder_config_sha256
-                or len(payload) > registration.maximum_payload_bytes
             ):
                 raise ValueError("extension bytes/decoder differ from their exact proposal")
             physical_sha256 = hashlib.sha256(payload).hexdigest()
@@ -2619,13 +2700,7 @@ class EmpiricalLawhoodApi:
                 message="candidate compilation context is not composed",
             )
         try:
-            loaded = load_registered_authoring_materialization(
-                request.path,
-                root_schemas={
-                    ExecutableStudyDefinition.SCHEMA: ExecutableStudyDefinition,
-                    RetrospectiveAuthoringPackage.SCHEMA: RetrospectiveAuthoringPackage,
-                },
-            )
+            loaded = load_executable_study_authoring_materialization(request.path)
             package = loaded.record
             if not isinstance(package, ExecutableStudyDefinition):
                 raise AuthoringCodecError(
@@ -2698,6 +2773,7 @@ class EmpiricalLawhoodApi:
                     draft_path=request.path,
                     requested_path=request.emit_path,
                     payload=candidate_payload,
+                    maximum_bytes=MAX_COMPOSED_PROGRAMME_CONTROL_BYTES,
                 )
                 candidate_sha256 = hashlib.sha256(candidate_payload).hexdigest()
                 local_bytes_written = len(candidate_payload)
@@ -2814,13 +2890,7 @@ class EmpiricalLawhoodApi:
                 or candidate.canonical_bytes() != expected.canonical_bytes()
             ):
                 raise ValueError("candidate changed after the public compilation")
-            package = load_registered_authoring(
-                request.authoring_package_path,
-                root_schemas={
-                    ExecutableStudyDefinition.SCHEMA: ExecutableStudyDefinition,
-                    RetrospectiveAuthoringPackage.SCHEMA: RetrospectiveAuthoringPackage,
-                },
-            )
+            package = load_executable_study_authoring(request.authoring_package_path)
             payloads, registrations, materializations, records = (
                 self._load_extension_materializations(
                     package=package,
@@ -3407,13 +3477,7 @@ class EmpiricalLawhoodApi:
                 message="extension issuance requires the guarded external publisher",
             )
         try:
-            loaded = load_registered_authoring_materialization(
-                request.authoring_package_path,
-                root_schemas={
-                    ExecutableStudyDefinition.SCHEMA: ExecutableStudyDefinition,
-                    RetrospectiveAuthoringPackage.SCHEMA: RetrospectiveAuthoringPackage,
-                },
-            )
+            loaded = load_executable_study_authoring_materialization(request.authoring_package_path)
             package = loaded.record
             if not isinstance(package, ExecutableStudyDefinition):
                 raise AuthoringCodecError("extension issuance requires ExecutableStudyDefinition")
@@ -3525,68 +3589,72 @@ class EmpiricalLawhoodApi:
                 )
             if candidate != expected_candidate:
                 raise ValueError("executable study candidate changed between preview and issue")
-            published_base = publisher.load_study(request.base_issue_id)
-            if published_base.manifest.candidate != candidate.base_candidate:
-                raise ValueError("extension issue request names another immutable base issue")
-            at_utc = self._study_issue_clock.now_utc()
-            preparation = prepare_executable_study_issue(
-                base_manifest=published_base.manifest,
-                base_publication_receipt=published_base.publication_receipt,
-                current_compilation=report,
-                candidate=candidate,
-                extension_payload_bytes=payloads,
-                decoder_registrations=registrations,
-                extension_materializations=materializations,
-                extension_proposer_attestation=attestation,
-                extension_custody_authority=custody_authority,
-                storage_root_id=publisher.storage_root_id,
-                grantee_id=publisher.grantee_id,
-                at_utc=at_utc,
-            )
-            planned_bytes = publisher.validate_standard(preparation, at_utc=at_utc)
-            issue_summary_type: type[ExecutableStudyIssueSummary] = (
-                RetrospectiveIssueSummary
-                if isinstance(preparation.manifest, RetrospectiveIssuedStudy)
-                else ExecutableStudyIssueSummary
-            )
-            if not request.confirmed:
+            verification_scope = getattr(publisher, "verification_scope", None)
+            if verification_scope is not None and not callable(verification_scope):
+                raise TypeError("issue publisher verification scope must be callable")
+            with (verification_scope() if verification_scope is not None else nullcontext(publisher)) as publisher:
+                published_base = publisher.load_study(request.base_issue_id)
+                if published_base.manifest.candidate != candidate.base_candidate:
+                    raise ValueError("extension issue request names another immutable base issue")
+                at_utc = self._study_issue_clock.now_utc()
+                preparation = prepare_executable_study_issue(
+                    base_manifest=published_base.manifest,
+                    base_publication_receipt=published_base.publication_receipt,
+                    current_compilation=report,
+                    candidate=candidate,
+                    extension_payload_bytes=payloads,
+                    decoder_registrations=registrations,
+                    extension_materializations=materializations,
+                    extension_proposer_attestation=attestation,
+                    extension_custody_authority=custody_authority,
+                    storage_root_id=publisher.storage_root_id,
+                    grantee_id=publisher.grantee_id,
+                    at_utc=at_utc,
+                )
+                planned_bytes = publisher.validate_standard(preparation, at_utc=at_utc)
+                issue_summary_type: type[ExecutableStudyIssueSummary] = (
+                    RetrospectiveIssueSummary
+                    if isinstance(preparation.manifest, RetrospectiveIssuedStudy)
+                    else ExecutableStudyIssueSummary
+                )
+                if not request.confirmed:
+                    return ApiResult(
+                        operation=operation,
+                        status=OperationStatus.BLOCKED,
+                        payload=issue_summary_type(
+                            manifest=preparation.manifest,
+                            confirmed=False,
+                            publication_receipt=None,
+                            base_member_count=len(preparation.manifest.base.members),
+                            extension_member_count=len(preparation.manifest.issued_extensions.members),
+                            planned_extension_payload_bytes=planned_bytes,
+                            external_bytes_written=0,
+                            publication_receipt_bytes=0,
+                        ),
+                        reason_codes=("WRITE_CONFIRMATION_REQUIRED",),
+                    )
+                publication = publisher.publish_standard(preparation, at_utc=at_utc)
+                published = publisher.load_executable_study(preparation.manifest.issue_id)
+                if (
+                    published.manifest != preparation.manifest
+                    or published.publication_receipt != publication
+                ):
+                    raise RuntimeError("published executable study failed exact external replay")
+                receipt_bytes = len(publication.canonical_bytes())
                 return ApiResult(
                     operation=operation,
-                    status=OperationStatus.BLOCKED,
+                    status=OperationStatus.SUCCEEDED,
                     payload=issue_summary_type(
-                        manifest=preparation.manifest,
-                        confirmed=False,
-                        publication_receipt=None,
-                        base_member_count=len(preparation.manifest.base.members),
-                        extension_member_count=len(preparation.manifest.issued_extensions.members),
+                        manifest=published.manifest,
+                        confirmed=True,
+                        publication_receipt=publication,
+                        base_member_count=len(published.manifest.base.members),
+                        extension_member_count=len(published.manifest.issued_extensions.members),
                         planned_extension_payload_bytes=planned_bytes,
-                        external_bytes_written=0,
-                        publication_receipt_bytes=0,
+                        external_bytes_written=planned_bytes + receipt_bytes,
+                        publication_receipt_bytes=receipt_bytes,
                     ),
-                    reason_codes=("WRITE_CONFIRMATION_REQUIRED",),
                 )
-            publication = publisher.publish_standard(preparation, at_utc=at_utc)
-            published = publisher.load_executable_study(preparation.manifest.issue_id)
-            if (
-                published.manifest != preparation.manifest
-                or published.publication_receipt != publication
-            ):
-                raise RuntimeError("published executable study failed exact external replay")
-            receipt_bytes = len(publication.canonical_bytes())
-            return ApiResult(
-                operation=operation,
-                status=OperationStatus.SUCCEEDED,
-                payload=issue_summary_type(
-                    manifest=published.manifest,
-                    confirmed=True,
-                    publication_receipt=publication,
-                    base_member_count=len(published.manifest.base.members),
-                    extension_member_count=len(published.manifest.issued_extensions.members),
-                    planned_extension_payload_bytes=planned_bytes,
-                    external_bytes_written=planned_bytes + receipt_bytes,
-                    publication_receipt_bytes=receipt_bytes,
-                ),
-            )
         except FileNotFoundError as error:
             return _dataset_catalog_error(
                 operation,
@@ -4081,13 +4149,19 @@ class EmpiricalLawhoodApi:
         draft_path: Path,
         requested_path: Path,
         payload: bytes,
+        maximum_bytes: int | None = None,
     ) -> str:
         if requested_path.is_absolute():
             raise ValueError("local candidate output must be relative to the draft")
         if requested_path.suffix.casefold() != ".json":
             raise ValueError("local candidate output must use a .json suffix")
-        if len(payload) > MAX_AUTHORING_BYTES:
-            raise ValueError("local candidate output exceeds the authoring byte limit")
+        byte_limit = MAX_AUTHORING_BYTES if maximum_bytes is None else maximum_bytes
+        if type(byte_limit) is not int or not 0 < byte_limit <= MAX_CAMPAIGN_PACKAGE_BYTES:
+            raise ValueError("local emission requires its bounded authoring or package allocation")
+        if len(payload) > byte_limit:
+            if maximum_bytes is None:
+                raise ValueError("local candidate output exceeds the authoring byte limit")
+            raise ValueError("local campaign package output exceeds the package byte limit")
         draft_root = draft_path.parent.resolve(strict=True)
         unresolved_target = draft_root / requested_path
         resolved_parent = unresolved_target.parent.resolve(strict=True)
@@ -4096,9 +4170,10 @@ class EmpiricalLawhoodApi:
         target = resolved_parent / unresolved_target.name
         if target == draft_path.resolve(strict=True):
             raise ValueError("local candidate output cannot overwrite the draft")
-        external_root = self._external_root.resolve(strict=False)
-        if target.is_relative_to(external_root):
-            raise ValueError("local candidate emission cannot write to the scientific plane")
+        if self._external_root is not None:
+            external_root = self._external_root.resolve(strict=False)
+            if target.is_relative_to(external_root):
+                raise ValueError("local candidate emission cannot write to the scientific plane")
 
         file_descriptor, temporary_name = tempfile.mkstemp(
             prefix=f".{target.name}.",
@@ -4368,10 +4443,12 @@ class EmpiricalLawhoodApi:
     def run_campaign(
         self,
         request: RunCampaignRequest,
+        *, expected_candidate: ObjectIdentity | None = None,
     ) -> ApiResult[RunExecutionSummary | WriteEffectSummary | CampaignAuthorityRequired]:
         operation = "campaign.run"
         try:
             package, run_plan, execution_plan = self._compile_path(request.path)
+            _require_programme_candidate(package, expected_candidate)
             conditional_instantiations, parent_input_bindings = self._conditional_execution_records(
                 package=package,
                 parent_record_path=request.parent_record_path,
@@ -4407,7 +4484,7 @@ class EmpiricalLawhoodApi:
                         "experiment contract closure failed: " + ",".join(closure.reason_codes)
                     )
             effects = self._execution_service.write_effects(run_plan.run_plan_id)
-            resource_admission = self._execution_service.resource_admission(execution_plan)
+            resource_admission = self._execution_service.resource_admission(execution_plan, package=package)
         except Exception as error:
             return self._execution_error(operation, error)
         if not request.confirmed:
@@ -4833,10 +4910,16 @@ class EmpiricalLawhoodApi:
     def resume_campaign(
         self,
         request: ResumeCampaignRequest,
-    ) -> ApiResult[RunExecutionSummary | WriteEffectSummary | CampaignAuthorityRequired]:
+        *, expected_candidate: ObjectIdentity | None = None,
+    ) -> ApiResult[RunExecutionSummary | RunHistoryReconciliationSummary | WriteEffectSummary | CampaignAuthorityRequired]:
         operation = "campaign.resume"
         try:
             validate_stable_id(request.run_id, field_name="run_id")
+            if type(request.reconcile_only) is not bool:
+                raise ValueError("history reconciliation selection must be a boolean")
+            if request.reconcile_only and any((request.parent_record_path,
+                    request.parent_input_binding_paths)):
+                raise ValueError("receipt-only reconciliation does not accept parent inputs")
         except ValueError as error:
             invalid = _validation_error(operation, error)
             return ApiResult(
@@ -4848,33 +4931,21 @@ class EmpiricalLawhoodApi:
         if self._execution_service is None:
             return self._execution_unavailable(operation)
         try:
-            effects = self._execution_service.write_effects(request.run_id)
+            if expected_candidate is not None:
+                retained = self._execution_service.load_persisted_package(request.run_id)
+                _require_programme_candidate(retained, expected_candidate)
+            effects = ((f"external:runs/{request.run_id}/recovery/*",
+                self._catalog_effect()) if request.reconcile_only
+                else self._execution_service.write_effects(request.run_id))
+        except KeyError as error:
+            return ApiResult(operation=operation, status=OperationStatus.NOT_FOUND,
+                errors=(ApiError(category=ErrorCategory.NOT_FOUND, reason_code="RUN_NOT_FOUND", message=str(error)),),
+                reason_codes=("RUN_NOT_FOUND",))
+        except ValueError as error:
+            return _validation_error(operation, error)
         except Exception as error:
             return self._execution_error(operation, error)
         if not request.confirmed:
-            if request.retry_amendment_path is not None or request.retry_authority_id is not None:
-                try:
-                    package = self._execution_service.load_persisted_package(request.run_id)
-                    run_plan, execution_plan = self._compile_package(package)
-                    self._execution_service.preflight_retry(
-                        package=package,
-                        run_plan=run_plan,
-                        execution_plan=execution_plan,
-                        amendment_path=request.retry_amendment_path,
-                        authority_id=request.retry_authority_id,
-                        at_utc=self._study_issue_clock.now_utc(),
-                    )
-                except Exception as error:
-                    return self._execution_error(operation, error)
-                return ApiResult(
-                    operation=operation,
-                    status=OperationStatus.BLOCKED,
-                    payload=self._write_preview(operation, effects),
-                    reason_codes=(
-                        "OPERATIONAL_RETRY_PREFLIGHT_PASSED",
-                        "WRITE_CONFIRMATION_REQUIRED",
-                    ),
-                )
             return ApiResult(
                 operation=operation,
                 status=OperationStatus.BLOCKED,
@@ -4883,23 +4954,34 @@ class EmpiricalLawhoodApi:
             )
         try:
             persisted_package = self._execution_service.load_persisted_package(request.run_id)
+            _require_programme_candidate(persisted_package, expected_candidate)
+            if request.reconcile_only:
+                summary = self._execution_service.reconcile_failed_history(request.run_id,
+                    at_utc=self._study_issue_clock.now_utc(), reveal_authority_id=request.reveal_authority_id,
+                    expected_package=persisted_package)
+                return ApiResult(operation=operation, status=OperationStatus.SUCCEEDED, payload=summary,
+                    reason_codes=("FAILED_HISTORY_RECONCILED_WITHOUT_EXECUTION",))
             conditional_instantiations, parent_input_bindings = self._conditional_execution_records(
                 package=persisted_package,
                 parent_record_path=request.parent_record_path,
                 parent_input_binding_paths=request.parent_input_binding_paths,
             )
             run_plan, execution_plan = self._compile_package(persisted_package)
+
+            def compile_resumed_package(package):
+                if expected_candidate is not None:
+                    _require_programme_candidate(package, expected_candidate)
+                    if package != persisted_package:
+                        raise ValueError("programme recovery package changed after authenticated compilation")
+                return run_plan, execution_plan
+
             summary = self._execution_service.resume(
                 request.run_id,
-                lambda _package: (run_plan, execution_plan),
+                compile_resumed_package,
                 at_utc=self._study_issue_clock.now_utc(),
                 reveal_authority_id=request.reveal_authority_id,
                 conditional_instantiations=conditional_instantiations,
                 parent_input_bindings=parent_input_bindings,
-                retry_amendment_path=request.retry_amendment_path,
-                retry_authority_id=request.retry_authority_id,
-                source_amendment_path=request.source_amendment_path,
-                source_authority_id=request.source_authority_id,
             )
         except (AuthoringCodecError, ProtocolCompilationError, ValueError) as error:
             invalid = _validation_error(operation, error)
@@ -4937,6 +5019,7 @@ class EmpiricalLawhoodApi:
     def campaign_status(
         self,
         request: CampaignStatusRequest,
+        *, expected_candidate: ObjectIdentity | None = None,
     ) -> ApiResult[RunStatusSummary]:
         operation = "campaign.status"
         try:
@@ -4967,6 +5050,9 @@ class EmpiricalLawhoodApi:
                 reason_codes=("RUN_NOT_FOUND",),
             )
         try:
+            if expected_candidate is not None:
+                retained = self._execution_service.load_persisted_package(request.run_id)
+                _require_programme_candidate(retained, expected_candidate)
             summary = self._execution_service.status(
                 request.run_id,
                 include_attempt_history=request.include_attempt_history,
@@ -4986,6 +5072,8 @@ class EmpiricalLawhoodApi:
                 ),
                 reason_codes=("RUN_NOT_FOUND",),
             )
+        except ValueError as error:
+            return _validation_error(operation, error)
         except CampaignExecutionError as error:
             failed = self._execution_error(operation, error)
             return ApiResult(
@@ -5011,7 +5099,7 @@ class EmpiricalLawhoodApi:
     def doctor(self, *, route: str | None = None) -> ApiResult[DoctorSummary]:
         operation = "doctor"
         import platform
-        from .environment import EnvironmentRoute, inspect_route_dependencies
+        from empirical_lawhood.api.environment import EnvironmentRoute, inspect_route_dependencies
         from empirical_lawhood.infrastructure.source_origin import require_executing_target_source
 
         try:
@@ -5044,15 +5132,15 @@ class EmpiricalLawhoodApi:
                 pass
         catalog_path = (
             self._catalog_path()
-            if self._project_configured
+            if self._project_configured or self._catalog_access is not None
             else self._repo_root / PRODUCTION_RELATIVE_PATH
         )
-        if self._project_configured:
+        if self._project_configured or self._catalog_access is not None:
             catalog_check = self.check_catalog()
             catalog_present = (
                 catalog_check.payload.present
                 if catalog_check.payload is not None
-                else catalog_path.is_file()
+                else False if self._catalog_access is not None else catalog_path.is_file()
             )
             catalog_state, catalog_reason_codes = self._catalog_diagnostic_state(catalog_check)
             warnings: list[str] = list(catalog_check.reason_codes)
@@ -5107,7 +5195,7 @@ class EmpiricalLawhoodApi:
                     if self._execution_service is None
                     else self._execution_service.provider_registry_fingerprint
                 ),
-                catalog_relative_path=PRODUCTION_RELATIVE_PATH.as_posix(),
+                catalog_relative_path=self._catalog_label(),
                 catalog_present=catalog_present,
                 catalog_state=catalog_state,
                 catalog_reason_codes=catalog_reason_codes,
@@ -5256,7 +5344,13 @@ class EmpiricalLawhoodApi:
             value for value in backends if value.backend_id == "trusted-local-process"
         )
         catalog_parent = catalog_path.parent
-        if not self._project_configured:
+        if self._catalog_access is not None:
+            try:
+                self._catalog_access.verify(for_write=True)
+                catalog_parent_ready = True
+            except (OSError, RuntimeError, ValueError):
+                catalog_parent_ready = False
+        elif not self._project_configured:
             catalog_parent_ready = False
         elif catalog_parent.exists():
             catalog_parent_ready = (
@@ -5290,6 +5384,8 @@ class EmpiricalLawhoodApi:
                         *storage_write_reasons,
                         *(() if catalog_state in {"ABSENT", "VALID"} else catalog_reason_codes),
                         *trusted_blockers,
+                        *(("SELECTED_CATALOG_NOT_WRITABLE",)
+                            if self._catalog_access is not None and not catalog_parent_ready else ()),
                     )
                 )
             )
@@ -5412,13 +5508,18 @@ class EmpiricalLawhoodApi:
 
     def check_catalog(self) -> ApiResult[CatalogSummary]:
         operation = "catalog.check"
-        path = self._catalog_path()
+        try:
+            path = self._catalog_path()
+            if self._catalog_access is not None:
+                self._catalog_access.verify(for_write=False)
+        except (OSError, RuntimeError, ValueError) as error:
+            return self._storage_error(operation, "CATALOG_AUDIT_FAILED", error)
         if not path.is_file():
             return ApiResult(
                 operation=operation,
                 status=OperationStatus.SUCCEEDED,
                 payload=CatalogSummary(
-                    catalog_relative_path=PRODUCTION_RELATIVE_PATH.as_posix(),
+                    catalog_relative_path=self._catalog_label(),
                     present=False,
                     schema_valid=None,
                     schema_version=None,
@@ -5433,7 +5534,7 @@ class EmpiricalLawhoodApi:
             )
         engine = None
         try:
-            engine = create_read_only_catalog_engine(path)
+            engine = self._catalog_read_only_engine(path)
             audit = schema_audit(engine)
         except CatalogSchemaAuditLimitExceeded as error:
             return self._catalog_audit_limit_error(operation, error)
@@ -5458,7 +5559,7 @@ class EmpiricalLawhoodApi:
             operation=operation,
             status=OperationStatus.SUCCEEDED if audit.passed else OperationStatus.INVALID,
             payload=CatalogSummary(
-                catalog_relative_path=PRODUCTION_RELATIVE_PATH.as_posix(),
+                catalog_relative_path=self._catalog_label(),
                 present=True,
                 schema_valid=audit.passed,
                 schema_version=audit.user_version,
@@ -5484,7 +5585,7 @@ class EmpiricalLawhoodApi:
                 payload=WriteEffectSummary(
                     action=operation,
                     confirmed=False,
-                    effects=("local:.empirical-lawhood/experiment_catalog.sqlite3",),
+                    effects=(self._catalog_effect(),),
                 ),
                 reason_codes=("WRITE_CONFIRMATION_REQUIRED",),
             )
@@ -5492,7 +5593,8 @@ class EmpiricalLawhoodApi:
             engine = (
                 self._execution_service.engine_factory()
                 if self._execution_service is not None
-                else initialize_production_catalog(self._repo_root)
+                else (initialize_production_catalog(self._repo_root) if self._catalog_access is None
+                    else self._catalog_access.initialize_engine())
             )
             audit = schema_audit(engine)
         except CatalogSchemaAuditLimitExceeded as error:
@@ -5513,6 +5615,8 @@ class EmpiricalLawhoodApi:
         request: DatabaseMutationRequest,
     ) -> ApiResult[DatabaseMutationSummary | WriteEffectSummary]:
         operation = "db.compact"
+        if self._catalog_access is not None:
+            return self._catalog_location_refusal(operation)
         path = self._catalog_path()
         if not path.is_file():
             return self._catalog_not_found(operation)
@@ -5523,7 +5627,7 @@ class EmpiricalLawhoodApi:
                 payload=WriteEffectSummary(
                     action=operation,
                     confirmed=False,
-                    effects=("local:.empirical-lawhood/experiment_catalog.sqlite3",),
+                    effects=(self._catalog_effect(),),
                 ),
                 reason_codes=("WRITE_CONFIRMATION_REQUIRED",),
             )
@@ -5759,7 +5863,12 @@ class EmpiricalLawhoodApi:
                 errors=invalid.errors,
                 reason_codes=invalid.reason_codes,
             )
-        path = self._catalog_path()
+        try:
+            path = self._catalog_path()
+            if self._catalog_access is not None:
+                self._catalog_access.verify(for_write=False)
+        except (OSError, RuntimeError, ValueError) as error:
+            return self._storage_error(operation, "CATALOG_QUERY_FAILED", error)
         if not path.is_file():
             return ApiResult(
                 operation=operation,
@@ -5775,7 +5884,7 @@ class EmpiricalLawhoodApi:
             )
         engine = None
         try:
-            engine = create_read_only_catalog_engine(path)
+            engine = self._catalog_read_only_engine(path)
             audit = catalog_query_preflight(engine)
             if not audit.passed:
                 return ApiResult(
@@ -5998,6 +6107,8 @@ class EmpiricalLawhoodApi:
         request: CatalogRebuildRequest,
     ) -> ApiResult[CatalogRebuildSummary | WriteEffectSummary]:
         operation = "catalog.rebuild"
+        if self._catalog_access is not None:
+            return self._catalog_location_refusal(operation)
         try:
             if self._execution_service is not None:
                 projection = self._execution_service.validate_external_projection(
@@ -6033,7 +6144,7 @@ class EmpiricalLawhoodApi:
                 payload=WriteEffectSummary(
                     action=operation,
                     confirmed=False,
-                    effects=("local:.empirical-lawhood/experiment_catalog.sqlite3",),
+                    effects=(self._catalog_effect(),),
                 ),
                 reason_codes=("WRITE_CONFIRMATION_REQUIRED",),
             )
@@ -6054,7 +6165,7 @@ class EmpiricalLawhoodApi:
                     payload=WriteEffectSummary(
                         action=operation,
                         confirmed=True,
-                        effects=("local:.empirical-lawhood/experiment_catalog.sqlite3",),
+                        effects=(self._catalog_effect(),),
                     ),
                     errors=(
                         ApiError(
@@ -6705,7 +6816,7 @@ class EmpiricalLawhoodApi:
             raise TypeError("catalog mutation returned an invalid audit")
         return DatabaseMutationSummary(
             action=action,
-            catalog_relative_path=PRODUCTION_RELATIVE_PATH.as_posix(),
+            catalog_relative_path=self._catalog_label(),
             schema_valid=audit.passed,
             schema_version=audit.user_version,
             alembic_revision=audit.alembic_revision,

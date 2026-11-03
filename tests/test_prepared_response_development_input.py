@@ -12,7 +12,7 @@ from empirical_lawhood.adapters.simulators.prepared_response.instruments import 
 from empirical_lawhood.adapters.simulators.prepared_response.native_quickstart import PreparedResponsePreparedCanary, run_prepared_canary
 from empirical_lawhood.api.codecs import load_registered_authoring
 
-CONFIG = Path(__file__).parents[1] / "experiments/prepared-response/prepared-canary.json"
+CONFIG = Path(__file__).parents[1] / "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-canary.json"
 
 
 def _config() -> PreparedResponsePreparedCanary:

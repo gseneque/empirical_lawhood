@@ -1,0 +1,811 @@
+{
+  "schema": "rubisco.public-scientific-input-register.v1",
+  "review_date": "2026-10-09",
+  "checkout_base_commit": "9c670a3127cb652f839e56463758226749b07c73",
+  "explicit_input_root": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs",
+  "source_role": "bounded public-source research and exact native-table inspection; no issue, reveal, execution or qualification authority",
+  "original_retrieval_manifest": {
+    "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/retrieval-manifest-through-panel-inspection.json",
+    "bytes": 13829,
+    "sha256": "ef259017be0dd84a06be9f047125e6b6cf8bad09b5daac4daf0738de849950b9"
+  },
+  "source_records": [
+    {
+      "id": "flamholz-source-panel",
+      "artifact": {
+        "requested_url": "https://raw.githubusercontent.com/flamholz/rubisco/e7441ec736b0a862205dcc0df025176f12f8dc7d/data/DatasetS1_SourceRubiscoKinetics.csv",
+        "resolved_url": "https://raw.githubusercontent.com/flamholz/rubisco/e7441ec736b0a862205dcc0df025176f12f8dc7d/data/DatasetS1_SourceRubiscoKinetics.csv",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/flamholz-rubisco-data-DatasetS1_SourceRubiscoKinetics.csv",
+        "byte_count": 276245,
+        "sha256": "586f57382c3f490becd2e76196ba72f8fe769a851f8b80b3adc1b5dca9085fb0",
+        "media_type_header": "text/plain; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:14:18Z"
+      },
+      "role": "secondary compiled source table",
+      "terms": "DatasetS1_SourceRubiscoKinetics.csv at Git commit e7441ec736b0a862205dcc0df025176f12f8dc7d; repository-wide reuse license not found in inspected tree; preserve terms unresolved",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "davidi-repository-map",
+      "artifact": {
+        "requested_url": "https://raw.githubusercontent.com/milo-lab/rubiscolympics/63c5acede27674e7ee292e97e32990d48255e3e4/data/milo_synth.csv",
+        "resolved_url": "https://raw.githubusercontent.com/milo-lab/rubiscolympics/63c5acede27674e7ee292e97e32990d48255e3e4/data/milo_synth.csv",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/milo-lab-rubiscolympics-data-milo_synth.csv",
+        "byte_count": 8136,
+        "sha256": "cb9544094e0ec8035b6cf998fcdac0ce8d65bdffdc1b39cf9fab40c04a914e93",
+        "media_type_header": "text/plain; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:14:20Z"
+      },
+      "role": "internalID/accession crosswalk, not rate evidence",
+      "terms": "Pinned repository commit63c5acede27674e7ee292e97e32990d48255e3e4; repository license unresolved",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rejected-payload-tsai2025-correction.html",
+      "artifact": {
+        "requested_url": "https://link.springer.com/article/10.1038/s44318-025-00419-y",
+        "resolved_url": "https://link.springer.com/article/10.1038/s44318-025-00419-y",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/tsai2025-correction.html",
+        "byte_count": 3038,
+        "sha256": "32ed63159c77e21ee19ca1b9aa3213ccf0218eb59539560b132a8e68ef0e18ea",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:14:21Z"
+      },
+      "role": "failed retrieval retained for custody",
+      "admission": "rejected: actual bytes are challenge HTML, not requested PDF/XLSX",
+      "exposure": "no biological label claimed"
+    },
+    {
+      "id": "davidi-article",
+      "artifact": {
+        "requested_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7507306/",
+        "resolved_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7507306/",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/davidi2020-original.html",
+        "byte_count": 251305,
+        "sha256": "c26181ee58761569e6de28593a13c33f59a5be63404002d2f575173b699f49ed",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:14:21Z"
+      },
+      "role": "original methods and table; superseded kcat source",
+      "terms": "CC BY 4.0 per current PMC metadata",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rejected-payload-tsai2025-correction.pdf",
+      "artifact": {
+        "requested_url": "https://link.springer.com/content/pdf/10.1038/s44318-025-00419-y.pdf",
+        "resolved_url": "https://link.springer.com/content/pdf/10.1038/s44318-025-00419-y.pdf",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/tsai2025-correction.pdf",
+        "byte_count": 3038,
+        "sha256": "32ed63159c77e21ee19ca1b9aa3213ccf0218eb59539560b132a8e68ef0e18ea",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:15:10Z"
+      },
+      "role": "failed retrieval retained for custody",
+      "admission": "rejected: actual bytes are challenge HTML, not requested PDF/XLSX",
+      "exposure": "no biological label claimed"
+    },
+    {
+      "id": "davidi-2025-correction",
+      "artifact": {
+        "requested_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12048540/",
+        "resolved_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12048540/",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/tsai2025-pmc.html",
+        "byte_count": 114701,
+        "sha256": "b68c813ff073972d42ed7b1ca9540244c45e6bfdb2c7bd8fe50070825b9068bc",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:15:11Z"
+      },
+      "role": "current corrected historical and remeasured turnover; specificity not remeasured",
+      "terms": "Article CC BY 4.0; article states CC0 data unless otherwise indicated; third-party exceptions retained",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rejected-payload-davidi2020-table-ev1.xlsx",
+      "artifact": {
+        "requested_url": "https://pmc.ncbi.nlm.nih.gov/articles/instance/7507306/bin/EMBJ-39-e104081-s002.xlsx",
+        "resolved_url": "https://pmc.ncbi.nlm.nih.gov/articles/instance/7507306/bin/EMBJ-39-e104081-s002.xlsx",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/davidi2020-table-ev1.xlsx",
+        "byte_count": 1817,
+        "sha256": "ba603581a2ed1a4164eea46782a8adf645eafc5da1710c5664e1734b37fee460",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:16:39Z"
+      },
+      "role": "failed retrieval retained for custody",
+      "admission": "rejected: actual bytes are challenge HTML, not requested PDF/XLSX",
+      "exposure": "no biological label claimed"
+    },
+    {
+      "id": "davidi-repository-sequences",
+      "artifact": {
+        "requested_url": "https://raw.githubusercontent.com/milo-lab/rubiscolympics/63c5acede27674e7ee292e97e32990d48255e3e4/data/milo_synthetized_rubisco.faa",
+        "resolved_url": "https://raw.githubusercontent.com/milo-lab/rubiscolympics/63c5acede27674e7ee292e97e32990d48255e3e4/data/milo_synthetized_rubisco.faa",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/milo-lab-rubiscolympics-data-milo_synthetized_rubisco.faa",
+        "byte_count": 101764,
+        "sha256": "8f5aadd03722166939d4f2a0f55fd0ddfd0de4f4d90357e425b738a360a490a2",
+        "media_type_header": "text/plain; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:17:23Z"
+      },
+      "role": "published accession/sequence cross-check; supplement remains preferred construct source",
+      "terms": "Pinned repository commit63c5acede27674e7ee292e97e32990d48255e3e4; repository license not found, reuse terms unresolved",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "mcdonald-article",
+      "artifact": {
+        "requested_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12260525/",
+        "resolved_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12260525/",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/mcdonald2025-pmc.html",
+        "byte_count": 235440,
+        "sha256": "3ac8b38b12c29717bfeef666f851ab642ec97a9f58b9a02b3b4261ead532d037",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:17:44Z"
+      },
+      "role": "direct-mutant study methods and exact endpoint role",
+      "terms": "CC BY-NC-ND 4.0 per article and current PMC metadata; no code redistribution license inferred",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rejected-payload-mcdonald2025-dataset-s3.xlsx",
+      "artifact": {
+        "requested_url": "https://pmc.ncbi.nlm.nih.gov/articles/instance/12260525/bin/pnas.2505083122.sd03.xlsx",
+        "resolved_url": "https://pmc.ncbi.nlm.nih.gov/articles/instance/12260525/bin/pnas.2505083122.sd03.xlsx",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/mcdonald2025-dataset-s3.xlsx",
+        "byte_count": 1817,
+        "sha256": "2e5d60556b4fc4c2840fb5d982366f0a165465d58ac8505b3f5d929d66d998fc",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:18:45Z",
+        "payload_zip_magic": false
+      },
+      "role": "failed retrieval retained for custody",
+      "admission": "rejected: actual bytes are challenge HTML, not requested PDF/XLSX",
+      "exposure": "no biological label claimed"
+    },
+    {
+      "id": "pmc-current-retrieval",
+      "artifact": {
+        "requested_url": "https://pmc-oa-opendata.s3.amazonaws.com/README.txt",
+        "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/README.txt",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/pmc-current-readme.txt",
+        "byte_count": 14524,
+        "sha256": "257a001b400485176702ed49ca7607d73cd83c581bffb6dd3c9be127a2e42634",
+        "media_type_header": "text/plain",
+        "retrieved_at_utc": "2026-10-09T11:20:52Z"
+      },
+      "role": "current source retrieval contract",
+      "terms": "Official PMC public service documentation",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "pmc-mcdonald-metadata",
+      "artifact": {
+        "requested_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC12260525.1/PMC12260525.1.json",
+        "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC12260525.1/PMC12260525.1.json",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/PMC12260525.1.json",
+        "byte_count": 1694,
+        "sha256": "9c0503eb942351912033b3a0c46f25517b1ee861a4dea504c262cfebea1a9e4f",
+        "md5": "5ac218a9919efc66bba209311b3c84eb",
+        "media_type_header": "binary/octet-stream",
+        "retrieved_at_utc": "2026-10-09T11:21:24Z",
+        "payload_zip_magic": false
+      },
+      "role": "license/sourceMD5 metadata",
+      "terms": "Official public PMC metadata",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "pmc-davidi-metadata",
+      "artifact": {
+        "requested_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC7507306.1/PMC7507306.1.json",
+        "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC7507306.1/PMC7507306.1.json",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/PMC7507306.1.json",
+        "byte_count": 1629,
+        "sha256": "2f9c5788077eb59302db3c15b6b1519f70cf4f5f30c3afab73d3bdb66260901d",
+        "md5": "ef6e6eeec47753e07940c4efa262dfa5",
+        "media_type_header": "binary/octet-stream",
+        "retrieved_at_utc": "2026-10-09T11:21:25Z",
+        "payload_zip_magic": false
+      },
+      "role": "license/sourceMD5 metadata",
+      "terms": "Official public PMC metadata",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "mcdonald-construct-views",
+      "artifact": {
+        "requested_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC12260525.1/pnas.2505083122.sd01.xlsx",
+        "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC12260525.1/pnas.2505083122.sd01.xlsx",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/pnas.2505083122.sd01.xlsx",
+        "byte_count": 17228,
+        "sha256": "45688ff0decfaf086fcc1b4dc66dd292142cc079d25df949080a1accf619f088",
+        "md5": "d2a62b958a024e20d99175f14125e242",
+        "media_type_header": "binary/octet-stream",
+        "retrieved_at_utc": "2026-10-09T11:21:26Z",
+        "payload_zip_magic": true
+      },
+      "role": "tagged/untagged and historical source views; not single unified preparation",
+      "terms": "CC BY-NC-ND 4.0 publication supplement per PMC metadata",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "mcdonald-mutant-panel",
+      "artifact": {
+        "requested_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC12260525.1/pnas.2505083122.sd03.xlsx",
+        "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC12260525.1/pnas.2505083122.sd03.xlsx",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/pnas.2505083122.sd03.xlsx",
+        "byte_count": 1014187,
+        "sha256": "1fbb073dbcc50e96d40677e0d38a817944a3cc1d859fdd38d9dc8c6c8f5e3f98",
+        "md5": "d0ad970c644cd9084c0f56e15a7dc07e",
+        "media_type_header": "binary/octet-stream",
+        "retrieved_at_utc": "2026-10-09T11:21:28Z",
+        "payload_zip_magic": true
+      },
+      "role": "primary reported summary plus individual values; unresolved uncertainty conflicts",
+      "terms": "CC BY-NC-ND 4.0 publication supplement per PMC metadata; retain original bytes and factual internal inspection",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "mcdonald-mutation-map",
+      "artifact": {
+        "requested_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC12260525.1/pnas.2505083122.sd04.xlsx",
+        "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC12260525.1/pnas.2505083122.sd04.xlsx",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/pnas.2505083122.sd04.xlsx",
+        "byte_count": 14701,
+        "sha256": "77304e9f8ae53c2ba3e65c31589194669d477cf57703ba9dfca8e834554b6a7d",
+        "md5": "ae86cf155e7ff3bd218817ab869e5777",
+        "media_type_header": "binary/octet-stream",
+        "retrieved_at_utc": "2026-10-09T11:21:29Z",
+        "payload_zip_magic": true
+      },
+      "role": "aligned residue and DMS fitness correspondence; not intrinsic kinetics",
+      "terms": "CC BY-NC-ND 4.0 publication supplement per PMC metadata",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "davidi-ev1",
+      "artifact": {
+        "requested_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC7507306.1/EMBJ-39-e104081-s002.xlsx",
+        "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC7507306.1/EMBJ-39-e104081-s002.xlsx",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/EMBJ-39-e104081-s002.xlsx",
+        "byte_count": 124800,
+        "sha256": "37cb57accc4d10ef72098199038f6ab15310aefdd86461be54a8f7ffa5f7fa96",
+        "md5": "11cf8f9a102debdbc542a73f9943340d",
+        "media_type_header": "binary/octet-stream",
+        "retrieved_at_utc": "2026-10-09T11:21:30Z",
+        "payload_zip_magic": true
+      },
+      "role": "original supplement; rates superseded, source construct mapping retained",
+      "terms": "Article CC BY 4.0 per current PMC metadata; source supplement terms tied to publication, third-party exceptions retained",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "wilson-te-primary-table",
+      "artifact": {
+        "requested_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5766918/",
+        "resolved_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5766918/",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/wilson2017-jbc.html",
+        "byte_count": 223002,
+        "sha256": "102a96a551bf11104b7ca7563572010adf8dc540a937165c671f23c618a24316",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:37:25.884854+00:00"
+      },
+      "role": "primary Table1 and full methods,19enzyme rows",
+      "terms": "JBC primary article at PMC5766918,DOI10.1074/jbc.M117.810861; publication reuse terms not separately captured; preserve original bytes",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "te-exact-parent-insert",
+      "artifact": {
+        "requested_url": "https://www.ncbi.nlm.nih.gov/sviewer/viewer.fcgi?id=MG000148&db=nuccore&report=genbank&retmode=text",
+        "resolved_url": "https://www.ncbi.nlm.nih.gov/sviewer/viewer.fcgi?id=MG000148&db=nuccore&report=genbank&retmode=text",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/te-MG000148.gb",
+        "byte_count": 5511,
+        "sha256": "62f8c50c51ba007b4d6b99273b9c397ceea85d97985449f6c0bcef376e51b305",
+        "media_type_header": "text/plain",
+        "retrieved_at_utc": "2026-10-09T11:38:51.163294+00:00"
+      },
+      "role": "NCBI GenBank MG000148.1 complete1850bp insert, two complete CDS",
+      "terms": "NCBI public sequence record; source-specific redistribution terms not separately captured; retain accession version and exact source bytes",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "galdieria-structure-entry",
+      "artifact": {
+        "requested_url": "https://data.rcsb.org/rest/v1/core/entry/1BWV",
+        "resolved_url": "https://data.rcsb.org/rest/v1/core/entry/1BWV",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/galdieria-1bwv-core.json",
+        "byte_count": 18179,
+        "sha256": "7e2c111a8489c03daeddb2bb649a93b6d7942661ef81f1cd2c501231ac5fe0f1",
+        "media_type_header": "application/json",
+        "retrieved_at_utc": "2026-10-09T11:35:04.728726+00:00"
+      },
+      "role": "RCSB primary entry metadata",
+      "terms": "Public RCSB/wwPDB source; source bytes preserved. These coordinates do not supply reaction-state or intrinsic-kinetic validation.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "galdieria-structure-LSU",
+      "artifact": {
+        "requested_url": "https://data.rcsb.org/rest/v1/core/polymer_entity/1BWV/1",
+        "resolved_url": "https://data.rcsb.org/rest/v1/core/polymer_entity/1BWV/1",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/galdieria-1bwv-entities1.json",
+        "byte_count": 19890,
+        "sha256": "7020b506b2a746ba67d485d15d4a8d526d81df77f3be50c16b4bf66dd93b8912",
+        "media_type_header": "application/json",
+        "retrieved_at_utc": "2026-10-09T11:37:27.219373+00:00"
+      },
+      "role": "RCSB primary LSU polymer metadata and canonical/noncanonical sequences",
+      "terms": "Public RCSB/wwPDB source; source bytes preserved. These coordinates do not supply reaction-state or intrinsic-kinetic validation.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "galdieria-structure-SSU",
+      "artifact": {
+        "requested_url": "https://data.rcsb.org/rest/v1/core/polymer_entity/1BWV/2",
+        "resolved_url": "https://data.rcsb.org/rest/v1/core/polymer_entity/1BWV/2",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/galdieria-1bwv-entities2.json",
+        "byte_count": 10718,
+        "sha256": "fdc2643782a01a04e4b116c4803550677875050b257a2e6a60e35d452f797524",
+        "media_type_header": "application/json",
+        "retrieved_at_utc": "2026-10-09T11:37:27.702841+00:00"
+      },
+      "role": "RCSB primary SSU polymer metadata and sequences",
+      "terms": "Public RCSB/wwPDB source; source bytes preserved. These coordinates do not supply reaction-state or intrinsic-kinetic validation.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "galdieria-native-assembly",
+      "artifact": {
+        "requested_url": "https://data.rcsb.org/rest/v1/core/assembly/1BWV/1",
+        "resolved_url": "https://data.rcsb.org/rest/v1/core/assembly/1BWV/1",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/galdieria-1bwv-assembly1.json",
+        "byte_count": 5001,
+        "sha256": "1f2dd2d7f10b860901c300be4bdba379276c6bf40ec677439853429430a46cbe",
+        "media_type_header": "application/json",
+        "retrieved_at_utc": "2026-10-09T11:39:19.208161+00:00"
+      },
+      "role": "RCSB primary biological assembly metadata",
+      "terms": "Public RCSB/wwPDB source; source bytes preserved. These coordinates do not supply reaction-state or intrinsic-kinetic validation.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "galdieria-native-coordinates",
+      "artifact": {
+        "requested_url": "https://files.rcsb.org/download/1BWV.cif",
+        "resolved_url": "https://files.rcsb.org/download/1BWV.cif",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/galdieria-1bwv.cif",
+        "byte_count": 2046400,
+        "sha256": "4fe0d7197062a6643568937520582a58673a91d032ed313a8c37545d22a0d6b6",
+        "media_type_header": "chemical/x-cif",
+        "retrieved_at_utc": "2026-10-09T11:53:56.505399+00:00"
+      },
+      "role": "wwPDB primary inhibitor-bound coordinates and native residue/assembly correspondence",
+      "terms": "Public RCSB/wwPDB source; source bytes preserved. These coordinates do not supply reaction-state or intrinsic-kinetic validation.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "te-native-coordinates",
+      "artifact": {
+        "requested_url": "https://files.rcsb.org/download/3ZXW.cif",
+        "resolved_url": "https://files.rcsb.org/download/3ZXW.cif",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/te-3zxw.cif",
+        "byte_count": 2006344,
+        "sha256": "119f966e3706442fa493134f90c21e65bc12c109e68041bf4cc7e399d9961c15",
+        "media_type_header": "chemical/x-cif",
+        "retrieved_at_utc": "2026-10-09T11:53:57.126084+00:00"
+      },
+      "role": "wwPDB primary inhibitor-bound coordinates and native residue/assembly correspondence",
+      "terms": "Public RCSB/wwPDB source; source bytes preserved. These coordinates do not supply reaction-state or intrinsic-kinetic validation.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "galdieria-uniprot-SSU",
+      "artifact": {
+        "requested_url": "https://rest.uniprot.org/uniprotkb/O98950.json",
+        "resolved_url": "https://rest.uniprot.org/uniprotkb/O98950.json",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/galdieria-O98950.json",
+        "byte_count": 10741,
+        "sha256": "88f4ec62724e4e30e2833a658401633912e1ef19ab58b9bde76dcc65540d5504",
+        "media_type_header": "application/json",
+        "retrieved_at_utc": "2026-10-09T11:39:18.722738+00:00"
+      },
+      "role": "UniProt source SSU annotation/sequence, separate view from1BWV",
+      "terms": "Public UniProt record; terms not separately captured. N-terminal Met differs from native1BWV Val; preserve separate sequence views.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rs2019-primary-html",
+      "artifact": {
+        "requested_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6834295/",
+        "resolved_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6834295/",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/zhou2019-rs.html",
+        "byte_count": 374492,
+        "sha256": "97f0c6065e36882d1fab606a3c290f25b5f438aa0aa0d31d3fa677466c58fff5",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:53:57.506327+00:00"
+      },
+      "role": "primary exposed article and Table2",
+      "terms": "Official PMC metadata license_code CC BY; source XML MD5 matches official metadata7bbcfdaf1a4f3111b8ae9d8320f31ab6",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rs2019-primary-xml",
+      "artifact": {
+        "requested_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC6834295.1/PMC6834295.1.xml",
+        "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC6834295.1/PMC6834295.1.xml",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/zhou2019-rs.xml",
+        "byte_count": 269884,
+        "sha256": "b2122c277f73ebcfb3f5ce8ef5dca4be8712c9353b8bb95fcb8607f187c85c59",
+        "media_type_header": "binary/octet-stream",
+        "retrieved_at_utc": "2026-10-09T11:56:48.301012+00:00"
+      },
+      "role": "primary exposed JATS Table2 and original method/numerical-role text",
+      "terms": "Official PMC metadata license_code CC BY; source XML MD5 matches official metadata7bbcfdaf1a4f3111b8ae9d8320f31ab6",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rs2019-pmc-metadata",
+      "artifact": {
+        "requested_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC6834295.1/PMC6834295.1.json",
+        "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC6834295.1/PMC6834295.1.json",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/zhou2019-pmc-metadata.json",
+        "byte_count": 1705,
+        "sha256": "51cefee80d1aafd4dd2c3ff749e08dc9235dd40fb06780a45f06e3e75d39da8b",
+        "media_type_header": "binary/octet-stream",
+        "retrieved_at_utc": "2026-10-09T11:53:58.234551+00:00"
+      },
+      "role": "official publication terms and content identity metadata",
+      "terms": "Official PMC metadata license_code CC BY; source XML MD5 matches official metadata7bbcfdaf1a4f3111b8ae9d8320f31ab6",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rbcmodel-source-inventory",
+      "artifact": {
+        "requested_url": "https://api.github.com/repos/cran/rbcmodel/contents/R",
+        "resolved_url": "https://api.github.com/repos/cran/rbcmodel/contents/R",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/rbcmodel-R-list.json",
+        "byte_count": 5725,
+        "sha256": "e379b833b476e6748177a1e61866d4f447c56be83cec4415bdc2306b83d2d00c",
+        "media_type_header": "application/json; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:53:53.782974+00:00"
+      },
+      "role": "public native code-file inventory",
+      "terms": "rbcmodel1.0.1,MIT+fileLICENSE per pinnedDESCRIPTION,commit5a50e2839bdf6ded8808044fe00060af5802418c. Read-only inspection; no code install/execution.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rbcmodel-source-ref",
+      "artifact": {
+        "requested_url": "https://api.github.com/repos/cran/rbcmodel/git/ref/heads/master",
+        "resolved_url": "https://api.github.com/repos/cran/rbcmodel/git/ref/heads/master",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/rbcmodel-master-ref.json",
+        "byte_count": 331,
+        "sha256": "840d2acbe94ee0a654e84a7e7659394a7caf0584268b410e5bd1d000e07935b2",
+        "media_type_header": "application/json; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:56:48.586010+00:00"
+      },
+      "role": "public Git ref pinned5a50e2839bdf6ded8808044fe00060af5802418c",
+      "terms": "rbcmodel1.0.1,MIT+fileLICENSE per pinnedDESCRIPTION,commit5a50e2839bdf6ded8808044fe00060af5802418c. Read-only inspection; no code install/execution.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rbcmodel-native-kinetics",
+      "artifact": {
+        "requested_url": "https://raw.githubusercontent.com/cran/rbcmodel/5a50e2839bdf6ded8808044fe00060af5802418c/R/kinetics.R",
+        "resolved_url": "https://raw.githubusercontent.com/cran/rbcmodel/5a50e2839bdf6ded8808044fe00060af5802418c/R/kinetics.R",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/rbcmodel-R_kinetics.R",
+        "byte_count": 7430,
+        "sha256": "008d28b46559090ca82fab9855407b961daf6bc35772eec54b343d06909d1886",
+        "media_type_header": "text/plain; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:56:48.915565+00:00"
+      },
+      "role": "native conditional gas-response simulator source",
+      "terms": "rbcmodel1.0.1,MIT+fileLICENSE per pinnedDESCRIPTION,commit5a50e2839bdf6ded8808044fe00060af5802418c. Read-only inspection; no code install/execution.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rbcmodel-native-grid",
+      "artifact": {
+        "requested_url": "https://raw.githubusercontent.com/cran/rbcmodel/5a50e2839bdf6ded8808044fe00060af5802418c/R/grid.R",
+        "resolved_url": "https://raw.githubusercontent.com/cran/rbcmodel/5a50e2839bdf6ded8808044fe00060af5802418c/R/grid.R",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/rbcmodel-R_grid.R",
+        "byte_count": 7261,
+        "sha256": "979964ba00e7d2b46fb1555b061deaf69e15262a351f1e82eb89b9d0c1ac79f1",
+        "media_type_header": "text/plain; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:56:49.234354+00:00"
+      },
+      "role": "native gas-grid input/array simulator source",
+      "terms": "rbcmodel1.0.1,MIT+fileLICENSE per pinnedDESCRIPTION,commit5a50e2839bdf6ded8808044fe00060af5802418c. Read-only inspection; no code install/execution.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rbcmodel-description",
+      "artifact": {
+        "requested_url": "https://raw.githubusercontent.com/cran/rbcmodel/5a50e2839bdf6ded8808044fe00060af5802418c/DESCRIPTION",
+        "resolved_url": "https://raw.githubusercontent.com/cran/rbcmodel/5a50e2839bdf6ded8808044fe00060af5802418c/DESCRIPTION",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/rbcmodel-DESCRIPTION",
+        "byte_count": 1435,
+        "sha256": "e7e8300afdaad287e609a827adb97ec1d7e0ba70fb930861d613b6509e1d652d",
+        "media_type_header": "text/plain; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:56:49.617605+00:00"
+      },
+      "role": "native package version1.0.1, declared reuse license and dependencies",
+      "terms": "rbcmodel1.0.1,MIT+fileLICENSE per pinnedDESCRIPTION,commit5a50e2839bdf6ded8808044fe00060af5802418c. Read-only inspection; no code install/execution.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rbcmodel-license",
+      "artifact": {
+        "requested_url": "https://raw.githubusercontent.com/cran/rbcmodel/5a50e2839bdf6ded8808044fe00060af5802418c/LICENSE",
+        "resolved_url": "https://raw.githubusercontent.com/cran/rbcmodel/5a50e2839bdf6ded8808044fe00060af5802418c/LICENSE",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/rbcmodel-LICENSE",
+        "byte_count": 48,
+        "sha256": "d850d2af6a3b064be9b8a57432dd2f58aade89f9e53a631c791c9aa0815eafed",
+        "media_type_header": "text/plain; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:56:49.928101+00:00"
+      },
+      "role": "native license-holder declaration",
+      "terms": "rbcmodel1.0.1,MIT+fileLICENSE per pinnedDESCRIPTION,commit5a50e2839bdf6ded8808044fe00060af5802418c. Read-only inspection; no code install/execution.",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    },
+    {
+      "id": "rs2023-rejected-body",
+      "artifact": {
+        "requested_url": "https://www.nature.com/articles/s41477-023-01436-7",
+        "resolved_url": "https://www.nature.com/articles/s41477-023-01436-7",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/zhou2023-nature.html",
+        "byte_count": 3038,
+        "sha256": "32ed63159c77e21ee19ca1b9aa3213ccf0218eb59539560b132a8e68ef0e18ea",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:35:02.728263+00:00"
+      },
+      "role": "rejected publisher HTML challenge payload",
+      "terms": "Requested publication asset not acquired; HTML response is not a PDF/XLSX or scientific source",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "rejected payload retained for custody; never admitted as requested native scientific content"
+    },
+    {
+      "id": "rs2023-rejected-supplement",
+      "artifact": {
+        "requested_url": "https://media.springernature.com/full/springer-static/esm/art%3A10.1038%2Fs41477-023-01436-7/MediaObjects/41477_2023_1436_MOESM1_ESM.pdf",
+        "resolved_url": "https://media.springernature.com/full/springer-static/esm/art%3A10.1038%2Fs41477-023-01436-7/MediaObjects/41477_2023_1436_MOESM1_ESM.pdf",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/zhou2023-MOESM1_ESM.pdf",
+        "byte_count": 3038,
+        "sha256": "32ed63159c77e21ee19ca1b9aa3213ccf0218eb59539560b132a8e68ef0e18ea",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:35:55.869879+00:00"
+      },
+      "role": "rejected publisher HTML challenge payload",
+      "terms": "Requested publication asset not acquired; HTML response is not a PDF/XLSX or scientific source",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "rejected payload retained for custody; never admitted as requested native scientific content"
+    },
+    {
+      "id": "rs2023-rejected-xlsx4",
+      "artifact": {
+        "requested_url": "https://media.springernature.com/full/springer-static/esm/art%3A10.1038%2Fs41477-023-01436-7/MediaObjects/41477_2023_1436_MOESM4_ESM.xlsx",
+        "resolved_url": "https://media.springernature.com/full/springer-static/esm/art%3A10.1038%2Fs41477-023-01436-7/MediaObjects/41477_2023_1436_MOESM4_ESM.xlsx",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/zhou2023-MOESM4_ESM.xlsx",
+        "byte_count": 3038,
+        "sha256": "32ed63159c77e21ee19ca1b9aa3213ccf0218eb59539560b132a8e68ef0e18ea",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:35:56.211595+00:00"
+      },
+      "role": "rejected publisher HTML challenge payload",
+      "terms": "Requested publication asset not acquired; HTML response is not a PDF/XLSX or scientific source",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "rejected payload retained for custody; never admitted as requested native scientific content"
+    },
+    {
+      "id": "rs2023-rejected-xlsx5",
+      "artifact": {
+        "requested_url": "https://media.springernature.com/full/springer-static/esm/art%3A10.1038%2Fs41477-023-01436-7/MediaObjects/41477_2023_1436_MOESM5_ESM.xlsx",
+        "resolved_url": "https://media.springernature.com/full/springer-static/esm/art%3A10.1038%2Fs41477-023-01436-7/MediaObjects/41477_2023_1436_MOESM5_ESM.xlsx",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/zhou2023-MOESM5_ESM.xlsx",
+        "byte_count": 3038,
+        "sha256": "32ed63159c77e21ee19ca1b9aa3213ccf0218eb59539560b132a8e68ef0e18ea",
+        "media_type_header": "text/html; charset=utf-8",
+        "retrieved_at_utc": "2026-10-09T11:35:56.544793+00:00"
+      },
+      "role": "rejected publisher HTML challenge payload",
+      "terms": "Requested publication asset not acquired; HTML response is not a PDF/XLSX or scientific source",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "rejected payload retained for custody; never admitted as requested native scientific content"
+    },
+    {
+      "id": "rs2023-bibliographic-metadata",
+      "artifact": {
+        "requested_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1038/s41477-023-01436-7&format=json",
+        "resolved_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1038/s41477-023-01436-7&format=json",
+        "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/zhou2023-europepmc.json",
+        "byte_count": 928,
+        "sha256": "b55451f4bd55164f026008d7888a89189fe7dbbc0dfebc4cf7d5fdcf3858320f",
+        "media_type_header": "application/json;charset=UTF-8",
+        "retrieved_at_utc": "2026-10-09T11:35:04.078704+00:00"
+      },
+      "role": "EuropePMC bibliographic record only",
+      "terms": "Bibliographic API response; no native kinetics/construct supplement acquired",
+      "exposure": "public source inspected during this turn; retrospective/exposed",
+      "admission": "reviewed original source bytes only; scientific record/effect authority not conferred"
+    }
+  ],
+  "derived_inspections": [
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/davidi-natural-panel-inspection.json",
+      "bytes": 40232,
+      "sha256": "ffb9b2e63582dee9fbf486de956cf01e6b292ede6abbfa85bf79a9210169a5de",
+      "role": "one-off exposed source inspection; not qualified scientific result"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/mcdonald2025-mutant-panel-inspection.json",
+      "bytes": 180734,
+      "sha256": "592490dcc9f89c20d0e98ddb21a9c67c130d61b6297922d57246604de2be9cea",
+      "role": "one-off exposed source inspection; not qualified scientific result"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/flamholz-selected-rows-inspection.json",
+      "bytes": 24130,
+      "sha256": "a6710fa0073be74f14fcc9f59033c88716b2b09eb49e12a015faee668f615164",
+      "role": "one-off exposed source inspection; not qualified scientific result"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/pnas.2505083122.sd01-cells.json",
+      "bytes": 16088,
+      "sha256": "b9f4dac49ef042540f5cb801381784c954abc2c2f072114069658bfdbde63642",
+      "role": "one-off exposed source inspection; not qualified scientific result"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/pnas.2505083122.sd04-cells.json",
+      "bytes": 12714,
+      "sha256": "c12b5b89952a600e630c3cd39c2ba968d4c32d752b0b6eae7c7fa8c4c9cd3d45",
+      "role": "one-off exposed source inspection; not qualified scientific result"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/inspection-artifact-inventory.json",
+      "bytes": 6784,
+      "sha256": "1d2a032791da32e52c2b948ba39064e06d17cfdfbc86700b08c096bac632d323",
+      "role": "one-off exposed source inspection; not qualified scientific result"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/wilson2017-exact-mutant-panel-inspection.json",
+      "bytes": 47396,
+      "sha256": "63b0497ddba236f0c209eca60f26857defb4f2e5ec549bb7d007e42f97b559f3",
+      "role": "bounded source-bound exposed inspection; not canonical qualified scientific evidence"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/crosswalk-corrected-endpoint-conflicts-inspection.json",
+      "bytes": 15025,
+      "sha256": "4a11585d9e97e383a9c622f0c2fd3d7401a0e709b72fde19ebd90a83416cfcd4",
+      "role": "bounded source-bound exposed inspection; not canonical qualified scientific evidence"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/crosswalk-pareto25-inspection.json",
+      "bytes": 27949,
+      "sha256": "4c6861b6c9dd081472823126f250a1137ffa6f04ac6e1cfb0d7f61ceae5a8992",
+      "role": "bounded source-bound exposed inspection; not canonical qualified scientific evidence"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/flamholz-pareto25-inspection.json",
+      "bytes": 212414,
+      "sha256": "eac2c31f18fddcb585d192b465652227698260ff4e521a96ec74a332f0501176",
+      "role": "bounded source-bound exposed inspection; not canonical qualified scientific evidence"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/rubisco-structure-correspondence-inspection.json",
+      "bytes": 19016,
+      "sha256": "a40be79bf050859deaea7cf9fcdb36601dedeb69d73e882427c75bc2f40b7c2b",
+      "role": "bounded source-bound exposed inspection; not canonical qualified scientific evidence"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/zhou2019-native-mutant-panel-inspection.json",
+      "bytes": 12763,
+      "sha256": "c724f855aae742914860dacbff19a8c311db1b9a88b782e3b3af531b38ff76b0",
+      "role": "bounded source-bound exposed inspection; not canonical qualified scientific evidence"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/rbcmodel-native-supplier-inspection.json",
+      "bytes": 2202,
+      "sha256": "83db936f40a7c08b5b904f480f5926022efa35b02c0d66a3214bd54f0922343d",
+      "role": "bounded source-bound exposed inspection; not canonical qualified scientific evidence"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/tsai2025-table1-native-inspection.json",
+      "bytes": 17534,
+      "sha256": "b31ff2d72c10f709442e2eb25662bcbf3d7b85ac5acbbacf70dca08622474f45",
+      "role": "bounded source-bound exposed inspection; not canonical qualified scientific evidence"
+    }
+  ],
+  "source_version_limits": [
+    "PMC .1 cloud prefix can update without new version: retain exact SHA256 and retrieval timestamp; matching supplement MD5 verified against metadata",
+    "2020 Davidi rates superseded by2025 correction: rate revision not just multiply by two; old specificity is not a2025 remeasurement",
+    "McDonald N-His6 and C-His6 GWS1B are distinct preparations, Davidi Gallionella L2 is a different sequence and assembly",
+    "S3 TM specificity is missing; R337C kcat raw SD conflicts with cached SD/SEM; Ko uncertainty header conflicts and S1/S3 Ko source views differ",
+    "Some Flamholz joint rows combine cited experiments; primary=1 is a native flag, not scientific qualification",
+    "Nine retained *_davidi_2020_corrected crosswalk rows mislabel carboxylation efficiency as S_val; none admitted as specificity. S. elongatus and unknown additionally swap affinity/efficiency identities. Preserve raw rows and separate conflicts.",
+    "Wilson primary P415A differs from compiledP451A labels: deposited LSU415=P,451=W. Te WT MG000148.1 protein pair equals3ZXWcanonical sequences; chemical-state source distinctions still apply.",
+    "Wilson Table1 denominator19=15Te+4Se;14Te mutants. Values mean\u00b1SE, endpoint-specific Ns and assay/preparation conditions are retained. V98M-alone onWT not measured.",
+    "Galdieria1BWV authorV332/Q386 map exactsource sequence340/394; carbamylK author201 maps source210. Exact historicalSc238 preparation/strain binding remains unresolved.",
+    "Exploratory Pareto rows preserve native temperature and primary flags, duplicates/preparation worlds and all known invalid endpoint-role rows as conflicts; no nominal row establishes a strong two-target nomination."
+  ],
+  "retained_sources_owned_elsewhere": [
+    {
+      "role": "RR2018 actual source XML and1454-row dePins crosswalk; source sibling owns admission",
+      "inspection_only": "Read-only retained icf-yolo programme assets; preserve their original identities/exposure, do not reuse old signers or freshness labels"
+    }
+  ],
+  "current_search_findings_not_artifact_admitted": [
+    {
+      "doi": "10.64898/2026.09.04.749267",
+      "source": "https://www.biorxiv.org/content/10.64898/2026.09.04.749267v1.full",
+      "finding": "RubisGen Sept2026: apparent endpoint specificity explicitly not conventional kinetic specificity; full supplementary construct/custody not acquired",
+      "status": "primary full text indexed by web search; direct fetch denied403; no local original admitted"
+    },
+    {
+      "doi": "10.1126/sciadv.aeh3246",
+      "source": "https://www.broadinstitute.org/publications/broad1382791",
+      "finding": "Plant MLDE now listed as October2026 Science Advances publication; T391I turnover/aerobic-efficiency improvement does not establish both challenge targets",
+      "status": "author institution primary publication record; full article/supplement not locally admitted"
+    },
+    {
+      "doi": "10.1111/nph.18623",
+      "source": "https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.18623",
+      "finding": "Ellisolandiaelongata primary Table1 mean3.40\u00b10.81s^-1 andSc137.4\u00b117.8 at25C; source prose uncertainty differs. No exact assayed LSU/SSU genotype.",
+      "status": "primary full body indexed and inspected; direct original body403; no local original admitted"
+    },
+    {
+      "doi": "10.1038/s41477-023-01436-7",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/37291398/",
+      "finding": "Primary abstract reports RsC329A/A332V redalgal loop graft increases rate60% andspecificity7%; no threshold-qualified nomination, complete native supplement unavailable.",
+      "status": "primary abstract and metadata reviewed; local3038B publisher challenge payloads rejected"
+    },
+    {
+      "doi": "10.1002/mlf2.12154",
+      "source": "https://onlinelibrary.wiley.com/doi/full/10.1002/mlf2.12154",
+      "finding": "NAC4ED is relevant existing near-attack/MD mutant ranking prior art, with published Glide/LigPrep plusAMBER/PyMOL pipeline. Unrestrictedsource/dependencylicense andRubisco calibration not verified.",
+      "status": "primaryfullpaper inspected; no installation/native execution/sourcepackage admitted"
+    },
+    {
+      "source": "https://github.com/davidkastner/quantumpdb",
+      "documentation": "https://quantumpdb.readthedocs.io/en/latest/configuration.html",
+      "finding": "MIT QM-cluster workflow can reuse bounded cluster extraction on prepared local structures; optionalProtoss/Modeller andTeraChem+SLURM defaults require separate availability. Does not predictRubisco reaction barriers/kcat/Sc.",
+      "status": "primary repo/docs inspected; no local package installed or execution admitted"
+    }
+  ],
+  "followup_retrieval_manifest": {
+    "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/retrieval-manifest-through-mechanism-selection.json",
+    "byte_count": 25712,
+    "sha256": "5518a1f546e91c63d6ae65deaaef1ab77d8ba7edb87c7c86c147030e842ed188",
+    "role": "immutable acquisition snapshot through exact construct, correction and mechanism-component selection"
+  }
+}

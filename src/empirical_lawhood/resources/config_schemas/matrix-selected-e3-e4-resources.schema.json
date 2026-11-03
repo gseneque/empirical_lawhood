@@ -1,0 +1,146 @@
+{
+  "$defs": {
+    "ResourceBudget_c7b1ab18aa7a": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/resource-budget"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "cpu_cores": {
+              "description": "cpu cores; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "gpu_devices": {
+              "description": "gpu devices; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "memory_bytes": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "memory bytes; constructor checks semantics and units."
+            },
+            "output_bytes": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "output bytes; constructor checks semantics and units."
+            },
+            "source_scan_bytes": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "source scan bytes; constructor checks semantics and units."
+            },
+            "wall_time_seconds": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "wall time seconds; constructor checks semantics and units.",
+              "x-unit": "s"
+            }
+          },
+          "required": [
+            "cpu_cores",
+            "memory_bytes",
+            "gpu_devices",
+            "wall_time_seconds",
+            "source_scan_bytes",
+            "output_bytes"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "SelectedE3E4OperationalSelection_570aece3e9d7": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-selected-e3-e4/operational-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "phase_budgets": {
+              "description": "phase budgets; constructor checks semantics and units.",
+              "items": {
+                "items": false,
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/$defs/ResourceBudget_c7b1ab18aa7a"
+                  }
+                ],
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "record_id",
+            "phase_budgets"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-selected-e3-e4-resources",
+  "$ref": "#/$defs/SelectedE3E4OperationalSelection_570aece3e9d7",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Selected E3 E4 Resources",
+  "x-consumer": "matrix-selected-e3-e4-resources",
+  "x-consumer-maximum-bytes": 134217728,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

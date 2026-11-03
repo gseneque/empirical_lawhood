@@ -40,7 +40,7 @@ class CandidateCapabilityRegistration(CanonicalRecord):
     provider_key: str
     provider_version: str
     config_media_type: str
-    maximum_config_bytes: int
+    maximum_config_bytes: int | None
 
     @property
     def registration_id(self) -> str:
@@ -50,13 +50,12 @@ class CandidateCapabilityRegistration(CanonicalRecord):
         validate_stable_id(self.provider_key, field_name="provider_key")
         validate_semantic_version(self.provider_version)
         validate_nonempty(self.config_media_type, field_name="config_media_type")
-        if (
+        if self.maximum_config_bytes is not None and (
             not isinstance(self.maximum_config_bytes, int)
             or isinstance(self.maximum_config_bytes, bool)
             or self.maximum_config_bytes <= 0
-            or self.maximum_config_bytes > 16 * 1024**2
         ):
-            raise ValueError("maximum_config_bytes must be in (0, 16 MiB]")
+            raise ValueError("maximum_config_bytes must be positive or None")
 
 
 @dataclass(frozen=True, slots=True)

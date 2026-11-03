@@ -1,0 +1,561 @@
+{
+  "$defs": {
+    "MatrixResponseErrorAssessmentSelection_784302f32e16": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-experiment/assessment-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "alpha_denominator": {
+              "description": "alpha denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "alpha_numerator": {
+              "description": "alpha numerator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "comparison_slots": {
+              "description": "comparison slots; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "improvement_margin": {
+              "additionalProperties": false,
+              "description": "improvement margin; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "improvement_rule": {
+              "description": "improvement rule; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "minimum_usable_units": {
+              "description": "minimum usable units; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "missing_rule": {
+              "description": "missing rule; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "null_success_denominator": {
+              "description": "null success denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "null_success_numerator": {
+              "description": "null success numerator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "usability_scope": {
+              "description": "usability scope; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "improvement_margin",
+            "null_success_numerator",
+            "null_success_denominator",
+            "alpha_numerator",
+            "alpha_denominator",
+            "minimum_usable_units",
+            "comparison_slots",
+            "improvement_rule",
+            "missing_rule",
+            "usability_scope"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MatrixResponseErrorSpecification_e1a156e52c10": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-experiment/specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "assessment": {
+              "$ref": "#/$defs/MatrixResponseErrorAssessmentSelection_784302f32e16",
+              "description": "assessment; constructor checks semantics and units."
+            },
+            "calibration_alpha": {
+              "additionalProperties": false,
+              "description": "calibration alpha; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "calibration_missing_rule": {
+              "description": "calibration missing rule; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "calibration_scope": {
+              "description": "calibration scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "calibration_target_view": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "calibration target view; constructor checks semantics and units."
+            },
+            "evidence_scope": {
+              "description": "evidence scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "measurement": {
+              "$ref": "#/$defs/MatrixResponseMeasurementSelection_c818def9385b",
+              "description": "measurement; constructor checks semantics and units."
+            },
+            "methods": {
+              "description": "methods; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/MatrixResponseEstimatorSelection_000638fae7cc"
+              },
+              "type": "array"
+            },
+            "permitted_revisions": {
+              "description": "permitted revisions; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "populations": {
+              "description": "populations; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/PopulationSelection_4132a93a9ae7"
+              },
+              "type": "array"
+            },
+            "protocol_sha256": {
+              "description": "protocol sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "question": {
+              "description": "question; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "reserve_before_training_load": {
+              "description": "reserve before training load; constructor checks semantics and units.",
+              "type": "boolean"
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "specification_id",
+            "question",
+            "protocol_sha256",
+            "populations",
+            "measurement",
+            "methods",
+            "assessment",
+            "calibration_alpha",
+            "calibration_scope",
+            "calibration_missing_rule",
+            "reserve_before_training_load",
+            "permitted_revisions",
+            "evidence_scope",
+            "calibration_target_view"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MatrixResponseEstimatorSelection_000638fae7cc": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-experiment/estimator-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "estimation_rule": {
+              "description": "estimation rule; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "feature_blocks": {
+              "description": "feature blocks; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "fit_scale": {
+              "description": "fit scale; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "label_transform": {
+              "description": "label transform; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "method_key": {
+              "description": "method key; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "penalize_intercept": {
+              "description": "penalize intercept; constructor checks semantics and units.",
+              "type": "boolean"
+            },
+            "prediction_transform": {
+              "description": "prediction transform; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "ridge_lambda": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ridge lambda; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "method_key",
+            "feature_blocks",
+            "ridge_lambda",
+            "penalize_intercept",
+            "label_transform",
+            "prediction_transform",
+            "fit_scale",
+            "estimation_rule"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MatrixResponseMeasurementSelection_c818def9385b": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-experiment/measurement-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "action_amplitude": {
+              "additionalProperties": false,
+              "description": "action amplitude; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "actions": {
+              "description": "actions; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "aggregation": {
+              "description": "aggregation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "descriptions": {
+              "description": "descriptions; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "estimand": {
+              "description": "estimand; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "feature_cadence_ticks": {
+              "description": "feature cadence ticks; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "feature_window_ticks": {
+              "description": "feature window ticks; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "fine_timestep": {
+              "additionalProperties": false,
+              "description": "fine timestep; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "horizons": {
+              "description": "horizons; constructor checks semantics and units.",
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "matrix_dimension": {
+              "description": "matrix dimension; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "metric": {
+              "description": "metric; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "numerical_views": {
+              "description": "numerical views; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "origin_tick": {
+              "description": "origin tick; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "panel_roles": {
+              "description": "panel roles; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "primary_description": {
+              "description": "primary description; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "primary_horizon": {
+              "description": "primary horizon; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "primary_timestep": {
+              "additionalProperties": false,
+              "description": "primary timestep; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "pulse_ticks": {
+              "description": "pulse ticks; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "q": {
+              "description": "q; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "receiver_count": {
+              "description": "receiver count; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "target_discrepancy_tolerance": {
+              "additionalProperties": false,
+              "description": "target discrepancy tolerance; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "q",
+            "matrix_dimension",
+            "descriptions",
+            "horizons",
+            "primary_description",
+            "primary_horizon",
+            "origin_tick",
+            "feature_window_ticks",
+            "feature_cadence_ticks",
+            "primary_timestep",
+            "fine_timestep",
+            "actions",
+            "action_amplitude",
+            "pulse_ticks",
+            "panel_roles",
+            "receiver_count",
+            "numerical_views",
+            "target_discrepancy_tolerance",
+            "estimand",
+            "metric",
+            "aggregation"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "PopulationSelection_4132a93a9ae7": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-experiment/population-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "expected_units": {
+              "description": "expected units; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "family_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "family id; constructor checks semantics and units."
+            },
+            "role": {
+              "description": "role; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "selection_id": {
+              "description": "selection id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "source_key": {
+              "description": "source key; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "unit_ids": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "unit ids; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "selection_id",
+            "source_key",
+            "role",
+            "expected_units",
+            "family_id",
+            "unit_ids"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-response-experiment",
+  "$ref": "#/$defs/MatrixResponseErrorSpecification_e1a156e52c10",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Response Experiment",
+  "x-consumer": "matrix-response-experiment",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

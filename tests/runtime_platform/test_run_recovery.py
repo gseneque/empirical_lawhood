@@ -341,3 +341,41 @@ def test_recovery_probes_scale_linearly_and_never_scan_directories(
     assert small.event_probe_count == small.candidate_count + len(base.tasks)
     assert large.event_probe_count == large.candidate_count + len(expanded.tasks)
     assert large.candidate_count == 10 * small.candidate_count
+
+
+def test_recovery_custody_limits_are_explicit_and_preserve_large_attempt_census(tmp_path, protocol_fixture):
+    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits
+
+    # An exposed software plan declares all possible attempts; none is executed.
+    plan = protocol_fixture.execution_plan
+    first, *rest = plan.tasks
+    plan = replace(plan, tasks=(replace(first, maximum_attempts=1001), *rest))
+    plane = _plane(tmp_path)
+    index, store = _recovery(plane, plan)
+    assert max(t.maximum_attempts for t in index.tasks) == 1001
+    store.freeze(index)
+    assert store.read_index(index.index_relative_path, expected_schema=index.SCHEMA) == index
+    for field, ceiling in (("recovery_tasks", 1), ("recovery_candidates", 1),
+                           ("recovery_attempts_per_task", 1000), ("recovery_index_bytes", 1)):
+        finite = ExternalRunRecoveryStore(ExternalArtifactPlane(
+            plane.root, custody_limits=ArtifactCustodyLimits(**{field: ceiling}),
+        ))
+        with pytest.raises(RunRecoveryError, match="allowance"):
+            finite.freeze(index)
+
+
+@pytest.mark.parametrize('damage', ('duplicate', 'unsorted', 'gap'))
+def test_terminal_one_pass_attempt_check_keeps_order_and_ordinal_refusals(damage):
+    from tests.recovery_support import case
+
+    terminal = case.__wrapped__().terminal
+    attempts = terminal.attempts
+    if damage == 'duplicate':
+        attempts = (attempts[0], *attempts)
+    elif damage == 'unsorted':
+        attempts = tuple(reversed(attempts))
+    else:
+        attempts = (replace(attempts[0], ordinal=2), *attempts[1:])
+    with pytest.raises(ValueError, match='sorted and unique|contiguous per task'):
+        replace(terminal, attempts=attempts)

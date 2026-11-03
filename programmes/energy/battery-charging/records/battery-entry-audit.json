@@ -1,0 +1,478 @@
+{
+  "RA5_C": {
+    "available": [
+      "adapters/control/controller_authoring.py::DeliveryControllerAuthor.author",
+      "runtime/controller_compiler.py::ControllerCompiler.compile",
+      "runtime/controller_runtime.py::ControllerRuntime.tick",
+      "runtime/controller_runtime.py::ControllerRuntime.prepare_commitment",
+      "runtime/controller_runtime.py::NativeDeliveryPort.deliver"
+    ],
+    "closure": "NOT_ESTABLISHED_BY_AUDIT; domain owner binding and ACT/HOLD/NONATTEMPT plus stale/wrong-delivery acceptance remain necessary after valid science entry.",
+    "missing": "No selected battery native ObserverPort/online gate/delivery provider composition, actual charging finite law/admission/reachability operands or native measured-HOLD evidence found. Open-campaign metadata naming a current controller is not that implementation.",
+    "semantics": "Qualified ACT or independently supported measured HOLD undergo live gate checks and exact requested/accepted/applied/realized occurrence and clock validation. Unsupported/stale/deadline failures yield NONATTEMPT; delivery discrepancy requires recovery/termination and cannot become successful actuation by request alone."
+  },
+  "actual_cost": {
+    "cpu_seconds": null,
+    "environment_syncs": 0,
+    "failed_native_contacts": 0,
+    "historical_cost_carried": "Existing reports retain earlier science costs; audit does not replace or reset them. Host shell/tool inspection and researcher/agent expense were not metered. Unknown is not zero.",
+    "native_contacts": 0,
+    "new_scientific_units": 0,
+    "peak_memory_bytes": null,
+    "setup_repairs": 0,
+    "wall_seconds": null
+  },
+  "audit_date": "2026-10-11",
+  "checks": "Manifest SHA-256 and JSON syntax checked using standard-library reads; no source imports, native builds/runs, test execution or literature acquisition. Coordinator owns documentation validation/integration.",
+  "disposition": "BOUNDED_ENTRY_STOP_MISSING_CONSEQUENTIAL_CONTRACT; not evidence that every permitted thermal/model/uncertainty/preparation investigation fails.",
+  "gates": [
+    {
+      "gate": "D0 consequential exact question",
+      "outcome": "NOT_ESTABLISHED",
+      "reason": "Known history/model/view prediction effects are not an actual charging decision inadequacy; no independently justified service/deadline/risk contract."
+    },
+    {
+      "gate": "D0 explanation pair, distinguishing assessment and choice map",
+      "outcome": "UNFROZEN",
+      "reason": "Model/history/qualification alternatives remain possible, but exact paired question and all terminal decisions absent."
+    },
+    {
+      "gate": "D1 authentic lumped source operands",
+      "outcome": "SOURCE_INSPECTION_CONFIRMED_ONLY",
+      "reason": "Installed compatible Chen2020 data and native source semantics identified; no new runtime/scientific qualification."
+    },
+    {
+      "gate": "D1 ordinary receiver semantics",
+      "outcome": "REQUIRES_EXPLICIT_CORRECTION",
+      "reason": "Native surface output means ambient. Modeled uniform cell-thermometer port is possible with correctly declared scope; distinct physical core/surface inference is unsupported."
+    },
+    {
+      "gate": "D1 exact thermal/preparation contrast",
+      "outcome": "UNSELECTED",
+      "reason": "Source supports historical initial/ambient changes, but none selected and justified for actual charging consequence."
+    },
+    {
+      "gate": "D1 custody/runtime compatibility",
+      "outcome": "PARTIAL_UNVERIFIED",
+      "reason": "Historical directories present; payloads/receipts not reauthenticated. Shipped executable input only isothermal; thermal controller ports absent."
+    },
+    {
+      "gate": "D0/D1 whole inquiry, units and allowances",
+      "outcome": "UNFROZEN",
+      "reason": "Scientific native allocation, independent roster/exposure, capable competitor and alternative, numerical/risk tolerances and repair/use budgets absent; read-only audit cap is not native allocation."
+    },
+    {
+      "gate": "D2-D6 scientific execution",
+      "outcome": "NOT_ENTERED",
+      "reason": "Entry source/value contract incomplete."
+    }
+  ],
+  "historical_evidence": [
+    {
+      "charging_service": "No frozen delivered-charge/deadline/risk decision; no P4/P5 controller claim.",
+      "denominators": 8,
+      "receipts": 3840,
+      "results": "Adjusted order equivalence in 23/24 coordinate-denominator rows; coarse DFN/lumped exception 0.0159889 K not reproduced in refined view. Same-end repetition all 24 rows equivalence. Exact reconstruction conditional, reduced chart inadequate.",
+      "study": "V8B",
+      "units": 24
+    },
+    {
+      "charging_service": "No charging service result.",
+      "continuation_rows": 240,
+      "results": "240/240 lossless R3 target-direct continuations; resolves declared reconstruction issue only.",
+      "study": "V8C",
+      "units": 6
+    },
+    {
+      "adequate": 479,
+      "charging_service": "History matters for prediction, but no measured charge-choice consequence or prospective risk/service threshold.",
+      "complete": 480,
+      "inside_support": 480,
+      "prediction_rows": 480,
+      "results": "One SPMe/lumped/CasADi i-then-t thermal defect 0.005929472639763844 K at 420 s; voltage error 0.00015881707199438821 V. End thermal error ~0.0000351 K. Natural order pair close/diverged 96/96, up to 0.5 K and 0.05437 V; not exact coordinate equality.",
+      "study": "V8D",
+      "units": 12
+    },
+    {
+      "charging_service": "Pedagogical development; no new thermal inquiry or universal observable-only failure.",
+      "results": "Isothermal known full-state procedure supplied to C1; observable-only C2 refused; voltage history/current-proportionality contrasts retained.",
+      "study": "public recursive A/B",
+      "units": 2
+    }
+  ],
+  "inquiry_assessment": {
+    "candidate_pair": "Model inadequacy under thermal/preparation change versus history-local support/qualification inadequacy remains admissible to investigate. No pair is established as a live unresolved charging-service distinction by inspected evidence.",
+    "hidden_core_pair": "Not realizable as separate core/surface states in retained default lumped denominator; reject this candidate explanation only.",
+    "no_manufactured_threshold": true,
+    "oracle_current_status": "Service contract, decision-to-outcome map, capable conventional inquiry, chosen supplier and independent charging evaluator are absent. Native premise check is not entry-ready.",
+    "required_endpoint": "Positive realized net delivered charge by a fixed deadline, voltage and correctly named modeled-temperature envelope over preparation plus later charging use; explicit violation/false-admission criterion. HOLD and conditioning alone do not count as delivered-charge service.",
+    "smallest_next_oracle": "First authenticate already retained signed-current episode arrays and compare absolute charging voltage/temperature and charge against an independently justified service contract, if such a contract exists. Keep all clocks/views nested and include initial-condition/ambient history. No native reacquisition required. Report no consequential inadequacy if common competent control meets service. A new service boundary chosen from the observed discrepancy is not permitted.",
+    "useful_delivery_endpoint": null
+  },
+  "installed_metadata": {
+    "casadi": "3.7.2",
+    "metadata_only": true,
+    "pybamm": "26.6.2.0",
+    "pybammsolvers": "0.8.2",
+    "python": "3.11.14 (pyvenv.cfg, not executed native runtime)"
+  },
+  "next_action": "Close this D0/D1 attempt with retained source/value findings. An eligible continuation requires an actual independently justified charging-service question and exact supported receiver/contrast, plus source/custody, comparison, independent evaluation and native allowance gates. No automatic new family, sensor/model tier, historical rerun or repair.",
+  "payload_custody": {
+    "historical_roots_present": [
+      "/media/chevre/SEMIOS/icf-yolo/runs/ose-v8b-pybamm-electrothermal-hierarchy-v1",
+      "/media/chevre/SEMIOS/icf-yolo/runs/ose-v8c-pybamm-exact-restart-qualification-v1",
+      "/media/chevre/SEMIOS/icf-yolo/runs/ose-v8d-pybamm-reduced-coordinate-sufficiency-v1"
+    ],
+    "verification": "Directory presence only; no scientific payload member census, digest, authority or replay completeness reauthenticated."
+  },
+  "record_kind": "bounded-entry-audit-not-scientific-protocol",
+  "resource_cap": {
+    "cpu_seconds": 300,
+    "memory_bytes": 1073741824,
+    "native_contacts": 0,
+    "note": "Coordinator allocation applied to bounded follow-up source audit and its durable output; earlier exploratory read expense not retrospectively reset.",
+    "output_bytes": 5242880,
+    "setup_repairs": 0,
+    "wall_seconds": 600
+  },
+  "scope": {
+    "active": "one thermal/preparation battery inquiry, distinct later charging use, one subsequent reuse test",
+    "excluded": [
+      "native contact",
+      "environment synchronization",
+      "setup repairs",
+      "new thresholds",
+      "literature restart",
+      "aging/plating/lifetime/instrumentation",
+      "expanded comparators/reuse",
+      "plan edits"
+    ]
+  },
+  "source": {
+    "donor_branch": "codex/safest-honest-metatheory-route-v1",
+    "donor_head": "70ad6708799f0e8070526ef15c1da4870e080238",
+    "manifest": [
+      {
+        "bytes": 3397,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/AGENTS.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "bb283bf3c55cabc3f04efabf4032ad856c91d5081e1c07761943111201508283"
+      },
+      {
+        "bytes": 20264,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/README.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "e8e6623bc2184eab3f8f45027c03c25ae26d44ace5c07ccc9500b93e49dabf11"
+      },
+      {
+        "bytes": 30220,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/experiments/README.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "5deb607c90342f366b44196695ca712bcf94a47932221862b6c09582a3c59776"
+      },
+      {
+        "bytes": 19768,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/docs/applied-el-handoff.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "510eb1e422fceec01e269cc21f45916e26cdaf7a1b191b54c8ad1904f8e65589"
+      },
+      {
+        "bytes": 127137,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/ELTOP5.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "5127cca22abebcb53f0f305280ccc1d69d1dd76f36772f87a0a2b878d9f182a3"
+      },
+      {
+        "bytes": 54380,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/RECURARCH.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "cf7d6813c0010ce899707caa9b4e6afea8c4bb036598ca3ebd25a5b36f66e7bf"
+      },
+      {
+        "bytes": 7821,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/docs/recursive-inquiry-reuse-boundary.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "58f7224893c0529612a276fb885e74fee8f49994138d6479ca0b164bedc486f7"
+      },
+      {
+        "bytes": 10920,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/docs/recursive-prerequisite-results.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "6d0ad1459dc397e131bb82a4f8b548abdb3143e17d62a27a0057fee3478351ab"
+      },
+      {
+        "bytes": 9504,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/experiments/battery-response-and-restart/guide.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "5cc404286200d26dd79e149542f164dd624f0c1ea1a5313a4a91b0e31c7acfe2"
+      },
+      {
+        "bytes": 1206,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/experiments/battery-response-and-restart/config.json",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "e67b9c7e6f0d8aa612e5e28f7b0db94fcf1b3025ba33a9e44f4b1daf812bcb95"
+      },
+      {
+        "bytes": 9981,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/experiments/recursive-inquiry/battery-protocol.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "ee41e58c038f34029a1d29073507e196ceb8cbf5853eb2978a02f15a06945ce3"
+      },
+      {
+        "bytes": 45001,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/experiments/recursive-inquiry/battery-wave-a.json",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "c97154850db52e0064c6232e1d148ada70d90ace127990631093e582c25a164f"
+      },
+      {
+        "bytes": 14177,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/simulators/pybamm_development_input.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "f2f86a5c8d9e3846c6696c67a9c41d325465d8a1beca4291ee58e40e9aa8d42d"
+      },
+      {
+        "bytes": 137714,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/simulators/pybamm_electrothermal_hierarchy.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "5d8ede26199ee0989e9d0affa77e6bf4d78cb9027c3e51f499e72f504cf29ffe"
+      },
+      {
+        "bytes": 131684,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/simulators/pybamm_exact_restart.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "fcb33b3ad7e98fd55d7916a62187b17be8c678c46f4e069a12900acc55bbe0d7"
+      },
+      {
+        "bytes": 75296,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/simulators/pybamm_reduced_coordinate_sufficiency.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "882c75f39bd4e9569721216a6c287ab8f193fb94fc0b10ccaba7fecaa7b1b210"
+      },
+      {
+        "bytes": 18625,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/battery_recursive_construction/contracts.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "b0e8b627bd0ae65a8db11f4ec0f596cc3729395a7c546d385ecc8d76003cd5b8"
+      },
+      {
+        "bytes": 30242,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/battery_recursive_construction/science.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "3233867418a1fedfae5a3ef55ae498269a89156e4f428fef0209036343cc750a"
+      },
+      {
+        "bytes": 18718,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/battery_recursive_construction/executable_binding.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "fc8a82897bc18da952af35b7de87f8f195f7997af883f6a44a4cc3b44cb20637"
+      },
+      {
+        "bytes": 25409,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/battery_recursive_construction/examples.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "ed9fd3b3fbde232b26613c8e07c1b5b4ddff29f2ded2342cf0d58bb1f3f0ac0a"
+      },
+      {
+        "bytes": 9240,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/control/controller_authoring.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "ba860f2f65fd23e0d379136057e27d469fc55806c041219052c8f939809d677a"
+      },
+      {
+        "bytes": 132218,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/runtime/controller_compiler.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "9dac7485e5e72d59c6c5c59222f8971ae740c78b6ceb365e348c43f58bad968c"
+      },
+      {
+        "bytes": 98225,
+        "owner": "target",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/runtime/controller_runtime.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "69582fd2c5407b1e258e025c83c7333e0167475fdad5747ea6003d96a86ec636"
+      },
+      {
+        "bytes": 12508,
+        "owner": "installed",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm/input/parameters/lithium_ion/Chen2020.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "7c360a546a76492585e147231caee2f8f4fe29222b893cb12091dc4d158f62f0"
+      },
+      {
+        "bytes": 30427,
+        "owner": "installed",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm/input/parameters/lithium_ion/ORegan2022.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "c0c8111cb37fd4e79726f17e0d02f0aaac6d06532060a677efb5743c92a0b259"
+      },
+      {
+        "bytes": 81601,
+        "owner": "installed",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm/models/full_battery_models/base_battery_model.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "5391e6db1e13fac3746f5317c27830df2d4cb3bf96295161c22ca439ba3777ec"
+      },
+      {
+        "bytes": 3818,
+        "owner": "installed",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm/models/submodels/thermal/lumped.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "f4c03e752281b8089a1b98fbb8e4a09670f618b24ce2317a1dcb99dcb3422609"
+      },
+      {
+        "bytes": 23868,
+        "owner": "installed",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm/models/submodels/thermal/base_thermal.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "4e66ef69411b6233a456d43c134abca30b321ef290806c193ddad0a1c07b825d"
+      },
+      {
+        "bytes": 932,
+        "owner": "installed",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm/models/submodels/thermal/surface/ambient.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "b3b5c42e8065d97e9c525fcfc025c8f68309f8931f963ebed54b43323a5d1f11"
+      },
+      {
+        "bytes": 1670,
+        "owner": "installed",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm/models/submodels/thermal/surface/lumped.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "956f6cda5f3402eccf8ad6bb1d91326824190732525e8446e8de1d88b8c0d685"
+      },
+      {
+        "bytes": 7070,
+        "owner": "installed",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm/parameters/thermal_parameters.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "605ea7d30bfe10ea5418d4fe3a2ce4705782fc6e631c01e436d031c8ba02083a"
+      },
+      {
+        "bytes": 14255,
+        "owner": "installed",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm-26.6.2.0.dist-info/METADATA",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "5ba0019af3fba95a8f35d6cdf0818c853545c3436f0322754ea6607b0877515b"
+      },
+      {
+        "bytes": 2168,
+        "owner": "installed",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/casadi-3.7.2.dist-info/METADATA",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "1c63a61afb51c005adc81b046fdae038a107d8cf50941d51e31b1b7c06a801a3"
+      },
+      {
+        "bytes": 3611,
+        "owner": "installed",
+        "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybammsolvers-0.8.2.dist-info/METADATA",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "a3f59d73b06818fd5d9ba6cf14c452e245954ce4a6a044d17588d9d7ef47dedf"
+      },
+      {
+        "bytes": 124936,
+        "owner": "donor",
+        "path": "/home/chevre/gs-ml/icf-yolo/src/icf_yolo/adapters/simulators/pybamm_electrothermal_hierarchy_v8b.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "419753be2d833abef845cdfacbfe98bdb882632f3d4757db054899c8a313ac77"
+      },
+      {
+        "bytes": 120335,
+        "owner": "donor",
+        "path": "/home/chevre/gs-ml/icf-yolo/src/icf_yolo/adapters/simulators/pybamm_exact_restart_v8c.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "f410d07cf1f6cc7afb3d18da5690f37b976d001c73ae0c78a2bfe7156090206f"
+      },
+      {
+        "bytes": 67316,
+        "owner": "donor",
+        "path": "/home/chevre/gs-ml/icf-yolo/src/icf_yolo/adapters/simulators/pybamm_reduced_coordinate_sufficiency_v8d.py",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "93aff74eef2ad85510e34bc21efcc4c2798d336c8133c58fda1ae9e6dbc2c303"
+      },
+      {
+        "bytes": 26826,
+        "owner": "donor",
+        "path": "/home/chevre/gs-ml/icf-yolo/docs/results/pybamm-electrothermal-hierarchy-successor-v8b-closeout-v1.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "3e4e8534fe38a491afb63407fd55451a1e8021bfdbe98f77902f1217ce38b647"
+      },
+      {
+        "bytes": 25084,
+        "owner": "donor",
+        "path": "/home/chevre/gs-ml/icf-yolo/docs/results/pybamm-exact-restart-reconstruction-qualification-successor-v8c-closeout-v1.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "5a8bd3238b6c58b59c967ebdff7029997ab5cf46121d0ce0dba35320c92cce07"
+      },
+      {
+        "bytes": 23185,
+        "owner": "donor",
+        "path": "/home/chevre/gs-ml/icf-yolo/docs/results/pybamm-reduced-coordinate-sufficiency-successor-v8d-closeout-v1.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "26c39acd0b0b49992e32c61b57998322389fa410d38bf215353abc0f6f203226"
+      },
+      {
+        "bytes": 104999,
+        "owner": "donor",
+        "path": "/home/chevre/gs-ml/icf-yolo/docs/plans/pybamm-rc-reusable-capability-v1.md",
+        "role": "inspected source or retained documentary evidence; no newly qualified result",
+        "sha256": "338d3556c02b16b3485d527f63863bd11a22317f81668bf7ca417c6df561991f"
+      }
+    ],
+    "target_branch": "recchain",
+    "target_head": "9a4c29cb017cae6338dcf7c422f202062bc2a8cd",
+    "working_tree_warning": "Plans/handoff are pre-existing untracked inputs; donor plan is also untracked. HEAD alone does not identify inspected bytes; manifest hashes bind working-tree files."
+  },
+  "thermal_source": {
+    "authentic_entered_models": [
+      "SPMe/lumped/Chen2020/pouch",
+      "DFN/lumped/Chen2020/pouch"
+    ],
+    "cell_volume_m3": "0.0000242",
+    "cooling_surface_area_m2": "0.00531",
+    "deployable_receiver_ceiling": "Existing modeled volume-mean cell temperature can support a explicitly declared simulated thermometer port; it does not supply physical surface metrology. Correct receiver meaning and fair competitor access must be frozen before use.",
+    "h_total_W_per_m2_K": "10.0",
+    "heat_capacity": "Layer-thickness weighted volumetric rho*c_p from authentic Chen2020 electrode/separator/current-collector entries; optional Cell heat capacity parameter is not needed with false default.",
+    "heat_transfer_variants": "Existing action words support ambient +0.5 K and initial-temperature preparation strata. No empirical thermal-contact coefficient distribution or aging mechanism is supplied.",
+    "installed_defaults": {
+      "contact resistance": "false",
+      "surface temperature": "ambient",
+      "use lumped thermal capacity": "false"
+    },
+    "native_initial_temperature_K": "298.15",
+    "nominal_capacity_Ah": "5.0",
+    "selected_historical_initial_temperature_range_K": [
+      "291.15",
+      "297.15"
+    ],
+    "surface_receiver": "Surface temperature [K] equals Ambient temperature [K] in default surface submodel; not independent measured cell-surface temperature. Lumped cell temperature is one spatially broadcast volume-mean state.",
+    "two_temperature_option": "Installed surface=lumped adds Casing heat capacity [J.K-1] and Environment thermal resistance [K.W-1]; neither is present in Chen2020 or inspected ORegan2022. No justified values added.",
+    "voltage_cutoffs_V": [
+      "2.5",
+      "4.2"
+    ],
+    "x_full": "Excluded: missing current-collector surface heat-transfer parameter."
+  },
+  "version": "1.0.0"
+}

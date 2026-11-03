@@ -128,7 +128,7 @@ def test_profile_unavailability_is_diagnosed_without_initialization(
 
 
 def test_profile_containment_is_checked_before_mount_inspection(tmp_path: Path) -> None:
-    profile = replace(_profile(tmp_path), required_mount_path=str(tmp_path))
+    profile = replace(_profile(tmp_path / 'project'), required_mount_path=str(tmp_path))
     result = _invoke(tmp_path, profile.canonical_bytes())
     assert result.exit_code == 2
     assert "forbidden local root" in result.output

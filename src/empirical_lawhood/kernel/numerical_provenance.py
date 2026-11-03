@@ -22,7 +22,7 @@ class NumericalProducingProvenance(CanonicalRecord):
     def __post_init__(self):
         validate_sha256(self.dependency_lock_sha256)
         validate_sha256(self.code_sources_sha256)
-        if (not 0 < len(self.package_sources) <= 8192
+        if (not self.package_sources
             or self.package_sources != tuple(sorted(set(self.package_sources)))
             or len({name for name, _ in self.package_sources}) != len(self.package_sources)
             or sha256(canonical_json_bytes(self.package_sources)).hexdigest() != self.code_sources_sha256

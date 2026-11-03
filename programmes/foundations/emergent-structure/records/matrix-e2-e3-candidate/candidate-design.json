@@ -1,0 +1,728 @@
+{
+  "format": "empirical-lawhood/development-decision-design/v1",
+  "decision_id": "matrix.e2-e3.deanneal.continuous-error.decision01",
+  "kind": "REVIEWABLE_SCIENTIFIC_CANDIDATE_DESIGN_NOT_ISSUABLE_CANONICAL_RECORD",
+  "producing_implementation_commit": "7ef80a5d50da4aee2cdee050751a61495846647c",
+  "claim": "Origin-only prediction opportunity for finite-dt FACTOR response error in nominal de-anneal; no confirmed useful-response, continuum, schedule-causality or algebra-specific-superiority claim.",
+  "standing": "EXPOSED_DEV_SELECTED_SUCCESSOR_UNENTERED",
+  "population": {
+    "family_id": "matrix-history.joint-decreasing-coupling",
+    "original_stratum_id": "cc1.history.de-anneal",
+    "selection": "All64 original de-anneal roots are disclosed development. Fresh nominal CAL64 and CONF64 assigned before outcomes, no success replacement. No four-family finite-only conditioning.",
+    "development_root_ids": [
+      "history.cc1-grr-c2.h064",
+      "history.cc1-grr-c2.h065",
+      "history.cc1-grr-c2.h066",
+      "history.cc1-grr-c2.h067",
+      "history.cc1-grr-c2.h068",
+      "history.cc1-grr-c2.h069",
+      "history.cc1-grr-c2.h070",
+      "history.cc1-grr-c2.h071",
+      "history.cc1-grr-c2.h072",
+      "history.cc1-grr-c2.h073",
+      "history.cc1-grr-c2.h074",
+      "history.cc1-grr-c2.h075",
+      "history.cc1-grr-c2.h076",
+      "history.cc1-grr-c2.h077",
+      "history.cc1-grr-c2.h078",
+      "history.cc1-grr-c2.h079",
+      "history.cc1-grr-c2.h080",
+      "history.cc1-grr-c2.h081",
+      "history.cc1-grr-c2.h082",
+      "history.cc1-grr-c2.h083",
+      "history.cc1-grr-c2.h084",
+      "history.cc1-grr-c2.h085",
+      "history.cc1-grr-c2.h086",
+      "history.cc1-grr-c2.h087",
+      "history.cc1-grr-c2.h088",
+      "history.cc1-grr-c2.h089",
+      "history.cc1-grr-c2.h090",
+      "history.cc1-grr-c2.h091",
+      "history.cc1-grr-c2.h092",
+      "history.cc1-grr-c2.h093",
+      "history.cc1-grr-c2.h094",
+      "history.cc1-grr-c2.h095",
+      "history.cc1-grr-c2.h096",
+      "history.cc1-grr-c2.h097",
+      "history.cc1-grr-c2.h098",
+      "history.cc1-grr-c2.h099",
+      "history.cc1-grr-c2.h100",
+      "history.cc1-grr-c2.h101",
+      "history.cc1-grr-c2.h102",
+      "history.cc1-grr-c2.h103",
+      "history.cc1-grr-c2.h104",
+      "history.cc1-grr-c2.h105",
+      "history.cc1-grr-c2.h106",
+      "history.cc1-grr-c2.h107",
+      "history.cc1-grr-c2.h108",
+      "history.cc1-grr-c2.h109",
+      "history.cc1-grr-c2.h110",
+      "history.cc1-grr-c2.h111",
+      "history.cc1-grr-c2.h112",
+      "history.cc1-grr-c2.h113",
+      "history.cc1-grr-c2.h114",
+      "history.cc1-grr-c2.h115",
+      "history.cc1-grr-c2.h116",
+      "history.cc1-grr-c2.h117",
+      "history.cc1-grr-c2.h118",
+      "history.cc1-grr-c2.h119",
+      "history.cc1-grr-c2.h120",
+      "history.cc1-grr-c2.h121",
+      "history.cc1-grr-c2.h122",
+      "history.cc1-grr-c2.h123",
+      "history.cc1-grr-c2.h124",
+      "history.cc1-grr-c2.h125",
+      "history.cc1-grr-c2.h126",
+      "history.cc1-grr-c2.h127"
+    ],
+    "development_independent_groups": [
+      "unit.cc1-grr-c2.h064",
+      "unit.cc1-grr-c2.h065",
+      "unit.cc1-grr-c2.h066",
+      "unit.cc1-grr-c2.h067",
+      "unit.cc1-grr-c2.h068",
+      "unit.cc1-grr-c2.h069",
+      "unit.cc1-grr-c2.h070",
+      "unit.cc1-grr-c2.h071",
+      "unit.cc1-grr-c2.h072",
+      "unit.cc1-grr-c2.h073",
+      "unit.cc1-grr-c2.h074",
+      "unit.cc1-grr-c2.h075",
+      "unit.cc1-grr-c2.h076",
+      "unit.cc1-grr-c2.h077",
+      "unit.cc1-grr-c2.h078",
+      "unit.cc1-grr-c2.h079",
+      "unit.cc1-grr-c2.h080",
+      "unit.cc1-grr-c2.h081",
+      "unit.cc1-grr-c2.h082",
+      "unit.cc1-grr-c2.h083",
+      "unit.cc1-grr-c2.h084",
+      "unit.cc1-grr-c2.h085",
+      "unit.cc1-grr-c2.h086",
+      "unit.cc1-grr-c2.h087",
+      "unit.cc1-grr-c2.h088",
+      "unit.cc1-grr-c2.h089",
+      "unit.cc1-grr-c2.h090",
+      "unit.cc1-grr-c2.h091",
+      "unit.cc1-grr-c2.h092",
+      "unit.cc1-grr-c2.h093",
+      "unit.cc1-grr-c2.h094",
+      "unit.cc1-grr-c2.h095",
+      "unit.cc1-grr-c2.h096",
+      "unit.cc1-grr-c2.h097",
+      "unit.cc1-grr-c2.h098",
+      "unit.cc1-grr-c2.h099",
+      "unit.cc1-grr-c2.h100",
+      "unit.cc1-grr-c2.h101",
+      "unit.cc1-grr-c2.h102",
+      "unit.cc1-grr-c2.h103",
+      "unit.cc1-grr-c2.h104",
+      "unit.cc1-grr-c2.h105",
+      "unit.cc1-grr-c2.h106",
+      "unit.cc1-grr-c2.h107",
+      "unit.cc1-grr-c2.h108",
+      "unit.cc1-grr-c2.h109",
+      "unit.cc1-grr-c2.h110",
+      "unit.cc1-grr-c2.h111",
+      "unit.cc1-grr-c2.h112",
+      "unit.cc1-grr-c2.h113",
+      "unit.cc1-grr-c2.h114",
+      "unit.cc1-grr-c2.h115",
+      "unit.cc1-grr-c2.h116",
+      "unit.cc1-grr-c2.h117",
+      "unit.cc1-grr-c2.h118",
+      "unit.cc1-grr-c2.h119",
+      "unit.cc1-grr-c2.h120",
+      "unit.cc1-grr-c2.h121",
+      "unit.cc1-grr-c2.h122",
+      "unit.cc1-grr-c2.h123",
+      "unit.cc1-grr-c2.h124",
+      "unit.cc1-grr-c2.h125",
+      "unit.cc1-grr-c2.h126",
+      "unit.cc1-grr-c2.h127"
+    ],
+    "calibration_independent_groups": 64,
+    "confirmation_independent_groups": 64,
+    "fresh_group_and_stream_assignment": null,
+    "origin": "At tick256 (physical time0.256), admit only the frozen pre-future factor/frame rule. Later-origin substitution prohibited; no-origin/unavailable/UNKNOWN retained with their tags and full assigned denominator.",
+    "sampling_warrant": "MISSING_ACTUAL_FIXED_MAP_IID_SOURCE_ASSESSMENT",
+    "nominal_coordinate": {
+      "path": "/tmp/el-matrix-continuation-20261014/e2-e3-candidate01/matrix.e3.deanneal.nominal.canonical.json",
+      "schema": "empirical-lawhood/simulators/six-matrix-response/parameter-coordinate",
+      "object_id": "matrix.e3.deanneal.nominal.coordinate",
+      "sha256": "37828bbe1f0e322cabf1fd723f33b80c60c0a3e0cd6409e3f56ff242abe90896",
+      "bytes": 2294,
+      "full_physical_key": [
+        "0.5",
+        "0.5",
+        "1",
+        "PUBLISHED_DETERMINISTIC",
+        "1",
+        "1",
+        "matrix-history.joint-decreasing-coupling",
+        "0.6666666666666666666666666667",
+        "7.333333333333333333333333334",
+        "8",
+        "0.256",
+        "0.768",
+        "matrix-parameter-q2.four-family-initial.v1",
+        "matrix-parameter-q2.four-family-coupling.v1"
+      ]
+    },
+    "recipe_source": {
+      "path": "/media/chevre/SEMIOS/icf-yolo/runs/run.cc1-grr-c2-v2.retained-histories-8/inputs/config.cc1-grr-c2-v2.source.bin",
+      "bytes": 111486,
+      "sha256": "578440388763ed49393666d681460a1804a5f68671d9c112a4e2232323aa7766",
+      "standing": "Original historical bytes copied only as mathematical/numerical selection operands; not future qualification."
+    }
+  },
+  "target": {
+    "primary": [
+      "FACTOR",
+      128
+    ],
+    "secondary_factor_horizons": [
+      16,
+      64
+    ],
+    "auxiliary_complete_outputs": "All5 response descriptions x3 existing horizons=15; endpoints/panels/receivers/views nested in a whole root.",
+    "quantity": "Cumulative odd plus/minus response discrepancy, maximum over position/momentum HS24 receivers, all panels/actions and preceding horizons, divided by original nominal actuator scale.",
+    "metric": "MAX_POSITION_MOMENTUM_HS24_ERROR_OVER_NOMINAL_ACTUATOR_SCALE",
+    "original_mathematical_protocol": {
+      "schema": "empirical-lawhood/matrix-response-frontier/protocol",
+      "value": {
+        "action_scales": [
+          {
+            "schema": "empirical-lawhood/matrix-response-frontier/action-scale",
+            "value": {
+              "amplitude": {
+                "decimal": "0.01"
+              },
+              "force_norm": {
+                "decimal": "1"
+              },
+              "pulse_steps": 16,
+              "role": "COMPLEMENT"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "schema": "empirical-lawhood/matrix-response-frontier/action-scale",
+            "value": {
+              "amplitude": {
+                "decimal": "0.01"
+              },
+              "force_norm": {
+                "decimal": "1"
+              },
+              "pulse_steps": 16,
+              "role": "FACTOR"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "schema": "empirical-lawhood/matrix-response-frontier/action-scale",
+            "value": {
+              "amplitude": {
+                "decimal": "0.01"
+              },
+              "force_norm": {
+                "decimal": "1"
+              },
+              "pulse_steps": 16,
+              "role": "GENERIC"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "schema": "empirical-lawhood/matrix-response-frontier/action-scale",
+            "value": {
+              "amplitude": {
+                "decimal": "0.01"
+              },
+              "force_norm": {
+                "decimal": "1"
+              },
+              "pulse_steps": 16,
+              "role": "TRACE"
+            },
+            "version": "1.0.0"
+          }
+        ],
+        "aggregation": "MAX_ALL_PANELS_ACTIONS_AND_PRECEDING_HORIZONS_PER_WHOLE_ROOT",
+        "estimand": "FINITE_DT_ODD_RESPONSE_HALF_PLUS_MINUS",
+        "factor_rule": {
+          "schema": "empirical-lawhood/kernel/object-identity",
+          "value": {
+            "object_fingerprint": "ccae427c5dba3f391952015799983465a34b91f368203100d40f89749dbefc3e",
+            "object_id": "matrix.factor.lifetime.development.scalar.rule01",
+            "object_schema": "empirical-lawhood/matrix-factor-lifetime/event-spec",
+            "object_version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "factor_rule_compatibilities": [
+          {
+            "schema": "empirical-lawhood/matrix-response-frontier/factor-rule-compatibility",
+            "value": {
+              "compatibility_id": "compatibility.matrix.h000-full-admission01",
+              "original": {
+                "schema": "empirical-lawhood/matrix-factor-lifetime/event-spec",
+                "value": {
+                  "adjacent_angle_maximum_degrees": {
+                    "decimal": "15"
+                  },
+                  "associative_leakage_maximum": {
+                    "decimal": "0.05"
+                  },
+                  "exposure": "EXPOSED_DEVELOPMENT_NONPROMOTABLE",
+                  "factor_fit_angle_maximum_degrees": {
+                    "decimal": "15"
+                  },
+                  "frame_alignment_minimum_overlap": {
+                    "decimal": "0.5"
+                  },
+                  "identifiability_absolute_fourth": {
+                    "decimal": "0.00000000000000000001"
+                  },
+                  "identifiability_relative_gap": {
+                    "decimal": "0.0000000001"
+                  },
+                  "lattice": [
+                    0,
+                    16,
+                    32,
+                    48,
+                    64,
+                    80,
+                    96,
+                    112,
+                    128,
+                    144,
+                    160,
+                    176,
+                    192,
+                    208,
+                    224,
+                    240,
+                    256,
+                    272,
+                    288,
+                    304,
+                    320,
+                    336,
+                    352,
+                    368,
+                    384,
+                    400,
+                    416,
+                    432,
+                    448,
+                    464,
+                    480,
+                    496,
+                    512,
+                    528,
+                    544,
+                    560,
+                    576,
+                    592,
+                    608,
+                    624,
+                    640,
+                    656,
+                    672,
+                    688,
+                    704,
+                    720,
+                    736,
+                    752,
+                    768,
+                    784,
+                    800,
+                    816,
+                    832,
+                    848,
+                    864,
+                    880,
+                    896,
+                    912,
+                    928,
+                    944,
+                    960,
+                    976,
+                    992,
+                    1008,
+                    1024
+                  ],
+                  "lie_leakage_maximum": {
+                    "decimal": "0.05"
+                  },
+                  "origin_angle_maximum_degrees": {
+                    "decimal": "30"
+                  },
+                  "primary_dt": {
+                    "decimal": "0.001"
+                  },
+                  "risk_start_tick": 256,
+                  "scalar_closure": null,
+                  "sectors": [
+                    "X",
+                    "Y"
+                  ],
+                  "spec_id": "matrix.factor.lifetime.development.rule01",
+                  "trailing_persistence_ticks": 32
+                },
+                "version": "1.0.0"
+              },
+              "target": {
+                "schema": "empirical-lawhood/matrix-factor-lifetime/event-spec",
+                "value": {
+                  "adjacent_angle_maximum_degrees": {
+                    "decimal": "15"
+                  },
+                  "associative_leakage_maximum": {
+                    "decimal": "0.05"
+                  },
+                  "exposure": "EXPOSED_DEVELOPMENT_NONPROMOTABLE",
+                  "factor_fit_angle_maximum_degrees": {
+                    "decimal": "15"
+                  },
+                  "frame_alignment_minimum_overlap": {
+                    "decimal": "0.5"
+                  },
+                  "identifiability_absolute_fourth": {
+                    "decimal": "0.00000000000000000001"
+                  },
+                  "identifiability_relative_gap": {
+                    "decimal": "0.0000000001"
+                  },
+                  "lattice": [
+                    0,
+                    16,
+                    32,
+                    48,
+                    64,
+                    80,
+                    96,
+                    112,
+                    128,
+                    144,
+                    160,
+                    176,
+                    192,
+                    208,
+                    224,
+                    240,
+                    256,
+                    272,
+                    288,
+                    304,
+                    320,
+                    336,
+                    352,
+                    368,
+                    384,
+                    400,
+                    416,
+                    432,
+                    448,
+                    464,
+                    480,
+                    496,
+                    512,
+                    528,
+                    544,
+                    560,
+                    576,
+                    592,
+                    608,
+                    624,
+                    640,
+                    656,
+                    672,
+                    688,
+                    704,
+                    720,
+                    736,
+                    752,
+                    768,
+                    784,
+                    800,
+                    816,
+                    832,
+                    848,
+                    864,
+                    880,
+                    896,
+                    912,
+                    928,
+                    944,
+                    960,
+                    976,
+                    992,
+                    1008,
+                    1024
+                  ],
+                  "lie_leakage_maximum": {
+                    "decimal": "0.05"
+                  },
+                  "origin_angle_maximum_degrees": {
+                    "decimal": "30"
+                  },
+                  "primary_dt": {
+                    "decimal": "0.001"
+                  },
+                  "risk_start_tick": 256,
+                  "scalar_closure": {
+                    "schema": "empirical-lawhood/matrix-factor-lifetime/scalar-closure-spec",
+                    "value": {
+                      "normalization_owner": {
+                        "schema": "empirical-lawhood/kernel/artifact-identity",
+                        "value": {
+                          "artifact_id": "matrix.scalar.closure.normalization-owner01",
+                          "extensions": [],
+                          "media_type": "text/x-python",
+                          "payload_schema": "empirical-lawhood/source/checksummed-uninterpreted-public-bytes",
+                          "role": "native-normalization-source",
+                          "sha256": "701d7c5a1157d5d4f29c2a4cc82630e7fff70dc5ade042339009d92934fc31c9",
+                          "size_bytes": 20101
+                        },
+                        "version": "1.0.0"
+                      },
+                      "spec_id": "matrix.scalar.closure.original-0p30.01",
+                      "threshold": {
+                        "decimal": "0.3"
+                      }
+                    },
+                    "version": "1.0.0"
+                  },
+                  "sectors": [
+                    "X",
+                    "Y"
+                  ],
+                  "spec_id": "matrix.factor.lifetime.development.scalar.rule01",
+                  "trailing_persistence_ticks": 32
+                },
+                "version": "1.0.0"
+              }
+            },
+            "version": "1.0.0"
+          }
+        ],
+        "horizon_steps": [
+          16,
+          64,
+          128
+        ],
+        "inference": "EXPOSED_DEVELOPMENT_FRONTIER_NO_ADMISSION_OR_QUALIFICATION",
+        "metric": "MAX_POSITION_MOMENTUM_HS24_ERROR_OVER_NOMINAL_ACTUATOR_SCALE",
+        "panel_roles": [
+          "COMMON_NOISE_PANEL",
+          "INDEPENDENT_FUTURE"
+        ],
+        "primary_timestep": {
+          "decimal": "0.001"
+        },
+        "protocol_id": "protocol.matrix.population-response-frontier01",
+        "receiver_gram_tolerance": {
+          "decimal": "0.000000000001"
+        }
+      },
+      "version": "1.0.0"
+    },
+    "original_protocol_standing": "EXPOSED mathematical operand reused only; no original qualification promoted.",
+    "receiver": "48 origin-fixed PRIMARY receiver coordinates (24 position and24 momentum); no future frame alignment.",
+    "lifetime_secondary": {
+      "normalized_adequacy_tolerance": "0.01",
+      "reporting_horizons": [
+        16,
+        64,
+        128
+      ],
+      "rule": "First definite failure on unchanged lattice, retain last definite pass, censoring and unresolved intervals.",
+      "observed_development": "All64 FACTOR and FULL_COUPLED lastpass16/firstfailure64; nontrivial within-family lifetime prediction stopped as uninformative."
+    }
+  },
+  "prediction": {
+    "candidate_method": "SPECTRAL",
+    "candidate_features": "CONTEXT10 + SPECTRAL3 installed fixed feature mask",
+    "strong_conventional_baseline": "ALL_ORIGIN21 fixed ridge, with the same available pre-cutoff observation channels.",
+    "opportunity_baseline": "TRAIN-only per-endpoint median of raw normalized error (even-n median arithmetic midpoint), fit after genuine reservation; transform with log1p only for uniform forecast representation.",
+    "feature_window_ticks": 32,
+    "feature_cadence_ticks": 16,
+    "label_transform": "log1p(E), all15 outputs",
+    "algorithm": "TRAIN-only means/scales; constant columns scale1/mask; intercept unpenalized; ridge lambda1 fixed; no hyperparameter/model search. Clip log predictions at0 then per-description cumulative max on the unchanged horizon lattice; compare expm1 predictions in original normalized units.",
+    "training_population": "Entire64 exposed de-anneal development roots under a new successor role specification; original256 and their existing32/16/16 roles are unchanged.",
+    "causal_delivery": "Feature/model/calibration only to forecaster; future raw arrays and labels only to evaluator; exact source, frame, clock and cutoff joins; forecast seal before continuation.",
+    "fit_executed": false,
+    "current_codec_limit": "Existing MatrixResponseErrorPredictionSpec fixes original256 population/roles; this narrow design is not falsely instantiated under that schema. Implement only when the selected scientific entry is eligible.",
+    "paired_view_forecast": "ONE immutable forecast from the original PRIMARY causal frame, compared with BOTH view labels; no view-specific refit or future-feature access."
+  },
+  "primary_criterion": {
+    "root_loss": "Absolute FACTOR E128 forecast error in original actuator-normalized units.",
+    "meaningful_paired_improvement": "0.0002",
+    "choice_rationale": "A pre-fit research precision choice equal to2percent of the preserved0.01 adequacy threshold; tests small but resolved predictive opportunity, not application usefulness. Not fitted to an observed forecast distribution.",
+    "success": "One whole assigned CONF root succeeds only if usable/qualified, and its candidate absolute forecast loss improves by STRICTLY MORE than0.0002 versus EACH fixed baseline at BOTH PRIMARY and FINE views. Ties, refusal, no-origin, missing, numerical failure and UNKNOWN count as nonsuccess, with original labels preserved.",
+    "null": "Probability of this whole-root success is at most1/2 under the genuinely assessed fixed-map IID sampling contract.",
+    "test": "One-sided exact binomial, n64, full denominator, no reruns or replacement.",
+    "alpha_rational": "1/240",
+    "minimum_successes": 43,
+    "tail_at_43_rational": "75141910203168229/18446744073709551616",
+    "admissible_fixed_roster_requirement": {
+      "minimum": 58,
+      "denominator": 64,
+      "interpretation": "Operational research service requirement, NOT population usability>=90percent confidence claim."
+    },
+    "supplementary": "Complete tagged distributions, mean/median paired loss, both individual baseline contrasts, native-response adequacy and lifetime, FULL_COUPLED and weaker response comparisons; no extra formal primary claims.",
+    "formal_family": "Preserve12 planned programme comparison slots; this one E3 claim uses conservative0.05/12. No redistribution of unused slots."
+  },
+  "numerical": {
+    "estimand": "Explicit finite-dt empirical quantity; paired-view stability is not a rigorous error enclosure or continuum convergence.",
+    "primary_dt": "0.001",
+    "fine_dt": "0.0005",
+    "horizon_physical_times": [
+      "0.016",
+      "0.064",
+      "0.128"
+    ],
+    "observed_target_primary_fine_difference_gate": "0.0001",
+    "gate_scope": "Absolute actuator-normalized target discrepancy at each of3 fixed horizons, on each selected root; original independent equation/OU/clock/array/native and factor-feature numerical gates also required. All48 receiver/15 target records retained. No raw receiver-unit1e-6 tolerance relabeled as normalized uncertainty.",
+    "choice_rationale": "Target stability budget is half the paired forecast-loss improvement margin; both-view primary criterion additionally prevents a view-specific advantage. Report differences, never claim certified intervals.",
+    "current_support": "No de-anneal fine response pair;0/64. Supplied h000+h001 pairs both co-anneal;176 other measured roots without supplied pair. Both original full192 assessments retain72/72 VIOLATED at1e-6.",
+    "next_selected_operation": "Retained h064 de-anneal paired refinement; must authenticate actual chunked source and native custody without schema or task-namespace relabeling.",
+    "entry": "UNENTERED_CURRENT_CHUNKED_CUSTODY_NOT_ACCEPTED_BY_LEGACY_REFINEMENT"
+  },
+  "calibration": {
+    "independent_groups": 64,
+    "score": "One max positive log1p residual across ALL15 outputs per whole root; missing/nonuse score infinity.",
+    "alpha": "0.05",
+    "rank": 62,
+    "purpose": "Upper prediction error bound construction; qualification/reveal separate from prediction usefulness.",
+    "width_and_coverage": "Report empirical coverage and original-unit slack expm1(point+radius)-expm1(point); no log radius relabeled as normalized width and no population coverage claim absent sampling/source warrant.",
+    "state": "UNENTERED",
+    "interpretation": "Under genuine exchangeability rank62/64 yields62/65 nominal marginal coverage for one fresh whole root across15 outputs, not joint coverage of64 queries or transfer. >=3 infinite CAL scores makes rank62 infinite; retain all scores."
+  },
+  "E6_reservation_intent": {
+    "status": "DESIGN_FROZEN_ACTUAL_RESERVATION_MISSING",
+    "required_before_fitting": true,
+    "family_id": "matrix-history.joint-decreasing-coupling",
+    "regimes": [
+      {
+        "name": "nearby",
+        "temperature": "1.25",
+        "friction": "1",
+        "cross_coupling": "1",
+        "whole_groups": 64
+      },
+      {
+        "name": "shifted",
+        "temperature": "3",
+        "friction": "1",
+        "cross_coupling": "1",
+        "whole_groups": 64
+      }
+    ],
+    "shared_recipe": "Same full nominal E3 de-anneal physical recipe, cutoffs, receiver/action menu, clocks and source conventions, changing only bath temperature.",
+    "source_purposes": [
+      "autonomous-coarse-driver",
+      "autonomous-fine-bridge",
+      "preparation-coarse-driver",
+      "preparation-fine-bridge"
+    ],
+    "group_and_effective_seed_assignments": null,
+    "prior_proposals": "Earlier co-anneal T1.25/T3 design remains unreserved and unchanged; old T2/friction0.5/cross2 collides E4. This is a new de-anneal exclusion intent.",
+    "exclusions": "Exclude BOTH complete de-anneal physical keys and every assigned whole group/purpose/effective stream from E2/E3/E4/E5 TRAIN/CAL/CONF. Reconcile complete known exposure and all nine E4 coordinates, not just temperatures.",
+    "publication_needed": "Actual validated ScheduledAllocation with genuine complete ScheduledExposure and untouched whole-group/4purpose assignments, original OUTCOME_BLIND PROSPECTIVE allocation ArtifactWriteResult, then ScheduledReservation and its actual publication; no synthetic signer or merely copied checksum.",
+    "fit_gate": "CLOSED until actual reservation + eligible source/role publications authenticate before loading training inputs.",
+    "typed_coordinates": [
+      {
+        "path": "/tmp/el-matrix-continuation-20261014/e2-e3-candidate01/matrix.e3.deanneal.e6-nearby.canonical.json",
+        "schema": "empirical-lawhood/simulators/six-matrix-response/parameter-coordinate",
+        "object_id": "matrix.e3.deanneal.e6-nearby.coordinate",
+        "sha256": "e2d8fc7329fbf15a25551935f1825b1f95d833821dc387686fed340a13130284",
+        "bytes": 2310,
+        "full_physical_key": [
+          "0.5",
+          "0.5",
+          "1",
+          "PUBLISHED_DETERMINISTIC",
+          "1",
+          "1.25",
+          "matrix-history.joint-decreasing-coupling",
+          "0.6666666666666666666666666667",
+          "7.333333333333333333333333334",
+          "8",
+          "0.256",
+          "0.768",
+          "matrix-parameter-q2.four-family-initial.v1",
+          "matrix-parameter-q2.four-family-coupling.v1"
+        ]
+      },
+      {
+        "path": "/tmp/el-matrix-continuation-20261014/e2-e3-candidate01/matrix.e3.deanneal.e6-shifted.canonical.json",
+        "schema": "empirical-lawhood/simulators/six-matrix-response/parameter-coordinate",
+        "object_id": "matrix.e3.deanneal.e6-shifted.coordinate",
+        "sha256": "0089de88fc87b3b556bfb83b806f902f9e9a08b0c3342b66470f04d67df5e80d",
+        "bytes": 2309,
+        "full_physical_key": [
+          "0.5",
+          "0.5",
+          "1",
+          "PUBLISHED_DETERMINISTIC",
+          "1",
+          "3",
+          "matrix-history.joint-decreasing-coupling",
+          "0.6666666666666666666666666667",
+          "7.333333333333333333333333334",
+          "8",
+          "0.256",
+          "0.768",
+          "matrix-parameter-q2.four-family-initial.v1",
+          "matrix-parameter-q2.four-family-coupling.v1"
+        ]
+      }
+    ],
+    "selected_E4_literal_check": "Complete typed de-anneal physical keys disjoint from nominal+8 current half/double E4 corners. Global prior/exposure completeness and untouched eligibility remain MISSING.",
+    "native_recipe": "Initial/preparation rule identities matrix-parameter-q2.four-family-initial.v1 and matrix-parameter-q2.four-family-coupling.v1; organised ideal11 de-anneal start8, ramp256, autonomous768, cadence16; exact targetDecimals copied from original111486byte source, not rounded rational replacements."
+  },
+  "decision": {
+    "lifetime": "STOP_UNINFORMATIVE_WITHIN_NOMINAL_DEANNEAL_FIXED_LATTICE",
+    "continuous_error": "REDIRECT_TO_CONCRETE_SUCCESSOR_TARGET;PREDICTABILITY_NOT_ESTABLISHED",
+    "qualified_E3_entry": "STOP_NUMERICAL_SUPPORT_UNESTABLISHED_AND_GENUINE_ENTRY_RECORDS_MISSING",
+    "next_numerical_entry": "UNENTERED_TYPE_CUSTODY_CONTRACT_REFUSAL;NO_FAILED_NATIVE_RESULT_INVENTED",
+    "E6": "DESIGN_ONLY_NOT_RESERVED",
+    "next_action": "Obtain original source/exposure/qualification and human/control/trust records, qualify target/features with a compatible original-custody paired assay, publish genuine E6 reserve, then fit only once under the selected successor."
+  },
+  "preservation": {
+    "original256_statuses": {
+      "measured": 178,
+      "no_origin": 70,
+      "UNKNOWN": 8
+    },
+    "battery": "HOLD",
+    "new_fresh_units": 0,
+    "new_fits": 0,
+    "new_native_contacts": 0,
+    "original_source_sha256": "9cc8cbfd2ce198bbbebdfd1e18b159674acbeb70060b251f9dbdb8d7cdde23fb"
+  },
+  "evidence": {
+    "consumer_source": "/tmp/el-matrix-continuation-20261014/retained-consumer03/custody/assessed/assessment.json",
+    "analysis": {
+      "path": "/tmp/el-matrix-continuation-20261014/e2-e3-continuous-error-audit01/analysis.json",
+      "sha256": "c7f3e6d3a39b6b8c964be7f7c687891b47897c6edc3689e423e15c730b1b2f72"
+    },
+    "numerical_census": {
+      "path": "/tmp/el-matrix-continuation-20261014/e2-e3-continuous-error-audit01/numerical-support-census.json",
+      "sha256": "fdd91ccc45cc1b45b7a4c7a646d215dd92553662291a408c6405336c8a7bfbb0"
+    },
+    "entry_record_manifest": {
+      "path": "/tmp/el-matrix-continuation-20261014/e3-entry-records02/missing-records.json",
+      "sha256": "50a2ad4c1306ed8c97dd6e849a151a21d6aa8ef7381a54abe16224bcffb25d11"
+    },
+    "next_operation_refusal": {
+      "path": "/tmp/el-matrix-continuation-20261014/e3-entry-records02/operation-refusal.json",
+      "sha256": "cf0e59df7e3b787ce600a85ff7f18feb461b43f56d65799713bad8edae5e686a"
+    }
+  }
+}

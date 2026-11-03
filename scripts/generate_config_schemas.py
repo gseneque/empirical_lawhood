@@ -17,6 +17,9 @@ def main() -> None:
     actual = {path.name for path in root.glob("*.json")}
     if arguments.check and actual != set(resources):
         raise SystemExit("configuration schema resource inventory drifted")
+    if not arguments.check:
+        for name in sorted(actual - set(resources)):
+            (root / name).unlink()
     for name, payload in resources.items():
         path = root / name
         if arguments.check:

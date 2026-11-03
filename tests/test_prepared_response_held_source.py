@@ -32,7 +32,7 @@ def _external(name: str) -> Path:
 
 def test_shipped_q_selected_source_keeps_five_parents_and_seventeen_words() -> None:
     config = load_registered_authoring(
-        ROOT / "experiments/prepared-response/prepared-source-qualification-author.json",
+        ROOT / "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-source-qualification-author.json",
         root_schemas={PreparedResponseNativeAuthoringInput.SCHEMA: PreparedResponseNativeAuthoringInput},
         maximum_bytes=16 * 1024,
     )

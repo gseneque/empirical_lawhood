@@ -143,6 +143,62 @@ class RetrospectiveProposerAttestation(HumanProposerAttestation):
 
 
 @dataclass(frozen=True, slots=True)
+class SelectedSourceManifestMember(CanonicalRecord):
+    """One committed executable, resource, script or environment input."""
+
+    SCHEMA: ClassVar[str] = 'empirical-lawhood/planning/selected-source-manifest-member'
+
+    relative_path: str
+    mode: str
+    size_bytes: int
+    sha256: str
+
+    def __post_init__(self) -> None:
+        validate_relative_locator(self.relative_path)
+        validate_sha256(self.sha256)
+        if (self.mode not in ("100644", "100755") or type(self.size_bytes) is not int
+                or self.size_bytes < 0):
+            raise ValueError("selected source member changes its committed regular-file mode or size")
+
+
+@dataclass(frozen=True, slots=True)
+class SelectedSourceManifest(CanonicalRecord):
+    """A closed committed source selection, separate from raw checkout status.
+
+    The source inspector independently derives the complete owning selection.
+    Constructing this record supplies no source authentication or authority.
+    """
+
+    SCHEMA: ClassVar[str] = 'empirical-lawhood/planning/selected-source-manifest'
+
+    manifest_id: str
+    implementation_commit: str
+    implementation_sha256: str
+    source_tree_sha256: str
+    members: tuple[SelectedSourceManifestMember, ...]
+
+    def __post_init__(self) -> None:
+        validate_stable_id(self.manifest_id, field_name="manifest_id")
+        if (type(self.implementation_commit) is not str or len(self.implementation_commit) != 40
+                or any(value not in "0123456789abcdef" for value in self.implementation_commit)):
+            raise ValueError("selected source manifest requires an exact committed Git identity")
+        validate_sha256(self.implementation_sha256)
+        validate_sha256(self.source_tree_sha256)
+        if (type(self.members) is not tuple or not self.members
+                or any(type(member) is not SelectedSourceManifestMember for member in self.members)):
+            raise ValueError("selected source manifest requires its immutable complete member census")
+        for member in self.members:
+            member.__post_init__()
+        paths = tuple(member.relative_path for member in self.members)
+        if paths != tuple(sorted(set(paths))):
+            raise ValueError("selected source manifest aliases or reorders its committed member census")
+
+    @property
+    def identity(self) -> ObjectIdentity:
+        return ObjectIdentity.from_record(self.manifest_id, self)
+
+
+@dataclass(frozen=True, slots=True)
 class ImplementationSourceClosure(CanonicalRecord):
     """Exact implementation closure checked again immediately before issue."""
 
@@ -307,6 +363,8 @@ __all__ = [
     "AccountableHumanIdentity",
     "HumanProposerAttestation",
     "ImplementationSourceClosure",
+    "SelectedSourceManifest",
+    "SelectedSourceManifestMember",
     'StudyAuthorityKind',
     'StudyOperationAuthority',
     "SourceClosureKind",

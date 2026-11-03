@@ -9,7 +9,7 @@ import pytest
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_input import ReactorBatchInput, check_batch_input
 from empirical_lawhood.api.codecs import load_registered_authoring
 
-CONFIG = Path(__file__).parents[1] / "experiments/reactor-response/batch-input.json"
+CONFIG = Path(__file__).parents[1] / "programmes/foundations/measurement-and-response/workflows/reactor-response/batch-input.json"
 PACKAGED = (
     Path(__file__).parents[1] / "src/empirical_lawhood/_vendor/terminal_bench_science"
 )

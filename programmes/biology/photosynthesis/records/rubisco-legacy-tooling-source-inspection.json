@@ -1,0 +1,858 @@
+{
+  "cost": {
+    "cpu_seconds": 0.032224408999999996,
+    "unmeasured_tail": "manifest serialization and process exit; earlier reading/reviewer time unknown",
+    "wall_seconds": 0.05678211594931781
+  },
+  "current_existing_owners": [
+    {
+      "bytes": 7274,
+      "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+      "sha256": "fab894c026900257951f94b1b3d980a3ccae50d3cb9fb73fb63f074142e2001a"
+    },
+    {
+      "bytes": 24483,
+      "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_amber_nonbonded.py",
+      "sha256": "eee75176fa3ccff0a08f00ab17dada8716eb935c7dddd7b9ff4d5123450fb7a0"
+    },
+    {
+      "bytes": 29411,
+      "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_qmmm_reference_topology.py",
+      "sha256": "fd18b723e824cbff00327732f9f9914610671833f06e64f5f2c839b6a094db7e"
+    },
+    {
+      "bytes": 23829,
+      "path": "src/empirical_lawhood/adapters/simulators/rubisco_electronic/rr_qmmm_xtb.py",
+      "sha256": "d2c26705e776304c50b0563754210d6722368896e63a1c2afd504bf24b54b40c"
+    },
+    {
+      "bytes": 143688,
+      "path": "docs/rubisco-inquiry/migration-manifest.json",
+      "sha256": "218cd661e568e5b7e1db7d3f3cefbad9ee76ce0955709513495598651a45e69c"
+    }
+  ],
+  "date": "2026-10-11",
+  "earlier_intake_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+  "git_mutations": 0,
+  "historical_tests_executed": 0,
+  "legacy_files": [
+    {
+      "bytes": 11948,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 60,
+          "kind": "ClassDef",
+          "line": 37,
+          "name": "ReconstructionAuditV1"
+        },
+        {
+          "end_line": 197,
+          "kind": "FunctionDef",
+          "line": 63,
+          "name": "reconstruct_coordinates"
+        },
+        {
+          "end_line": 263,
+          "kind": "FunctionDef",
+          "line": 200,
+          "name": "isolated_kcx_parameters"
+        },
+        {
+          "end_line": 290,
+          "kind": "FunctionDef",
+          "line": 266,
+          "name": "leap_commands"
+        }
+      ],
+      "path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/preparation.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "90f98f2a0888ba30b7d3e9b6510c41f522585ad8e59bcf578fda406560215fa0"
+    },
+    {
+      "bytes": 12863,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 45,
+          "kind": "FunctionDef",
+          "line": 31,
+          "name": "hardware_fingerprint"
+        },
+        {
+          "end_line": 63,
+          "kind": "FunctionDef",
+          "line": 48,
+          "name": "read_regular"
+        },
+        {
+          "end_line": 71,
+          "kind": "FunctionDef",
+          "line": 66,
+          "name": "_sync_directory"
+        },
+        {
+          "end_line": 106,
+          "kind": "FunctionDef",
+          "line": 74,
+          "name": "_immutable_write"
+        },
+        {
+          "end_line": 113,
+          "kind": "ClassDef",
+          "line": 110,
+          "name": "LoadedCheckpoint"
+        },
+        {
+          "end_line": 139,
+          "kind": "FunctionDef",
+          "line": 116,
+          "name": "validate_checkpoint"
+        },
+        {
+          "end_line": 160,
+          "kind": "FunctionDef",
+          "line": 142,
+          "name": "_from_members"
+        },
+        {
+          "end_line": 197,
+          "kind": "FunctionDef",
+          "line": 163,
+          "name": "unpack_checkpoint"
+        },
+        {
+          "end_line": 251,
+          "kind": "ClassDef",
+          "line": 200,
+          "name": "CheckpointStore"
+        },
+        {
+          "end_line": 289,
+          "kind": "FunctionDef",
+          "line": 254,
+          "name": "pack_latest_checkpoint"
+        }
+      ],
+      "path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "bfafd825a58b5ccda6dff141f9bb240ceabb2e6ce03e6f357eec2a584ba408f2"
+    },
+    {
+      "bytes": 38001,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 53,
+          "kind": "ClassDef",
+          "line": 52,
+          "name": "PreparationRefusal"
+        },
+        {
+          "end_line": 57,
+          "kind": "ClassDef",
+          "line": 56,
+          "name": "NativeInterruption"
+        },
+        {
+          "end_line": 63,
+          "kind": "FunctionDef",
+          "line": 60,
+          "name": "decimal"
+        },
+        {
+          "end_line": 79,
+          "kind": "FunctionDef",
+          "line": 66,
+          "name": "pack_prepared"
+        },
+        {
+          "end_line": 114,
+          "kind": "FunctionDef",
+          "line": 82,
+          "name": "unpack_prepared"
+        },
+        {
+          "end_line": 124,
+          "kind": "FunctionDef",
+          "line": 117,
+          "name": "_read"
+        },
+        {
+          "end_line": 169,
+          "kind": "FunctionDef",
+          "line": 127,
+          "name": "prepare_topology"
+        },
+        {
+          "end_line": 252,
+          "kind": "FunctionDef",
+          "line": 172,
+          "name": "_observation_indices"
+        },
+        {
+          "end_line": 286,
+          "kind": "FunctionDef",
+          "line": 255,
+          "name": "_receivers"
+        },
+        {
+          "end_line": 304,
+          "kind": "FunctionDef",
+          "line": 289,
+          "name": "_chirality"
+        },
+        {
+          "end_line": 319,
+          "kind": "FunctionDef",
+          "line": 307,
+          "name": "_checkpoint_input"
+        },
+        {
+          "end_line": 873,
+          "kind": "FunctionDef",
+          "line": 322,
+          "name": "observe"
+        }
+      ],
+      "path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/native.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "808c461ab657e3385e8a72b596bd1f8d9d16e84193ff591c3b7d5df9fe7d1ad5"
+    },
+    {
+      "bytes": 7599,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 27,
+          "kind": "FunctionDef",
+          "line": 24,
+          "name": "_mean"
+        },
+        {
+          "end_line": 31,
+          "kind": "FunctionDef",
+          "line": 30,
+          "name": "_values"
+        },
+        {
+          "end_line": 148,
+          "kind": "FunctionDef",
+          "line": 34,
+          "name": "project"
+        },
+        {
+          "end_line": 200,
+          "kind": "FunctionDef",
+          "line": 151,
+          "name": "evaluate"
+        }
+      ],
+      "path": "src/icf_yolo/adapters/simulators/rubisco_m1_v6/analysis.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "88b2386152540dbc5d7e3c0e6b527b52e12faea6581c6f7f084a99921c00b553"
+    },
+    {
+      "bytes": 11948,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 60,
+          "kind": "ClassDef",
+          "line": 37,
+          "name": "ReconstructionAuditV1"
+        },
+        {
+          "end_line": 197,
+          "kind": "FunctionDef",
+          "line": 63,
+          "name": "reconstruct_coordinates"
+        },
+        {
+          "end_line": 263,
+          "kind": "FunctionDef",
+          "line": 200,
+          "name": "isolated_kcx_parameters"
+        },
+        {
+          "end_line": 290,
+          "kind": "FunctionDef",
+          "line": 266,
+          "name": "leap_commands"
+        }
+      ],
+      "path": "src/icf_yolo/adapters/simulators/rubisco_m1_v6/preparation.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "1dcad5beaae85ae24333ee8f67ade798fbecebbb57f656306671c6e035c596d0"
+    },
+    {
+      "bytes": 4773,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 82,
+          "kind": "FunctionDef",
+          "line": 18,
+          "name": "project"
+        },
+        {
+          "end_line": 121,
+          "kind": "FunctionDef",
+          "line": 85,
+          "name": "evaluate"
+        }
+      ],
+      "path": "src/icf_yolo/adapters/simulators/rubisco_molecular_v1/analysis.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "c554c3f6b788b5de789f567bfc7566d88f706239bb48f0a2b9a1b7dde95f9f97"
+    },
+    {
+      "bytes": 3965,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 44,
+          "kind": "ClassDef",
+          "line": 18,
+          "name": "JointPrecisionRequirements"
+        },
+        {
+          "end_line": 57,
+          "kind": "FunctionDef",
+          "line": 47,
+          "name": "_covariance"
+        },
+        {
+          "end_line": 64,
+          "kind": "FunctionDef",
+          "line": 60,
+          "name": "parent_mutant_log_contrast_covariance"
+        },
+        {
+          "end_line": 71,
+          "kind": "FunctionDef",
+          "line": 67,
+          "name": "specificity_log_variance"
+        },
+        {
+          "end_line": 80,
+          "kind": "FunctionDef",
+          "line": 74,
+          "name": "unknown_correlation_contrast_sd_bounds"
+        },
+        {
+          "end_line": 89,
+          "kind": "FunctionDef",
+          "line": 83,
+          "name": "effective_energy_width_kj_mol"
+        }
+      ],
+      "path": "src/icf_yolo/adapters/methods/rubisco_precision_v1.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "baf906c2a1ae13e8c1b8bc568f19b1b2bc34a3ae53164226b75a13df397e407c"
+    },
+    {
+      "bytes": 14060,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 43,
+          "kind": "FunctionDef",
+          "line": 23,
+          "name": "continuation"
+        },
+        {
+          "end_line": 62,
+          "kind": "FunctionDef",
+          "line": 46,
+          "name": "checkpoint_record"
+        },
+        {
+          "end_line": 78,
+          "kind": "FunctionDef",
+          "line": 65,
+          "name": "test_committed_state_is_atomic_and_immutable"
+        },
+        {
+          "end_line": 95,
+          "kind": "FunctionDef",
+          "line": 81,
+          "name": "test_symlinks_and_unauthenticated_objects_fail_closed"
+        },
+        {
+          "end_line": 118,
+          "kind": "FunctionDef",
+          "line": 98,
+          "name": "test_wrong_protocol_hardware_and_cost_are_rejected"
+        },
+        {
+          "end_line": 193,
+          "kind": "FunctionDef",
+          "line": 122,
+          "name": "synthetic_native"
+        },
+        {
+          "end_line": 209,
+          "kind": "FunctionDef",
+          "line": 196,
+          "name": "execute"
+        },
+        {
+          "end_line": 224,
+          "kind": "FunctionDef",
+          "line": 212,
+          "name": "numerical_case"
+        },
+        {
+          "end_line": 269,
+          "kind": "FunctionDef",
+          "line": 228,
+          "name": "test_interrupted_observe_resumes_exact_next_operation"
+        },
+        {
+          "end_line": 299,
+          "kind": "FunctionDef",
+          "line": 272,
+          "name": "test_failed_case_is_never_retried"
+        },
+        {
+          "end_line": 315,
+          "kind": "FunctionDef",
+          "line": 302,
+          "name": "test_minimizer_interruption_does_not_mark_stage_complete"
+        },
+        {
+          "end_line": 356,
+          "kind": "FunctionDef",
+          "line": 318,
+          "name": "test_scheduler_second_attempt_restores_same_issued_config"
+        },
+        {
+          "end_line": 374,
+          "kind": "FunctionDef",
+          "line": 359,
+          "name": "test_second_attempt_without_checkpoint_never_restarts"
+        }
+      ],
+      "path": "tests/adapters/test_rubisco_m1_checkpoints_v5.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "568662fa5523f835717cb5ab8666091181a25c052f664e0dfbca30626f50437c"
+    },
+    {
+      "bytes": 21129,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 35,
+          "kind": "FunctionDef",
+          "line": 34,
+          "name": "identity"
+        },
+        {
+          "end_line": 50,
+          "kind": "FunctionDef",
+          "line": 38,
+          "name": "test_pilot_time_successor_preserves_scientific_census"
+        },
+        {
+          "end_line": 77,
+          "kind": "FunctionDef",
+          "line": 53,
+          "name": "configuration"
+        },
+        {
+          "end_line": 134,
+          "kind": "FunctionDef",
+          "line": 80,
+          "name": "synthetic_result"
+        },
+        {
+          "end_line": 140,
+          "kind": "FunctionDef",
+          "line": 137,
+          "name": "grade"
+        },
+        {
+          "end_line": 158,
+          "kind": "FunctionDef",
+          "line": 143,
+          "name": "test_codec_and_unsafe_or_changed_assignment_are_rejected"
+        },
+        {
+          "end_line": 177,
+          "kind": "FunctionDef",
+          "line": 161,
+          "name": "test_both_native_rosters_have_valid_system_and_adjudication_contracts"
+        },
+        {
+          "end_line": 310,
+          "kind": "FunctionDef",
+          "line": 181,
+          "name": "test_actual_candidate_has_all_native_inputs_and_three_owned_stages"
+        },
+        {
+          "end_line": 334,
+          "kind": "FunctionDef",
+          "line": 313,
+          "name": "test_progress_counts_completed_work_without_timer_generated_heartbeats"
+        },
+        {
+          "end_line": 346,
+          "kind": "FunctionDef",
+          "line": 337,
+          "name": "test_resolved_numerical_contrast_does_not_promote_biology"
+        },
+        {
+          "end_line": 354,
+          "kind": "FunctionDef",
+          "line": 349,
+          "name": "test_opposite_preparation_contrasts_are_a_scientific_negative"
+        },
+        {
+          "end_line": 362,
+          "kind": "FunctionDef",
+          "line": 357,
+          "name": "test_missing_or_repeated_cases_cannot_supply_independent_repeats"
+        },
+        {
+          "end_line": 369,
+          "kind": "FunctionDef",
+          "line": 365,
+          "name": "test_pilot_has_no_mutation_contrast_verdict"
+        },
+        {
+          "end_line": 381,
+          "kind": "FunctionDef",
+          "line": 372,
+          "name": "test_untrusted_prepared_archive_member_is_rejected"
+        },
+        {
+          "end_line": 403,
+          "kind": "FunctionDef",
+          "line": 384,
+          "name": "test_cost_allocator_cannot_consume_a_failed_or_unrecovered_pilot"
+        },
+        {
+          "end_line": 432,
+          "kind": "FunctionDef",
+          "line": 406,
+          "name": "test_corrected_native_recipe_is_rectangular_and_bounded"
+        },
+        {
+          "end_line": 469,
+          "kind": "FunctionDef",
+          "line": 435,
+          "name": "test_adjudication_of_a_failed_preparation_remains_unevaluable"
+        },
+        {
+          "end_line": 500,
+          "kind": "FunctionDef",
+          "line": 472,
+          "name": "test_selected_cpu_minimizer_and_step_interfaces_on_synthetic_particle"
+        },
+        {
+          "end_line": 532,
+          "kind": "FunctionDef",
+          "line": 503,
+          "name": "test_kcx_parameters_never_replace_ordinary_protein_keys"
+        }
+      ],
+      "path": "tests/adapters/test_rubisco_m1_native_v5.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "b022160768f174fe0a6de11146b7df9b9cec5f764c509c5f8af8121ba2ef7f51"
+    },
+    {
+      "bytes": 12234,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 36,
+          "kind": "FunctionDef",
+          "line": 35,
+          "name": "identity"
+        },
+        {
+          "end_line": 56,
+          "kind": "FunctionDef",
+          "line": 39,
+          "name": "configuration"
+        },
+        {
+          "end_line": 112,
+          "kind": "FunctionDef",
+          "line": 59,
+          "name": "synthetic_result"
+        },
+        {
+          "end_line": 118,
+          "kind": "FunctionDef",
+          "line": 115,
+          "name": "grade"
+        },
+        {
+          "end_line": 136,
+          "kind": "FunctionDef",
+          "line": 121,
+          "name": "test_fixed_scientific_workload_and_closed_input_roster"
+        },
+        {
+          "end_line": 147,
+          "kind": "FunctionDef",
+          "line": 139,
+          "name": "test_finite_signal_is_not_equilibrium_or_biological_qualification"
+        },
+        {
+          "end_line": 154,
+          "kind": "FunctionDef",
+          "line": 150,
+          "name": "test_preparation_reversal_is_an_honest_negative"
+        },
+        {
+          "end_line": 175,
+          "kind": "FunctionDef",
+          "line": 158,
+          "name": "test_invalid_or_incomplete_native_input_withholds_contrast"
+        },
+        {
+          "end_line": 189,
+          "kind": "FunctionDef",
+          "line": 178,
+          "name": "test_thermalization_checkpoint_keeps_exact_clock_and_cannot_skip_a_case"
+        },
+        {
+          "end_line": 203,
+          "kind": "FunctionDef",
+          "line": 192,
+          "name": "test_complete_two_attempt_inventory_fits_declared_disk"
+        },
+        {
+          "end_line": 283,
+          "kind": "FunctionDef",
+          "line": 207,
+          "name": "synthetic_native"
+        },
+        {
+          "end_line": 316,
+          "kind": "FunctionDef",
+          "line": 286,
+          "name": "test_real_context_mid_thermalization_continues_identical_numerical_history"
+        },
+        {
+          "end_line": 331,
+          "kind": "FunctionDef",
+          "line": 319,
+          "name": "test_missing_durable_state_never_restarts_a_new_seed"
+        }
+      ],
+      "path": "tests/adapters/test_rubisco_m1_sampling_v6.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "28a2b11a95047b03ab6f9a1dec3b300b114bae2bbcc01a4f6d56753b2dbd3588"
+    },
+    {
+      "bytes": 2528,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 18,
+          "kind": "FunctionDef",
+          "line": 17,
+          "name": "pdb"
+        },
+        {
+          "end_line": 28,
+          "kind": "FunctionDef",
+          "line": 21,
+          "name": "inspect"
+        },
+        {
+          "end_line": 45,
+          "kind": "FunctionDef",
+          "line": 31,
+          "name": "test_explicit_alias_is_required_and_does_not_claim_equilibration"
+        },
+        {
+          "end_line": 61,
+          "kind": "FunctionDef",
+          "line": 59,
+          "name": "test_wrong_preparation_is_refused"
+        },
+        {
+          "end_line": 76,
+          "kind": "FunctionDef",
+          "line": 65,
+          "name": "test_only_tested_force_boundaries_are_allowed"
+        }
+      ],
+      "path": "tests/adapters/test_rubisco_molecular_preparation.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "ff3638302f712f2b8302ed647e0890e08b4972cffee97f91dd99a80164faf4bc"
+    },
+    {
+      "bytes": 14626,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 52,
+          "kind": "FunctionDef",
+          "line": 51,
+          "name": "identity"
+        },
+        {
+          "end_line": 69,
+          "kind": "FunctionDef",
+          "line": 55,
+          "name": "config"
+        },
+        {
+          "end_line": 98,
+          "kind": "FunctionDef",
+          "line": 72,
+          "name": "authoring"
+        },
+        {
+          "end_line": 127,
+          "kind": "FunctionDef",
+          "line": 101,
+          "name": "synthetic_result"
+        },
+        {
+          "end_line": 132,
+          "kind": "FunctionDef",
+          "line": 130,
+          "name": "methods"
+        },
+        {
+          "end_line": 145,
+          "kind": "FunctionDef",
+          "line": 135,
+          "name": "test_quadratic_gradient_both_scales_and_biological_ceiling"
+        },
+        {
+          "end_line": 162,
+          "kind": "FunctionDef",
+          "line": 148,
+          "name": "test_wrong_force_and_missing_observation_are_distinct_terminals"
+        },
+        {
+          "end_line": 171,
+          "kind": "FunctionDef",
+          "line": 165,
+          "name": "test_probe_roster_and_configuration_cannot_be_retuned"
+        },
+        {
+          "end_line": 202,
+          "kind": "FunctionDef",
+          "line": 174,
+          "name": "test_real_candidate_compiles_three_tasks_one_numerical_unit"
+        },
+        {
+          "end_line": 393,
+          "kind": "FunctionDef",
+          "line": 206,
+          "name": "test_worker_ports_custody_and_separate_adjudication"
+        }
+      ],
+      "path": "tests/adapters/test_rubisco_molecular_probe.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "e3ab511830fbec145eb98711ed2b25e8635080f2468f6ecfec4da2d8aa2f2c09"
+    },
+    {
+      "bytes": 6167,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 54,
+          "kind": "FunctionDef",
+          "line": 15,
+          "name": "_fixture_system"
+        },
+        {
+          "end_line": 68,
+          "kind": "FunctionDef",
+          "line": 57,
+          "name": "_energy_force"
+        },
+        {
+          "end_line": 88,
+          "kind": "FunctionDef",
+          "line": 71,
+          "name": "test_amber_roundtrip_and_force_units"
+        },
+        {
+          "end_line": 176,
+          "kind": "FunctionDef",
+          "line": 105,
+          "name": "test_ash_pyscf_openmm_boundary_and_environment_gradients"
+        }
+      ],
+      "path": "tests/adapters/test_rubisco_environment_installation.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "0f1669a995685a9d85f1249fc1775018806b944286aa742f83f14066d020ce85"
+    },
+    {
+      "bytes": 2267,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "definitions": [
+        {
+          "end_line": 24,
+          "kind": "FunctionDef",
+          "line": 15,
+          "name": "test_common_parent_mutant_error_cancels_but_independent_error_does_not"
+        },
+        {
+          "end_line": 33,
+          "kind": "FunctionDef",
+          "line": 27,
+          "name": "test_algebraically_derived_oxygenase_is_not_independent_specificity_evidence"
+        },
+        {
+          "end_line": 42,
+          "kind": "FunctionDef",
+          "line": 40,
+          "name": "test_invalid_or_missing_covariance_is_rejected"
+        },
+        {
+          "end_line": 48,
+          "kind": "FunctionDef",
+          "line": 45,
+          "name": "test_unknown_correlation_retains_worst_case_and_missingness"
+        },
+        {
+          "end_line": 57,
+          "kind": "FunctionDef",
+          "line": 51,
+          "name": "test_joint_precision_uses_two_endpoints_and_exposes_energy_requirement"
+        }
+      ],
+      "path": "tests/adapters/test_rubisco_precision.py",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "ddcd2e7070642576635c2b01f1c3f458f922cc27ec66a55d9c42f3539dff688c"
+    },
+    {
+      "bytes": 6581,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "path": "docs/programmes/rubisco-el/results/r02s-m1-pilot-v5-results-2026-09-26.md",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "f04f97f5061c9f012093f2b456d2975e8621b5453d85af330ba24223d33b3330"
+    },
+    {
+      "bytes": 7087,
+      "commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "path": "docs/programmes/rubisco-el/results/r02s-m1-checkpoint-and-resource-audit-2026-09-26.md",
+      "retained_worktree_bytes_match_commit": true,
+      "sha256": "db2455d0c1e4b519dbba73838e16cd275aafb8a39fc22276f3f26490f15c857a"
+    }
+  ],
+  "native_calls": 0,
+  "native_imports": 0,
+  "repository": "/home/chevre/gs-ml/icf-yolo",
+  "repository_head": "70ad6708799f0e8070526ef15c1da4870e080238",
+  "retained_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+  "retained_coupling_helper": {
+    "bytes": 65783,
+    "path": "/tmp/rubisco-qmmm-work-v9/native_coupling.py",
+    "sha256": "0cbef06a873c745279d6525f6a697ae91b8adaa73bb8d8b5e7e0f256465e3765"
+  },
+  "retained_worktree": "/home/chevre/gs-ml/icf-yolo-rubisco-r02s-20260925",
+  "schema": "operational/legacy-rubisco-read-only-reuse-review/v1"
+}

@@ -1,0 +1,248 @@
+{
+  "schema": "el-documentary-consolidation-custody/v1",
+  "date": "2026-10-10",
+  "source_root": "/home/chevre/gs-ml/empirical_lawhood",
+  "branch": "recchain",
+  "head_before": "9c670a3127cb652f839e56463758226749b07c73",
+  "scope": "Root planning consolidation; no scientific execution, source change, merge, push or programme-objective amendment.",
+  "backup": {
+    "destination": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z",
+    "state": "VERIFIED_SEMIOS_BACKUP",
+    "manifest_sha256": "e97120b93e1be2e38c10628451a8d8fe2035ee30b96890823c303d31178b273e",
+    "verification_member": "backup-verification.json",
+    "original_root_document_count": 25,
+    "original_root_bytes": 2283615
+  },
+  "cleanup_state": "COMPLETE_ROOT_CONSOLIDATION",
+  "retained_root_plans": [
+    "ELSC.md",
+    "ELTOP5.md",
+    "RUBISCO-PRIZE-REFINED-PLAN.md"
+  ],
+  "retained_public_root_markdown": [
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "CITATION.md",
+    "CONTRIBUTING.md",
+    "README.md",
+    "REPRODUCIBILITY.md"
+  ],
+  "archived_root_documents": [
+    {
+      "path": "DERPCHAIN-2.md",
+      "bytes": 51573,
+      "sha256": "27b5a55721c9b26c3f49bcce517569b8b5878104d6b26f6f5f75de732cac87ec",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/DERPCHAIN-2.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/DERPCHAIN-2.md",
+      "maintained_successors": [],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "DERPCHAIN.md",
+      "bytes": 44481,
+      "sha256": "8d2fe81dcd7d830e3b8025c12e073891c70812b26fa29faee14b0f6911d4e0f0",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/DERPCHAIN.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/DERPCHAIN.md",
+      "maintained_successors": [
+        "docs/recursive-prerequisite-results.md",
+        "experiments/rc-prerequisite-chain/guide.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "DOCFINALISE.md",
+      "bytes": 57343,
+      "sha256": "55f596d4e46e8c1543bf01b10ad7a05f590dd017a5825f60df277eee02ae22cb",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/DOCFINALISE.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/DOCFINALISE.md",
+      "maintained_successors": [
+        "CONTRIBUTING.md",
+        "docs/testing.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "FINALAUDIT.md",
+      "bytes": 187351,
+      "sha256": "56309bf02450d25477bbee3de22a0df0027f3659a2e75e238b41e530fd730ade",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/FINALAUDIT.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/FINALAUDIT.md",
+      "maintained_successors": [
+        "CONTRIBUTING.md",
+        "docs/testing.md",
+        "paper/SOURCES.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "FINALINTEGRATIONS-IMPL.md",
+      "bytes": 193990,
+      "sha256": "c3588899be115ccb0d9313cd3760500875df3dd96278f2590ddc79a92178ca64",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/FINALINTEGRATIONS-IMPL.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/FINALINTEGRATIONS-IMPL.md",
+      "maintained_successors": [
+        "docs/integrations.md",
+        "docs/substrate-route-register.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "FINALINTEGRATIONS.md",
+      "bytes": 98025,
+      "sha256": "ffaca9361bd9c38c43aba131526b0a22af0fc6e74655ca79c5b1d117362d56bd",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/FINALINTEGRATIONS.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/FINALINTEGRATIONS.md",
+      "maintained_successors": [
+        "docs/integrations.md",
+        "docs/substrate-route-register.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "FINALISEARCH.md",
+      "bytes": 150541,
+      "sha256": "d65aba1299c4ad0bc2ea95245c4c7001b8665e7c310876762fc1451136fd3d37",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/FINALISEARCH.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/FINALISEARCH.md",
+      "maintained_successors": [
+        "docs/recursive-inquiry-reuse-boundary.md",
+        "docs/recursive-prerequisite-results.md",
+        "experiments/recursive-inquiry/guide.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "FINALISENAMING.md",
+      "bytes": 124744,
+      "sha256": "959641388d56f81693417a790f0c3dd3f007278fba820ddd7d268cc61a7a01ff",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/FINALISENAMING.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/FINALISENAMING.md",
+      "maintained_successors": [
+        "docs/architecture.md",
+        "CONTRIBUTING.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "FINALISERELEASE.md",
+      "bytes": 147515,
+      "sha256": "357936e9869804215a8ce1830a3dea5a1826db5512f5aa66f4745fa2bfd15dcc",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/FINALISERELEASE.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/FINALISERELEASE.md",
+      "maintained_successors": [
+        "docs/release-status.md",
+        "CONTRIBUTING.md",
+        "docs/recursive-inquiry-reuse-boundary.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "FINALMIG.md",
+      "bytes": 138196,
+      "sha256": "35ec3fec3a8f7ce4eb89478a875a5a6409eb1b85b06349531d886460936be134",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/FINALMIG.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/FINALMIG.md",
+      "maintained_successors": [
+        "ELTOP5.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "LOWFRICTION.md",
+      "bytes": 126179,
+      "sha256": "2c1f828c5693e19bc53f09ac52d369727c400d9802b12505d52d7d75bc5d76d9",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/LOWFRICTION.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/LOWFRICTION.md",
+      "maintained_successors": [
+        "README.md",
+        "docs/configuration.md",
+        "CONTRIBUTING.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "NATURE_AB_EXPERIMENT_PLAN.md",
+      "bytes": 221010,
+      "sha256": "60c73959ebbf4e3d9aa05a7376aefd70dcffb3e768b1a8b88c18703458ce1799",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/NATURE_AB_EXPERIMENT_PLAN.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/NATURE_AB_EXPERIMENT_PLAN.md",
+      "maintained_successors": [],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "NATWORKING.md",
+      "bytes": 20227,
+      "sha256": "28c332afa0fdafd572269c5c1e3f6c9298c26981b800bad15ab6fab5159b288a",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/NATWORKING.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/NATWORKING.md",
+      "maintained_successors": [
+        "docs/recursive-prerequisite-results.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "RUBISCO-PROGRESS.md",
+      "bytes": 51338,
+      "sha256": "5dafa18dda31a9e9ba5b306cab571d53995b1cb53a2f8031b51c2caeb9ebd554",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/RUBISCO-PROGRESS.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/RUBISCO-PROGRESS.md",
+      "maintained_successors": [
+        "docs/rubisco-inquiry/progress.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "RUBISCO.md",
+      "bytes": 247895,
+      "sha256": "f36f51fb462dff3283d6759ebbc7cb50266d73705212b3f9f915fe15130e0ff2",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/RUBISCO.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/RUBISCO.md",
+      "maintained_successors": [
+        "RUBISCO-PRIZE-REFINED-PLAN.md",
+        "docs/rubisco-inquiry/programme-contract.md",
+        "docs/rubisco-inquiry/progress.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    },
+    {
+      "path": "SCIREVIEW.md",
+      "bytes": 122220,
+      "sha256": "cbe5e74cfedd433b3b02c281c0014d5930319517290d35910080c63fee7974b7",
+      "action": "remove-after-verified-semios-backup",
+      "backup_member": "root-before/SCIREVIEW.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/el-root-plan-cleanup-20261010T104602Z/root-before/SCIREVIEW.md",
+      "maintained_successors": [
+        "CONTRIBUTING.md",
+        "docs/testing.md",
+        "paper/SOURCES.md"
+      ],
+      "meaning": "Exact original documentary snapshot. Successor paths carry current guidance or findings, not replacement scientific identities."
+    }
+  ],
+  "historical_reference_rule": "Original filenames, absolute paths and digests inside frozen protocols, source snapshots and receipts continue to identify their historical producing context; use this map to locate archived bytes.",
+  "scientific_preservation": "Original joint Rubisco objective, molecular PARK, exposed RC/battery status, adverse outcomes, costs and unresolved software acceptance remain unchanged.",
+  "removed_after_external_readback_utc": "2026-10-10T10:50:02.928369+00:00",
+  "checks": {
+    "all_25_originals_external_sha256_readback": "PASS",
+    "all_16_removals_match_original_backed_bytes": "PASS",
+    "remaining_root_markdown_matches_3_plans_plus_6_public_documents": "PASS",
+    "maintained_documentation": "PASS: 187 source Markdown files / 32 guides; authenticated historical bytes and maintained links/anchors checked",
+    "git_diff_check": "PASS",
+    "no_active_links_to_removed_root_documents": "PASS"
+  }
+}

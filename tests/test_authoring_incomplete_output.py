@@ -137,7 +137,7 @@ def test_actual_cli_handlers_render_incomplete_path_stage_and_original_refusal(t
     monkeypatch.setattr(platform, "GuardedExternalRoot", lambda contract: SimpleNamespace(verify=lambda **kwargs: None, resolve=lambda *args, **kwargs: selected))
     if family == "matrix":
         monkeypatch.setattr(importlib.import_module(MODULES[family]), entry, refuse)
-        arguments = [command, "--config", str(ROOT / "experiments/prepared-response/prepared-source-qualification-author.json")]
+        arguments = [command, "--config", str(ROOT / "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-source-qualification-author.json")]
     else:
         monkeypatch.setattr(platform, entry, refuse)
         loader = {"rc": "load_rc_study", "electron-gas": "load_uniform_electron_gas_analytic_config", "material": "load_synthetic_material_response_config"}[family]

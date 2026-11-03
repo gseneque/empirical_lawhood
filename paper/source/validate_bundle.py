@@ -76,7 +76,6 @@ def anchors(text: str) -> set[str]:
     result = set(re.findall(r'<a\s+id=[\"\']([^\"\']+)[\"\']', text))
     result.update(re.findall(r'\{#([^\s}]+)', text))
     for heading in re.findall(r'^#{1,6}\s+(.+)$', text, re.M):
-        heading = re.sub(r'\s*\{[^}]*\}\s*$', '', heading)
         heading = re.sub(r'[^\w\s-]', '', heading.lower())
         result.add(re.sub(r'\s+', '-', heading.strip()))
     return result

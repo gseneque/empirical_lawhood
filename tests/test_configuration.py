@@ -17,8 +17,8 @@ from empirical_lawhood.cli.configuration import config_app
 from empirical_lawhood.kernel.decoding import decode_canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
-RC = ROOT / "experiments/rc-ladder-response/model.json"
-BRIAN = ROOT / "experiments/neuron-current-response/config.json"
+RC = ROOT / "programmes/foundations/measurement-and-response/workflows/rc-ladder-response/model.json"
+BRIAN = ROOT / "programmes/biology/cell-responses/workflows/neuron-current-response/config.json"
 SUPPLIED = tuple((consumer, path) for consumer in CONSUMERS for path in consumer.supplied_inputs if path.endswith(".json"))
 
 
@@ -29,12 +29,21 @@ def _copy(tmp_path, document, name="input.json"):
 
 
 def test_registry_exactly_accounts_for_public_inputs_without_widening_roots():
-    actual = {path.relative_to(ROOT).as_posix() for path in (ROOT / "experiments").glob("*/*.json")}
-    actual.update(path.relative_to(ROOT).as_posix() for path in (ROOT / "experiments").glob("*/exposed-inputs/*.json"))
-    registered = {path for consumer in CONSUMERS for path in consumer.supplied_inputs if path.startswith("experiments/")}
-    assert actual == registered
+    actual = {path.relative_to(ROOT).as_posix() for path in (ROOT / "programmes").glob("*/*/workflows/**/*.json")}
+    registered = {path for consumer in CONSUMERS for path in consumer.supplied_inputs if path.startswith("programmes/")}
+    from empirical_lawhood.api.workflows import list_workflows
+    declared = {item.path: item for workflow in list_workflows() for item in workflow.inputs
+                if item.path.startswith("programmes/")}
+    specialized = set(declared) - registered
+    assert registered <= actual
+    assert actual == registered | specialized
+    for path in specialized:
+        declaration = declared[path]
+        assert declaration.role.strip()
+        assert json.loads((ROOT / path).read_bytes())["schema"] == declaration.schema_id
     assert {path for consumer in CONSUMERS for path in consumer.supplied_inputs if path.startswith("configs/")} == {
-        "configs/operator-storage.example.json", "configs/sources/fair-mast-level2.json",
+        "configs/operator-storage.example.json",
+        "configs/operational.example.yaml",
         "configs/templates/evidence-provenance.yaml",
     }
     assert len({consumer.consumer for consumer in CONSUMERS}) == len(CONSUMERS)
@@ -42,7 +51,7 @@ def test_registry_exactly_accounts_for_public_inputs_without_widening_roots():
 
 
 @pytest.mark.parametrize("consumer,path", SUPPLIED, ids=[path for _, path in SUPPLIED])
-def test_supplied_values_validate_without_network_or_provider_contact(consumer, path, monkeypatch):
+def test_supplied_values_validate_without_network_or_provider_contact(consumer, path, monkeypatch, tmp_path):
     def forbidden(*args, **kwargs):
         raise AssertionError("configuration validation contacted a network")
     monkeypatch.setattr(socket, "create_connection", forbidden)
@@ -52,6 +61,24 @@ def test_supplied_values_validate_without_network_or_provider_contact(consumer, 
     assert report["external_prerequisites_checked"] is False
     assert report["authority_granted"] is False
     assert report["preparation_allowed"] == (consumer.disposition == "editable")
+    if report["consumer_byte_ready"] is False:
+        assert consumer.disposition == "editable" and consumer.requires_canonical
+        assert report["preparation_required"] is True
+        original_raw = (ROOT / path).read_bytes()
+        assert sha256(original_raw).hexdigest() == report["input_sha256"]
+        with pytest.raises(ConfigurationError, match="prepare a new canonical file"):
+            configuration.load_configuration_record(ROOT / path, consumer=consumer.consumer)
+        canonical = tmp_path / "prepared-supplied-input.json"
+        prepared = prepare_configuration(ROOT / path, canonical, consumer=consumer.consumer)
+        assert prepared["status"] == "PREPARED"
+        assert prepared["input_sha256"] == sha256(original_raw).hexdigest()
+        report = validate_configuration(canonical, consumer=consumer.consumer)
+        assert report["input_sha256"] == prepared["output_sha256"] == sha256(canonical.read_bytes()).hexdigest()
+        assert report["canonical_byte_ready"] is True and report["preparation_required"] is False
+        assert report["external_prerequisites_checked"] is False and report["authority_granted"] is False
+        record = configuration.load_configuration_record(canonical, consumer=consumer.consumer)
+        assert record.canonical_bytes() == canonical.read_bytes()
+        assert (ROOT / path).read_bytes() == original_raw
     assert report["consumer_byte_ready"] is True
 
 
@@ -193,7 +220,7 @@ def test_provenance_template_has_explicit_helper_only_disposition():
 
 def test_declared_yaml_authoring_round_trip_and_exact_json_consumer_refusal(tmp_path):
     import yaml
-    source = ROOT / "experiments/battery-response-and-restart/config.json"
+    source = ROOT / "programmes/energy/battery-charging/workflows/battery-response-and-restart/config.json"
     path = tmp_path / "editable.yaml"
     path.write_text(yaml.safe_dump(json.loads(source.read_bytes())))
     output = tmp_path / "canonical.json"
@@ -222,6 +249,39 @@ def test_authoring_and_prepared_byte_bounds_are_separate(tmp_path):
     with pytest.raises(ConfigurationError) as caught:
         validate_configuration(source, consumer=consumer.consumer)
     assert caught.value.code == "INPUT_READ_REFUSED"
+
+
+def test_explicit_unrestricted_consumer_round_trip_preserves_values_and_finite_refusal(tmp_path, monkeypatch):
+    selected = consumer_by_id("rc-ladder-model")
+    source = tmp_path / "large.json"
+    source.write_bytes(RC.read_bytes() + b" " * selected.authoring_maximum_bytes)
+    with pytest.raises(ConfigurationError) as caught:
+        validate_configuration(source, consumer=selected.consumer)
+    assert caught.value.code == "INPUT_READ_REFUSED"
+    monkeypatch.setattr(configuration, "consumer_by_id", lambda _consumer: replace(selected, maximum_bytes=None))
+    report = validate_configuration(source, consumer=selected.consumer)
+    assert report["consumer_maximum_bytes"] is report["authoring_maximum_bytes"] is None
+    assert report["preparation_required"]
+    output = tmp_path / "prepared.json"
+    prepare_configuration(source, output, consumer=selected.consumer)
+    assert output.read_bytes() == RC.read_bytes()
+    record = configuration.load_configuration_record(output, consumer=selected.consumer)
+    assert record.canonical_bytes() == RC.read_bytes()
+
+
+def test_integration_entrypoint_preserves_explicit_unrestricted_selection(tmp_path, monkeypatch):
+    from empirical_lawhood.api import configuration_registry
+    from empirical_lawhood.cli import integrations
+    selected = replace(consumer_by_id("rc-ladder-model"), maximum_bytes=None)
+    monkeypatch.setattr(configuration_registry, "consumer_by_id", lambda _consumer: selected)
+    monkeypatch.setattr(configuration, "consumer_by_id", lambda _consumer: selected)
+    bounds = []
+    def retained_input(path, *, maximum_bytes, **kwargs):
+        bounds.append(maximum_bytes)
+        return path
+    monkeypatch.setattr(integrations, "attempt_input", retained_input)
+    assert integrations._configuration(RC, selected.consumer).canonical_bytes() == RC.read_bytes()
+    assert bounds == [None]
 
 
 def test_short_decimal_exponent_and_aggregate_expansion_refuse_before_constructor(tmp_path, monkeypatch):

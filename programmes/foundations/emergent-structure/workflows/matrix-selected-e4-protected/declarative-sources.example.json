@@ -1,0 +1,10 @@
+{
+  "schema": "empirical-lawhood/experiment-inputs/file-selection",
+  "version": "1.0.0",
+  "value": {
+    "selection_id": "selection.selected-e4.declarative",
+    "protocol_id": "matrix.e4.selected-protected-declarative",
+    "bindings": [],
+    "files": []
+  }
+}

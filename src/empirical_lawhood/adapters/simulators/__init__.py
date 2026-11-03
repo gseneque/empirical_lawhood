@@ -1,55 +1,68 @@
 """Maintained current simulator adapters and held-source registrations."""
 
-from empirical_lawhood.planning.simulator_inventory import (
-    SimulatorDirectoryInventoryAudit,
-    SimulatorDirectoryInventoryAuthor,
-    SimulatorHeldInventorySpec,
-    SimulatorInventorySelectionKind,
-)
+from importlib import import_module
 
-from .lineage import (
-    SimulatorGenerationEvidenceExpectation,
-    SimulatorGenerationEvidenceRole,
-    SimulatorGenerationExceptionCode,
-    SimulatorGenerationKind,
-    SimulatorGenerationLineageManifest,
-)
-from .manifests import (
-    SimulatorHeldRegistrationDefinition,
-    SimulatorRegistrationManifestDependencies,
-    build_simulator_directory_output_contract,
-    build_simulator_held_registration_manifest,
-)
-from .open_campaigns import OpenSimulatorActionDeliveryBinding, OpenSimulatorAuthoringBundle, OpenSimulatorStudyConfig, OpenSimulatorConditionalChildResolver, OpenSimulatorKind, OpenSimulatorAdmissionAdjudication, OpenSimulatorAdmissionPolicy, OpenSimulatorProspectiveEvaluationInput, OpenSimulatorQuantityBand, OpenSimulatorRungAdjudication, OpenSimulatorRungResult, OpenSimulatorSourceManifest, OpenSimulatorStageRecord, build_open_simulator_authoring_bundle, instantiate_open_simulator_prospective, open_simulator_candidate_catalog, open_simulator_compilation_context, open_simulator_config, open_simulator_config_decoders, open_simulator_definitions, open_simulator_experiment, open_simulator_formal_catalog, open_simulator_system
-from .production import (
-    SIMULATOR_DATASET_CONFIG_ARTIFACT_ID,
-    SIMULATOR_DATASET_EVIDENCE_CLOSURE_ID,
-    SIMULATOR_DATASET_INSPECTOR_CLOSURE_ID,
-    SIMULATOR_DATASET_PRODUCTION_PROFILE_ID,
-    SimulatorDatasetCapabilityConfig,
-    SimulatorRegistrationStaticComposition,
-    build_simulator_registration_static_composition,
-    simulator_dataset_capability_config,
-)
-from .registration import (
-    SimulatorDirectoryRegistrationInspection,
-    SimulatorDirectoryRegistrationInspector,
-    SimulatorDirectoryVerificationPolicy,
-    bind_simulator_directory_registration_inspector,
-)
-from .registry import (
-    SIMULATOR_DATASET_CAPABILITY_VERSION,
-    SIMULATOR_DATASET_CONFIG_KEY,
-    SIMULATOR_DATASET_ENVIRONMENT_KEY,
-    SIMULATOR_DATASET_EVIDENCE_VERIFIER_KEY,
-    SIMULATOR_DATASET_INSPECTOR_KEY,
-    SIMULATOR_DATASET_RUNTIME_KEY,
-    SIMULATOR_DIRECTORY_FORMAT_PROFILE_ID,
-    SIMULATOR_DIRECTORY_MEDIA_TYPE,
-    SimulatorDatasetRegistryProfile,
-    build_simulator_dataset_registry_profile,
-    simulator_dataset_capability_bindings,
-)
+_EXPORTS = {
+    'OpenSimulatorActionDeliveryBinding': ('.open_campaigns', 'OpenSimulatorActionDeliveryBinding'),
+    'OpenSimulatorAdmissionAdjudication': ('.open_campaigns', 'OpenSimulatorAdmissionAdjudication'),
+    'OpenSimulatorAdmissionPolicy': ('.open_campaigns', 'OpenSimulatorAdmissionPolicy'),
+    'OpenSimulatorAuthoringBundle': ('.open_campaigns', 'OpenSimulatorAuthoringBundle'),
+    'OpenSimulatorConditionalChildResolver': ('.open_campaigns', 'OpenSimulatorConditionalChildResolver'),
+    'OpenSimulatorKind': ('.open_campaigns', 'OpenSimulatorKind'),
+    'OpenSimulatorProspectiveEvaluationInput': ('.open_campaigns', 'OpenSimulatorProspectiveEvaluationInput'),
+    'OpenSimulatorQuantityBand': ('.open_campaigns', 'OpenSimulatorQuantityBand'),
+    'OpenSimulatorRungAdjudication': ('.open_campaigns', 'OpenSimulatorRungAdjudication'),
+    'OpenSimulatorRungResult': ('.open_campaigns', 'OpenSimulatorRungResult'),
+    'OpenSimulatorSourceManifest': ('.open_campaigns', 'OpenSimulatorSourceManifest'),
+    'OpenSimulatorStageRecord': ('.open_campaigns', 'OpenSimulatorStageRecord'),
+    'OpenSimulatorStudyConfig': ('.open_campaigns', 'OpenSimulatorStudyConfig'),
+    'SIMULATOR_DATASET_CAPABILITY_VERSION': ('.registry', 'SIMULATOR_DATASET_CAPABILITY_VERSION'),
+    'SIMULATOR_DATASET_CONFIG_ARTIFACT_ID': ('.production', 'SIMULATOR_DATASET_CONFIG_ARTIFACT_ID'),
+    'SIMULATOR_DATASET_CONFIG_KEY': ('.registry', 'SIMULATOR_DATASET_CONFIG_KEY'),
+    'SIMULATOR_DATASET_ENVIRONMENT_KEY': ('.registry', 'SIMULATOR_DATASET_ENVIRONMENT_KEY'),
+    'SIMULATOR_DATASET_EVIDENCE_CLOSURE_ID': ('.production', 'SIMULATOR_DATASET_EVIDENCE_CLOSURE_ID'),
+    'SIMULATOR_DATASET_EVIDENCE_VERIFIER_KEY': ('.registry', 'SIMULATOR_DATASET_EVIDENCE_VERIFIER_KEY'),
+    'SIMULATOR_DATASET_INSPECTOR_CLOSURE_ID': ('.production', 'SIMULATOR_DATASET_INSPECTOR_CLOSURE_ID'),
+    'SIMULATOR_DATASET_INSPECTOR_KEY': ('.registry', 'SIMULATOR_DATASET_INSPECTOR_KEY'),
+    'SIMULATOR_DATASET_PRODUCTION_PROFILE_ID': ('.production', 'SIMULATOR_DATASET_PRODUCTION_PROFILE_ID'),
+    'SIMULATOR_DATASET_RUNTIME_KEY': ('.registry', 'SIMULATOR_DATASET_RUNTIME_KEY'),
+    'SIMULATOR_DIRECTORY_FORMAT_PROFILE_ID': ('.registry', 'SIMULATOR_DIRECTORY_FORMAT_PROFILE_ID'),
+    'SIMULATOR_DIRECTORY_MEDIA_TYPE': ('.registry', 'SIMULATOR_DIRECTORY_MEDIA_TYPE'),
+    'SimulatorDatasetCapabilityConfig': ('.production', 'SimulatorDatasetCapabilityConfig'),
+    'SimulatorDatasetRegistryProfile': ('.registry', 'SimulatorDatasetRegistryProfile'),
+    'SimulatorDirectoryInventoryAudit': ('empirical_lawhood.planning.simulator_inventory', 'SimulatorDirectoryInventoryAudit'),
+    'SimulatorDirectoryInventoryAuthor': ('empirical_lawhood.planning.simulator_inventory', 'SimulatorDirectoryInventoryAuthor'),
+    'SimulatorDirectoryRegistrationInspection': ('.registration', 'SimulatorDirectoryRegistrationInspection'),
+    'SimulatorDirectoryRegistrationInspector': ('.registration', 'SimulatorDirectoryRegistrationInspector'),
+    'SimulatorDirectoryVerificationPolicy': ('.registration', 'SimulatorDirectoryVerificationPolicy'),
+    'SimulatorGenerationEvidenceExpectation': ('.lineage', 'SimulatorGenerationEvidenceExpectation'),
+    'SimulatorGenerationEvidenceRole': ('.lineage', 'SimulatorGenerationEvidenceRole'),
+    'SimulatorGenerationExceptionCode': ('.lineage', 'SimulatorGenerationExceptionCode'),
+    'SimulatorGenerationKind': ('.lineage', 'SimulatorGenerationKind'),
+    'SimulatorGenerationLineageManifest': ('.lineage', 'SimulatorGenerationLineageManifest'),
+    'SimulatorHeldInventorySpec': ('empirical_lawhood.planning.simulator_inventory', 'SimulatorHeldInventorySpec'),
+    'SimulatorHeldRegistrationDefinition': ('.manifests', 'SimulatorHeldRegistrationDefinition'),
+    'SimulatorInventorySelectionKind': ('empirical_lawhood.planning.simulator_inventory', 'SimulatorInventorySelectionKind'),
+    'SimulatorRegistrationManifestDependencies': ('.manifests', 'SimulatorRegistrationManifestDependencies'),
+    'SimulatorRegistrationStaticComposition': ('.production', 'SimulatorRegistrationStaticComposition'),
+    'bind_simulator_directory_registration_inspector': ('.registration', 'bind_simulator_directory_registration_inspector'),
+    'build_open_simulator_authoring_bundle': ('.open_campaigns', 'build_open_simulator_authoring_bundle'),
+    'build_simulator_dataset_registry_profile': ('.registry', 'build_simulator_dataset_registry_profile'),
+    'build_simulator_directory_output_contract': ('.manifests', 'build_simulator_directory_output_contract'),
+    'build_simulator_held_registration_manifest': ('.manifests', 'build_simulator_held_registration_manifest'),
+    'build_simulator_registration_static_composition': ('.production', 'build_simulator_registration_static_composition'),
+    'instantiate_open_simulator_prospective': ('.open_campaigns', 'instantiate_open_simulator_prospective'),
+    'open_simulator_candidate_catalog': ('.open_campaigns', 'open_simulator_candidate_catalog'),
+    'open_simulator_compilation_context': ('.open_campaigns', 'open_simulator_compilation_context'),
+    'open_simulator_config': ('.open_campaigns', 'open_simulator_config'),
+    'open_simulator_config_decoders': ('.open_campaigns', 'open_simulator_config_decoders'),
+    'open_simulator_definitions': ('.open_campaigns', 'open_simulator_definitions'),
+    'open_simulator_experiment': ('.open_campaigns', 'open_simulator_experiment'),
+    'open_simulator_formal_catalog': ('.open_campaigns', 'open_simulator_formal_catalog'),
+    'open_simulator_system': ('.open_campaigns', 'open_simulator_system'),
+    'simulator_dataset_capability_bindings': ('.registry', 'simulator_dataset_capability_bindings'),
+    'simulator_dataset_capability_config': ('.production', 'simulator_dataset_capability_config'),
+}
 
 __all__ = [
     "SIMULATOR_DATASET_CAPABILITY_VERSION",
@@ -112,3 +125,18 @@ __all__ = [
     "simulator_dataset_capability_bindings",
     "simulator_dataset_capability_config",
 ]
+
+
+def __getattr__(name: str):
+    """Preserve public exports while importing numerical owners on demand."""
+    try:
+        module_name, attribute = _EXPORTS[name]
+    except KeyError:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}") from None
+    value = getattr(import_module(module_name, __name__), attribute)
+    globals()[name] = value
+    return value
+
+
+def __dir__() -> list[str]:
+    return sorted(set(globals()) | set(__all__))

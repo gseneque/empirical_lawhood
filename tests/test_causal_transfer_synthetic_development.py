@@ -13,7 +13,7 @@ ROOT = Path(__file__).parents[1]
 
 def test_response_composition_whole_root_nested_folds_and_adverse_numerical_view() -> None:
     selection = load_registered_authoring(
-        ROOT / 'experiments/causal-transfer-audit/analysis-input.json',
+        ROOT / 'programmes/foundations/emergent-structure/workflows/causal-transfer-audit/analysis-input.json',
         root_schemas={ResponseCompositionInput.SCHEMA: ResponseCompositionInput},
         maximum_bytes=16 * 1024,
     )

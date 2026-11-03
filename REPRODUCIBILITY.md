@@ -9,26 +9,35 @@ Use it to retain the records required for a stated result.
 `uv.lock` records the target Python dependency solution. The portable reactor
 prefix additionally pins Python 3.11.14 and NumPy 2.4.6 and validates the hashes
 of its three packaged public inputs. Run it as described in
-[examples](experiments/reactor-response/guide.md). Its report records runtime, source hashes,
+[examples](programmes/foundations/measurement-and-response/workflows/reactor-response/guide.md). Its report records runtime, source hashes,
 relation/action identifiers, branch completion, observed delivery stages and
 paired contrasts by independent unit and numerical view.
 
-The separate [fresh campaign route](docs/fresh-experiment.md) supplies strict
+The separate [fresh campaign route](programmes/foundations/measurement-and-response/workflows/reactor-response/authoring.md) supplies strict
 target-owned authoring inputs and a no-effect preissue proof for a new target
 identity. Its issued native run, if performed, has its own external controls,
 task receipts, reveal record and adjudication. The example report is never a
-substitute for those records. [Public source declarations](docs/sources.md)
+substitute for those records. [Public source declarations](docs/using/sources.md)
 include one bounded FAIR-MAST Zarr selection. A verified acquisition receipt
 can become a prospective design input. It does not make an unqualified native
 observation scientifically fit.
 
-A complete campaign needs a clean checkout executing its tracked package and an explicit `OperatorStorageProfile`.
-It also needs exact source/input identities, frozen proposal, approvals, custody authority, issued package, resource contract, guarded store and receipts. Candidate compilation
-does not grant any of these. The local SQLite database is a rebuildable index,
-not the scientific record. A site-packages wheel may inspect documents and run
-the example, but cannot assert the source checkout's clean-Git implementation
-identity for source-bound issue or execution. There is no implicit storage
-mount or signing key.
+Current routes with selected-source admission require the selected committed package and an explicit `OperatorStorageProfile`.
+The [source-admission owner](src/empirical_lawhood/infrastructure/source_policy.py) verifies selected bytes, modes and imported source.
+It records actual checkout status separately.
+Permitted disclosed untracked operational notes do not require an empty Git status.
+Legacy routes with raw-clean checks retain those checks.
+Historical clean-source records retain their original meaning.
+
+Issued campaigns also require exact inputs, a frozen proposal, approvals, custody authority, an issued package and resource contracts.
+Guarded stores retain the actual grants and receipts.
+Candidate compilation supplies no issue, execution or reveal authority.
+Development routes retain their declared separate authority boundary.
+The local SQLite catalog is a rebuildable projection.
+
+An installed wheel can inspect documents and run the example.
+It cannot assert a selected checkout's source identity for issue or source-bound execution.
+There is no implicit storage mount or signing key.
 
 The manuscript's historical primary archives, trajectories, immutable receipts
 and adjudications have not been deposited in this repository.
@@ -42,7 +51,7 @@ Optional publication derivatives can be built separately, but the packaged examp
 A later evidence release needs its original code identity, configuration, native source, independent-unit roster, outputs and verification records.
 Historical producing identities remain separate from the current package.
 
-The [first-release reproduction record](docs/paper-reproduction.md) documents original external inputs, full numerical replays and encountered failures.
+The [first-release reproduction record](docs/using/paper-reproduction.md) documents original external inputs, full numerical replays and encountered failures.
 It separates headline reproduction, numerical differences, software checks and fresh qualification.
 
 A new result should record the exact target version, command, environment,
@@ -61,7 +70,7 @@ qualified law result or replacement historical evidence.
 
 Project-generated derivatives released under the project's CC0-1.0 policy
 retain that dedication unless specifically marked otherwise. See the
-[licensing scopes](docs/licensing.md). For each record, identify the producing
+[licensing scopes](docs/reference/licensing.md). For each record, identify the producing
 code state, protocol and command, source and native version, configuration,
 independent units, seeds, output hashes and receipts. The
 [template](configs/templates/evidence-provenance.yaml) is a starting point. Remove inapplicable
@@ -71,7 +80,7 @@ fields instead of inventing values. Third-party inputs retain their own rights.
 
 This account measures recorded Codex token usage in a bounded development snapshot.
 It separates measured response records from unavailable usage and scientific evidence.
-Use [the aggregate](docs/ai-usage.json) to inspect the totals, coverage, source hashes and recorded model-context/task breakdowns.
+Use [the aggregate](docs/reference/ai-usage.json) to inspect the totals, coverage, source hashes and recorded model-context/task breakdowns.
 
 ### Scope and cutoff
 

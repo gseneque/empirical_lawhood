@@ -39,10 +39,10 @@ def _identity(value: os.stat_result) -> tuple[int, int, int, int, int, int]:
 def _open_regular(
     path: Path,
     *,
-    maximum_bytes: int,
+    maximum_bytes: int | None,
     open_error: Callable[[OSError], Exception] | None = None,
 ) -> tuple[int, os.stat_result]:
-    if maximum_bytes < 0:
+    if maximum_bytes is not None and maximum_bytes < 0:
         raise ValueError("maximum_bytes must be nonnegative")
     # Validate the descriptor before any read. Without O_NONBLOCK, opening a
     # FIFO can wait for a writer forever, before fstat can refuse its type.
@@ -62,7 +62,7 @@ def _open_regular(
         observed = os.fstat(descriptor)
         if not stat.S_ISREG(observed.st_mode):
             raise BoundedFileIOError("bounded input is not a regular file")
-        if observed.st_size > maximum_bytes:
+        if maximum_bytes is not None and observed.st_size > maximum_bytes:
             raise BoundedFileIOError("bounded input exceeds its byte limit")
     except BaseException:
         os.close(descriptor)
@@ -165,11 +165,11 @@ def _hash_regular_descriptor(
 
 
 def _open_contained_regular(
-    root: Path, path: Path, maximum_bytes: int
+    root: Path, path: Path, maximum_bytes: int | None
 ) -> tuple[int, os.stat_result]:
     """Open once, relative to no-follow directories; the caller owns the descriptor."""
 
-    if maximum_bytes < 0:
+    if maximum_bytes is not None and maximum_bytes < 0:
         raise ValueError("bounded file maximum_bytes must be nonnegative")
     if not root.is_absolute() or not path.is_absolute():
         raise BoundedFileIOError("bounded root and member must be absolute")
@@ -199,7 +199,7 @@ def _open_contained_regular(
         before = os.fstat(descriptor)
         if not stat.S_ISREG(before.st_mode):
             raise BoundedFileIOError("bounded input is not a regular file")
-        if before.st_size > maximum_bytes:
+        if maximum_bytes is not None and before.st_size > maximum_bytes:
             raise BoundedFileIOError("bounded input exceeds its byte limit")
         selected, descriptor = descriptor, -1
         return selected, before
@@ -213,11 +213,13 @@ def _open_contained_regular(
 
 
 
-def read_bounded_bytes(path: Path, *, maximum_bytes: int) -> bytes:
-    """Read at most ``maximum_bytes`` and reject identity drift during the read."""
+def read_bounded_bytes(path: Path, *, maximum_bytes: int | None) -> bytes:
+    """Read a stable regular file; None removes the additional byte ceiling."""
 
     descriptor, before = _open_regular(path, maximum_bytes=maximum_bytes)
-    return _read_regular_descriptor(descriptor, before, maximum_bytes=maximum_bytes)
+    return _read_regular_descriptor(descriptor, before,
+        maximum_bytes=before.st_size if maximum_bytes is None else maximum_bytes,
+        opened_size_bound=maximum_bytes is None)
 
 
 def file_matches_bytes(
@@ -250,18 +252,61 @@ def file_matches_bytes(
     return matches and offset == len(expected)
 
 
-def bounded_file_sha256(path: Path, *, maximum_bytes: int) -> tuple[int, str]:
+def bounded_file_sha256(path: Path, *, maximum_bytes: int | None) -> tuple[int, str]:
     """Stream one regular file through SHA-256 under an explicit total-byte bound."""
 
     descriptor, before = _open_regular(path, maximum_bytes=maximum_bytes)
-    return _hash_regular_descriptor(descriptor, before, maximum_bytes=maximum_bytes)
+    return _hash_regular_descriptor(descriptor, before,
+        maximum_bytes=before.st_size if maximum_bytes is None else maximum_bytes,
+        opened_size_bound=maximum_bytes is None)
+
+
+def copy_bounded_file(
+    source: Path, destination: Path, *, maximum_bytes: int | None,
+) -> tuple[int, str]:
+    """Stream stable source bytes into a fresh file and return their exact hash.
+
+    None selects the opened source size without an additional output ceiling.
+    A failed copy retains its incomplete destination for the caller's custody;
+    no existing destination is overwritten or removed.
+    A second streaming pass checks consumed content even on filesystems whose
+    timestamps cannot distinguish same-size writes within one clock tick.
+    """
+
+    descriptor, before = _open_regular(source, maximum_bytes=maximum_bytes)
+    digest = hashlib.sha256()
+    count = 0
+    with _stable_descriptor(descriptor, before, operation="copying"):
+        with destination.open("xb") as output:
+            for chunk in _regular_chunks(
+                descriptor, before,
+                maximum_bytes=before.st_size if maximum_bytes is None else maximum_bytes,
+                chunk_bytes=CONTROL_PLANE_CHUNK_BYTES,
+                opened_size_bound=maximum_bytes is None, operation="copying",
+            ):
+                output.write(chunk)
+                digest.update(chunk)
+                count += len(chunk)
+            if count != before.st_size:
+                raise BoundedFileIOError("bounded input changed during copying")
+            os.lseek(descriptor, 0, os.SEEK_SET)
+            verified = hashlib.sha256()
+            for chunk in _regular_chunks(
+                descriptor, before, maximum_bytes=before.st_size,
+                chunk_bytes=CONTROL_PLANE_CHUNK_BYTES,
+                opened_size_bound=True, operation="copy verification",
+            ):
+                verified.update(chunk)
+            if verified.digest() != digest.digest():
+                raise BoundedFileIOError("bounded input changed during copying")
+    return count, digest.hexdigest()
 
 
 def bounded_file_contains_any(
     path: Path,
     needles: tuple[bytes, ...],
     *,
-    maximum_bytes: int,
+    maximum_bytes: int | None,
 ) -> bool:
     """Search a bounded file incrementally, including matches across chunk boundaries."""
 
@@ -282,7 +327,9 @@ def bounded_file_contains_any(
             if not chunk:
                 break
             observed_bytes += len(chunk)
-            if observed_bytes > maximum_bytes:
+            if maximum_bytes is None and observed_bytes > before.st_size:
+                raise BoundedFileIOError("bounded input grew beyond its opened size")
+            if maximum_bytes is not None and observed_bytes > maximum_bytes:
                 raise BoundedFileIOError("bounded input exceeds its byte limit")
             window = tail + chunk
             if any(needle in window for needle in values):

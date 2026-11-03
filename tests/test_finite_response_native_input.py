@@ -10,7 +10,7 @@ from empirical_lawhood.adapters.composition.finite_response_law.native_input imp
 from empirical_lawhood.api.codecs import load_registered_authoring
 
 ROOT = Path(__file__).parents[1]
-CONFIG = ROOT / "experiments/finite-response-law/finite-calibration-input.json"
+CONFIG = ROOT / "programmes/foundations/emergent-structure/workflows/finite-response-law/finite-calibration-input.json"
 
 
 def test_shipped_finite_input_refuses_missing_source_and_changed_role() -> None:
@@ -65,6 +65,6 @@ def test_current_local_guide_cannot_substitute_frozen_finite_plan(
         check_finite_calibration_input(
             config,
             source_root=held,
-            plan=ROOT / "experiments/prepared-response/guide.md",
+            plan=ROOT / "programmes/foundations/emergent-structure/workflows/prepared-response/guide.md",
             prior_exposure=prior,
         )

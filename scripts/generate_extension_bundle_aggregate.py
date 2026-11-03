@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Sequence
 
 from empirical_lawhood.runtime.extension_bundles import ExtensionBundleContribution, compose_extension_bundle_aggregate
+from empirical_lawhood.runtime.experiment_preparation import ExperimentProtocolDeclaration, ExperimentRuntimeBinding
 
 
 try:
@@ -35,6 +36,8 @@ ALLOWLISTED_ROOTS = (
 OUTPUT = PACKAGE_ROOT / "adapters/composition/generated_extension_bundles.py"
 DESCRIPTOR_NAME = "extension_bundle.py"
 SYMBOL_NAME = "EXTENSION_BUNDLE_CONTRIBUTION"
+API_BINDING_ROOT = PACKAGE_ROOT / "api/domain_composition"
+API_BINDING_OUTPUT = PACKAGE_ROOT / "api/generated_experiment_runtime_bindings.py"
 
 
 def _module_name(path: Path) -> str:
@@ -84,6 +87,27 @@ def render_generated_module(paths: tuple[Path, ...]) -> str:
         )
         for contribution in contributions
     ]
+    protocol_imports = []
+    protocol_aliases = []
+    protocols = []
+    for index, module_name_ in enumerate(modules):
+        module = importlib.import_module(module_name_)
+        declarations = getattr(module, "EXPERIMENT_PROTOCOL_DECLARATIONS", ())
+        if (type(declarations) is not tuple
+                or any(type(value) is not ExperimentProtocolDeclaration for value in declarations)):
+            raise TypeError("experiment protocols require exact static code-owned declarations")
+        if declarations:
+            alias = f"_experiment_protocols_{index:03d}"
+            protocol_imports.append(f"from {module_name_} import EXPERIMENT_PROTOCOL_DECLARATIONS as {alias}")
+            protocol_aliases.append("*" + alias)
+            protocols.extend(declarations)
+    for attribute in ("protocol_id", "consumer_id"):
+        values = [getattr(protocol, attribute) for protocol in protocols]
+        if len(values) != len(set(values)):
+            raise ValueError("installed experiment protocol declarations conflict")
+    schemas = [(protocol.specification_type.SCHEMA, protocol.specification_type.VERSION) for protocol in protocols]
+    if len(schemas) != len(set(schemas)):
+        raise ValueError("installed experiment specifications require unique registered schema/revision pairs")
     aggregate = compose_extension_bundle_aggregate(contributions)
     aliases = ",\n    ".join(
         alias_by_id[contribution.contribution_id] for contribution in contributions
@@ -96,6 +120,7 @@ def render_generated_module(paths: tuple[Path, ...]) -> str:
             "    compose_extension_bundle_aggregate,",
             ")",
             *imports,
+            *protocol_imports,
             "",
             "EXTENSION_BUNDLE_CONTRIBUTIONS = (",
             f"    {aliases},",
@@ -108,8 +133,13 @@ def render_generated_module(paths: tuple[Path, ...]) -> str:
             "if GENERATED_EXTENSION_BUNDLE_AGGREGATE.fingerprint() != EXPECTED_AGGREGATE_FINGERPRINT:",
             '    raise RuntimeError("generated extension aggregate fingerprint drifted")',
             "",
+            "EXPERIMENT_PROTOCOL_DECLARATIONS = tuple(sorted((",
+            "    " + ",\n    ".join(protocol_aliases) + ("," if protocol_aliases else ""),
+            "), key=lambda declaration: declaration.protocol_id))",
+            "",
             "__all__ = [",
             '    "EXPECTED_AGGREGATE_FINGERPRINT",',
+            '    "EXPERIMENT_PROTOCOL_DECLARATIONS",',
             '    "EXTENSION_BUNDLE_CONTRIBUTIONS",',
             '    "GENERATED_EXTENSION_BUNDLE_AGGREGATE",',
             "]",
@@ -118,17 +148,55 @@ def render_generated_module(paths: tuple[Path, ...]) -> str:
     )
 
 
+def render_runtime_bindings() -> str:
+    paths = _discover_descriptors(package_root=PACKAGE_ROOT, roots=(API_BINDING_ROOT,),
+        name="experiment_binding.py", kind="experiment API binding")
+    imports, aliases, protocols = [], [], set()
+    for index, path in enumerate(paths):
+        module = _module_name(path)
+        binding = getattr(importlib.import_module(module), "EXPERIMENT_RUNTIME_BINDING", None)
+        if type(binding) is not ExperimentRuntimeBinding:
+            raise TypeError("experiment API descriptor requires its exact runtime binding")
+        binding.__post_init__()
+        if binding.protocol_id in protocols:
+            raise ValueError("experiment API bindings repeat one protocol")
+        protocols.add(binding.protocol_id)
+        alias = f"_runtime_binding_{index:03d}"
+        aliases.append(alias)
+        imports.append(f"from {module} import EXPERIMENT_RUNTIME_BINDING as {alias}")
+    declarations = {row.protocol_id: row for path in discover_descriptors()
+        for row in getattr(importlib.import_module(_module_name(path)), "EXPERIMENT_PROTOCOL_DECLARATIONS", ())}
+    required = {key for key,row in declarations.items() if (row.requires_prospective_runtime_binding
+        or row.requires_development_runtime_binding or row.programme_record_type is not None)}
+    if not required <= protocols or not protocols <= set(declarations):
+        raise ValueError("experiment API bindings differ from declared protocols/runtime requirements")
+    from empirical_lawhood.api.experiment_runtime_bindings import validate_experiment_runtime_binding
+    for path in paths:
+        binding = getattr(importlib.import_module(_module_name(path)), "EXPERIMENT_RUNTIME_BINDING")
+        validate_experiment_runtime_binding(declarations[binding.protocol_id], binding)
+        if not set(binding.derivation_target_protocol_ids)<=set(declarations):
+            raise ValueError('experiment preprocessing target lacks its installed declared protocol')
+    return "\n".join(('"""Generated by scripts/generate_extension_bundle_aggregate.py; do not edit."""',
+        "", *imports, "", "EXPERIMENT_RUNTIME_BINDINGS = (",
+        *("    " + alias + "," for alias in aliases), ")", "",
+        "EXPERIMENT_SPECIFICATION_PROTOCOLS = (",
+        *("    " + repr((row.specification_type.SCHEMA, row.specification_type.VERSION, row.protocol_id)) + ","
+            for row in sorted(declarations.values(), key=lambda row: row.protocol_id)), ")", ""))
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="fail if generated output drifts")
     arguments = parser.parse_args(argv)
     expected = render_generated_module(discover_descriptors()).encode("utf-8")
-    require_safe_output(OUTPUT, package_root=PACKAGE_ROOT)
-    if arguments.check:
-        if not OUTPUT.is_file() or OUTPUT.read_bytes() != expected:
-            raise SystemExit("generated extension bundle aggregate is missing or stale")
-        return 0
-    OUTPUT.write_bytes(expected)
+    runtime_bindings = render_runtime_bindings().encode("utf-8")
+    for path, payload in ((OUTPUT, expected), (API_BINDING_OUTPUT, runtime_bindings)):
+        require_safe_output(path, package_root=PACKAGE_ROOT)
+        if arguments.check:
+            if not path.is_file() or path.read_bytes() != payload:
+                raise SystemExit("generated extension/API aggregate is missing or stale: " + str(path))
+        else:
+            path.write_bytes(payload)
     return 0
 
 

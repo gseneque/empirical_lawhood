@@ -1,0 +1,790 @@
+{
+  "schema": "el-documentary-plan-cleanup/v1",
+  "recorded_utc": "2026-10-25T12:13:08.249653+00:00",
+  "scope": "Owner-requested Markdown-plan cleanup, steps 1-4; documentary custody, not scientific authority or final release acceptance.",
+  "source_before": {
+    "branch": "recchain",
+    "commit": "3d90b8645bbbd9d8dd2a2f28b05e91a0e36edbc2",
+    "root": "/home/chevre/gs-ml/empirical_lawhood"
+  },
+  "archive_root": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z",
+  "snapshot_manifest": {
+    "path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/snapshot-manifest.json",
+    "sha256": "4ce1b033bf66044e5716b8195223cb1b1fcb72ad8c43992f0d9c1a47df0dec84",
+    "size_bytes": 10845,
+    "file_count": 43
+  },
+  "checks_root": "/media/chevre/EL/empirical-lawhood/checks/plan-cleanup-20261025T115121Z",
+  "summary": {
+    "originals_archived": 43,
+    "working_copies_removed": 34,
+    "active_plans_reconciled": 2,
+    "originals_retained_unchanged": 7,
+    "new_local_successor_plans": 2
+  },
+  "new_local_successor_plans": [
+    "docs/plans/performance-backlog.md",
+    "docs/plans/future-applications.md"
+  ],
+  "historical_custody_record": "docs/plan-consolidation-custody.json",
+  "locator_resolution": "Each original path resolves to archive_path with the recorded exact size and SHA256. Historical package-relative adapters/methods/... paths resolve by prefixing src/empirical_lawhood/. Historical protocol text, scientific identities and provenance records remain unchanged.",
+  "preservation_limits": [
+    "Local source revisions and elapsed software checks do not grant issue, execution, reveal or publication authority.",
+    "Superseded work queues are not claims of scientific target completion.",
+    "E3 remains held; original E1/E2 and completed TRAIN are not reacquired.",
+    "Original paper assets, maintained scientific specifications, scientific records and result analyses are unchanged.",
+    "All local work records and successor plans remain excluded from wheels, sdists and release archives."
+  ],
+  "crosswalks": {
+    "shared_CONSOLIDATION_S_A": "docs/plans/performance-backlog.md#legacy-shared-work-crosswalk",
+    "RECURARCH_AR_RA_APPLIED_F_MATRIXAUDIT_M_XD": "docs/plans/future-applications.md#retired-shared-queues-and-preserved-residuals",
+    "current_acceptance": "WTF.md",
+    "current_scientific_design": "WTF-FINALDESIGN.md",
+    "public_navigation": "docs/recursive-inquiry-reuse-boundary.md"
+  },
+  "files": [
+    {
+      "path": "APPLIED-EL-REVIEW-WORKING.md",
+      "size_bytes": 37417,
+      "sha256": "1f253ff51137e369592193a8e398e4056c06754df03cc29ffb464aef644f11ef",
+      "archive_member": "before/APPLIED-EL-REVIEW-WORKING.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/APPLIED-EL-REVIEW-WORKING.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/plans/future-applications.md",
+        "WTF.md"
+      ],
+      "reason": "Domain residuals and shared F1-F5 crosswalk consolidated; old sequencing retired."
+    },
+    {
+      "path": "CONSOLIDATION.md",
+      "size_bytes": 136811,
+      "sha256": "fdf59614a840fe8061f2f2d1faa3f8165906927abd121226a1338474eb723976",
+      "archive_member": "before/CONSOLIDATION.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/CONSOLIDATION.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF.md",
+        "docs/plans/performance-backlog.md"
+      ],
+      "reason": "S/A responsibilities mapped to current work order; old recovery/source-period queues retired."
+    },
+    {
+      "path": "E2-CONTROLPRELIM.md",
+      "size_bytes": 11383,
+      "sha256": "18d09219c2fb2b43e52f93727c5bc902fc7da3ae9e2aa5878c060c4fe0679777",
+      "archive_member": "before/E2-CONTROLPRELIM.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/E2-CONTROLPRELIM.md",
+      "disposition": "retained_local_unchanged",
+      "successors": [
+        "E2-CONTROLPRELIM.md"
+      ],
+      "reason": "Analysis/synthesis or retained evidence ledger outside plan-removal scope; exact current bytes unchanged."
+    },
+    {
+      "path": "E2-MECHANISM-ANALYSIS-RESULTS.md",
+      "size_bytes": 61800,
+      "sha256": "0f91fb9c0e1dee439b93578ffe7cfe2a1a6e8ed3650986c20611dc4bb55337ae",
+      "archive_member": "before/E2-MECHANISM-ANALYSIS-RESULTS.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/E2-MECHANISM-ANALYSIS-RESULTS.md",
+      "disposition": "retained_local_unchanged",
+      "successors": [
+        "E2-MECHANISM-ANALYSIS-RESULTS.md"
+      ],
+      "reason": "Analysis/synthesis or retained evidence ledger outside plan-removal scope; exact current bytes unchanged."
+    },
+    {
+      "path": "E2-MECHANISM-ANALYSIS.md",
+      "size_bytes": 42468,
+      "sha256": "7ce4dbf4c157b148c62702883caedcbc9f6e2c8d915cae02d91b2b772ab3a555",
+      "archive_member": "before/E2-MECHANISM-ANALYSIS.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/E2-MECHANISM-ANALYSIS.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "E2-MECHANISM-ANALYSIS-RESULTS.md",
+        "WTF-FINALDESIGN.md"
+      ],
+      "reason": "Completed analysis execution brief retained as provenance; result record unchanged."
+    },
+    {
+      "path": "E2-PRELIM.md",
+      "size_bytes": 13253,
+      "sha256": "c31ea24ddc1719a8532beff2927b234521429566206114121bc0a8527d241c9b",
+      "archive_member": "before/E2-PRELIM.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/E2-PRELIM.md",
+      "disposition": "retained_local_unchanged",
+      "successors": [
+        "E2-PRELIM.md"
+      ],
+      "reason": "Analysis/synthesis or retained evidence ledger outside plan-removal scope; exact current bytes unchanged."
+    },
+    {
+      "path": "EL-MECHANISM-DENOMINATORS-RECURSION-AND-APPLICATIONS.md",
+      "size_bytes": 25136,
+      "sha256": "12318f43bf8a6abee68610941f80ae7d7877d4307cf7ff5ea9b98bc280a13289",
+      "archive_member": "before/EL-MECHANISM-DENOMINATORS-RECURSION-AND-APPLICATIONS.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/EL-MECHANISM-DENOMINATORS-RECURSION-AND-APPLICATIONS.md",
+      "disposition": "retained_local_unchanged",
+      "successors": [
+        "EL-MECHANISM-DENOMINATORS-RECURSION-AND-APPLICATIONS.md"
+      ],
+      "reason": "Analysis/synthesis or retained evidence ledger outside plan-removal scope; exact current bytes unchanged."
+    },
+    {
+      "path": "ELSC.md",
+      "size_bytes": 109647,
+      "sha256": "7a56168fb11b101222b9e852553248e5203690f84964cf52d7bb0183f0971d2e",
+      "archive_member": "before/ELSC.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/ELSC.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/plans/future-applications.md"
+      ],
+      "reason": "Unfinished material target and D01-D12 scientific selections preserved."
+    },
+    {
+      "path": "ELTOP5.md",
+      "size_bytes": 181600,
+      "sha256": "a646c434c699d7679700b1d768956fa15dfd01008f41e7d8daeeff34e06f23a8",
+      "archive_member": "before/ELTOP5.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/ELTOP5.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/plans/future-applications.md"
+      ],
+      "reason": "BR1-BR5, holds, unknown contacts and later M12/M19/M28/M21 targets preserved."
+    },
+    {
+      "path": "MATRIX-FINALOPTIM.md",
+      "size_bytes": 35349,
+      "sha256": "aef9b210affcdd49706758dee1950f49365f1c3b0c106aef0e97016e2f89fe9a",
+      "archive_member": "before/MATRIX-FINALOPTIM.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/MATRIX-FINALOPTIM.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/plans/performance-backlog.md"
+      ],
+      "reason": "Eight optimization items reviewed individually; optional candidates remain separate from release acceptance."
+    },
+    {
+      "path": "MATRIXAUDIT.md",
+      "size_bytes": 76383,
+      "sha256": "2f9230edfa5e307647cb94003d380667474d60e14d422e0f7eefc7d39a8b8663",
+      "archive_member": "before/MATRIXAUDIT.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/MATRIXAUDIT.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF.md",
+        "docs/plans/future-applications.md"
+      ],
+      "reason": "M01-M22 residual classes mapped to current acceptance; obsolete controllers and prescriptions retired."
+    },
+    {
+      "path": "PAPERMIGRATION.md",
+      "size_bytes": 43467,
+      "sha256": "6a6e4826e5b249fd6a596bd61c1a08e01d8dfeb5b5cdff03bf96986759860025",
+      "archive_member": "before/PAPERMIGRATION.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/PAPERMIGRATION.md",
+      "disposition": "retained_local_unchanged",
+      "successors": [
+        "PAPERMIGRATION.md"
+      ],
+      "reason": "Separate paper-migration plan left unimplemented."
+    },
+    {
+      "path": "PREPRINTNOVELTY.md",
+      "size_bytes": 40116,
+      "sha256": "4202b48a05a4f40cf9c3c6c97d3c58f3bf55bb4eedd459aaa6ed735896dc1454",
+      "archive_member": "before/PREPRINTNOVELTY.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/PREPRINTNOVELTY.md",
+      "disposition": "archived_removed",
+      "successors": [],
+      "reason": "Research rationale archived unchanged; no claim that novelty judgments are completed or disproved."
+    },
+    {
+      "path": "PROREVIEW/THEMATRIX-CRITICAL-REVIEW.md",
+      "size_bytes": 54577,
+      "sha256": "606a3fd69d30aa9897fc7bb5665fe810533580ad702497951b93e059fcb6d776",
+      "archive_member": "before/PROREVIEW/THEMATRIX-CRITICAL-REVIEW.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/PROREVIEW/THEMATRIX-CRITICAL-REVIEW.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF-FINALDESIGN.md"
+      ],
+      "reason": "Historical independent design review; selected design is the current owner."
+    },
+    {
+      "path": "PROREVIEW/THEMATRIX-FINALDESIGN-UPDATED.md",
+      "size_bytes": 63750,
+      "sha256": "a37f4c1b2fe720b09f8df34da600a354b2f8426d2930820d873cd9b3c40855a6",
+      "archive_member": "before/PROREVIEW/THEMATRIX-FINALDESIGN-UPDATED.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/PROREVIEW/THEMATRIX-FINALDESIGN-UPDATED.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF-FINALDESIGN.md"
+      ],
+      "reason": "Historical proposed redesign superseded by integrated design and amendment."
+    },
+    {
+      "path": "RECCHAIN-CURRENT.md",
+      "size_bytes": 48914,
+      "sha256": "ebd611fc80b6bed4d4bfe6e93a1a65fff9533e227b779e495a55dd307844371e",
+      "archive_member": "before/RECCHAIN-CURRENT.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/RECCHAIN-CURRENT.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF.md",
+        "docs/architecture.md"
+      ],
+      "reason": "Historical source snapshot; current ownership and status use maintained owners."
+    },
+    {
+      "path": "RECURARCH.md",
+      "size_bytes": 120230,
+      "sha256": "ba36326e0a592f2efd00efc11c1b6a0a823dce48e8200478ee86ec90a9b45016",
+      "archive_member": "before/RECURARCH.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/RECURARCH.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF.md",
+        "docs/plans/future-applications.md",
+        "docs/plans/performance-backlog.md"
+      ],
+      "reason": "AR/RA and prior S/A residuals mapped; no independent architecture/domain-before-release queue."
+    },
+    {
+      "path": "RUBISCO-LOOP.md",
+      "size_bytes": 82339,
+      "sha256": "3c4e96260551d0b1a1b6bc11b3a1b92ece1e87cc82e015ce6462302dd5484ba3",
+      "archive_member": "before/RUBISCO-LOOP.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/RUBISCO-LOOP.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/plans/future-applications.md",
+        "docs/rubisco-inquiry/loop-target-contract.md"
+      ],
+      "reason": "Joint target and W2-W8/RR1-RR5 gaps preserved; old process recovery instructions retired."
+    },
+    {
+      "path": "RUBISCO-PRIZE-REFINED-PLAN.md",
+      "size_bytes": 103641,
+      "sha256": "18cd7afa8b3b9e9b58da7f7cc6928b0abbc6f6fb6a9842cee0c3bc7a7920701f",
+      "archive_member": "before/RUBISCO-PRIZE-REFINED-PLAN.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/RUBISCO-PRIZE-REFINED-PLAN.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/plans/future-applications.md",
+        "docs/rubisco-inquiry/programme-contract.md"
+      ],
+      "reason": "Joint target, in-silico pathway and scientific residuals consolidated."
+    },
+    {
+      "path": "THEMATRIX-AUDIT-EXPDESIGN.md",
+      "size_bytes": 53951,
+      "sha256": "04fa48e590949f93fa10c3eafc579e59952281b191273c54992b2e144b28ee90",
+      "archive_member": "before/THEMATRIX-AUDIT-EXPDESIGN.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/THEMATRIX-AUDIT-EXPDESIGN.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF-FINALDESIGN.md"
+      ],
+      "reason": "XD design concerns now belong to selected design and public protocols."
+    },
+    {
+      "path": "THEMATRIX-LEAN.md",
+      "size_bytes": 41542,
+      "sha256": "0ef78ad8ee839c12069f9ea421553d7683a58bcdcb06b2882b8be04ebdb158ac",
+      "archive_member": "before/THEMATRIX-LEAN.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/THEMATRIX-LEAN.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF-FINALDESIGN.md"
+      ],
+      "reason": "Conditional predecessor E4/account prescriptions superseded by selected eligible SR/BR pathway."
+    },
+    {
+      "path": "THEMATRIX-MIDFIXES.md",
+      "size_bytes": 29604,
+      "sha256": "35eb65fb607ecb1ef6a162fb6b8cbe6fbb8a9ed0c510d2ed3e74baf9f98daa84",
+      "archive_member": "before/THEMATRIX-MIDFIXES.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/THEMATRIX-MIDFIXES.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF.md"
+      ],
+      "reason": "Scoped MF/SI repair evidence retained; current scientific acceptance remains open at its own scope."
+    },
+    {
+      "path": "THEMATRIX-NOVELTY-E3-E6-REVIEW.md",
+      "size_bytes": 43919,
+      "sha256": "3aa9bc3e2591658e5e0a54ba9e7a1a47dbabdd5df67ca36ec60c1911fc6df42b",
+      "archive_member": "before/THEMATRIX-NOVELTY-E3-E6-REVIEW.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/THEMATRIX-NOVELTY-E3-E6-REVIEW.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF-FINALDESIGN.md",
+        "docs/protocols/matrix-programme.md"
+      ],
+      "reason": "Amendment rationale preserved; optional extended attribution was not selected."
+    },
+    {
+      "path": "THEMATRIX-OPTIM-DEFERRED.md",
+      "size_bytes": 64876,
+      "sha256": "6673290060b6ebd3d1168adb973f4a8201fa59465f5fa222b1f7e0cecdf3a387",
+      "archive_member": "before/THEMATRIX-OPTIM-DEFERRED.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/THEMATRIX-OPTIM-DEFERRED.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/plans/performance-backlog.md"
+      ],
+      "reason": "Deferred performance ideas reconciled against implemented custody/reuse and remaining measured candidates."
+    },
+    {
+      "path": "THEMATRIX-OPTIM.md",
+      "size_bytes": 19328,
+      "sha256": "4a09184244dc3c0a1d1194f66bddd10f77e2e92ad11adf6aadfa9008cac41a28",
+      "archive_member": "before/THEMATRIX-OPTIM.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/THEMATRIX-OPTIM.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/plans/performance-backlog.md",
+        "WTF.md"
+      ],
+      "reason": "Implemented gradient cache/worker controls and historical measurements preserved; current release acceptance owns residual RA8."
+    },
+    {
+      "path": "THEMATRIX.md",
+      "size_bytes": 99106,
+      "sha256": "215e2dc2e0369f0906d7ececde4982a8c2babfb6398c5d00408f3acfde60f115",
+      "archive_member": "before/THEMATRIX.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/THEMATRIX.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF-FINALDESIGN.md",
+        "docs/protocols/matrix-programme.md"
+      ],
+      "reason": "Original motivation preserved; current contracts supersede executable design. Policy fixture now uses maintained specification."
+    },
+    {
+      "path": "WTF-FINALDESIGN.md",
+      "size_bytes": 93945,
+      "sha256": "40503df85d9db4ebf0331bde47be1cd036c007410cf577688aedac33755af183",
+      "archive_member": "before/WTF-FINALDESIGN.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/WTF-FINALDESIGN.md",
+      "disposition": "retained_local_reconciled",
+      "successors": [
+        "WTF-FINALDESIGN.md"
+      ],
+      "reason": "Active pair reconciled for present source, acceptance and completed TRAIN/E3 hold; original bytes preserved."
+    },
+    {
+      "path": "WTF.md",
+      "size_bytes": 206847,
+      "sha256": "9f9a8afc1121e0c474d6e00fbad0746e3496066d6a47a90b20ae196f14cc7cdd",
+      "archive_member": "before/WTF.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/WTF.md",
+      "disposition": "retained_local_reconciled",
+      "successors": [
+        "WTF.md"
+      ],
+      "reason": "Active pair reconciled for present source, acceptance and completed TRAIN/E3 hold; original bytes preserved."
+    },
+    {
+      "path": "docs/applied-el-handoff.md",
+      "size_bytes": 21439,
+      "sha256": "c3f4c609c180a31a60368a181840d3833bfb95e18bbfdc2ef85b41a57aaf2a68",
+      "archive_member": "before/docs/applied-el-handoff.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/applied-el-handoff.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF.md",
+        "docs/recursive-inquiry-reuse-boundary.md"
+      ],
+      "reason": "Superseded operational handoff archived."
+    },
+    {
+      "path": "docs/applied-el/architecture-finalisation.md",
+      "size_bytes": 28899,
+      "sha256": "ae1714f13c0a2d2221411072193a43eb47c156626bedae8cc230688118b4e0b0",
+      "archive_member": "before/docs/applied-el/architecture-finalisation.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/applied-el/architecture-finalisation.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF.md"
+      ],
+      "reason": "Historical scoped engineering evidence; not current candidate acceptance."
+    },
+    {
+      "path": "docs/applied-el/battery-controller-composition.md",
+      "size_bytes": 12810,
+      "sha256": "4058569916376a7bd901ecee2b40f6d2b6fc1c7cbe7933789cf3caa015c383a6",
+      "archive_member": "before/docs/applied-el/battery-controller-composition.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/applied-el/battery-controller-composition.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/plans/future-applications.md",
+        "docs/applied-el/battery-thermal-inquiry-selection.md"
+      ],
+      "reason": "Implemented interface proposal retained as history; scientific qualification remains separate."
+    },
+    {
+      "path": "docs/applied-el/battery-interface-selection.md",
+      "size_bytes": 5232,
+      "sha256": "b351b2235587ef1c8885394a3d4b9d21e7b851b4c76b3ad21c72b6680950c556",
+      "archive_member": "before/docs/applied-el/battery-interface-selection.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/applied-el/battery-interface-selection.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/plans/future-applications.md",
+        "docs/applied-el/battery-thermal-inquiry-selection.md"
+      ],
+      "reason": "Historical interface selection and scoped controls preserved."
+    },
+    {
+      "path": "docs/applied-el/battery-remediation-progress.md",
+      "size_bytes": 127576,
+      "sha256": "6c1c8e52f97f0bee8e4c45307d9ee3361f630bca916b20cfd2d77135ea9c4b95",
+      "archive_member": "before/docs/applied-el/battery-remediation-progress.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/applied-el/battery-remediation-progress.md",
+      "disposition": "retained_local_unchanged",
+      "successors": [
+        "docs/applied-el/battery-remediation-progress.md"
+      ],
+      "reason": "Analysis/synthesis or retained evidence ledger outside plan-removal scope; exact current bytes unchanged."
+    },
+    {
+      "path": "docs/applied-el/consolidation-c4-progress.md",
+      "size_bytes": 74627,
+      "sha256": "7b588b91095e61b0d72c41c235efdfcb47b299a3bb75614dccf649ef01fbff81",
+      "archive_member": "before/docs/applied-el/consolidation-c4-progress.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/applied-el/consolidation-c4-progress.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF.md"
+      ],
+      "reason": "Historical engineering/execution ledger archived; old continuation instructions superseded."
+    },
+    {
+      "path": "docs/applied-el/matrix-factor-development-progress.md",
+      "size_bytes": 84050,
+      "sha256": "c994424fe533ca2608347cd4a25e9f8ca41d9fdf9ab15e7f702cafbc61f82ff0",
+      "archive_member": "before/docs/applied-el/matrix-factor-development-progress.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/applied-el/matrix-factor-development-progress.md",
+      "disposition": "retained_local_unchanged",
+      "successors": [
+        "docs/applied-el/matrix-factor-development-progress.md"
+      ],
+      "reason": "Analysis/synthesis or retained evidence ledger outside plan-removal scope; exact current bytes unchanged."
+    },
+    {
+      "path": "docs/applied-el/ra0-selection.md",
+      "size_bytes": 17139,
+      "sha256": "b49e073917e682b9e96a46813acce600d404e96641910315aed8add3cd6ea773",
+      "archive_member": "before/docs/applied-el/ra0-selection.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/applied-el/ra0-selection.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "WTF.md",
+        "docs/plans/future-applications.md"
+      ],
+      "reason": "Historical selection and superseded allowances retained without current authority."
+    },
+    {
+      "path": "docs/plans/empirical-lawhood.constructed-preparation-applicability.md",
+      "size_bytes": 7707,
+      "sha256": "13f40db8d139d190558e89a24edfbd6487063bf23c5ac22c1f11a97e26d0d51e",
+      "archive_member": "before/docs/plans/empirical-lawhood.constructed-preparation-applicability.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/plans/empirical-lawhood.constructed-preparation-applicability.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/protocols/empirical-lawhood.constructed-preparation-applicability.md"
+      ],
+      "reason": "Historical local copy archived; current authoring uses the unchanged maintained protocol and its own digest."
+    },
+    {
+      "path": "docs/plans/empirical-lawhood.matrix-preparation-analysis.md",
+      "size_bytes": 7013,
+      "sha256": "ec94c939f65e44ad4871b611c91d1c33ae5e6c5c7b0b1bb00b6daf573af00329",
+      "archive_member": "before/docs/plans/empirical-lawhood.matrix-preparation-analysis.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/plans/empirical-lawhood.matrix-preparation-analysis.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/protocols/empirical-lawhood.matrix-preparation-analysis.md"
+      ],
+      "reason": "Historical local copy archived; current authoring uses the unchanged maintained protocol and its own digest."
+    },
+    {
+      "path": "docs/plans/empirical-lawhood.preparation-applicability.md",
+      "size_bytes": 6302,
+      "sha256": "66870de4f60cdda4b28629351e72c9643b8cef6622eabb82fc68ab6c5b06a613",
+      "archive_member": "before/docs/plans/empirical-lawhood.preparation-applicability.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/plans/empirical-lawhood.preparation-applicability.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/protocols/empirical-lawhood.preparation-applicability.md"
+      ],
+      "reason": "Historical local copy archived; current authoring uses the unchanged maintained protocol and its own digest."
+    },
+    {
+      "path": "docs/plans/matrix-history-analysis-v1.md",
+      "size_bytes": 5612,
+      "sha256": "55c20a2b67ce1c010979e5eeeef740806c65a764b253285839c486a8552b6a3d",
+      "archive_member": "before/docs/plans/matrix-history-analysis-v1.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/plans/matrix-history-analysis-v1.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/protocols/matrix-history-analysis-v1.md"
+      ],
+      "reason": "Historical local copy archived; current authoring uses the unchanged maintained protocol and its own digest."
+    },
+    {
+      "path": "docs/rubisco-inquiry/scientific-redirection-v1.md",
+      "size_bytes": 15428,
+      "sha256": "96fe6a5fa1c3c8093d8e64a2ed5aab1b168f18c0256c697eea80eaabc2db4c39",
+      "archive_member": "before/docs/rubisco-inquiry/scientific-redirection-v1.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/docs/rubisco-inquiry/scientific-redirection-v1.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/plans/future-applications.md",
+        "docs/rubisco-inquiry/redirection-result-v1.md"
+      ],
+      "reason": "Bounded R0-R2 disposition retained; further molecular work remains future scientific work."
+    },
+    {
+      "path": "src/empirical_lawhood/adapters/methods/constructed_preparation_applicability/frozen_specification.md",
+      "size_bytes": 12145,
+      "sha256": "1b50614ffe258a3c0a5e8a7625ef8c820d1a328af439c0612b484fc1e78b3361",
+      "archive_member": "before/src/empirical_lawhood/adapters/methods/constructed_preparation_applicability/frozen_specification.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/src/empirical_lawhood/adapters/methods/constructed_preparation_applicability/frozen_specification.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/protocols/empirical-lawhood.constructed-preparation-applicability.md"
+      ],
+      "reason": "Exact historical donor bytes preserved; retired package-relative locator resolves through this custody map, without modifying canonical protocol/provenance identities."
+    },
+    {
+      "path": "src/empirical_lawhood/adapters/methods/preparation_applicability/frozen_specification.md",
+      "size_bytes": 7334,
+      "sha256": "be628f6d7869e2c8388fa13ae1ee4ab2784eda4471ee4580c5c5e3c78e8da66d",
+      "archive_member": "before/src/empirical_lawhood/adapters/methods/preparation_applicability/frozen_specification.md",
+      "archive_path": "/media/chevre/SEMIOS/empirical-lawhood-recchain/plan-cleanup-20261025T115121Z/before/src/empirical_lawhood/adapters/methods/preparation_applicability/frozen_specification.md",
+      "disposition": "archived_removed",
+      "successors": [
+        "docs/protocols/empirical-lawhood.preparation-applicability.md"
+      ],
+      "reason": "Exact historical donor bytes preserved; retired package-relative locator resolves through this custody map, without modifying canonical protocol/provenance identities."
+    }
+  ],
+  "matrix_audit_finding_crosswalk": [
+    {
+      "historical_finding": "M01",
+      "current_work_order_items": [
+        "C15",
+        "C17",
+        "C19",
+        "C20",
+        "C21"
+      ],
+      "disposition": "Run-scoped custody repair retains its evidence; remaining bounded read/freshness/scaling acceptance belongs to the current programme."
+    },
+    {
+      "historical_finding": "M02",
+      "current_work_order_items": [
+        "C23",
+        "C25"
+      ],
+      "disposition": "Earlier readiness stage/kind repair remains scoped evidence; common operation declarations own current readiness. No old compiler campaign is reopened."
+    },
+    {
+      "historical_finding": "M03",
+      "current_work_order_items": [
+        "C25",
+        "C26",
+        "C27",
+        "R03",
+        "R04",
+        "R05",
+        "R06",
+        "R07"
+      ],
+      "disposition": "Declarations do not establish completed eligible execution, installed handoffs or the final scientific report."
+    },
+    {
+      "historical_finding": "M04",
+      "current_work_order_items": [
+        "C23"
+      ],
+      "disposition": "Historical common E1 declarations/canonical-history controls retain their scope; use current generated owners."
+    },
+    {
+      "historical_finding": "M05",
+      "current_work_order_items": [
+        "C23",
+        "C24"
+      ],
+      "disposition": "Shared declaration/science owners and retirement supersede the old body-duplication inventory. Fix demonstrated current defects rather than restore retired mechanisms."
+    },
+    {
+      "historical_finding": "M06",
+      "current_work_order_items": [
+        "C15",
+        "C21",
+        "C24",
+        "V03"
+      ],
+      "disposition": "Centralized decoding and compact-population components retain their implementation evidence; remaining actual read/memory acceptance stays in the current work order."
+    },
+    {
+      "historical_finding": "M07",
+      "current_work_order_items": [
+        "C11",
+        "C28",
+        "S01"
+      ],
+      "disposition": "Keep immutable capability/evidence separate from editable selections; the former paired-15 selection is not a current Matrix roster."
+    },
+    {
+      "historical_finding": "M08",
+      "current_work_order_items": [
+        "C05",
+        "C08",
+        "C11",
+        "C26",
+        "C27"
+      ],
+      "disposition": "Retired legacy preparation routes are not restored. Current public derivation/read/export own the remaining workflow."
+    },
+    {
+      "historical_finding": "M09",
+      "current_work_order_items": [
+        "AM06",
+        "R03",
+        "R08"
+      ],
+      "disposition": "The audit describes an earlier TRAIN/source-assembly snapshot. Preserve it as history; current continuation must retain the actual amended TRAIN produced by 2e858fbb."
+    },
+    {
+      "historical_finding": "M10",
+      "current_work_order_items": [
+        "C24",
+        "V03",
+        "F03"
+      ],
+      "disposition": "Historical EL-fixture and limited codec measurements remain scoped; use the actual selected source and population for missing acceptance."
+    },
+    {
+      "historical_finding": "M11",
+      "current_work_order_items": [
+        "C20",
+        "C25",
+        "V04",
+        "F03"
+      ],
+      "disposition": "Current selected recovery and release acceptance remain; old failed-source/controller restoration is not a separate requirement."
+    },
+    {
+      "historical_finding": "M12",
+      "current_work_order_items": [
+        "C25",
+        "C26",
+        "C27",
+        "R05",
+        "R06"
+      ],
+      "disposition": "Prepared/transport software alone does not provide genuine chronological E5/E6 scientific evidence."
+    },
+    {
+      "historical_finding": "M13",
+      "current_work_order_items": [
+        "S02",
+        "S03",
+        "AM01",
+        "R06"
+      ],
+      "disposition": "Preserve original exact commitments and exposure; amended future selections retain their own identities. Do not reinstate predecessor parameter choices."
+    },
+    {
+      "historical_finding": "M14",
+      "current_work_order_items": [
+        "C26",
+        "R05"
+      ],
+      "disposition": "Current E5 prerequisites, source exclusions and actual public use remain governed by the selected design; an implemented check is not a scientific result."
+    },
+    {
+      "historical_finding": "M15",
+      "current_work_order_items": [
+        "C12",
+        "C25"
+      ],
+      "disposition": "Direct authenticated native input repair retains its scoped evidence; current lifecycle consumers must deliver their actual declared operands."
+    },
+    {
+      "historical_finding": "M16",
+      "current_work_order_items": [
+        "C19",
+        "C20",
+        "V02"
+      ],
+      "disposition": "Preserve actionable refusal diagnostics and durable contact/state; current interruption/dispatch acceptance uses existing controls and actual receipts."
+    },
+    {
+      "historical_finding": "M17",
+      "current_work_order_items": [
+        "C15",
+        "C27"
+      ],
+      "disposition": "Earlier bounded emitter repair retains its evidence; current read/export must honor exact package allocations and complete populations."
+    },
+    {
+      "historical_finding": "M18",
+      "current_work_order_items": [
+        "V01",
+        "V04",
+        "F03"
+      ],
+      "disposition": "Verification must match current report, fit minima and public lifecycle contracts. No blanket acceptance follows from historical focused passes."
+    },
+    {
+      "historical_finding": "M19",
+      "current_work_order_items": [
+        "C12",
+        "C25",
+        "R04",
+        "R05",
+        "R06"
+      ],
+      "disposition": "Versioned direct-input repairs retain their original scope; remaining current E4-E6 lifecycle joins still require actual evidence."
+    },
+    {
+      "historical_finding": "M20",
+      "current_work_order_items": [
+        "C15",
+        "C21",
+        "C24",
+        "V03"
+      ],
+      "disposition": "Invocation-bound reuse must preserve complete isolation, immutable bindings and measured memory/scaling. Optional further optimization belongs to the performance backlog."
+    },
+    {
+      "historical_finding": "M21",
+      "current_work_order_items": [
+        "C14",
+        "AM06",
+        "R08"
+      ],
+      "disposition": "The archived 43ab85f0 TRAIN/source snapshot is historical. Current E3 remains held for a supported source transition retaining completed amended TRAIN; no silent source replacement."
+    },
+    {
+      "historical_finding": "M22",
+      "current_work_order_items": [
+        "C15",
+        "C18",
+        "C20",
+        "C27"
+      ],
+      "disposition": "Publication retry/cold-reader repairs retain their evidence; remaining current handoffs and bounded reuse acceptance remain separate."
+    }
+  ],
+  "matrix_audit_finding_crosswalk_scope": "Responsibility and status reconciliation against the superseding work order, not a new independent acceptance test or scientific completion claim. Original finding text and direct historical evidence remain in the archived MATRIXAUDIT.md."
+}

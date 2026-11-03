@@ -273,12 +273,17 @@ def matrix_geometry_summary(report, config):
         "evidence_ceiling": "NON_PROMOTABLE", "exposed_example": config.allocation.exposed_example}
 
 
-def read_matrix_geometry_result(*, config: MatrixGeometryScanInput, artifact_writer: ExternalArtifactPlane, implementation_commit: str):
-    prove_matrix_geometry_scan(config)
+def read_matrix_geometry_result(*, config: MatrixGeometryScanInput, artifact_writer: ExternalArtifactPlane,
+                                implementation_commit: str | None = None):
+    """Authenticate retained science; an optional commit pins its original producer."""
+    config.__post_init__()
     custody = _custody(config, artifact_writer, implementation_commit, read_only=True)
     report = custody.load("terminal", science.MatrixResponseAnisotropicFeasibilityQualificationReport)
     if report is None:
         raise ValueError("Geometry scan has no completed terminal receipt; resume the same selected input")
+    implementation_commit = custody.implementation_commit
+    if report.implementation_commit != implementation_commit:
+        raise ValueError("Geometry terminal changes its authenticated producing commit")
     qualification = _qualification(config, artifact_writer, implementation_commit)
     if report.numerical_qualification_report_sha256 != qualification.fingerprint():
         raise ValueError("Geometry terminal substitutes its current numerical qualification")

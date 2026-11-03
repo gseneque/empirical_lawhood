@@ -29,7 +29,7 @@ from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_
 from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
 
 ROOT = Path(__file__).resolve().parents[1]
-STUDY = ROOT / "experiments/rc-ladder-response/study.json"
+STUDY = ROOT / "programmes/foundations/measurement-and-response/workflows/rc-ladder-response/study.json"
 
 
 def _record_paths(

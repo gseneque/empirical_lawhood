@@ -30,7 +30,7 @@ def _cli_args(profile_path, route, args):
     command = 'response-composition-input-check' if route == "response-composition" else 'dependent-response-input-check'
     config = 'causal-transfer-audit/analysis-input.json' if route == "response-composition" else f"prepared-response/prepared-{route}-input.json"
     invocation = ["--project-root", str(ROOT), "--operator-profile", str(profile_path),
-                  "campaign", command, "--config", str(ROOT / "experiments" / config)]
+                  "campaign", command, "--config", str(ROOT / "programmes/foundations/emergent-structure/workflows" / config)]
     for key, value in args.items():
         if key != "authority_store":
             invocation.extend(["--" + key.replace("_", "-"), str(value)])
@@ -117,7 +117,7 @@ def _finite_cli_args(profile_path, stage, args, *, plan, prior, assignment=None,
     }
     invocation = ["--project-root", str(ROOT), "--operator-profile", str(profile_path),
                   "campaign", 'finite-response-stage-input-check', "--config",
-                  str(ROOT / "experiments/finite-response-law" / files[stage]),
+                  str(ROOT / "programmes/foundations/emergent-structure/workflows/finite-response-law" / files[stage]),
                   "--plan", str(plan), "--prior-exposure", str(prior)]
     for key, value in args.items():
         if key != "authority_store" and value is not None:

@@ -66,8 +66,9 @@ from empirical_lawhood.infrastructure.public_source_acquisition import (
     ExternalPublicSourceCustody,
 )
 from empirical_lawhood.infrastructure.source_origin import (
-    require_executing_target_source,
+    require_selected_implementation,
 )
+from empirical_lawhood.infrastructure.guarded_catalog import select_operator_catalog
 from empirical_lawhood.infrastructure.sql import (
     create_read_only_catalog_engine,
     initialize_production_catalog,
@@ -123,6 +124,7 @@ from empirical_lawhood.runtime.evidence_profiles import EvidenceProfileRegistryR
 from empirical_lawhood.runtime.executable_bindings import ExecutableBindingRole, ExecutableCapabilityProviderFactoryRegistry, ExecutableLinkedCampaignCoordinatorFactory, ExecutablePlatformPort, ExecutableProfileCompilerFactory, GeneratedExecutableBindingAggregate, LayeredCampaignRuntimeProviderResolver
 from empirical_lawhood.runtime.issued_extension_payloads import IssuedExtensionPayloadResolver
 from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignProvider, build_linked_campaign_protocol
+from empirical_lawhood.runtime.artifacts import ExternalRootContract
 from empirical_lawhood.runtime.operator_profile import (
     OperatorStorageAccessMode,
     OperatorStorageProfile,
@@ -632,9 +634,11 @@ def create_api(
     | None = None,
     runtime_provider_registry: CampaignRuntimeProviderRegistry | None = None,
     artifact_profile_validators: ArtifactProfileValidatorRegistry | None = None,
+    artifact_verification: str | None = None,
     source_profile_compiler: SourceProfileCompilerRegistry | None = None,
     linked_profile_compiler: LinkedCampaignProfileCompiler | None = None,
     operator_storage_profile: OperatorStorageProfile | None = None,
+    operator_artifact_root_contract: ExternalRootContract | None = None,
     study_authority_store: StudyOperationAuthorityStore | None = None,
     study_issue_publisher: ExternalIssuedStudyPublisher | None = None,
     study_source_closure_inspector: StudySourceClosureInspector | None = None,
@@ -647,15 +651,19 @@ def create_api(
     approval_checker_trust_path: Path | None = None,
     maximum_parallel_tasks: int = 1,
     executable_platform_ports: tuple[ExecutablePlatformPort, ...] = (),
+    catalog_relative_path: str | None = None,
 ) -> EmpiricalLawhoodApi:
     """Create the stable generic facade without probing sources or writing state."""
+
+    if operator_artifact_root_contract is not None and (operator_storage_profile is None or execution_service is not None):
+        raise ValueError("selected external root requires its operator profile and default storage composition")
 
     root = (
         discover_repository_root()
         if repo_root is None
         else repo_root.resolve(strict=True)
     )
-    require_executing_target_source(root)
+    require_selected_implementation(root)
     installed_factories = _generated_executable_factory_registry()
     installed_executable_codecs = _generated_executable_codec_registry()
     factories = executable_factory_registry or installed_factories
@@ -693,6 +701,7 @@ def create_api(
             operator_storage_profile,
             repo_root=root,
             home_root=Path(pwd.getpwuid(os.geteuid()).pw_dir),
+            selected_contract=operator_artifact_root_contract,
         )
     )
     scratch_root_contract = (
@@ -709,7 +718,16 @@ def create_api(
         and maximum_parallel_tasks != operator_storage_profile.maximum_parallel_tasks
     ):
         raise ValueError("operator profile and execution concurrency differ")
+    catalog_access = select_operator_catalog(profile=operator_storage_profile,
+        project_root=root, catalog_relative_path=catalog_relative_path)
+    if execution_service is not None and catalog_access is not None:
+        raise ValueError("catalog_relative_path cannot replace an injected execution service catalog")
     service = execution_service
+    if artifact_verification is not None:
+        from empirical_lawhood.runtime.operational_configuration import ArtifactVerificationMode
+        artifact_verification = ArtifactVerificationMode(artifact_verification)
+        if service is not None and artifact_verification != service.artifact_plane.artifact_verification:
+            raise ValueError('artifact_verification cannot replace an explicit execution service policy')
     internally_composed_publisher: ExternalIssuedStudyPublisher | None = None
     if service is not None and maximum_parallel_tasks != 1:
         raise ValueError(
@@ -743,6 +761,8 @@ def create_api(
         artifact_plane = ExternalArtifactPlane(
             GuardedExternalRoot(external_root_contract),
             artifact_profile_validators or PRODUCTION_ARTIFACT_PROFILE_VALIDATORS,
+            maximum_parallel_verifications=maximum_parallel_tasks,
+            artifact_verification='reduced' if artifact_verification is None else artifact_verification,
         )
         service_programme_authority_store = study_authority_store or (
             study_issue_publisher.authority_store
@@ -785,11 +805,11 @@ def create_api(
         service = CampaignExecutionService(
             repo_root=root,
             artifact_plane=artifact_plane,
-            engine_factory=lambda: initialize_production_catalog(root),
-            read_only_engine_factory=lambda: create_read_only_catalog_engine(
-                production_catalog_path(root)
-            ),
-            catalog_path=production_catalog_path(root),
+            engine_factory=(lambda: initialize_production_catalog(root)) if catalog_access is None else catalog_access.initialize_engine,
+            read_only_engine_factory=(lambda: create_read_only_catalog_engine(
+                production_catalog_path(root))) if catalog_access is None else catalog_access.read_only_engine,
+            catalog_path=production_catalog_path(root) if catalog_access is None else catalog_access.database_path,
+            catalog_access=catalog_access,
             providers=installed_runtime_providers,
             provider_resolver=LayeredCampaignRuntimeProviderResolver(
                 precomposed=installed_runtime_providers,
@@ -819,7 +839,9 @@ def create_api(
             execution_resource_envelope_coordinator=(
                 DurableExecutionResourceEnvelopeCoordinator(
                     execution_resource_envelope_store
-                    or ExternalExecutionResourceEnvelopeStore(artifact_plane.root)
+                    or ExternalExecutionResourceEnvelopeStore(
+                        artifact_plane.root, artifact_plane=artifact_plane
+                    )
                 )
             ),
         )
@@ -922,8 +944,12 @@ def create_inspection_api(
     *,
     repo_root: Path | None = None,
     operator_storage_profile: OperatorStorageProfile | None = None,
+    operator_artifact_root_contract: ExternalRootContract | None = None,
+    catalog_relative_path: str | None = None,
 ) -> EmpiricalLawhoodApi:
     """Compose static discovery and local validation without a storage plane."""
+    if operator_artifact_root_contract is not None and operator_storage_profile is None:
+        raise ValueError("selected inspection root requires its operator profile")
 
     root = Path.cwd().resolve() if repo_root is None else repo_root.resolve(strict=True)
     factories = _generated_executable_factory_registry()
@@ -936,12 +962,15 @@ def create_inspection_api(
                 repo_root=root,
                 home_root=Path.home(),
                 for_write=False,
+                selected_contract=operator_artifact_root_contract,
             )
         )
     )
     return EmpiricalLawhoodApi(
         repo_root=root,
         project_configured=repo_root is not None,
+        catalog_access=select_operator_catalog(profile=operator_storage_profile,
+            project_root=root, catalog_relative_path=catalog_relative_path),
         external_root=None if storage is None else Path(storage.contract.canonical_path),
         inspection_storage_root=storage,
         inspection_storage_read_only=(
@@ -959,14 +988,17 @@ def create_cli_api(
     *,
     repo_root: Path | None = None,
     operator_storage_profile: OperatorStorageProfile | None = None,
+    operator_artifact_root_contract: ExternalRootContract | None = None,
     dataset_projection_trust_path: Path | None = None,
     approval_checker_trust_path: Path | None = None,
+    catalog_relative_path: str | None = None,
     reactor_authoring_dir: Path | None = None,
     circuit_authoring_dir: Path | None = None,
     electron_gas_authoring_dir: Path | None = None,
     synthetic_material_authoring_dir: Path | None = None,
     authoring_dir: Path | None = None,
     maximum_parallel_tasks: int = 1,
+    artifact_verification: str = 'reduced',
 ) -> EmpiricalLawhoodApi:
     """Create the generic CLI facade with explicit optional trust roots."""
 
@@ -993,19 +1025,28 @@ def create_cli_api(
         > 1
     ):
         raise ValueError("select exactly one fresh native authoring directory")
+    if operator_artifact_root_contract is not None and any(directory is not None for directory in (
+            reactor_authoring_dir, circuit_authoring_dir, electron_gas_authoring_dir,
+            synthetic_material_authoring_dir, authoring_dir)):
+        raise ValueError("selected retained root uses the experiment programme interface for authored work")
     native_kwargs: dict[str, object] = {}
     if reactor_authoring_dir is not None:
         directory, contract = resolve_authoring_directory(
             reactor_authoring_dir, repo_root=root, storage_profile=operator_storage_profile,
             escape_message='fresh reactor authoring lies outside explicit external storage',
         )
+        from empirical_lawhood.api.reactor_source_provenance import authenticate_reactor_authoring_source
+
+        authenticate_reactor_authoring_source(directory=directory, project_root=root,
+            artifact_writer=ExternalArtifactPlane(GuardedExternalRoot(contract), artifact_verification=artifact_verification))
         bundle = load_fresh_reactor_bundle(directory)
-        projection = load_authoring_execution_projection(directory)
+        projection = load_authoring_execution_projection(directory,
+            artifact_writer=ExternalArtifactPlane(GuardedExternalRoot(contract), artifact_verification=artifact_verification))
         run_id = bundle.authoring.base.draft.experiment.experiment_id
         if projection.execution_plan_id != f"execution.{run_id}":
             raise ValueError("fresh reactor projection binds another experiment")
         ports = fresh_reactor_platform_ports(
-            plane=ExternalArtifactPlane(GuardedExternalRoot(contract)),
+            plane=ExternalArtifactPlane(GuardedExternalRoot(contract), artifact_verification=artifact_verification),
             bundle=bundle,
             projected_execution=projection,
             run_id=run_id,
@@ -1021,8 +1062,13 @@ def create_cli_api(
             circuit_authoring_dir, repo_root=root, storage_profile=operator_storage_profile,
             escape_message='fresh RC authoring lies outside explicit external storage',
         )
+        from empirical_lawhood.api.authoring_handoff import authenticate_authoring_source
+
+        authenticate_authoring_source(directory=directory, project_root=root,
+            artifact_writer=ExternalArtifactPlane(GuardedExternalRoot(contract), artifact_verification=artifact_verification))
         bundle = load_fresh_rc_bundle(directory)
-        projection = load_authoring_execution_projection(directory)
+        projection = load_authoring_execution_projection(directory,
+            artifact_writer=ExternalArtifactPlane(GuardedExternalRoot(contract), artifact_verification=artifact_verification))
         run_id = bundle.authoring.base.draft.experiment.experiment_id
         if projection.execution_plan_id != f"execution.{run_id}":
             raise ValueError("fresh RC projection binds another experiment")
@@ -1036,8 +1082,13 @@ def create_cli_api(
             electron_gas_authoring_dir, repo_root=root, storage_profile=operator_storage_profile,
             escape_message='fresh uniform electron gas authoring lies outside explicit external storage',
         )
+        from empirical_lawhood.api.authoring_handoff import authenticate_authoring_source
+
+        authenticate_authoring_source(directory=directory, project_root=root,
+            artifact_writer=ExternalArtifactPlane(GuardedExternalRoot(contract), artifact_verification=artifact_verification))
         bundle = load_uniform_electron_gas_analytic_authoring_bundle(directory)
-        projection = load_authoring_execution_projection(directory)
+        projection = load_authoring_execution_projection(directory,
+            artifact_writer=ExternalArtifactPlane(GuardedExternalRoot(contract), artifact_verification=artifact_verification))
         run_id = bundle.authoring.base.draft.experiment.experiment_id
         if projection.execution_plan_id != f"execution.{run_id}":
             raise ValueError("fresh uniform electron gas projection binds another experiment")
@@ -1053,8 +1104,13 @@ def create_cli_api(
             synthetic_material_authoring_dir, repo_root=root, storage_profile=operator_storage_profile,
             escape_message='synthetic material authoring lies outside explicit external storage',
         )
+        from empirical_lawhood.api.authoring_handoff import authenticate_authoring_source
+
+        authenticate_authoring_source(directory=directory, project_root=root,
+            artifact_writer=ExternalArtifactPlane(GuardedExternalRoot(contract), artifact_verification=artifact_verification))
         bundle = load_synthetic_material_response_bundle(directory)
-        projection = load_authoring_execution_projection(directory)
+        projection = load_authoring_execution_projection(directory,
+            artifact_writer=ExternalArtifactPlane(GuardedExternalRoot(contract), artifact_verification=artifact_verification))
         run_id = bundle.authoring.base.draft.experiment.experiment_id
         if projection.execution_plan_id != f"execution.{run_id}":
             raise ValueError("synthetic material projection binds another experiment")
@@ -1073,7 +1129,7 @@ def create_cli_api(
         )
         handoff = load_integration_handoff(
             directory=authoring_dir, root=root, storage_profile=operator_storage_profile,
-            artifact_writer=ExternalArtifactPlane(GuardedExternalRoot(contract), integration_artifact_profile_validators()),
+            artifact_writer=ExternalArtifactPlane(GuardedExternalRoot(contract), integration_artifact_profile_validators(), artifact_verification=artifact_verification),
         )
         native_kwargs = integration_api_inputs(handoff)
     if dataset_projection_trust_path is None:
@@ -1086,8 +1142,11 @@ def create_cli_api(
         return create_api(
             repo_root=root,
             operator_storage_profile=operator_storage_profile,
+            operator_artifact_root_contract=operator_artifact_root_contract,
             approval_checker_trust_path=approval_checker_trust_path,
+            catalog_relative_path=catalog_relative_path,
             maximum_parallel_tasks=maximum_parallel_tasks,
+            artifact_verification=artifact_verification,
             **native_kwargs,
         )
     external_root = GuardedExternalRoot(
@@ -1095,6 +1154,7 @@ def create_cli_api(
             operator_storage_profile,
             repo_root=root,
             home_root=Path(pwd.getpwuid(os.geteuid()).pw_dir),
+            selected_contract=operator_artifact_root_contract,
         )
     )
     authority = ExternalDatasetCatalogAuthorityLoader(
@@ -1104,10 +1164,13 @@ def create_cli_api(
         maximum_projection_bytes=MAX_UNIFIED_CATALOG_PROJECTION_BYTES,
         maximum_authorization_bytes=MAX_DATASET_AUTHORITY_RECORD_BYTES,
     ).load(reference.evidence_id)
+    catalog_access = select_operator_catalog(profile=operator_storage_profile,
+        project_root=root, catalog_relative_path=catalog_relative_path)
     provider = DatasetCatalogReadSessionProvider(
-        production_catalog_path(root),
+        production_catalog_path(root) if catalog_access is None else catalog_access.database_path,
         authority.dataset_snapshot,
         authority.anchor,
+        catalog_access=catalog_access,
     )
     binding_resolver = AuthenticatedDatasetCampaignBindingResolver(
         provider,
@@ -1119,10 +1182,13 @@ def create_cli_api(
     return create_api(
         repo_root=root,
         operator_storage_profile=operator_storage_profile,
+        operator_artifact_root_contract=operator_artifact_root_contract,
         dataset_catalog_session_provider=provider,
         dataset_campaign_binding_resolver=binding_resolver,
+        catalog_relative_path=catalog_relative_path,
         approval_checker_trust_path=approval_checker_trust_path,
         maximum_parallel_tasks=maximum_parallel_tasks,
+        artifact_verification=artifact_verification,
         **native_kwargs,
     )
 

@@ -31,8 +31,9 @@ def _closed(properties: dict[str, object]) -> dict[str, object]:
 
 
 class _Projection:
-    def __init__(self) -> None:
+    def __init__(self, configuration_capabilities=()) -> None:
         self.definitions: dict[str, object] = {}
+        self.capabilities = {value.record_type: value for value in configuration_capabilities}
 
     def record(self, record_type: type[CanonicalRecord]) -> dict[str, str]:
         key = record_type.__name__ + "_" + sha256(record_type.SCHEMA.encode()).hexdigest()[:12]
@@ -47,11 +48,20 @@ class _Projection:
                 if suffix in _UNITS:
                     projection["x-unit"] = _UNITS[suffix]
                 properties[field.name] = projection
+            capability = self.capabilities.get(record_type)
+            if capability is not None:
+                metadata = capability.metadata()
+                for name, value in metadata["fixed_fields"].items():
+                    properties[name].update({"const": value, "readOnly": True, "x-selection": "fixed-capability"})
+                for name in capability.selectable_fields:
+                    properties[name]["x-selection"] = "selectable"
             self.definitions[key] = _closed({
                 "schema": {"const": record_type.SCHEMA},
                 "version": {"const": record_type.VERSION},
                 "value": _closed(properties),
             })
+            if capability is not None:
+                self.definitions[key]["x-capability-contract"] = capability.metadata()
         return {"$ref": f"#/$defs/{key}"}
 
     def annotation(self, annotation: object) -> dict[str, object]:
@@ -87,8 +97,8 @@ class _Projection:
         raise TypeError(f"unsupported configuration schema annotation: {annotation!r}")
 
 
-def project_record(record_type: type[CanonicalRecord]) -> dict[str, object]:
-    projection = _Projection()
+def project_record(record_type: type[CanonicalRecord], *, configuration_capabilities=()) -> dict[str, object]:
+    projection = _Projection(configuration_capabilities)
     reference = projection.record(record_type)
     return {"$schema": DIALECT, **reference, "$defs": projection.definitions}
 
@@ -132,7 +142,7 @@ def generated_resources() -> dict[str, bytes]:
             elif consumer.disposition == "helper":
                 schema = _helper_schema(consumer)
             else:
-                schema = project_record(consumer.record_type())
+                schema = project_record(consumer.record_type(), configuration_capabilities=consumer.configuration_capabilities)
             schema.update({
                 "title": consumer.consumer.replace("-", " ").title(),
                 "$id": "urn:empirical-lawhood:configuration:" + consumer.consumer,
@@ -141,6 +151,8 @@ def generated_resources() -> dict[str, bytes]:
                 "x-consumer-maximum-bytes": consumer.maximum_bytes,
                 "x-preparation-allowed": consumer.preparation_allowed,
             })
+            if consumer.configuration_capabilities:
+                schema["x-configuration-capabilities"] = [value.metadata() for value in consumer.configuration_capabilities]
             result[filename] = (json.dumps(schema, sort_keys=True, indent=2) + "\n").encode()
         entries.append({"consumer": consumer.consumer, "schema_id": consumer.schema_id,
                         "disposition": consumer.disposition, "schema_resource": filename,
@@ -154,11 +166,12 @@ def generated_resources() -> dict[str, bytes]:
     return result
 
 
-def configuration_schema(schema_id: str) -> dict[str, object]:
-    """Read an allowlisted installed schema; never follow remote references."""
+def configuration_schema(schema_id: str, *, consumer: str | None = None) -> dict[str, object]:
+    """Read one closed consumer's installed schema; refuse ambiguous roots."""
     root = files(RESOURCE_PACKAGE)
     index = json.loads(root.joinpath("index.json").read_text(encoding="utf-8"))
-    candidates = [item for item in index["consumers"] if item["schema_id"] == schema_id]
+    candidates = [item for item in index["consumers"] if item["schema_id"] == schema_id
+                  and (consumer is None or item["consumer"] == consumer)]
     if len(candidates) != 1:
         raise ValueError(f"unknown or ambiguous configuration schema: {schema_id}")
     return json.loads(root.joinpath(candidates[0]["schema_resource"]).read_text(encoding="utf-8"))

@@ -49,7 +49,7 @@ from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_
 from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
 
 ROOT = Path(__file__).resolve().parents[1]
-CONFIG = ROOT / "experiments/lattice-pairing-method/authoring.json"
+CONFIG = ROOT / "programmes/materials/superconductivity/workflows/lattice-pairing-method/authoring.json"
 
 
 def test_shipped_synthetic_material_response_method_compiles_and_selects_exact_provider_chain(

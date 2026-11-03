@@ -2,6 +2,7 @@
 
 from dataclasses import replace
 from pathlib import Path
+import os
 from types import MethodType, SimpleNamespace
 
 import pytest
@@ -19,7 +20,7 @@ from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manif
 from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
 from empirical_lawhood.kernel.provenance import ObjectIdentity
 from empirical_lawhood.runtime.artifacts import (
-    ArtifactManifest, ArtifactProfile, ArtifactWriteRequest, ExternalRootContract,
+    ArtifactCustodyLimits, ArtifactManifest, ArtifactProfile, ArtifactWriteRequest, ExternalRootContract,
     artifact_publication_batch_id, artifact_publication_commit_relative_path,
     artifact_publication_member,
 )
@@ -28,6 +29,25 @@ from empirical_lawhood.runtime.plans import CandidateExecutionPlan
 
 
 FIXTURE = Path(__file__).parent / 'fixtures/authoring-execution-plan.json'
+
+
+def test_topological_generations_visit_each_dependency_list_once():
+    from empirical_lawhood.runtime.plans import _topological_order
+
+    visits = []
+    class Dependencies(dict):
+        def __getitem__(self, key):
+            visits.append(key)
+            return super().__getitem__(key)
+    identifiers = tuple(f'task.{index:04d}' for index in range(512))
+    dependencies = Dependencies({task: (() if index == 0 else (identifiers[index - 1],))
+        for index, task in enumerate(identifiers)})
+    assert _topological_order(identifiers, dependencies) == identifiers
+    assert sorted(visits) == list(identifiers)
+    # Whole sorted generations differ from a single global ready heap.
+    assert _topological_order(('a', 'b', 'z'), {'a': (), 'b': ('a',), 'z': ()}) == ('a', 'z', 'b')
+    with pytest.raises(ValueError, match='cycle'):
+        _topological_order(('a', 'b'), {'a': ('b',), 'b': ('a',)})
 
 
 def _sparse(path, size):
@@ -47,7 +67,8 @@ def test_oversize_typed_plan_is_refused_before_decode(tmp_path, monkeypatch, own
     monkeypatch.setattr(selected, 'decode_canonical_bytes', forbidden)
     with pytest.raises(BoundedFileIOError, match='exceeds its byte limit'):
         if owner == 'shared':
-            authoring_handoff.load_authoring_execution_projection(tmp_path)
+            writer = SimpleNamespace(custody_limits=ArtifactCustodyLimits(control_record_bytes=MAX_RUNTIME_PLAN_JSON_BYTES))
+            authoring_handoff.load_authoring_execution_projection(tmp_path, artifact_writer=writer)
         elif owner == 'finite':
             finite_rerun_authoring._read_record(tmp_path, 'preissue-execution-plan.json', CandidateExecutionPlan)
         else:
@@ -96,9 +117,10 @@ def test_mixed_root_codec_applies_typed_plan_bound_after_closed_selection(monkey
 
 
 def _stored_plan(tmp_path):
+    mount = next(parent for parent in (tmp_path, *tmp_path.parents) if os.path.ismount(parent))
     plane = ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
         'synthetic.plan-bound-store', 'software-only bounded plan custody', str(tmp_path),
-        '/', OperatorStorageProfile.SCHEMA, 1, None, None, (),
+        str(mount), OperatorStorageProfile.SCHEMA, 1, None, None, (),
     )))
     (tmp_path / 'preissue-execution-plan.json').write_bytes(FIXTURE.read_bytes())
     plan = authoring_handoff.load_authoring_execution_projection(tmp_path)

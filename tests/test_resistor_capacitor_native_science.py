@@ -55,7 +55,7 @@ def test_one_cell_solution_matches_closed_form_voltage_and_charge_balance() -> N
 
 
 def test_quickstart_model_has_four_cells_and_frozen_native_units() -> None:
-    path = Path("experiments/rc-ladder-response/model.json")
+    path = Path("programmes/foundations/measurement-and-response/workflows/rc-ladder-response/model.json")
     model = decode_canonical_bytes(
         path.read_bytes(), ResistorCapacitorLadderModelConfig, maximum_bytes=64 * 1024
     )
@@ -81,7 +81,7 @@ def test_quickstart_model_has_four_cells_and_frozen_native_units() -> None:
 
 
 def test_shipped_model_boundary_current_integrates_to_stored_charge() -> None:
-    path = Path("experiments/rc-ladder-response/model.json")
+    path = Path("programmes/foundations/measurement-and-response/workflows/rc-ladder-response/model.json")
     model = decode_canonical_bytes(
         path.read_bytes(), ResistorCapacitorLadderModelConfig, maximum_bytes=64 * 1024
     )

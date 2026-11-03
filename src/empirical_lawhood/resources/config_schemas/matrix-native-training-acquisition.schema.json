@@ -1,0 +1,472 @@
+{
+  "$defs": {
+    "ConfiguredE3Measurement_c818def9385b": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-experiment/measurement-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "action_amplitude": {
+              "additionalProperties": false,
+              "const": {
+                "decimal": "0.01"
+              },
+              "description": "action amplitude; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "readOnly": true,
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-selection": "fixed-capability"
+            },
+            "actions": {
+              "const": [
+                "COMPLEMENT",
+                "FACTOR",
+                "GENERIC",
+                "TRACE"
+              ],
+              "description": "actions; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "readOnly": true,
+              "type": "array",
+              "x-selection": "fixed-capability"
+            },
+            "aggregation": {
+              "const": "MAX_ALL_PANELS_ACTIONS_AND_PRECEDING_HORIZONS_PER_WHOLE_ROOT",
+              "description": "aggregation; constructor checks semantics and units.",
+              "readOnly": true,
+              "type": "string",
+              "x-selection": "fixed-capability"
+            },
+            "descriptions": {
+              "description": "descriptions; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "x-selection": "selectable"
+            },
+            "estimand": {
+              "const": "FINITE_DT_ODD_RESPONSE_HALF_PLUS_MINUS",
+              "description": "estimand; constructor checks semantics and units.",
+              "readOnly": true,
+              "type": "string",
+              "x-selection": "fixed-capability"
+            },
+            "feature_cadence_ticks": {
+              "const": 16,
+              "description": "feature cadence ticks; constructor checks semantics and units.",
+              "readOnly": true,
+              "type": "integer",
+              "x-selection": "fixed-capability"
+            },
+            "feature_window_ticks": {
+              "const": 32,
+              "description": "feature window ticks; constructor checks semantics and units.",
+              "readOnly": true,
+              "type": "integer",
+              "x-selection": "fixed-capability"
+            },
+            "fine_timestep": {
+              "additionalProperties": false,
+              "const": {
+                "decimal": "0.0005"
+              },
+              "description": "fine timestep; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "readOnly": true,
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-selection": "fixed-capability"
+            },
+            "horizons": {
+              "description": "horizons; constructor checks semantics and units.",
+              "items": {
+                "type": "integer"
+              },
+              "type": "array",
+              "x-selection": "selectable"
+            },
+            "matrix_dimension": {
+              "const": 4,
+              "description": "matrix dimension; constructor checks semantics and units.",
+              "readOnly": true,
+              "type": "integer",
+              "x-selection": "fixed-capability"
+            },
+            "metric": {
+              "const": "MAX_POSITION_MOMENTUM_HS24_ERROR_OVER_NOMINAL_ACTUATOR_SCALE",
+              "description": "metric; constructor checks semantics and units.",
+              "readOnly": true,
+              "type": "string",
+              "x-selection": "fixed-capability"
+            },
+            "numerical_views": {
+              "const": [
+                "FINE",
+                "PRIMARY"
+              ],
+              "description": "numerical views; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "readOnly": true,
+              "type": "array",
+              "x-selection": "fixed-capability"
+            },
+            "origin_tick": {
+              "const": 256,
+              "description": "origin tick; constructor checks semantics and units.",
+              "readOnly": true,
+              "type": "integer",
+              "x-selection": "fixed-capability"
+            },
+            "panel_roles": {
+              "const": [
+                "COMMON_NOISE_PANEL",
+                "INDEPENDENT_FUTURE"
+              ],
+              "description": "panel roles; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "readOnly": true,
+              "type": "array",
+              "x-selection": "fixed-capability"
+            },
+            "primary_description": {
+              "description": "primary description; constructor checks semantics and units.",
+              "type": "string",
+              "x-selection": "selectable"
+            },
+            "primary_horizon": {
+              "description": "primary horizon; constructor checks semantics and units.",
+              "type": "integer",
+              "x-selection": "selectable"
+            },
+            "primary_timestep": {
+              "additionalProperties": false,
+              "const": {
+                "decimal": "0.001"
+              },
+              "description": "primary timestep; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "readOnly": true,
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-selection": "fixed-capability"
+            },
+            "pulse_ticks": {
+              "const": 16,
+              "description": "pulse ticks; constructor checks semantics and units.",
+              "readOnly": true,
+              "type": "integer",
+              "x-selection": "fixed-capability"
+            },
+            "q": {
+              "const": 2,
+              "description": "q; constructor checks semantics and units.",
+              "readOnly": true,
+              "type": "integer",
+              "x-selection": "fixed-capability"
+            },
+            "receiver_count": {
+              "const": 48,
+              "description": "receiver count; constructor checks semantics and units.",
+              "readOnly": true,
+              "type": "integer",
+              "x-selection": "fixed-capability"
+            },
+            "target_contract": {
+              "description": "target contract; constructor checks semantics and units.",
+              "type": "string",
+              "x-selection": "selectable"
+            },
+            "target_discrepancy_tolerance": {
+              "additionalProperties": false,
+              "description": "target discrepancy tolerance; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object",
+              "x-selection": "selectable"
+            }
+          },
+          "required": [
+            "q",
+            "matrix_dimension",
+            "descriptions",
+            "horizons",
+            "primary_description",
+            "primary_horizon",
+            "origin_tick",
+            "feature_window_ticks",
+            "feature_cadence_ticks",
+            "primary_timestep",
+            "fine_timestep",
+            "actions",
+            "action_amplitude",
+            "pulse_ticks",
+            "panel_roles",
+            "receiver_count",
+            "numerical_views",
+            "target_discrepancy_tolerance",
+            "estimand",
+            "metric",
+            "aggregation",
+            "target_contract"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "3.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object",
+      "x-capability-contract": {
+        "contract_id": "matrix.response-error.selected-paired-target.v3",
+        "fixed_fields": {
+          "action_amplitude": {
+            "decimal": "0.01"
+          },
+          "actions": [
+            "COMPLEMENT",
+            "FACTOR",
+            "GENERIC",
+            "TRACE"
+          ],
+          "aggregation": "MAX_ALL_PANELS_ACTIONS_AND_PRECEDING_HORIZONS_PER_WHOLE_ROOT",
+          "estimand": "FINITE_DT_ODD_RESPONSE_HALF_PLUS_MINUS",
+          "feature_cadence_ticks": 16,
+          "feature_window_ticks": 32,
+          "fine_timestep": {
+            "decimal": "0.0005"
+          },
+          "matrix_dimension": 4,
+          "metric": "MAX_POSITION_MOMENTUM_HS24_ERROR_OVER_NOMINAL_ACTUATOR_SCALE",
+          "numerical_views": [
+            "FINE",
+            "PRIMARY"
+          ],
+          "origin_tick": 256,
+          "panel_roles": [
+            "COMMON_NOISE_PANEL",
+            "INDEPENDENT_FUTURE"
+          ],
+          "primary_timestep": {
+            "decimal": "0.001"
+          },
+          "pulse_ticks": 16,
+          "q": 2,
+          "receiver_count": 48
+        },
+        "schema": "empirical-lawhood/matrix-response-experiment/measurement-selection",
+        "selectable_fields": [
+          "descriptions",
+          "horizons",
+          "primary_description",
+          "primary_horizon",
+          "target_contract",
+          "target_discrepancy_tolerance"
+        ],
+        "sha256": "9773b779e7cffd5963416a12175cb1ce0907ead0abffc8160f82297c8192c8e8",
+        "version": "3.0.0"
+      }
+    },
+    "NativeTrainingAcquisitionSpecification_212a3fb33e7b": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-experiment/native-training-acquisition-specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "candidate": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "candidate; constructor checks semantics and units."
+            },
+            "future_reservation": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "future reservation; constructor checks semantics and units."
+            },
+            "measurement": {
+              "$ref": "#/$defs/ConfiguredE3Measurement_c818def9385b",
+              "description": "measurement; constructor checks semantics and units."
+            },
+            "root_ids": {
+              "description": "root ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "specification_id",
+            "measurement",
+            "root_ids",
+            "future_reservation",
+            "candidate"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-native-training-acquisition",
+  "$ref": "#/$defs/NativeTrainingAcquisitionSpecification_212a3fb33e7b",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Native Training Acquisition",
+  "x-configuration-capabilities": [
+    {
+      "contract_id": "matrix.response-error.selected-paired-target.v3",
+      "fixed_fields": {
+        "action_amplitude": {
+          "decimal": "0.01"
+        },
+        "actions": [
+          "COMPLEMENT",
+          "FACTOR",
+          "GENERIC",
+          "TRACE"
+        ],
+        "aggregation": "MAX_ALL_PANELS_ACTIONS_AND_PRECEDING_HORIZONS_PER_WHOLE_ROOT",
+        "estimand": "FINITE_DT_ODD_RESPONSE_HALF_PLUS_MINUS",
+        "feature_cadence_ticks": 16,
+        "feature_window_ticks": 32,
+        "fine_timestep": {
+          "decimal": "0.0005"
+        },
+        "matrix_dimension": 4,
+        "metric": "MAX_POSITION_MOMENTUM_HS24_ERROR_OVER_NOMINAL_ACTUATOR_SCALE",
+        "numerical_views": [
+          "FINE",
+          "PRIMARY"
+        ],
+        "origin_tick": 256,
+        "panel_roles": [
+          "COMMON_NOISE_PANEL",
+          "INDEPENDENT_FUTURE"
+        ],
+        "primary_timestep": {
+          "decimal": "0.001"
+        },
+        "pulse_ticks": 16,
+        "q": 2,
+        "receiver_count": 48
+      },
+      "schema": "empirical-lawhood/matrix-response-experiment/measurement-selection",
+      "selectable_fields": [
+        "descriptions",
+        "horizons",
+        "primary_description",
+        "primary_horizon",
+        "target_contract",
+        "target_discrepancy_tolerance"
+      ],
+      "sha256": "9773b779e7cffd5963416a12175cb1ce0907ead0abffc8160f82297c8192c8e8",
+      "version": "3.0.0"
+    }
+  ],
+  "x-consumer": "matrix-native-training-acquisition",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

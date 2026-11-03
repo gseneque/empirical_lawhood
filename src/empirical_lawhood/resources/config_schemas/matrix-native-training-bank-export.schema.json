@@ -1,0 +1,53 @@
+{
+  "$defs": {
+    "NativeTrainingBankExportSelection_9e251217b449": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-experiment/native-training-bank-export-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "bank_record_id": {
+              "description": "bank record id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "output_relative_path": {
+              "description": "output relative path; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "record_id",
+            "bank_record_id",
+            "output_relative_path"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "2.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-native-training-bank-export",
+  "$ref": "#/$defs/NativeTrainingBankExportSelection_9e251217b449",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Native Training Bank Export",
+  "x-consumer": "matrix-native-training-bank-export",
+  "x-consumer-maximum-bytes": 1048576,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

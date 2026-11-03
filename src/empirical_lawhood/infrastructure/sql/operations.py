@@ -6,9 +6,10 @@ import threading
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
-from sqlalchemy import Connection, Engine, alias, and_, delete, func, or_, select, update
+from sqlalchemy import Connection, Engine, alias, and_, delete, exists, func, or_, select, update
 from sqlalchemy.exc import IntegrityError, OperationalError
 
 from empirical_lawhood.kernel.serialization import validate_sha256, validate_stable_id
@@ -19,11 +20,71 @@ from empirical_lawhood.runtime.execution import (
     TaskBlockReason,
 )
 
-from .schema import lease, run_event, task_attempt, workflow_run
+from empirical_lawhood.infrastructure.sql.schema import lease, run_event, task_attempt, workflow_run
 
 
 class OperationalWriteConflict(RuntimeError):
     pass
+
+
+class _OriginalCatalogConnectionProof:
+    """Invocation-local selected file/connection proof, never entry authority.
+
+    Creator engines intentionally need no URL.database. Both custody reads and
+    lease CAS authenticate their ACTUAL SQLite connection through this owner.
+    File identity stays fixed; ordinary connection policy and the owned CAS may
+    legitimately change database content metadata.
+    """
+
+    def __init__(self, catalog_path):
+        if type(catalog_path) is not str:
+            raise ValueError("original transaction requires its exact canonical catalog path")
+        self.path = Path(catalog_path)
+        self.catalog_path = catalog_path
+        observed = self._snapshot()
+        self._identity = observed[:4]
+
+    def _snapshot(self):
+        import stat
+
+        path = self.path
+        try:
+            if (not path.is_absolute() or ".." in path.parts
+                    or any(value.is_symlink() for value in (path, *path.parents))
+                    or str(path.resolve(strict=True)) != self.catalog_path):
+                raise ValueError("original transaction requires its exact canonical catalog path")
+            value = path.lstat()
+        except OSError as error:
+            raise ValueError("original transaction requires its existing regular catalog") from error
+        if not stat.S_ISREG(value.st_mode):
+            raise ValueError("original transaction catalog is not a regular file")
+        return tuple(getattr(value, field) for field in ("st_dev", "st_ino", "st_mode",
+            "st_nlink", "st_size", "st_mtime_ns", "st_ctime_ns"))
+
+    def require_path_identity(self):
+        observed = self._snapshot()
+        if observed[:4] != self._identity:
+            raise ValueError("original transaction catalog file identity changed")
+        return observed
+
+    def require_current(self, connection):
+        if connection.engine.url.get_backend_name() != "sqlite":
+            raise ValueError("original transaction requires its SQLite catalog")
+        databases = tuple(connection.exec_driver_sql("PRAGMA database_list"))
+        main = tuple(row for row in databases if row[1] == "main")
+        names = tuple(row[1] for row in databases)
+        if (len(main) != 1 or main[0][2] != self.catalog_path
+                or len(names) != len(set(names))
+                or any(row[1] not in ("main", "temp")
+                    or row[1] == "temp" and row[2] != "" for row in databases)):
+            raise ValueError("original transaction connected catalog or namespace changed")
+        # Schema reflection can leave a legitimate EMPTY TEMP namespace on a
+        # pooled connection. No TEMP object of ANY type may shadow these reads.
+        # This query may initialize an empty namespace; no presentation/order
+        # equality or cached verdict is used as evidence of namespace safety.
+        if connection.exec_driver_sql("SELECT 1 FROM temp.sqlite_master LIMIT 1").first() is not None:
+            raise ValueError("original transaction TEMP namespace contains objects")
+        return self.require_path_identity()
 
 
 DEFAULT_OPERATIONAL_QUERY_WORK_LIMIT = 1_000_000
@@ -282,6 +343,120 @@ class SQLiteOperationalRepository:
             self._attempt_from_row(row, ordinal=int(row["attempt_ordinal"])) for row in rows
         )
 
+    def current_attempt_lease(
+        self,
+        *,
+        run_id: str,
+        execution_plan_sha256: str,
+        task_id: str,
+        attempt_id: str,
+        lease_id: str,
+        owner_id: str,
+        at_epoch_seconds: int,
+    ) -> OperationalAttempt:
+        """Read one current owned lease; grant no source or execution authority.
+
+        Catalog display ordinals count retained unindexed block rows. They are
+        observed here and are never equated with recovery candidate ordinals.
+        The public owner calls this under its existing run lock after its heavy
+        source and authority checks, then separately checks the final clock.
+        """
+
+        for name, value in (
+            ("run_id", run_id), ("task_id", task_id),
+            ("attempt_id", attempt_id), ("lease_id", lease_id),
+            ("owner_id", owner_id),
+        ):
+            validate_stable_id(value, field_name=name)
+        validate_sha256(execution_plan_sha256, field_name="execution_plan_sha256")
+        if type(at_epoch_seconds) is not int or at_epoch_seconds < 0:
+            raise ValueError("current attempt lease clock must be a nonnegative integer")
+        current = (
+            select(
+                func.max(task_attempt.c.pk).label("current_attempt_pk"),
+                func.count(task_attempt.c.pk).label("attempt_ordinal"),
+            )
+            .join(workflow_run, task_attempt.c.workflow_run_pk == workflow_run.c.pk)
+            .where(workflow_run.c.run_id == run_id, task_attempt.c.task_id == task_id)
+            .subquery("bounded_current_attempt")
+        )
+        statement = (
+            select(
+                task_attempt,
+                workflow_run.c.run_id,
+                workflow_run.c.state.label("run_state"),
+                workflow_run.c.plan_fingerprint,
+                current.c.attempt_ordinal,
+                lease.c.lease_id,
+                lease.c.owner_id,
+                lease.c.expires_epoch_seconds,
+            )
+            .join(workflow_run, task_attempt.c.workflow_run_pk == workflow_run.c.pk)
+            .join(current, task_attempt.c.pk == current.c.current_attempt_pk)
+            .outerjoin(lease, lease.c.task_attempt_pk == task_attempt.c.pk)
+            .where(
+                workflow_run.c.run_id == run_id,
+                task_attempt.c.task_id == task_id,
+                task_attempt.c.attempt_id == attempt_id,
+            )
+        )
+        with self._bounded_connection() as (connection, _work_state):
+            rows = tuple(map(_row_mapping, connection.execute(statement)))
+        if len(rows) != 1:
+            raise OperationalWriteConflict("current attempt lease is not one latest selected attempt")
+        row = rows[0]
+        if (
+            row["run_state"] != OperationalStatus.RUNNING.value
+            or bytes(row["plan_fingerprint"]) != _digest(execution_plan_sha256)
+            or row["state"] != TaskAttemptDisposition.RUNNING.value
+            or row["reason_code"] is not None
+            or row["lease_id"] != lease_id
+            or row["owner_id"] != owner_id
+            or type(row["expires_epoch_seconds"]) is not int
+            or row["expires_epoch_seconds"] <= at_epoch_seconds
+        ):
+            raise OperationalWriteConflict("current attempt owned RUNNING lease changed or expired")
+        return self._attempt_from_row(row, ordinal=int(row["attempt_ordinal"]))
+
+    def refresh_attempt_lease(self, *, run_id: str, execution_plan_sha256: str,
+            task_id: str, attempt_id: str, lease_id: str, owner_id: str,
+            at_epoch_seconds: int, expires_epoch_seconds: int) -> None:
+        """Extend only the exact still-live lease under its existing run claim.
+
+        This changes operational liveness, not scientific execution permission.
+        It cannot resurrect expiry, take over another owner or extend a completed
+        or superseded attempt. The scheduler's owner thread performs the CAS.
+        """
+        self._assert_writer()
+        current = self.current_attempt_lease(run_id=run_id,
+            execution_plan_sha256=execution_plan_sha256, task_id=task_id,
+            attempt_id=attempt_id, lease_id=lease_id, owner_id=owner_id,
+            at_epoch_seconds=at_epoch_seconds)
+        if type(expires_epoch_seconds) is not int or expires_epoch_seconds <= at_epoch_seconds:
+            raise ValueError("lease refresh requires a bounded future expiration")
+        newer = alias(task_attempt, name="newer_refresh_attempt")
+        selected = (select(task_attempt.c.pk)
+            .join(workflow_run, task_attempt.c.workflow_run_pk == workflow_run.c.pk)
+            .where(workflow_run.c.run_id == run_id,
+                workflow_run.c.plan_fingerprint == _digest(execution_plan_sha256),
+                workflow_run.c.state == OperationalStatus.RUNNING.value,
+                task_attempt.c.task_id == task_id, task_attempt.c.attempt_id == attempt_id,
+                task_attempt.c.state == TaskAttemptDisposition.RUNNING.value,
+                task_attempt.c.reason_code.is_(None),
+                ~exists(select(newer.c.pk).where(
+                    newer.c.workflow_run_pk == task_attempt.c.workflow_run_pk,
+                    newer.c.task_id == task_attempt.c.task_id,
+                    newer.c.pk > task_attempt.c.pk))))
+        with self.engine.begin() as connection:
+            changed = connection.execute(update(lease).where(
+                lease.c.task_attempt_pk.in_(selected), lease.c.lease_id == lease_id,
+                lease.c.owner_id == owner_id,
+                lease.c.expires_epoch_seconds == current.lease_expires_epoch_seconds,
+                lease.c.expires_epoch_seconds > at_epoch_seconds,
+            ).values(expires_epoch_seconds=max(expires_epoch_seconds, current.lease_expires_epoch_seconds)))
+            if changed.rowcount != 1:
+                raise OperationalWriteConflict("current attempt lease changed before refresh")
+
     def attempt_history_page(
         self,
         run_id: str,
@@ -502,6 +677,8 @@ class SQLiteOperationalRepository:
                 )
         except IntegrityError as error:
             raise OperationalWriteConflict("attempt or lease identity already exists") from error
+
+
 
     def _finish_attempt(
         self,

@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import threading
+from itertools import chain, islice
 from collections.abc import Mapping
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import Connection, Engine, alias, exists, func, or_, select
-from sqlalchemy.engine import CursorResult
-from sqlalchemy.exc import IntegrityError, OperationalError
+from sqlalchemy.exc import IntegrityError, NoResultFound, OperationalError
 
 from empirical_lawhood.kernel.evidence import VisibilityCeiling
 from empirical_lawhood.runtime.artifacts import ArtifactProfile
@@ -137,11 +137,26 @@ def _row_mapping(row: Any) -> Mapping[str, Any]:
     return row._mapping  # type: ignore[no-any-return]
 
 
-def _inserted_pk(result: CursorResult[Any]) -> int:
-    primary_key = result.inserted_primary_key
-    if not primary_key or primary_key[0] is None:
-        raise RuntimeError("catalog insert did not return a primary key")
-    return int(primary_key[0])
+_CATALOG_BATCH_ROWS = 256
+
+
+def _insert_many(connection, table, rows):
+    """Use the existing transaction with bounded DBAPI parameter batches."""
+    iterator = iter(rows)
+    while batch := list(islice(iterator, _CATALOG_BATCH_ROWS)):
+        connection.execute(table.insert(), batch)
+
+
+def _primary_keys(connection, table, id_column, identifiers):
+    """Resolve this operation's exact foreign-key census in bounded queries."""
+    keys = sorted({value for value in identifiers if value is not None})
+    result = {}
+    for offset in range(0, len(keys), _CATALOG_BATCH_ROWS):
+        selected = keys[offset:offset + _CATALOG_BATCH_ROWS]
+        result.update(connection.execute(select(id_column, table.c.pk).where(id_column.in_(selected))).all())
+    if len(result) != len(keys):
+        raise NoResultFound('catalog append references a missing ' + table.name + ' identity')
+    return result
 
 
 class SQLiteCatalogRepository:
@@ -165,16 +180,6 @@ class SQLiteCatalogRepository:
         if threading.get_ident() != self._writer_thread:
             raise CatalogWriterViolation("catalog writes are restricted to the owner thread")
 
-    @staticmethod
-    def _pk(
-        connection: Connection,
-        table: Any,
-        id_column: Any,
-        identifier: str,
-    ) -> int:
-        value = connection.execute(select(table.c.pk).where(id_column == identifier)).scalar_one()
-        return int(value)
-
     def append_snapshot(self, snapshot: CatalogSnapshot) -> None:
         self._assert_writer()
         try:
@@ -189,211 +194,97 @@ class SQLiteCatalogRepository:
             raise CatalogWriteConflict("append-only catalog identity already exists") from error
 
     def _insert_roots(self, connection: Connection, snapshot: CatalogSnapshot) -> None:
-        for record in snapshot.storage_roots:
-            connection.execute(
-                storage_root.insert().values(
-                    storage_root_id=record.storage_root_id,
-                    logical_name=record.logical_name,
-                    canonical_path=record.canonical_path,
-                    mount_contract_schema=record.mount_contract_schema,
-                    verification_status=record.verification_status.value,
-                )
-            )
+        _insert_many(connection, storage_root, (dict(
+            storage_root_id=row.storage_root_id, logical_name=row.logical_name,
+            canonical_path=row.canonical_path, mount_contract_schema=row.mount_contract_schema,
+            verification_status=row.verification_status.value) for row in snapshot.storage_roots))
 
     def _insert_artifacts(self, connection: Connection, snapshot: CatalogSnapshot) -> None:
-        for logical_record in snapshot.logical_artifacts:
-            connection.execute(
-                logical_artifact.insert().values(
-                    logical_artifact_id=logical_record.logical_artifact_id,
-                    content_sha256=_digest(logical_record.content_sha256),
-                    payload_schema=logical_record.payload_schema,
-                    profile=logical_record.profile.value,
-                    media_type=logical_record.media_type,
-                    visibility_ceiling=logical_record.visibility_ceiling.value,
-                )
-            )
-        for locator in snapshot.artifact_locators:
-            connection.execute(
-                artifact.insert().values(
-                    materialization_id=locator.materialization_id,
-                    logical_artifact_pk=self._pk(
-                        connection,
-                        logical_artifact,
-                        logical_artifact.c.logical_artifact_id,
-                        locator.logical_artifact_id,
-                    ),
-                    storage_root_pk=self._pk(
-                        connection,
-                        storage_root,
-                        storage_root.c.storage_root_id,
-                        locator.storage_root_id,
-                    ),
-                    relative_path=locator.relative_path,
-                    physical_sha256=_digest(locator.physical_sha256),
-                    size_bytes=locator.size_bytes,
-                    compression=locator.compression,
-                    partition_selector=locator.partition_selector,
-                    verification_status=locator.verification_status.value,
-                )
-            )
+        _insert_many(connection, logical_artifact, (dict(
+            logical_artifact_id=row.logical_artifact_id, content_sha256=_digest(row.content_sha256),
+            payload_schema=row.payload_schema, profile=row.profile.value, media_type=row.media_type,
+            visibility_ceiling=row.visibility_ceiling.value) for row in snapshot.logical_artifacts))
+        logical = _primary_keys(connection, logical_artifact, logical_artifact.c.logical_artifact_id,
+            (row.logical_artifact_id for row in snapshot.artifact_locators))
+        roots = _primary_keys(connection, storage_root, storage_root.c.storage_root_id,
+            (row.storage_root_id for row in snapshot.artifact_locators))
+        _insert_many(connection, artifact, (dict(
+            materialization_id=row.materialization_id, logical_artifact_pk=logical[row.logical_artifact_id],
+            storage_root_pk=roots[row.storage_root_id], relative_path=row.relative_path,
+            physical_sha256=_digest(row.physical_sha256), size_bytes=row.size_bytes,
+            compression=row.compression, partition_selector=row.partition_selector,
+            verification_status=row.verification_status.value) for row in snapshot.artifact_locators))
 
     def _insert_receipts(self, connection: Connection, snapshot: CatalogSnapshot) -> None:
-        for record in snapshot.receipts:
-            connection.execute(
-                receipt.insert().values(
-                    receipt_id=record.receipt_id,
-                    run_id=record.run_id,
-                    storage_root_pk=self._pk(
-                        connection,
-                        storage_root,
-                        storage_root.c.storage_root_id,
-                        record.storage_root_id,
-                    ),
-                    relative_path=record.relative_path,
-                    sha256=_digest(record.sha256),
-                    receipt_schema=record.receipt_schema,
-                    verification_status=record.verification_status.value,
-                )
-            )
+        roots = _primary_keys(connection, storage_root, storage_root.c.storage_root_id,
+            (row.storage_root_id for row in snapshot.receipts))
+        _insert_many(connection, receipt, (dict(
+            receipt_id=row.receipt_id, run_id=row.run_id, storage_root_pk=roots[row.storage_root_id],
+            relative_path=row.relative_path, sha256=_digest(row.sha256), receipt_schema=row.receipt_schema,
+            verification_status=row.verification_status.value) for row in snapshot.receipts))
 
     def _insert_scientific_objects(self, connection: Connection, snapshot: CatalogSnapshot) -> None:
-        for record in snapshot.scientific_objects:
-            artifact_pk = (
-                None
-                if record.artifact_materialization_id is None
-                else self._pk(
-                    connection,
-                    artifact,
-                    artifact.c.materialization_id,
-                    record.artifact_materialization_id,
-                )
-            )
-            receipt_pk = (
-                None
-                if record.receipt_id is None
-                else self._pk(
-                    connection,
-                    receipt,
-                    receipt.c.receipt_id,
-                    record.receipt_id,
-                )
-            )
-            result = connection.execute(
-                scientific_object.insert().values(
-                    scientific_object_id=record.scientific_object_id,
-                    kind=record.kind.value,
-                    object_schema=record.object_schema,
-                    fingerprint=_digest(record.object_sha256),
-                    visibility_ceiling=record.visibility_ceiling.value,
-                    categorical_status=record.categorical_status,
-                    artifact_pk=artifact_pk,
-                    receipt_pk=receipt_pk,
-                )
-            )
-            object_pk = _inserted_pk(result)
-            projection = projection_tables[record.kind.value.lower()]
-            connection.execute(projection.insert().values(scientific_object_pk=object_pk))
-
-    def _object_pk(self, connection: Connection, object_id: str) -> int:
-        return self._pk(
-            connection,
-            scientific_object,
-            scientific_object.c.scientific_object_id,
-            object_id,
-        )
+        artifacts = _primary_keys(connection, artifact, artifact.c.materialization_id,
+            (row.artifact_materialization_id for row in snapshot.scientific_objects))
+        receipts = _primary_keys(connection, receipt, receipt.c.receipt_id,
+            (row.receipt_id for row in snapshot.scientific_objects))
+        _insert_many(connection, scientific_object, (dict(
+            scientific_object_id=row.scientific_object_id, kind=row.kind.value,
+            object_schema=row.object_schema, fingerprint=_digest(row.object_sha256),
+            visibility_ceiling=row.visibility_ceiling.value, categorical_status=row.categorical_status,
+            artifact_pk=artifacts.get(row.artifact_materialization_id), receipt_pk=receipts.get(row.receipt_id))
+            for row in snapshot.scientific_objects))
+        objects = _primary_keys(connection, scientific_object, scientific_object.c.scientific_object_id,
+            (row.scientific_object_id for row in snapshot.scientific_objects))
+        projections = {}
+        for row in snapshot.scientific_objects:
+            projections.setdefault(row.kind.value.lower(), []).append(
+                dict(scientific_object_pk=objects[row.scientific_object_id]))
+        for kind, rows in projections.items():
+            _insert_many(connection, projection_tables[kind], rows)
 
     def _insert_edges_and_metrics(self, connection: Connection, snapshot: CatalogSnapshot) -> None:
-        for edge_record in snapshot.knowledge_edges:
-            connection.execute(
-                knowledge_edge.insert().values(
-                    edge_id=edge_record.edge_id,
-                    relation=edge_record.relation,
-                    source_object_pk=self._object_pk(connection, edge_record.source_object_id),
-                    target_object_pk=self._object_pk(connection, edge_record.target_object_id),
-                    evidence_object_pk=(
-                        None
-                        if edge_record.evidence_object_id is None
-                        else self._object_pk(connection, edge_record.evidence_object_id)
-                    ),
-                    scope_id=edge_record.scope_id,
-                )
-            )
-        for definition_record in snapshot.metric_definitions:
-            connection.execute(
-                metric_definition.insert().values(
-                    metric_definition_id=definition_record.metric_definition_id,
-                    metric_name=definition_record.metric_name,
-                    dataset_version_id=definition_record.dataset_version_id,
-                    relation_id=definition_record.relation_id,
-                    denominator_gauge_id=definition_record.denominator_gauge_id,
-                    response_gauge_id=definition_record.response_gauge_id,
-                    horizon_id=definition_record.horizon_id,
-                    native_unit=definition_record.native_unit,
-                    aggregation=definition_record.aggregation,
-                    direction=definition_record.direction,
-                )
-            )
-        for observation_record in snapshot.metric_observations:
-            connection.execute(
-                metric_observation.insert().values(
-                    metric_observation_id=observation_record.metric_observation_id,
-                    metric_definition_pk=self._pk(
-                        connection,
-                        metric_definition,
-                        metric_definition.c.metric_definition_id,
-                        observation_record.metric_definition_id,
-                    ),
-                    scientific_object_pk=self._object_pk(
-                        connection, observation_record.scientific_object_id
-                    ),
-                    point_decimal=str(observation_record.point),
-                    lower_decimal=(
-                        None if observation_record.lower is None else str(observation_record.lower)
-                    ),
-                    upper_decimal=(
-                        None if observation_record.upper is None else str(observation_record.upper)
-                    ),
-                    physical_independent_unit_count=(
-                        observation_record.physical_independent_unit_count
-                    ),
-                    numerical_view_count=observation_record.numerical_view_count,
-                )
-            )
+        references = (value for row in snapshot.knowledge_edges
+            for value in (row.source_object_id, row.target_object_id, row.evidence_object_id))
+        objects = _primary_keys(connection, scientific_object, scientific_object.c.scientific_object_id,
+            chain(references, (row.scientific_object_id for row in snapshot.metric_observations)))
+        _insert_many(connection, knowledge_edge, (dict(
+            edge_id=row.edge_id, relation=row.relation, source_object_pk=objects[row.source_object_id],
+            target_object_pk=objects[row.target_object_id], evidence_object_pk=objects.get(row.evidence_object_id),
+            scope_id=row.scope_id) for row in snapshot.knowledge_edges))
+        _insert_many(connection, metric_definition, (dict(
+            metric_definition_id=row.metric_definition_id, metric_name=row.metric_name,
+            dataset_version_id=row.dataset_version_id, relation_id=row.relation_id,
+            denominator_gauge_id=row.denominator_gauge_id, response_gauge_id=row.response_gauge_id,
+            horizon_id=row.horizon_id, native_unit=row.native_unit, aggregation=row.aggregation,
+            direction=row.direction) for row in snapshot.metric_definitions))
+        definitions = _primary_keys(connection, metric_definition, metric_definition.c.metric_definition_id,
+            (row.metric_definition_id for row in snapshot.metric_observations))
+        _insert_many(connection, metric_observation, (dict(
+            metric_observation_id=row.metric_observation_id,
+            metric_definition_pk=definitions[row.metric_definition_id],
+            scientific_object_pk=objects[row.scientific_object_id], point_decimal=str(row.point),
+            lower_decimal=None if row.lower is None else str(row.lower),
+            upper_decimal=None if row.upper is None else str(row.upper),
+            physical_independent_unit_count=row.physical_independent_unit_count,
+            numerical_view_count=row.numerical_view_count) for row in snapshot.metric_observations))
 
-    def _insert_exploration_attempts(
-        self, connection: Connection, snapshot: CatalogSnapshot
-    ) -> None:
-        for record in snapshot.exploration_attempts:
-            result = connection.execute(
-                exploration_attempt.insert().values(
-                    attempt_id=record.attempt_id,
-                    analysis_spec_object_pk=self._object_pk(
-                        connection, record.analysis_spec_object_id
-                    ),
-                    disposition=record.disposition,
-                )
-            )
-            attempt_pk = _inserted_pk(result)
-            for ordinal, reason_code in enumerate(record.reason_codes):
-                connection.execute(
-                    exploration_attempt_reason.insert().values(
-                        attempt_pk=attempt_pk,
-                        ordinal=ordinal,
-                        reason_code=reason_code,
-                    )
-                )
-            for materialization_id in record.artifact_materialization_ids:
-                connection.execute(
-                    exploration_attempt_artifact.insert().values(
-                        attempt_pk=attempt_pk,
-                        artifact_pk=self._pk(
-                            connection,
-                            artifact,
-                            artifact.c.materialization_id,
-                            materialization_id,
-                        ),
-                    )
-                )
+    def _insert_exploration_attempts(self, connection: Connection, snapshot: CatalogSnapshot) -> None:
+        objects = _primary_keys(connection, scientific_object, scientific_object.c.scientific_object_id,
+            (row.analysis_spec_object_id for row in snapshot.exploration_attempts))
+        artifacts = _primary_keys(connection, artifact, artifact.c.materialization_id,
+            (value for row in snapshot.exploration_attempts for value in row.artifact_materialization_ids))
+        _insert_many(connection, exploration_attempt, (dict(
+            attempt_id=row.attempt_id, analysis_spec_object_pk=objects[row.analysis_spec_object_id],
+            disposition=row.disposition) for row in snapshot.exploration_attempts))
+        attempts = _primary_keys(connection, exploration_attempt, exploration_attempt.c.attempt_id,
+            (row.attempt_id for row in snapshot.exploration_attempts))
+        _insert_many(connection, exploration_attempt_reason, (dict(
+            attempt_pk=attempts[row.attempt_id], ordinal=ordinal, reason_code=reason)
+            for row in snapshot.exploration_attempts for ordinal, reason in enumerate(row.reason_codes)))
+        _insert_many(connection, exploration_attempt_artifact, (dict(
+            attempt_pk=attempts[row.attempt_id], artifact_pk=artifacts[value])
+            for row in snapshot.exploration_attempts for value in row.artifact_materialization_ids))
 
     @staticmethod
     def _object_query_predicates(query: CatalogObjectQuery) -> tuple[Any, ...]:

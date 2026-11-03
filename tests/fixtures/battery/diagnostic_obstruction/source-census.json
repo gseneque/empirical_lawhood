@@ -1,0 +1,52 @@
+{
+  "compressed": {
+    "bytes": 31765,
+    "path": "source01.json.gz",
+    "sha256": "1d4c7fec773cb76f7061ba39d42978c8fa810424d999da409a4c99bc273c599a"
+  },
+  "exposure": "EXPOSED_RETAINED_HISTORY_NONPROMOTABLE",
+  "fresh_native_contacts": 0,
+  "fresh_physical_units": 0,
+  "historical_custody_edited": false,
+  "preserved_history": {
+    "actual_charging_subcalls": null,
+    "actual_forecast_completions": null,
+    "actual_forecast_provider_entries": null,
+    "actual_initial_soc_soh_subcalls": null,
+    "complete_custody_members": 475,
+    "entered_registered_native_operations": 1,
+    "kernel_attribution_scope": "HOST_JOURNAL_PID_EVIDENCE_NOT_A_SCIENTIFIC_COMPLETION_LEDGER",
+    "native_input_manifests": 3,
+    "numerical_disposition": "UNEVALUABLE",
+    "operational_record_roles": [
+      "contact",
+      "event",
+      "index",
+      "plan",
+      "terminal"
+    ],
+    "returned_materialized_trace_rows": 0,
+    "selected_forecast_roster": 12
+  },
+  "provenance": {
+    "archive_authority_audit": {
+      "bytes": 108465,
+      "path": "/tmp/el-domain-entry-audit-20261011/br3-entry-uncertainty01.json",
+      "sha256": "17bc7ddc89c85d32aeadcd96d2d1d9960c8bd1b972eacfa06ea528badee52f23"
+    },
+    "member_exactly_matches_retained_source": true,
+    "original_path": "/tmp/empirical-lawhood-applied-el-20261011-reopen01/battery-obstruction-history01/preparation/source01.json",
+    "producing_archive": "/tmp/empirical-lawhood-applied-el-20261011-reopen01/producing-source-battery-refined02.zip",
+    "producing_archive_member": "scientific-inputs/battery-obstruction/source01.json"
+  },
+  "schema": "empirical-lawhood/exposed-battery-obstruction-fixture-census",
+  "scientific_qualification": false,
+  "source": {
+    "bytes": 207993,
+    "schema": "empirical-lawhood/battery-diagnostic-obstruction/source",
+    "sha256": "f147680f49187838e7d712b7b642e312f34d5fac1029d1a44548378108541303",
+    "source_id": "source.battery-diagnostic-obstruction.actual02",
+    "version": "1.0.0"
+  },
+  "version": "1.0.0"
+}

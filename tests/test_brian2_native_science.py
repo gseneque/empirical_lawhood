@@ -20,10 +20,10 @@ from empirical_lawhood.cli.app import app
 from empirical_lawhood.kernel.decoding import decode_canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
-CONFIG = ROOT / "experiments/neuron-current-response/config.json"
+CONFIG = ROOT / "programmes/biology/cell-responses/workflows/neuron-current-response/config.json"
 NATIVE_PYTHON = Path(os.environ.get(
     "EMPIRICAL_LAWHOOD_BRIAN2_PYTHON",
-    str(ROOT / "experiments/neuron-current-response/native-env/.venv/bin/python"),
+    str(ROOT / "programmes/biology/cell-responses/workflows/neuron-current-response/native-env/.venv/bin/python"),
 ))
 
 

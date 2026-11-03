@@ -2,6 +2,7 @@
 """Neutral bounded provider proof shared by current integration families."""
 
 import sys
+from dataclasses import replace
 
 from empirical_lawhood.kernel.provenance import ObjectIdentity
 from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
@@ -51,7 +52,8 @@ def prove_provider_projection(*, provider, registry, projection, resources, proo
     scientific = {}
     for task in projection.tasks:
         for operand in task.external_inputs:
-            if expected.setdefault(operand.logical_artifact_id, operand) != operand:
+            current = expected.setdefault(operand.logical_artifact_id, operand)
+            if replace(current, input_id=operand.input_id) != operand:
                 raise ValueError('Integration has conflicting exact external operand descriptors')
         for edge in task.scientific_inputs:
             if edge.external_input_id is not None:
@@ -80,7 +82,7 @@ def prove_provider_projection(*, provider, registry, projection, resources, proo
             for edge in scientific.get(operand.logical_artifact_id, ()):
                 if (operand.payload_schema != edge.payload_schema or operand.media_type != edge.media_type
                     or operand.visibility_ceiling != edge.visibility_ceiling or operand.outcome_access != edge.outcome_access
-                    or operand.size_bytes > edge.maximum_size_bytes):
+                    or (edge.maximum_size_bytes is not None and operand.size_bytes > edge.maximum_size_bytes)):
                     raise ValueError('Integration external operand differs from its declared scientific edge')
             for _ in operand.chunks():
                 pass

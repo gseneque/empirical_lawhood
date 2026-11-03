@@ -388,6 +388,7 @@ def build_issued_study_fixture(
                     "config_id",
                     "manifest_id",
                     "topology_id",
+                    "selection_id",
                 )
                 if isinstance(getattr(record, name, None), str)
             ),

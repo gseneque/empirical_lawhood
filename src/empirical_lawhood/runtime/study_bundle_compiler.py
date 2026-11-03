@@ -539,14 +539,7 @@ def _validate_joint_template(
 
 
 def _aggregate_resource_budgets(budgets: tuple[ResourceBudget, ...]) -> ResourceBudget:
-    return ResourceBudget(
-        cpu_cores=max(value.cpu_cores for value in budgets),
-        memory_bytes=max(value.memory_bytes for value in budgets),
-        gpu_devices=max(value.gpu_devices for value in budgets),
-        wall_time_seconds=sum(value.wall_time_seconds for value in budgets),
-        source_scan_bytes=sum(value.source_scan_bytes for value in budgets),
-        output_bytes=sum(value.output_bytes for value in budgets),
-    )
+    return ResourceBudget.aggregate(budgets)
 
 
 __all__ = [

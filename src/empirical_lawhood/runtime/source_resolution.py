@@ -49,7 +49,7 @@ class ContentAddressedInputRequirement(CanonicalRecord):
     content_sha256: str
     payload_schema: str
     media_type: str
-    maximum_bytes: int
+    maximum_bytes: int | None
     expected_size_bytes: int | None
     outcome_access: OutcomeAccess
     visibility_ceiling: VisibilityCeiling
@@ -59,17 +59,17 @@ class ContentAddressedInputRequirement(CanonicalRecord):
         validate_sha256(self.content_sha256, field_name="content_sha256")
         validate_schema(self.payload_schema)
         validate_nonempty(self.media_type, field_name="media_type")
-        if (
+        if self.maximum_bytes is not None and (
             not isinstance(self.maximum_bytes, int)
             or isinstance(self.maximum_bytes, bool)
             or self.maximum_bytes <= 0
         ):
-            raise ValueError("maximum_bytes must be a positive integer")
+            raise ValueError("maximum_bytes must be a positive integer or None")
         if self.expected_size_bytes is not None and (
             not isinstance(self.expected_size_bytes, int)
             or isinstance(self.expected_size_bytes, bool)
             or self.expected_size_bytes < 0
-            or self.expected_size_bytes > self.maximum_bytes
+            or (self.maximum_bytes is not None and self.expected_size_bytes > self.maximum_bytes)
         ):
             raise ValueError("expected size must fit the input work envelope")
 
@@ -194,7 +194,7 @@ class SourceMaterializationConfig(CanonicalRecord):
     role: SourceMaterializationRole
     content_sha256: str
     expected_size_bytes: int
-    maximum_bytes: int
+    maximum_bytes: int | None
     payload_schema: str
     media_type: str
     read_mode: SourceReadMode
@@ -211,13 +211,13 @@ class SourceMaterializationConfig(CanonicalRecord):
             or self.expected_size_bytes < 0
         ):
             raise ValueError("expected_size_bytes must be nonnegative")
-        if (
+        if self.maximum_bytes is not None and (
             not isinstance(self.maximum_bytes, int)
             or isinstance(self.maximum_bytes, bool)
             or self.maximum_bytes <= 0
             or self.expected_size_bytes > self.maximum_bytes
         ):
-            raise ValueError("source size must fit its positive read envelope")
+            raise ValueError("source size must fit its optional positive read envelope")
         validate_schema(self.payload_schema)
         validate_nonempty(self.media_type, field_name="media_type")
 
@@ -247,21 +247,20 @@ class CandidateSourceResolutionService:
 
     resolver: ContentAddressedInputResolver
     capability_config_decoders: tuple[CandidateCapabilityConfigDecoder, ...] = ()
-    maximum_source_config_bytes: int = 1024 * 1024
-    maximum_qualification_bytes: int = 1024 * 1024
+    maximum_source_config_bytes: int | None = 1024 * 1024
+    maximum_qualification_bytes: int | None = 1024 * 1024
 
     def __post_init__(self) -> None:
         for name, value in (
             ("maximum_source_config_bytes", self.maximum_source_config_bytes),
             ("maximum_qualification_bytes", self.maximum_qualification_bytes),
         ):
-            if (
+            if value is not None and (
                 not isinstance(value, int)
                 or isinstance(value, bool)
                 or value <= 0
-                or value > 16 * 1024**2
             ):
-                raise ValueError(f"{name} must be in (0, 16 MiB]")
+                raise ValueError(f"{name} must be a positive integer or None")
         provider_ids: list[str] = []
         for decoder in self.capability_config_decoders:
             validate_stable_id(decoder.provider_key, field_name="provider_key")

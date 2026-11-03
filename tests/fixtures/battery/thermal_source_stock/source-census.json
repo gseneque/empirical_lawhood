@@ -1,0 +1,323 @@
+{
+  "archive": {
+    "bytes": 698758,
+    "expanded_tar_bytes": 1351680,
+    "path": "source-operands.tar.gz",
+    "sha256": "a1ae2eaa026ba1f0dfaa789114f3f2f024548d1540a2388197d6d7acbb48a077"
+  },
+  "exposure": "EXPOSED_DEVELOPMENT_STOCK_NONPROMOTABLE",
+  "license_origin": {
+    "distribution_version": "26.6.2.0",
+    "path": "/home/chevre/.cache/uv/archive-v0/CxRb86qiMR4tA5Rr/pybamm-26.6.2.0.dist-info/licenses/LICENSE.txt",
+    "sha256": "e32e218b9184b0c498c1e13a8e66c1e67df9ef48ba9071bd2a5ebe04efdb303a"
+  },
+  "members": [
+    {
+      "bytes": 12972,
+      "path": "battery-thermal-inquiry-selection.json",
+      "sha256": "553b7c23587818892bba11894096aa95f68994f1163d5ed2e6d6fad8086829e3"
+    },
+    {
+      "bytes": 1494,
+      "path": "licenses/PyBaMM-LICENSE.txt",
+      "sha256": "e32e218b9184b0c498c1e13a8e66c1e67df9ef48ba9071bd2a5ebe04efdb303a"
+    },
+    {
+      "bytes": 576273,
+      "path": "m50-original.pdf",
+      "sha256": "a8d895143a55e0beae273f2c94eb4f3038857f19cc190ea2048f825e77a76f6a"
+    },
+    {
+      "bytes": 15022,
+      "path": "provenance/source-intake-register.json",
+      "sha256": "d86b889742bc0bd0b96f2ed79b6b41e672287c7571b86ae60c5d6c4cd8c47a5c"
+    },
+    {
+      "bytes": 26965,
+      "path": "pybamm/experiment/step/base_step.py",
+      "sha256": "529b13e48d47bde6dbe7568b77dfa9eb414bdfddcdfef41f10090c704ffa4c51"
+    },
+    {
+      "bytes": 7476,
+      "path": "pybamm/experiment/step/step_termination.py",
+      "sha256": "dec8604759478667d2b5b8bc27ce083ff765519aaa2d84600dd88c01bb4930a0"
+    },
+    {
+      "bytes": 15261,
+      "path": "pybamm/experiment/step/steps.py",
+      "sha256": "646840589957343587ab23916718dc5d3a5d645116d238c4fdfb23606e849d08"
+    },
+    {
+      "bytes": 67231,
+      "path": "pybamm/expression_tree/binary_operators.py",
+      "sha256": "0d63c767b0c19b0596a13bcb5ae35cfcba800e4e465aeb532f7ea6210b8199c4"
+    },
+    {
+      "bytes": 4716,
+      "path": "pybamm/expression_tree/input_parameter.py",
+      "sha256": "dca5228c35ed5dbae85e26ce2a7b6fb316e2a6260721372d10372b732d496bb0"
+    },
+    {
+      "bytes": 12508,
+      "path": "pybamm/input/parameters/lithium_ion/Chen2020.py",
+      "sha256": "7c360a546a76492585e147231caee2f8f4fe29222b893cb12091dc4d158f62f0"
+    },
+    {
+      "bytes": 30427,
+      "path": "pybamm/input/parameters/lithium_ion/ORegan2022.py",
+      "sha256": "c0c8111cb37fd4e79726f17e0d02f0aaac6d06532060a677efb5743c92a0b259"
+    },
+    {
+      "bytes": 16208,
+      "path": "pybamm/meshes/one_dimensional_submeshes.py",
+      "sha256": "26f6b8b86ea1d73c912de54c83dcf3f58f4c879cd7ed03d01f7827057c212e7a"
+    },
+    {
+      "bytes": 81601,
+      "path": "pybamm/models/full_battery_models/base_battery_model.py",
+      "sha256": "5391e6db1e13fac3746f5317c27830df2d4cb3bf96295161c22ca439ba3777ec"
+    },
+    {
+      "bytes": 5536,
+      "path": "pybamm/models/full_battery_models/lithium_ion/dfn.py",
+      "sha256": "84711c3ac78beac3c4de102f043549d8ffb11f6a1411c47ce47d0e4488c8a00c"
+    },
+    {
+      "bytes": 51540,
+      "path": "pybamm/models/full_battery_models/lithium_ion/electrode_soh.py",
+      "sha256": "55002481f8bd9750ebee05667a1e70382bbd7da1c3fb7a5327c8db0e9cf19d54"
+    },
+    {
+      "bytes": 3215,
+      "path": "pybamm/models/full_battery_models/lithium_ion/spme.py",
+      "sha256": "3a5a1b870be8f88cdd510f3dc131731029d89b304c68b5d2f4b7084781304543"
+    },
+    {
+      "bytes": 1908,
+      "path": "pybamm/models/submodels/external_circuit/explicit_control_external_circuit.py",
+      "sha256": "59d8387a084760b84f3084ef0176afb29db31a653103fa6d8842ec786442cdc5"
+    },
+    {
+      "bytes": 6303,
+      "path": "pybamm/models/submodels/external_circuit/function_control_external_circuit.py",
+      "sha256": "63a902b35a2228428ebc2a74934076e88420dd2e23158c2d675b362f8489f471"
+    },
+    {
+      "bytes": 23868,
+      "path": "pybamm/models/submodels/thermal/base_thermal.py",
+      "sha256": "4e66ef69411b6233a456d43c134abca30b321ef290806c193ddad0a1c07b825d"
+    },
+    {
+      "bytes": 3818,
+      "path": "pybamm/models/submodels/thermal/lumped.py",
+      "sha256": "f4c03e752281b8089a1b98fbb8e4a09670f618b24ce2317a1dcb99dcb3422609"
+    },
+    {
+      "bytes": 932,
+      "path": "pybamm/models/submodels/thermal/surface/ambient.py",
+      "sha256": "b3b5c42e8065d97e9c525fcfc025c8f68309f8931f963ebed54b43323a5d1f11"
+    },
+    {
+      "bytes": 1751,
+      "path": "pybamm/parameters/electrical_parameters.py",
+      "sha256": "19a3b43c6aac04a60d3736cbf186e50ebf5b2515e3e76e496a6675447c0372c6"
+    },
+    {
+      "bytes": 7097,
+      "path": "pybamm/parameters/geometric_parameters.py",
+      "sha256": "4609bf6e420494d76e58102fbc43222778ceaa10bc167a2b054c642df436aff9"
+    },
+    {
+      "bytes": 53642,
+      "path": "pybamm/parameters/parameter_values.py",
+      "sha256": "869abd3bc55b40591859e45a6af822de976739a6b872782edf4c0874ba7966f6"
+    },
+    {
+      "bytes": 7070,
+      "path": "pybamm/parameters/thermal_parameters.py",
+      "sha256": "605ea7d30bfe10ea5418d4fe3a2ce4705782fc6e631c01e436d031c8ba02083a"
+    },
+    {
+      "bytes": 30854,
+      "path": "pybamm/simulation/base_simulation.py",
+      "sha256": "70e345a89433b001ebce742a3d6697ee3e7605557af99c86a146d9563618f1f4"
+    },
+    {
+      "bytes": 54503,
+      "path": "pybamm/simulation/simulation.py",
+      "sha256": "06544d81a67ca62d833a8c637e596c2dfe0a0fc205a35dc9ebf5942d107f7a23"
+    },
+    {
+      "bytes": 11290,
+      "path": "pybamm/solvers/algebraic_solver.py",
+      "sha256": "7eca13b6dc8daf8a8b23a79f2eaa3c45cdc170479fe19d37ee2ba3b4ca92a07f"
+    },
+    {
+      "bytes": 80275,
+      "path": "pybamm/solvers/base_solver.py",
+      "sha256": "6be19408156c28188fd5cafea3d95aa6b472efaa5f10a2e97e14cf8f84e450b0"
+    },
+    {
+      "bytes": 1457,
+      "path": "pybamm/solvers/composite_solver.py",
+      "sha256": "a540e804a83be9c476a52b30e4be8ca96faf4014f570565a9831fbed5bc5b239"
+    },
+    {
+      "bytes": 48365,
+      "path": "pybamm/solvers/idaklu_solver.py",
+      "sha256": "50eaece1875e98baea0fab51a59c1fcfcbf5d82e7b088dc65d11fad42b6081aa"
+    },
+    {
+      "bytes": 8068,
+      "path": "pybamm/solvers/nonlinear_solver.py",
+      "sha256": "edb602af017bbaf2c7f1d678fabb722831db7d1b71cf3e084430646ade7ef5ef"
+    },
+    {
+      "bytes": 51516,
+      "path": "pybamm/solvers/solution.py",
+      "sha256": "fdc7bfb8b2a251f95d9f139f9c434d64a8c45e9a8475d239767735cd947b161d"
+    }
+  ],
+  "native_contacts": 0,
+  "new_physical_units": 0,
+  "schema": "empirical-lawhood/exposed-battery-source-stock-census",
+  "scientific_qualification": false,
+  "source": {
+    "schema": "empirical-lawhood/battery-thermal-inquiry/source",
+    "value": {
+      "manufacturer_document_sha256": "a8d895143a55e0beae273f2c94eb4f3038857f19cc190ea2048f825e77a76f6a",
+      "protocol_sha256": "553b7c23587818892bba11894096aa95f68994f1163d5ed2e6d6fad8086829e3",
+      "pybamm_version": "26.6.2.0",
+      "source_id": "source.battery-thermal-inquiry.lgm50",
+      "source_members": [
+        [
+          "experiment/step/base_step.py",
+          "529b13e48d47bde6dbe7568b77dfa9eb414bdfddcdfef41f10090c704ffa4c51"
+        ],
+        [
+          "experiment/step/step_termination.py",
+          "dec8604759478667d2b5b8bc27ce083ff765519aaa2d84600dd88c01bb4930a0"
+        ],
+        [
+          "experiment/step/steps.py",
+          "646840589957343587ab23916718dc5d3a5d645116d238c4fdfb23606e849d08"
+        ],
+        [
+          "expression_tree/binary_operators.py",
+          "0d63c767b0c19b0596a13bcb5ae35cfcba800e4e465aeb532f7ea6210b8199c4"
+        ],
+        [
+          "expression_tree/input_parameter.py",
+          "dca5228c35ed5dbae85e26ce2a7b6fb316e2a6260721372d10372b732d496bb0"
+        ],
+        [
+          "input/parameters/lithium_ion/Chen2020.py",
+          "7c360a546a76492585e147231caee2f8f4fe29222b893cb12091dc4d158f62f0"
+        ],
+        [
+          "input/parameters/lithium_ion/ORegan2022.py",
+          "c0c8111cb37fd4e79726f17e0d02f0aaac6d06532060a677efb5743c92a0b259"
+        ],
+        [
+          "meshes/one_dimensional_submeshes.py",
+          "26f6b8b86ea1d73c912de54c83dcf3f58f4c879cd7ed03d01f7827057c212e7a"
+        ],
+        [
+          "models/full_battery_models/base_battery_model.py",
+          "5391e6db1e13fac3746f5317c27830df2d4cb3bf96295161c22ca439ba3777ec"
+        ],
+        [
+          "models/full_battery_models/lithium_ion/dfn.py",
+          "84711c3ac78beac3c4de102f043549d8ffb11f6a1411c47ce47d0e4488c8a00c"
+        ],
+        [
+          "models/full_battery_models/lithium_ion/electrode_soh.py",
+          "55002481f8bd9750ebee05667a1e70382bbd7da1c3fb7a5327c8db0e9cf19d54"
+        ],
+        [
+          "models/full_battery_models/lithium_ion/spme.py",
+          "3a5a1b870be8f88cdd510f3dc131731029d89b304c68b5d2f4b7084781304543"
+        ],
+        [
+          "models/submodels/external_circuit/explicit_control_external_circuit.py",
+          "59d8387a084760b84f3084ef0176afb29db31a653103fa6d8842ec786442cdc5"
+        ],
+        [
+          "models/submodels/external_circuit/function_control_external_circuit.py",
+          "63a902b35a2228428ebc2a74934076e88420dd2e23158c2d675b362f8489f471"
+        ],
+        [
+          "models/submodels/thermal/base_thermal.py",
+          "4e66ef69411b6233a456d43c134abca30b321ef290806c193ddad0a1c07b825d"
+        ],
+        [
+          "models/submodels/thermal/lumped.py",
+          "f4c03e752281b8089a1b98fbb8e4a09670f618b24ce2317a1dcb99dcb3422609"
+        ],
+        [
+          "models/submodels/thermal/surface/ambient.py",
+          "b3b5c42e8065d97e9c525fcfc025c8f68309f8931f963ebed54b43323a5d1f11"
+        ],
+        [
+          "parameters/electrical_parameters.py",
+          "19a3b43c6aac04a60d3736cbf186e50ebf5b2515e3e76e496a6675447c0372c6"
+        ],
+        [
+          "parameters/geometric_parameters.py",
+          "4609bf6e420494d76e58102fbc43222778ceaa10bc167a2b054c642df436aff9"
+        ],
+        [
+          "parameters/parameter_values.py",
+          "869abd3bc55b40591859e45a6af822de976739a6b872782edf4c0874ba7966f6"
+        ],
+        [
+          "parameters/thermal_parameters.py",
+          "605ea7d30bfe10ea5418d4fe3a2ce4705782fc6e631c01e436d031c8ba02083a"
+        ],
+        [
+          "simulation/base_simulation.py",
+          "70e345a89433b001ebce742a3d6697ee3e7605557af99c86a146d9563618f1f4"
+        ],
+        [
+          "simulation/simulation.py",
+          "06544d81a67ca62d833a8c637e596c2dfe0a0fc205a35dc9ebf5942d107f7a23"
+        ],
+        [
+          "solvers/algebraic_solver.py",
+          "7eca13b6dc8daf8a8b23a79f2eaa3c45cdc170479fe19d37ee2ba3b4ca92a07f"
+        ],
+        [
+          "solvers/base_solver.py",
+          "6be19408156c28188fd5cafea3d95aa6b472efaa5f10a2e97e14cf8f84e450b0"
+        ],
+        [
+          "solvers/composite_solver.py",
+          "a540e804a83be9c476a52b30e4be8ca96faf4014f570565a9831fbed5bc5b239"
+        ],
+        [
+          "solvers/idaklu_solver.py",
+          "50eaece1875e98baea0fab51a59c1fcfcbf5d82e7b088dc65d11fad42b6081aa"
+        ],
+        [
+          "solvers/nonlinear_solver.py",
+          "edb602af017bbaf2c7f1d678fabb722831db7d1b71cf3e084430646ade7ef5ef"
+        ],
+        [
+          "solvers/solution.py",
+          "fdc7bfb8b2a251f95d9f139f9c434d64a8c45e9a8475d239767735cd947b161d"
+        ]
+      ]
+    },
+    "version": "1.1.0"
+  },
+  "source_member_count": 29,
+  "source_origin": {
+    "manufacturer_current_oem_approval": false,
+    "original_manufacturer_url": "https://www.lithiumelements.com/wp-content/uploads/2023/07/m50.pdf",
+    "retained_root": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/battery-broad02/battery-source-originals",
+    "source_intake_register_bytes": 15022,
+    "source_intake_register_sha256": "d86b889742bc0bd0b96f2ed79b6b41e672287c7571b86ae60c5d6c4cd8c47a5c"
+  },
+  "source_sha256": "54eabf2cef5c38335ce09fe3a3f2409e4af0b6a86731c46d344fcb2e09cadce7",
+  "version": "1.0.0"
+}

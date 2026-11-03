@@ -18,7 +18,7 @@ from empirical_lawhood.adapters.composition.finite_response_law.rerun_input impo
 from empirical_lawhood.adapters.methods.finite_response_law.science import FiniteResponseLawScienceSpec
 from empirical_lawhood.api import finite_rerun_authoring as application
 from empirical_lawhood.api.finite_operands import current_nomination_operand_export
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
 from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
 from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
 from empirical_lawhood.kernel.provenance import ObjectIdentity
@@ -126,7 +126,8 @@ def test_packet_helper_authenticates_public_nomination_and_keeps_current_exposur
 
 def test_exact_receipt_custody_rejects_wrong_run_task_commit_and_incomplete_outputs(tmp_path):
     """Exercise the real receipt store; this unit supplies no scientific grants."""
-    plane = ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract('synthetic.integrity-store', 'software-only receipt store', str(tmp_path), '/', OperatorStorageProfile.SCHEMA, 1, None, None, ())))
+    plane = ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract('synthetic.integrity-store', 'software-only receipt store', str(tmp_path),
+        str(next(parent for parent in (tmp_path, *tmp_path.parents) if parent.is_mount())), OperatorStorageProfile.SCHEMA, 1, None, None, ())))
     run_id, task_id = 'synthetic.current-run', 'synthetic.current-task'
     output = SimpleNamespace(output_id='report', payload_schema=ObjectIdentity.SCHEMA, profile=ArtifactProfile.CANONICAL_JSON, media_type='application/json', filename_suffix='.json')
     logical_id = f'artifact.{run_id}.{task_id}.report'
@@ -143,7 +144,7 @@ def test_exact_receipt_custody_rejects_wrong_run_task_commit_and_incomplete_outp
     assert application._exact_current_receipt(plane, issued, run_id, task_id, receipts[1].receipt_id) == receipts[1]
     assert application._exact_current_receipt(plane, issued, run_id, task_id, receipts[0].receipt_id) == receipts[0]
     for wrong_run, wrong_task in (('synthetic.other-run', task_id), (run_id, 'synthetic.other-task')):
-        with pytest.raises(ArtifactIdentityConflict, match='substitutes its run or task'):
+        with pytest.raises(ValueError, match='SUCCESSFUL_EXACT_ISSUED_RECEIPT_REQUIRED'):
             application._exact_current_receipt(plane, issued, wrong_run, wrong_task, receipts[0].receipt_id)
     issued.source_closure.implementation_commit = '1' * 40
     with pytest.raises(ValueError, match='SUCCESSFUL_EXACT_ISSUED_RECEIPT_REQUIRED'):
@@ -165,7 +166,7 @@ def test_authoring_destination_is_refused_before_closure_or_protected_reads(tmp_
     outside = tmp_path / 'outside'
     outside.mkdir()
     plane = ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract('synthetic.preflight-store',
-        'software-only output preflight', str(store), '/', OperatorStorageProfile.SCHEMA, 1, None, None, ())))
+        'software-only output preflight', str(store), str(next(parent for parent in store.parents if parent.is_mount())), OperatorStorageProfile.SCHEMA, 1, None, None, ())))
     if destination == 'outside':
         output = outside / 'new'
     elif destination == 'traversal':
@@ -182,7 +183,7 @@ def test_authoring_destination_is_refused_before_closure_or_protected_reads(tmp_
         output = store / 'file' / 'new'
     def forbidden(*args, **kwargs):
         raise AssertionError('invalid destination reached source or protected input')
-    for name in ('capture_clean_target_closure', 'current_nomination_operand_import', '_validate_parent'):
+    for name in ('_capture_prospective_source', 'current_nomination_operand_import', '_validate_parent'):
         monkeypatch.setattr(application, name, forbidden)
     with pytest.raises((OSError, ValueError)):
         application.author_finite_response_rerun(root=ROOT, packet=None, exposure=None,
@@ -196,18 +197,17 @@ def test_authoring_accepts_cli_created_empty_directory_before_closure(tmp_path, 
     output = tmp_path / 'empty'
     output.mkdir()
     plane = ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract('synthetic.empty-preflight-store',
-        'software-only empty directory', str(tmp_path), '/', OperatorStorageProfile.SCHEMA, 1, None, None, ())))
+        'software-only empty directory', str(tmp_path), str(next(parent for parent in (tmp_path, *tmp_path.parents) if parent.is_mount())), OperatorStorageProfile.SCHEMA, 1, None, None, ())))
     def stop(*args, **kwargs):
         raise AssertionError('empty output passed preflight')
-    monkeypatch.setattr(application, 'capture_clean_target_closure', stop)
+    monkeypatch.setattr(application, '_capture_prospective_source', stop)
     with pytest.raises(AssertionError, match='empty output passed preflight'):
         application.author_finite_response_rerun(root=ROOT, packet=SimpleNamespace(config_id='synthetic.packet'),
             exposure=None, nomination_directory=tmp_path, output_dir=output, artifact_writer=plane)
     assert not tuple(output.iterdir())
 
 
-def test_native_result_summary_fits_report_bound_and_preserves_full_failed_census():
-    from empirical_lawhood.infrastructure.development_attempts import MAX_REPORT_BYTES
+def test_native_result_summary_is_compact_and_preserves_full_failed_census():
     from tests.finite_response_custody_fixtures import synthetic_native
     record = synthetic_native()
     view = record.views[0]
@@ -216,7 +216,6 @@ def test_native_result_summary_fits_report_bound_and_preserves_full_failed_censu
     failed = replace(view, accounting=((view.accounting[0][0], 0, 'NUMERICAL_FAILURE'), *view.accounting[1:]))
     record = replace(record, views=(failed, *record.views[1:]))
     raw = record.canonical_bytes()
-    assert len(raw) > MAX_REPORT_BYTES
     logical = SimpleNamespace(logical_artifact_id='synthetic.native-result', payload_schema=record.SCHEMA,
         content_sha256=sha256(raw).hexdigest(), visibility_ceiling=VisibilityCeiling.OUTCOME_VISIBLE,
         outcome_access=OutcomeAccess.EVALUATION_REVEALED)
@@ -226,7 +225,7 @@ def test_native_result_summary_fits_report_bound_and_preserves_full_failed_censu
         materialization=physical),), result_artifact_id=logical.logical_artifact_id,
         receipt_binding=('synthetic.native', 'native', 'receipt.synthetic.native.attempt-002'))
     summary = application.finite_response_current_result_summary(config=config, record=record)
-    assert len(json.dumps(summary).encode()) < MAX_REPORT_BYTES
+    assert len(json.dumps(summary).encode()) < len(raw)
     assert summary['independent_roots'] == len(summary['root_ids']) == 32
     assert summary['nested_numerical_views'] == len(summary['views']) == 64
     assert summary['native_cell_dispositions']['NUMERICAL_FAILURE'] == 1

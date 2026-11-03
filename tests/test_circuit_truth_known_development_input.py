@@ -14,7 +14,7 @@ from empirical_lawhood.adapters.reference_worlds.physical_scale_morphism.oracle 
 from empirical_lawhood.adapters.reference_worlds.physical_scale_morphism.worlds import generate_truth_cases
 from empirical_lawhood.api.codecs import load_registered_authoring
 
-STARTER = Path("experiments/response-method-reference/config.json")
+STARTER = Path("programmes/foundations/measurement-and-response/workflows/response-method-reference/config.json")
 
 
 def _config() -> PhysicalScaleMorphismTruthSuiteConfig:

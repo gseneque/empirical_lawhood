@@ -1,0 +1,53 @@
+{
+  "archive_bytes": 1118756,
+  "archive_sha256": "d1942a3aecd4f629d1ea8dd593f4eed00b0d34da70307e3749a766b26e7e6c98",
+  "expanded_tar_bytes": 6000640,
+  "members": [
+    {
+      "bytes": 3910957,
+      "name": "dry-core-source-projection-v1a.json",
+      "original_path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/followup-rr-amber-core-v1/dry-core-source-projection-v1a.json",
+      "sha256": "bfbaa57a1b9d466e311c23c37616cd54771ac170d7fc361ef7769a4004040c5f"
+    },
+    {
+      "bytes": 11467,
+      "name": "native-asn-templates-v1.json",
+      "original_path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/followup-rr-amber-core-v1/native-asn-templates-v1.json",
+      "sha256": "bd35c76940c4a727641a315208ef7cc1895c08184ba00dc7edfb1a80162e635e"
+    },
+    {
+      "bytes": 12703,
+      "name": "rr-amber-core-register-v1.json",
+      "original_path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/followup-rr-amber-core-v1/rr-amber-core-register-v1.json",
+      "sha256": "a6deb1386faa51e39669208fecb79a68a859888f60c6fcfaf689cfbc8c1c3ec1"
+    },
+    {
+      "bytes": 24049,
+      "name": "source-facts.json",
+      "original_path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/rr-heavy-scaffold-v1/source-facts.json",
+      "sha256": "16d82dcf3e103965041ab9c0ce27dfed2108c47d9548fe2553104e12ef7a8909"
+    },
+    {
+      "bytes": 676129,
+      "name": "unedited-reference.json",
+      "original_path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/rr-heavy-scaffold-v1/projections/unedited-reference.json",
+      "sha256": "5be633243f7d7831501b35930c4fec5281bba852cbc0dcefbe7fb819ed708302"
+    },
+    {
+      "bytes": 676662,
+      "name": "d263n.json",
+      "original_path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/rr-heavy-scaffold-v1/projections/d263n.json",
+      "sha256": "85e71834f5413161e3332b934c11cd280757c0250519eaff86e0bad2a35c75b8"
+    },
+    {
+      "bytes": 676599,
+      "name": "h287n.json",
+      "original_path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/rr-heavy-scaffold-v1/projections/h287n.json",
+      "sha256": "4df7e5cfde3d50d2a7e53245871c846851b9e076648b78239c0e6af3ecaa9ffa"
+    }
+  ],
+  "new_six_context_constructions": 0,
+  "new_source_acquisitions": 0,
+  "original_payload_bytes": 5988566,
+  "schema": "rr-coupled-source-test-operands-v1"
+}

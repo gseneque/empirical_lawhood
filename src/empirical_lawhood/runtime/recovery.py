@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from bisect import bisect_left
+from operator import attrgetter
 from enum import StrEnum
 import hashlib
-from typing import TYPE_CHECKING, ClassVar, Final, Self
-
-if TYPE_CHECKING:
-    from empirical_lawhood.runtime.retry_amendment import LeaseExpiryRetryAmendment
+from typing import ClassVar, Final, Self
 
 from empirical_lawhood.kernel.provenance import ObjectIdentity
 from empirical_lawhood.kernel.serialization import (
@@ -182,8 +181,8 @@ class RecoveryTaskBinding(CanonicalRecord):
             self.dependency_task_ids,
             field_name="dependency_task_ids",
         )
-        if not 0 < self.maximum_attempts <= MAX_RECOVERY_ATTEMPTS_PER_TASK:
-            raise ValueError("task maximum attempts exceed the recovery bound")
+        if self.maximum_attempts <= 0:
+            raise ValueError("task maximum attempts must be positive")
         validate_stable_id(self.capability_key, field_name="capability_key")
         validate_semantic_version(self.capability_version)
         validate_sha256(
@@ -212,6 +211,7 @@ class ProtocolRunRecoveryIndex(CanonicalRecord):
     EXECUTION_PLAN_SCHEMA: ClassVar[str] = ProtocolExecutionPlan.SCHEMA
     TASK_EVENT_SCHEMA: ClassVar[str] = 'empirical-lawhood/runtime/task-recovery-event'
     TERMINAL_EVENT_SCHEMA: ClassVar[str] = 'empirical-lawhood/runtime/protocol-run-recovery-terminal-event'
+    REQUIRES_EXECUTION_AUTHORITY: ClassVar[bool] = True
 
     recovery_index_id: str
     wave_id: str
@@ -239,7 +239,7 @@ class ProtocolRunRecoveryIndex(CanonicalRecord):
             attribute="object_id",
             field_name="authority_identities",
         )
-        if not self.authority_identities:
+        if self.REQUIRES_EXECUTION_AUTHORITY and not self.authority_identities:
             raise ValueError("recovery index requires exact execution authority")
         validate_sha256(self.registry_sha256, field_name="registry_sha256")
         if len(self.implementation_commit) != 40 or any(
@@ -252,10 +252,8 @@ class ProtocolRunRecoveryIndex(CanonicalRecord):
         if self.terminal_event_schema != self.TERMINAL_EVENT_SCHEMA:
             raise ValueError("recovery index terminal-event schema is unsupported")
         require_sorted_unique_ids(self.tasks, attribute="task_id", field_name="tasks")
-        if not self.tasks or len(self.tasks) > MAX_RECOVERY_TASKS:
-            raise ValueError("recovery index task count is outside its bound")
-        if sum(len(task.attempts) for task in self.tasks) > MAX_RECOVERY_CANDIDATES:
-            raise ValueError("recovery index exceeds its aggregate candidate bound")
+        if not self.tasks:
+            raise ValueError("recovery index must contain tasks")
         by_id = {task.task_id: task for task in self.tasks}
         if tuple(sorted(task.topological_ordinal for task in self.tasks)) != tuple(
             range(len(self.tasks))
@@ -315,25 +313,7 @@ class ProtocolRunRecoveryIndex(CanonicalRecord):
             tasks=tasks,
         )
 
-    def validate_plan(
-        self, plan: ProtocolExecutionPlan, *, retry_amendment: LeaseExpiryRetryAmendment | None = None
-    ) -> None:
-        if retry_amendment is not None:
-            if retry_amendment.identity not in self.authority_identities:
-                raise ValueError("recovery index lacks the exact retry amendment")
-            base = RunRecoveryIndex.from_execution_plan(
-                plan,
-                run_id=self.run_id,
-                wave_id=self.wave_id,
-                authority_identities=tuple(
-                    value
-                    for value in self.authority_identities
-                    if value != retry_amendment.identity
-                ),
-            )
-            if self != retry_amendment.recovery_index(plan, base):
-                raise ValueError("recovery index differs from its bounded retry amendment")
-            return
+    def validate_plan(self, plan: ProtocolExecutionPlan) -> None:
         expected = type(self).from_execution_plan(
             plan,
             run_id=self.run_id,
@@ -344,10 +324,10 @@ class ProtocolRunRecoveryIndex(CanonicalRecord):
             raise ValueError("run recovery index differs from the frozen execution plan")
 
     def task(self, task_id: str) -> RecoveryTaskBinding:
-        for task in self.tasks:
-            if task.task_id == task_id:
-                return task
-        raise KeyError(task_id)
+        position = bisect_left(self.tasks, task_id, key=attrgetter('task_id'))
+        if position == len(self.tasks) or self.tasks[position].task_id != task_id:
+            raise KeyError(task_id)
+        return self.tasks[position]
 
 
 @dataclass(frozen=True, slots=True)
@@ -358,6 +338,30 @@ class CandidateRunRecoveryIndex(ProtocolRunRecoveryIndex):
     EXECUTION_PLAN_SCHEMA: ClassVar[str] = CandidateExecutionPlan.SCHEMA
     TASK_EVENT_SCHEMA: ClassVar[str] = 'empirical-lawhood/runtime/task-recovery-event'
     TERMINAL_EVENT_SCHEMA: ClassVar[str] = 'empirical-lawhood/runtime/candidate-run-recovery-terminal-event'
+
+
+@dataclass(frozen=True, slots=True)
+class DevelopmentRunRecoveryIndex(ProtocolRunRecoveryIndex):
+    """Authority-free recovery of a compiled exposed development wave."""
+
+    SCHEMA: ClassVar[str] = 'empirical-lawhood/runtime/development-run-recovery-index'
+    EXECUTION_PLAN_SCHEMA: ClassVar[str] = 'empirical-lawhood/runtime/development-execution-plan'
+    TERMINAL_EVENT_SCHEMA: ClassVar[str] = 'empirical-lawhood/runtime/development-run-recovery-terminal-event'
+    REQUIRES_EXECUTION_AUTHORITY: ClassVar[bool] = False
+
+    def __post_init__(self) -> None:
+        super(DevelopmentRunRecoveryIndex, self).__post_init__()
+        if self.authority_identities:
+            raise ValueError("development recovery cannot acquire issued execution authority")
+
+    @classmethod
+    def from_execution_plan(cls, plan: ProtocolExecutionPlan, *, run_id: str, wave_id: str,
+                            authority_identities: tuple[ObjectIdentity, ...] = ()) -> Self:
+        from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
+        if not isinstance(plan, DevelopmentExecutionPlan) or plan.lane.value != "DEVELOPMENT":
+            raise ValueError("development recovery requires its genuine development plan")
+        return super(DevelopmentRunRecoveryIndex, cls).from_execution_plan(plan,
+            run_id=run_id, wave_id=wave_id, authority_identities=authority_identities)
 
 
 @dataclass(frozen=True, slots=True)
@@ -534,6 +538,9 @@ def build_run_recovery_index(
     """Select the recovery schema matching the immutable execution-plan version."""
 
     index_type = (
+        DevelopmentRunRecoveryIndex
+        if plan.SCHEMA == DevelopmentRunRecoveryIndex.EXECUTION_PLAN_SCHEMA
+        else
         RunRecoveryIndex
         if isinstance(plan, ExecutionPlan)
         else EnvelopeRunRecoveryIndex
@@ -558,8 +565,6 @@ def _task_binding(
     topological_ordinal: int,
     event_schema: str,
 ) -> RecoveryTaskBinding:
-    if task.maximum_attempts > MAX_RECOVERY_ATTEMPTS_PER_TASK:
-        raise ValueError("execution plan maximum attempts exceed the recovery bound")
     recovery_root = f"runs/{run_id}/recovery/{wave_id}"
     attempts = tuple(
         RecoveryAttemptCandidate(
@@ -678,6 +683,10 @@ class ProtocolTaskRecoveryEvent(CanonicalRecord):
         index: ProtocolRunRecoveryIndex,
         receipt: CanonicalTaskReceipt,
     ) -> Self:
+        from .retained_e3_repair import RetainedE3RepairRecoveryIndex
+        from .development_output_repair import DevelopmentOutputRepairRecoveryIndex
+        if isinstance(index, (RetainedE3RepairRecoveryIndex, DevelopmentOutputRepairRecoveryIndex)):
+            index = index.event_owner(receipt.task_id)
         task = index.task(receipt.task_id)
         candidate = next(
             (value for value in task.attempts if value.attempt_id == receipt.attempt_id),
@@ -728,6 +737,12 @@ class TaskRecoveryEvent(ProtocolTaskRecoveryEvent):
         CandidateRunRecoveryIndex.SCHEMA,
         EnvelopeRunRecoveryIndex.SCHEMA,
         RunRecoveryIndex.SCHEMA,
+        DevelopmentRunRecoveryIndex.SCHEMA,
+        'empirical-lawhood/runtime/retained-e3-repair-recovery-index',
+        'empirical-lawhood/runtime/retained-e3-continued-repair-recovery-index',
+        'empirical-lawhood/runtime/development-output-repair-recovery-index',
+        'empirical-lawhood/runtime/development-controller-repair-recovery-index',
+        'empirical-lawhood/runtime/development-native-continuation-recovery-index',
     )
 
     failure: OperationalFailureDiagnostic | None = None
@@ -804,14 +819,19 @@ class ProtocolRunRecoveryTerminalEvent(CanonicalRecord):
             raise ValueError("terminal event binds another recovery index schema")
         if self.operational_status not in {"SUCCEEDED", "FAILED", "BLOCKED"}:
             raise ValueError("terminal event has a nonterminal operational status")
-        attempt_keys = tuple((value.task_id, value.ordinal) for value in self.attempts)
-        if tuple(sorted(set(attempt_keys))) != attempt_keys:
-            raise ValueError("terminal attempts must be task/ordinal sorted and unique")
-        task_ids = tuple(sorted({value.task_id for value in self.attempts}))
-        for task_id in task_ids:
-            ordinals = tuple(value.ordinal for value in self.attempts if value.task_id == task_id)
-            if ordinals != tuple(range(1, len(ordinals) + 1)):
-                raise ValueError("terminal attempt ordinals must be contiguous per task")
+        terminal_by_task: dict[str, RecoveryTerminalDisposition] = {}
+        previous_key, ordinals_contiguous = None, True
+        for attempt in self.attempts:
+            key = (attempt.task_id, attempt.ordinal)
+            if previous_key is not None and key <= previous_key:
+                raise ValueError("terminal attempts must be task/ordinal sorted and unique")
+            expected_ordinal = (previous_key[1] + 1
+                if previous_key is not None and attempt.task_id == previous_key[0] else 1)
+            ordinals_contiguous &= attempt.ordinal == expected_ordinal
+            previous_key = key
+            terminal_by_task[attempt.task_id] = attempt.disposition
+        if not ordinals_contiguous:
+            raise ValueError("terminal attempt ordinals must be contiguous per task")
         for name, values in (
             ("completed_task_ids", self.completed_task_ids),
             ("failed_task_ids", self.failed_task_ids),
@@ -822,9 +842,6 @@ class ProtocolRunRecoveryTerminalEvent(CanonicalRecord):
             {*self.failed_task_ids, *self.blocked_task_ids}
         ) or set(self.failed_task_ids).intersection(self.blocked_task_ids):
             raise ValueError("terminal task sets must be disjoint")
-        terminal_by_task: dict[str, RecoveryTerminalDisposition] = {}
-        for attempt in self.attempts:
-            terminal_by_task[attempt.task_id] = attempt.disposition
         expected_completed = tuple(
             sorted(
                 task_id
@@ -884,6 +901,14 @@ class RunRecoveryTerminalEvent(CandidateRunRecoveryTerminalEvent):
 
     SCHEMA: ClassVar[str] = 'empirical-lawhood/runtime/run-recovery-terminal-event'
     RECOVERY_INDEX_SCHEMA: ClassVar[str] = RunRecoveryIndex.SCHEMA
+
+
+@dataclass(frozen=True, slots=True)
+class DevelopmentRunRecoveryTerminalEvent(ProtocolRunRecoveryTerminalEvent):
+    """Complete operational census without issued or qualification authority."""
+
+    SCHEMA: ClassVar[str] = 'empirical-lawhood/runtime/development-run-recovery-terminal-event'
+    RECOVERY_INDEX_SCHEMA: ClassVar[str] = DevelopmentRunRecoveryIndex.SCHEMA
 
 
 @dataclass(frozen=True, slots=True)

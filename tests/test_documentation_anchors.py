@@ -16,17 +16,6 @@ from scripts.check_documentation import (
 
 FROZEN_SCIENCE_TARGETS = {
     FINITE_SCIENCE_DOCUMENT: frozenset((FINITE_SCIENCE_LEGACY_TARGET,)),
-    "src/empirical_lawhood/adapters/methods/preparation_applicability/frozen_specification.md": frozenset((
-        "../../scripts/analyze_cc1_applicability_opportunity_v1.py",
-        "../guides/scientific-experiment-design-standard.md",
-        "../results/cc1-applicability-production-opportunity-v1-2026-10-01.md",
-        "cc1-boundary-production-v1.md",
-        "../results/cc1-boundary-production-v1-2026-10-01.md",
-    )),
-    "src/empirical_lawhood/adapters/methods/constructed_preparation_applicability/frozen_specification.md": frozenset((
-        "../reference/project-owner-authority.md",
-        "../results/cc1-applicability-production-opportunity-v1-2026-10-01.md",
-    )),
 }
 
 
@@ -61,7 +50,7 @@ def test_remote_and_pdf_fragments_do_not_claim_local_anchor_validation(tmp_path)
 
 
 @pytest.mark.parametrize("document", tuple(FROZEN_SCIENCE_TARGETS))
-def test_frozen_science_citation_requires_exact_plan_and_exempts_only_legacy_target(tmp_path, document):
+def test_curated_science_citation_requires_exact_specification_and_exempts_only_legacy_target(tmp_path, document):
     root = Path(__file__).resolve().parents[1]
     _copy_frozen_science_documents(root, tmp_path)
     selected = tmp_path / document

@@ -72,7 +72,7 @@ def _local_discovery() -> Path:
 def test_shipped_batch_selection_has_two_native_views_and_realized_mass() -> None:
     root = _held_root()
     config = load_registered_authoring(
-        ROOT / "experiments/reactor-response/batch-input.json",
+        ROOT / "programmes/foundations/measurement-and-response/workflows/reactor-response/batch-input.json",
         root_schemas={ReactorBatchInput.SCHEMA: ReactorBatchInput},
         maximum_bytes=16 * 1024,
     )
@@ -119,7 +119,7 @@ def test_shipped_batch_selection_has_two_native_views_and_realized_mass() -> Non
 def test_shipped_history_selection_preserves_matched_pulse_and_recovery() -> None:
     root = _held_root()
     config = load_registered_authoring(
-        ROOT / 'experiments/reactor-response/matched-replay-history-input.json',
+        ROOT / 'programmes/foundations/measurement-and-response/workflows/reactor-response/matched-replay-history-input.json',
         root_schemas={ReactorPreparedInput.SCHEMA: ReactorPreparedInput},
         maximum_bytes=16 * 1024,
     )
@@ -153,7 +153,7 @@ def test_shipped_feed_selection_has_three_matched_native_actions_and_two_receive
 ):
     root, discovery = _held_root(), _local_discovery()
     config = load_registered_authoring(
-        ROOT / "experiments/reactor-response/feed-input.json",
+        ROOT / "programmes/foundations/measurement-and-response/workflows/reactor-response/feed-input.json",
         root_schemas={ReactorPreparedInput.SCHEMA: ReactorPreparedInput},
         maximum_bytes=16 * 1024,
     )
@@ -228,7 +228,7 @@ def test_shipped_local_selection_checks_all_nine_native_actions_after_causal_cut
 ):
     root, discovery = _held_root(), _local_discovery()
     config = load_registered_authoring(
-        ROOT / "experiments/reactor-response/local-input.json",
+        ROOT / "programmes/foundations/measurement-and-response/workflows/reactor-response/local-input.json",
         root_schemas={ReactorPreparedInput.SCHEMA: ReactorPreparedInput},
         maximum_bytes=16 * 1024,
     )
@@ -323,7 +323,7 @@ def test_shipped_regime_selection_has_common_c_p_preparation_and_phase_receivers
 ):
     root, discovery = _held_root(), _local_discovery()
     config = load_registered_authoring(
-        ROOT / "experiments/reactor-response/regime-input.json",
+        ROOT / "programmes/foundations/measurement-and-response/workflows/reactor-response/regime-input.json",
         root_schemas={ReactorPreparedInput.SCHEMA: ReactorPreparedInput},
         maximum_bytes=16 * 1024,
     )
@@ -422,7 +422,7 @@ def test_shipped_regime_selection_has_common_c_p_preparation_and_phase_receivers
 def test_shipped_frontier_selection_checks_zero_pulse_and_120_second_guard() -> None:
     root, discovery = _held_root(), _local_discovery()
     config = load_registered_authoring(
-        ROOT / 'experiments/reactor-response/finite-control-frontier-input.json',
+        ROOT / 'programmes/foundations/measurement-and-response/workflows/reactor-response/finite-control-frontier-input.json',
         root_schemas={ReactorPreparedInput.SCHEMA: ReactorPreparedInput},
         maximum_bytes=16 * 1024,
     )
@@ -503,7 +503,7 @@ def test_shipped_frontier_selection_checks_zero_pulse_and_120_second_guard() -> 
 def test_shipped_classical_selection_measures_selected_native_action() -> None:
     root, discovery = _held_root(), _local_discovery()
     config = load_registered_authoring(
-        ROOT / 'experiments/reactor-response/selected-action-response-input.json',
+        ROOT / 'programmes/foundations/measurement-and-response/workflows/reactor-response/selected-action-response-input.json',
         root_schemas={ReactorPreparedInput.SCHEMA: ReactorPreparedInput},
         maximum_bytes=16 * 1024,
     )
@@ -566,7 +566,7 @@ def test_shipped_classical_selection_measures_selected_native_action() -> None:
 def test_shipped_classical_selection_preserves_first_and_induced_pair() -> None:
     root, discovery = _held_root(), _local_discovery()
     config = load_registered_authoring(
-        ROOT / 'experiments/reactor-response/staged-pulse-response-input.json',
+        ROOT / 'programmes/foundations/measurement-and-response/workflows/reactor-response/staged-pulse-response-input.json',
         root_schemas={ReactorPreparedInput.SCHEMA: ReactorPreparedInput},
         maximum_bytes=16 * 1024,
     )
@@ -718,7 +718,7 @@ def test_shipped_classical_selection_preserves_first_and_induced_pair() -> None:
 def test_shipped_empirical_selection_has_causal_action_and_native_receiver() -> None:
     root = _held_root()
     config = load_registered_authoring(
-        ROOT / 'experiments/reactor-response/causal-response-study-input.json',
+        ROOT / 'programmes/foundations/measurement-and-response/workflows/reactor-response/causal-response-study-input.json',
         root_schemas={ReactorPreparedInput.SCHEMA: ReactorPreparedInput},
         maximum_bytes=16 * 1024,
     )

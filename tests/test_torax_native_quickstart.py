@@ -22,7 +22,7 @@ from empirical_lawhood.cli.app import app
 from empirical_lawhood.kernel.decoding import decode_canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
-CONFIG = ROOT / "experiments/tokamak-heat-response/config.json"
+CONFIG = ROOT / "programmes/energy/fusion/workflows/tokamak-heat-response/config.json"
 
 
 @pytest.mark.native('torax')

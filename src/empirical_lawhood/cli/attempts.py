@@ -25,9 +25,27 @@ from empirical_lawhood.infrastructure.development_attempts import DevelopmentAtt
 ATTEMPT_OUTPUT_OPTION = typer.Option("--output-dir", help="Optional fresh directory for this development invocation, report and bounded failure diagnostics.")
 ATTEMPT_DIRECTORY_OPTION = typer.Option("--attempt-dir", help="Optional fresh operational attempt directory, separate from the existing scientific output location.")
 _current: ContextVar[DevelopmentAttempt | None] = ContextVar("development_attempt", default=None)
+_operational_configuration = ContextVar('invocation_operational_configuration', default=None)
 _participants: dict[str, dict[str, object]] = {}
 _PATH_ROLES = {"config", "profile", "study", "archive", "source_root", "source_checkout", "native_python", "plan", "design_packet", "prior_exposure", "model_bank", "assignment", "parent_manifest", "custody", "reveal_record", "analysis_record", "authoring_input", "discovery_file", "upstream_binding"}
 _F = TypeVar("_F", bound=Callable[..., Any])
+
+
+def retain_output_reservations(record: dict) -> None:
+    """Keep the live operational selection and bounded plan arithmetic."""
+    attempt = _current.get()
+    if attempt is not None:
+        attempt.record["output_reservations"] = record
+
+
+def retain_metadata_rss(record: dict) -> None:
+    """Retain explicit controller RSS selection outside scientific records."""
+    attempt = _current.get()
+    if record["selected_limit_bytes"] is not None and attempt is None:
+        raise typer.BadParameter("metadata RSS override requires a retained invocation destination",
+            param_hint="--metadata-rss-limit-bytes")
+    if attempt is not None:
+        attempt.record["metadata_rss"] = record
 
 
 def participation() -> dict[str, dict[str, object]]:
@@ -112,10 +130,15 @@ def retained_command(operation: str, *, closed_output: bool = False, native: boo
             owned = attempt is None
             token = None
             if owned:
-                scientific = bound.arguments.get("output_dir", bound.arguments.get("output")) if closed_output else None
+                scientific = bound.arguments.get("output_dir", bound.arguments.get("output", bound.arguments.get("metadata_directory"))) if closed_output else None
                 attempt = _start(Path(destination), operation, native=native, scientific=scientific)
                 token = _current.set(attempt)
             assert attempt is not None
+            configuration = _operational_configuration.get()
+            if configuration is None:
+                from empirical_lawhood.runtime.operational_configuration import OperationalConfiguration
+                configuration = OperationalConfiguration()
+            attempt.record['operational_configuration'] = configuration.to_document()
             attempt.record["handler_entered"] = True
             # Locators only for held/multi-input operands. No archive, authority,
             # outcome payload, environment or arbitrary argv is copied here.
@@ -194,6 +217,15 @@ def retain_development_report(report: object, *, allow_nan: bool = True) -> None
         attempt.operation_completed()
         attempt.event("result_serialization")
         attempt.report(json.dumps(report, sort_keys=True, indent=2, allow_nan=allow_nan))
+
+
+def retain_operational_configuration(configuration):
+    """Record selected check policy separately from scientific result bytes."""
+    token = _operational_configuration.set(configuration)
+    attempt = _current.get()
+    if attempt is not None:
+        attempt.record['operational_configuration'] = configuration.to_document()
+    return lambda: _operational_configuration.reset(token)
 
 
 def emit_development_report(report: object, *, allow_nan: bool = True) -> None:

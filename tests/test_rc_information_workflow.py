@@ -10,7 +10,7 @@ from typer.testing import CliRunner
 from empirical_lawhood.cli.app import app
 
 ROOT = Path(__file__).resolve().parents[1]
-BASELINE = ROOT / 'experiments/rc-information/input.json'
+BASELINE = ROOT / 'programmes/foundations/measurement-and-response/workflows/rc-information/input.json'
 
 
 def test_public_edited_input_requires_prepare_and_retains_scaled_result(tmp_path):

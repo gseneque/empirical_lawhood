@@ -167,6 +167,10 @@ class ChecksummedPublicSourceAcquisitionPlan(CanonicalRecord):
         if type(self.minimum_free_bytes) is not int or self.minimum_free_bytes <= 0:
             raise ValueError("source acquisition requires an explicit positive space floor")
         budget = self.resource_budget
+        if any(getattr(budget, name) is None for name in (
+            "memory_bytes", "wall_time_seconds", "source_scan_bytes", "output_bytes",
+        )):
+            raise ValueError("source acquisition requires finite resource limits")
         if (
             budget.cpu_cores > 4
             or budget.gpu_devices != 0

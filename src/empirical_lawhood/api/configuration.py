@@ -86,7 +86,7 @@ def _decimal_size(value: Decimal) -> int:
     return sign + max(count + exponent, 1) + fractional + bool(fractional)
 
 
-def _bound_decimal_expansion(document: object, maximum_bytes: int) -> None:
+def _bound_decimal_expansion(document: object, maximum_bytes: int | None) -> None:
     stack = [document]
     while stack:
         value = stack.pop()
@@ -96,14 +96,14 @@ def _bound_decimal_expansion(document: object, maximum_bytes: int) -> None:
                     size = _decimal_size(Decimal(value["decimal"]))
                 except DecimalException as error:
                     raise ConfigurationError("INVALID_DECIMAL", "invalid tagged Decimal") from error
-                if size > maximum_bytes:
+                if maximum_bytes is not None and size > maximum_bytes:
                     raise ConfigurationError("CONSUMER_BYTE_LIMIT", "Decimal expansion exceeds the consumer byte limit")
             stack.extend(value.values())
         elif isinstance(value, list):
             stack.extend(value)
 
 
-def _canonical_size(value: object, limit: int) -> int:
+def _canonical_size(value: object, limit: int | None) -> int:
     """Bound the complete output before allocating any fixed-point Decimal text."""
     if isinstance(value, CanonicalRecord):
         return _canonical_size({
@@ -121,19 +121,19 @@ def _canonical_size(value: object, limit: int) -> int:
         for index, (key, child) in enumerate(value.items()):
             result += bool(index) + _string_size(key, limit=limit) + 1
             result += _canonical_size(child, limit)
-            if result > limit:
+            if limit is not None and result > limit:
                 break
     elif isinstance(value, (tuple, list, frozenset)):
         result = 2
         for index, child in enumerate(value):
             result += bool(index) + _canonical_size(child, limit)
-            if result > limit:
+            if limit is not None and result > limit:
                 break
     elif isinstance(value, str):
         result = _string_size(value, limit=limit)
     else:
         result = len(json.dumps(value, ensure_ascii=True, allow_nan=False))
-    if result > limit:
+    if limit is not None and result > limit:
         raise ConfigurationError("CONSUMER_BYTE_LIMIT", "canonical configuration exceeds the consumer byte limit")
     return result
 
@@ -221,14 +221,14 @@ def _validate(path: Path, *, consumer: str | None) -> _ValidatedConfiguration:
     if not isinstance(document, dict) or not isinstance(document.get("schema"), str):
         raise ConfigurationError("ROOT_SCHEMA_REQUIRED", "configuration needs a declared schema; provenance templates are helper-only")
     selected = _select(document["schema"], consumer)
-    if len(raw) > selected.authoring_maximum_bytes:
+    if selected.authoring_maximum_bytes is not None and len(raw) > selected.authoring_maximum_bytes:
         raise ConfigurationError("AUTHORING_BYTE_LIMIT", "editable document exceeds its declared authoring byte limit")
     if suffix != ".json" and (selected.requires_canonical or selected.disposition != "editable"):
         raise ConfigurationError("UNSUPPORTED_FORMAT", "this consumer requires JSON; YAML is not its declared authoring format")
     canonical = None
     try:
         if selected.disposition == "import":
-            if len(raw) > selected.maximum_bytes:
+            if selected.maximum_bytes is not None and len(raw) > selected.maximum_bytes:
                 raise ConfigurationError("CONSUMER_BYTE_LIMIT", "retained import exceeds its consumer byte limit")
             if selected.consumer == "prepared-prior-census":
                 from empirical_lawhood.adapters.composition.prepared_response.native_authoring import _prior_census
@@ -241,24 +241,30 @@ def _validate(path: Path, *, consumer: str | None) -> _ValidatedConfiguration:
         elif selected.disposition == "helper":
             if selected.consumer != "exposed-inventory":
                 raise ConfigurationError("HELPER_ONLY", "helper has no runner validation contract")
-            if len(raw) > selected.maximum_bytes:
+            if selected.maximum_bytes is not None and len(raw) > selected.maximum_bytes:
                 raise ConfigurationError("CONSUMER_BYTE_LIMIT", "helper exceeds its byte limit")
             _helper_inventory(document)
         else:
             record_type = selected.record_type()
             if suffix == ".json":
                 document = _parse_json(text)
+            if (selected.consumer == "operational-configuration"
+                    and document.get("version") == "1.0.0"):
+                from empirical_lawhood.runtime.operational_configuration import OperationalConfigurationV1
+                previous = decode_record(document, OperationalConfigurationV1)
+                document = record_type(artifact_verification=previous.artifact_verification).to_document()
             if document.get("version") != record_type.VERSION:
                 raise ConfigurationError("WRONG_REVISION", "configuration version differs from its typed owner", field="document.version")
             _bound_decimal_expansion(document, selected.maximum_bytes)
-            _canonical_size(document, selected.maximum_bytes - 1)
+            canonical_limit = None if selected.maximum_bytes is None else selected.maximum_bytes - 1
+            _canonical_size(document, canonical_limit)
             if selected.disposition == "retained":
                 record = decode_canonical_bytes(raw, record_type, maximum_bytes=selected.maximum_bytes)
             else:
                 record = decode_record(document, record_type)
-            _canonical_size(record, selected.maximum_bytes - 1)
+            _canonical_size(record, canonical_limit)
             canonical = record.canonical_bytes()
-            if len(canonical) > selected.maximum_bytes:
+            if selected.maximum_bytes is not None and len(canonical) > selected.maximum_bytes:
                 raise ConfigurationError("CONSUMER_BYTE_LIMIT", "canonical configuration exceeds the consumer byte limit")
     except (TypeError, ValueError, DecimalException, RecursionError) as error:
         if isinstance(error, ConfigurationError):
@@ -269,7 +275,8 @@ def _validate(path: Path, *, consumer: str | None) -> _ValidatedConfiguration:
         raise ConfigurationError(code, str(error), field=getattr(error, "field", None)) from error
     ready = raw == canonical if canonical is not None else None
     # Authoring-capable consumers read the original document, not prepared bytes.
-    consumer_ready = len(raw) <= selected.maximum_bytes and (ready if selected.requires_canonical else True)
+    consumer_ready = (selected.maximum_bytes is None or len(raw) <= selected.maximum_bytes) and (
+        ready if selected.requires_canonical else True)
     report: dict[str, object] = {
         "status": "VALIDATED", "consumer": selected.consumer,
         "schema_id": selected.schema_id, "record_version": document.get("version"),
@@ -313,7 +320,6 @@ def load_configuration_record(
     if not validated.report["consumer_byte_ready"]:
         raise ConfigurationError("CONSUMER_BYTE_LIMIT", "input exceeds its operation consumer byte limit")
     record_type = validated.consumer.record_type()
-    assert validated.consumer.maximum_bytes is not None
     return decode_canonical_bytes(
         validated.canonical, record_type, maximum_bytes=validated.consumer.maximum_bytes
     )

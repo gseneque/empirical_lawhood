@@ -14,7 +14,7 @@ The manuscript uses its abstract for orientation and retains its scientific stru
 
 Start each document with three short sentences about its task, purpose and reader action.
 Use the dictionary's approved word meanings, parts of speech and verb forms.
-Use [defined scientific and software terms](docs/glossary.md) in their stated contexts.
+Use [defined scientific and software terms](docs/reference/glossary.md) in their stated contexts.
 Classify technical nouns under rule 1.5 and technical verbs under rule 1.12.
 Technical words still obey the standard's grammar and word-use rules.
 If an approved word has the same meaning, use that word.
@@ -116,10 +116,10 @@ A software aid does not establish compliance with the specification.
 
 ## Development and release checks
 
-Use the [workflow index](experiments/README.md), [configuration guide](docs/configuration.md)
-and [results guide](docs/results-and-failures.md) as the public contributor conventions.
+Use the [programme index](programmes/README.md), [workflow catalogue](docs/reference/workflows.md), [configuration guide](docs/using/configuration.md)
+and [results guide](docs/using/results-and-failures.md) as the public contributor conventions.
 The root [agent instructions](AGENTS.md) give the same source map and preservation rules.
-For a small adapter or method change, follow the [worked RC recipe](docs/extending-the-engine.md#worked-rc-extension).
+For a small adapter or method change, follow the [worked RC recipe](docs/development/extending-the-engine.md#worked-rc-extension).
 Keep local results and the additional issued-provider work distinct.
 For a descriptive analysis route, reuse bounded source and array contracts with its own declared protocol and complete result census.
 Retain source/environment identities, failures and independent scientific falsifiers.
@@ -135,13 +135,20 @@ uv run --no-sync python scripts/check_documentation.py
 ```
 
 The extension guide gives aggregate generator order. Inspect every generated diff.
-Use [test profiles](docs/testing.md) for required optional/held boundaries with genuine prerequisites.
-After shared runtime changes settle, the [release procedure](docs/release-artifacts.md) runs the complete portable gate on that source.
+Use [test profiles](docs/development/testing.md) for required optional/held boundaries with genuine prerequisites.
+Push and PR CI use the bounded `ci` profile with exact installed-artifact checks.
+Select integration and scale profiles explicitly for the corresponding workflow or capacity claims.
+The [profile guide](docs/development/testing.md) defines their complete partitions and module shards.
+A bounded CI pass does not establish complete portable critical coverage.
+After the candidate settles, the [release procedure](docs/release/release-artifacts.md) runs the complete selected correctness and artifact gate.
+The portable profile includes the installed worked example and states its evidence limits.
+A separately selected scientific acquisition requires its own inputs, workflow acceptance, capacity and authority.
+Final review binds retained scientific results without reacquiring them.
 Do not repeat the full suite for a later prose-only edit. Bind that edit and its affected checks separately.
 Preserve failed checks and genuine scientific negatives. Tests and synthetic authority establish software behavior, not scientific qualification.
 
 
-Use the [tested Linux environment](docs/environments.md). From an unactivated
+Use the [tested Linux environment](docs/using/environments.md). From an unactivated
 shell in the checkout:
 
 ```sh
@@ -152,6 +159,11 @@ uv run --no-sync python scripts/generate_executable_binding_aggregate.py --check
 uv run --no-sync python scripts/generate_cli_reference.py --check
 uv run --no-sync python scripts/generate_test_fixture.py --check
 uv run --no-sync python scripts/generate_operator_examples.py --check
+uv run --no-sync python scripts/generate_workflow_index.py --check
+uv run --no-sync python scripts/generate_config_schemas.py --check
+uv run --no-sync python scripts/generate_integration_examples.py --check
+uv run --no-sync python scripts/generate_recursive_examples.py --check
+uv run --no-sync python scripts/generate_matrix_experiment_examples.py --check
 uv run --no-sync python scripts/check_documentation.py
 ```
 
@@ -165,7 +177,15 @@ uv run --no-sync python scripts/release_candidate_check.py --output-dir /path/to
 
 Require passing tests, coverage and unchanged candidate bytes.
 Commit that exact staged tree locally.
-Use its evidence for the clean committed source:
+Use its evidence for the exact committed source.
+The candidate and release tools use the sole checkout and verify the selected source.
+They record the actual status and local plan separately.
+An empty Git status is not a prerequisite.
+Preserve any existing local plans in their declared custody.
+Select new check, release and environment destinations outside the checkout.
+Verify their actual filesystem, write access and capacity before the gate.
+The [local consolidation guide](docs/development/maintainer-environment.md#storage-and-retained-evidence)
+records the maintainer's EL disk; it is not a required path for other contributors.
 
 ```sh
 uv run --no-sync python scripts/release_check.py --profile portable \
@@ -181,14 +201,14 @@ The runner publishes no artifacts and changes no tags.
 
 Keep the selected packet.
 Select artifacts by their recorded hashes.
-The [artifact guide](docs/release-artifacts.md) also gives the combined gate and failed-packet procedure.
+The [artifact guide](docs/release/release-artifacts.md) also gives the combined gate and failed-packet procedure.
 
-[Native and held-input profiles](docs/testing.md) use separate jobs.
+[Native and held-input profiles](docs/development/testing.md) use separate jobs.
 A selected profile fails when its required dependency or input is absent.
 Portable results give evidence for only the portable profile.
 Synthetic approvals under `tests/` provide software conformance fixtures.
 They grant no operator authority.
-For schema or provider changes, follow the [extension recipe](docs/extending-the-engine.md).
+For schema or provider changes, follow the [extension recipe](docs/development/extending-the-engine.md).
 
 ## Licensing of contributions
 
@@ -224,7 +244,7 @@ A released derivative requires review, complete provenance, permitted redistribu
 Record its exact producing source, configuration, inputs, environment and verification records.
 Keep negative outcomes and causal cutoffs.
 Keep private keys and raw held archives outside the repository.
-Read the [release status](docs/release-status.md) and [scientific integrity guide](docs/scientific-integrity.md).
+Read the [release status](docs/release/release-status.md) and [scientific integrity guide](docs/reference/scientific-integrity.md).
 
 The template at `configs/templates/evidence-provenance.yaml` may be adapted for a released evidence tranche.
 
@@ -239,7 +259,7 @@ For vendored or copied third-party material, record at minimum:
 - local path
 - modifications, if any
 
-See the [licensing and provenance policy](docs/licensing.md).
+See the [licensing and provenance policy](docs/reference/licensing.md).
 
 ## Registry and reference generators
 
@@ -265,7 +285,7 @@ uv run --no-sync python scripts/generate_executable_binding_aggregate.py --check
 ```
 
 The CLI reference generator reads the installed Click tree and exact metadata.
-It writes `docs/cli.md`.
+It writes `docs/reference/cli.md`.
 It needs the target package and declared Python dependencies.
 It needs no external scientific data or service.
 Use:
@@ -280,10 +300,20 @@ Its `--check` option compares the existing fixture.
 The generator uses target typed constructors and test-only approvals.
 `scripts/check_documentation.py` validates local Markdown and HTML destinations against shipped files.
 It also validates the unactivated-shell convention.
-Remote URLs and section anchors require separate review.
+It checks maintained local Markdown anchors.
+External URLs and PDF viewer fragments require separate review.
 
 `generate_operator_examples.py --check` verifies the four inert, explicitly
-exposed [input examples](docs/input-contracts.md).
+exposed [input examples](docs/reference/input-contracts.md).
+The workflow and configuration-schema generators own their public projections.
+Generate those projections before integration examples: the latter bind the
+complete package, including generated resources, and the selected dependency lock.
+When those bindings change, regenerate the current editable exposed examples.
+Their scientific operands and effective streams remain unchanged; regeneration
+creates no fresh units. Preserve any retained scientific inputs separately in
+their original custody. The generator needs no historical input chain or
+succession manifests.
+`generate_recursive_examples.py --check` verifies the recursive inquiry fixtures.
 `operator_records.py` supplies the reviewed-record persistence and replay
-helpers used by the [operator walkthrough](docs/reactor-operator.md).
+helpers used by the [operator walkthrough](programmes/foundations/measurement-and-response/workflows/reactor-response/operation.md).
 It supplies no authority decision, signing key, or automatic native execution.

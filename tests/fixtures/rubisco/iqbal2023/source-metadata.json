@@ -1,0 +1,21 @@
+{
+  "role": "EXPOSED_ORIGINAL_PUBLICATION_BYTES_FOR_SOFTWARE_DECODER_TESTS_NOT_QUALIFICATION",
+  "doi": "10.1093/jxb/erac368",
+  "authors": "Iqbal et al.",
+  "primary": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9833099/fullTextXML",
+  "supplement": "https://raw.githubusercontent.com/Iqbalwasim01/Mining-Rubisco-kinetics/a6244b717679f7f6998a5ee7893402374b5182e1/Tabel%20S2.%20Kinetics%20and%20sequence%20data%20used%20for%20model%20training.xlsx",
+  "license": "CC BY 4.0, native primary XML permissions statement; original assets unchanged",
+  "extraction": "Exact original training workbook and article bytes; no formula execution, JATS DTD execution or preprocessing",
+  "files": [
+    {
+      "member": "primary.xml",
+      "bytes": 177420,
+      "sha256": "77c7bb857c26132820123d70ad356deb36124b162300f124784df6eddadbdd0f"
+    },
+    {
+      "member": "table_s2.xlsx",
+      "bytes": 35582,
+      "sha256": "bbd449d86c96297acf6351cf184464ceb23cbc1f42535beff4fce8b0dcd7bbc0"
+    }
+  ]
+}

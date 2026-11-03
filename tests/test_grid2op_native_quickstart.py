@@ -21,7 +21,7 @@ from empirical_lawhood.kernel.evidence import OutcomeAccess
 from empirical_lawhood.kernel.provenance import ObjectIdentity
 
 ROOT = Path(__file__).resolve().parents[1]
-SHIPPED = ROOT / "experiments/grid-response-inputs/config.json"
+SHIPPED = ROOT / "programmes/energy/electricity-grids/workflows/grid-response-inputs/config.json"
 
 
 def test_shipped_grid2op_selection_refuses_missing_held_source_before_contact(

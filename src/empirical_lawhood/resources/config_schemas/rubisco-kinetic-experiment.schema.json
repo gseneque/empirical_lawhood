@@ -1,0 +1,296 @@
+{
+  "$defs": {
+    "AssayQuery_15a5724484c3": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/simulators/rubisco-assay/query"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "co2_um": {
+              "additionalProperties": false,
+              "description": "co2 um; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "duration_s": {
+              "additionalProperties": false,
+              "description": "duration s; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "o2_um": {
+              "additionalProperties": false,
+              "description": "o2 um; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "co2_um",
+            "o2_um",
+            "duration_s"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "KineticSupplyContext_da45d260e7e3": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco/kinetic-supply/context"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "assay_conditions": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "assay conditions; constructor checks semantics and units."
+            },
+            "context_id": {
+              "description": "context id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "interpretation": {
+              "description": "interpretation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "material": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "material; constructor checks semantics and units."
+            },
+            "temperature_k": {
+              "additionalProperties": false,
+              "description": "temperature k; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "context_id",
+            "material",
+            "assay_conditions",
+            "temperature_k",
+            "interpretation"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RubiscoKineticExperimentSpecification_588e818a7b86": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-kinetic-experiment/specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "biological_predictive_calibration": {
+              "description": "biological predictive calibration; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "campaign": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "campaign; constructor checks semantics and units."
+            },
+            "comparison": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "comparison; constructor checks semantics and units."
+            },
+            "context": {
+              "$ref": "#/$defs/KineticSupplyContext_da45d260e7e3",
+              "description": "context; constructor checks semantics and units."
+            },
+            "evidence_scope": {
+              "description": "evidence scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "expected_member_ids": {
+              "description": "expected member ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "independent_biological_units": {
+              "description": "independent biological units; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "material": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "material; constructor checks semantics and units."
+            },
+            "numerical_relative_tolerance": {
+              "additionalProperties": false,
+              "description": "numerical relative tolerance; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "query": {
+              "$ref": "#/$defs/AssayQuery_15a5724484c3",
+              "description": "query; constructor checks semantics and units."
+            },
+            "question": {
+              "description": "question; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "source_query": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "source query; constructor checks semantics and units."
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "supply": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "supply; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "specification_id",
+            "question",
+            "campaign",
+            "material",
+            "supply",
+            "source_query",
+            "comparison",
+            "context",
+            "expected_member_ids",
+            "query",
+            "numerical_relative_tolerance",
+            "evidence_scope",
+            "independent_biological_units",
+            "biological_predictive_calibration"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:rubisco-kinetic-experiment",
+  "$ref": "#/$defs/RubiscoKineticExperimentSpecification_588e818a7b86",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Rubisco Kinetic Experiment",
+  "x-consumer": "rubisco-kinetic-experiment",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

@@ -1,0 +1,56 @@
+{
+  "$defs": {
+    "OperationalConfiguration_cbc326551676": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/runtime/operational-configuration"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_verification": {
+              "description": "artifact verification; constructor checks semantics and units.",
+              "enum": [
+                "reduced",
+                "strict"
+              ],
+              "type": "string"
+            },
+            "scientific_reconstruction": {
+              "description": "scientific reconstruction; constructor checks semantics and units.",
+              "enum": [
+                "off",
+                "full"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_verification",
+            "scientific_reconstruction"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "2.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:operational-configuration",
+  "$ref": "#/$defs/OperationalConfiguration_cbc326551676",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Operational Configuration",
+  "x-consumer": "operational-configuration",
+  "x-consumer-maximum-bytes": 65536,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

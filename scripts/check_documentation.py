@@ -21,7 +21,7 @@ FROZEN_EDITION_DOCUMENTS = frozenset((
     "editions/v0.60/Empirical_Lawhood_Evidence_and_Provenance_v0.60.md",
     "editions/v0.60/Revision_Summary_v0.60.md",
 ))
-# The finite science plan binds exact bytes, including its historical citation.
+# The curated current scientific specification binds its exact recipe bytes.
 # Only this removed bibliography target is exempt; other navigation is checked.
 FINITE_SCIENCE_DOCUMENT = "src/empirical_lawhood/adapters/methods/finite_response_law/specification.md"
 FINITE_SCIENCE_SHA256 = "90baf62da60fd3f925f9212429e5b724184d6ea29da33a4da6d5bc42aa825d5f"
@@ -101,29 +101,8 @@ def frozen_scientific_link_targets(root: Path) -> dict[str, frozenset[str]]:
     """Retain only authenticated frozen citations without changing scientific identities."""
     raw = _paper_file(root, FINITE_SCIENCE_DOCUMENT).read_bytes()
     if len(raw) != 84916 or hashlib.sha256(raw).hexdigest() != FINITE_SCIENCE_SHA256:
-        raise ValueError("finite scientific specification bytes differ from frozen plan")
-    bindings = {
-        "src/empirical_lawhood/adapters/methods/preparation_applicability/frozen_specification.md":
-            (7334, "be628f6d7869e2c8388fa13ae1ee4ab2784eda4471ee4580c5c5e3c78e8da66d", (
-                "../../scripts/analyze_cc1_applicability_opportunity_v1.py",
-                "../guides/scientific-experiment-design-standard.md",
-                "../results/cc1-applicability-production-opportunity-v1-2026-10-01.md",
-                "cc1-boundary-production-v1.md",
-                "../results/cc1-boundary-production-v1-2026-10-01.md",
-            )),
-        "src/empirical_lawhood/adapters/methods/constructed_preparation_applicability/frozen_specification.md":
-            (12145, "1b50614ffe258a3c0a5e8a7625ef8c820d1a328af439c0612b484fc1e78b3361", (
-                "../reference/project-owner-authority.md",
-                "../results/cc1-applicability-production-opportunity-v1-2026-10-01.md",
-            )),
-    }
-    targets = {FINITE_SCIENCE_DOCUMENT: frozenset((FINITE_SCIENCE_LEGACY_TARGET,))}
-    for relative, (size, checksum, historical_targets) in bindings.items():
-        raw = _paper_file(root, relative).read_bytes()
-        if len(raw) != size or hashlib.sha256(raw).hexdigest() != checksum:
-            raise ValueError(f"frozen scientific provenance bytes differ: {relative}")
-        targets[relative] = frozenset(historical_targets)
-    return targets
+        raise ValueError("finite scientific specification bytes differ from its declared identity")
+    return {FINITE_SCIENCE_DOCUMENT: frozenset((FINITE_SCIENCE_LEGACY_TARGET,))}
 
 
 class _HTMLTargets(HTMLParser):
@@ -261,6 +240,8 @@ def current_paper_citation_errors(
 
 
 def main() -> None:
+    from empirical_lawhood.infrastructure.source_policy import is_work_plan_path
+
     root = Path(__file__).resolve().parents[1]
     inventory = set(
         subprocess.check_output(
@@ -269,6 +250,10 @@ def main() -> None:
             text=True,
         ).split("\0")
     ) - {""}
+    inventory = {
+        name for name in inventory
+        if not is_work_plan_path(name) and not name.startswith("docs/blog/")
+    }
     names = sorted(name for name in inventory if name.endswith(".md"))
     errors = []
     frozen_sources = 0
@@ -313,7 +298,7 @@ def main() -> None:
                 and not any(item.startswith(relative + "/") for item in inventory)
             ):
                 errors.append(f"{name}: local target is not shipped {selected}")
-        if name.startswith("experiments/") and name.endswith("/guide.md"):
+        if name.startswith("programmes/") and name.endswith("/guide.md"):
             if re.search(r"^empirical-lawhood\b", content, re.MULTILINE):
                 errors.append(
                     f"{name}: bare CLI; use uv run --no-sync from the selected checkout"
@@ -321,12 +306,12 @@ def main() -> None:
     if errors:
         raise SystemExit("\n".join(errors))
     guides = sum(
-        name.startswith("experiments/") and name.endswith("/guide.md") for name in names
+        name.startswith("programmes/") and name.endswith("/guide.md") for name in names
     )
     print(
         f"checked shipped Markdown/HTML targets in {len(names)} source Markdown files "
         "and current manuscript citation metadata; "
-        f"and unactivated-shell rules in {guides} experiment guides; "
+        f"and unactivated-shell rules in {guides} programme workflow guides; "
         f"{frozen_sources} authenticated historical documentary sources retain their original local links; "
         "authenticated frozen scientific historical targets retained; "
         "maintained local Markdown anchors checked; external URLs and PDF viewer fragments are not checked"

@@ -1,0 +1,83 @@
+{
+  "$defs": {
+    "AssayQuery_15a5724484c3": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/simulators/rubisco-assay/query"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "co2_um": {
+              "additionalProperties": false,
+              "description": "co2 um; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "duration_s": {
+              "additionalProperties": false,
+              "description": "duration s; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "o2_um": {
+              "additionalProperties": false,
+              "description": "o2 um; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "co2_um",
+            "o2_um",
+            "duration_s"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:rubisco-kinetic-query",
+  "$ref": "#/$defs/AssayQuery_15a5724484c3",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Rubisco Kinetic Query",
+  "x-consumer": "rubisco-kinetic-query",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "retained",
+  "x-preparation-allowed": false
+}

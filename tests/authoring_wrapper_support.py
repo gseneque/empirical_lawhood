@@ -13,6 +13,10 @@ from pathlib import Path
 from empirical_lawhood.api.codecs import load_registered_authoring
 from empirical_lawhood.kernel.decoding import decode_canonical_bytes
 from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.runtime.artifacts import ExternalRootContract
+from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from tests.prospective_source_capture_fixture import install_historical_source_capture
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,16 +48,20 @@ def export_wrapper(family, directory, monkeypatch, *, module=None, persist=True,
         def closure(root, closure_id):
             return ImplementationSourceClosure(closure_id, SourceClosureKind.CLEAN_GIT_COMMIT, "a" * 40, "b" * 64, "c" * 64, True)
 
-        monkeypatch.setattr(module, "capture_clean_target_closure", closure)
+        install_historical_source_capture(monkeypatch, module, closure(ROOT, experiment_id + ".source-closure"))
+    plane = None if family == "matrix" else ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
+        "software.wrapper-source", "disclosed frozen-output control", str(directory.absolute()),
+        str(next(parent for parent in (directory, *directory.parents) if parent.is_mount())),
+        OperatorStorageProfile.SCHEMA, 1, None, None, ())))
     if family == "rc":
-        study = decode_canonical_bytes((ROOT / "experiments/rc-ladder-response/study.json").read_bytes(), module.ResistorCapacitorLadderStudyConfig, maximum_bytes=65536)
-        summary = module.author_fresh_rc(root=ROOT, study=study, experiment_id=experiment_id, output_dir=output)
+        study = decode_canonical_bytes((ROOT / "programmes/foundations/measurement-and-response/workflows/rc-ladder-response/study.json").read_bytes(), module.ResistorCapacitorLadderStudyConfig, maximum_bytes=65536)
+        summary = module.author_fresh_rc(root=ROOT, study=study, experiment_id=experiment_id, output_dir=output, artifact_writer=plane)
     elif family == "electron-gas":
-        config = decode_canonical_bytes((ROOT / "experiments/electron-gas-response/config.json").read_bytes(), module.UniformElectronGasAnalyticReferenceConfig, maximum_bytes=65536)
-        summary = module.author_uniform_electron_gas_analytic_reference(root=ROOT, config=config, experiment_id=experiment_id, output_dir=output)
+        config = decode_canonical_bytes((ROOT / "programmes/materials/superconductivity/workflows/electron-gas-response/config.json").read_bytes(), module.UniformElectronGasAnalyticReferenceConfig, maximum_bytes=65536)
+        summary = module.author_uniform_electron_gas_analytic_reference(root=ROOT, config=config, experiment_id=experiment_id, output_dir=output, artifact_writer=plane)
     elif family == "material":
-        config = decode_canonical_bytes((ROOT / "experiments/lattice-pairing-method/authoring.json").read_bytes(), module.SyntheticMaterialResponseMethodConfig, maximum_bytes=128 * 1024)
-        summary = module.author_synthetic_material_response(root=ROOT, config=config, experiment_id=experiment_id, output_dir=output)
+        config = decode_canonical_bytes((ROOT / "programmes/materials/superconductivity/workflows/lattice-pairing-method/authoring.json").read_bytes(), module.SyntheticMaterialResponseMethodConfig, maximum_bytes=128 * 1024)
+        summary = module.author_synthetic_material_response(root=ROOT, config=config, experiment_id=experiment_id, output_dir=output, artifact_writer=plane)
     else:
         preparation = importlib.import_module("empirical_lawhood.adapters.composition.prepared_response.native_authoring")
         monkeypatch.setattr(preparation, "_implementation_digest", lambda root: "b" * 64)
@@ -67,7 +75,7 @@ def export_wrapper(family, directory, monkeypatch, *, module=None, persist=True,
                 return replace(observed, dependency_lock_sha256=MATRIX_BASELINE_LOCK_SHA256)
 
             monkeypatch.setattr(preparation, "PreparedNativeSpec", original_producing_spec)
-        config = load_registered_authoring(ROOT / "experiments/prepared-response/prepared-source-qualification-author.json", root_schemas={preparation.PreparedResponseNativeAuthoringInput.SCHEMA: preparation.PreparedResponseNativeAuthoringInput}, maximum_bytes=16 * 1024)
+        config = load_registered_authoring(ROOT / "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-source-qualification-author.json", root_schemas={preparation.PreparedResponseNativeAuthoringInput.SCHEMA: preparation.PreparedResponseNativeAuthoringInput}, maximum_bytes=16 * 1024)
         held = directory / "held"
         held.mkdir(parents=True)
         prior = held / "inspection.json"

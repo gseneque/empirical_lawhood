@@ -25,7 +25,7 @@ from empirical_lawhood.planning.study_issue import AccountableHumanIdentity, Stu
 from empirical_lawhood.runtime.artifacts import ExternalRootContract
 from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
 
-CONFIG = Path(__file__).resolve().parents[1] / "configs/sources/fair-mast-level2.json"
+CONFIG = Path(__file__).resolve().parents[1] / "programmes/energy/fusion/workflows/fair-mast-source/fair-mast-level2.json"
 
 
 class Gateway:
@@ -93,7 +93,7 @@ def test_fair_mast_preview_acquire_recover_and_drift(tmp_path):
         "test-fair-mast-root",
         "test root",
         str(tmp_path),
-        "/",
+        str(next(parent for parent in (tmp_path, *tmp_path.parents) if parent.is_mount())),
         OperatorStorageProfile.SCHEMA,
         1,
         None,

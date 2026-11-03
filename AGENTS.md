@@ -1,49 +1,63 @@
 # Working in Empirical Lawhood
 
 This repository implements response-law contracts and supported researcher workflows.
-Use development results, software conformance and scientific qualification as distinct claims.
-Start with the public documentation for the task you are changing.
+Keep development results, software conformance and scientific qualification distinct.
+Start with the public documentation for the task you are doing.
 
-## Navigation
+## Researcher workflows
 
-- [README](README.md): purpose, installation and the first reactor report.
-- [Workflow index](experiments/README.md): public bundles, commands, inputs and first stops.
-- [Configuration](docs/configuration.md): copied inputs, consumer validation and canonical preparation.
-- [Results and failures](docs/results-and-failures.md): retained attempts, scientific states and receipt-based recovery.
-- [Architecture](docs/architecture.md): source ownership and three distinct graphs.
-- [Extension recipe](docs/extending-the-engine.md): local RC boundary, independent falsifier and later provider work.
-- [Environments](docs/environments.md) and [testing](docs/testing.md): exact selected profiles.
+Use the [programme index](programmes/README.md) to select a scientific question.
+Use [getting started](docs/getting-started.md) for installation and the first report.
+The [workflow catalogue](docs/reference/workflows.md) lists every supported guide. The
+[experiment procedure](docs/using/designing-and-running-an-experiment.md#researcher-procedure)
+owns the high-level design, preparation, execution and analysis steps.
+For the Matrix E1–E6 programme, follow the
+[programme guide](programmes/foundations/emergent-structure/workflows/matrix-programme/guide.md) and its public scientific
+specification. Use each guide's supported commands and returned paths; do not
+construct task rosters, scientific identities or predecessor records by hand.
 
-## Source and effects
+Select the guide's [locked environment](docs/using/environments.md), your operator
+profile and explicit storage destinations. After environment selection, use
+`uv run --no-sync`; do not synchronize merely to inspect a file or edit prose.
+Brian2 uses its separate locked interpreter and NumPy pin.
+[Configuration](docs/using/configuration.md) explains copied inputs and canonical
+preparation. [Results and failures](docs/using/results-and-failures.md) explains
+scientific readouts, retained attempts, recovery and original-result access.
+Keep actual source, input access, resource, issue, execution and reveal
+prerequisites at their documented boundaries. Configuration validation and
+development receipts create no scientific or outcome-access authority.
 
+Preserve exact canonical bytes, Decimal values, source digests and record revisions.
+Keep cutoffs, independent units, nested views, complete denominators and negative
+or unevaluable outcomes. Relabeling exposed evidence does not make it fresh.
+Write outputs only to explicitly selected paths. Closed scientific packages
+retain their member contracts; receipts are primary custody and the local
+catalog is a rebuildable projection. Keep original paper assets unchanged.
+Do not use synthetic test signers or exposed examples as qualification evidence.
+
+## Engine development
+
+Read [Contributing](CONTRIBUTING.md), [architecture](docs/development/architecture.md),
+[testing](docs/development/testing.md) and the [extension recipe](docs/development/extending-the-engine.md).
 Imports point inward: kernel ← planning ← runtime ← adapters/infrastructure ← API ← CLI.
-The kernel owns scientific records and canonical identities. Adapters own native science.
-Infrastructure owns bounded I/O and custody. API composes services; CLI owns presentation.
-Static workflow discovery does not inspect prerequisites, build providers or run native tasks.
-Guide/config paths belong to a selected checkout or source distribution, not wheel resources.
-Reuse typed source, allocation and array contracts across consumers. Keep scientific protocols and immutable evidence separate from editable selections.
-Development completion receipts do not create issue, qualification or outcome-access authority.
+The kernel owns scientific records and canonical identities; adapters own native
+science, infrastructure owns bounded I/O and custody, API composes services and
+CLI owns presentation. Static discovery must not inspect prerequisites, build
+providers or run native tasks. Guide/config paths belong to the selected
+checkout or source distribution. Reuse typed source, allocation and array
+contracts; keep immutable evidence separate from editable selections.
 
-## Development and checks
+Run affected focused checks and lint, and `python scripts/check_documentation.py`
+for maintained documentation. Change generated owners first, then regenerate
+the extension aggregate, executable aggregate and CLI reference in that order.
+Workflow/config projections have their own generators. Use the named scripts
+in the extension guide and inspect the diff. Do not hand-edit generated
+scientific identities. The coordinator owns shared interfaces, generated
+aggregates, dependency changes and integrated acceptance.
 
-Use the locked environment declared in the relevant guide. After selecting it, use `uv run --no-sync`.
-Do not synchronize an environment merely to inspect a file or fix prose.
-Brian2 has a separate locked interpreter; do not combine its NumPy pin with the main environment.
-Run affected focused tests and lint. Use `python scripts/check_documentation.py` for maintained documentation.
-The [contribution guide](CONTRIBUTING.md) gives complete release checks for settled runtime changes.
-Ordinary reversible code, prose and exposed test work need no scientific approval ceremony.
-Real issue, execution, reveal, external access and publication retain their explicit authority boundaries.
-
-Generated owners: extension aggregate, then executable aggregate, then CLI reference.
-Use the named scripts in the extension guide. Workflow/config projections have their own generators.
-Change owners, regenerate and inspect the diff; do not hand-edit generated scientific identities.
-
-## Preservation
-
-Preserve exact canonical and historical bytes, Decimal values, source digests and record revisions.
-Keep cutoffs, independent units, nested views, complete denominators and negative/unevaluable outcomes.
-A new seed label or ID does not make exposed evidence fresh.
-Write operational outputs only to explicitly selected paths. Closed scientific packages retain their member contracts.
-Receipts are primary custody; the local catalog is a rebuildable projection.
-Do not use synthetic test signers or exposed examples as real qualification evidence.
-Keep original paper assets unchanged. Maintained paper indexes may change with their manifest bindings.
+Exclude every Markdown work plan from wheels, source distributions and release
+archives while preserving its original bytes in local or external custody.
+Public guides and scientific specifications must stand without packaged work
+plans. The [coverage map](docs/release/implementation-coverage.md) records the shipped
+implementation summary. Maintained paper indexes may change only with their
+manifest bindings.

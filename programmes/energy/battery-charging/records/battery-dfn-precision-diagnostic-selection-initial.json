@@ -1,0 +1,94 @@
+{
+  "comparison_denominator": 9,
+  "comparisons": [
+    {
+      "component": "localization-band",
+      "left": "A",
+      "right": "B"
+    },
+    {
+      "component": "mesh",
+      "left": "B",
+      "right": "C"
+    },
+    {
+      "component": "solver-tolerance",
+      "left": "B",
+      "right": "D"
+    }
+  ],
+  "components": [
+    {
+      "atol": "1e-10",
+      "electrode_points": 90,
+      "localization_epsilon_k": "1e-5",
+      "radial_points": 120,
+      "rtol": "1e-9",
+      "view": "A"
+    },
+    {
+      "atol": "1e-10",
+      "electrode_points": 90,
+      "localization_epsilon_k": "1e-6",
+      "radial_points": 120,
+      "rtol": "1e-9",
+      "view": "B"
+    },
+    {
+      "atol": "1e-10",
+      "electrode_points": 180,
+      "localization_epsilon_k": "1e-6",
+      "radial_points": 240,
+      "rtol": "1e-9",
+      "view": "C"
+    },
+    {
+      "atol": "1e-8",
+      "electrode_points": 90,
+      "localization_epsilon_k": "1e-6",
+      "radial_points": 120,
+      "rtol": "1e-7",
+      "view": "D"
+    }
+  ],
+  "controller": "Conservative LOW/HIGH hybrid approximation; up25C+epsilon,down25C+epsilon/2; HIGHeligibleonlyactualT>25C; original4.2Vcomplementarity/protective4.201Vevents unchanged.",
+  "cost": "Actual12 forecast expense retained including observed initial-SOC calls. Ancestor36 remains historical negative context. No claim of complete physical/comparative expense.",
+  "denominators": "Retain every main solve/step attempt, full differential state, receiver clock, transitions and initialization attempts; no retry/segment cap.",
+  "forecast_denominator": 12,
+  "original_source_fingerprint": "54eabf2cef5c38335ce09fe3a3f2409e4af0b6a86731c46d344fcb2e09cadce7",
+  "original_source_version": "1.1.0",
+  "physical_units": 0,
+  "preparations": [
+    {
+      "initial_temperature_k": "278.15",
+      "reason": "Cold least-time recipe and strongest thermal precision discrepancy.",
+      "recipe": "chamber-40c"
+    },
+    {
+      "initial_temperature_k": "298.15",
+      "reason": "Observed tier-crossing transient and terminal-clock sensitivity.",
+      "recipe": "original-ambient"
+    },
+    {
+      "initial_temperature_k": "308.15",
+      "reason": "Warm preparation without tier transition: mesh/tolerance anchor.",
+      "recipe": "original-ambient"
+    }
+  ],
+  "prior_reference_checks": 9,
+  "prior_reference_checks_unresolved": 9,
+  "prior_registered_receipt_sha256": "6cd6199ff5359c9d6d2388107805f19dcaef455f731b092776741fbbfdf84d1e",
+  "prior_supply_disposition": "UNEVALUABLE",
+  "prior_supply_sha256": "a79d5bf5ffdb4bc232615a445eb82f058ce3ac4c8137fbc5b3a94352eaabda6e",
+  "qualification": false,
+  "question": "Finite DFN band, mesh and tolerance sensitivity under unchanged1s/1mV/.01K gates.",
+  "revision": "1.0.0",
+  "root_roundoff": "epsilon/1000000K; unchanged strict root-integrity test; small bands and old D tolerances can yield technical UNEVALUABLE.",
+  "source_freeze_before_entry": true,
+  "status": "SELECTED_PROSPECTIVE_NUMERICAL_DIAGNOSTIC",
+  "strict_gates": {
+    "terminal_time_s": "1",
+    "voltage_v": "0.001",
+    "volume_temperature_k": "0.01"
+  }
+}

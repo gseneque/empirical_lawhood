@@ -21,7 +21,8 @@ from .bounded_process import BoundedProcessError, run_bounded_command
 from .atomic_files import rename_noreplace
 
 
-MAX_REPORT_BYTES = 1024 * 1024
+# Returned reports have already been rendered by the public operation. Their
+# exact encoded allocation bounds export; diagnostic and input bounds are separate.
 MAX_INPUT_COPY_BYTES = 64 * 1024
 MAX_RECORD_BYTES = 64 * 1024
 MAX_DIAGNOSTICS_BYTES = 32 * 1024
@@ -99,7 +100,6 @@ class DevelopmentAttempt:
         self._installed: dict[str, str] = {}
         self._events: list[bytes] = []
         self._report: bytes | None = None
-        self._report_error: Exception | None = None
         self.failure_exception: BaseException | None = None
         self.closed = False
         self.record: dict[str, Any] = {
@@ -234,26 +234,20 @@ class DevelopmentAttempt:
 
     def report(self, rendered: str) -> None:
         self.operation_completed()
-        if len(rendered) + 1 > MAX_REPORT_BYTES:
-            self._report_error = ValueError("returned report exceeds the operational export byte limit")
-        else:
-            self._report = rendered.encode("ascii") + b"\n"
+        self._report = rendered.encode("ascii") + b"\n"
 
     def finish(self, exit_code: int, error: BaseException | None = None) -> None:
         if self.closed:
             return
         self.record.update(ended_at_utc=_utc(), exit_code=exit_code,
                            state="SUCCEEDED" if exit_code == 0 else "FAILED")
-        if error is None and self._report_error is not None:
-            error = self._report_error
-            self.record.update(state="EXPORT_FAILED", exit_code=1, stage="result_export")
         if exit_code and error is None:
             error = RuntimeError("CLI returned a nonzero exit without an exception")
         failure = None if error is None else safe_failure(error, stage=self.record["stage"])
         try:
             if self._report is not None:
                 self.event("result_export")
-                self._write("report.json", self._report, MAX_REPORT_BYTES)
+                self._write("report.json", self._report, len(self._report))
                 self.record["products"].append({"path": "report.json", "role": "returned_route_report", "complete": True,
                                                "bytes": len(self._report), "sha256": hashlib.sha256(self._report).hexdigest()})
             if failure is not None:

@@ -1,0 +1,159 @@
+{
+  "sources": [
+    {
+      "source_id": "flamholz-rubisco-data-DatasetS1_SourceRubiscoKinetics.csv",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/flamholz-rubisco-data-DatasetS1_SourceRubiscoKinetics.csv",
+      "bytes": 276245,
+      "sha256": "586f57382c3f490becd2e76196ba72f8fe769a851f8b80b3adc1b5dca9085fb0",
+      "selected": false
+    },
+    {
+      "source_id": "followup-plant4.te-galdieria-ssu-correspondence-inspection.json",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/followup-plant4/te-galdieria-ssu-correspondence-inspection.json",
+      "bytes": 586663,
+      "sha256": "94bb8cd0cb2d5b7c7e356eff70a973f1f8b302dc422418bbc8675e1285eada8b",
+      "selected": true
+    },
+    {
+      "source_id": "followup-reference2.galdieria-AB018008.1.txt",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/followup-reference2/galdieria-AB018008.1.txt",
+      "bytes": 6868,
+      "sha256": "dfe1d30b4870faa271c6f58d67d6bc39cf6e3a805b7b94dfd4362401bfc14c99",
+      "selected": true
+    },
+    {
+      "source_id": "followup-reference2.galdieria-O98949.json",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/followup-reference2/galdieria-O98949.json",
+      "bytes": 19630,
+      "sha256": "2d5d1f8d2182c021dbccc0440e77b385a127205b3b1d542d4734a5feb468482f",
+      "selected": true
+    },
+    {
+      "source_id": "followup-reference2.galdieria-reference-sequence-inspection.json",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/followup-reference2/galdieria-reference-sequence-inspection.json",
+      "bytes": 12870,
+      "sha256": "04f4a792bbc131e7752ccdc868462711110e9b8a9f570af24ef2fe81397da689",
+      "selected": true
+    },
+    {
+      "source_id": "followup-reference2.reference-catalogue-native-inspection.json",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/followup-reference2/reference-catalogue-native-inspection.json",
+      "bytes": 11600,
+      "sha256": "bc3e11c3c8a282af5422c889c4d63a30d942172fd91a48ea13183b92dcaeedc4",
+      "selected": true
+    },
+    {
+      "source_id": "followup-reference2.sharwood2008-native-inspection.json",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/followup-reference2/sharwood2008-native-inspection.json",
+      "bytes": 129875,
+      "sha256": "fd2fe5b366e6fc0e8f19029e82388c60d6b4d9c0c25bad4685b632d67498fb4f",
+      "selected": true
+    },
+    {
+      "source_id": "followup-reference2.sharwood2016-native-inspection.json",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/followup-reference2/sharwood2016-native-inspection.json",
+      "bytes": 130498,
+      "sha256": "77f46bdaa879f2b8f0b347e5ace2c1110bd18997dd18d6465653081652bf846c",
+      "selected": true
+    },
+    {
+      "source_id": "galdieria-1bwv-entities1.json",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/galdieria-1bwv-entities1.json",
+      "bytes": 19890,
+      "sha256": "7020b506b2a746ba67d485d15d4a8d526d81df77f3be50c16b4bf66dd93b8912",
+      "selected": false
+    },
+    {
+      "source_id": "galdieria-1bwv-entities2.json",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/galdieria-1bwv-entities2.json",
+      "bytes": 10718,
+      "sha256": "fdc2643782a01a04e4b116c4803550677875050b257a2e6a60e35d452f797524",
+      "selected": false
+    },
+    {
+      "source_id": "galdieria-1bwv.cif",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/galdieria-1bwv.cif",
+      "bytes": 2046400,
+      "sha256": "4fe0d7197062a6643568937520582a58673a91d032ed313a8c37545d22a0d6b6",
+      "selected": false
+    },
+    {
+      "source_id": "galdieria-O98950.json",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/galdieria-O98950.json",
+      "bytes": 10741,
+      "sha256": "88f4ec62724e4e30e2833a658401633912e1ef19ab58b9bde76dcc65540d5504",
+      "selected": true
+    },
+    {
+      "source_id": "genbank.py",
+      "path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/physical/rubisco_kinetics/genbank.py",
+      "bytes": 10819,
+      "sha256": "090e9a07b5fedf0dda502ceeec83b25bf161f9de33ddb6c5b2f2485f2d8e48a9",
+      "selected": false
+    },
+    {
+      "source_id": "inspect_structure_correspondence.py",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/inspect_structure_correspondence.py",
+      "bytes": 4333,
+      "sha256": "0e070daf0ff6dc841e3adc6850c2df56be0649952bedcc75079d7f2c052ee59f",
+      "selected": false
+    },
+    {
+      "source_id": "rubisco-te-galdieria-ssu-correspondence-v1.py",
+      "path": "/tmp/rubisco-te-galdieria-ssu-correspondence-v1.py",
+      "bytes": 16825,
+      "sha256": "31ff87e9f1dc1b91b5557020f7f8307fa94347720f51da25f3100d476af3d28d",
+      "selected": false
+    },
+    {
+      "source_id": "rubisco-tobacco-red-alignment-v1.py",
+      "path": "/tmp/rubisco-tobacco-red-alignment-v1.py",
+      "bytes": 10478,
+      "sha256": "44419f25ddbf83b914adf54ff0925e0736a94d2b81812af8480fa85f74257c80",
+      "selected": false
+    },
+    {
+      "source_id": "sharwood2008-radiometric-method.html",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/followup-reference2/sharwood2008-radiometric-method.html",
+      "bytes": 241517,
+      "sha256": "731ce277bcad5128e0b786542062d37974390d37773415de81c0e6c804419808",
+      "selected": false
+    },
+    {
+      "source_id": "sharwood2016-maize.html",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/followup-reference2/sharwood2016-maize.html",
+      "bytes": 250576,
+      "sha256": "23cf83f6c2a87927af8c68ce66a9e10b01b19b386331a1e85c1a99507a6d02fd",
+      "selected": false
+    },
+    {
+      "source_id": "te-3zxw.cif",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/te-3zxw.cif",
+      "bytes": 2006344,
+      "sha256": "119f966e3706442fa493134f90c21e65bc12c109e68041bf4cc7e399d9961c15",
+      "selected": false
+    },
+    {
+      "source_id": "te-MG000148.gb",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/te-MG000148.gb",
+      "bytes": 5511,
+      "sha256": "62f8c50c51ba007b4d6b99273b9c397ceea85d97985449f6c0bcef376e51b305",
+      "selected": true
+    },
+    {
+      "source_id": "wilson2017-exact-mutant-panel-inspection.json",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/wilson2017-exact-mutant-panel-inspection.json",
+      "bytes": 47396,
+      "sha256": "63b0497ddba236f0c209eca60f26857defb4f2e5ec549bb7d007e42f97b559f3",
+      "selected": true
+    },
+    {
+      "source_id": "wilson2017-jbc.html",
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/public-inputs/wilson2017-jbc.html",
+      "bytes": 223002,
+      "sha256": "102a96a551bf11104b7ca7563572010adf8dc540a937165c671f23c618a24316",
+      "selected": true
+    }
+  ],
+  "selection_sha256": "d29ded32f92b683538cc78b1c8fd9506d538f2e8d1e9bc21680e74abd0d5ba9b"
+}

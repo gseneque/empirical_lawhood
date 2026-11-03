@@ -30,7 +30,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def scenario(tmp_path_factory):
     store = tmp_path_factory.mktemp("synthetic-selected-event")
     plane = ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
-        "synthetic.selected-store", "software exposed conditioning", str(store), "/", OperatorStorageProfile.SCHEMA, 1, None, None, ())))
+        "synthetic.selected-store", "software exposed conditioning", str(store), str(next(parent for parent in store.parents if parent.is_mount())), OperatorStorageProfile.SCHEMA, 1, None, None, ())))
     lock = sha256((ROOT / "uv.lock").read_bytes()).hexdigest()
     request = replace(api.selected_parent_example_input(environment_lock_sha256=lock), minimum_free_bytes=1)
     parent, manifest = api.reconstruct_nominated_selected_parent(config=request, artifact_writer=plane, project_root=ROOT, implementation_commit="0" * 40)

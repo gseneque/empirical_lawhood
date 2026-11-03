@@ -37,7 +37,7 @@ def test_store_requires_publication_exact_context_and_independent_authority(
                 "synthetic-store",
                 "synthetic store",
                 str(root),
-                "/",
+                str(next(parent for parent in root.parents if parent.is_mount())),
                 OperatorStorageProfile.SCHEMA,
                 1,
                 None,

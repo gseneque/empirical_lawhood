@@ -6,13 +6,13 @@
   "files": [
     {
       "path": "README.md",
-      "bytes": 12619,
-      "sha256": "2aa2af9d503a630574f20800549a4d7175d5ba8481855f5e67df49322ecb83c4"
+      "bytes": 13299,
+      "sha256": "65d2214b8374965fd0ba8194b8f06241180885b881b7ac2476ba9e343e96bcf8"
     },
     {
       "path": "SOURCES.md",
-      "bytes": 14160,
-      "sha256": "07fc96985af2463df8dc67fae9b71ddb2a1b2bdec1468787b637a851ec09c58e"
+      "bytes": 17258,
+      "sha256": "f5a3fe37b73782de49f2657346475db812fee19c476cf0e82486214cdcc17f7b"
     },
     {
       "path": "assets/figure1.pdf",
@@ -246,13 +246,13 @@
     },
     {
       "path": "source/tests/test_validate_bundle.py",
-      "bytes": 5155,
-      "sha256": "a7461547da283fc6f5601b5e4c3718a01405b52b6b01165bae91664d6e50e6eb"
+      "bytes": 5584,
+      "sha256": "f2213f34a86b2a55089b57bf2acece5cd73cc5e3ff60cc3f3407cadec01eb0db"
     },
     {
       "path": "source/validate_bundle.py",
-      "bytes": 21045,
-      "sha256": "b1cc921ff020bebbb6599f4252d40054a5cd8bb4621cfe125381b7a2c5387ce4"
+      "bytes": 20986,
+      "sha256": "006de8743f9f3d7940c83cf513a1a5855ed13fe9737c0d720721a498138cf1f5"
     },
     {
       "path": "source/write_manifest.py",

@@ -1,0 +1,430 @@
+{
+  "$defs": {
+    "NativeAmendedUtilityCriterion_4a54e453b0ce": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-factor-response/amended-native-utility-criterion"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "adequacy_horizon": {
+              "description": "adequacy horizon; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "adequacy_null_denominator": {
+              "description": "adequacy null denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "adequacy_null_numerator": {
+              "description": "adequacy null numerator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "adequacy_tolerance": {
+              "additionalProperties": false,
+              "description": "adequacy tolerance; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "alpha_denominator": {
+              "description": "alpha denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "alpha_numerator": {
+              "description": "alpha numerator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "candidate": {
+              "description": "candidate; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "comparators": {
+              "description": "comparators; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "estimand": {
+              "description": "estimand; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "fitting_budget": {
+              "description": "fitting budget; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "improvement_margin": {
+              "additionalProperties": false,
+              "description": "improvement margin; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "io48_dimension_rule": {
+              "description": "io48 dimension rule; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "maximum_view_discrepancy": {
+              "additionalProperties": false,
+              "description": "maximum view discrepancy; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "minimum_usable_units": {
+              "description": "minimum usable units; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "null_success_denominator": {
+              "description": "null success denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "null_success_numerator": {
+              "description": "null success numerator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "phase_dimensions": {
+              "description": "phase dimensions; constructor checks semantics and units.",
+              "items": {
+                "items": false,
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "primary_horizon": {
+              "description": "primary horizon; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "record_id",
+            "primary_horizon",
+            "comparators",
+            "improvement_margin",
+            "maximum_view_discrepancy",
+            "null_success_numerator",
+            "null_success_denominator",
+            "alpha_numerator",
+            "alpha_denominator",
+            "minimum_usable_units",
+            "candidate",
+            "adequacy_horizon",
+            "adequacy_tolerance",
+            "adequacy_null_numerator",
+            "adequacy_null_denominator",
+            "phase_dimensions",
+            "fitting_budget",
+            "estimand",
+            "io48_dimension_rule"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "NativeUtilityCriterion_f55356aeacbc": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-factor-response/native-utility-criterion"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "aggregation": {
+              "description": "aggregation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "alpha_denominator": {
+              "description": "alpha denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "alpha_numerator": {
+              "description": "alpha numerator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "candidate": {
+              "description": "candidate; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "comparators": {
+              "description": "comparators; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "estimand": {
+              "description": "estimand; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "fitting_budget": {
+              "description": "fitting budget; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "improvement_margin": {
+              "additionalProperties": false,
+              "description": "improvement margin; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "information": {
+              "description": "information; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "maximum_view_discrepancy": {
+              "additionalProperties": false,
+              "description": "maximum view discrepancy; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "minimum_usable_units": {
+              "description": "minimum usable units; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "null_success_denominator": {
+              "description": "null success denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "null_success_numerator": {
+              "description": "null success numerator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "phase_dimensions": {
+              "description": "phase dimensions; constructor checks semantics and units.",
+              "items": {
+                "items": false,
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "predictor_class": {
+              "description": "predictor class; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "primary_horizon": {
+              "description": "primary horizon; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "record_id",
+            "primary_horizon",
+            "comparators",
+            "improvement_margin",
+            "maximum_view_discrepancy",
+            "null_success_numerator",
+            "null_success_denominator",
+            "alpha_numerator",
+            "alpha_denominator",
+            "minimum_usable_units",
+            "candidate",
+            "estimand",
+            "information",
+            "predictor_class",
+            "phase_dimensions",
+            "fitting_budget",
+            "aggregation"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "NativeUtilitySpecification_4f8bcd413329": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-factor-response/native-utility-specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "criterion": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/NativeUtilityCriterion_f55356aeacbc"
+                },
+                {
+                  "$ref": "#/$defs/NativeAmendedUtilityCriterion_4a54e453b0ce"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "criterion; constructor checks semantics and units."
+            },
+            "mathematical_protocol": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "mathematical protocol; constructor checks semantics and units."
+            },
+            "root_ids": {
+              "description": "root ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "specification_id",
+            "root_ids",
+            "mathematical_protocol",
+            "criterion"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-native-utility",
+  "$ref": "#/$defs/NativeUtilitySpecification_4f8bcd413329",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Native Utility",
+  "x-consumer": "matrix-native-utility",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

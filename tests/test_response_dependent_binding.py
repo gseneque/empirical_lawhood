@@ -31,7 +31,7 @@ ROOT = Path(__file__).parents[1]
 
 def _selection(route):
     return load_registered_authoring(
-        ROOT / f"experiments/prepared-response/prepared-{route}-input.json",
+        ROOT / f"programmes/foundations/emergent-structure/workflows/prepared-response/prepared-{route}-input.json",
         root_schemas={PreparedResponseDependentInput.SCHEMA: PreparedResponseDependentInput},
     )
 

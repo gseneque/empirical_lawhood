@@ -25,6 +25,8 @@ include =
     src/empirical_lawhood/adapters/methods/scientific_description_code.py
     src/empirical_lawhood/api/facade.py
     src/empirical_lawhood/infrastructure/bounded_io.py
+    src/empirical_lawhood/infrastructure/artifact_validation.py
+    src/empirical_lawhood/infrastructure/matrix_array_io.py
     src/empirical_lawhood/infrastructure/catalog_mutation.py
     src/empirical_lawhood/infrastructure/catalog_projection.py
     src/empirical_lawhood/infrastructure/catalog_rebuild.py
@@ -46,5 +48,44 @@ include =
     src/empirical_lawhood/kernel/serialization.py
     src/empirical_lawhood/runtime/candidate_composition.py
 
+    src/empirical_lawhood/infrastructure/development_native_custody.py
+    src/empirical_lawhood/api/rc_prerequisite_chain.py
+    src/empirical_lawhood/adapters/methods/rc_prerequisite_chain/contracts.py
+    src/empirical_lawhood/adapters/methods/rc_prerequisite_chain/science.py
+
+    src/empirical_lawhood/api/recursive_authoring.py
+    src/empirical_lawhood/api/recursive_inquiry.py
+    src/empirical_lawhood/api/recursive_inquiry_evidence.py
+    src/empirical_lawhood/api/recursive_execution.py
+    src/empirical_lawhood/api/recursive_contributions.py
+    src/empirical_lawhood/api/recursive_prospective_authoring.py
+    src/empirical_lawhood/api/recursive_qualified_parents.py
+    src/empirical_lawhood/kernel/recursive_requirements.py
+    src/empirical_lawhood/kernel/recursive_inquiry.py
+    src/empirical_lawhood/kernel/recursive_inquiry_policy.py
+    src/empirical_lawhood/kernel/scientific_contributions.py
+    src/empirical_lawhood/planning/recursive_authoring.py
+    src/empirical_lawhood/planning/recursive_input_origins.py
+    src/empirical_lawhood/planning/recursive_inquiry.py
+    src/empirical_lawhood/planning/recursive_inquiry_policy.py
+    src/empirical_lawhood/runtime/recursive_compiler.py
+    src/empirical_lawhood/runtime/recursive_inquiry.py
+    src/empirical_lawhood/runtime/recursive_handoff.py
+    src/empirical_lawhood/runtime/recursive_prospective.py
+    src/empirical_lawhood/runtime/recursive_qualified_parents.py
+    src/empirical_lawhood/runtime/recursive_provider.py
+    src/empirical_lawhood/runtime/native_effects.py
+    src/empirical_lawhood/runtime/artifacts.py
+    src/empirical_lawhood/runtime/native_subwork.py
+    src/empirical_lawhood/infrastructure/native_effect_custody.py
+    src/empirical_lawhood/infrastructure/native_subwork.py
+    src/empirical_lawhood/infrastructure/native_subwork_ipc.py
+    src/empirical_lawhood/infrastructure/file_locks.py
+    src/empirical_lawhood/infrastructure/recursive_custody.py
+    src/empirical_lawhood/infrastructure/recursive_prospective_inputs.py
+
+    src/empirical_lawhood/adapters/methods/battery_recursive_construction/scientific_binding.py
+    src/empirical_lawhood/adapters/methods/rc_prerequisite_chain/operation_bindings.py
+    src/empirical_lawhood/adapters/methods/rc_prerequisite_chain/scientific_binding.py
 [report]
 show_missing = True

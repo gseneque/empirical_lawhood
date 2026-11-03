@@ -18,6 +18,15 @@ validator = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(validator)
 
 
+class LocalAnchorTests(unittest.TestCase):
+    def test_class_suffix_matches_maintained_github_link(self):
+        self.assertIn("references-unnumbered", validator.anchors("# References {.unnumbered}"))
+
+    def test_explicit_markdown_and_html_ids_remain_available(self):
+        result = validator.anchors('## Heading {#chosen .unnumbered}\n<a id="legacy"></a>')
+        self.assertTrue({"chosen", "legacy"}.issubset(result))
+
+
 class OriginalPublicationPreservationTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix="paper-preservation-")

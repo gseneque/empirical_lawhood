@@ -1,0 +1,16 @@
+{
+  "schema": "empirical-lawhood/testing/exposed-rubisco-finalist-source",
+  "version": "1.0.0",
+  "evidence_role": "EXPOSED_SOFTWARE_CONFORMANCE_ONLY",
+  "scientific_qualification": "NOT_PERFORMED",
+  "fresh_independent_units": 0,
+  "contains_execution_receipts": false,
+  "original_source_locator": "/tmp/empirical-lawhood-applied-el-20261011-reopen01/rubisco-portfolio-source-audit/yamori2026-primary.xml",
+  "source_pinned_by": "rubisco_portfolio_inquiry.challenge.YAMORI_BYTES/YAMORI_SHA256",
+  "source_doi": "10.1038/s41467-026-73783-w",
+  "member": {
+    "path": "yamori2026-primary.xml",
+    "size_bytes": 139555,
+    "sha256": "41c3ee13edb2d0cb55287d2852ce849910f9c238ceade7968883f7d6b809aaa5"
+  }
+}

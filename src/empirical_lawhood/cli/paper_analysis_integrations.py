@@ -119,10 +119,10 @@ def register_paper_analysis_commands(app):
         """Read the exact complete scan result without repeating acquisition."""
         from empirical_lawhood.api.matrix_geometry import read_matrix_geometry_result
         try:
-            root, _, plane = h._storage()
+            _, _, plane = h._storage(read_only=True)
             value = h._configuration(input, "matrix-geometry")
             attempt_stage("retained_geometry_receipt_read", native_contact="none")
-            result = read_matrix_geometry_result(config=value, artifact_writer=plane, implementation_commit=_commit(root))
+            result = read_matrix_geometry_result(config=value, artifact_writer=plane)
         except (OSError, RuntimeError, TypeError, ValueError) as error:
             h._error(error)
         h._report(result["summary"])
@@ -288,10 +288,10 @@ def register_paper_analysis_commands(app):
         """Read all declared checkpoints, null denominators and conditional outcomes."""
         from empirical_lawhood.api.selected_events import read_selected_event_result
         try:
-            root, _, plane = h._storage()
+            _, _, plane = h._storage(read_only=True)
             value = h._configuration(input, "selected-events")
             attempt_stage("retained_selected_event_read", native_contact="none")
-            result = read_selected_event_result(config=value, artifact_writer=plane, implementation_commit=_commit(root))
+            result = read_selected_event_result(config=value, artifact_writer=plane)
         except (OSError, RuntimeError, TypeError, ValueError) as error:
             h._error(error)
         h._report(result["summary"])

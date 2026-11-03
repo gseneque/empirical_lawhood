@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "MatrixPreparedFunctionalExperimentSpecification_a47057a5e537": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-experimental-programme/prepared-functional-experiment"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "assay": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "assay; constructor checks semantics and units."
+            },
+            "campaign": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "campaign; constructor checks semantics and units."
+            },
+            "expected_groups": {
+              "description": "expected groups; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "expected_sources": {
+              "description": "expected sources; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "scope": {
+              "description": "scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "selection": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "selection; constructor checks semantics and units."
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "specification_id",
+            "selection",
+            "assay",
+            "campaign",
+            "expected_groups",
+            "expected_sources",
+            "scope"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-prepared-functional-experiment",
+  "$ref": "#/$defs/MatrixPreparedFunctionalExperimentSpecification_a47057a5e537",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Prepared Functional Experiment",
+  "x-consumer": "matrix-prepared-functional-experiment",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

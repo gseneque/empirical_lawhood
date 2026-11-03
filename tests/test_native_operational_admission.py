@@ -26,8 +26,8 @@ from empirical_lawhood.cli.app import app
 from empirical_lawhood.kernel.decoding import decode_canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
-TORAX_INPUT = ROOT / "experiments/tokamak-heat-response/config.json"
-BRIAN_INPUT = ROOT / "experiments/neuron-current-response/config.json"
+TORAX_INPUT = ROOT / "programmes/energy/fusion/workflows/tokamak-heat-response/config.json"
+BRIAN_INPUT = ROOT / "programmes/biology/cell-responses/workflows/neuron-current-response/config.json"
 
 
 @pytest.fixture

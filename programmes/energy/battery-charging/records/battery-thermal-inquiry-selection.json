@@ -1,0 +1,165 @@
+{
+  "selection_id": "battery-thermal-inquiry.selection.20261011",
+  "question": "Within the selected LGM50 numerical models, which temperature-dependent response procedure admits the least-time registered charging preparation to operational SOC 80%, and can its assessed model-selection procedure support later 20 C and subsequent 30 C decisions?",
+  "prior_service": "The retained 900 s, 0.36375 Ah service at 23 C and 27 C is unchanged and passed its sampled premise.",
+  "development_initial_temperatures_k": [
+    "278.15",
+    "298.15",
+    "308.15"
+  ],
+  "later_initial_temperature_k": "293.15",
+  "reuse_initial_temperature_k": "303.15",
+  "initial_model_soc": "0.30",
+  "operational_soc": "0.30 - discharge_capacity_change_ah / 5",
+  "target_operational_soc": "0.80",
+  "target_charge_ah": "2.5",
+  "nominal_capacity_ah": "5",
+  "recipes": [
+    "original-ambient",
+    "chamber-35c",
+    "chamber-40c"
+  ],
+  "current_guard": "Charge magnitude 1.455 A at mean temperature <= 298.15 K; 3.395 A only at mean temperature > 298.15 K. Both CC/CV phases must obey this limit.",
+  "voltage_window_v": [
+    "2.5",
+    "4.2"
+  ],
+  "mean_temperature_window_k": [
+    "273.15",
+    "318.15"
+  ],
+  "cv_termination_current_a": "0.05",
+  "native_control": "Callable algebraic operating mode implementing ideal guarded CC/CV: min((4.2 V - terminal_voltage)/(1 V), (current + eligible_charge_magnitude)/(1 A)) = 0. Its complementarity branches separately enforce the voltage target and temperature-tier current limit; measured current remains a native receiver in CV.",
+  "native_clock_window_s": "180000 = 2.5 Ah / 0.05 A * 3600 s/h, derived from target charge and the source termination current; no active eligible charge can require longer.",
+  "voltage_protective_event_v": "4.201; nominal controller bound remains4.2 V, with1mV declared numerical protection/assessment allowance. The ordinary4.2V terminating event is replaced to permit CV regulation.",
+  "conditioning_cost": "Every recipe starts at the selected initial temperature and model clock zero; chamber changes occur at zero. Total completion time includes all warming during charge. No free warm start or idle warm-up comparator.",
+  "parameter_copies": "Preserve installed Chen2020 and ORegan2022 bytes. Explicitly set both Upper voltage cut-off [V] and Open-circuit voltage at 100% SOC [V] to 4.2, and their lower/0% counterparts to 2.5, in runtime copies only. ORegan2022 source defaults are 4.4 V.",
+  "model_views": [
+    "chen-spme",
+    "oregan-spme",
+    "oregan-dfn",
+    "oregan-dfn-refined"
+  ],
+  "model_options": {
+    "thermal": "lumped",
+    "cell geometry": "arbitrary",
+    "dimensionality": 0,
+    "surface temperature": "ambient",
+    "contact resistance": "false",
+    "use lumped thermal capacity": "false"
+  },
+  "primary_mesh": {
+    "x_n": 30,
+    "x_s": 30,
+    "x_p": 30,
+    "r_n": 40,
+    "r_p": 40
+  },
+  "refined_mesh": {
+    "x_n": 60,
+    "x_s": 60,
+    "x_p": 60,
+    "r_n": 80,
+    "r_p": 80
+  },
+  "particle_mesh": "Exponential1DSubMesh, side right",
+  "solver": "IDAKLU",
+  "solver_allocation_options": {
+    "max_num_steps": -1,
+    "dt_max": "0",
+    "num_steps_no_progress": 0
+  },
+  "primary_rtol": "1e-7",
+  "primary_atol": "1e-8",
+  "refined_rtol": "1e-9",
+  "refined_atol": "1e-10",
+  "receiver_period_s": "1",
+  "reference_agreement": {
+    "completion_time_s": "1",
+    "voltage_v": "0.001",
+    "mean_temperature_k": "0.01",
+    "integral_capacity_discrepancy_ah": "0.0001"
+  },
+  "candidate_admission": "Complete development roster must match refined-DFN numerical feasibility, have <= 1% completion-time error for every admitted recipe, and not select a different unique fastest recipe outside 2 s ties. The cheaper admitted procedure is selected using actual aggregate forecast CPU expense; no admitted reduced model means explicit direct-DFN fallback.",
+  "model_adequacy_pair": [
+    "Chen2020 SPMe transfer preserves finite-menu admission, charging choice and completion forecasts across the selected thermal preparations",
+    "Temperature-dependent ORegan transport and/or DFN resolution materially changes admission, charging choice or completion forecasts"
+  ],
+  "supplier": "One assessed model-selection procedure plus complete development response table, native traces, precision checks, failure and cost census.",
+  "later_and_reuse": "Select the least predicted completion-time admitted recipe using the supplied procedure at 20 C, then separately at 30 C. Independently assess the complete recipe roster using primary/refined ORegan DFN; retain discrepancy, refusal, fallback, tie and delivery outcomes.",
+  "reuse_lineage": "The subsequent 30 C instance binds the exact canonical identity of the actual prior 20 C assessment, its original supplier and source. Revalidate that prior assessment and its complete retained attempted native roster before reuse entry; a phase label or unentered/refused zero-attempt use cannot supply this lineage. Retained negative or unevaluable attempted use permits only separate conditional revalidation, never qualification promotion. The registered custody wrapper authenticates the actual previous assessment receipt and carries the original supplier unchanged.",
+  "whole_inquiry_comparator": "Competent adaptive model-qualification and cached finite-policy planner, with identical sources, model and refinement choices, recipes, known preparation, V/I/mean-temperature/ambient observations, forecast calls and cache privileges. A shared faithful implementation supplies this comparison; receipt framing alone does not create performance advantage.",
+  "native_census": {
+    "singleton_operations": 3,
+    "supply_backend_attempts": 36,
+    "later_backend_attempts": 12,
+    "reuse_backend_attempts": 12,
+    "total_backend_attempts": 60,
+    "independent_units": "One simulated family, zero physical units; every view/preparation/recipe nested."
+  },
+  "solver_census_scope": "The exact60 roster counts logical charging forecasts, not backend solve calls. Each event-segment solver.step invocation is a main charging subsolve; backend_solve_calls equals its complete ordered charging_attempts ledger and can exceed1 per forecast. Retain every actual return/error, solver/config/model/control digest, regime/input values, requested and realized full differential boundary states, native adaptive clocks, root/left/right receivers and measured CPU/wall. IDAKLU_INTERNAL_CALC_IC_REQUESTED identifies one requested internal consistent initialization per charging call, not a separately observed internal iteration or subsolver census. InitialSOC0.30 is prepared once per forecast, with every actual SOH BaseSolver.solve subsolver/full-split fallback retained separately. Backend scope MAIN_CHARGING_SUBSOLVES_ONLY excludes SOH initializer calls; neither scope is total scientific/native work. All subwindows are contained in complete trace expense and must not be added twice. No completed logical forecast is automatically replayed.",
+  "comparison_cost_allocation": "EL and matched conventional full-procedure arms receive the same36development and12+12recipient actual forecast ledger. Direct-DFN arm receives the18development and6+6recipient primary/refinedDFN ledger. Allocations reference shared actual traces and measured costs, not independent executions or copied contacts. Unknown engineering/researcher expense leaves complete-total-cost superiority unevaluable.",
+  "meaningful_alternative": "Direct primary/refined ORegan DFN finite-policy planning and the same source-legal guard-based CC/CV. No weaker CCCV, forbidden cache or artificial deadline.",
+  "attribution_contrast": "Unsupplied Chen-SPMe forecast selects from the same complete finite menu; this localizes model-selection consequences and is not the whole-inquiry superiority comparator.",
+  "risk_estimand": "Zero observed false numerical admissions over the complete selected finite roster, with all failures and unevaluable entries retained; no population or continuous-time probability guarantee.",
+  "scope": {
+    "simulated_parameter_families": 1,
+    "physical_independent_units": 0,
+    "nested": "All temperatures, recipes, parameterizations, numerical views and later/reuse observations belong to the same exposed LGM50 family."
+  },
+  "claim_limits": "Conditional sampled numerical service and model-adequacy results only. Independent DFN is a separate model/numerical evaluator, not physical truth. Whole-time certification, physical thermal gradients, plating, degradation, global optimality and population qualification remain unevaluable.",
+  "sources": [
+    "https://doi.org/10.1149/1945-7111/AB9050",
+    "https://doi.org/10.1016/j.electacta.2022.140700",
+    "https://zenodo.org/records/5171874",
+    "https://www.lithiumelements.com/wp-content/uploads/2023/07/m50.pdf",
+    "https://docs.pybamm.org/en/v25.8.0/source/examples/notebooks/models/simulating-ORegan-2022-parameter-set.html",
+    "https://arxiv.org/html/2404.04358v1",
+    "https://arxiv.org/html/2605.24889v1"
+  ],
+  "manufacturer_document_sha256": "a8d895143a55e0beae273f2c94eb4f3038857f19cc190ea2048f825e77a76f6a",
+  "installed_versions": {
+    "pybamm": "26.6.2.0",
+    "casadi": "3.7.2",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pybammsolvers": "0.8.2"
+  },
+  "resource_budget": {
+    "memory_bytes": null,
+    "wall_time_seconds": null,
+    "source_scan_bytes": null,
+    "output_bytes": null
+  },
+  "ordinary_repair": "Receipt-based recovery retains original attempts, costs and source bindings; no automatic scientific retry or fixed repair ceiling.",
+  "execution": "No native entry before protocol/source review and producing archive. Each singleton operation retains its full backend attempt/solve census; exact finite scientific rosters are not allocation limits. Each recipient freezes its selected recipe using supplied-model forecasts before independent reference checks; the actually entered Chen-SPMe attribution forecast is retained and charged.",
+  "optional_impossibility": "NOT_SELECTED",
+  "protocol_revision": "1.1.0",
+  "historical_protocol": {
+    "path": "battery-thermal-inquiry-exact-guard-v1.json",
+    "sha256": "f73f54c3e9505667fba05dbdea1f1cf518634f1b8c618c9f443b60f4839149e2",
+    "status": "Original exact-guard attempt retained under its own frozen producing source; no continuation or relabeling as this repaired method."
+  },
+  "controller": "Conservative numerical hybrid CC/CV approximation: each smooth LOW/HIGH segment solves min((4.2-V)/1V,(I+active_magnitude)/1A)=0. LOW magnitude1.455A; HIGH3.395A. Initialize LOW unless initial T>=25C+epsilon. LOW-to-HIGH native state root25C+epsilon; HIGH-to-LOW root25C+epsilon/2. Both roots strictlyabove25C. Every retained HIGH receiver must have T>25C; exact25C remains LOW. No smoothing of OEM eligibility; no assertion that this approximate hysteretic controller is the unchanged exact ideal controller.",
+  "hybrid_localization": {
+    "primary_epsilon_k": "0.001",
+    "refined_epsilon_k": "0.0001",
+    "derivation": "Frozen0.01K temperature-assessment precision divided by10 and100 respectively, chosen before repaired outputs. Joint DFN mesh+localization refinement can fail; this is not a temperature-accuracy certificate.",
+    "root_expression_residual_allowance_k": "epsilon/1000000; numerical root/roundoff integrity only, not physical accuracy.",
+    "state_carry": "Same built native model. Carry complete actual scaled differential state, global time and capacity across every native root; IDAKLU recalculates algebraic consistent state only. Retain requested and realized full state vectors/digests separately. Componentwise carry difference may not exceed original atol+rtol*max(abs(left),abs(right)); capacity continuity also may not exceed0.0001Ah.",
+    "left_right": "Retain actual root/left receiver and next native right receiver, full states, regime/input signatures and native clocks. Native step nextafter time does not heat the carried state or grant HIGH eligibility.",
+    "progress": "A returned subsolve with no strictly advancing model-time endpoint is a technical numerical integrity failure. No segment count, elapsed-time or resource stop.",
+    "interpretation": "LOW may conservatively continue slightly above25C within the declared localization band. Check its active-segment CCCV residual and exact OEM envelope separately; do not assert unchanged ideal-controller delivery. Temperature displacement alone does not bound time/charge error; complete primary/refined outcome and current-integral checks determine admission, retaining unresolved sensitivity."
+  },
+  "prospective_additional_source_pins": [
+    {
+      "member": "expression_tree/input_parameter.py",
+      "sha256": "dca5228c35ed5dbae85e26ce2a7b6fb316e2a6260721372d10372b732d496bb0"
+    },
+    {
+      "member": "solvers/solution.py",
+      "sha256": "fdc7bfb8b2a251f95d9f139f9c434d64a8c45e9a8475d239767735cd947b161d"
+    }
+  ],
+  "source_pin_census": 29
+}

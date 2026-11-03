@@ -9,7 +9,7 @@ Use it to find each file's terms and provenance.
 Empirical Lawhood source and source-code-form scientific specifications use
 MPL-2.0 unless an individual file states otherwise. The complete MPL-2.0 text
 ships in the distribution's license metadata. Creator: Gareth Seneque;
-repository: https://github.com/jokebroker/empirical_lawhood.
+repository: https://github.com/gseneque/empirical_lawhood.
 
 ## Finite response law specification
 
@@ -27,9 +27,24 @@ custody. A changed specification requires a new hash and consistent consumers.
 
 Files under `resources/finite_response_law/original_f/` and `nomination/` are original project numerical records, published under the package MPL-2.0 policy by Gareth Seneque. The colocated `resources/finite_response_law/README.md` inventories each exact byte count and SHA256 and identifies the inspected `icf-yolo` source commit. These are fixed exposed numerical operands/provenance, not imported scientific authority or compatibility codecs. Current wrapper identities are separate; numerical projection checks authenticate the original F and nominated coefficient transport before reuse.
 
-## Preserved preparation specifications
+## Excluded historical preparation plans
 
-The exact original project plans are packaged at `adapters/methods/preparation_applicability/frozen_specification.md` (SHA256 `be628f6d7869e2c8388fa13ae1ee4ab2784eda4471ee4580c5c5e3c78e8da66d`) and `adapters/methods/constructed_preparation_applicability/frozen_specification.md` (SHA256 `1b50614ffe258a3c0a5e8a7625ef8c820d1a328af439c0612b484fc1e78b3361`). Their colocated provenance records identify the donor revision and original paths. The donor repository's metadata described that source as Proprietary; the project owner has authorized its migration/publication in this release under the package MPL-2.0 policy. Original owner instructions in the frozen text document historical context and grant no standing execution authority. Current operative specifications live separately under repository `docs/plans/`.
+Two archival operational plans have the former package-relative locators
+`adapters/methods/preparation_applicability/frozen_specification.md` (SHA256
+`be628f6d7869e2c8388fa13ae1ee4ab2784eda4471ee4580c5c5e3c78e8da66d`) and
+`adapters/methods/constructed_preparation_applicability/frozen_specification.md`
+(SHA256 `1b50614ffe258a3c0a5e8a7625ef8c820d1a328af439c0612b484fc1e78b3361`).
+They are excluded from distributions and current source inventories.
+Their exact bytes remain in external preservation custody. Repository
+`docs/development/history/plan-cleanup-custody-20261025.json` resolves both retired locators to their
+verified archive copies; the historical scientific specifications retain their
+original locator text and byte identities.
+The provenance records beside their former locations identify the donor revision
+and original paths.
+The donor metadata described that source as Proprietary.
+The project owner authorized migration of the current scientific owners under MPL-2.0.
+Historical instructions and standing grants confer no current execution authority.
+Current scientific specifications live with their repository `programmes/` records.
 
 ## Matrix analysis and preparation diagnostics
 
@@ -41,7 +56,7 @@ donor revision and script hashes; its current specification has SHA-256
 `810a04f28cdd88c8c1c1952078a00c70e3561255880d4d5881ad782cc16d82ab`.
 The diagnostic owner's `diagnostic-provenance.json` identifies the original
 adversarial analysis and the deliberate actual-count probability correction.
-The repository's `docs/plans/matrix-history-analysis-v1.md` documents the
+The repository's `programmes/foundations/emergent-structure/records/matrix-history-analysis-v1.md` documents the
 available mathematical-owner identity and unresolved original producing chain.
 These source identities preserve provenance. They convey no historical
 execution authority, newly performed campaign or qualification.

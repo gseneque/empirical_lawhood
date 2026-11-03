@@ -26,7 +26,7 @@ def test_real_target_store_replay_and_forged_locator_refusal(tmp_path: Path) -> 
         "synthetic-target",
         "synthetic target",
         str(target),
-        "/",
+        str(next(parent for parent in target.parents if parent.is_mount())),
         OperatorStorageProfile.SCHEMA,
         1,
         None,

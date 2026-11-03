@@ -1,0 +1,210 @@
+{
+  "$defs": {
+    "KineticSupportInterval_decb87988f0b": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco/kinetic-supply/support-interval"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "lower": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "lower; constructor checks semantics and units."
+            },
+            "upper": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "upper; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "lower",
+            "upper"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "KineticTargetComparison_a73ab99240e3": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco/kinetic-supply/target-comparison"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "assay_compatibility": {
+              "description": "assay compatibility; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "authority_url": {
+              "description": "authority url; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "candidate_context": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "candidate context; constructor checks semantics and units."
+            },
+            "comparator": {
+              "description": "comparator; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "comparison_id": {
+              "description": "comparison id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "gp_specificity": {
+              "$ref": "#/$defs/KineticSupportInterval_decb87988f0b",
+              "description": "gp specificity; constructor checks semantics and units."
+            },
+            "maize_turnover_s_inv": {
+              "$ref": "#/$defs/KineticSupportInterval_decb87988f0b",
+              "description": "maize turnover s inv; constructor checks semantics and units."
+            },
+            "practical_relative_margin": {
+              "additionalProperties": false,
+              "description": "practical relative margin; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "reference_sources": {
+              "description": "reference sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "comparison_id",
+            "candidate_context",
+            "maize_turnover_s_inv",
+            "gp_specificity",
+            "reference_sources",
+            "assay_compatibility",
+            "practical_relative_margin",
+            "comparator",
+            "authority_url"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:rubisco-kinetic-comparison",
+  "$ref": "#/$defs/KineticTargetComparison_a73ab99240e3",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Rubisco Kinetic Comparison",
+  "x-consumer": "rubisco-kinetic-comparison",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "retained",
+  "x-preparation-allowed": false
+}

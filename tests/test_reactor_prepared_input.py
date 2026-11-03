@@ -30,7 +30,7 @@ ROUTES = (
 
 def _selection(route: str) -> ReactorPreparedInput:
     return load_registered_authoring(
-        ROOT / f"experiments/reactor-response/{route}-input.json",
+        ROOT / f"programmes/foundations/measurement-and-response/workflows/reactor-response/{route}-input.json",
         root_schemas={ReactorPreparedInput.SCHEMA: ReactorPreparedInput},
         maximum_bytes=16 * 1024,
     )
@@ -119,7 +119,7 @@ def test_held_inputs_build_eight_distinct_native_contracts(
         check_prepared_input(
             _selection("feed"),
             source_root=source,
-            discovery_file=ROOT / "experiments/reactor-response/guide.md",
+            discovery_file=ROOT / "programmes/foundations/measurement-and-response/workflows/reactor-response/guide.md",
         )
     with pytest.raises(ValueError, match="DISCOVERY_NOT_USED_FOR_ROUTE"):
         check_prepared_input(

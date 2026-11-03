@@ -9,6 +9,7 @@ from pathlib import Path
 
 from empirical_lawhood.api.composition import create_cli_api
 from empirical_lawhood.api.results import CheckReadinessRequest
+from empirical_lawhood.api.reactor_source_provenance import authenticate_reactor_authoring_source
 from empirical_lawhood.infrastructure.artifacts import (
     ExternalArtifactPlane,
     GuardedExternalRoot,
@@ -21,7 +22,6 @@ from empirical_lawhood.kernel.serialization import CanonicalRecord
 from empirical_lawhood.planning.study_issue import ImplementationSourceClosure
 from empirical_lawhood.runtime.artifacts import (
     ArtifactProfile,
-    ArtifactStreamWriteRequest,
     ArtifactWriteRequest,
 )
 from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeSpec
@@ -53,6 +53,7 @@ def prove_fresh_reactor(
     storage_profile: OperatorStorageProfile,
     directory: Path,
     approval_checker_trust_path: Path | None = None,
+    catalog_relative_path: str | None = None,
 ) -> dict[str, object]:
     """Resolve the actual CLI API and persist exact control records; run no task."""
 
@@ -63,11 +64,9 @@ def prove_fresh_reactor(
     }
     if any(size > MAX_ISSUE_PAYLOAD_BYTES for size in issue_member_bytes.values()):
         raise ValueError("REACTOR_AUTHORING_EXCEEDS_PRODUCTION_ISSUE_BYTE_BOUND")
-    bundle = load_fresh_reactor_bundle(directory)
     from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import fresh_assignment_status, load_fresh_reactor_profile
 
     profile = load_fresh_reactor_profile(directory / "profile.json")
-    run_id = bundle.authoring.base.draft.experiment.experiment_id
     root_contract = resolve_external_root_contract(
         storage_profile, repo_root=repo_root, home_root=Path.home()
     )
@@ -75,11 +74,15 @@ def prove_fresh_reactor(
     guard.verify(for_write=True)
     if not directory.is_relative_to(Path(root_contract.canonical_path)):
         raise ValueError("fresh authoring directory is outside guarded artifacts")
+    authenticate_reactor_authoring_source(directory=directory, project_root=repo_root, artifact_writer=ExternalArtifactPlane(guard))
+    bundle = load_fresh_reactor_bundle(directory)
+    run_id = bundle.authoring.base.draft.experiment.experiment_id
     api = create_cli_api(
         repo_root=repo_root,
         operator_storage_profile=storage_profile,
         approval_checker_trust_path=approval_checker_trust_path,
         reactor_authoring_dir=directory,
+        catalog_relative_path=catalog_relative_path,
     )
     payloads = tuple(sorted(directory.glob("payload-*.json")))
     decoders = tuple(sorted(directory.glob("decoder-*.json")))
@@ -121,30 +124,12 @@ def prove_fresh_reactor(
             "full preissue output locator set differs from the CLI API proof"
         )
     plane = ExternalArtifactPlane(guard)
-    for task in execution.tasks:
-        budget = task.capability.requested_resources.output_bytes
-        plane._preflight_publication(
-            tuple(
-                ArtifactStreamWriteRequest(
-                    logical_artifact_id=output.logical_artifact_id,
-                    relative_path=output.relative_path,
-                    payload_schema=output.payload_schema,
-                    profile=output.profile,
-                    media_type=output.media_type,
-                    publication_scope_id=f"task-output-scope.{run_id}.{task.task_id}",
-                    publication_scope_relative_root=f"runs/{run_id}",
-                    chunks=(),
-                    maximum_bytes=budget,
-                    maximum_chunk_bytes=min(budget, 1024 * 1024),
-                    visibility_ceiling=output.visibility_ceiling,
-                    parent_visibility_ceilings=output.parent_visibility_ceilings,
-                    outcome_access=output.outcome_access,
-                    read_only_source_input=True,
-                    minimum_free_bytes=root_contract.minimum_free_bytes,
-                )
-                for output in task.outputs
-            )
-        )
+    # Shared readiness owns the frozen output contracts. Their actual parents
+    # do not exist yet, so this boundary checks guarded destinations only.
+    # The execution publisher owns exact lineage and publication admission.
+    for relative in paths:
+        guard.resolve(relative, for_write=True)
+        guard.resolve(relative + ".manifest.json", for_write=True)
     proof_root = f"control-persistence/{run_id}/{closure.implementation_commit[:12]}"
     persisted = []
     for name, record in (
@@ -203,6 +188,7 @@ def prove_fresh_reactor(
         "runner_ids": summary.runner_ids,
         "external_input_ids": summary.external_input_ids,
         "output_locators": paths,
+        "output_publication_admission": "DEFERRED_UNTIL_ACTUAL_OUTPUTS",
         "adjudication_locator": summary.adjudication_relative_locator,
         "aggregate_task_output_byte_ceiling": sum(
             task.capability.requested_resources.output_bytes for task in execution.tasks

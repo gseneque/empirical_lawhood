@@ -18,11 +18,14 @@ from empirical_lawhood.api.preparation_applicability import preflight_preparatio
 from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
 from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
 from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.api.recursive_prospective_authoring import _capture_prospective_source, _publish_source_provenance
+from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
 from empirical_lawhood.infrastructure.source_closure import capture_clean_target_closure
+from empirical_lawhood.api.authoring_handoff import authenticate_selected_authoring_source, require_authoring_source_kind_layout
 from empirical_lawhood.kernel.decoding import decode_canonical_bytes
 from empirical_lawhood.kernel.provenance import ObjectIdentity
 from empirical_lawhood.planning.experiment_entry import ExecutableStudyDefinition
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure
+from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
 from empirical_lawhood.runtime.artifacts import ArtifactWriter
 from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_run_plan
 from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeSpec
@@ -57,7 +60,8 @@ def author_constructed_preparation_applicability(*, root: Path, selection: Const
     """Export a complete candidate and preissue plan without simulation or issue."""
     output_dir=preflight_preparation_authoring_output(output_dir=output_dir,root=root,artifact_writer=artifact_writer)
     _authenticate(selection, artifact_writer, artifact_writer)
-    closure = capture_clean_target_closure(root, f"{selection.stage.config_id}.source-closure")
+    captured = _capture_prospective_source(root, f"{selection.stage.config_id}.source-closure", artifact_writer=artifact_writer)
+    closure = captured.closure
     bundle = _bundle(selection, root, closure)
     output_dir=preflight_preparation_authoring_output(output_dir=output_dir,root=root,artifact_writer=artifact_writer)
     output_dir.mkdir(parents=True, exist_ok=False)
@@ -97,6 +101,8 @@ def author_constructed_preparation_applicability(*, root: Path, selection: Const
             ("preissue-run-plan.json", projected), ("preissue-execution-plan.json", projection),
             ("evidence-profile.json", bundle.evidence_profile)):
             save(name, record)
+        _publish_source_provenance(captured=captured, destination=output_dir, artifact_writer=artifact_writer)
+        GitStudySourceClosureInspector(Path(root)).observe(closure)
     return {"phase": selection.stage.phase, "authoring_dir": str(output_dir),
         "candidate_sha256": candidate.fingerprint(), "task_count": len(projection.tasks),
         "independent_units": len(selection.stage.root_ids), "source_contacted": False,
@@ -123,13 +129,18 @@ def load_constructed_preparation_applicability_handoff(*, directory: Path, root:
     plane = ExternalArtifactPlane(GuardedExternalRoot(contract))
     _authenticate(selection, artifact_writer, plane)
     closure = read("source-closure.json", ImplementationSourceClosure)
-    current_closure = capture_clean_target_closure(root, closure.source_closure_id)
-    if current_closure != closure:
-        raise ValueError("retained authoring current implementation closure differs")
+    require_authoring_source_kind_layout(directory=directory, closure=closure)
+    if closure.kind is SourceClosureKind.CLEAN_GIT_COMMIT:
+        current_closure = capture_clean_target_closure(root, closure.source_closure_id)
+        if current_closure != closure:
+            raise ValueError("retained authoring current implementation closure differs")
+    else:
+        authenticate_selected_authoring_source(directory=directory, project_root=root,
+            artifact_writer=artifact_writer, closure=closure)
     bundle = _bundle(selection, root, closure)
     if bundle.authoring != read("authoring.json", ExecutableStudyDefinition):
         raise ValueError("retained authoring differs from the exact installed family reconstruction")
-    projection = load_authoring_execution_projection(directory)
+    projection = load_authoring_execution_projection(directory, artifact_writer=artifact_writer)
     resources = read("resources.json", ExecutionResourceEnvelopeSpec)
     if projection.registry_sha256 != bundle.standard_context.base.registry.fingerprint():
         raise ValueError("retained applicability registry differs from its current family")

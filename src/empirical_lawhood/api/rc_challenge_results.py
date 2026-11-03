@@ -49,6 +49,7 @@ def read_rc_challenge_result(payload: bytes, *, writer: ArtifactWriter) -> RCCha
             if hasattr(record, name):
                 value = getattr(record, name)
                 summary[name] = getattr(value, "value", value)
+    authenticate_rc_challenge_result_authority(retained, writer=writer)
     return RCChallengeResultView(retained, record, summary)
 
 
@@ -62,6 +63,7 @@ def bind_rc_challenge_retained_result(*, result_id: str, record_payload: bytes,
     authenticate_rc_challenge_result_authority(result, writer=writer)
     result.authenticate(writer)
     result.decode()
+    authenticate_rc_challenge_result_authority(result, writer=writer)
     return result
 
 

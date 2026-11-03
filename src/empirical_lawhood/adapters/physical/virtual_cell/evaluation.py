@@ -6,15 +6,11 @@ from dataclasses import dataclass
 from decimal import Decimal
 import math
 from pathlib import Path
-from typing import BinaryIO, cast
+from typing import TYPE_CHECKING, BinaryIO, cast
 
-import anndata as ad  # type: ignore
-from anndata._io.specs import read_elem  # type: ignore
-from cell_eval import MetricsEvaluator  # type: ignore[import-not-found]
 import h5py  # type: ignore[import-untyped]
 import numpy as np
 from numpy.typing import NDArray
-import polars as pl  # type: ignore[import-not-found]
 
 from .analysis import (
     OfficialAggregateScore,
@@ -22,12 +18,24 @@ from .analysis import (
     official_aggregate_score,
     verify_official_evaluator_versions,
 )
-from .codecs import encode_official_metrics
 from .contracts import MetricContract, VirtualCellContractError
+from .metric_correction_v2 import (
+    DES_SOURCE_COLUMN,
+    PDS_SOURCE_COLUMN,
+    OfficialMetricGaugeV2,
+    OfficialMetricSetV2,
+    metric_set_from_source_columns,
+    require_metric_contract_gauge,
+    score_source_aggregate,
+)
+
+if TYPE_CHECKING:
+    import anndata as ad
+    import polars as pl
 
 
 @dataclass(frozen=True, slots=True)
-class OfficialEvaluatorRun:
+class HistoricalOfficialEvaluatorRun:
     target_ids: tuple[str, ...]
     des: NDArray[np.float64]
     pds: NDArray[np.float64]
@@ -47,12 +55,36 @@ class OfficialEvaluatorRun:
         expected = (len(self.target_ids),)
         if any(values.shape != expected for values in (self.des, self.pds, self.mae)):
             raise ValueError("official evaluator arrays are not target aligned")
-        if any(not np.all(np.isfinite(values)) for values in (self.des, self.pds, self.mae)):
+        if any(
+            not np.all(np.isfinite(values)) for values in (self.des, self.pds, self.mae)
+        ):
             raise ValueError("official evaluator arrays contain nonfinite values")
-        if self.profile != "vcc" or not self.control_label or not self.perturbation_column:
+        if (
+            self.profile != "vcc"
+            or not self.control_label
+            or not self.perturbation_column
+        ):
             raise ValueError("official evaluator configuration differs from VCC")
         if not self.response_outcome_read:
-            raise ValueError("official evaluation must acknowledge its response outcome read")
+            raise ValueError(
+                "official evaluation must acknowledge its response outcome read"
+            )
+
+
+@dataclass(frozen=True, slots=True)
+class OfficialEvaluatorRunV2:
+    metrics: OfficialMetricSetV2
+    score: OfficialAggregateScore
+    cell_eval_version: str
+    pdex_version: str
+    profile: str
+    control_label: str
+    perturbation_column: str
+    response_outcome_read: bool
+
+    @property
+    def metrics_canonical(self):
+        return self.metrics.canonical_bytes()
 
 
 def bootstrap_official_score_standard_error(
@@ -76,8 +108,15 @@ def bootstrap_official_score_standard_error(
     if isinstance(seed, bool) or seed < 0:
         raise ValueError("official-score bootstrap seed must be nonnegative")
     expected = des.shape
-    if len(expected) != 1 or expected[0] == 0 or pds.shape != expected or mae.shape != expected:
-        raise ValueError("official-score bootstrap arrays must be aligned nonempty vectors")
+    if (
+        len(expected) != 1
+        or expected[0] == 0
+        or pds.shape != expected
+        or mae.shape != expected
+    ):
+        raise ValueError(
+            "official-score bootstrap arrays must be aligned nonempty vectors"
+        )
     if any(not np.all(np.isfinite(values)) for values in (des, pds, mae)):
         raise ValueError("official-score bootstrap arrays contain nonfinite values")
     rng = np.random.default_rng(seed)
@@ -93,16 +132,23 @@ def bootstrap_official_score_standard_error(
         scores[index] = float(score.average_score)
     standard_error = float(np.std(scores, ddof=1))
     if not math.isfinite(standard_error):
-        raise VirtualCellAnalysisError("official-score bootstrap standard error is nonfinite")
+        raise VirtualCellAnalysisError(
+            "official-score bootstrap standard error is nonfinite"
+        )
     return Decimal(str(standard_error))
 
 
 def read_anndata_h5ad_stream(stream: BinaryIO) -> ad.AnnData:
     """Read one already-authorized seekable H5AD stream without a caller path."""
 
+    import anndata as ad
+    from anndata._io.specs import read_elem
+
     try:
         if not stream.readable() or not stream.seekable():
-            raise VirtualCellContractError("evaluator H5AD stream must be readable and seekable")
+            raise VirtualCellContractError(
+                "evaluator H5AD stream must be readable and seekable"
+            )
         stream.seek(0)
         with h5py.File(stream, "r") as handle:
             value = read_elem(handle)
@@ -115,7 +161,9 @@ def read_anndata_h5ad_stream(stream: BinaryIO) -> ad.AnnData:
     return cast(ad.AnnData, value)
 
 
-def _target_registry(adata: ad.AnnData, *, column: str, control_label: str) -> tuple[str, ...]:
+def _target_registry(
+    adata: ad.AnnData, *, column: str, control_label: str
+) -> tuple[str, ...]:
     if column not in adata.obs:
         raise VirtualCellContractError(f"AnnData lacks evaluator column {column}")
     values = tuple(str(value) for value in adata.obs[column])
@@ -144,16 +192,22 @@ def _metric_arrays(
     target_ids = tuple(str(value) for value in ordered["perturbation"].to_list())
     arrays = tuple(
         np.asarray(ordered[column].to_numpy(), dtype=np.float64)
-        for column in ("discrimination_score_l1", "overlap_at_N", "mae")
+        for column in (DES_SOURCE_COLUMN, PDS_SOURCE_COLUMN, "mae")
     )
     if tuple(sorted(set(target_ids))) != target_ids:
-        raise VirtualCellAnalysisError("cell-eval returned duplicate or unsorted targets")
+        raise VirtualCellAnalysisError(
+            "cell-eval returned duplicate or unsorted targets"
+        )
     if any(not np.all(np.isfinite(value)) for value in arrays):
-        raise VirtualCellAnalysisError("cell-eval returned nonfinite per-target metrics")
+        raise VirtualCellAnalysisError(
+            "cell-eval returned nonfinite per-target metrics"
+        )
     return target_ids, arrays[0], arrays[1], arrays[2]
 
 
 def _aggregate_mean(aggregate: pl.DataFrame, column: str) -> float:
+    import polars as pl
+
     if "statistic" not in aggregate.columns or column not in aggregate.columns:
         raise VirtualCellAnalysisError("cell-eval aggregate table differs")
     row = aggregate.filter(pl.col("statistic") == "mean")
@@ -165,25 +219,37 @@ def _aggregate_mean(aggregate: pl.DataFrame, column: str) -> float:
     return value
 
 
-def evaluate_official_2025(
+def evaluate_official_2025_v2(
     *,
     predicted: ad.AnnData,
     real: ad.AnnData,
     metric_contract: MetricContract,
+    metric_gauge: OfficialMetricGaugeV2,
     scratch_directory: Path,
     num_threads: int,
     control_label: str = "non-targeting",
     perturbation_column: str = "target_gene",
-) -> OfficialEvaluatorRun:
-    """Run the pinned broad evaluator, then apply the exact recovered final scorer."""
+) -> OfficialEvaluatorRunV2:
+    """Produce a separately versioned corrected metric artifact using the pinned evaluator."""
+
+    if type(metric_gauge) is not OfficialMetricGaugeV2:
+        raise TypeError(
+            "corrected evaluation requires its explicit versioned metric gauge"
+        )
+    require_metric_contract_gauge(gauge=metric_gauge, metric_contract=metric_contract)
+    from cell_eval import MetricsEvaluator
 
     if isinstance(num_threads, bool) or num_threads <= 0:
         raise ValueError("official evaluator thread count must be positive")
     if scratch_directory.exists() or scratch_directory.is_symlink():
-        raise VirtualCellContractError("cell-eval scratch destination must not already exist")
+        raise VirtualCellContractError(
+            "cell-eval scratch destination must not already exist"
+        )
     parent = scratch_directory.parent
     if not parent.is_dir() or parent.is_symlink():
-        raise VirtualCellContractError("cell-eval scratch parent must be an authorized directory")
+        raise VirtualCellContractError(
+            "cell-eval scratch parent must be an authorized directory"
+        )
     predicted_targets = _target_registry(
         predicted,
         column=perturbation_column,
@@ -195,12 +261,18 @@ def evaluate_official_2025(
         control_label=control_label,
     )
     if predicted_targets != real_targets:
-        raise VirtualCellContractError("prediction and protected target registries differ")
+        raise VirtualCellContractError(
+            "prediction and protected target registries differ"
+        )
     if tuple(str(value) for value in predicted.var_names) != tuple(
         str(value) for value in real.var_names
     ):
-        raise VirtualCellContractError("prediction and protected gene registries differ")
-    cell_eval_version, pdex_version = verify_official_evaluator_versions(metric_contract)
+        raise VirtualCellContractError(
+            "prediction and protected gene registries differ"
+        )
+    cell_eval_version, pdex_version = verify_official_evaluator_versions(
+        metric_contract
+    )
     scratch_directory.mkdir()
     evaluator = MetricsEvaluator(
         adata_pred=predicted,
@@ -221,29 +293,25 @@ def evaluate_official_2025(
     )
     target_ids, des, pds, mae = _metric_arrays(results)
     if target_ids != real_targets:
-        raise VirtualCellAnalysisError("cell-eval result targets differ from protected roster")
-    aggregate_des = _aggregate_mean(aggregate, "discrimination_score_l1")
-    aggregate_pds = _aggregate_mean(aggregate, "overlap_at_N")
-    aggregate_mae = _aggregate_mean(aggregate, "mae")
-    score = official_aggregate_score(
-        des=Decimal(str(aggregate_des)),
-        pds=Decimal(str(aggregate_pds)),
-        mae=Decimal(str(aggregate_mae)),
+        raise VirtualCellAnalysisError(
+            "cell-eval result targets differ from protected roster"
+        )
+    score = score_source_aggregate(
+        columns={
+            name: _aggregate_mean(aggregate, name)
+            for name in (DES_SOURCE_COLUMN, PDS_SOURCE_COLUMN, "mae")
+        },
+        gauge=metric_gauge,
         metric_contract=metric_contract,
     )
-    metrics_arrow = encode_official_metrics(
+    metrics = metric_set_from_source_columns(
         target_ids=target_ids,
-        des=des,
-        pds=pds,
-        mae=mae,
+        columns={DES_SOURCE_COLUMN: des, PDS_SOURCE_COLUMN: pds, "mae": mae},
+        gauge=metric_gauge,
     )
-    return OfficialEvaluatorRun(
-        target_ids=target_ids,
-        des=des,
-        pds=pds,
-        mae=mae,
+    return OfficialEvaluatorRunV2(
+        metrics=metrics,
         score=score,
-        metrics_arrow=metrics_arrow,
         cell_eval_version=cell_eval_version,
         pdex_version=pdex_version,
         profile="vcc",
@@ -253,9 +321,19 @@ def evaluate_official_2025(
     )
 
 
+def evaluate_official_2025(**_kwargs):
+    """Do not publish corrected meanings under original crossed artifact contracts."""
+    raise VirtualCellContractError(
+        "SOFTWARE: select evaluate_official_2025_v2 and its versioned gauge/output "
+        "contracts; original crossed evaluation receipts remain historical"
+    )
+
+
 __all__ = [
-    "OfficialEvaluatorRun",
+    "HistoricalOfficialEvaluatorRun",
+    "OfficialEvaluatorRunV2",
     "bootstrap_official_score_standard_error",
     "evaluate_official_2025",
+    "evaluate_official_2025_v2",
     "read_anndata_h5ad_stream",
 ]

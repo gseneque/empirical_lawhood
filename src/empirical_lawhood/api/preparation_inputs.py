@@ -72,6 +72,7 @@ def _retained_output(*, plane, receipt, kind, result_access,
     record=decode_canonical_bytes(read_bounded_bytes(path,maximum_bytes=128*1024**2),kind,maximum_bytes=128*1024**2)
     if record.fingerprint()!=manifest.materialization.physical_sha256:
         raise ValueError("retained scientific output bytes differ")
+    access_authenticator(context=result_access,receipt=receipt,logical=outputs[0],writer=plane)
     return record,manifest
 
 
@@ -129,6 +130,8 @@ def read_preparation_report(retained,*,artifact_writer):
         raise ValueError("retained preparation report changes its committed task receipt")
     artifact_writer.verify_manifest(retained.manifest)
     record=decode_canonical_bytes(retained.record_payload.encode("utf-8"),kind,maximum_bytes=16*1024**2)
+    authenticate_preparation_result_access(context=retained.result_access,receipt=retained.receipt,
+        logical=retained.manifest.logical,writer=artifact_writer)
     return {"phase":record.phase,"independent_roots":len(record.root_ids),"complete":record.complete,
         "disposition":record.disposition,"full_valid_counts":record.full_valid_counts,
         "support_counts":record.support_counts,"joint_counts":record.joint_counts,

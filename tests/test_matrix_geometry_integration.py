@@ -31,7 +31,7 @@ def plane(tmp_path):
     store = tmp_path / "synthetic-matrix-store"
     store.mkdir()
     return ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
-        "synthetic.matrix-store", "software conformance storage", str(store), "/",
+        "synthetic.matrix-store", "software conformance storage", str(store), str(next(parent for parent in store.parents if parent.is_mount())),
         OperatorStorageProfile.SCHEMA, 1, None, None, ())))
 
 
@@ -198,10 +198,15 @@ def test_public_complete_negative_terminal_actual_custody_fresh_read_and_source_
     fresh = ExternalArtifactPlane(plane.root)
     with monkeypatch.context() as retained_read:
         retained_read.setattr(science, "_run_rollout", lambda *_: pytest.fail("read repeated engineered acquisition"))
-        reread = api.read_matrix_geometry_result(config=bound, artifact_writer=fresh, implementation_commit="0" * 40)
+        retained_read.setattr(api, "matrix_scientific_code_sha256", lambda: pytest.fail("retained read admitted current source"))
+        retained_read.setattr(api, "prove_matrix_geometry_scan", lambda *_: pytest.fail("retained read rebuilt provider proof"))
+        reread = api.read_matrix_geometry_result(config=bound, artifact_writer=fresh)
         assert reread["report"] == result["report"]
-        with pytest.raises(ValueError, match="source owners"):
-            api.read_matrix_geometry_result(config=replace(bound, scientific_code_sha256="0" * 64), artifact_writer=fresh, implementation_commit="0" * 40)
+        assert reread["report"].implementation_commit == "0" * 40
+        with pytest.raises(ValueError, match="changes source"):
+            api.read_matrix_geometry_result(config=bound, artifact_writer=fresh, implementation_commit="1" * 40)
+        with pytest.raises(ValueError, match="retained exact input"):
+            api.read_matrix_geometry_result(config=replace(bound, scientific_code_sha256="0" * 64), artifact_writer=fresh)
         custody = MatrixNativeCustody(writer=fresh, config=bound, run_id=bound.run_id, implementation_commit="0" * 40,
             minimum_free_bytes=1, maximum_output_bytes=bound.maximum_output_bytes, read_only=True)
         partial = replace(result["report"], rollouts=result["report"].rollouts[:-1])
@@ -262,5 +267,13 @@ def _selected_view_sensitive_public_case(bound, plane, monkeypatch):
     assert set(result["report"].condition_false_descendants) >= {"shooting", "local-linearization"}
     monkeypatch.setattr(shooting_committor, "execute_brownian_bridge_replay", lambda **_: pytest.fail("read repeated bridge"))
     fresh = ExternalArtifactPlane(plane.root)
-    recovered = selected_events.read_selected_event_result(config=config, artifact_writer=fresh, implementation_commit="0" * 40)
+    with monkeypatch.context() as reading:
+        def forbidden(*args, **kwargs):
+            pytest.fail("completed selected-event read entered current source/provider/native proof")
+        reading.setattr(selected_events, "matrix_scientific_code_sha256", forbidden)
+        reading.setattr(selected_events, "prove_selected_event", forbidden)
+        reading.setattr(selected_events, "prove_matrix_geometry_scan", forbidden)
+        reading.setattr(api, "matrix_scientific_code_sha256", forbidden)
+        reading.setattr(api, "prove_matrix_geometry_scan", forbidden)
+        recovered = selected_events.read_selected_event_result(config=config, artifact_writer=fresh)
     assert recovered["report"] == result["report"] and not recovered["cohorts"]

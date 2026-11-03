@@ -24,14 +24,15 @@ if TYPE_CHECKING:
     from empirical_lawhood.api.finite_rerun_authoring import FiniteResponseLawApplicationHandoff
     from empirical_lawhood.api.preparation_applicability import PreparationApplicabilityApplicationHandoff
     from empirical_lawhood.api.constructed_preparation_applicability import PreparationApplicabilityApplicationHandoff as ConstructedPreparationApplicabilityApplicationHandoff
+    from empirical_lawhood.api.recursive_prospective_authoring import RecursiveProspectiveApplicationHandoff
 
-IntegrationFamily = Literal['rc-challenges', 'finite-response-law', 'preparation-applicability', 'constructed-preparation-applicability']
+IntegrationFamily = Literal['rc-challenges', 'finite-response-law', 'preparation-applicability', 'constructed-preparation-applicability', 'recursive-inquiry']
 
 
 @dataclass(frozen=True, slots=True)
 class IntegrationApplicationHandoff:
     family: IntegrationFamily
-    selected: RCChallengeApplicationHandoff | FiniteResponseLawApplicationHandoff | PreparationApplicabilityApplicationHandoff | ConstructedPreparationApplicabilityApplicationHandoff
+    selected: RCChallengeApplicationHandoff | FiniteResponseLawApplicationHandoff | PreparationApplicabilityApplicationHandoff | ConstructedPreparationApplicabilityApplicationHandoff | RecursiveProspectiveApplicationHandoff
 
     def __post_init__(self) -> None:
         # Import only the selected code-owned family. No user value supplies a
@@ -48,6 +49,9 @@ class IntegrationApplicationHandoff:
         elif self.family == 'constructed-preparation-applicability':
             from empirical_lawhood.api.constructed_preparation_applicability import PreparationApplicabilityApplicationHandoff as ConstructedPreparationApplicabilityApplicationHandoff
             expected = ConstructedPreparationApplicabilityApplicationHandoff
+        elif self.family == 'recursive-inquiry':
+            from empirical_lawhood.api.recursive_prospective_authoring import RecursiveProspectiveApplicationHandoff
+            expected = RecursiveProspectiveApplicationHandoff
         else:
             raise ValueError('Unsupported integration family')
         if type(self.selected) is not expected:
@@ -57,10 +61,17 @@ class IntegrationApplicationHandoff:
 def load_integration_handoff(*, directory, root, storage_profile, artifact_writer) -> IntegrationApplicationHandoff:
     """Load one exact current handoff; never search for a latest result."""
     directory, _ = resolve_authoring_directory(directory, repo_root=root, storage_profile=storage_profile, escape_message='Integration handoff lies outside the explicitly selected guarded external root')
-    markers = tuple(name for name in ('issued-inputs.json', 'rerun-input.json', 'selection.json') if (directory / name).is_file())
+    markers = tuple(name for name in ('issued-inputs.json', 'rerun-input.json', 'selection.json', 'recursive-prospective.json') if (directory / name).is_file())
     if len(markers) != 1:
         raise ValueError('Select exactly one unambiguous current integration authoring directory')
     marker = markers[0]
+    if marker == 'recursive-prospective.json':
+        # Its closed loader authenticates the small packet and installed decoder
+        # before reading the selected semantic or operational carrier. A generic
+        # schema read must not impose a second, smaller allocation on that body.
+        from empirical_lawhood.api.recursive_prospective_authoring import load_recursive_prospective_handoff
+        return IntegrationApplicationHandoff('recursive-inquiry', load_recursive_prospective_handoff(
+            directory=directory, root=root, storage_profile=storage_profile, artifact_writer=artifact_writer))
     document = loads_external_json(read_bounded_bytes(directory / marker, maximum_bytes=16 * 1024**2))
     if not isinstance(document, dict):
         raise ValueError('Integration selector must be a typed object')
@@ -84,6 +95,12 @@ def load_integration_handoff(*, directory, root, storage_profile, artifact_write
 
 def integration_api_inputs(handoff: IntegrationApplicationHandoff) -> dict[str, object]:
     """Supply only the existing generic API composition parameters."""
+    if handoff.family == 'recursive-inquiry':
+        selected = cast('RecursiveProspectiveApplicationHandoff', handoff.selected)
+        return {'candidate_context_provider': selected.context,
+                'candidate_capability_catalog': selected.context.catalog,
+                'study_bundle_registry': selected.compilation.registry,
+                'executable_platform_ports': selected.platform_ports}
     if handoff.family == 'rc-challenges':
         from empirical_lawhood.adapters.simulator_morphism_challenges.composition import RCChallengeCandidateContextProvider
         selected = cast('RCChallengeApplicationHandoff', handoff.selected)
@@ -113,6 +130,9 @@ def integration_api_inputs(handoff: IntegrationApplicationHandoff) -> dict[str, 
 
 def prove_integration_handoff(handoff: IntegrationApplicationHandoff) -> dict[str, object]:
     """Validate installed providers and full task/resource/output census with no execute."""
+    if handoff.family == 'recursive-inquiry':
+        from empirical_lawhood.api.recursive_prospective_authoring import prove_recursive_prospective_handoff
+        return {'family': handoff.family, **prove_recursive_prospective_handoff(handoff.selected)}
     if handoff.family == 'rc-challenges':
         from empirical_lawhood.api.rc_challenge_authoring import prove_rc_challenge_handoff
         return {'family': handoff.family, **prove_rc_challenge_handoff(handoff.selected)}

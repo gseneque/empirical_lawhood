@@ -34,6 +34,18 @@ def _payload(document: object) -> bytes:
     return (json.dumps(document, sort_keys=True, separators=(",", ":")) + "\n").encode()
 
 
+def test_unrestricted_decode_preserves_typed_validation_and_finite_refusal():
+    raw = _payload(_document("1"))
+    result = decode_canonical_bytes(raw, DecimalEnvelope, maximum_bytes=None)
+    assert result.amount == Decimal(1)
+    assert result.canonical_bytes() == raw
+    with pytest.raises(CanonicalizationError, match="bounded contract"):
+        decode_canonical_bytes(raw, DecimalEnvelope, maximum_bytes=1)
+    duplicate = raw.replace(b'"count":1', b'"count":1,"count":1')
+    with pytest.raises(CanonicalizationError, match="duplicate"):
+        decode_canonical_bytes(duplicate, DecimalEnvelope, maximum_bytes=None)
+
+
 @pytest.mark.parametrize("text", ("0", "1", "-1", "1000", "-1000", "0.01", "-0.01", "123.0001",
                                    "1.23456789012345678901234567890123456789", "0." + "0" * 99 + "1"))
 def test_canonical_fixed_point_operands_keep_exact_bytes_and_values(text: str) -> None:

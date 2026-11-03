@@ -342,10 +342,7 @@ class ResumeCampaignRequest:
     reveal_authority_id: str | None = None
     parent_record_path: Path | None = None
     parent_input_binding_paths: tuple[Path, ...] = ()
-    retry_amendment_path: Path | None = None
-    retry_authority_id: str | None = None
-    source_amendment_path: Path | None = None
-    source_authority_id: str | None = None
+    reconcile_only: bool = False
 
 
 @dataclass(frozen=True, slots=True)

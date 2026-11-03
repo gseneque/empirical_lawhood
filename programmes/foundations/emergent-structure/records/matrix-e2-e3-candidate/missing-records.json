@@ -1,0 +1,161 @@
+{
+  "E3_training_after_reservation": {
+    "current_fitted_models": 0,
+    "owner": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/methods/matrix_factor_response/response_error_prediction.py",
+    "record_types": [
+      "MatrixResponseErrorPredictionSpec",
+      "MatrixResponseErrorModel"
+    ],
+    "rule": "The installed fit_scheduled_error_model calls require_reserved_fit_input before invoking the training loader. It verifies exact allocation/reservation/roles publications, consumed-group exclusion and withheld fullphysicalkeys. A model is a later experiment product, not a source-owner record to invent now."
+  },
+  "E6_old_proposal_preservation": "Historical co-annealT1.25/T3 unreserved proposals remain historical. New nominal de-anneal population requires new fullrecipe reconciliation; labels or parameterpoint absence alone do not make a reserved untouched source.",
+  "human_authorization": "The user has already authorized completion and eligible execution. Missing inputs are factual source/role/custody/approval acts; this audit requests no blanket reconfirmation.",
+  "next_entry": "Fresh scheduled de-anneal paired PRIMARY/FINE source and numerical response study, followed only if qualified by E3 development training/calibration/confirmation.",
+  "preserved": {
+    "battery": "HOLD",
+    "original_UNKNOWN_contacts": 8,
+    "original_complete_denominator": 256,
+    "original_full192": "VIOLATED72/72at1e-6"
+  },
+  "required_record_groups": [
+    {
+      "genuine_act": "Source owner binds the complete actual historical bank/public allocation/prior allocations, effective seeds, exposed groups/artifact hashes, prior physical regimes and complete prior scheduled-coordinate corpus to original audit bytes. A hash alone does not establish completeness.",
+      "id": "SOURCE_OWNER_EXPOSURE",
+      "input_paths": [
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/known-exposure-inventory.json",
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/exposure-census.json",
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/scheduled-exposure.json"
+      ],
+      "proposed_input_path_exists": {
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/exposure-census.json": false,
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/known-exposure-inventory.json": false,
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/scheduled-exposure.json": false
+      },
+      "record_types": [
+        "MatrixFactorExposureCensus",
+        "ScheduledExposure"
+      ],
+      "state": "MISSING_OR_UNSELECTED; bounded actual namespace audit has no current applicable EL operands."
+    },
+    {
+      "genuine_act": "Bind exact source/materialization hash, VERIFIED_ACCESS, observation operator, numerical views, native units, frame, clocks, receivers, validity and uncertainty; retain actual QUALIFIED publication/recovery and every applicable independent gate operand and measurement. De-anneal paired response support is currently absent; old full192 violations cannot be replaced by SATISFIED.",
+      "id": "SOURCE_MATERIALIZATION_AND_VALIDITY",
+      "input_paths": [
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/source-profile.json",
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/pipeline-qualification.json",
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/materialization-qualification.json",
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/scientific-qualification.json"
+      ],
+      "proposed_input_path_exists": {
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/materialization-qualification.json": false,
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/pipeline-qualification.json": false,
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/scientific-qualification.json": false,
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/source/source-profile.json": false
+      },
+      "record_types": [
+        "SourcePipelineProfile",
+        "SourcePipelineQualificationReceipt",
+        "MaterializationQualificationReceipt",
+        "ScientificSourceQualificationSpec",
+        "ScientificSourceGateEvidence",
+        "ScientificSourceQualificationResult"
+      ],
+      "state": "MISSING_OR_UNSELECTED; exposed fixtures and2co-anneal numerical pairs do not supply de-anneal support."
+    },
+    {
+      "genuine_act": "After the real exposure inventory exists, choose exact roots/whole-group roles/four purpose effective streams and full de-anneal recipe coordinates; authenticate original OUTCOME_BLIND PROSPECTIVE allocation and reservation publications including manifests and commit markers. Withheld physical keys must differ from actual upstream/exposed regimes. Freeze before any fitted parameter/preprocessing/calibration.",
+      "id": "E6_BEFORE_FIT",
+      "input_paths": [
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/reservation/allocation.json",
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/reservation/allocation-publication.json",
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/reservation/reservation.json",
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/reservation/reservation-publication.json"
+      ],
+      "proposed_input_path_exists": {
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/reservation/allocation-publication.json": false,
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/reservation/allocation.json": false,
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/reservation/reservation-publication.json": false,
+        "/tmp/el-matrix-continuation-20261014/e3-entry-records02/required-inputs/reservation/reservation.json": false
+      },
+      "record_types": [
+        "ScheduledAllocation",
+        "ScheduledReservation"
+      ],
+      "state": "NOT_RESERVED; a frozen design with unassigned roots/seeds is the only honest current state."
+    },
+    {
+      "genuine_act": "An actual accountable human adopts the exact compiled candidate/qualification receipts and raw/semantic digests, attesting complete known lineage and genuinely unexposed evaluation roots/seeds before outcome access. Codex cannot be proposer, attestor, approver or issuer. Old ICF identity is retained under its original schema.",
+      "id": "ACCOUNTABLE_HUMAN",
+      "input_paths": [
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/human.json",
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/base-proposer.json",
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/extension-proposer.json"
+      ],
+      "proposed_input_path_exists": {
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/base-proposer.json": false,
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/extension-proposer.json": false,
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/human.json": false
+      },
+      "record_types": [
+        "AccountableHumanIdentity",
+        "HumanProposerAttestation"
+      ],
+      "state": "NO_APPLICABLE_CURRENT_EL_RECORD_SELECTED."
+    },
+    {
+      "genuine_act": "Owner explicitly installs a public checker registry in an owner-only directory/file (0600). Independently permitted checkers act on every exact gate ID derived from the selected bound policy and exact candidate/issued subject. No reactor/test gate IDs, passing defaults or generated signer substitution.",
+      "guarded_store_paths": [
+        "authority/gate-attestations/<actual-attestation-id>.json",
+        "authority/frozen-programme-proposals/<actual-proposal-id>.json",
+        "authority/authorization-records/<actual-authorization-id>.json"
+      ],
+      "id": "OWNER_TRUST_AND_APPROVAL",
+      "input_paths": [
+        "/home/chevre/.local/share/empirical-lawhood/trust/matrix-deanneal-e3-20261014/approval-checkers.json",
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/scientific-approval.json"
+      ],
+      "proposed_input_path_exists": {
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/scientific-approval.json": false,
+        "/home/chevre/.local/share/empirical-lawhood/trust/matrix-deanneal-e3-20261014/approval-checkers.json": false
+      },
+      "record_types": [
+        "ApprovalCheckerRegistry",
+        "ApprovalGateAttestation",
+        "FrozenIssuedStudyApprovalProposal",
+        "DurableAuthorizationRecord"
+      ],
+      "state": "NO_CURRENT_EL_TRUST_SELECTION_OR_AUTHENTIC_GATE_ACTS."
+    },
+    {
+      "genuine_act": "Candidate-scoped CUSTODY_PUBLICATION to operator.issue-service binds actual storage; immutable issue then produces exact issued subject. EXPERIMENT_EXECUTION binds scientific DurableAuthorizationRecord and operator.execution-service. Separate OUTCOME_REVEAL binds exact execution grant and operator.evaluator-service. Valid times/scopes/prerequisites and original custody are mandatory.",
+      "guarded_store_paths": [
+        "authority/programme-operation-authorities/<actual-authority-id>.json",
+        "issued-programmes/<actual-issued-subject>"
+      ],
+      "id": "ISSUE_EXECUTE_REVEAL",
+      "input_paths": [
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/base-custody.json",
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/extension-custody.json",
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/base-execution.json",
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/extension-execution.json",
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/base-reveal.json",
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/extension-reveal.json"
+      ],
+      "proposed_input_path_exists": {
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/base-custody.json": false,
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/base-execution.json": false,
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/base-reveal.json": false,
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/extension-custody.json": false,
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/extension-execution.json": false,
+        "/home/chevre/.local/share/empirical-lawhood/control/matrix-deanneal-e3-20261014/extension-reveal.json": false
+      },
+      "record_types": [
+        "StudyOperationAuthority",
+        "PublishedExecutableStudy"
+      ],
+      "state": "NO_CURRENT_APPLICABLE_ISSUED_PACKAGE_OR_GENUINE_GRANTS."
+    }
+  ],
+  "schema": "matrix-deanneal/concrete-missing-entry-records/v1",
+  "scope": "Named proposed handoff paths, not fictitious records or an assertion that these paths were selected by an owner. No private keys requested or created."
+}

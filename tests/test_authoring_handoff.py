@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.api import authoring_handoff, composition
+from empirical_lawhood.api import authoring_handoff, composition, reactor_source_provenance
 from empirical_lawhood.kernel.serialization import CanonicalizationError
 from empirical_lawhood.runtime.plans import CandidateExecutionPlan
 
@@ -45,7 +45,7 @@ def _configure_composition(monkeypatch, tmp_path):
     monkeypatch.setattr(authoring_handoff, "resolve_external_root_contract", lambda *args, **kwargs: contract)
     monkeypatch.setattr(composition, "create_api", lambda **kwargs: kwargs)
     monkeypatch.setattr(composition, "GuardedExternalRoot", lambda contract: contract)
-    monkeypatch.setattr(composition, "ExternalArtifactPlane", lambda root: root)
+    monkeypatch.setattr(composition, "ExternalArtifactPlane", lambda root, **kwargs: root)
     return contract
 
 
@@ -63,12 +63,17 @@ def test_four_explicit_cli_authoring_selections_retain_context_and_reactor_ports
     experiment = SimpleNamespace(experiment_id="maintenance.wrapper.rc")
     bundle = SimpleNamespace(authoring=SimpleNamespace(base=SimpleNamespace(draft=SimpleNamespace(experiment=experiment))), standard_context=SimpleNamespace(base=SimpleNamespace(registry="synthetic-registry")), catalog="synthetic-catalog")
     seen = []
+    source_calls = []
+    monkeypatch.setattr(reactor_source_provenance, 'authenticate_reactor_authoring_source', lambda **values: source_calls.append(values))
+    monkeypatch.setattr(authoring_handoff, 'authenticate_authoring_source', lambda **values: source_calls.append(values))
     monkeypatch.setattr(composition, loader, lambda path: bundle)
     monkeypatch.setattr(composition, provider, lambda selected: seen.append(selected) or "synthetic-provider")
     monkeypatch.setattr(composition, "fresh_reactor_platform_ports", lambda **kwargs: ("synthetic-port",))
     trust = Path("synthetic-approval-trust")
     result = composition.create_cli_api(repo_root=ROOT, operator_storage_profile=object(), approval_checker_trust_path=trust, **{selector: directory})
     assert seen == [bundle]
+    assert len(source_calls) == 1
+    assert source_calls[0]['directory'] == directory and source_calls[0]['project_root'] == ROOT
     assert result["candidate_context_provider"] == "synthetic-provider"
     assert result["candidate_capability_catalog"] == "synthetic-catalog"
     assert result["study_bundle_registry"] == "synthetic-registry"

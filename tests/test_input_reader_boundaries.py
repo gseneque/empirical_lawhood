@@ -33,7 +33,8 @@ def read_input(owner, root, path):
     if owner == "bounded":
         return bounded_io.read_bounded_bytes(path, maximum_bytes=len(EXPECTED))
     guarded_root = GuardedExternalRoot(ExternalRootContract(
-        "synthetic-input-root", "synthetic input", str(root), "/", OperatorStorageProfile.SCHEMA,
+        "synthetic-input-root", "synthetic input", str(root),
+        str(next(parent for parent in (root, *root.parents) if parent.is_mount())), OperatorStorageProfile.SCHEMA,
         1, None, None, (),
     ))
     scope = DatasetStorageScope("synthetic.input-scope", ObjectIdentity.from_record(

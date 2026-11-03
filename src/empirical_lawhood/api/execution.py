@@ -12,7 +12,8 @@ import hashlib
 import json
 import subprocess
 from collections.abc import Mapping
-from dataclasses import dataclass, replace
+from contextlib import ExitStack
+from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Callable, Final, Protocol
 
@@ -44,7 +45,12 @@ from empirical_lawhood.infrastructure.bounded_process import (
 )
 from empirical_lawhood.infrastructure.catalog_projection import decode_catalog_snapshot
 from empirical_lawhood.infrastructure.maintenance import ReceiptBoundaryStopper
-from empirical_lawhood.infrastructure.execution import DurableExecutionEnvelopeCoordinator, DurableExecutionResourceEnvelopeCoordinator, ExecutionResourceAdmission, ExecutionErrorKind, FailureInjector, InjectedSchedulerCrash, LiveLeaseError, LocalExecutionResourceAdmitter, LocalProcessExecutor, LocalScheduler, ResourceAdmissionError, SchedulerConsistencyError, TaskProcessError
+from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.infrastructure.execution import DurableExecutionEnvelopeCoordinator, DurableExecutionResourceEnvelopeCoordinator, ExecutionResourceAdmission, ExecutionErrorKind, FailureInjector, LocalExecutionResourceAdmitter, LocalProcessExecutor, LocalScheduler
+from empirical_lawhood.infrastructure.native_parent_finalization import NativeParentFinalizationPending
+from empirical_lawhood.runtime.native_effects import NativeEntryRefused
+from ..infrastructure.execution import execution_error_types
+from ..infrastructure.recovery import recovery_error_types
 from empirical_lawhood.infrastructure.campaign_elapsed_budgets import (
     ExternalCampaignElapsedBudgetStore,
 )
@@ -110,7 +116,7 @@ from empirical_lawhood.runtime.exploration import (
     validate_exploration_wave_result,
 )
 from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityRegistry
-from empirical_lawhood.runtime.input_access import planned_input_access_allowed
+from empirical_lawhood.runtime.input_access import validate_planned_input_access
 from empirical_lawhood.runtime.catalog import (
     CatalogVerificationStatus,
 )
@@ -120,7 +126,7 @@ from empirical_lawhood.runtime.compiler import (
     lower_run_plan,
 )
 from empirical_lawhood.runtime.conditional_children import ConditionalChildInstantiation, FrozenParentInputBinding
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, CandidateExecutionPlan, EnvelopeExecutionPlan, ExecutionPlan, ProtocolExecutionTask, ExecutionTask, ExternalInputSpec, ProtocolRunPlan, ScientificStage
+from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, CandidateExecutionPlan, EnvelopeExecutionPlan, ExecutionPlan, ProtocolExecutionTask, ExternalInputSpec, ProtocolRunPlan, ScientificStage
 from empirical_lawhood.runtime.response_experiment import derive_response_experiment_topology
 from empirical_lawhood.runtime.observation_order import ObservationOrderSubstrateBinding, derive_observation_order_topology
 from empirical_lawhood.runtime.response_experiment_ports import NativeInteractionKind, ResponseSubstrateBinding
@@ -130,11 +136,14 @@ from empirical_lawhood.runtime.providers import (
     CapabilityOutputSemanticContract,
     ExternalInputPayload,
     capability_semantic_validation_registry,
+    validate_worker_preparations,
 )
+from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
 from empirical_lawhood.runtime.issued_extension_payloads import AuthenticatedExecutableRecord, ExecutableProviderReconstructionReceipt, RetrospectiveProviderReconstruction, ExecutableProviderRecoveryReceipt, IssuedExtensionPayloadResolver, reconstruct_executable_provider, verify_executable_provider_recovery
 from empirical_lawhood.runtime.study_issue import StudySourceClosureInspector
+from empirical_lawhood.runtime.progress import report_progress
+from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location as _provider_input_location
 from empirical_lawhood.runtime.preexecution_contract import ExperimentContractApplicability, ExperimentContractChronologyEvent, ExperimentContractChronologyKind, ExperimentContractClosureMatrix, ExperimentContractEvidence, ExperimentContractNativeConformance, ExperimentContractNativeDisposition, ExperimentContractPublicationBatch, ExperimentContractStageApplicability, derive_experiment_contract_applicability, validate_experiment_contract_closure
-from empirical_lawhood.runtime.retry_amendment import OperationalSourceAmendment, LeaseExpiryRetryAmendment, DiagnosedPureTaskRetryAmendment, ChainedPureTaskRetryAmendment, CompletedRepairRetryAmendment, ElapsedClosureRetryAmendment, ResourcePureTaskRetryAmendment, ChainedResourceRetryAmendment, RetainedCustodyCompletionAmendment
 from empirical_lawhood.runtime.recovery import RecoveryTerminalAttempt, RecoveryTerminalDisposition, ProtocolRunRecoveryIndex, CandidateRunRecoveryIndex, EnvelopeRunRecoveryIndex, RunRecoveryIndex, ProtocolRunRecoveryTerminalEvent, TaskRecoveryEvent, build_run_recovery_index
 from empirical_lawhood.kernel.provenance import ObjectIdentity
 from empirical_lawhood.kernel.serialization import (
@@ -145,13 +154,13 @@ from empirical_lawhood.kernel.serialization import (
 from empirical_lawhood.kernel.status import AdmissionStatus, OperationalStatus, ScientificStatus
 from empirical_lawhood.planning.approval import CompleteApprovalService
 
-from .codecs import (
+from empirical_lawhood.api.codecs import (
     MAX_AUTHORING_BYTES,
     MAX_CAMPAIGN_PACKAGE_BYTES,
     AuthoringCodecError,
     loads_campaign_package_authoring,
 )
-from .models import CampaignPackage, DualLoopPackage, ExplorationExecutionPackage, IssuedCampaignPackage, IssuedCampaignPackageRoot, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage, ElapsedExperimentPackage, issued_base_candidate, issued_standard_candidate
+from empirical_lawhood.api.models import CampaignPackage, DualLoopPackage, ExplorationExecutionPackage, IssuedCampaignPackage, IssuedCampaignPackageRoot, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage, ElapsedExperimentPackage, issued_base_candidate, issued_standard_candidate
 
 
 CampaignExecutionPackage = CampaignPackage | IssuedCampaignPackageRoot
@@ -551,9 +560,18 @@ class CampaignPrerequisiteError(CampaignExecutionError):
     reason_code = "EXECUTION_RESOURCE_UNAVAILABLE"
 
 
+class CampaignParentFinalizationPending(CampaignPrerequisiteError):
+    reason_code = "NATIVE_PARENT_FINALIZATION_PENDING"
+
+
+class CampaignNativeEntryRefused(CampaignPrerequisiteError):
+    reason_code = "NATIVE_ENTRY_REFUSED"
+
+
 class CampaignOperationalQueryWorkLimitError(CampaignExecutionError):
     kind = ExecutionErrorKind.CAPABILITY
     reason_code = "OPERATIONAL_QUERY_WORK_LIMIT_EXCEEDED"
+
 
 
 @dataclass(slots=True)
@@ -682,6 +700,23 @@ class RunExecutionSummary:
     provider_reconstruction_receipt_fingerprint: str | None = None
     provider_recovery_receipt_id: str | None = None
     provider_recovery_receipt_fingerprint: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class RunHistoryReconciliationSummary:
+    """Retained attempt closure; pending work receives no execution permission."""
+
+    run_id: str
+    operational_status: str
+    recovery_index: ObjectIdentity
+    terminal: ObjectIdentity
+    assigned_task_count: int
+    completed_task_ids: tuple[str, ...]
+    failed_task_ids: tuple[str, ...]
+    blocked_task_ids: tuple[str, ...]
+    pending_task_ids: tuple[str, ...]
+    closure_only: bool = True
+    worker_entries: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -856,66 +891,60 @@ class _StaticInputResolver(ExternalInputResolver):
             raise CampaignCapabilityError("runtime provider omitted a frozen input") from error
 
 
+
+
+
+
+
+
+
+
+
+
+class _ReconciliationPackageRead:
+    """One owned immutable package within an explicit artifact read lifetime."""
+
+    def __init__(self, service, plane, run_id):
+        from threading import get_ident
+        self.service, self.plane, self.run_id = service, plane, run_id
+        self.thread_id = get_ident()
+        self.active = True
+        self.entry = None
+
+    def require(self, service):
+        from threading import get_ident
+        if (not self.active or service is not self.service
+                or service.artifact_plane is not self.plane
+                or get_ident() != self.thread_id):
+            raise CampaignIdentityError("reconciliation package read lifetime changed or ended")
+        self.plane.require_verification_snapshot()
+
+
 class CampaignExecutionService:
     """Execute/resume through guarded artifacts, receipts and operational SQLite."""
 
-    def __init__(
-        self,
-        *,
-        repo_root: Path,
-        artifact_plane: ExternalArtifactPlane,
-        engine_factory: Callable[[], Engine],
-        read_only_engine_factory: Callable[[], Engine] | None = None,
-        catalog_path: Path,
-        providers: CampaignRuntimeProviderRegistry,
-        provider_resolver: CampaignRuntimeProviderResolver | None = None,
-        executable_binding_aggregate: GeneratedExecutableBindingAggregate | None = None,
-        issued_extension_payload_resolver: IssuedExtensionPayloadResolver | None = None,
-        authenticated_executable_record_resolver: (
-            AuthenticatedExecutableRecordResolver | None
-        ) = None,
-        experiment_contract_evidence_provider: (ExperimentContractEvidenceProvider | None) = None,
-        executable_platform_ports: tuple[ExecutablePlatformPort, ...] = (),
-        approval_service: CompleteApprovalService | None = None,
-        study_authority_store: StudyOperationAuthorityStore | None = None,
-        study_execution_grantee_id: str = PROGRAMME_EXECUTION_GRANTEE_ID,
-        study_reveal_grantee_id: str = PROGRAMME_REVEAL_GRANTEE_ID,
-        executor: TaskExecutor | None = None,
-        failure_injector: FailureInjector | None = None,
-        resource_admitter: LocalExecutionResourceAdmitter | None = None,
-        enforce_git_identity: bool = True,
-        operational_query_work_limit: int = DEFAULT_OPERATIONAL_QUERY_WORK_LIMIT,
-        catalog_semantic_validation_registry: ArtifactSemanticValidationRegistry | None = None,
-        execution_assurance_profile: ExecutionAssuranceProfile = (
-            ExecutionAssuranceProfile.TRUSTED_LOCAL
-        ),
-        maximum_parallel_tasks: int = 1,
-        study_source_closure_inspector: StudySourceClosureInspector | None = None,
-        execution_envelope_coordinator: DurableExecutionEnvelopeCoordinator | None = None,
-        execution_resource_envelope_coordinator: (
-            DurableExecutionResourceEnvelopeCoordinator | None
-        ) = None,
-        roster_capacity_decisions: tuple[RosterCapacityDecision, ...] = (),
-    ) -> None:
-        if (
-            operational_query_work_limit <= 0
-            or operational_query_work_limit > MAX_OPERATIONAL_QUERY_WORK_LIMIT
-        ):
-            raise ValueError("operational query work limit is outside its supported range")
+    def __init__(self, *, repo_root: Path, artifact_plane: ExternalArtifactPlane, engine_factory: Callable[[], Engine], read_only_engine_factory: Callable[[], Engine] | None=None, catalog_path: Path, providers: CampaignRuntimeProviderRegistry, provider_resolver: CampaignRuntimeProviderResolver | None=None, executable_binding_aggregate: GeneratedExecutableBindingAggregate | None=None, issued_extension_payload_resolver: IssuedExtensionPayloadResolver | None=None, authenticated_executable_record_resolver: AuthenticatedExecutableRecordResolver | None=None, experiment_contract_evidence_provider: ExperimentContractEvidenceProvider | None=None, executable_platform_ports: tuple[ExecutablePlatformPort, ...]=(), approval_service: CompleteApprovalService | None=None, study_authority_store: StudyOperationAuthorityStore | None=None, study_execution_grantee_id: str=PROGRAMME_EXECUTION_GRANTEE_ID, study_reveal_grantee_id: str=PROGRAMME_REVEAL_GRANTEE_ID, executor: TaskExecutor | None=None, failure_injector: FailureInjector | None=None, resource_admitter: LocalExecutionResourceAdmitter | None=None, enforce_git_identity: bool=True, operational_query_work_limit: int=DEFAULT_OPERATIONAL_QUERY_WORK_LIMIT, catalog_semantic_validation_registry: ArtifactSemanticValidationRegistry | None=None, execution_assurance_profile: ExecutionAssuranceProfile=ExecutionAssuranceProfile.TRUSTED_LOCAL, maximum_parallel_tasks: int=1, study_source_closure_inspector: StudySourceClosureInspector | None=None, execution_envelope_coordinator: DurableExecutionEnvelopeCoordinator | None=None, execution_resource_envelope_coordinator: DurableExecutionResourceEnvelopeCoordinator | None=None, roster_capacity_decisions: tuple[RosterCapacityDecision, ...]=(), catalog_access: object | None=None) -> None:
+        if operational_query_work_limit <= 0 or operational_query_work_limit > MAX_OPERATIONAL_QUERY_WORK_LIMIT:
+            raise ValueError('operational query work limit is outside its supported range')
         if maximum_parallel_tasks <= 0:
-            raise ValueError("maximum parallel tasks must be positive")
+            raise ValueError('maximum parallel tasks must be positive')
         self.repo_root = repo_root.resolve(strict=True)
         self.artifact_plane = artifact_plane
         self._maintenance_stopper = ReceiptBoundaryStopper(artifact_plane)
         self.engine_factory = engine_factory
         self.catalog_path = catalog_path
-        self.read_only_engine_factory = read_only_engine_factory or (
-            lambda: create_read_only_catalog_engine(self.catalog_path)
-        )
+        if catalog_access is not None:
+            from empirical_lawhood.infrastructure.guarded_catalog import GuardedCatalogAccess
+            if type(catalog_access) is not GuardedCatalogAccess or catalog_access.database_path != catalog_path:
+                raise ValueError('execution catalog differs from its exact guarded selection')
+        self.catalog_access = catalog_access
+        if catalog_access is not None:
+            self.engine_factory = catalog_access.initialize_engine
+        self.read_only_engine_factory = catalog_access.read_only_engine if catalog_access is not None else read_only_engine_factory or (lambda: create_read_only_catalog_engine(self.catalog_path))
         self.providers = providers
-        port_keys = tuple(value.port_key for value in executable_platform_ports)
+        port_keys = tuple((value.port_key for value in executable_platform_ports))
         if tuple(sorted(set(port_keys))) != port_keys:
-            raise ValueError("executable platform ports must be sorted and unique")
+            raise ValueError('executable platform ports must be sorted and unique')
         self.provider_resolver = provider_resolver
         self.executable_binding_aggregate = executable_binding_aggregate
         self.issued_extension_payload_resolver = issued_extension_payload_resolver
@@ -923,20 +952,12 @@ class CampaignExecutionService:
         self.experiment_contract_evidence_provider = experiment_contract_evidence_provider
         self.executable_platform_ports = executable_platform_ports
         self.approval_service = approval_service
-        validate_stable_id(
-            study_execution_grantee_id,
-            field_name='study_execution_grantee_id',
-        )
-        validate_stable_id(
-            study_reveal_grantee_id,
-            field_name='study_reveal_grantee_id',
-        )
+        validate_stable_id(study_execution_grantee_id, field_name='study_execution_grantee_id')
+        validate_stable_id(study_reveal_grantee_id, field_name='study_reveal_grantee_id')
         self.study_authority_store = study_authority_store
         self.study_execution_grantee_id = study_execution_grantee_id
         self.study_reveal_grantee_id = study_reveal_grantee_id
-        self.executor = executor or LocalProcessExecutor(
-            scratch_root=artifact_plane.root,
-        )
+        self.executor = executor or LocalProcessExecutor(scratch_root=artifact_plane.root)
         self.failure_injector = failure_injector
         self.resource_admitter = resource_admitter or LocalExecutionResourceAdmitter()
         self.enforce_git_identity = enforce_git_identity
@@ -947,12 +968,7 @@ class CampaignExecutionService:
         self.execution_envelope_coordinator = execution_envelope_coordinator
         self.execution_resource_envelope_coordinator = execution_resource_envelope_coordinator
         self.roster_capacity_decisions = roster_capacity_decisions
-        # Catalog rebuild has no execution plan from which to derive capability
-        # semantics.  Resolve it against a separately configured immutable
-        # registry instead of trusting the declarations in persisted manifests.
-        self.catalog_semantic_validation_registry = (
-            catalog_semantic_validation_registry or artifact_plane.semantic_validations
-        )
+        self.catalog_semantic_validation_registry = catalog_semantic_validation_registry or artifact_plane.semantic_validations
 
     @property
     def catalog_present(self) -> bool:
@@ -1188,28 +1204,20 @@ class CampaignExecutionService:
         if (
             payload_schema != receipt.SCHEMA
             or payload_sha256 != receipt.fingerprint()
-            or receipt.canonical_bytes() != payload
+            or not receipt.canonical_equals(payload)
         ):
             raise CampaignIdentityError(
                 "persisted provider reconstruction receipt differs from its identity"
             )
         return receipt
 
-    def _resolve_campaign_provider(
-        self,
-        package: CampaignExecutionPackage,
-        *,
-        authorization_replayed: bool,
-        require_persisted_reconstruction: bool = False,
-        budget: _CatalogSemanticReplayBudget | None = None,
-    ) -> _ResolvedCampaignProvider:
+    def _resolve_campaign_provider(self, package: CampaignExecutionPackage, *, authorization_replayed: bool, require_persisted_reconstruction: bool=False, budget: _CatalogSemanticReplayBudget | None=None) -> _ResolvedCampaignProvider:
         """Resolve a precomposed package or reconstruct its issued executable provider.
 
-        The explicit boolean is accepted only from call sites that have just
-        replayed both durable campaign approval and programme execution
-        authority.  It is checked before any issued payload source is read.
-        """
-
+            The explicit boolean is accepted only from call sites that have just
+            replayed both durable campaign approval and programme execution
+            authority.  It is checked before any issued payload source is read.
+            """
         registry_sha256 = package.registry.fingerprint()
         try:
             provider = self.providers.resolve(registry_sha256)
@@ -1217,103 +1225,50 @@ class CampaignExecutionService:
             provider = None
         if provider is not None:
             return _ResolvedCampaignProvider(provider=provider)
-
         if not isinstance(package, ExperimentPackage):
-            raise CampaignCapabilityError(
-                "no runtime provider has an exact precomposed package binding"
-            )
+            raise CampaignCapabilityError('no runtime provider has an exact precomposed package binding')
         if not authorization_replayed:
-            raise PermissionError("issued provider reconstruction requires prior authority replay")
+            raise PermissionError('issued provider reconstruction requires prior authority replay')
         aggregate = self.executable_binding_aggregate
         payload_resolver = self.issued_extension_payload_resolver
         provider_resolver = self.provider_resolver
         if aggregate is None or payload_resolver is None or provider_resolver is None:
-            raise CampaignCapabilityError(
-                "issued executable provider reconstruction is not fully composed"
-            )
+            raise CampaignCapabilityError('issued executable provider reconstruction is not fully composed')
         selected_binding_ids = self._selected_runtime_binding_ids(package.registry)
-        selected_bindings = tuple(
-            next(value for value in aggregate.bindings if value.binding_id == binding_id)
-            for binding_id in selected_binding_ids
-        )
-        required_authenticated_schemas = tuple(
-            sorted(
-                {
-                    schema
-                    for binding in selected_bindings
-                    for schema in binding.required_authenticated_record_schemas
-                }
-            )
-        )
+        selected_bindings = tuple((next((value for value in aggregate.bindings if value.binding_id == binding_id)) for binding_id in selected_binding_ids))
+        selected_ports = self.executable_platform_ports
+        required_authenticated_schemas = tuple(sorted({schema for binding in selected_bindings for schema in binding.required_authenticated_record_schemas}))
         authenticated_records: tuple[AuthenticatedExecutableRecord, ...] = ()
         if required_authenticated_schemas:
             authenticated_resolver = self.authenticated_executable_record_resolver
             if authenticated_resolver is None:
-                raise CampaignExecutableInputError(
-                    "ExperimentPackage factory inputs require owning qualification replay"
-                )
+                raise CampaignExecutableInputError('ExperimentPackage factory inputs require owning qualification replay')
             try:
-                authenticated_records = authenticated_resolver.resolve(
-                    package=package,
-                    required_schema_ids=required_authenticated_schemas,
-                )
+                authenticated_records = authenticated_resolver.resolve(package=package, required_schema_ids=required_authenticated_schemas)
             except CampaignExecutionError:
                 raise
             except Exception as error:
-                raise CampaignExecutableInputError(
-                    "ExperimentPackage factory input qualification replay failed"
-                ) from error
-            observed_schemas = tuple(value.record.SCHEMA for value in authenticated_records)
-            if (
-                observed_schemas != required_authenticated_schemas
-                or tuple(sorted(set(observed_schemas))) != observed_schemas
-            ):
-                raise CampaignExecutableInputError(
-                    "qualified ExperimentPackage input roster differs from its bindings"
-                )
+                raise CampaignExecutableInputError('ExperimentPackage factory input qualification replay failed') from error
+            observed_schemas = tuple((value.record.SCHEMA for value in authenticated_records))
+            if observed_schemas != required_authenticated_schemas or tuple(sorted(set(observed_schemas))) != observed_schemas:
+                raise CampaignExecutableInputError('qualified ExperimentPackage input roster differs from its bindings')
         try:
-            reconstructed = reconstruct_executable_provider(
-                registry=package.registry,
-                manifest=package.issued_study,
-                aggregate=aggregate,
-                selected_binding_ids=selected_binding_ids,
-                payload_resolver=payload_resolver,
-                provider_resolver=provider_resolver,
-                authenticated_records=authenticated_records,
-                platform_ports=self.executable_platform_ports,
-                authorization_replayed=True,
-            )
+            reconstructed = reconstruct_executable_provider(registry=package.registry, manifest=package.issued_study, aggregate=aggregate, selected_binding_ids=selected_binding_ids, payload_resolver=payload_resolver, provider_resolver=provider_resolver, authenticated_records=authenticated_records, platform_ports=selected_ports, authorization_replayed=True)
         except PermissionError:
             raise
         except (KeyError, TypeError, ValueError) as error:
-            raise CampaignCapabilityError(
-                "issued executable provider reconstruction failed closed"
-            ) from error
-
-        stored = self._load_provider_reconstruction_receipt(
-            package.run_plan_id,
-            budget=budget,
-        )
+            raise CampaignCapabilityError('issued executable provider reconstruction failed closed') from error
+        stored = self._load_provider_reconstruction_receipt(package.run_plan_id, budget=budget)
         if require_persisted_reconstruction and stored is None:
-            raise CampaignIdentityError(
-                "persisted ExperimentPackage execution lacks its provider reconstruction receipt"
-            )
+            raise CampaignIdentityError('persisted ExperimentPackage execution lacks its provider reconstruction receipt')
         recovery = None
         if stored is not None:
             try:
-                recovery = verify_executable_provider_recovery(
-                    stored,
-                    reconstructed.receipt,
-                )
+                recovery = verify_executable_provider_recovery(stored, reconstructed.receipt)
             except ValueError as error:
-                raise CampaignCapabilityError(
-                    "fresh provider reconstruction differs from persisted state"
-                ) from error
-        return _ResolvedCampaignProvider(
-            provider=reconstructed.provider,
-            reconstruction=reconstructed.receipt,
-            recovery=recovery,
-        )
+                raise CampaignCapabilityError('fresh provider reconstruction differs from persisted state') from error
+        return _ResolvedCampaignProvider(provider=reconstructed.provider, reconstruction=reconstructed.receipt, recovery=recovery)
+
 
     @property
     def executor_enforces_resources(self) -> bool:
@@ -1337,7 +1292,8 @@ class CampaignExecutionService:
             f"external:runs/{run_id}/outputs/*",
             f"external:runs/{run_id}/plans/*",
             f"external:runs/{run_id}/receipts/*",
-            "local:.empirical-lawhood/experiment_catalog.sqlite3",
+            ("local:.empirical-lawhood/experiment_catalog.sqlite3"
+                if self.catalog_access is None else self.catalog_access.display_locator),
         )
 
     def storage_diagnostic(
@@ -1349,19 +1305,26 @@ class CampaignExecutionService:
             operation_minimum_free_bytes=operation_minimum_free_bytes
         )
 
-    def resource_admission(self, execution_plan: ProtocolExecutionPlan) -> ExecutionResourceAdmission:
-        """Assess one plan without mutating storage or the operational catalog."""
+    @staticmethod
+    def _selected_resource_spec(package):
+        if not isinstance(package, ExperimentPackage):
+            return None
+        selected = package.execution_resource_envelope_spec
+        return selected
 
-        storage = self.artifact_plane.root.diagnostic(
-            operation_minimum_free_bytes=execution_plan.minimum_free_bytes,
-        )
-        return self.resource_admitter.assess(
-            execution_plan,
-            available_scratch_bytes=storage.observed_free_bytes,
-            executor_enforces_resources=self.executor_enforces_resources,
-            executor_enforces_no_network=self.supports_exploration_no_network,
-            assurance_profile=self.execution_assurance_profile,
-        )
+    def resource_admission(self, execution_plan: ProtocolExecutionPlan, *, package=None) -> ExecutionResourceAdmission:
+        """Assess one plan without mutating storage or the operational catalog."""
+        storage = self.artifact_plane.root.diagnostic(operation_minimum_free_bytes=execution_plan.minimum_free_bytes)
+        try:
+            return self.resource_admitter.assess(execution_plan, available_scratch_bytes=storage.observed_free_bytes, executor_enforces_resources=self.executor_enforces_resources, executor_enforces_no_network=self.supports_exploration_no_network, assurance_profile=self.execution_assurance_profile, resource_spec=self._selected_resource_spec(package), maximum_parallel_tasks=self.maximum_parallel_tasks)
+        except (TypeError, ValueError) as error:
+            raise CampaignValidationError('selected resource contract is incompatible: ' + str(error)) from error
+
+    def _require_selected_resource_admission(self, *, package, execution_plan):
+        admission = self.resource_admission(execution_plan, package=package)
+        if not admission.admitted:
+            raise CampaignPrerequisiteError('selected execution resources refused: ' + ','.join(admission.reason_codes))
+        return admission
 
     def validate_external_projection(self, path: Path) -> Path:
         """Verify mount identity and resolve one existing projection without writes."""
@@ -1725,7 +1688,7 @@ class CampaignExecutionService:
             raise CampaignIdentityError(
                 "catalog rebuild cannot authenticate its persisted execution plan"
             ) from error
-        if expected_plan != plan or expected_plan.canonical_bytes() != plan_payload:
+        if expected_plan != plan or not expected_plan.canonical_equals(plan_payload):
             raise CampaignIdentityError(
                 "persisted execution plan differs from deterministic recompilation"
             )
@@ -1978,43 +1941,10 @@ class CampaignExecutionService:
 
     @staticmethod
     def _validate_planned_input_access(execution_plan: ProtocolExecutionPlan) -> None:
-        by_task = {task.task_id: task for task in execution_plan.tasks}
-        for task in execution_plan.tasks:
-            selected = (
-                {
-                    edge.operational_logical_artifact_id
-                    for edge in task.scientific_inputs
-                    if edge.producer_task_id is not None
-                }
-                if isinstance(task, ExecutionTask)
-                else None
-            )
-            accesses: list[tuple[str, OutcomeAccess, VisibilityCeiling | None]] = [
-                (output.logical_artifact_id, output.outcome_access, output.visibility_ceiling)
-                for parent in task.dependency_task_ids
-                for output in by_task[parent].outputs
-                if selected is None or output.logical_artifact_id in selected
-            ]
-            accesses.extend(
-                (
-                    value.logical_artifact_id,
-                    value.expected_outcome_access,
-                    value.expected_visibility_ceiling,
-                )
-                for value in task.external_inputs
-                if value.expected_outcome_access is not None
-            )
-            for artifact_id, access, visibility in accesses:
-                if not planned_input_access_allowed(
-                    task,
-                    artifact_id,
-                    access,
-                    visibility,
-                    reveal_barrier_authorized=task.barrier is BarrierKind.REVEAL,
-                ):
-                    raise CampaignCapabilityError(
-                        f"task {task.task_id} lacks read permission for planned input {artifact_id}"
-                    )
+        try:
+            validate_planned_input_access(execution_plan)
+        except ValueError as error:
+            raise CampaignCapabilityError(str(error)) from error
 
     def _semantic_artifact_plane(
         self,
@@ -2030,328 +1960,135 @@ class CampaignExecutionService:
         return self.artifact_plane.with_semantic_validation_registry(registry)
 
     def execute(
-        self,
-        *,
-        package: CampaignExecutionPackage,
-        run_plan: ProtocolRunPlan,
-        execution_plan: ProtocolExecutionPlan,
-        at_utc: str | None = None,
+        self, *, package: CampaignExecutionPackage, run_plan: ProtocolRunPlan,
+        execution_plan: ProtocolExecutionPlan, at_utc: str | None = None,
         reveal_authority_id: str | None = None,
-        conditional_instantiations: tuple[
-            ConditionalChildInstantiation,
-            ...,
-        ] = (),
+        conditional_instantiations: tuple[ConditionalChildInstantiation, ...] = (),
         parent_input_bindings: tuple[FrozenParentInputBinding, ...] = (),
-        retry_amendment: LeaseExpiryRetryAmendment | None = None,
-        source_amendment: OperationalSourceAmendment | None = None,
+    ) -> RunExecutionSummary:
+        return self._execute_campaign(
+            package=package, run_plan=run_plan, execution_plan=execution_plan,
+            at_utc=at_utc, execution_authority_at_utc=at_utc,
+            reveal_authority_id=reveal_authority_id,
+            conditional_instantiations=conditional_instantiations,
+            parent_input_bindings=parent_input_bindings,
+        )
+
+    def _execute_campaign(
+        self, *, package: CampaignExecutionPackage, run_plan: ProtocolRunPlan,
+        execution_plan: ProtocolExecutionPlan, at_utc: str | None,
+        execution_authority_at_utc: str | None,
+        reveal_authority_id: str | None = None,
+        conditional_instantiations: tuple[ConditionalChildInstantiation, ...] = (),
+        parent_input_bindings: tuple[FrozenParentInputBinding, ...] = (),
     ) -> RunExecutionSummary:
         try:
-            # Refuse source drift before reading large issued control publications.
-            # _execute_plan repeats this check immediately before effects.
-            self._check_identity(
-                package,
-                retry_amendment=retry_amendment,
-                source_amendment=source_amendment,
-            )
+            report_progress(phase='execution.validation')
+            self._check_identity(package)
+            self._require_selected_resource_admission(package=package, execution_plan=execution_plan)
             try:
-                self.preexecution_contract_closure(
-                    package=package,
-                    run_plan=run_plan,
-                    execution_plan=execution_plan,
-                ).require_pass()
+                self.preexecution_contract_closure(package=package, run_plan=run_plan, execution_plan=execution_plan).require_pass()
             except ValueError as error:
                 raise CampaignValidationError(str(error)) from error
             authorized_barriers: tuple[BarrierKind, ...] = (BarrierKind.REVEAL,)
             self._validate_campaign_authorization(package)
             if conditional_instantiations:
-                if not isinstance(
-                    package,
-                    (
-                        IssuedCampaignPackage,
-                        IssuedStudyPackage,
-                        EnvelopeExperimentPackage,
-                        ExperimentPackage,
-                    ),
-                ):
-                    raise CampaignValidationError(
-                        "conditional execution requires an issued programme"
-                    )
+                if not isinstance(package, (IssuedCampaignPackage, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage)):
+                    raise CampaignValidationError('conditional execution requires an issued programme')
                 if len(conditional_instantiations) != 1:
-                    raise CampaignValidationError(
-                        "conditional execution requires exactly one instantiation"
-                    )
+                    raise CampaignValidationError('conditional execution requires exactly one instantiation')
                 instantiation = conditional_instantiations[0]
                 base_candidate = issued_base_candidate(package)
-                if (
-                    instantiation.child_candidate
-                    != ObjectIdentity.from_record(
-                        base_candidate.candidate_id,
-                        base_candidate,
-                    )
-                    or base_candidate.conditional_successor is not None
-                ):
-                    raise CampaignValidationError(
-                        "conditional instantiation binds another issued child"
-                    )
+                if instantiation.child_candidate != ObjectIdentity.from_record(base_candidate.candidate_id, base_candidate) or base_candidate.conditional_successor is not None:
+                    raise CampaignValidationError('conditional instantiation binds another issued child')
             if parent_input_bindings:
-                if not isinstance(
-                    package,
-                    (
-                        IssuedCampaignPackage,
-                        IssuedStudyPackage,
-                        EnvelopeExperimentPackage,
-                        ExperimentPackage,
-                    ),
-                ):
-                    raise CampaignValidationError(
-                        "parent input binding requires an issued programme"
-                    )
+                if not isinstance(package, (IssuedCampaignPackage, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage)):
+                    raise CampaignValidationError('parent input binding requires an issued programme')
                 base_candidate = issued_base_candidate(package)
-                base_candidate_identity = ObjectIdentity.from_record(
-                    base_candidate.candidate_id,
-                    base_candidate,
-                )
+                base_candidate_identity = ObjectIdentity.from_record(base_candidate.candidate_id, base_candidate)
                 issued_candidate = issued_standard_candidate(package)
-                issued_candidate_identity = ObjectIdentity.from_record(
-                    issued_candidate.candidate_id,
-                    issued_candidate,
-                )
-                if any(
-                    value.candidate not in {base_candidate_identity, issued_candidate_identity}
-                    or value.scientific_graph_sha256
-                    != base_candidate.scientific_graph.fingerprint()
-                    for value in parent_input_bindings
-                ):
-                    raise CampaignValidationError(
-                        "parent input binding differs from the issued candidate"
-                    )
-                binding_ids = tuple(
-                    sorted(value.external_input_id for value in parent_input_bindings)
-                )
-                if binding_ids != tuple(
-                    value.external_input_id for value in parent_input_bindings
-                ) or len(set(binding_ids)) != len(binding_ids):
-                    raise CampaignValidationError("parent input bindings must be sorted and unique")
-                authenticate_parent_inputs = getattr(
-                    self.provider_resolver,
-                    "authenticate_parent_inputs",
-                    None,
-                )
+                issued_candidate_identity = ObjectIdentity.from_record(issued_candidate.candidate_id, issued_candidate)
+                if any((value.candidate not in {base_candidate_identity, issued_candidate_identity} or value.scientific_graph_sha256 != base_candidate.scientific_graph.fingerprint() for value in parent_input_bindings)):
+                    raise CampaignValidationError('parent input binding differs from the issued candidate')
+                binding_ids = tuple(sorted((value.external_input_id for value in parent_input_bindings)))
+                if binding_ids != tuple((value.external_input_id for value in parent_input_bindings)) or len(set(binding_ids)) != len(binding_ids):
+                    raise CampaignValidationError('parent input bindings must be sorted and unique')
+                authenticate_parent_inputs = getattr(self.provider_resolver, 'authenticate_parent_inputs', None)
                 if callable(authenticate_parent_inputs):
-                    authenticate_parent_inputs(
-                        registry=package.registry,
-                        target_candidate=parent_input_bindings[0].candidate,
-                        scientific_graph_sha256=(base_candidate.scientific_graph.fingerprint()),
-                        bindings=parent_input_bindings,
-                    )
+                    authenticate_parent_inputs(registry=package.registry, target_candidate=parent_input_bindings[0].candidate, scientific_graph_sha256=base_candidate.scientific_graph.fingerprint(), bindings=parent_input_bindings)
             source_records: tuple[CanonicalRecord, ...] = ()
             resolved_provider: _ResolvedCampaignProvider | None = None
-            authority_identities: tuple[ObjectIdentity, ...] = (
-                ObjectIdentity.from_record(
-                    package.authorization.authorization_id,
-                    package.authorization,
-                ),
-            )
-            if isinstance(
-                package,
-                (
-                    IssuedCampaignPackage,
-                    IssuedStudyPackage,
-                    EnvelopeExperimentPackage,
-                    ExperimentPackage,
-                ),
-            ):
+            authority_identities: tuple[ObjectIdentity, ...] = (ObjectIdentity.from_record(package.authorization.authorization_id, package.authorization),)
+            if isinstance(package, (IssuedCampaignPackage, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage)):
                 if at_utc is None:
-                    raise CampaignValidationError(
-                        "issued execution requires an explicit decision time"
-                    )
-                execution_authority = self._validate_issued_execution_authority(
-                    package,
-                    at_utc=at_utc,
-                )
-                authority_identities = (
-                    ObjectIdentity.from_record(
-                        package.scientific_approval.authorization_id,
-                        package.scientific_approval,
-                    ),
-                    ObjectIdentity.from_record(
-                        execution_authority.authority_id,
-                        execution_authority,
-                    ),
-                )
-                standard_package = (
-                    package.base
-                    if isinstance(
-                        package,
-                        (EnvelopeExperimentPackage, ExperimentPackage),
-                    )
-                    else package
-                )
+                    raise CampaignValidationError('issued execution requires an explicit decision time')
+                execution_authority = self._validate_issued_execution_authority(package, at_utc=execution_authority_at_utc)
+                authority_identities = (ObjectIdentity.from_record(package.scientific_approval.authorization_id, package.scientific_approval), ObjectIdentity.from_record(execution_authority.authority_id, execution_authority))
+                standard_package = package.base if isinstance(package, (EnvelopeExperimentPackage, ExperimentPackage)) else package
                 if isinstance(standard_package, IssuedStudyPackage):
                     issued_draft = standard_package.issued_study.authoring_package.draft
                 else:
                     assert isinstance(package, IssuedCampaignPackage)
                     issued_draft = package.issued_study.draft
-                standard_records: tuple[CanonicalRecord, ...] = (
-                    (
-                        standard_package.issued_study.authoring_package,
-                        standard_package.issued_study.authoring_package.entry_package,
-                    )
-                    if isinstance(standard_package, IssuedStudyPackage)
-                    else ()
-                )
-                extension_records: tuple[CanonicalRecord, ...] = (
-                    (
-                        package.issued_study.candidate.authoring_package,
-                        package.issued_study.issued_extensions,
-                        package.issued_study.extension_validation,
-                        package.execution_envelope_spec,
-                    )
-                    if isinstance(package, EnvelopeExperimentPackage)
-                    else ()
-                )
+                standard_records: tuple[CanonicalRecord, ...] = (standard_package.issued_study.authoring_package, standard_package.issued_study.authoring_package.entry_package) if isinstance(standard_package, IssuedStudyPackage) else ()
+                extension_records: tuple[CanonicalRecord, ...] = (package.issued_study.candidate.authoring_package, package.issued_study.issued_extensions, package.issued_study.extension_validation, package.execution_envelope_spec) if isinstance(package, EnvelopeExperimentPackage) else ()
                 if isinstance(package, ExperimentPackage):
-                    extension_records = tuple(
-                        record
-                        for record in (
-                            package.issued_study.candidate.authoring_package,
-                            package.issued_study.issued_extensions,
-                            package.issued_study.extension_validation,
-                            package.execution_resource_envelope_spec,
-                            package.predevelopment_jit_signature_census,
-                            package.jit_graph_signature_manifest,
-                            *(
-                                (
-                                    package.campaign_elapsed_budget,
-                                    package.campaign_elapsed_reservation_plan,
-                                )
-                                if isinstance(package, ElapsedExperimentPackage)
-                                else ()
-                            ),
-                        )
-                        if record is not None
-                    )
-                available_source_records: tuple[CanonicalRecord, ...] = (
-                    issued_draft,
-                    *standard_records,
-                    *extension_records,
-                    package.issued_study.proposer_attestation,
-                    *package.issued_study.materialization_qualifications,
-                    package.scientific_approval,
-                    package.experiment,
-                    package.execution_authority,
-                    *conditional_instantiations,
-                    *parent_input_bindings,
-                    *((package.model_set,) if package.model_set is not None else ()),
-                )
+                    extension_records = tuple((record for record in (package.issued_study.candidate.authoring_package, package.issued_study.issued_extensions, package.issued_study.extension_validation, package.execution_resource_envelope_spec, package.predevelopment_jit_signature_census, package.jit_graph_signature_manifest, *((package.campaign_elapsed_budget, package.campaign_elapsed_reservation_plan) if isinstance(package, ElapsedExperimentPackage) else ())) if record is not None))
+                available_source_records: tuple[CanonicalRecord, ...] = (issued_draft, *standard_records, *extension_records, package.issued_study.proposer_attestation, *package.issued_study.materialization_qualifications, package.scientific_approval, package.experiment, package.execution_authority, *conditional_instantiations, *parent_input_bindings, *((package.model_set,) if package.model_set is not None else ()))
                 if self._plan_requires_reveal_authority(execution_plan):
-                    reveal_authority = (
-                        None
-                        if isinstance(package, ExperimentPackage)
-                        and reveal_authority_id is None
-                        else self._validate_issued_reveal_authority(
-                            package,
-                            reveal_authority_id=reveal_authority_id,
-                            at_utc=at_utc,
-                        )
-                    )
-                    if (
-                        isinstance(package, ExperimentPackage)
-                        and reveal_authority is None
-                    ):
+                    reveal_authority = None if isinstance(package, ExperimentPackage) and reveal_authority_id is None else self._validate_issued_reveal_authority(package, reveal_authority_id=reveal_authority_id, at_utc=at_utc)
+                    if isinstance(package, ExperimentPackage) and reveal_authority is None:
                         authorized_barriers = ()
                     if reveal_authority is not None:
                         authorized_barriers = (BarrierKind.REVEAL,)
                         if not isinstance(package, ExperimentPackage):
-                            authority_identities = (
-                                *authority_identities,
-                                ObjectIdentity.from_record(
-                                    reveal_authority.authority_id,
-                                    reveal_authority,
-                                ),
-                            )
-                        available_source_records = (
-                            *available_source_records,
-                            reveal_authority,
-                        )
-                resolved_provider = self._resolve_campaign_provider(
-                    package,
-                    authorization_replayed=True,
-                )
+                            authority_identities = (*authority_identities, ObjectIdentity.from_record(reveal_authority.authority_id, reveal_authority))
+                        available_source_records = (*available_source_records, reveal_authority)
+                resolved_provider = self._resolve_campaign_provider(package, authorization_replayed=True, require_persisted_reconstruction=False)
                 provider = resolved_provider.provider
                 if StudyOperationAuthority.SCHEMA in provider.issued_source_schema_ids:
                     authority_store = self.study_authority_store
                     if authority_store is None:
-                        raise CampaignValidationError(
-                            "issued custody-authority replay is not composed"
-                        )
+                        raise CampaignValidationError('issued custody-authority replay is not composed')
                     try:
-                        custody_authority = authority_store.load(
-                            package.issued_study.custody_authority.object_id
-                        )
+                        custody_authority = authority_store.load(package.issued_study.custody_authority.object_id)
                     except Exception as error:
-                        raise CampaignValidationError(
-                            "stored programme custody authority replay failed"
-                        ) from error
-                    if (
-                        ObjectIdentity.from_record(
-                            custody_authority.authority_id,
-                            custody_authority,
-                        )
-                        != package.issued_study.custody_authority
-                    ):
-                        raise CampaignValidationError(
-                            "issued custody-authority store returned a substituted record"
-                        )
-                    available_source_records = (
-                        *available_source_records,
-                        custody_authority,
-                    )
+                        raise CampaignValidationError('stored programme custody authority replay failed') from error
+                    if ObjectIdentity.from_record(custody_authority.authority_id, custody_authority) != package.issued_study.custody_authority:
+                        raise CampaignValidationError('issued custody-authority store returned a substituted record')
+                    available_source_records = (*available_source_records, custody_authority)
                 requested_schemas = set(provider.issued_source_schema_ids)
-                source_records = tuple(
-                    value for value in available_source_records if value.SCHEMA in requested_schemas
-                )
+                source_records = tuple((value for value in available_source_records if value.SCHEMA in requested_schemas))
                 if resolved_provider.reconstruction is not None:
                     source_records = tuple(sorted(source_records, key=lambda value: value.SCHEMA))
-            return self._execute_plan(
-                package=package,
-                source_plan=run_plan,
-                execution_plan=execution_plan,
-                package_name="campaign-package",
-                source_plan_name="run-plan",
-                source_records=source_records,
-                authority_identities=authority_identities,
-                authorized_barriers=authorized_barriers,
-                resolved_provider=resolved_provider,
-                retry_amendment=retry_amendment,
-                source_amendment=source_amendment,
-            )
-        except InjectedSchedulerCrash:
+            return self._execute_plan(package=package, source_plan=run_plan, execution_plan=execution_plan, package_name='campaign-package', source_plan_name='run-plan', source_records=source_records, authority_identities=authority_identities, authorized_barriers=authorized_barriers, resolved_provider=resolved_provider, at_utc=at_utc, reveal_authority_id=reveal_authority_id)
+        except execution_error_types('InjectedSchedulerCrash'):
             raise
+        except NativeParentFinalizationPending as error:
+            raise CampaignParentFinalizationPending(str(error)) from error
+        except NativeEntryRefused as error:
+            raise CampaignNativeEntryRefused(str(error)) from error
         except CampaignExecutionError:
             raise
         except ArtifactIdentityConflict as error:
-            raise CampaignConflictError("immutable artifact identity conflict") from error
-        except (LiveLeaseError, OperationalWriteConflict) as error:
-            raise CampaignConcurrencyError("another execution owns the active operation") from error
-        except SchedulerConsistencyError as error:
-            raise CampaignValidationError(
-                "execution result violated its frozen contract"
-            ) from error
-        except ResourceAdmissionError as error:
-            raise CampaignPrerequisiteError(
-                "frozen execution resources cannot be enforced locally"
-            ) from error
-        except (TaskProcessError, TimeoutError) as error:
-            raise CampaignTaskError("task execution failed") from error
+            if getattr(self, '_retained_e3_control_repair', None) is not None:
+                import logging
+                logging.getLogger(__name__).error('Retained E3 immutable custody refused', exc_info=True)
+            raise CampaignConflictError('immutable artifact identity conflict') from error
+        except (*execution_error_types('LiveLeaseError'), OperationalWriteConflict) as error:
+            raise CampaignConcurrencyError('another execution owns the active operation') from error
+        except execution_error_types('SchedulerConsistencyError') as error:
+            raise CampaignValidationError('execution result violated its frozen contract') from error
+        except execution_error_types('ResourceAdmissionError') as error:
+            raise CampaignPrerequisiteError('frozen execution resources cannot be enforced locally') from error
+        except (*execution_error_types('TaskProcessError'), TimeoutError) as error:
+            raise CampaignTaskError('task execution failed') from error
         except (ArtifactPlaneError, SQLAlchemyError) as error:
-            raise CampaignExecutionError("execution custody or storage boundary failed") from error
+            raise CampaignExecutionError('execution custody or storage boundary failed') from error
         except ValueError as error:
-            raise CampaignCapabilityError(
-                "runtime provider violated its registered contract"
-            ) from error
+            raise CampaignCapabilityError('runtime provider violated its registered contract') from error
         except (OSError, subprocess.SubprocessError) as error:
-            raise CampaignExecutionError("execution custody or storage boundary failed") from error
+            raise CampaignExecutionError('execution custody or storage boundary failed') from error
         except Exception as error:
             raise CampaignInternalError() from error
 
@@ -2396,21 +2133,25 @@ class CampaignExecutionService:
                     ),
                 ),
             )
+        except NativeParentFinalizationPending as error:
+            raise CampaignParentFinalizationPending(str(error)) from error
+        except NativeEntryRefused as error:
+            raise CampaignNativeEntryRefused(str(error)) from error
         except CampaignExecutionError:
             raise
         except ArtifactIdentityConflict as error:
             raise CampaignConflictError("immutable artifact identity conflict") from error
-        except (LiveLeaseError, OperationalWriteConflict) as error:
+        except (*execution_error_types("LiveLeaseError"), OperationalWriteConflict) as error:
             raise CampaignConcurrencyError("another execution owns the active operation") from error
-        except SchedulerConsistencyError as error:
+        except execution_error_types("SchedulerConsistencyError") as error:
             raise CampaignValidationError(
                 "execution result violated its frozen contract"
             ) from error
-        except ResourceAdmissionError as error:
+        except execution_error_types("ResourceAdmissionError") as error:
             raise CampaignPrerequisiteError(
                 "frozen execution resources cannot be enforced locally"
             ) from error
-        except (TaskProcessError, TimeoutError) as error:
+        except (*execution_error_types("TaskProcessError"), TimeoutError) as error:
             raise CampaignTaskError("task execution failed") from error
         except (ArtifactPlaneError, SQLAlchemyError) as error:
             raise CampaignExecutionError("execution custody or storage boundary failed") from error
@@ -2772,8 +2513,10 @@ class CampaignExecutionService:
                 specifications[specification.logical_artifact_id] = specification
         resolved: dict[str, str] = {}
         for logical_artifact_id, specification in sorted(specifications.items()):
-            relative_path = f"runs/{run_id}/inputs/{logical_artifact_id}.bin"
             try:
+                relative_path, _scope_id, _scope_root = _provider_input_location(
+                    self.artifact_plane, run_id, logical_artifact_id
+                )
                 manifest_path = self.artifact_plane.root.resolve(
                     f"{relative_path}.manifest.json",
                     for_write=False,
@@ -2915,29 +2658,126 @@ class CampaignExecutionService:
             )
         return payload
 
-    def _execute_plan(
-        self,
-        *,
-        package: ExecutionPackage,
-        source_plan: CanonicalRecord,
-        execution_plan: ProtocolExecutionPlan,
-        package_name: str,
-        source_plan_name: str,
-        source_records: tuple[CanonicalRecord, ...],
-        authority_identities: tuple[ObjectIdentity, ...],
-        authorized_barriers: tuple[BarrierKind, ...] = (BarrierKind.REVEAL,),
-        resolved_provider: _ResolvedCampaignProvider | None = None,
-        retry_amendment: LeaseExpiryRetryAmendment | None = None,
-        source_amendment: OperationalSourceAmendment | None = None,
-    ) -> RunExecutionSummary:
-        self._check_identity(
-            package,
-            retry_amendment=retry_amendment,
-            source_amendment=source_amendment,
-        )
+    @staticmethod
+    def _worker_preparation_contracts(*, provider, package, execution_plan):
+        """Validate frozen operation/effect/resource bindings without preparation."""
+        try:
+            preparations = validate_worker_preparations(
+                provider.worker_preparations(package.registry, execution_plan),
+                package.registry, execution_plan,
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            raise CampaignCapabilityError("runtime provider worker preparation differs from the selected registry or plan") from error
+        if not preparations:
+            return ()
+        keys = tuple(value.selection.capability_key for value in preparations)
+        if len(set(keys)) != len(keys):
+            raise CampaignCapabilityError("worker preparation cannot merge selected versions of one capability")
+        native_keys = tuple(sorted(value.selection.capability_key for value in preparations if value.native_effect))
+        if any(value.native_effect and value.native_work_preparer is None for value in preparations):
+            raise CampaignCapabilityError("declared native operation lacks its registered worker preparation software")
+        if isinstance(package, ExperimentPackage):
+            by_key = {value.selection.capability_key: value for value in preparations}
+            for task in execution_plan.tasks:
+                preparation = by_key.get(task.capability.capability_key)
+                if preparation is None:
+                    continue
+                try:
+                    cell = package.execution_resource_envelope_spec.cell_for_task(task.task_id)
+                except KeyError as error:
+                    raise CampaignCapabilityError("prepared operation lacks its exact selected resource cell") from error
+                if cell.native_simulator_launch is not preparation.native_effect:
+                    raise CampaignCapabilityError("runtime provider native effect differs from its selected resource cell")
+        if any(task.capability.capability_key in native_keys and task.maximum_attempts != 1
+                for task in execution_plan.tasks):
+            raise CampaignCapabilityError("declared native worker preparation forbids automatic effect retries")
+        return preparations
+
+    def _worker_preparation_arguments(self, *, provider: CampaignRuntimeProvider, package: ExecutionPackage, execution_plan: ProtocolExecutionPlan) -> dict:
+        """Select only the actual provider's code-owned worker requirements."""
+        preparations = self._worker_preparation_contracts(provider=provider, package=package, execution_plan=execution_plan)
+        if not preparations:
+            return {}
+        native_keys = tuple(sorted((value.selection.capability_key for value in preparations if value.native_effect)))
+        from empirical_lawhood.api.recursive_authoring import implementation_binding
+        self._check_identity(package)
+        try:
+            repair_index = getattr(self, '_retained_e3_control_repair', None)
+            binding = (repair_index.repair.worker if repair_index is not None
+                and repair_index.run_id == package.run_plan_id else implementation_binding(self.repo_root))
+            if type(binding) is not RecursiveImplementationBinding:
+                raise ValueError('implementation observation returned another record')
+            binding.__post_init__()
+        except (OSError, PermissionError, RuntimeError, ValueError) as error:
+            raise CampaignIdentityError('worker preparation could not observe its actual selected implementation') from error
+        self._check_identity(package)
+        if (native_keys or self.enforce_git_identity) and binding.observed_git_head != execution_plan.implementation_commit:
+            raise CampaignIdentityError('worker preparation actual implementation commit differs from its selected source')
+        return {'implementation_binding': binding, 'provenance_requirements': {value.selection.capability_key: value.provenance_requirements for value in preparations}, 'native_work_preparers': {value.selection.capability_key: value.native_work_preparer for value in preparations if value.native_work_preparer is not None}, 'worker_environment_selectors': {value.selection.capability_key: value.worker_environment_selector for value in preparations if value.worker_environment_selector is not None}, 'native_effect_capability_keys': native_keys}
+
+
+
+
+
+
+    @staticmethod
+    def _require_no_live_run_lease(repository, run_id):
+        from time import time
+
+        if any(row.disposition.value == "RUNNING"
+                and row.lease_expires_epoch_seconds is not None
+                and row.lease_expires_epoch_seconds > int(time())
+                for row in repository.attempts(run_id)):
+            raise CampaignConcurrencyError("run reconciliation refuses an existing live task lease")
+
+
+
+
+
+    def _new_recovery_store(self, plane, **kwargs):
+        return ExternalRunRecoveryStore(plane, **kwargs)
+
+
+
+
+
+
+
+    def _preserve_worker_source(self, *, package, execution_plan, authority_identities):
+        """Preserve source at the actual experiment entry, once for its run.
+
+            Legacy reference campaign packets and explicitly injected unit services
+            retain their existing test boundary. Current experiment packages have no
+            permissive preservation fallback.
+            """
+        if not self.enforce_git_identity or type(package) not in (ExperimentPackage, ElapsedExperimentPackage, EnvelopeExperimentPackage):
+            return None
+        from empirical_lawhood.infrastructure.run_source_admission import ensure_run_source_entry
+        repair_index = getattr(self, '_retained_e3_control_repair', None)
+        if repair_index is not None and repair_index.run_id == package.run_plan_id:
+            admission = getattr(self, '_retained_e3_controller_admission', None)
+            controller = repair_index.repair.controller if admission is None else admission.controller
+            return ensure_run_source_entry(project_root=self.repo_root, artifact_writer=self.artifact_plane,
+                run_id=repair_index.run_id + '.' + repair_index.repair.repair_id + '.controller.' + controller.observed_git_head[:8],
+                expected_commit=controller.observed_git_head,
+                invocation=('campaign.repair-retained-e3', repair_index.run_id),
+                source_bindings=(repair_index.repair.identity, *((admission.identity,) if admission is not None else ())))
+        expected_commit = execution_plan.implementation_commit
+        bindings = [ObjectIdentity.from_record(package.package_id, package), ObjectIdentity.from_record(execution_plan.execution_plan_id, execution_plan), execution_plan.source_plan, *authority_identities]
+        by_id = {}
+        for identity in bindings:
+            if identity.object_id in by_id and by_id[identity.object_id] != identity:
+                raise CampaignIdentityError('source preservation bindings change an existing identity')
+            by_id[identity.object_id] = identity
+        return ensure_run_source_entry(project_root=self.repo_root, artifact_writer=self.artifact_plane, run_id=execution_plan.source_plan.object_id, expected_commit=expected_commit, invocation=('campaign.execute', execution_plan.source_plan.object_id), source_bindings=tuple((by_id[key] for key in sorted(by_id))))
+
+    def _execute_plan(self, *, package: ExecutionPackage, source_plan: CanonicalRecord, execution_plan: ProtocolExecutionPlan, package_name: str, source_plan_name: str, source_records: tuple[CanonicalRecord, ...], authority_identities: tuple[ObjectIdentity, ...], authorized_barriers: tuple[BarrierKind, ...]=(BarrierKind.REVEAL,), resolved_provider: _ResolvedCampaignProvider | None=None, at_utc: str | None=None, reveal_authority_id: str | None=None) -> RunExecutionSummary:
+        report_progress(phase='execution.setup')
+        self._check_identity(package)
+        self._require_selected_resource_admission(package=package, execution_plan=execution_plan)
         source_plan_id = execution_plan.source_plan.object_id
         if execution_plan.source_plan != ObjectIdentity.from_record(source_plan_id, source_plan):
-            raise CampaignIdentityError("execution plan binds another source plan")
+            raise CampaignIdentityError('execution plan binds another source plan')
         if resolved_provider is None:
             try:
                 provider = self.providers.resolve(execution_plan.registry_sha256)
@@ -2946,113 +2786,82 @@ class CampaignExecutionService:
         else:
             provider = resolved_provider.provider
             if provider.registry_sha256 != execution_plan.registry_sha256:
-                raise CampaignCapabilityError(
-                    "resolved provider differs from the execution-plan registry"
-                )
-        adjudication_contract = provider.scientific_adjudication_contract(
-            package.registry,
-            execution_plan,
-        )
-        adjudication_binding = self._bind_scientific_adjudication(
-            package,
-            execution_plan,
-            adjudication_contract,
-        )
-        output_semantic_contracts = provider.output_semantic_contracts(
-            package.registry,
-            execution_plan,
-        )
-        expected_semantic_keys = tuple(
-            sorted(
-                {
-                    (
-                        task.capability.capability_key,
-                        task.capability.capability_version,
-                        output.payload_schema,
-                        output.profile,
-                    )
-                    for task in execution_plan.tasks
-                    for output in task.outputs
-                },
-                key=str,
-            )
-        )
-        observed_semantic_keys = tuple(contract.key for contract in output_semantic_contracts)
+                raise CampaignCapabilityError('resolved provider differs from the execution-plan registry')
+        worker_preparation_arguments = self._worker_preparation_arguments(provider=provider, package=package, execution_plan=execution_plan)
+        adjudication_contract = provider.scientific_adjudication_contract(package.registry, execution_plan)
+        adjudication_binding = self._bind_scientific_adjudication(package, execution_plan, adjudication_contract)
+        output_semantic_contracts = provider.output_semantic_contracts(package.registry, execution_plan)
+        expected_semantic_keys = tuple(sorted({(task.capability.capability_key, task.capability.capability_version, output.payload_schema, output.profile) for task in execution_plan.tasks for output in task.outputs}, key=str))
+        observed_semantic_keys = tuple((contract.key for contract in output_semantic_contracts))
         if observed_semantic_keys != expected_semantic_keys:
-            raise CampaignCapabilityError(
-                "runtime provider semantic contracts differ from the execution plan"
-            )
-        if any(
-            contract.capability_implementation_sha256
-            != package.registry.resolve(
-                contract.capability_key,
-                contract.capability_version,
-            ).implementation_sha256
-            for contract in output_semantic_contracts
-        ):
-            raise CampaignCapabilityError(
-                "runtime provider semantic validator differs from its registered implementation"
-            )
-        semantic_plane = self._semantic_artifact_plane(
-            execution_plan,
-            output_semantic_contracts,
-        )
+            raise CampaignCapabilityError('runtime provider semantic contracts differ from the execution plan')
+        if any((contract.capability_implementation_sha256 != package.registry.resolve(contract.capability_key, contract.capability_version).implementation_sha256 for contract in output_semantic_contracts)):
+            raise CampaignCapabilityError('runtime provider semantic validator differs from its registered implementation')
+        semantic_plane = self._semantic_artifact_plane(execution_plan, output_semantic_contracts)
         operation_minimum_free_bytes = execution_plan.minimum_free_bytes
-        admission = self.resource_admission(execution_plan)
-        if not admission.admitted:
-            raise ResourceAdmissionError(",".join(admission.reason_codes))
-        self.artifact_plane.root.verify(
-            for_write=True,
-            operation_minimum_free_bytes=operation_minimum_free_bytes,
+        admission = self._require_selected_resource_admission(package=package, execution_plan=execution_plan)
+        self.artifact_plane.root.verify(for_write=True, operation_minimum_free_bytes=operation_minimum_free_bytes)
+        if self.catalog_access is not None:
+            self.catalog_access.verify(for_write=True)
+        from empirical_lawhood.api.current_task_custody import (
+            CurrentIssuedTaskCustody, current_issued_original_input_accesses, current_issued_task_custodies,
+            current_issued_task_control_scope,
         )
-        self._persist_plans(
-            package,
-            source_plan,
-            execution_plan,
-            package_name=package_name,
-            source_plan_name=source_plan_name,
-            minimum_free_bytes=operation_minimum_free_bytes,
-            provider_reconstruction=(
-                None if resolved_provider is None else resolved_provider.reconstruction
-            ),
-        )
+        original_accesses = current_issued_original_input_accesses(self)
+        custody = (CurrentIssuedTaskCustody(writer=semantic_plane,
+            reveal_authority_id=reveal_authority_id, original_input_access=original_accesses)
+            if isinstance(package, ExperimentPackage) else None)
+        original_options = ({} if custody is None or not original_accesses else
+            {"original_input_access": custody})
+        if original_accesses:
+            custody.require_original_input_access()
+        self._persist_plans(package, source_plan, execution_plan, package_name=package_name,
+            source_plan_name=source_plan_name, minimum_free_bytes=operation_minimum_free_bytes,
+            provider_reconstruction=None if resolved_provider is None else resolved_provider.reconstruction,
+            **original_options)
+        if original_accesses:
+            for owner in (custody, *current_issued_task_custodies(self)):
+                if not owner._original_input_accesses:
+                    continue
+                owner.bind_current_run(source_plan_id, package=package, source_plan=source_plan,
+                    execution_plan=execution_plan, package_name=package_name, source_plan_name=source_plan_name,
+                    provider_reconstruction=None if resolved_provider is None else resolved_provider.reconstruction,
+                    require_current_source=self._check_identity)
+            custody.require_original_input_access()
         provider_inputs = provider.external_inputs(execution_plan, source_records)
-        expected_inputs = tuple(
-            sorted(
-                {
-                    artifact_id
-                    for task in execution_plan.tasks
-                    for artifact_id in task.external_input_artifact_ids
-                }
-            )
-        )
-        if tuple(value.logical_artifact_id for value in provider_inputs) != expected_inputs:
+        if custody is not None:
+            custody.require_original_input_access()
+        expected_inputs = tuple(sorted({artifact_id for task in execution_plan.tasks for artifact_id in task.external_input_artifact_ids}))
+        if tuple((value.logical_artifact_id for value in provider_inputs)) != expected_inputs:
             for value in provider_inputs:
                 value.close()
-            raise CampaignCapabilityError("runtime provider input set differs from plan")
-        external_inputs = self._persist_provider_inputs(
-            source_plan_id,
-            provider_inputs,
-            minimum_free_bytes=operation_minimum_free_bytes,
-        )
+            raise CampaignCapabilityError('runtime provider input set differs from plan')
+        repair_index = getattr(self, '_retained_e3_control_repair', None)
+        repair_input_options = ({'retained_repair_plan': execution_plan}
+            if repair_index is not None and repair_index.run_id == source_plan_id else {})
+        external_inputs = self._persist_provider_inputs(source_plan_id, provider_inputs,
+            minimum_free_bytes=operation_minimum_free_bytes, **original_options, **repair_input_options)
+        if original_accesses:
+            seen_custodies = set()
+            for owner in (custody, *current_issued_task_custodies(self)):
+                if id(owner) in seen_custodies or not owner._original_input_accesses:
+                    continue
+                seen_custodies.add(id(owner))
+                owner.bind_provider_inputs(execution_plan=execution_plan,
+                    payloads=provider_inputs, inputs=external_inputs)
         try:
             engine = self.engine_factory()
         except Exception as error:
-            raise CampaignExecutionError("operational catalog is unavailable") from error
-        receipt_store = ExternalTaskReceiptStore(
-            semantic_plane,
-            minimum_free_bytes=operation_minimum_free_bytes,
-        )
-        recovery_index = build_run_recovery_index(
-            execution_plan,
-            run_id=source_plan_id,
-            wave_id=f"wave.{package.package_id}",
-            authority_identities=authority_identities,
-        )
-        recovery_store = ExternalRunRecoveryStore(
-            semantic_plane,
-            minimum_free_bytes=operation_minimum_free_bytes,
-        )
+            raise CampaignExecutionError('operational catalog is unavailable') from error
+        receipt_store = ExternalTaskReceiptStore(semantic_plane, minimum_free_bytes=operation_minimum_free_bytes)
+        recovery_index = build_run_recovery_index(execution_plan, run_id=source_plan_id, wave_id=f'wave.{package.package_id}', authority_identities=authority_identities)
+        repair_index = getattr(self, '_retained_e3_control_repair', None)
+        if repair_index is not None and repair_index.run_id == source_plan_id:
+            if repair_index.original_index != recovery_index:
+                raise CampaignIdentityError('retained E3 repair changes the original recovery authority')
+            repair_index.validate_plan(execution_plan)
+            recovery_index = repair_index
+        recovery_store = self._new_recovery_store(semantic_plane, minimum_free_bytes=operation_minimum_free_bytes)
         execution_envelope_id: str | None = None
         envelope_coordinator: DurableExecutionEnvelopeCoordinator | None = None
         execution_resource_envelope_id: str | None = None
@@ -3061,188 +2870,47 @@ class CampaignExecutionService:
         elapsed_reservation_plan: CampaignElapsedReservationPlan | None = None
         if isinstance(package, EnvelopeExperimentPackage):
             if not isinstance(execution_plan, EnvelopeExecutionPlan):
-                raise CampaignValidationError("EnvelopeExperimentPackage did not compile an execution plan")
+                raise CampaignValidationError('EnvelopeExperimentPackage did not compile an execution plan')
             envelope_coordinator = self.execution_envelope_coordinator
             if envelope_coordinator is None:
-                raise CampaignPrerequisiteError(
-                    "EnvelopeExperimentPackage execution requires a durable execution-envelope store"
-                )
-            execution_envelope_id = f"run-envelope.{source_plan_id}"
-            envelope_coordinator.ensure_initialized(
-                envelope_id=execution_envelope_id,
-                spec=package.execution_envelope_spec,
-                execution_plan=ObjectIdentity.from_record(
-                    execution_plan.execution_plan_id,
-                    execution_plan,
-                ),
-            )
+                raise CampaignPrerequisiteError('EnvelopeExperimentPackage execution requires a durable execution-envelope store')
+            execution_envelope_id = f'run-envelope.{source_plan_id}'
+            envelope_coordinator.ensure_initialized(envelope_id=execution_envelope_id, spec=package.execution_envelope_spec, execution_plan=ObjectIdentity.from_record(execution_plan.execution_plan_id, execution_plan))
         elif isinstance(package, ExperimentPackage):
             if not isinstance(execution_plan, ExecutionPlan):
-                raise CampaignValidationError("ExperimentPackage did not compile an ExecutionPlan")
+                raise CampaignValidationError('ExperimentPackage did not compile an ExecutionPlan')
             resource_envelope_coordinator = self.execution_resource_envelope_coordinator
+            if repair_index is not None and repair_index.run_id == source_plan_id:
+                from .retained_e3_control_repair import repair_resource_coordinator
+                resource_envelope_coordinator = repair_resource_coordinator(writer=semantic_plane,
+                    package=package, plan=execution_plan, index=repair_index)
             if resource_envelope_coordinator is None:
-                raise CampaignPrerequisiteError(
-                    "ExperimentPackage execution requires a durable resource-envelope store"
-                )
-            execution_resource_envelope_id = f"run-resource-envelope.{source_plan_id}"
-            if retry_amendment is None:
-                resource_envelope_coordinator.ensure_initialized(
-                    envelope_id=execution_resource_envelope_id,
-                    spec=package.execution_resource_envelope_spec,
-                    execution_plan=ObjectIdentity.from_record(
-                        execution_plan.execution_plan_id,
-                        execution_plan,
-                    ),
-                    jit_graph_signature_manifest=package.jit_graph_signature_manifest,
-                )
-            else:
-                from empirical_lawhood.infrastructure.retry_amendment import prepare_operational_retry
-                from empirical_lawhood.runtime.recovery import OperationalFailureDiagnostic
-
-                prepared_retry = prepare_operational_retry(
-                    retry_amendment,
-                    plan=execution_plan,
-                    original_index=recovery_index,
-                    original_envelope=resource_envelope_coordinator.load(
-                        execution_resource_envelope_id
-                    ),
-                    recovery_store=recovery_store,
-                    receipt_store=receipt_store,
-                    artifact_plane=semantic_plane,
-                )
-                resource_envelope_coordinator.ensure_checkpoint(
-                    prepared_retry.resource_checkpoint,
-                    jit_graph_signature_manifest=package.jit_graph_signature_manifest,
-                )
-                execution_resource_envelope_id = retry_amendment.envelope_id
-                recovery_index = prepared_retry.index
-                recovery_store.freeze(recovery_index)
-                for event in prepared_retry.retained_failures:
-                    assert event.failure is not None
-                    assert event.attempt_id is not None
-                    recovery_store.record_failure(
-                        recovery_index,
-                        task_id=event.task_id,
-                        attempt_id=event.attempt_id,
-                        reason_code=event.reason_codes[0],
-                        failure=event.failure,
-                    )
-                diagnostic = OperationalFailureDiagnostic.create(
-                    OperationalFailureClass.RECOVERY_OBSTRUCTION,
-                    sanitized_exception_type=None,
-                    sanitized_message="Owner-authorized prior operational failure; no task receipt or output custody",
-                )
-                for task_id in retry_amendment.task_ids:
-                    if any(e.task_id == task_id for e in prepared_retry.retained_failures):
-                        continue
-                    recovery_store.record_failure(
-                        recovery_index,
-                        task_id=task_id,
-                        attempt_id=recovery_index.task(task_id).attempts[0].attempt_id,
-                        reason_code=retry_amendment.failure_reason,
-                        failure=diagnostic,
-                    )
+                raise CampaignPrerequisiteError('ExperimentPackage execution requires a durable resource-envelope store')
+            execution_resource_envelope_id = f'run-resource-envelope.{source_plan_id}'
+            resource_envelope_coordinator.ensure_initialized(envelope_id=execution_resource_envelope_id, spec=package.execution_resource_envelope_spec, execution_plan=ObjectIdentity.from_record(execution_plan.execution_plan_id, execution_plan), jit_graph_signature_manifest=package.jit_graph_signature_manifest)
             if isinstance(package, ElapsedExperimentPackage):
-                elapsed_budget_coordinator = DurableCampaignElapsedBudgetCoordinator(
-                    ExternalCampaignElapsedBudgetStore(
-                        semantic_plane,
-                        minimum_free_bytes=operation_minimum_free_bytes,
-                    ),
-                    budget=package.campaign_elapsed_budget,
-                    ledger_id=(
-                        f"campaign-elapsed-ledger.{package.campaign_elapsed_budget.budget_id}"
-                    ),
-                )
+                elapsed_budget_coordinator = DurableCampaignElapsedBudgetCoordinator(ExternalCampaignElapsedBudgetStore(semantic_plane, minimum_free_bytes=operation_minimum_free_bytes), budget=package.campaign_elapsed_budget, ledger_id=f'campaign-elapsed-ledger.{package.campaign_elapsed_budget.budget_id}')
                 elapsed_reservation_plan = package.campaign_elapsed_reservation_plan
-                if isinstance(retry_amendment, ElapsedClosureRetryAmendment):
-                    from empirical_lawhood.infrastructure.retry_amendment import closure_elapsed_coordinator
-
-                    elapsed_budget_coordinator, _ = closure_elapsed_coordinator(
-                        retry_amendment,
-                        package.campaign_elapsed_budget,
-                        ExternalCampaignElapsedBudgetStore(
-                            semantic_plane, minimum_free_bytes=operation_minimum_free_bytes
-                        ),
-                    )
-                    elapsed_reservation_plan = replace(
-                        elapsed_reservation_plan, budget=elapsed_budget_coordinator.budget_identity
-                    )
-                if retry_amendment is not None:
-                    retry_spec = retry_amendment.resource_spec(
-                        package.execution_resource_envelope_spec
-                    )
-                    elapsed_reservation_plan = replace(
-                        elapsed_reservation_plan,
-                        plan_id=f"elapsed-reservations.{retry_amendment.amendment_id}",
-                        stage_id=retry_amendment.amendment_id,
-                        envelope_binding_id=f"elapsed-binding.{retry_amendment.amendment_id}",
-                        governed_envelope=ObjectIdentity.from_record(
-                            retry_spec.envelope_spec_id, retry_spec
-                        ),
-                    )
         try:
             repository = SQLiteOperationalRepository(engine)
+            assert worker_preparation_arguments is not None
+            self._preserve_worker_source(package=package, execution_plan=execution_plan, authority_identities=authority_identities)
             runners = provider.runners(package.registry, source_records)
-            scheduler = LocalScheduler(
-                operational_repository=repository,
-                artifact_writer=semantic_plane,
-                receipt_store=receipt_store,
-                recovery_index=recovery_index,
-                recovery_store=recovery_store,
-                runner_registry=RunnerRegistry(
-                    runners,
-                    registry_sha256=execution_plan.registry_sha256,
-                ),
-                implementation_commit=execution_plan.implementation_commit,
-                external_input_resolver=_StaticInputResolver(external_inputs),
-                failure_injector=self.failure_injector,
-                executor=self.executor,
-                input_port_factory=semantic_plane,
-                lane=execution_plan.lane,
-                minimum_free_bytes=operation_minimum_free_bytes,
-                output_semantic_contracts=output_semantic_contracts,
-                adjudication_task_id=(
-                    None if adjudication_binding is None else adjudication_binding.task.task_id
-                ),
-                scientific_adjudication_context=(
-                    None if adjudication_binding is None else adjudication_binding.context
-                ),
-                assurance_profile=self.execution_assurance_profile,
-                assurance_codes=admission.assurance_codes,
-                maximum_parallel_tasks=self.maximum_parallel_tasks,
-                parallel_resource_capacity=self.resource_admitter.capacity,
-                execution_envelope_coordinator=envelope_coordinator,
-                execution_envelope_event_store=(
-                    recovery_store if envelope_coordinator is not None else None
-                ),
-                execution_envelope_id=execution_envelope_id,
-                execution_resource_envelope_coordinator=(resource_envelope_coordinator),
-                execution_resource_envelope_id=execution_resource_envelope_id,
-                campaign_elapsed_budget_coordinator=elapsed_budget_coordinator,
-                campaign_elapsed_reservation_plan=elapsed_reservation_plan,
-                jit_graph_signature_manifest=(
-                    package.jit_graph_signature_manifest
-                    if isinstance(package, ExperimentPackage)
-                    else None
-                ),
-                roster_capacity_decisions=(
-                    self.roster_capacity_decisions
-                    if isinstance(package, ExperimentPackage)
-                    else ()
-                ),
-                authorized_barriers=authorized_barriers,
-                retry_amendment=retry_amendment,
-            )
-            result = scheduler.execute(source_plan_id, execution_plan)
+            native_keys = worker_preparation_arguments.get('native_effect_capability_keys', ())
+            if native_keys:
+                native_tasks = tuple((task for task in execution_plan.tasks if task.capability.capability_key in native_keys))
+                worker_preparation_arguments['native_effect_contact_store'] = ExternalNativeEffectContactStore(plane=semantic_plane, execution_plan=ObjectIdentity.from_record(execution_plan.execution_plan_id, execution_plan), visibility_ceiling=VisibilityCeiling.most_restrictive(*(output.visibility_ceiling for task in native_tasks for output in task.outputs)), outcome_access=most_restrictive_outcome_access(*(task.capability.requested_outcome_access for task in native_tasks), *(output.outcome_access for task in native_tasks for output in task.outputs)), minimum_free_bytes=operation_minimum_free_bytes, task_scopes={task.task_id: (VisibilityCeiling.most_restrictive(*(output.visibility_ceiling for output in task.outputs)), most_restrictive_outcome_access(task.capability.requested_outcome_access, *(output.outcome_access for output in task.outputs))) for task in native_tasks})
+            scheduler = LocalScheduler(operational_repository=repository, artifact_writer=semantic_plane, receipt_store=receipt_store, recovery_index=recovery_index, recovery_store=recovery_store, runner_registry=RunnerRegistry(runners, registry_sha256=execution_plan.registry_sha256), implementation_commit=execution_plan.implementation_commit, external_input_resolver=_StaticInputResolver(external_inputs), failure_injector=self.failure_injector, executor=self.executor, input_port_factory=semantic_plane, lane=execution_plan.lane, minimum_free_bytes=operation_minimum_free_bytes, output_semantic_contracts=output_semantic_contracts, adjudication_task_id=None if adjudication_binding is None else adjudication_binding.task.task_id, scientific_adjudication_context=None if adjudication_binding is None else adjudication_binding.context, assurance_profile=self.execution_assurance_profile, assurance_codes=admission.assurance_codes, maximum_parallel_tasks=self.maximum_parallel_tasks, parallel_resource_capacity=self.resource_admitter.capacity, execution_envelope_coordinator=envelope_coordinator, execution_envelope_event_store=recovery_store if envelope_coordinator is not None else None, execution_envelope_id=execution_envelope_id, execution_resource_envelope_coordinator=resource_envelope_coordinator, execution_resource_envelope_id=execution_resource_envelope_id, campaign_elapsed_budget_coordinator=elapsed_budget_coordinator, campaign_elapsed_reservation_plan=elapsed_reservation_plan, jit_graph_signature_manifest=package.jit_graph_signature_manifest if isinstance(package, ExperimentPackage) else None, roster_capacity_decisions=self.roster_capacity_decisions if isinstance(package, ExperimentPackage) else (), authorized_barriers=authorized_barriers, native_entry_guard=None if custody is None else custody.require_native_entry, before_input_member=None if not original_accesses else custody.require_input_member, **worker_preparation_arguments)
+            with ExitStack() as scopes:
+                if repair_index is not None and repair_index.run_id == source_plan_id:
+                    scheduler.repair_worker_environment = repair_index.repair.worker_environment
+                scopes.enter_context(current_issued_task_control_scope(self))
+                if custody is not None:
+                    scopes.enter_context(custody.verification_scope())
+                result = scheduler.execute(source_plan_id, execution_plan)
         finally:
             engine.dispose()
-        return self._summary(
-            result,
-            binding=adjudication_binding,
-            receipt_store=receipt_store,
-            artifact_plane=semantic_plane,
-            resolved_provider=resolved_provider,
-        )
+        return self._summary(result, binding=adjudication_binding, receipt_store=receipt_store, artifact_plane=semantic_plane, resolved_provider=resolved_provider)
 
     def _persist_provider_inputs(
         self,
@@ -3250,20 +2918,66 @@ class CampaignExecutionService:
         values: tuple[ExternalInputPayload, ...],
         *,
         minimum_free_bytes: int,
+        original_input_access=None,
+        retained_repair_plan=None,
     ) -> tuple[VerifiedArtifactInput, ...]:
+        access_guard = (None if original_input_access is None else
+            original_input_access.require_original_input_access)
+        def guarded_chunks(value):
+            access_guard()
+            iterator = iter(value.chunks())
+            access_guard()
+            try:
+                while True:
+                    access_guard()
+                    try:
+                        chunk = next(iterator)
+                    except StopIteration:
+                        return
+                    access_guard()
+                    yield chunk
+            finally:
+                close = getattr(iterator, "close", None)
+                if close is not None:
+                    close()
+
+        repair = getattr(self, '_retained_e3_control_repair', None)
+        frozen_specs = None
+        if retained_repair_plan is not None:
+            from .current_task_custody import _provider_input_specs
+            if (repair is None or repair.run_id != run_id
+                    or repair.execution_plan != ObjectIdentity.from_record(
+                        retained_repair_plan.execution_plan_id, retained_repair_plan)):
+                raise CampaignIdentityError('retained E3 input reuse lacks its exact active repair plan')
+            repair.validate_plan(retained_repair_plan)
+            frozen_specs = _provider_input_specs(retained_repair_plan)
+            from .configured_e3_retained_runtime import retained_e3_input_access_guard
+            retained_guard = retained_e3_input_access_guard(self, run_id)
+            generic_guard = access_guard
+            def access_guard():
+                if generic_guard is not None:
+                    generic_guard()
+                retained_guard()
+        elif repair is not None and repair.run_id == run_id:
+            raise CampaignIdentityError('retained E3 input reuse omits its frozen plan')
         resolved: list[VerifiedArtifactInput] = []
+        report_progress(phase="execution.inputs", done=0, total=len(values))
         try:
             for value in values:
-                result = self.artifact_plane.write_stream(
-                    ArtifactStreamWriteRequest(
+                if access_guard is not None:
+                    access_guard()
+                relative_path, scope_id, scope_root = _provider_input_location(
+                    self.artifact_plane, run_id, value.logical_artifact_id
+                )
+                request = ArtifactStreamWriteRequest(
                         logical_artifact_id=value.logical_artifact_id,
-                        relative_path=(f"runs/{run_id}/inputs/{value.logical_artifact_id}.bin"),
+                        relative_path=relative_path,
                         payload_schema=value.payload_schema,
                         profile=value.profile,
                         media_type=value.media_type,
-                        publication_scope_id=f"campaign-inputs.{run_id}",
-                        publication_scope_relative_root=f"runs/{run_id}/inputs",
-                        chunks=value.chunks(),
+                        publication_scope_id=scope_id,
+                        publication_scope_relative_root=scope_root,
+                        chunks=(value.chunks() if access_guard is None else guarded_chunks(value)),
                         maximum_bytes=value.maximum_bytes,
                         maximum_chunk_bytes=value.maximum_chunk_bytes,
                         expected_size_bytes=value.size_bytes,
@@ -3275,15 +2989,27 @@ class CampaignExecutionService:
                         lineage_parents=value.lineage_parents,
                         minimum_free_bytes=minimum_free_bytes,
                     )
-                )
+                if frozen_specs is None:
+                    result = self.artifact_plane.write_stream(request)
+                else:
+                    from .retained_e3_control_repair import reuse_frozen_provider_input
+                    result = reuse_frozen_provider_input(writer=self.artifact_plane, run_id=run_id,
+                        spec=frozen_specs[value.logical_artifact_id], request=request,
+                        require_access=access_guard)
                 if (
-                    result.materialization.size_bytes != value.size_bytes
+                    result.logical.logical_artifact_id != value.logical_artifact_id
+                    or result.materialization.logical_artifact_id != value.logical_artifact_id
+                    or result.materialization.relative_path != relative_path
+                    or result.materialization.size_bytes != value.size_bytes
                     or result.materialization.physical_sha256 != value.source_sha256
                 ):
                     raise CampaignCapabilityError(
                         "runtime provider input identity changed during persistence"
                     )
+                if access_guard is not None:
+                    access_guard()
                 resolved.append(VerifiedArtifactInput(result.logical, result.materialization))
+                report_progress(phase="execution.inputs", done=len(resolved), total=len(values))
         finally:
             for value in values:
                 value.close()
@@ -3355,326 +3081,138 @@ class CampaignExecutionService:
             observed.checkpoint_relative_path,
         )
 
-    def resume(
-        self,
-        run_id: str,
-        compile_package: Callable[
-            [CampaignExecutionPackage],
-            tuple[ProtocolRunPlan, ProtocolExecutionPlan],
-        ],
-        *,
-        at_utc: str | None = None,
-        reveal_authority_id: str | None = None,
-        conditional_instantiations: tuple[
-            ConditionalChildInstantiation,
-            ...,
-        ] = (),
-        parent_input_bindings: tuple[FrozenParentInputBinding, ...] = (),
-        retry_amendment_path: Path | None = None,
-        retry_authority_id: str | None = None,
-        source_amendment_path: Path | None = None,
-        source_authority_id: str | None = None,
-    ) -> RunExecutionSummary:
+    def _require_reconciliation_package_snapshot(self):
+        read = getattr(self, "_reconciliation_package_read", None)
+        if read is not None:
+            if type(read) is not _ReconciliationPackageRead:
+                raise CampaignIdentityError("reconciliation package reader is not its owned scope")
+            read.require(self)
+        return read
+
+    def _reconciliation_package_read_scope(self, run_id):
+        """Own static package reuse without retaining source or grant verdicts.
+
+        Only the ordinary service and untouched artifact owner use this local
+        optimization. The caller owns the returned invocation copy; the actual
+        API service, custom hooks and unscoped paths retain their old behavior.
+        """
+        from contextlib import contextmanager
+        from copy import copy
+        from empirical_lawhood.infrastructure.artifacts import _has_stock_manifest_reads
+
+        @contextmanager
+        def selected():
+            validate_stable_id(run_id, field_name="run_id")
+            current = self._require_reconciliation_package_snapshot()
+            if current is not None:
+                if current.run_id != run_id:
+                    raise CampaignIdentityError("reconciliation scope names another original run")
+                yield self
+                current.require(self)
+                return
+            if (type(self) is not CampaignExecutionService
+                    or type(self.artifact_plane) is not ExternalArtifactPlane
+                    or "_load_package" in vars(self)
+                    or not _has_stock_manifest_reads(self.artifact_plane)):
+                yield self
+                return
+            with self.artifact_plane.verification_scope() as plane:
+                execution = copy(self)
+                execution.artifact_plane = plane
+                read = _ReconciliationPackageRead(execution, plane, run_id)
+                execution._reconciliation_package_read = read
+                try:
+                    yield execution
+                    read.require(execution)
+                finally:
+                    read.entry = None
+                    read.active = False
+
+        return selected()
+
+    def reconcile_failed_history(self, run_id: str, *, at_utc: str,
+            reveal_authority_id: str | None = None,
+            expected_package: CampaignExecutionPackage | None = None) -> RunHistoryReconciliationSummary:
+        """Rebuild retained failed history without compilation or task dispatch.
+
+        This is an operational custody repair, not an execution or retry grant.
+        Existing scientific authority and protected-output access are replayed;
+        a repaired checkout does not relabel the original attempt source.
+        """
+        validate_stable_id(run_id, field_name="run_id")
+        package = self._load_package(run_id)
+        if type(package) is not ExperimentPackage or (expected_package is not None and package != expected_package):
+            raise CampaignIdentityError("history reconciliation requires its exact retained plain experiment package")
+        plan, index, store = self._load_status_index(run_id, package=package)
+        if (type(plan) is not ExecutionPlan or type(index) is not RunRecoveryIndex
+                or index.wave_id != f"wave.{package.package_id}"
+                or index.implementation_commit != package.implementation_commit):
+            raise CampaignIdentityError("history reconciliation requires its original frozen execution history")
+        self._validate_campaign_authorization(package)
+        # Reconciliation authenticates the stored grant but enters no task or
+        # native effect. Current reveal permission remains required below.
+        self._validate_issued_execution_authority(package, at_utc=None)
+        if self._plan_requires_reveal_authority(plan):
+            self._validate_issued_reveal_authority(package,
+                reveal_authority_id=reveal_authority_id, at_utc=at_utc)
+        self._require_reconciliation_package_snapshot()
+        engine = self.engine_factory()
+        try:
+            repository = SQLiteOperationalRepository(engine)
+            self._require_no_live_run_lease(repository, run_id)
+            terminal = store.reconcile_failed_history(plan=plan, index=index,
+                receipt_store=ExternalTaskReceiptStore(self.artifact_plane), repository=repository,
+                resource_spec=package.execution_resource_envelope_spec,
+                jit_graph_signature_manifest=package.jit_graph_signature_manifest)
+        except (*execution_error_types("LiveLeaseError"), OperationalWriteConflict) as error:
+            raise CampaignConcurrencyError("history reconciliation conflicts with an active execution") from error
+        except (*recovery_error_types(), ArtifactPlaneError, ValueError) as error:
+            raise CampaignIdentityError(f"retained history reconciliation refused: {error}") from error
+        finally:
+            engine.dispose()
+        self._require_reconciliation_package_snapshot()
+        known = {*terminal.completed_task_ids, *terminal.failed_task_ids, *terminal.blocked_task_ids}
+        return RunHistoryReconciliationSummary(run_id, terminal.operational_status,
+            ObjectIdentity.from_record(index.recovery_index_id, index),
+            ObjectIdentity.from_record(terminal.terminal_event_id, terminal), len(plan.tasks),
+            terminal.completed_task_ids, terminal.failed_task_ids, terminal.blocked_task_ids,
+            tuple(sorted(task.task_id for task in plan.tasks if task.task_id not in known)))
+
+    def resume(self, run_id: str, compile_package: Callable[[CampaignExecutionPackage], tuple[ProtocolRunPlan, ProtocolExecutionPlan]], *, at_utc: str | None=None, reveal_authority_id: str | None=None, conditional_instantiations: tuple[ConditionalChildInstantiation, ...]=(), parent_input_bindings: tuple[FrozenParentInputBinding, ...]=()) -> RunExecutionSummary:
         package = self._load_package(run_id)
         run_plan, execution_plan = compile_package(package)
         if run_plan.run_plan_id != run_id:
-            raise CampaignIdentityError("persisted campaign package binds another run")
-        retry_amendment = self._load_retry_amendment(
-            package, retry_amendment_path, retry_authority_id, at_utc=at_utc
-        )
-        source_amendment = self._load_source_amendment(
-            package,
-            execution_plan,
-            source_amendment_path,
-            source_authority_id,
-            at_utc=at_utc,
-        )
-        return self.execute(
-            package=package,
-            run_plan=run_plan,
-            execution_plan=execution_plan,
-            at_utc=at_utc,
-            reveal_authority_id=reveal_authority_id,
-            conditional_instantiations=conditional_instantiations,
-            parent_input_bindings=parent_input_bindings,
-            retry_amendment=retry_amendment,
-            source_amendment=source_amendment,
-        )
+            raise CampaignIdentityError('persisted campaign package binds another run')
+        # Current experiment tasks recheck effect permission after worker Ready.
+        # Other issued carriers retain their decision-time check until their
+        # effect boundary supplies that same fresh permission check.
+        authority_time = None if isinstance(package, ExperimentPackage) else at_utc
+        return self._execute_campaign(package=package, run_plan=run_plan, execution_plan=execution_plan, at_utc=at_utc, execution_authority_at_utc=authority_time, reveal_authority_id=reveal_authority_id, conditional_instantiations=conditional_instantiations, parent_input_bindings=parent_input_bindings)
 
-    def _load_source_amendment(
-        self,
-        package: CampaignExecutionPackage,
-        execution_plan: ProtocolExecutionPlan,
-        path: Path | None,
-        authority_id: str | None,
-        *,
-        at_utc: str | None,
-    ) -> OperationalSourceAmendment | None:
-        if path is None and authority_id is None:
-            return None
-        if (
-            path is None
-            or authority_id is None
-            or not isinstance(package, ExperimentPackage)
-        ):
-            raise CampaignValidationError(
-                "operational source repair requires an exact amendment, authority and ExperimentPackage"
-            )
-        root = self.artifact_plane.root.verify(for_write=False)
-        relative = path.absolute().relative_to(root).as_posix()
-        amendment = decode_canonical_bytes(
-            read_bounded_bytes(
-                self.artifact_plane.root.resolve(relative, for_write=False),
-                maximum_bytes=64 * 1024,
-            ),
-            OperationalSourceAmendment,
-            maximum_bytes=64 * 1024,
-        )
-        store = self.study_authority_store
-        if store is None:
-            raise CampaignValidationError("operational source authority store is not composed")
-        authority = store.load(authority_id)
-        require_study_authority(
-            authority,
-            kind=StudyAuthorityKind.EXPERIMENT_EXECUTION,
-            subject=amendment.identity,
-            prerequisite_authority=package.execution_authority.prerequisite_authority,
-            grantee_id=self.study_execution_grantee_id,
-            at_utc=at_utc,
-        )
-        if (
-            authority.issuer != package.execution_authority.issuer
-            or authority.scope_id != package.execution_authority.scope_id
-            or authority.allows_actuation
-            or amendment.run_id != execution_plan.source_plan.object_id
-            or amendment.execution_plan
-            != ObjectIdentity.from_record(execution_plan.execution_plan_id, execution_plan)
-            or amendment.original_implementation_commit != package.implementation_commit
-        ):
-            raise CampaignValidationError(
-                "operational source amendment changes owner, plan, scope or scientific source"
-            )
-        self._check_identity(package, source_amendment=amendment)
-        return amendment
 
-    def preflight_retry(
-        self,
-        *,
-        package: CampaignExecutionPackage,
-        run_plan: ProtocolRunPlan,
-        execution_plan: ProtocolExecutionPlan,
-        amendment_path: Path | None,
-        authority_id: str | None,
-        at_utc: str,
-    ) -> None:
-        """Prove the exact continuation through the public no-effect resume route."""
-        from empirical_lawhood.infrastructure.retry_amendment import prepare_operational_retry
-        from empirical_lawhood.infrastructure.execution_resource_envelopes import _JournalCheckpoint
-        from empirical_lawhood.runtime.execution_envelope import RunExecutionResourceEnvelope
 
-        amendment = self._load_retry_amendment(package, amendment_path, authority_id, at_utc=at_utc)
-        if amendment is None or not isinstance(package, ExperimentPackage):
-            raise CampaignValidationError("retry preview requires an explicit amendment and an ExperimentPackage or ElapsedExperimentPackage")
-        if not isinstance(package, ElapsedExperimentPackage) and not isinstance(
-            amendment, (ResourcePureTaskRetryAmendment, ChainedResourceRetryAmendment)
-        ):
-            raise CampaignValidationError("ExperimentPackage retry preview requires ResourcePureTaskRetryAmendment or ChainedResourceRetryAmendment")
-        self._validate_campaign_authorization(package)
-        authority = self._validate_issued_execution_authority(package, at_utc=at_utc)
-        self.preexecution_contract_closure(
-            package=package, run_plan=run_plan, execution_plan=execution_plan
-        ).require_pass()
-        provider = self._resolve_campaign_provider(
-            package, authorization_replayed=True, require_persisted_reconstruction=True
-        ).provider
-        runners = RunnerRegistry(
-            provider.runners(package.registry), registry_sha256=package.registry.fingerprint()
-        )
-        for task in execution_plan.tasks:
-            validate_runner_resource_interface(
-                runners.resolve(task),
-                package.execution_resource_envelope_spec.cell_for_task(task.task_id),
-            )
-        self._bind_scientific_adjudication(
-            package,
-            execution_plan,
-            provider.scientific_adjudication_contract(package.registry, execution_plan),
-        )
-        plane = self._semantic_artifact_plane(
-            execution_plan, provider.output_semantic_contracts(package.registry, execution_plan)
-        )
-        plane.root.verify(
-            for_write=False, operation_minimum_free_bytes=execution_plan.minimum_free_bytes
-        )
-        if not self.resource_admission(execution_plan).admitted:
-            raise CampaignPrerequisiteError("retry resources are unavailable")
-        index = build_run_recovery_index(
-            execution_plan,
-            run_id=run_plan.run_plan_id,
-            wave_id=f"wave.{package.package_id}",
-            authority_identities=(
-                ObjectIdentity.from_record(
-                    package.scientific_approval.authorization_id, package.scientific_approval
-                ),
-                ObjectIdentity.from_record(authority.authority_id, authority),
-            ),
-        )
-        coordinator = self.execution_resource_envelope_coordinator
-        if coordinator is None:
-            raise CampaignPrerequisiteError("retry resource journal is not composed")
-        recovery = ExternalRunRecoveryStore(
-            plane, minimum_free_bytes=execution_plan.minimum_free_bytes
-        )
-        receipts = ExternalTaskReceiptStore(
-            plane, minimum_free_bytes=execution_plan.minimum_free_bytes
-        )
-        prepared = prepare_operational_retry(
-            amendment,
-            plan=execution_plan,
-            original_index=index,
-            original_envelope=coordinator.load(f"run-resource-envelope.{run_plan.run_plan_id}"),
-            recovery_store=recovery,
-            receipt_store=receipts,
-            artifact_plane=plane,
-        )
-        index = prepared.prior_index
-        tasks = {task.task_id: task for task in execution_plan.tasks}
-        for task_id in prepared.prior_terminal.completed_task_ids:
-            binding = index.task(task_id)
-            successful = tuple(
-                (attempt, receipt)
-                for attempt in binding.attempts
-                if (receipt := receipts.read(index.run_id, task_id, attempt.attempt_id)) is not None
-            )
-            if len(successful) != 1:
-                raise CampaignValidationError("completed continuation input lacks its receipt")
-            attempt, receipt = successful[0]
-            recovery._validate_receipt_static(index, tasks[task_id], attempt, receipt)
-            for logical, materialization in zip(
-                receipt.output_logical_artifacts, receipt.output_materializations, strict=True
-            ):
-                plane.verify_manifest(
-                    ArtifactManifest(logical=logical, materialization=materialization)
-                )
-        _JournalCheckpoint(prepared.resource_checkpoint, package.jit_graph_signature_manifest)
-        payload = prepared.resource_checkpoint.canonical_bytes()
-        if (
-            decode_canonical_bytes(
-                payload, RunExecutionResourceEnvelope, maximum_bytes=256 * 1024 * 1024
-            )
-            != prepared.resource_checkpoint
-        ):
-            raise CampaignValidationError("full-size retry resource checkpoint differs on decode")
-        from empirical_lawhood.infrastructure.recovery import decode_run_recovery_index
 
-        if decode_run_recovery_index(prepared.index.canonical_bytes()) != prepared.index:
-            raise CampaignValidationError("full-size retry index differs on decode")
-        if not isinstance(package, ElapsedExperimentPackage):
-            return
-        elapsed_coordinator = DurableCampaignElapsedBudgetCoordinator(
-            ExternalCampaignElapsedBudgetStore(
-                plane, minimum_free_bytes=execution_plan.minimum_free_bytes
-            ),
-            budget=package.campaign_elapsed_budget,
-            ledger_id=f"campaign-elapsed-ledger.{package.campaign_elapsed_budget.budget_id}",
-        )
-        if isinstance(amendment, ElapsedClosureRetryAmendment):
-            from empirical_lawhood.infrastructure.retry_amendment import closure_elapsed_coordinator
 
-            elapsed_coordinator, elapsed = closure_elapsed_coordinator(
-                amendment,
-                package.campaign_elapsed_budget,
-                ExternalCampaignElapsedBudgetStore(
-                    plane, minimum_free_bytes=execution_plan.minimum_free_bytes
-                ),
-            )
-        else:
-            elapsed = elapsed_coordinator.current()
-        needed = sum(
-            package.campaign_elapsed_reservation_plan.projected_seconds(t)
-            for t in amendment.task_ids
-            if package.execution_resource_envelope_spec.cell_for_task(t).native_simulator_launch
-        )
-        if (
-            elapsed.open_interval_id is not None
-            or elapsed.exhausted
-            or elapsed.accumulated_active_seconds + needed
-            > elapsed_coordinator.budget.hard_ceiling_seconds
-        ):
-            raise CampaignPrerequisiteError(
-                "retry lacks a closed, sufficient cumulative elapsed budget"
-            )
-
-    def _load_retry_amendment(
-        self,
-        package: CampaignExecutionPackage,
-        path: Path | None,
-        authority_id: str | None,
-        *,
-        at_utc: str | None,
-    ) -> LeaseExpiryRetryAmendment | None:
-        if path is None and authority_id is None:
-            return None
-        if (
-            path is None
-            or authority_id is None
-            or not isinstance(
-                package, (ExperimentPackage, ElapsedExperimentPackage)
-            )
-        ):
-            raise CampaignValidationError(
-                "retry requires an exact amendment, authority and ExperimentPackage or ElapsedExperimentPackage"
-            )
-        root = self.artifact_plane.root.verify(for_write=False)
-        relative = path.absolute().relative_to(root).as_posix()
-        raw = read_bounded_bytes(
-            self.artifact_plane.root.resolve(relative, for_write=False), maximum_bytes=64 * 1024
-        )
-        schema = json.loads(raw).get("schema")
-        record_types: dict[str, type[LeaseExpiryRetryAmendment]] = {
-            LeaseExpiryRetryAmendment.SCHEMA: LeaseExpiryRetryAmendment,
-            DiagnosedPureTaskRetryAmendment.SCHEMA: DiagnosedPureTaskRetryAmendment,
-            ChainedPureTaskRetryAmendment.SCHEMA: ChainedPureTaskRetryAmendment,
-            CompletedRepairRetryAmendment.SCHEMA: CompletedRepairRetryAmendment,
-            ElapsedClosureRetryAmendment.SCHEMA: ElapsedClosureRetryAmendment,
-            ResourcePureTaskRetryAmendment.SCHEMA: ResourcePureTaskRetryAmendment,
-            ChainedResourceRetryAmendment.SCHEMA: ChainedResourceRetryAmendment,
-            RetainedCustodyCompletionAmendment.SCHEMA: RetainedCustodyCompletionAmendment,
-        }
-        record_type = record_types.get(schema)
-        if record_type is None:
-            raise CampaignValidationError("unknown operational retry amendment schema")
-        amendment = decode_canonical_bytes(raw, record_type, maximum_bytes=64 * 1024)
-        store = self.study_authority_store
-        if store is None:
-            raise CampaignValidationError("retry authority store is not composed")
-        authority = store.load(authority_id)
-        require_study_authority(
-            authority,
-            kind=StudyAuthorityKind.EXPERIMENT_EXECUTION,
-            subject=amendment.identity,
-            prerequisite_authority=package.execution_authority.prerequisite_authority,
-            grantee_id=self.study_execution_grantee_id,
-            at_utc=at_utc,
-        )
-        if (
-            authority.issuer != package.execution_authority.issuer
-            or authority.scope_id != package.execution_authority.scope_id
-            or authority.allows_actuation
-            or amendment.original_implementation_commit != package.implementation_commit
-        ):
-            raise CampaignValidationError(
-                "retry amendment changes owner, scope or scientific source"
-            )
-        self._check_identity(package, retry_amendment=amendment)
-        return amendment
 
     def _load_status_execution_plan(self, run_id: str) -> ProtocolExecutionPlan:
-        # Replay the complete typed DAG under the same finite plan envelope as
-        # authoring and semantic recovery. Compact receipts keep their own bound.
+        # The authenticated publication supplies the complete finite body size;
+        # an explicitly selected custody ceiling remains independently binding.
+        from empirical_lawhood.infrastructure.publication_metadata import read_publication_metadata
+
+        relative = f"runs/{run_id}/plans/execution-plan.json"
+        try:
+            manifest = self.artifact_plane.read_manifest(relative)
+            read_publication_metadata(self.artifact_plane, manifest)
+        except (ArtifactPlaneError, BoundedFileIOError, OSError, ValueError) as error:
+            raise CampaignIdentityError("persisted status plan changes its frozen identity") from error
+        maximum = manifest.materialization.size_bytes
+        if (type(maximum) is not int or maximum <= 0
+                or any(self.artifact_plane.custody_limits.exceeds(name, maximum)
+                    for name in ("control_record_bytes", "in_memory_payload_bytes"))):
+            raise CampaignIdentityError("persisted status plan exceeds its selected finite custody allowance")
         payload, expected_sha256, schema = self._verified_rebuild_control_payload(
             logical_artifact_id=f"execution-plan.{run_id}",
-            relative_path=f"runs/{run_id}/plans/execution-plan.json",
+            relative_path=relative,
             payload_schemas=tuple(
                 sorted(
                     {
@@ -3685,9 +3223,9 @@ class CampaignExecutionService:
                     }
                 )
             ),
-            maximum_bytes=MAX_RUNTIME_PLAN_JSON_BYTES,
+            maximum_bytes=maximum,
             budget=_CatalogSemanticReplayBudget(
-                remaining_bytes=MAX_RUNTIME_PLAN_JSON_BYTES + MAX_ARTIFACT_MANIFEST_BYTES,
+                remaining_bytes=maximum + MAX_ARTIFACT_MANIFEST_BYTES,
             ),
         )
         record_type: type[ProtocolExecutionPlan]
@@ -3702,12 +3240,15 @@ class CampaignExecutionService:
         plan = decode_canonical_bytes(
             payload,
             record_type,
-            maximum_bytes=MAX_RUNTIME_PLAN_JSON_BYTES,
+            maximum_bytes=maximum,
         )
         if (
             plan.source_plan.object_id != run_id
+            or expected_sha256 != manifest.logical.content_sha256
+            or schema != manifest.logical.payload_schema
+            or len(payload) != maximum
             or plan.fingerprint() != expected_sha256
-            or plan.canonical_bytes() != payload
+            or not plan.canonical_equals(payload)
         ):
             raise CampaignIdentityError("persisted status plan differs from its identity")
         return plan
@@ -3715,8 +3256,9 @@ class CampaignExecutionService:
     def _load_status_index(
         self,
         run_id: str,
+        *, package: CampaignExecutionPackage | None = None,
     ) -> tuple[ProtocolExecutionPlan, ProtocolRunRecoveryIndex, ExternalRunRecoveryStore]:
-        package = self._load_package(run_id)
+        package = self._load_package(run_id) if package is None else package
         plan = self._load_status_execution_plan(run_id)
         if package.execution_plan_id != plan.execution_plan_id:
             raise CampaignIdentityError("persisted status package binds another execution plan")
@@ -3734,7 +3276,7 @@ class CampaignExecutionService:
         else:
             schema = ProtocolRunRecoveryIndex.SCHEMA
             relative_path = f"{recovery_root}/run-recovery-index.json"
-        store = ExternalRunRecoveryStore(self.artifact_plane)
+        store = self._new_recovery_store(self.artifact_plane)
         index = store.read_index(relative_path, expected_schema=schema)
         if (
             index.run_id != run_id
@@ -3743,7 +3285,12 @@ class CampaignExecutionService:
             or index.implementation_commit != plan.implementation_commit
         ):
             raise CampaignIdentityError("persisted recovery status binds another run version")
+        if type(index) is RunRecoveryIndex:
+            from .retained_e3_control_repair import selected_repair_index
+            index = selected_repair_index(writer=self.artifact_plane, plan=plan, predecessor=index)
         return plan, index, store
+
+
 
     def _load_status_recovery(
         self,
@@ -3782,6 +3329,51 @@ class CampaignExecutionService:
         )
         return None if candidate is None else candidate.event_relative_path
 
+    @staticmethod
+    def _status_recovery_event(store, index, task_id, attempt_id, event_path):
+        if event_path is None:
+            return (None, None)
+        event = store.read_event(index, event_path)
+        return (event, event_path if event is None else store._event_path(index, event))
+
+    def _status_attempt_summary(
+        self, attempt, *, index, task, event, event_path, block_kind,
+        receipt_id, receipt_sha256,
+    ) -> AttemptHistorySummary:
+        """One read-only projection of existing attempt/event/receipt facts."""
+        failure = None if event is None else event.failure
+        fallback_class = (self._blocked_failure_class(attempt.reason_code)
+            if attempt.disposition.value == "BLOCKED" else None)
+        failure_class = failure.failure_class if failure is not None else fallback_class
+        materialization_ids = () if event is None else event.output_materialization_ids
+        adjudication = task is not None and any(
+            output.payload_schema == ScientificAdjudicationRecord.SCHEMA for output in task.outputs)
+        return AttemptHistorySummary(
+            attempt_id=attempt.attempt_id,
+            task_id=attempt.task_id,
+            ordinal=attempt.ordinal,
+            disposition=attempt.disposition.value,
+            reason_code=attempt.reason_code,
+            block_kind=block_kind,
+            implementation_commit=(None if index is None else index.implementation_commit),
+            execution_plan_id=(None if index is None else index.execution_plan.object_id),
+            execution_plan_schema=(None if index is None else index.execution_plan.object_schema),
+            execution_plan_sha256=(None if index is None else index.execution_plan.object_fingerprint),
+            failure_class=(None if failure_class is None else failure_class.value),
+            retryable=(None if failure_class is None else failure_class.retryable),
+            sanitized_exception_type=(None if failure is None else failure.sanitized_exception_type),
+            sanitized_message=(None if failure is None else failure.sanitized_message),
+            diagnostic_sha256=(None if failure is None else failure.diagnostic_sha256),
+            recovery_event_id=(None if event is None else event.event_id),
+            recovery_event_schema=(None if event is None else event.SCHEMA),
+            recovery_event_relative_path=event_path,
+            receipt_id=receipt_id,
+            receipt_relative_path=(None if event is None else event.receipt_relative_path),
+            receipt_sha256=receipt_sha256,
+            artifact_materialization_ids=materialization_ids,
+            adjudication_materialization_ids=(materialization_ids if adjudication else ()),
+        )
+
     def _status_from_recovery(
         self,
         run_id: str,
@@ -3795,9 +3387,8 @@ class CampaignExecutionService:
         rows: list[AttemptHistorySummary] = []
         for terminal_attempt in terminal.attempts:
             event_path = self._candidate_event_path(index, terminal_attempt)
-            event: TaskRecoveryEvent | None = (
-                None if event_path is None else store.read_event(index, event_path)
-            )
+            event, event_path = self._status_recovery_event(store, index, terminal_attempt.task_id,
+                terminal_attempt.attempt_id, event_path)
             if (
                 terminal_attempt.disposition
                 in {
@@ -3807,53 +3398,15 @@ class CampaignExecutionService:
                 and event is None
             ):
                 raise RunRecoveryError("terminal status attempt lacks its current recovery event")
-            failure = None if event is None else event.failure
-            fallback_class = (
-                self._blocked_failure_class(terminal_attempt.reason_code)
-                if terminal_attempt.disposition is RecoveryTerminalDisposition.BLOCKED
-                else None
-            )
-            failure_class = failure.failure_class if failure is not None else fallback_class
-            task = task_by_id[terminal_attempt.task_id]
-            adjudication = any(
-                output.payload_schema == ScientificAdjudicationRecord.SCHEMA
-                for output in task.outputs
-            )
-            materialization_ids = () if event is None else event.output_materialization_ids
-            rows.append(
-                AttemptHistorySummary(
-                    attempt_id=terminal_attempt.attempt_id,
-                    task_id=terminal_attempt.task_id,
-                    ordinal=terminal_attempt.ordinal,
-                    disposition=terminal_attempt.disposition.value,
-                    reason_code=terminal_attempt.reason_code,
-                    block_kind=(
-                        TaskBlockReason(terminal_attempt.reason_code).kind.value
-                        if terminal_attempt.disposition is RecoveryTerminalDisposition.BLOCKED
-                        and terminal_attempt.reason_code is not None
-                        else None
-                    ),
-                    implementation_commit=index.implementation_commit,
-                    execution_plan_id=index.execution_plan.object_id,
-                    execution_plan_schema=index.execution_plan.object_schema,
-                    execution_plan_sha256=index.execution_plan.object_fingerprint,
-                    failure_class=(None if failure_class is None else failure_class.value),
-                    retryable=(None if failure_class is None else failure_class.retryable),
-                    sanitized_exception_type=(
-                        None if failure is None else failure.sanitized_exception_type
-                    ),
-                    sanitized_message=(None if failure is None else failure.sanitized_message),
-                    diagnostic_sha256=(None if failure is None else failure.diagnostic_sha256),
-                    recovery_event_id=(None if event is None else event.event_id),
-                    recovery_event_schema=(None if event is None else event.SCHEMA),
-                    recovery_event_relative_path=event_path,
-                    receipt_id=terminal_attempt.receipt_id,
-                    receipt_relative_path=(None if event is None else event.receipt_relative_path),
-                    receipt_sha256=terminal_attempt.receipt_sha256,
-                    artifact_materialization_ids=materialization_ids,
-                    adjudication_materialization_ids=(materialization_ids if adjudication else ()),
-                )
-            )
+            rows.append(self._status_attempt_summary(
+                terminal_attempt, index=index, task=task_by_id[terminal_attempt.task_id],
+                event=event, event_path=event_path,
+                block_kind=(TaskBlockReason(terminal_attempt.reason_code).kind.value
+                    if terminal_attempt.disposition is RecoveryTerminalDisposition.BLOCKED
+                    and terminal_attempt.reason_code is not None else None),
+                receipt_id=terminal_attempt.receipt_id,
+                receipt_sha256=terminal_attempt.receipt_sha256,
+            ))
         start = 0
         if attempt_history_cursor is not None:
             cursor = _decode_attempt_history_cursor(run_id, attempt_history_cursor)
@@ -3957,7 +3510,7 @@ class CampaignExecutionService:
                 raise KeyError(run_id) from None
         except CampaignValidationError:
             raise
-        except (CampaignIdentityError, RunRecoveryError) as error:
+        except (CampaignIdentityError, *recovery_error_types()) as error:
             raise CampaignExecutionError("operational recovery evidence is obstructed") from error
         engine: Engine | None = None
         history_page = None
@@ -4016,7 +3569,7 @@ class CampaignExecutionService:
             status_plan, status_index, status_store = self._load_status_index(run_id)
         except KeyError:
             pass
-        except (CampaignIdentityError, RunRecoveryError) as error:
+        except (CampaignIdentityError, *recovery_error_types()) as error:
             raise CampaignExecutionError("operational recovery evidence is obstructed") from error
 
         def history_summary(attempt: OperationalAttempt) -> AttemptHistorySummary:
@@ -4031,56 +3584,16 @@ class CampaignExecutionService:
                 )
                 if candidate is not None:
                     event_path = candidate.event_relative_path
-                    event = status_store.read_event(status_index, event_path)
+                    event, event_path = self._status_recovery_event(status_store, status_index,
+                        attempt.task_id, attempt.attempt_id, event_path)
                 task = next(
                     value for value in status_plan.tasks if value.task_id == attempt.task_id
                 )
-            failure = None if event is None else event.failure
-            fallback_class = (
-                self._blocked_failure_class(attempt.reason_code)
-                if attempt.disposition.value == "BLOCKED"
-                else None
-            )
-            failure_class = failure.failure_class if failure is not None else fallback_class
-            materialization_ids = () if event is None else event.output_materialization_ids
-            adjudication = task is not None and any(
-                output.payload_schema == ScientificAdjudicationRecord.SCHEMA
-                for output in task.outputs
-            )
-            return AttemptHistorySummary(
-                attempt_id=attempt.attempt_id,
-                task_id=attempt.task_id,
-                ordinal=attempt.ordinal,
-                disposition=attempt.disposition.value,
-                reason_code=attempt.reason_code,
+            return self._status_attempt_summary(
+                attempt, index=status_index, task=task, event=event, event_path=event_path,
                 block_kind=(None if attempt.block_kind is None else attempt.block_kind.value),
-                implementation_commit=(
-                    None if status_index is None else status_index.implementation_commit
-                ),
-                execution_plan_id=(
-                    None if status_index is None else status_index.execution_plan.object_id
-                ),
-                execution_plan_schema=(
-                    None if status_index is None else status_index.execution_plan.object_schema
-                ),
-                execution_plan_sha256=(
-                    None if status_index is None else status_index.execution_plan.object_fingerprint
-                ),
-                failure_class=(None if failure_class is None else failure_class.value),
-                retryable=(None if failure_class is None else failure_class.retryable),
-                sanitized_exception_type=(
-                    None if failure is None else failure.sanitized_exception_type
-                ),
-                sanitized_message=(None if failure is None else failure.sanitized_message),
-                diagnostic_sha256=(None if failure is None else failure.diagnostic_sha256),
-                recovery_event_id=(None if event is None else event.event_id),
-                recovery_event_schema=(None if event is None else event.SCHEMA),
-                recovery_event_relative_path=event_path,
                 receipt_id=(None if event is None else event.receipt_id),
-                receipt_relative_path=(None if event is None else event.receipt_relative_path),
                 receipt_sha256=(None if event is None else event.receipt_sha256),
-                artifact_materialization_ids=materialization_ids,
-                adjudication_materialization_ids=(materialization_ids if adjudication else ()),
             )
 
         history_summaries = (
@@ -4145,89 +3658,54 @@ class CampaignExecutionService:
             ),
         )
 
-    def _check_identity(
-        self,
-        package: ExecutionPackage,
-        *,
-        retry_amendment: LeaseExpiryRetryAmendment | None = None,
-        source_amendment: OperationalSourceAmendment | None = None,
-    ) -> None:
-        from empirical_lawhood.infrastructure.source_origin import require_executing_target_source
 
+    def _check_identity(self, package: ExecutionPackage) -> str | None:
+        repair_index = getattr(self, '_retained_e3_control_repair', None)
+        if repair_index is not None and repair_index.run_id == package.run_plan_id:
+            from .recursive_authoring import implementation_binding
+            admission = getattr(self, '_retained_e3_controller_admission', None)
+            controller = repair_index.repair.controller if admission is None else admission.controller
+            if (implementation_binding(self.repo_root) != controller
+                    or package.implementation_commit != repair_index.repair.worker.observed_git_head):
+                raise CampaignIdentityError('retained E3 repair substitutes its controller or frozen worker source')
+            return
+        from empirical_lawhood.infrastructure.source_origin import observe_selected_implementation
         try:
-            require_executing_target_source(self.repo_root)
+            package_root, candidate = observe_selected_implementation(self.repo_root)
         except PermissionError as error:
-            raise CampaignIdentityError("executing package does not match target source") from error
-        if retry_amendment is not None and source_amendment is not None:
-            raise CampaignIdentityError("source and retry amendments cannot be combined")
-        if source_amendment is not None:
-            from empirical_lawhood.infrastructure.retry_amendment import verify_operational_repair_source
-
-            verify_operational_repair_source(self.repo_root, source_amendment)
-            return
-        if retry_amendment is not None:
-            from empirical_lawhood.infrastructure.retry_amendment import verify_operational_repair_source
-
-            verify_operational_repair_source(self.repo_root, retry_amendment)
-            return
+            raise CampaignIdentityError('executing package does not match target source') from error
         if not self.enforce_git_identity:
             return
-        if isinstance(
-            package,
-            (
-                IssuedStudyPackage,
-                EnvelopeExperimentPackage,
-                ExperimentPackage,
-            ),
-        ):
-            source_closure = (
-                package.base.issued_study.source_closure
-                if isinstance(
-                    package,
-                    (EnvelopeExperimentPackage, ExperimentPackage),
-                )
-                else package.issued_study.source_closure
-            )
+        if isinstance(package, (IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage)):
+            source_closure = package.base.issued_study.source_closure if isinstance(package, (EnvelopeExperimentPackage, ExperimentPackage)) else package.issued_study.source_closure
             if source_closure.kind is SourceClosureKind.EXACT_SOURCE_CLOSURE:
                 inspector = self.study_source_closure_inspector
                 if inspector is None:
-                    raise CampaignIdentityError(
-                        "exact-source execution lacks its composed source inspector"
-                    )
+                    raise CampaignIdentityError('exact-source execution lacks its composed source inspector')
                 try:
                     observed = inspector.observe(source_closure)
                 except (OSError, PermissionError, RuntimeError, ValueError) as error:
-                    raise CampaignIdentityError(
-                        "exact-source execution identity inspection failed"
-                    ) from error
+                    raise CampaignIdentityError('exact-source execution identity inspection failed') from error
                 if observed != source_closure:
-                    raise CampaignIdentityError("exact-source execution identity changed")
+                    raise CampaignIdentityError('exact-source execution identity changed')
                 return
+        if package_root != self.repo_root / "src/empirical_lawhood":
+            if candidate is None or candidate.implementation_commit != package.implementation_commit:
+                raise CampaignIdentityError('campaign implementation differs from the installed candidate')
+            return
         try:
-            commit_result = run_bounded_command(
-                ["git", "rev-parse", "HEAD"],
-                cwd=self.repo_root,
-                timeout_seconds=5,
-                maximum_stdout_bytes=4096,
-                maximum_stderr_bytes=16 * 1024,
-            )
-            dirty_result = run_bounded_command(
-                ["git", "status", "--porcelain"],
-                cwd=self.repo_root,
-                timeout_seconds=10,
-                maximum_stdout_bytes=1024 * 1024,
-                maximum_stderr_bytes=16 * 1024,
-            )
+            commit_result = run_bounded_command(['git', 'rev-parse', 'HEAD'], cwd=self.repo_root, timeout_seconds=5, maximum_stdout_bytes=4096, maximum_stderr_bytes=16 * 1024)
+            dirty_result = run_bounded_command(['git', 'status', '--porcelain'], cwd=self.repo_root, timeout_seconds=10, maximum_stdout_bytes=1024 * 1024, maximum_stderr_bytes=16 * 1024)
             if commit_result.returncode != 0 or dirty_result.returncode != 0:
-                raise BoundedProcessError("Git identity inspection failed")
-            commit = commit_result.stdout.decode("utf-8").strip()
-            dirty = dirty_result.stdout.decode("utf-8").strip()
+                raise BoundedProcessError('Git identity inspection failed')
+            commit = commit_result.stdout.decode('utf-8').strip()
+            dirty = dirty_result.stdout.decode('utf-8').strip()
         except (BoundedProcessError, UnicodeDecodeError) as error:
-            raise CampaignIdentityError("Git identity inspection failed closed") from error
+            raise CampaignIdentityError('Git identity inspection failed closed') from error
         if dirty:
-            raise CampaignIdentityError("campaign execution requires a clean worktree")
+            raise CampaignIdentityError('campaign execution requires a clean worktree')
         if commit != package.implementation_commit:
-            raise CampaignIdentityError("campaign implementation commit differs")
+            raise CampaignIdentityError('campaign implementation commit differs')
 
     def _persist_plans(
         self,
@@ -4239,15 +3717,29 @@ class CampaignExecutionService:
         source_plan_name: str,
         minimum_free_bytes: int,
         provider_reconstruction: ExecutableProviderReconstructionReceipt | None = None,
+        original_input_access=None,
     ) -> None:
-        for plan in (source_plan, execution_plan):
+        def require_original():
+            if original_input_access is not None:
+                original_input_access.require_original_input_access()
+
+        def guarded_chunks(payload, maximum_chunk_bytes):
+            for offset in range(0, len(payload), maximum_chunk_bytes):
+                require_original()
+                yield payload[offset:offset + maximum_chunk_bytes]
+                require_original()
+
+        require_original()
+        report_progress(phase="execution.plan-validation", done=0, total=2)
+        for completed, plan in enumerate((source_plan, execution_plan), start=1):
             if (
                 isinstance(plan, (ProtocolRunPlan, ProtocolExecutionPlan))
-                and len(plan.canonical_bytes()) > MAX_RUNTIME_PLAN_JSON_BYTES
+                and plan.canonical_size_bytes() > MAX_RUNTIME_PLAN_JSON_BYTES
             ):
                 raise CampaignValidationError(
                     "runtime plan exceeds its finite serialized byte envelope"
                 )
+            report_progress(phase="execution.plan-validation", done=completed, total=2)
         run_id = execution_plan.source_plan.object_id
         package_parents = self._package_lineage_parents(package)
         package_visibility = VisibilityCeiling.most_restrictive(
@@ -4308,8 +3800,11 @@ class CampaignExecutionService:
                 else ()
             ),
         )
-        for name, value, parents in values:
+        report_progress(phase="execution.plan-publication", done=0, total=len(values))
+        for completed, (name, value, parents) in enumerate(values, start=1):
+            require_original()
             payload = value.canonical_bytes()
+            require_original()
             maximum_chunk_bytes = min(1024 * 1024, len(payload))
             self.artifact_plane.write_stream(
                 ArtifactStreamWriteRequest(
@@ -4320,10 +3815,10 @@ class CampaignExecutionService:
                     media_type="application/json",
                     publication_scope_id=f"campaign-plans.{run_id}",
                     publication_scope_relative_root=f"runs/{run_id}/plans",
-                    chunks=(
+                    chunks=(guarded_chunks(payload, maximum_chunk_bytes) if original_input_access is not None else (
                         payload[offset : offset + maximum_chunk_bytes]
                         for offset in range(0, len(payload), maximum_chunk_bytes)
-                    ),
+                    )),
                     maximum_bytes=len(payload),
                     maximum_chunk_bytes=maximum_chunk_bytes,
                     expected_size_bytes=len(payload),
@@ -4340,6 +3835,8 @@ class CampaignExecutionService:
                     minimum_free_bytes=minimum_free_bytes,
                 )
             )
+            require_original()
+            report_progress(phase="execution.plan-publication", done=completed, total=len(values))
 
     @staticmethod
     def _record_id(value: CanonicalRecord) -> str:
@@ -4481,6 +3978,9 @@ class CampaignExecutionService:
         return self._load_package(run_id)
 
     def _load_package(self, run_id: str) -> CampaignExecutionPackage:
+        read = self._require_reconciliation_package_snapshot()
+        if read is not None and read.run_id != run_id:
+            raise CampaignIdentityError("reconciliation package reader changes its original run")
         relative = f"runs/{run_id}/plans/campaign-package.json"
         path = self.artifact_plane.root.resolve(relative, for_write=False)
         manifest = self.artifact_plane.root.resolve(f"{relative}.manifest.json", for_write=False)
@@ -4517,6 +4017,14 @@ class CampaignExecutionService:
                 "persisted campaign manifest violates its bounded package contract"
             )
         self.artifact_plane.verify_manifest(manifest_record)
+        if read is not None:
+            from empirical_lawhood.kernel.decoding import decimal_context_key
+            read.require(self)
+            entry = read.entry
+            if (entry is not None and entry[0] == manifest_record
+                    and entry[1] == decimal_context_key()):
+                read.require(self)
+                return entry[2]
         try:
             payload = read_bounded_bytes(path, maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES)
         except (BoundedFileIOError, OSError) as error:
@@ -4545,10 +4053,14 @@ class CampaignExecutionService:
             raise CampaignIdentityError(
                 "persisted campaign package schema differs from its manifest"
             )
-        if value.canonical_bytes() != payload:
+        if not value.canonical_equals(payload):
             raise CampaignIdentityError("persisted campaign package bytes are not canonical")
         if manifest_record.logical.content_sha256 != value.fingerprint():
             raise CampaignIdentityError("persisted campaign package identity differs")
+        if read is not None:
+            read.require(self)
+            if type(value) is ExperimentPackage and value._is_cacheable():
+                read.entry = (manifest_record, decimal_context_key(), value)
         return value
 
     def _validate_campaign_authorization(
@@ -4932,42 +4444,5 @@ class CampaignExecutionService:
         )
 
     @staticmethod
-    def _not_adjudicated(
-        result: SchedulerResult,
-        reason_code: str,
-        *,
-        resolved_provider: _ResolvedCampaignProvider | None = None,
-    ) -> RunExecutionSummary:
-        return RunExecutionSummary(
-            run_id=result.run_id,
-            operational_status=result.status.value,
-            completed_task_ids=result.completed_task_ids,
-            failed_task_ids=result.failed_task_ids,
-            blocked_task_ids=result.blocked_task_ids,
-            receipt_ids=result.receipt_ids,
-            adjudication_state=AdjudicationReadoutState.NOT_ADJUDICATED,
-            adjudication_evaluability=AdjudicationEvaluability.UNEVALUABLE,
-            scientific_status=None,
-            admission_status=None,
-            scientific_reason_codes=(reason_code,),
-            provider_reconstruction_receipt_id=(
-                None
-                if resolved_provider is None or resolved_provider.reconstruction is None
-                else resolved_provider.reconstruction.receipt_id
-            ),
-            provider_reconstruction_receipt_fingerprint=(
-                None
-                if resolved_provider is None or resolved_provider.reconstruction is None
-                else resolved_provider.reconstruction.fingerprint()
-            ),
-            provider_recovery_receipt_id=(
-                None
-                if resolved_provider is None or resolved_provider.recovery is None
-                else resolved_provider.recovery.receipt_id
-            ),
-            provider_recovery_receipt_fingerprint=(
-                None
-                if resolved_provider is None or resolved_provider.recovery is None
-                else resolved_provider.recovery.fingerprint()
-            ),
-        )
+    def _not_adjudicated(result: SchedulerResult, reason_code: str, *, resolved_provider: _ResolvedCampaignProvider | None=None) -> RunExecutionSummary:
+        return RunExecutionSummary(run_id=result.run_id, operational_status=result.status.value, completed_task_ids=result.completed_task_ids, failed_task_ids=result.failed_task_ids, blocked_task_ids=result.blocked_task_ids, receipt_ids=result.receipt_ids, adjudication_state=AdjudicationReadoutState.NOT_ADJUDICATED, adjudication_evaluability=AdjudicationEvaluability.UNEVALUABLE, scientific_status=None, admission_status=None, scientific_reason_codes=(reason_code,), provider_reconstruction_receipt_id=None if resolved_provider is None or resolved_provider.reconstruction is None else resolved_provider.reconstruction.receipt_id, provider_reconstruction_receipt_fingerprint=None if resolved_provider is None or resolved_provider.reconstruction is None else resolved_provider.reconstruction.fingerprint(), provider_recovery_receipt_id=None if resolved_provider is None or resolved_provider.recovery is None else resolved_provider.recovery.receipt_id, provider_recovery_receipt_fingerprint=None if resolved_provider is None or resolved_provider.recovery is None else resolved_provider.recovery.fingerprint())

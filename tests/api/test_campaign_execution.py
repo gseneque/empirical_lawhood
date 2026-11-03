@@ -559,8 +559,9 @@ def test_public_service_consumes_provider_input_as_a_bounded_stream(
     assert max(source.requested_chunk_bounds) <= 1024 * 1024
     assert source.maximum_yielded_chunk <= 7
     assert source.closed
+    input_token = hashlib.sha256(b'config-artifact.reference.develop-a').hexdigest()
     assert external.joinpath(
-        'runs/synthetic-reference-run-plan/inputs/config-artifact.reference.develop-a.bin'
+        f'runs/synthetic-reference-run-plan/inputs/{input_token[:2]}/{input_token}.bin'
     ).is_file()
 
 
@@ -769,20 +770,20 @@ def test_doctor_and_write_preview_report_injected_storage_facts(tmp_path: Path) 
     preview = api.run_campaign(RunCampaignRequest(PACKAGE))
     assert preview.payload is not None
     assert preview.payload.observed_free_bytes == 100_000_000
-    assert preview.payload.effective_write_floor_bytes == 8000
+    assert preview.payload.effective_write_floor_bytes == 1
     assert preview.payload.storage_write_ready
     assert preview.payload.storage_reason_codes == ()
     assert not external.joinpath("runs").exists()
 
 
-def test_campaign_plan_output_allocation_is_an_enforced_write_floor(
+def test_campaign_retains_the_selected_operator_write_floor(
     tmp_path: Path,
 ) -> None:
-    api, external, catalog = _api(tmp_path, free_bytes=7_999)
+    api, external, catalog = _api(tmp_path, free_bytes=0)
 
     preview = api.run_campaign(RunCampaignRequest(PACKAGE))
     assert preview.payload is not None
-    assert preview.payload.effective_write_floor_bytes == 8_000
+    assert preview.payload.effective_write_floor_bytes == 1
     assert not preview.payload.storage_write_ready
     assert preview.payload.storage_reason_codes == ("EXTERNAL_FREE_SPACE_BELOW_FLOOR",)
 
@@ -1312,6 +1313,24 @@ def test_unexpected_execution_error_is_redacted_in_public_envelope(tmp_path: Pat
     assert not catalog.exists()
 
 
+@pytest.mark.parametrize("reason", ("NATIVE_PARENT_FINALIZATION_PENDING", "NATIVE_ENTRY_REFUSED"))
+def test_native_prerequisite_is_blocked_without_a_completion_summary(reason) -> None:
+    from empirical_lawhood.api.execution import CampaignNativeEntryRefused, CampaignParentFinalizationPending
+    from empirical_lawhood.api.facade import EmpiricalLawhoodApi
+
+    result = EmpiricalLawhoodApi._execution_error(
+        "campaign-run",
+        (CampaignParentFinalizationPending("known native return; parent publication pending")
+            if reason == "NATIVE_PARENT_FINALIZATION_PENDING" else
+            CampaignNativeEntryRefused("current native-entry permission refused")),
+    )
+
+    assert result.status.value == "BLOCKED"
+    assert result.reason_codes == (reason,)
+    assert tuple(error.reason_code for error in result.errors) == result.reason_codes
+    assert result.payload is None
+
+
 def test_unexpected_status_error_is_redacted_in_public_envelope(tmp_path: Path) -> None:
     api, _external, catalog = _api(tmp_path)
     service = api._execution_service
@@ -1452,9 +1471,14 @@ def test_terminal_operational_failure_classes_are_never_retryable() -> None:
         RunRecoveryError("recovery obstruction"),
         failure_class=OperationalFailureClass.RECOVERY_OBSTRUCTION,
     )
+    native_failed = operational_failure_diagnostic(
+        RuntimeError("disclosed completed native failure"),
+        failure_class=OperationalFailureClass.NATIVE_RETURN_FAILURE,
+    )
 
     assert not exhausted.retryable
     assert not obstructed.retryable
+    assert not native_failed.retryable
     assert set(OperationalFailureClass) == {
         OperationalFailureClass.CONTRACT_REFUSAL,
         OperationalFailureClass.RESOURCE_REFUSAL,
@@ -1463,6 +1487,7 @@ def test_terminal_operational_failure_classes_are_never_retryable() -> None:
         OperationalFailureClass.TRANSIENT_INFRASTRUCTURE_FAILURE,
         OperationalFailureClass.RETRY_EXHAUSTION,
         OperationalFailureClass.RECOVERY_OBSTRUCTION,
+        OperationalFailureClass.NATIVE_RETURN_FAILURE,
     }
 
 

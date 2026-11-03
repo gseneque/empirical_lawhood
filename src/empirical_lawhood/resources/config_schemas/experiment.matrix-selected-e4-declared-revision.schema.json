@@ -1,0 +1,642 @@
+{
+  "$defs": {
+    "E4MatchedRelationSelection_85981b1bd6a4": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-selected-e4/matched-relation-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "feature_rule": {
+              "description": "feature rule; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "fold_count": {
+              "description": "fold count; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "loss": {
+              "description": "loss; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "maximum_fit_calls_per_arm": {
+              "description": "maximum fit calls per arm; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "minimum_complete_groups": {
+              "description": "minimum complete groups; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "minimum_complete_per_family": {
+              "description": "minimum complete per family; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "minimum_family_per_fold": {
+              "description": "minimum family per fold; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "missing_policy": {
+              "description": "missing policy; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "nominal_coupling": {
+              "additionalProperties": false,
+              "description": "nominal coupling; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "nominal_friction": {
+              "additionalProperties": false,
+              "description": "nominal friction; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "nominal_temperature": {
+              "additionalProperties": false,
+              "description": "nominal temperature; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "penalties": {
+              "description": "penalties; constructor checks semantics and units.",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "decimal": {
+                    "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "decimal"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "reference_family": {
+              "description": "reference family; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "target": {
+              "description": "target; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "target_discrepancy_tolerance": {
+              "additionalProperties": false,
+              "description": "target discrepancy tolerance; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "record_id",
+            "nominal_temperature",
+            "nominal_friction",
+            "nominal_coupling",
+            "reference_family",
+            "feature_rule",
+            "target",
+            "minimum_complete_groups",
+            "minimum_complete_per_family",
+            "minimum_family_per_fold",
+            "fold_count",
+            "maximum_fit_calls_per_arm",
+            "penalties",
+            "target_discrepancy_tolerance",
+            "loss",
+            "missing_policy"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "E4MatchedRelationTarget_98b0fee2be05": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-selected-e4/matched-relation-target"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "criterion": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "criterion; constructor checks semantics and units."
+            },
+            "definition": {
+              "description": "definition; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "horizon_ticks": {
+              "description": "horizon ticks; constructor checks semantics and units.",
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "numerical_views": {
+              "description": "numerical views; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "target_id": {
+              "description": "target id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "target_id",
+            "criterion",
+            "horizon_ticks",
+            "numerical_views",
+            "definition"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RevisionCandidateSelection_31e93aab59f9": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-scheduled-programme/revision-candidate-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "candidate_id": {
+              "description": "candidate id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "tuning": {
+              "$ref": "#/$defs/ScheduledRevisionTuning_ffddd9ca69a6",
+              "description": "tuning; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "candidate_id",
+            "tuning"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ScheduledRevisionTarget_b24945022154": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-scheduled-programme/revision-target"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "criterion": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "criterion; constructor checks semantics and units."
+            },
+            "definition": {
+              "description": "definition; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "horizon_ticks": {
+              "description": "horizon ticks; constructor checks semantics and units.",
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "numerical_views": {
+              "description": "numerical views; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "target_id": {
+              "description": "target id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "target_id",
+            "criterion",
+            "horizon_ticks",
+            "numerical_views",
+            "definition"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ScheduledRevisionTrigger_bc7cb89634a1": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-scheduled-programme/revision-trigger"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "comparison": {
+              "description": "comparison; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "metric": {
+              "description": "metric; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "threshold": {
+              "additionalProperties": false,
+              "description": "threshold; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "trigger_id": {
+              "description": "trigger id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "trigger_id",
+            "metric",
+            "comparison",
+            "threshold"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ScheduledRevisionTuning_ffddd9ca69a6": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-scheduled-programme/revision-tuning"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "family_id": {
+              "description": "family id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "feature_names": {
+              "description": "feature names; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "maximum_coefficients_per_endpoint": {
+              "description": "maximum coefficients per endpoint; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "penalize_intercept": {
+              "description": "penalize intercept; constructor checks semantics and units.",
+              "type": "boolean"
+            },
+            "penalty": {
+              "additionalProperties": false,
+              "description": "penalty; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "tuning_id": {
+              "description": "tuning id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "tuning_id",
+            "family_id",
+            "feature_names",
+            "penalty",
+            "penalize_intercept",
+            "maximum_coefficients_per_endpoint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "SelectedE4RevisionExperimentSpecification_e99de340a2f0": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-selected-e4/revision-experiment-specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "baseline_candidates": {
+              "description": "baseline candidates; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/RevisionCandidateSelection_31e93aab59f9"
+              },
+              "type": "array"
+            },
+            "baseline_tie_order": {
+              "description": "baseline tie order; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "fold_count": {
+              "description": "fold count; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "folds": {
+              "description": "folds; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/WholeUnitFold_69bdf93b4500"
+              },
+              "type": "array"
+            },
+            "matched_selection": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/E4MatchedRelationSelection_85981b1bd6a4"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "matched selection; constructor checks semantics and units."
+            },
+            "maximum_fit_calls": {
+              "description": "maximum fit calls; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "programme": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "programme; constructor checks semantics and units."
+            },
+            "revision_candidates": {
+              "description": "revision candidates; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/RevisionCandidateSelection_31e93aab59f9"
+              },
+              "type": "array"
+            },
+            "revision_tie_order": {
+              "description": "revision tie order; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "target": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ScheduledRevisionTarget_b24945022154"
+                },
+                {
+                  "$ref": "#/$defs/E4MatchedRelationTarget_98b0fee2be05"
+                }
+              ],
+              "description": "target; constructor checks semantics and units."
+            },
+            "trigger": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ScheduledRevisionTrigger_bc7cb89634a1"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "trigger; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "specification_id",
+            "programme",
+            "target",
+            "trigger",
+            "folds",
+            "fold_count",
+            "maximum_fit_calls",
+            "revision_candidates",
+            "baseline_candidates",
+            "revision_tie_order",
+            "baseline_tie_order",
+            "matched_selection"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "2.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "WholeUnitFold_69bdf93b4500": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/experimental-selection/whole-unit-fold"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "fold": {
+              "description": "fold; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "unit_id": {
+              "description": "unit id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "unit_id",
+            "fold"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:experiment.matrix-selected-e4-declared-revision",
+  "$ref": "#/$defs/SelectedE4RevisionExperimentSpecification_e99de340a2f0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Experiment.Matrix Selected E4 Declared Revision",
+  "x-consumer": "experiment.matrix-selected-e4-declared-revision",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

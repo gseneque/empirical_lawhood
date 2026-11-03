@@ -37,9 +37,6 @@ from .capabilities import (
 from .datasets import DatasetCapabilityRegistry
 
 
-MAX_EXTENSION_BUNDLE_MEMBERS = 1024
-
-
 class ExtensionBundleAggregation(StrEnum):
     MANUAL_PILOT = "MANUAL_PILOT"
     GENERATED_RELEASE = "GENERATED_RELEASE"
@@ -272,8 +269,6 @@ class ExtensionBundle(CanonicalRecord):
             *self.runtime_providers,
             *self.study_authors,
         )
-        if len(all_identities) > MAX_EXTENSION_BUNDLE_MEMBERS:
-            raise ValueError("extension bundle exceeds its member-count bound")
         exact = {
             (
                 value.object_id,

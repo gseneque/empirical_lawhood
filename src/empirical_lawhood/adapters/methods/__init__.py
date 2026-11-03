@@ -1,68 +1,73 @@
 """Registered substrate-neutral response-law method capabilities."""
 
-from .baselines import (
-    LocalLinearIdentifier,
-    LocalStateSpaceIdentifier,
-    NonlinearLocalIdentifier,
-    baseline_law_identifiers,
-)
-from .contracts import (
-    CandidateFit,
-    DataSplit,
-    IdentificationDataset,
-    LawIdentificationConfig,
-    LawObservation,
-    ModelCoefficient,
-    ObservationRole,
-    OneFactorExchange,
-    ParametricLawModel,
-    PredictionRecord,
-    ReceiverCriterion,
-    ResponseSlopeTolerance,
-    StructuralCoefficientTolerance,
-)
-from .identification import LawIdentificationService
-from .formal_analysis import (
-    FORMAL_DOMAIN_CAPABILITY_KEYS,
-    FORMAL_METHOD_VERSION,
-    FORMAL_PANEL_CAPABILITY_KEY,
-    assemble_formal_gap_panel,
-    formal_method_capability_manifests,
-    run_formal_domain_analysis,
-    standard_formal_method_catalog,
-)
-from .formal_protocol import (
-    add_standard_formal_analysis,
-    formal_gap_obligation_id,
-)
-from .odd_jacobian import (
-    ODD_RELATIONAL_JACOBIAN_METHOD_KEY,
-    ODD_RELATIONAL_JACOBIAN_METHOD_VERSION,
-    OddJacobianActionCoordinate,
-    OddJacobianBranchObservation,
-    OddJacobianCoefficient,
-    OddJacobianCoordinate,
-    OddJacobianDataset,
-    OddJacobianFit,
-    OddJacobianModel,
-    OddJacobianModelKind,
-    OddJacobianReceiverCoordinate,
-    OddRelationalJacobianConfig,
-    fit_odd_relational_jacobian,
-    odd_jacobian_triplet_arrays,
-    predict_odd_jacobian_slope,
-    predict_odd_response,
-)
-from .registry import THERMODYNAMIC_RESPONSE_ANALYSIS_KEY, THERMODYNAMIC_RESPONSE_EVALUATOR_KEY, THERMODYNAMIC_RESPONSE_POSTHOC_ANALYSIS_KEY, THERMODYNAMIC_RESPONSE_TRANSPORT_KEY, law_method_manifests, law_method_registry, odd_relational_jacobian_manifest, odd_relational_jacobian_registry, response_method_capability_manifests, response_method_capability_registry, thermodynamic_response_capability_manifests, thermodynamic_response_capability_registry, thermodynamic_response_posthoc_analysis_manifest, thermodynamic_response_posthoc_analysis_registry
-from .recurrence_qualification import RecurrenceGuardedResponseLawQualificationService
-from .transport import (
-    DirectionalDiscrepancyEstimator,
-    DirectionalTransportAssessment,
-    DirectionalTransportDataset,
-    DiscrepancyEstimatorConfig,
-    PairedTransportObservation,
-    TransportCriterion,
-)
+from importlib import import_module
+
+_EXPORTS = {
+    'CandidateFit': ('.contracts', 'CandidateFit'),
+    'DataSplit': ('.contracts', 'DataSplit'),
+    'DirectionalDiscrepancyEstimator': ('.transport', 'DirectionalDiscrepancyEstimator'),
+    'DirectionalTransportAssessment': ('.transport', 'DirectionalTransportAssessment'),
+    'DirectionalTransportDataset': ('.transport', 'DirectionalTransportDataset'),
+    'DiscrepancyEstimatorConfig': ('.transport', 'DiscrepancyEstimatorConfig'),
+    'FORMAL_DOMAIN_CAPABILITY_KEYS': ('.formal_analysis', 'FORMAL_DOMAIN_CAPABILITY_KEYS'),
+    'FORMAL_METHOD_VERSION': ('.formal_analysis', 'FORMAL_METHOD_VERSION'),
+    'FORMAL_PANEL_CAPABILITY_KEY': ('.formal_analysis', 'FORMAL_PANEL_CAPABILITY_KEY'),
+    'IdentificationDataset': ('.contracts', 'IdentificationDataset'),
+    'LawIdentificationConfig': ('.contracts', 'LawIdentificationConfig'),
+    'LawIdentificationService': ('.identification', 'LawIdentificationService'),
+    'LawObservation': ('.contracts', 'LawObservation'),
+    'LocalLinearIdentifier': ('.baselines', 'LocalLinearIdentifier'),
+    'LocalStateSpaceIdentifier': ('.baselines', 'LocalStateSpaceIdentifier'),
+    'ModelCoefficient': ('.contracts', 'ModelCoefficient'),
+    'NonlinearLocalIdentifier': ('.baselines', 'NonlinearLocalIdentifier'),
+    'ODD_RELATIONAL_JACOBIAN_METHOD_KEY': ('.odd_jacobian', 'ODD_RELATIONAL_JACOBIAN_METHOD_KEY'),
+    'ODD_RELATIONAL_JACOBIAN_METHOD_VERSION': ('.odd_jacobian', 'ODD_RELATIONAL_JACOBIAN_METHOD_VERSION'),
+    'ObservationRole': ('.contracts', 'ObservationRole'),
+    'OddJacobianActionCoordinate': ('.odd_jacobian', 'OddJacobianActionCoordinate'),
+    'OddJacobianBranchObservation': ('.odd_jacobian', 'OddJacobianBranchObservation'),
+    'OddJacobianCoefficient': ('.odd_jacobian', 'OddJacobianCoefficient'),
+    'OddJacobianCoordinate': ('.odd_jacobian', 'OddJacobianCoordinate'),
+    'OddJacobianDataset': ('.odd_jacobian', 'OddJacobianDataset'),
+    'OddJacobianFit': ('.odd_jacobian', 'OddJacobianFit'),
+    'OddJacobianModel': ('.odd_jacobian', 'OddJacobianModel'),
+    'OddJacobianModelKind': ('.odd_jacobian', 'OddJacobianModelKind'),
+    'OddJacobianReceiverCoordinate': ('.odd_jacobian', 'OddJacobianReceiverCoordinate'),
+    'OddRelationalJacobianConfig': ('.odd_jacobian', 'OddRelationalJacobianConfig'),
+    'OneFactorExchange': ('.contracts', 'OneFactorExchange'),
+    'PairedTransportObservation': ('.transport', 'PairedTransportObservation'),
+    'ParametricLawModel': ('.contracts', 'ParametricLawModel'),
+    'PredictionRecord': ('.contracts', 'PredictionRecord'),
+    'ReceiverCriterion': ('.contracts', 'ReceiverCriterion'),
+    'RecurrenceGuardedResponseLawQualificationService': ('.recurrence_qualification', 'RecurrenceGuardedResponseLawQualificationService'),
+    'ResponseSlopeTolerance': ('.contracts', 'ResponseSlopeTolerance'),
+    'StructuralCoefficientTolerance': ('.contracts', 'StructuralCoefficientTolerance'),
+    'THERMODYNAMIC_RESPONSE_ANALYSIS_KEY': ('.registry', 'THERMODYNAMIC_RESPONSE_ANALYSIS_KEY'),
+    'THERMODYNAMIC_RESPONSE_EVALUATOR_KEY': ('.registry', 'THERMODYNAMIC_RESPONSE_EVALUATOR_KEY'),
+    'THERMODYNAMIC_RESPONSE_POSTHOC_ANALYSIS_KEY': ('.registry', 'THERMODYNAMIC_RESPONSE_POSTHOC_ANALYSIS_KEY'),
+    'THERMODYNAMIC_RESPONSE_TRANSPORT_KEY': ('.registry', 'THERMODYNAMIC_RESPONSE_TRANSPORT_KEY'),
+    'TransportCriterion': ('.transport', 'TransportCriterion'),
+    'add_standard_formal_analysis': ('.formal_protocol', 'add_standard_formal_analysis'),
+    'assemble_formal_gap_panel': ('.formal_analysis', 'assemble_formal_gap_panel'),
+    'baseline_law_identifiers': ('.baselines', 'baseline_law_identifiers'),
+    'fit_odd_relational_jacobian': ('.odd_jacobian', 'fit_odd_relational_jacobian'),
+    'formal_gap_obligation_id': ('.formal_protocol', 'formal_gap_obligation_id'),
+    'formal_method_capability_manifests': ('.formal_analysis', 'formal_method_capability_manifests'),
+    'law_method_manifests': ('.registry', 'law_method_manifests'),
+    'law_method_registry': ('.registry', 'law_method_registry'),
+    'odd_jacobian_triplet_arrays': ('.odd_jacobian', 'odd_jacobian_triplet_arrays'),
+    'odd_relational_jacobian_manifest': ('.registry', 'odd_relational_jacobian_manifest'),
+    'odd_relational_jacobian_registry': ('.registry', 'odd_relational_jacobian_registry'),
+    'predict_odd_jacobian_slope': ('.odd_jacobian', 'predict_odd_jacobian_slope'),
+    'predict_odd_response': ('.odd_jacobian', 'predict_odd_response'),
+    'response_method_capability_manifests': ('.registry', 'response_method_capability_manifests'),
+    'response_method_capability_registry': ('.registry', 'response_method_capability_registry'),
+    'run_formal_domain_analysis': ('.formal_analysis', 'run_formal_domain_analysis'),
+    'standard_formal_method_catalog': ('.formal_analysis', 'standard_formal_method_catalog'),
+    'thermodynamic_response_capability_manifests': ('.registry', 'thermodynamic_response_capability_manifests'),
+    'thermodynamic_response_capability_registry': ('.registry', 'thermodynamic_response_capability_registry'),
+    'thermodynamic_response_posthoc_analysis_manifest': ('.registry', 'thermodynamic_response_posthoc_analysis_manifest'),
+    'thermodynamic_response_posthoc_analysis_registry': ('.registry', 'thermodynamic_response_posthoc_analysis_registry'),
+}
 
 __all__ = [
     "CandidateFit",
@@ -130,3 +135,18 @@ __all__ = [
     "thermodynamic_response_posthoc_analysis_registry",
     "standard_formal_method_catalog",
 ]
+
+
+def __getattr__(name: str):
+    """Preserve public exports while importing numerical owners on demand."""
+    try:
+        module_name, attribute = _EXPORTS[name]
+    except KeyError:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}") from None
+    value = getattr(import_module(module_name, __name__), attribute)
+    globals()[name] = value
+    return value
+
+
+def __dir__() -> list[str]:
+    return sorted(set(globals()) | set(__all__))

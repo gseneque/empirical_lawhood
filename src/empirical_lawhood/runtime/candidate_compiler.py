@@ -43,7 +43,7 @@ from empirical_lawhood.planning.campaigns import CampaignSpec
 from empirical_lawhood.kernel.systems import SystemSpec
 
 from .capabilities import (
-    CapabilityKind,
+    CapabilityPermission,
     CapabilityRegistry,
 )
 from .plans import (
@@ -137,7 +137,7 @@ class CandidateGraphExternalInput(CanonicalRecord):
     expected_content_sha256: str | None
     payload_schema: str
     media_type: str
-    maximum_size_bytes: int
+    maximum_size_bytes: int | None
     outcome_access: OutcomeAccess
     visibility_ceiling: VisibilityCeiling
 
@@ -149,7 +149,7 @@ class CandidateGraphExternalInput(CanonicalRecord):
         )
         validate_schema(self.payload_schema)
         validate_nonempty(self.media_type, field_name="media_type")
-        if self.maximum_size_bytes <= 0:
+        if self.maximum_size_bytes is not None and self.maximum_size_bytes <= 0:
             raise ValueError("external input requires a positive size bound")
         if self.content_identity_policy is ContentIdentityPolicy.EXACT_SHA256:
             if self.expected_content_sha256 is None:
@@ -227,7 +227,7 @@ class CandidateGraphEdge(CanonicalRecord):
     logical_artifact_id: str
     payload_schema: str
     media_type: str
-    maximum_size_bytes: int
+    maximum_size_bytes: int | None
     outcome_access: OutcomeAccess
     visibility_ceiling: VisibilityCeiling
     barrier: BarrierKind
@@ -263,7 +263,7 @@ class CandidateGraphEdge(CanonicalRecord):
             )
         validate_schema(self.payload_schema)
         validate_nonempty(self.media_type, field_name="media_type")
-        if self.maximum_size_bytes <= 0:
+        if self.maximum_size_bytes is not None and self.maximum_size_bytes <= 0:
             raise ValueError("scientific edge requires a positive size bound")
 
 
@@ -323,7 +323,8 @@ class CandidateScientificGraph(CanonicalRecord):
                     or edge.logical_artifact_id != external.logical_artifact_id
                     or edge.payload_schema != external.payload_schema
                     or edge.media_type != external.media_type
-                    or edge.maximum_size_bytes > external.maximum_size_bytes
+                    or (external.maximum_size_bytes is not None and
+                        (edge.maximum_size_bytes is None or edge.maximum_size_bytes > external.maximum_size_bytes))
                     or edge.outcome_access is not external.outcome_access
                     or edge.visibility_ceiling is not external.visibility_ceiling
                 ):
@@ -421,6 +422,10 @@ class StudyTemplate(CanonicalRecord):
         nodes = {node.node_id: node for node in self.graph.nodes}
         if set(steps) != set(nodes):
             raise ValueError("programme template graph and protocol nodes differ")
+        parents_by_consumer: dict[str, set[str]] = {}
+        for edge in self.graph.edges:
+            if edge.producer_node_id is not None:
+                parents_by_consumer.setdefault(edge.consumer_node_id, set()).add(edge.producer_node_id)
         for node_id, node in nodes.items():
             step = steps[node_id]
             if (
@@ -434,15 +439,7 @@ class StudyTemplate(CanonicalRecord):
                 or node.resource_budget != step.resource_budget
             ):
                 raise ValueError("programme template node differs from protocol step")
-            observed_parents = tuple(
-                sorted(
-                    {
-                        edge.producer_node_id
-                        for edge in self.graph.edges
-                        if edge.consumer_node_id == node_id and edge.producer_node_id is not None
-                    }
-                )
-            )
+            observed_parents = tuple(sorted(parents_by_consumer.get(node_id, ())))
             if observed_parents != step.dependency_step_ids:
                 raise ValueError("exact scientific edges differ from protocol dependencies")
         for edge in self.graph.edges:
@@ -1111,81 +1108,11 @@ def bind_standard_candidate_compilation_report(
     )
 
 
-_ALLOWED_STAGE_KINDS: dict[ScientificStage, frozenset[CapabilityKind]] = {
-    ScientificStage.PREPARE: frozenset({CapabilityKind.SOURCE, CapabilityKind.SIMULATOR}),
-    ScientificStage.ACQUIRE: frozenset(
-        {
-            CapabilityKind.SOURCE,
-            CapabilityKind.SIMULATOR,
-            CapabilityKind.ACTUATOR,
-            CapabilityKind.OBSERVATION_OPERATOR,
-        }
-    ),
-    ScientificStage.TRANSFORM: frozenset({CapabilityKind.TRANSFORM}),
-    ScientificStage.DEVELOP: frozenset(
-        {
-            CapabilityKind.ANALYSIS,
-            CapabilityKind.PROSPECTIVE_NOMINATOR,
-            # A prospective method may issue its frozen, development-visible
-            # prediction roster here and adjudicate only in a later EVALUATE
-            # task. Outcome-access and graph chronology remain independently
-            # checked; this does not authorize target evidence in development.
-            CapabilityKind.HYPOTHESIS_ADJUDICATOR,
-            CapabilityKind.LAW_IDENTIFIER,
-            CapabilityKind.RESPONSE_ALGEBRA_IDENTIFIER,
-            CapabilityKind.CONTROLLER_SYNTHESIZER,
-        }
-    ),
-    ScientificStage.FALSIFY: frozenset(
-        {
-            CapabilityKind.FALSIFIER,
-            CapabilityKind.TRANSPORT_TESTER,
-            CapabilityKind.DISCREPANCY_ESTIMATOR,
-        }
-    ),
-    ScientificStage.QUALIFY: frozenset(
-        {
-            CapabilityKind.LAW_IDENTIFIER,
-            CapabilityKind.NUMERICAL_QUALIFIER,
-            CapabilityKind.OBSERVATION_OPERATOR,
-            CapabilityKind.DISCREPANCY_ESTIMATOR,
-        }
-    ),
-    ScientificStage.FREEZE: frozenset(
-        {
-            CapabilityKind.EVALUATOR,
-            CapabilityKind.EXPERIMENT_DESIGNER,
-            CapabilityKind.TRANSFORM,
-            CapabilityKind.REPORTER,
-        }
-    ),
-    ScientificStage.EVALUATE: frozenset(
-        {CapabilityKind.EVALUATOR, CapabilityKind.HYPOTHESIS_ADJUDICATOR}
-    ),
-    ScientificStage.REVEAL: frozenset({CapabilityKind.EVALUATOR}),
-    ScientificStage.SYNTHESIZE: frozenset(
-        {
-            CapabilityKind.ANALYSIS,
-            CapabilityKind.ATLAS_ASSEMBLER,
-            CapabilityKind.HYPOTHESIS_SYNTHESIZER,
-            CapabilityKind.REPORTER,
-        }
-    ),
-    ScientificStage.ADMISSION: frozenset(
-        {CapabilityKind.ADMISSION_EVALUATOR, CapabilityKind.ONLINE_GATE_EVALUATOR}
-    ),
-    ScientificStage.CONTROLLER: frozenset(
-        {CapabilityKind.CONTROLLER_SYNTHESIZER, CapabilityKind.ONLINE_GATE_EVALUATOR}
-    ),
-    ScientificStage.REPORT: frozenset({CapabilityKind.REPORTER}),
-    ScientificStage.EXPLORE: frozenset(
-        {
-            CapabilityKind.ANALYSIS,
-            CapabilityKind.ANOMALY_DETECTOR,
-            CapabilityKind.PORTFOLIO_PLANNER,
-        }
-    ),
-}
+# Compatibility alias for existing candidate-contract callers.
+from .stage_contracts import PROSPECTIVE_STAGE_KINDS, stage_kind_allowed
+
+_ALLOWED_STAGE_KINDS = PROSPECTIVE_STAGE_KINDS
+
 
 _REQUIRED_ISSUE_INPUTS = (
     "accountable-human-proposer-attestation",
@@ -1594,8 +1521,11 @@ def _capability_diagnostics(
             )
         )
     step_entries: list[tuple[str, ProtocolStepTemplate, CandidateGraphNode]] = []
+    edges_by_consumer: dict[str, list[CandidateGraphEdge]] = {}
     for active_template in active_templates:
         nodes = {node.node_id: node for node in active_template.graph.nodes}
+        for edge in active_template.graph.edges:
+            edges_by_consumer.setdefault(edge.consumer_node_id, []).append(edge)
         for step in active_template.protocol.steps:
             selection_id = f"{step.capability_key}@{step.capability_version}"
             step_entries.append((selection_id, step, nodes[step.step_id]))
@@ -1604,6 +1534,7 @@ def _capability_diagnostics(
         key=lambda value: (value[0], value[1].step_id),
     ):
         selection = selections.get(selection_id)
+        incoming_edges = edges_by_consumer.get(step.step_id, ())
         if selection is None:
             diagnostics.append(
                 _diagnostic(
@@ -1627,9 +1558,7 @@ def _capability_diagnostics(
                         edge.scientific_role.value,
                         edge.payload_schema,
                     )
-                    for active_template in active_templates
-                    for edge in active_template.graph.edges
-                    if edge.consumer_node_id == step.step_id
+                    for edge in incoming_edges
                 )
             )
             input_ports = ",".join(
@@ -1643,9 +1572,7 @@ def _capability_diagnostics(
                 sorted(
                     {
                         edge.visibility_ceiling.value
-                        for active_template in active_templates
-                        for edge in active_template.graph.edges
-                        if edge.consumer_node_id == step.step_id
+                        for edge in incoming_edges
                     }
                 )
             )
@@ -1673,7 +1600,7 @@ def _capability_diagnostics(
         reasons: list[str] = []
         if selection.implementation_sha256 != manifest.implementation_sha256:
             reasons.append("implementation digest differs")
-        if manifest.kind not in _ALLOWED_STAGE_KINDS[step.stage]:
+        if not stage_kind_allowed(step.stage, manifest.kind):
             reasons.append("capability kind is forbidden for the scientific stage")
         if (
             manifest.config_schema != step.config.config_schema
@@ -1686,9 +1613,7 @@ def _capability_diagnostics(
             reasons.append("protocol output schema is unsupported")
         input_schemas = {
             edge.payload_schema
-            for active_template in active_templates
-            for edge in active_template.graph.edges
-            if edge.consumer_node_id == step.step_id
+            for edge in incoming_edges
         }
         if not input_schemas.issubset(manifest.input_schema_ids):
             reasons.append("exact scientific input schema is unsupported")
@@ -1747,7 +1672,12 @@ def _source_diagnostics(
         SourceMaterializationRole.NUMERICAL_CONFIGURATION: ScientificInputRole.MODEL,
     }
     source_like_roles = frozenset(role_map.values())
-    if not draft.source_materializations and not external_inputs:
+    # This explicit source variant does not retroactively require locks for
+    # historical graph HISTORY edges. Its own declared materialization retains
+    # the same exact experiment qualification as every other source candidate.
+    role_map[SourceMaterializationRole.RETAINED_HISTORY] = ScientificInputRole.HISTORY
+    if not draft.source_materializations and not any(
+            value.scientific_role is not ScientificInputRole.CONFIGURATION for value in external_inputs.values()):
         diagnostics.append(
             _diagnostic(
                 CandidateDiagnosticClass.UNRESOLVED_READINESS,
@@ -1808,13 +1738,35 @@ def _source_diagnostics(
                     "source materialization role differs from its exact graph input role",
                 )
             )
+        retained_sealed_history = False
+        if (bound_external_input is not None
+                and source.role is SourceMaterializationRole.RETAINED_HISTORY
+                and bound_external_input.scientific_role is ScientificInputRole.HISTORY):
+            consumers = {edge.consumer_node_id for edge in template_edges
+                if edge.external_input_id == source.source_id}
+            steps = {} if template is None else {step.step_id: step for step in template.protocol.steps}
+            retained_sealed_history = (
+                bool(consumers) and consumers <= set(steps)
+                and all(CapabilityPermission.READ_SEALED_OUTCOMES in steps[node].required_permissions
+                    for node in consumers)
+                and (bound_external_input.visibility_ceiling is VisibilityCeiling.PROSPECTIVE
+                    or bound_external_input.visibility_ceiling is VisibilityCeiling.DEVELOPMENT_ONLY
+                    and all(CapabilityPermission.READ_DEVELOPMENT in steps[node].required_permissions
+                        for node in consumers))
+                and bound_external_input.media_type == 'application/json'
+                and bound_external_input.maximum_size_bytes is not None
+                and source.materialization.object_schema == bound_external_input.payload_schema
+                and source.content_sha256 == bound_external_input.expected_content_sha256
+            )
         if (
             bound_external_input is not None
             and bound_external_input.outcome_access is OutcomeAccess.EVALUATION_SEALED
             and (
-                bound_external_input.scientific_role is not ScientificInputRole.MODEL
+                (bound_external_input.scientific_role is not ScientificInputRole.MODEL
+                    and not retained_sealed_history)
                 or bound_external_input.content_identity_policy is not ContentIdentityPolicy.EXACT_SHA256
-                or bound_external_input.visibility_ceiling is not VisibilityCeiling.PROSPECTIVE
+                or (bound_external_input.visibility_ceiling is not VisibilityCeiling.PROSPECTIVE
+                    and not retained_sealed_history)
             )
         ):
             diagnostics.append(
@@ -1822,7 +1774,7 @@ def _source_diagnostics(
                     CandidateDiagnosticClass.FATAL,
                     CandidateDiagnosticCode.CAPABILITY_CONTRACT_MISMATCH,
                     f"{field}.sealed-model",
-                    "sealed cross-campaign input requires an exact prospective model identity",
+                    "sealed cross-campaign input requires an exact prospective model or explicitly qualified bounded retained history with consumers admitted to its sealed and inherited development scope",
                 )
             )
         if source.access_disposition is SourceAccessDisposition.ACQUISITION_AUTHORITY_REQUIRED:

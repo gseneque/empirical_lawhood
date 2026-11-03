@@ -8,7 +8,7 @@ from pathlib import Path
 from empirical_lawhood.adapters.composition.task_resources import (
     progress_resource_envelope,
 )
-from empirical_lawhood.api.authoring_handoff import create_authoring_api, write_exclusive_record as _save_new
+from empirical_lawhood.api.authoring_handoff import create_authoring_api, preflight_authoring_output_directory, write_exclusive_record as _save_new
 from empirical_lawhood.api.authoring_output import report_incomplete_output
 from empirical_lawhood.api.results import CompileCandidateRequest
 from empirical_lawhood.kernel.provenance import ObjectIdentity
@@ -20,16 +20,20 @@ from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.analyti
 from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.native_quickstart import UniformElectronGasAnalyticReferenceConfig
 from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime_provider import native_task_id
 from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.analytic_fresh_authoring import UniformElectronGasAnalyticAuthoringProfile
-from empirical_lawhood.infrastructure.source_closure import capture_clean_target_closure
+from empirical_lawhood.api.recursive_prospective_authoring import _capture_prospective_source, _publish_source_provenance
+from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
 
 
 def author_uniform_electron_gas_analytic_reference(
-    *, root: Path, config: UniformElectronGasAnalyticReferenceConfig, experiment_id: str, output_dir: Path
+    *, root: Path, config: UniformElectronGasAnalyticReferenceConfig, experiment_id: str, output_dir: Path, artifact_writer
 ) -> dict[str, object]:
     """Compile strict executable study authoring and project a plan without executing an analytic task."""
 
     validate_stable_id(experiment_id, field_name="experiment_id")
-    closure = capture_clean_target_closure(root, f"{experiment_id}.source-closure")
+    output_dir = preflight_authoring_output_directory(directory=output_dir, repo_root=root,
+        artifact_writer=artifact_writer, allow_existing_empty=True)
+    captured = _capture_prospective_source(root, f"{experiment_id}.source-closure", artifact_writer=artifact_writer)
+    closure = captured.closure
     bundle = build_uniform_electron_gas_analytic_authoring(
         config=config,
         experiment_id=experiment_id,
@@ -124,6 +128,8 @@ def author_uniform_electron_gas_analytic_reference(
             ("preissue-execution-plan.json", lowered),
         ):
             _save_new(output_dir, name, record)
+        _publish_source_provenance(captured=captured, destination=output_dir, artifact_writer=artifact_writer)
+        GitStudySourceClosureInspector(Path(root)).observe(closure)
         return {
             "experiment_id": experiment_id,
             "implementation_commit": closure.implementation_commit,

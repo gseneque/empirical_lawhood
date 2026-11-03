@@ -31,7 +31,6 @@ from empirical_lawhood.planning.experiment_entry import ExperimentEntryPackage, 
 from empirical_lawhood.planning.study_issue import HumanProposerAttestation, RetrospectiveProposerAttestation, ImplementationSourceClosure, StudyAuthorityKind, StudyOperationAuthority, require_study_authority
 
 from .artifacts import (
-    MAX_ARTIFACT_PUBLICATION_MEMBERS,
     ArtifactMaterialization,
     ArtifactProfile,
     ArtifactPublicationBinding,
@@ -42,7 +41,8 @@ from .capabilities import CapabilityRegistry
 from .study_extensions import StudyExtensionMaterializationReceipt
 
 
-MAX_ISSUE_MEMBERS = MAX_ARTIFACT_PUBLICATION_MEMBERS
+# Programme inventories describe the complete frozen evidence population.
+# Publication allowances belong to the selected artifact custody limits.
 MAX_ISSUE_PAYLOAD_BYTES = 64 * 1024 * 1024
 # Generated standard reports duplicate full candidates and their provenance.
 # These finite capacities do not enlarge raw authoring or extension payloads.
@@ -134,8 +134,8 @@ class IssuedDraftManifest(CanonicalRecord):
             attribute="member_id",
             field_name="members",
         )
-        if not self.members or len(self.members) > MAX_ISSUE_MEMBERS:
-            raise ValueError("issued programme member count violates its bound")
+        if not self.members:
+            raise ValueError("issued programme member inventory cannot be empty")
         if self.canonical_draft != ObjectIdentity.from_record(
             self.draft.draft_id,
             self.draft,
@@ -410,8 +410,8 @@ class IssuedStudyManifest(CanonicalRecord):
             attribute="member_id",
             field_name="members",
         )
-        if not self.members or len(self.members) > MAX_ISSUE_MEMBERS:
-            raise ValueError("standard issued programme member count violates its bound")
+        if not self.members:
+            raise ValueError("standard issued programme member inventory cannot be empty")
         if self.canonical_authoring_package != ObjectIdentity.from_record(
             self.authoring_package.package_id,
             self.authoring_package,
@@ -622,8 +622,6 @@ class IssuedExecutableStudyManifest(CanonicalRecord):
             attribute="member_id",
             field_name="members",
         )
-        if len(self.members) > MAX_ISSUE_MEMBERS:
-            raise ValueError("issued executable study manifest exceeds its member bound")
         if self.candidate.base_candidate != self.base.candidate:
             raise ValueError("issued executable study manifest changes its base candidate")
         if self.issued_extensions.proposed_extension_set != (self.candidate.proposed_extension_set):

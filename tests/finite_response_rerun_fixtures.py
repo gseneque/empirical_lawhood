@@ -22,7 +22,7 @@ from empirical_lawhood.kernel.evidence import VisibilityCeiling
 from empirical_lawhood.kernel.status import OperationalStatus
 from empirical_lawhood.kernel.references import ArtifactIdentity
 from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest, ArtifactStreamWriteRequest, ArtifactProfile, CanonicalTaskReceipt, ReceiptCheck
+from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest, ArtifactStreamWriteRequest, ArtifactProfile, ArtifactLineageParent, CanonicalTaskReceipt, ReceiptCheck, lineage_parent_sort_key
 from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_artifact_manifest
 from empirical_lawhood.adapters.composition.finite_response_law.rerun_input import FiniteResponseLawCurrentParent
 
@@ -175,20 +175,26 @@ def publish_current_issue(plane, handoff, *, label):
         scientific_graph=base.scientific_graph, candidate=ObjectIdentity.from_record(candidate.candidate_id, candidate),
         issued_extension_set=replayed.issued_extensions, execution_resource_envelope_spec=handoff.resources)
     projection = lower_run_plan(plan, context.base.registry)
+    package_parent = ArtifactLineageParent(ObjectIdentity.from_record(package.package_id, package),
+        VisibilityCeiling.PROSPECTIVE, OutcomeAccess.OUTCOME_BLIND)
+    plan_parent = ArtifactLineageParent(ObjectIdentity.from_record(plan.run_plan_id, plan),
+        VisibilityCeiling.PROSPECTIVE, OutcomeAccess.OUTCOME_BLIND)
     sizes = []
-    for name, value in (("campaign-package", package), ("run-plan", plan), ("execution-plan", projection)):
+    for name, value, parents in (("campaign-package", package, ()), ("run-plan", plan, (package_parent,)),
+            ("execution-plan", projection, tuple(sorted((package_parent, plan_parent), key=lineage_parent_sort_key)))):
         raw = value.canonical_bytes()
         sizes.append((name, len(raw)))
         print(f"synthetic_{label}_{name}_bytes", len(raw), flush=True)
         plane.write_stream(ArtifactStreamWriteRequest(logical_artifact_id=f"{name}.{run_id}",
             relative_path=f"runs/{run_id}/plans/{name}.json", payload_schema=value.SCHEMA,
             profile=ArtifactProfile.CANONICAL_JSON, media_type="application/json",
-            publication_scope_id=f"synthetic.{label}.plans", publication_scope_relative_root=f"runs/{run_id}/plans",
+            publication_scope_id=f"campaign-plans.{run_id}", publication_scope_relative_root=f"runs/{run_id}/plans",
             chunks=(raw[index:index + 1024**2] for index in range(0, len(raw), 1024**2)),
             maximum_bytes=len(raw), maximum_chunk_bytes=min(len(raw), 1024**2),
             expected_size_bytes=len(raw), expected_physical_sha256=sha256(raw).hexdigest(),
             visibility_ceiling=VisibilityCeiling.PROSPECTIVE,
-            parent_visibility_ceilings=(), outcome_access=OutcomeAccess.OUTCOME_BLIND, minimum_free_bytes=1))
+            parent_visibility_ceilings=tuple(parent.visibility_ceiling for parent in parents),
+            outcome_access=OutcomeAccess.OUTCOME_BLIND, lineage_parents=parents, minimum_free_bytes=1))
     return CurrentIssueFixture(replayed, FiniteResponseLawCurrentPublication(run_id, issued,
         execution_identity, ObjectIdentity.from_record(reveal.authority_id, reveal)), package, tuple(sizes), trust_path, projection)
 
@@ -211,10 +217,31 @@ def publish_native_parent(plane, handoff, issue, *, label, native=None):
 
 def publish_current_step_output(plane, issue, *, label, record, task_id=None, input_materialization_ids=()):
     """Retain one typed fictional result and its full issued sibling output census."""
+    from empirical_lawhood.infrastructure.execution import DurableExecutionResourceEnvelopeCoordinator
+    from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+
     task = next(task for task in issue.execution_plan.tasks
         if (task_id is None or task.task_id == task_id)
         and any(output.payload_schema == record.SCHEMA for output in task.outputs))
     run_id = issue.publication.run_id
+    attempt = f"{run_id}.{task.task_id}.attempt-001"
+    # These explicitly fictional outputs need the same retained dispatch join
+    # as other current receipts. The real journal owner publishes that fixture
+    # event; no worker or native source is entered by this helper.
+    coordinator = DurableExecutionResourceEnvelopeCoordinator(
+        ExternalExecutionResourceEnvelopeStore(plane.root, artifact_plane=plane))
+    envelope_id = f"run-resource-envelope.{run_id}"
+    spec = issue.package.execution_resource_envelope_spec
+    coordinator.ensure_initialized(envelope_id=envelope_id, spec=spec,
+        execution_plan=ObjectIdentity.from_record(issue.execution_plan.execution_plan_id, issue.execution_plan),
+        jit_graph_signature_manifest=issue.package.jit_graph_signature_manifest)
+    cell, = (cell for cell in spec.task_cells if cell.task_id == task.task_id)
+    assert cell.jit_cell_id is None
+    dispatch = dict(envelope_id=envelope_id, occurred_at_utc="2026-10-07T00:00:00Z",
+        cell_id=cell.cell_id, attempt_id=attempt)
+    coordinator.reserve(**dispatch, event_id=f"resource-envelope-event.{attempt}.reserve")
+    coordinator.launch(**dispatch, event_id=f"resource-envelope-event.{attempt}.launch",
+        jit_projection=None, jit_graph_signature_manifest=issue.package.jit_graph_signature_manifest)
     requests = []
     for output in task.outputs:
         raw = record.canonical_bytes() if output.payload_schema == record.SCHEMA else canonical_json_bytes({
@@ -228,7 +255,6 @@ def publish_current_step_output(plane, issue, *, label, record, task_id=None, in
             parent_visibility_ceilings=(), outcome_access=output.outcome_access, minimum_free_bytes=1))
     outputs = tuple(plane.write(request) for request in requests)
     ordered = tuple(sorted(outputs, key=lambda result: result.logical.logical_artifact_id))
-    attempt = f"{run_id}.{task.task_id}.attempt-001"
     receipt = CanonicalTaskReceipt(f"receipt.{attempt}", run_id, task.task_id, attempt,
         issue.manifest.source_closure.implementation_commit, input_materialization_ids, tuple(result.materialization for result in ordered),
         tuple(result.logical for result in ordered), (ReceiptCheck("fictional-software-output-census", True, ()),),
@@ -236,6 +262,8 @@ def publish_current_step_output(plane, issue, *, label, record, task_id=None, in
     ExternalTaskReceiptStore(plane, minimum_free_bytes=1).commit(receipt,
         visibility_ceiling=VisibilityCeiling.most_restrictive(*(output.logical.visibility_ceiling for output in outputs)),
         outcome_access=OutcomeAccess.EVALUATOR_REVEAL)
+    coordinator.observe_receipt(**dispatch, event_id=f"resource-envelope-event.{attempt}.receipt",
+        receipt=ObjectIdentity.from_record(receipt.receipt_id, receipt), valid_receipt=True, scientific_terminal=True)
     manifests = tuple(sorted((decode_artifact_manifest(plane.root.resolve(result.manifest_materialization.relative_path, for_write=False).read_bytes())
         for result in outputs), key=lambda manifest: manifest.materialization.materialization_id))
     primary = next(result for result in outputs if result.logical.payload_schema == record.SCHEMA)

@@ -6,7 +6,7 @@
       "orcid": "0009-0003-3046-6899"
     }
   ],
-  "description": "Research software for defining, executing and checking empirical response-law experiments across heterogeneous systems. This repository is mixed-license: software is MPL-2.0, project-authored documentation and figures are CC-BY-4.0, and project-generated evidence and data are CC0-1.0 unless a file says otherwise. Third-party material retains its own terms. See docs/licensing.md for file scopes. Native substrate readiness is route-specific; no historical experimental source archive is deposited here. The associated manuscript is intended for a separate publication record and has no reserved DOI in this metadata.",
+  "description": "Research software for defining, executing and checking empirical response-law experiments across heterogeneous systems. Version 0.3.0 adds recursive inquiry workflows, guarded source and receipt recovery, and research documentation organised by programme. Software conformance, exposed development findings and scientific qualification remain distinct. This repository is mixed-license: software is MPL-2.0, project-authored documentation and figures are CC-BY-4.0, and project-generated evidence and data are CC0-1.0 unless a file says otherwise. Third-party material retains its own terms. See docs/reference/licensing.md for file scopes. Native substrate readiness is route-specific; historical primary experimental archives remain in external custody. The associated preprint is a separate publication, DOI 10.5281/zenodo.23083988; that DOI does not identify this software.",
   "keywords": [
     "empirical lawhood",
     "response laws",
@@ -17,5 +17,19 @@
   ],
   "license": "other-open",
   "title": "Empirical Lawhood",
-  "upload_type": "software"
+  "upload_type": "software",
+  "version": "0.3.0",
+  "language": "eng",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/gseneque/empirical_lawhood/tree/v0.3.0",
+      "relation": "isIdenticalTo",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "10.5281/zenodo.23083988",
+      "relation": "isSupplementTo",
+      "resource_type": "publication-preprint"
+    }
+  ]
 }

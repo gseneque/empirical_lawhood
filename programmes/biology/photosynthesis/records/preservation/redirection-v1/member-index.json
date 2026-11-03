@@ -1,0 +1,691 @@
+{
+  "archive": {
+    "bytes": 1080339,
+    "path": "/home/chevre/gs-ml/empirical_lawhood/docs/rubisco-inquiry/preservation/redirection-v1/source-metadata.zip",
+    "sha256": "23a5b28b35ec8260d4780d388f245a6872f3e4d1c536df94f47bf6f54b5c7a78"
+  },
+  "copied_bytecode_executable": false,
+  "expanded_bytes": 5705316,
+  "expanded_ceiling_bytes": 16777216,
+  "member_count": 96,
+  "members": [
+    {
+      "bytes": 3239,
+      "member": "closed-v3-custody-audit/README.md",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/README.md",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "6da42904c22468dc276ab957105b7c11de18202c9e755aeaf98a03e055638f49"
+    },
+    {
+      "bytes": 75882,
+      "member": "closed-v3-custody-audit/__pycache__/audit.cpython-312.pyc",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/__pycache__/audit.cpython-312.pyc",
+      "role": "DATA_ONLY_BYTECODE",
+      "sha256": "cf8c4cdeea4eaf102b971b2efbbf07d4a8c489e618995f3ce531e36fa30a59f3"
+    },
+    {
+      "bytes": 46100,
+      "member": "closed-v3-custody-audit/audit-corrected.py",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/audit-corrected.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "cbe73f2f6d10d77d31253f49547c0f94b1c5f789a76f2cad15099b954abf306e"
+    },
+    {
+      "bytes": 46409,
+      "member": "closed-v3-custody-audit/audit-final.py",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/audit-final.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e90ca8c25a13040f808fbd685906737fbecac4fe28c35195818d442bef8ff39e"
+    },
+    {
+      "bytes": 46043,
+      "member": "closed-v3-custody-audit/audit.py",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/audit.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "d7501bad3b939450ff4f94705d2c43940859a15a6207e907af4364c9e392eddb"
+    },
+    {
+      "bytes": 3914,
+      "member": "closed-v3-custody-audit/closed-audit.json",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/closed-audit.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "5ff30f3e56096b6732dfc575950af3846b8bbcb6b48c9eee545bac18deb1ec82"
+    },
+    {
+      "bytes": 13504,
+      "member": "closed-v3-custody-audit/observation.json",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/observation.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "a073cbf20cbc3ae0d8fda138b94aab7feb0322275fd48afdf1d44d05ecb30dfb"
+    },
+    {
+      "bytes": 122,
+      "member": "closed-v3-custody-audit/outer-resource-corrected.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/outer-resource-corrected.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "83679d802c80fa8fe00ecfa6758ec472ea486204a1cd8494ec7e5ca289f3007a"
+    },
+    {
+      "bytes": 123,
+      "member": "closed-v3-custody-audit/outer-resource-final.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/outer-resource-final.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "a4d9e1a69952a09a1c6ac7312c75b821291261cf70c03aaaaadf4217b963a35e"
+    },
+    {
+      "bytes": 122,
+      "member": "closed-v3-custody-audit/outer-resource.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/outer-resource.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "a043680176e3f3dbae957c7e844cd9738b48f5083e842c277d495efa0e768af4"
+    },
+    {
+      "bytes": 613,
+      "member": "closed-v3-custody-audit/pre-correction-refusal.json",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/pre-correction-refusal.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "adbab4bcb43b642d132f4bec3333e1a3a811fa87089dbd4a7a586e63f7a54fc8"
+    },
+    {
+      "bytes": 84,
+      "member": "closed-v3-custody-audit/record-scope-resource.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/record-scope-resource.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "281152736eb595ad053331ff5cc640f53800db15108b56a74389e6cd2fbcfe14"
+    },
+    {
+      "bytes": 0,
+      "member": "closed-v3-custody-audit/record-scope-stderr.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/record-scope-stderr.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 446,
+      "member": "closed-v3-custody-audit/record-scope-stdout.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/record-scope-stdout.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "3166abcdd4c77947194b735dac3df6e23cd83d357f6db982d76ce7a2fdd35823"
+    },
+    {
+      "bytes": 9386,
+      "member": "closed-v3-custody-audit/record_completed_scope.py",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/record_completed_scope.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "003a0d021e1bc0fc5cc7aa3189ccf2226d388354d9a6c22e524b6c53513e0be2"
+    },
+    {
+      "bytes": 671,
+      "member": "closed-v3-custody-audit/second-software-refusal.json",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/second-software-refusal.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "d8914d01a7abc1d6b831a9a89f4bc3211f6438536d68675e83a1c07fc264db0a"
+    },
+    {
+      "bytes": 691,
+      "member": "closed-v3-custody-audit/third-software-refusal.json",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/third-software-refusal.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "a2cd49271215c7059a8fd450ffcdf62411c73c2d3c2f25dabac2f770f01eb541"
+    },
+    {
+      "bytes": 482,
+      "member": "closed-v3-custody-audit/verification-stderr-corrected.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/verification-stderr-corrected.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "8794621a427e887827ae2111124b93880df37eeacd0084986df87ecd0694a8ad"
+    },
+    {
+      "bytes": 542,
+      "member": "closed-v3-custody-audit/verification-stderr-final.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/verification-stderr-final.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "7ca489e89855910352a9d10ee2f174ff7bfdbca3753595d47c54a7281342f4ae"
+    },
+    {
+      "bytes": 385,
+      "member": "closed-v3-custody-audit/verification-stderr.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/verification-stderr.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "9111ab0ada0103431b814eba55aa8d8c0524014cb985ac9dec0aa89a9210b398"
+    },
+    {
+      "bytes": 0,
+      "member": "closed-v3-custody-audit/verification-stdout-corrected.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/verification-stdout-corrected.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "member": "closed-v3-custody-audit/verification-stdout-final.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/verification-stdout-final.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "member": "closed-v3-custody-audit/verification-stdout.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-independent-audit-v3/verification-stdout.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 3119,
+      "member": "closed-v3-scientific-audit/audit-register.json",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-scientific-audit-v3/audit-register.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "b83e639f2e093af9d08789912d0ae702df124dc13c5054388f00bc63f0dc32ef"
+    },
+    {
+      "bytes": 21941,
+      "member": "closed-v3-scientific-audit/audit-successor-v2.py",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-scientific-audit-v3/audit-successor-v2.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "0e919561ba08b76ce52fc2def25ea7cb77ef0d462646fc886d5f0f801e9df264"
+    },
+    {
+      "bytes": 21039,
+      "member": "closed-v3-scientific-audit/audit.py",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-scientific-audit-v3/audit.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "f227a6422924216a210e91e811ce1806b10b01e59a8b8335ab58fb84849cfb9e"
+    },
+    {
+      "bytes": 0,
+      "member": "closed-v3-scientific-audit/checker-stderr-successor-v2.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-scientific-audit-v3/checker-stderr-successor-v2.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 421,
+      "member": "closed-v3-scientific-audit/checker-stderr.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-scientific-audit-v3/checker-stderr.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "40778d7fc3e48b50fc21502dcfa09c857464dd0ffaa97a3b0d5faa277b39bb6b"
+    },
+    {
+      "bytes": 287,
+      "member": "closed-v3-scientific-audit/checker-stdout-successor-v2.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-scientific-audit-v3/checker-stdout-successor-v2.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "140cdc9ce00ea4b6109694cdcd97f44571f38ed56f3de036b0af544dfd825005"
+    },
+    {
+      "bytes": 0,
+      "member": "closed-v3-scientific-audit/checker-stdout.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-scientific-audit-v3/checker-stdout.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 62523,
+      "member": "closed-v3-scientific-audit/observation.json",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-scientific-audit-v3/observation.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "c33ec0fd2d5df7f4e43f96751020856d24f17126d389b64e10ae605e7ca76542"
+    },
+    {
+      "bytes": 87,
+      "member": "closed-v3-scientific-audit/outer-resources-successor-v2.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-scientific-audit-v3/outer-resources-successor-v2.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "d281e3c2e5cc71e6f52f7e1057ae87e85bcf260ee733dd97c8f36812393ea0a6"
+    },
+    {
+      "bytes": 125,
+      "member": "closed-v3-scientific-audit/outer-resources.txt",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-scientific-audit-v3/outer-resources.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "2d15b307694e5f6225320b441de8e476b9539abcaf54894f7bf858e9f7dec510"
+    },
+    {
+      "bytes": 16679,
+      "member": "historical-helper/bounded_executor/bounded_executor.py",
+      "original_path": "/tmp/rubisco-qmmm-work-v8/bounded_executor.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "d1bcee4551109c69ef832085c927ea340b22fcaa1b3909fc10966cdd6725043a"
+    },
+    {
+      "bytes": 14095,
+      "member": "historical-helper/config-v3b/build_config.py",
+      "original_path": "/tmp/rubisco-qmmm-retained-reference-config-v3b/build_config.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "0fa859f6bf779010ecdeb0e4a89e51e7a81ebda9b051f644b4c575d84d075b46"
+    },
+    {
+      "bytes": 15286,
+      "member": "historical-helper/custody_bridge/custody_bridge.py",
+      "original_path": "/tmp/rubisco-qmmm-work-v8/custody_bridge.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "39f18ed5c65c347e42ba74542ced269ce95baceeaeaa2a691b98e8658c830d58"
+    },
+    {
+      "bytes": 22433,
+      "member": "historical-helper/geometry_helper/assess_final_geometry.py",
+      "original_path": "/tmp/rubisco-xtb-geometry-review/assess_final_geometry.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "481f83274799b9f722eb9fe4e67e4acc246b4c25f61b6be94481896e95ba9496"
+    },
+    {
+      "bytes": 43907,
+      "member": "historical-helper/launcher/launcher.py",
+      "original_path": "/tmp/rubisco-qmmm-reference-from-retained-v3/launcher.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "991567547458140b816c3ccf633b7cc1b0b7481aa72797663b17f7d3d2e91634"
+    },
+    {
+      "bytes": 96793,
+      "member": "historical-helper/native_coupling/native_coupling.py",
+      "original_path": "/tmp/rubisco-qmmm-work-v11/native_coupling.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "6d5d5f61d268844aa3ada3011f6c5a48f5a20a2be69e5535c2e0df7eb348b57f"
+    },
+    {
+      "bytes": 2861941,
+      "member": "historical-helper/profile/source-profile-v5.json",
+      "original_path": "/tmp/rubisco-qmmm-work-v5/source-profile-v5.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "0a6af7677efb3c2f6b3b13b655bb6814684e48acf7b58c4a5f02a204acabaafa"
+    },
+    {
+      "bytes": 17879,
+      "member": "historical-helper/protocol/rr-qmmm-retained-reference-protocol-v3b.md",
+      "original_path": "/home/chevre/gs-ml/empirical_lawhood/docs/rubisco-inquiry/rr-qmmm-retained-reference-protocol-v3b.md",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "96b42f8c322ea7f27e735c58a742801872a710e6e5de31d83a4afc3cf54c7d83"
+    },
+    {
+      "bytes": 23469,
+      "member": "historical-helper/reference_assessment/reference_assessment.py",
+      "original_path": "/tmp/rubisco-qmmm-work-v8/reference_assessment.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "8cd9192fa96531ff27653f4128641cf5f427dd35dbfe05b67765ce18eebc47ee"
+    },
+    {
+      "bytes": 629798,
+      "member": "historical-helper/retained-v3/execution-config-v3.json",
+      "original_path": "/tmp/rubisco-qmmm-reference-from-retained-v3/execution-config-v3.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "a1633431db55b3e466c2618f9bf32c2e47141e60912e99cf8cb6f8b00589d93c"
+    },
+    {
+      "bytes": 15595,
+      "member": "historical-helper/source_guard/worker.py",
+      "original_path": "/tmp/rubisco-qmmm-work-v8/worker.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "c2df8059b4c4afdbda44d65332b6671618d6d001af77e42632cc419f40ad7b16"
+    },
+    {
+      "bytes": 17140,
+      "member": "historical-helper/source_table_control/source_table_control.py",
+      "original_path": "/tmp/rubisco-qmmm-source-table-control-v1/source_table_control.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "94a64d9cd67c0005cb9efd1c1fc7297788f034474d4254cb84634128f21127e9"
+    },
+    {
+      "bytes": 20135,
+      "member": "historical-helper/worker/worker.py",
+      "original_path": "/tmp/rubisco-qmmm-reference-from-retained-v3/worker.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "4c23912bcbbe95c8bcfa255161660999fc2039a8c06bf795946b3b6fe3e36d6d"
+    },
+    {
+      "bytes": 2727,
+      "member": "prospective-assessment/README.md",
+      "original_path": "/tmp/rubisco-qmmm-redirection-v1/README.md",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "affafffb2d2d7146b77018fc2687535b9bb2c88fb88a18f526d48c32b396e706"
+    },
+    {
+      "bytes": 46963,
+      "member": "prospective-assessment/__pycache__/reference_assessment.cpython-311.pyc",
+      "original_path": "/tmp/rubisco-qmmm-redirection-v1/__pycache__/reference_assessment.cpython-311.pyc",
+      "role": "DATA_ONLY_BYTECODE",
+      "sha256": "7af00658957c4c2fc65ee3f4ec7b402dd79dfb2c0b398e5878217d1e55732be5"
+    },
+    {
+      "bytes": 29290,
+      "member": "prospective-assessment/__pycache__/test_reference_assessment.cpython-311-pytest-9.1.1.pyc",
+      "original_path": "/tmp/rubisco-qmmm-redirection-v1/__pycache__/test_reference_assessment.cpython-311-pytest-9.1.1.pyc",
+      "role": "DATA_ONLY_BYTECODE",
+      "sha256": "ed4e05df8a409c63d3f513ddf1404a00c9630b9b11071eeed67ef3985e182948"
+    },
+    {
+      "bytes": 7115,
+      "member": "prospective-assessment/assessment-successor.diff",
+      "original_path": "/tmp/rubisco-qmmm-redirection-v1/assessment-successor.diff",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3d4ecf30ec294b9f97a0ad12b4e1d6dc7f03c068edff0a1bcd507580efcee9b"
+    },
+    {
+      "bytes": 3281,
+      "member": "prospective-assessment/implementation-handoff.json",
+      "original_path": "/tmp/rubisco-qmmm-redirection-v1/implementation-handoff.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "9cd8923e6595840edf475a7ce8dd0bcd287dce0449211df2f390098c219b2861"
+    },
+    {
+      "bytes": 27907,
+      "member": "prospective-assessment/reference_assessment.py",
+      "original_path": "/tmp/rubisco-qmmm-redirection-v1/reference_assessment.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "96ae3533a422ca116ab42cf470e70b9251bf8b2760f26133aa63878f64dd381b"
+    },
+    {
+      "bytes": 7299,
+      "member": "prospective-assessment/test_reference_assessment.py",
+      "original_path": "/tmp/rubisco-qmmm-redirection-v1/test_reference_assessment.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "c276f90e12a193f65f8967a314468b02e6f4fba81c453c7e4ceaf60db4d40d1e"
+    },
+    {
+      "bytes": 7986,
+      "member": "provenance-diagnosis/README.md",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/README.md",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "80fd49051221d99edcd63dda74799fe89450cf5c4d69d937ee4ab36782b81d4a"
+    },
+    {
+      "bytes": 8900,
+      "member": "provenance-diagnosis/authenticated-parent-archive-census-v2.json",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/authenticated-parent-archive-census-v2.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "005562864b9c9180718a3d17af8783ac7763a5cd40b5e3116ee171628829ba1b"
+    },
+    {
+      "bytes": 8900,
+      "member": "provenance-diagnosis/authenticated-parent-archive-census.json",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/authenticated-parent-archive-census.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "005562864b9c9180718a3d17af8783ac7763a5cd40b5e3116ee171628829ba1b"
+    },
+    {
+      "bytes": 2907,
+      "member": "provenance-diagnosis/close.py",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/close.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "f6dfbf92df3dcc6367b35b2913d0bca898a3608ec20d534bf32048df18d616a6"
+    },
+    {
+      "bytes": 5605,
+      "member": "provenance-diagnosis/closed-register.json",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/closed-register.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "4da18e423fdd4befeb353473c03363a768a6935056591bb4840a949f09fd5aaf"
+    },
+    {
+      "bytes": 22682,
+      "member": "provenance-diagnosis/diagnose-v2.py",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/diagnose-v2.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "7c267fdf728c534568778b5ca554010107b195ca88908ee822503c2ec84f8199"
+    },
+    {
+      "bytes": 22624,
+      "member": "provenance-diagnosis/diagnose.py",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/diagnose.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "b829b0bbc125cc78acc6af6af886a69484503f8fa454416e4a07edcc549436d4"
+    },
+    {
+      "bytes": 99198,
+      "member": "provenance-diagnosis/observation.json",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/observation.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "6a767764855a0ee66d38d85dc13215eafe9f86b73eb3654659bba92086f2b692"
+    },
+    {
+      "bytes": 836,
+      "member": "provenance-diagnosis/outer-resource-v1.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/outer-resource-v1.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "f1b3a6c1076e37054d76a106671ee8028c22aaab6f3af56dd4f053a5839d75b5"
+    },
+    {
+      "bytes": 799,
+      "member": "provenance-diagnosis/outer-resource-v2.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/outer-resource-v2.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "87dd65defa17d29041ff041c2e1b5239b612a4fffca9e171383d5620f36414ea"
+    },
+    {
+      "bytes": 38001,
+      "member": "provenance-diagnosis/parent-v5-native.py",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/parent-v5-native.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "808c461ab657e3385e8a72b596bd1f8d9d16e84193ff591c3b7d5df9fe7d1ad5"
+    },
+    {
+      "bytes": 11948,
+      "member": "provenance-diagnosis/parent-v5-preparation.py",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/parent-v5-preparation.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "90f98f2a0888ba30b7d3e9b6510c41f522585ad8e59bcf578fda406560215fa0"
+    },
+    {
+      "bytes": 1988,
+      "member": "provenance-diagnosis/resource-summary.json",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/resource-summary.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "72cf438fc61f266f2e7f2b37e48f188b45a4287b9c90cfe68b167f46379fa121"
+    },
+    {
+      "bytes": 765,
+      "member": "provenance-diagnosis/selection.json",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/selection.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "0186aaef6f76202884bb2ea64ce972369c1cdeb8655e08921731f8c94a6c74a7"
+    },
+    {
+      "bytes": 686,
+      "member": "provenance-diagnosis/stderr-v1.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/stderr-v1.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "3ca680a52f01d5432becb9c57e8c7d4511f82ab39de292b4095dc61b36c3ec08"
+    },
+    {
+      "bytes": 0,
+      "member": "provenance-diagnosis/stderr-v2.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/stderr-v2.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "member": "provenance-diagnosis/stdout-v1.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/stdout-v1.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 389,
+      "member": "provenance-diagnosis/stdout-v2.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/stdout-v2.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "787a7548f27a0a07e957fb9786aba4441d3ed74c25c3a60b2c95599fadb2a241"
+    },
+    {
+      "bytes": 7852,
+      "member": "provenance-diagnosis/supplement-observation-v4.json",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-observation-v4.json",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "1c1215450cf0df0250dafe79c2de1d660025e90930b3744cf8c7d8c423f56119"
+    },
+    {
+      "bytes": 834,
+      "member": "provenance-diagnosis/supplement-resource-v2.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-resource-v2.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "847e65d25eab52052324a15328013aa9797d965d5ad7f2326a656b4857d7edea"
+    },
+    {
+      "bytes": 837,
+      "member": "provenance-diagnosis/supplement-resource-v3.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-resource-v3.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "01bc5f4b5c3edb544159bca2f3a41c98a5e547ec65ce26de453829bad53d058d"
+    },
+    {
+      "bytes": 800,
+      "member": "provenance-diagnosis/supplement-resource-v4.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-resource-v4.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "899f3db934d528b7ecde3491be23ac6664761d0bdd6c35c4c979bcbed60ca756"
+    },
+    {
+      "bytes": 831,
+      "member": "provenance-diagnosis/supplement-resource.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-resource.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "b1f6dccc40e0bbd6727d6d5ab2ce18e5f8b7cd8e715e4304ed4524dad69a9d10"
+    },
+    {
+      "bytes": 421,
+      "member": "provenance-diagnosis/supplement-stderr-v2.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-stderr-v2.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "39b83ba9044372943ff87606f9cf0aa0a8291d62d8d35736f50d71877504c1e7"
+    },
+    {
+      "bytes": 455,
+      "member": "provenance-diagnosis/supplement-stderr-v3.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-stderr-v3.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "8cabb3210a8652e3ab586c9169226a4f44a74db3dbbeeb67038222c3b00027f2"
+    },
+    {
+      "bytes": 0,
+      "member": "provenance-diagnosis/supplement-stderr-v4.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-stderr-v4.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 179,
+      "member": "provenance-diagnosis/supplement-stderr.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-stderr.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e770f4a527cb7913a300272cbd2ec3718728ca2efda5a390fac39f3e5e7e58d6"
+    },
+    {
+      "bytes": 0,
+      "member": "provenance-diagnosis/supplement-stdout-v2.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-stdout-v2.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "member": "provenance-diagnosis/supplement-stdout-v3.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-stdout-v3.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 169,
+      "member": "provenance-diagnosis/supplement-stdout-v4.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-stdout-v4.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "73f27025fcf4c4ea7f0006be1fbcffe71ac2282fbea283cb6f112645ed6fcf26"
+    },
+    {
+      "bytes": 0,
+      "member": "provenance-diagnosis/supplement-stdout.txt",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-stdout.txt",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 8910,
+      "member": "provenance-diagnosis/supplement-v2.py",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-v2.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "3dd0e06daeba3eda5fd7cf529b0830bbb0d3563d30b6b8b536772883fc4aa7e8"
+    },
+    {
+      "bytes": 8923,
+      "member": "provenance-diagnosis/supplement-v3.py",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-v3.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "69079f276c7e5498af21f47dbb614b9de0cb1764853724ade8be23742d8351b9"
+    },
+    {
+      "bytes": 8927,
+      "member": "provenance-diagnosis/supplement-v4.py",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement-v4.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "00c8e642e7a103152f1fefea663f6156fec2d42f062fdd7b1f4540f5af80fc4d"
+    },
+    {
+      "bytes": 8874,
+      "member": "provenance-diagnosis/supplement.py",
+      "original_path": "/tmp/rubisco-redirection-provenance-v1/supplement.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "7b52bc3b2583a598fc0b7579ac0a66f6af0690dade2a012f47f605a5f7797e12"
+    },
+    {
+      "bytes": 3660,
+      "member": "workspace-source/pyproject.toml",
+      "original_path": "/home/chevre/gs-ml/empirical_lawhood/pyproject.toml",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "56876d8834198793534e56c8bbb8ff9dcd36dd4aeee68a326b6271fdefe06649"
+    },
+    {
+      "bytes": 18892,
+      "member": "workspace-source/src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_coupled_embedding.py",
+      "original_path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_coupled_embedding.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "4edcd851c019826f0822079c45b28675fdbeee4bb529b26aefd0e26b1267f2ba"
+    },
+    {
+      "bytes": 43512,
+      "member": "workspace-source/src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_coupled_preparation.py",
+      "original_path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_coupled_preparation.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "cb2c00a28f1d45193551e4f528a9cad6312528c0d510447493ea7ace5ed36f00"
+    },
+    {
+      "bytes": 9399,
+      "member": "workspace-source/src/empirical_lawhood/adapters/simulators/rubisco_electronic/coupled_return.py",
+      "original_path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/simulators/rubisco_electronic/coupled_return.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "76deb33acafb87eb89de990913d55e0984bdc9ae597f5fd473725f6e1f9d02a9"
+    },
+    {
+      "bytes": 23829,
+      "member": "workspace-source/src/empirical_lawhood/adapters/simulators/rubisco_electronic/rr_qmmm_xtb.py",
+      "original_path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/simulators/rubisco_electronic/rr_qmmm_xtb.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "d2c26705e776304c50b0563754210d6722368896e63a1c2afd504bf24b54b40c"
+    },
+    {
+      "bytes": 43562,
+      "member": "workspace-source/src/empirical_lawhood/adapters/simulators/rubisco_electronic/rr_xtb_repair.py",
+      "original_path": "/home/chevre/gs-ml/empirical_lawhood/src/empirical_lawhood/adapters/simulators/rubisco_electronic/rr_xtb_repair.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "04633934f8222f8641466dd4c180bf8a864b80d02cd1617ae47fbd4d7b380238"
+    },
+    {
+      "bytes": 6284,
+      "member": "workspace-source/tests/test_rubisco_coupled_return.py",
+      "original_path": "/home/chevre/gs-ml/empirical_lawhood/tests/test_rubisco_coupled_return.py",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "e64a83981e2dea5fd28ef5b1022bcfc8101959bc1960a4ff6db5bc14ebbb6d01"
+    },
+    {
+      "bytes": 995920,
+      "member": "workspace-source/uv.lock",
+      "original_path": "/home/chevre/gs-ml/empirical_lawhood/uv.lock",
+      "role": "SOURCE_OR_ORDINARY_METADATA",
+      "sha256": "ea491f9e8789d6cd5a18d89908d16ef7db4ee3c9ed4729e32354bc713b135f24"
+    }
+  ],
+  "native_execution_authority": false,
+  "portable_native_replay": false,
+  "primary_evidence_unchanged": true,
+  "schema": "ordinary-minimal-redirection-preservation-v1",
+  "status": "PARTIAL_SOURCE_METADATA_HANDOFF_NOT_NATIVE_REPLAY",
+  "stored_archive_ceiling_bytes": 2097152
+}

@@ -86,6 +86,16 @@ def test_public_authoring_wrapper_exports_match_frozen_products_and_reviewed_ide
         )
         expected = _matrix_export_with_reviewed_provenance_identity(expected)
     actual = export_wrapper(family, tmp_path, monkeypatch, frozen_matrix_lock=family == "matrix")
+    if family != "matrix":
+        # Preserve every historical byte except the added operational native
+        # return failure disposition. Scientific products keep exact hashes.
+        raw = (tmp_path / 'export/resources.json').read_bytes()
+        addition = b'"NATIVE_RETURN_FAILURE",'
+        assert raw.count(addition) == 1
+        historical = raw.replace(addition, b'', 1)
+        resource = next(row for row in expected['files'] if row['name'] == 'resources.json')
+        assert (len(historical), sha256(historical).hexdigest()) == (resource['size_bytes'], resource['sha256'])
+        actual = {**actual, 'files': [resource if row['name'] == 'resources.json' else row for row in actual['files']]}
     assert actual == expected
     assert actual["summary"]["native_tasks_executed"] == 0
     if family == "matrix":
@@ -105,7 +115,7 @@ def test_current_matrix_export_binds_actual_lock_without_changing_scientific_roo
         maximum_bytes=1024 * 1024,
     )
     config = load_registered_authoring(
-        ROOT / "experiments/prepared-response/prepared-source-qualification-author.json",
+        ROOT / "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-source-qualification-author.json",
         root_schemas={PreparedResponseNativeAuthoringInput.SCHEMA: PreparedResponseNativeAuthoringInput},
         maximum_bytes=16 * 1024,
     )

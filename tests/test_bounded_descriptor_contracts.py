@@ -15,6 +15,49 @@ OPERATIONS = ("control-read", "control-hash", "control-match", "control-search",
               "adapter-read", "adapter-hash", "contained-read", "contained-hash")
 
 
+@pytest.mark.parametrize("name", tuple(name for name in OPERATIONS if name != "control-match"))
+def test_unrestricted_file_preserves_exact_bytes_hash_and_finite_refusal(tmp_path, name):
+    raw = b"authentic retained bytes\n" * 256
+    path = tmp_path / "member"
+    path.write_bytes(raw)
+    result = operate(name, tmp_path, path, maximum=None, needles=(b"retained",))
+    if name.endswith("read"):
+        assert result == raw
+    elif name.endswith("hash"):
+        digest = result[1] if name in ("control-hash", "contained-hash") else result
+        assert digest == sha256(raw).hexdigest()
+    else:
+        assert result is True
+    with pytest.raises((control.BoundedFileIOError, ValueError)):
+        operate(name, tmp_path, path, maximum=1, needles=(b"retained",))
+
+
+@pytest.mark.parametrize("operation", ["read", "hash", "search"])
+def test_unrestricted_io_still_refuses_growth(tmp_path, monkeypatch, operation):
+    path = tmp_path / "member"
+    path.write_bytes(b"original")
+    original_read = os.read
+    changed = False
+
+    def grow(fd, size):
+        nonlocal changed
+        payload = original_read(fd, size)
+        if payload and not changed:
+            changed = True
+            with path.open("ab") as stream:
+                stream.write(b"unexpected")
+        return payload
+
+    monkeypatch.setattr(os, "read", grow)
+    with pytest.raises(control.BoundedFileIOError, match="grew|changed"):
+        if operation == "read":
+            control.read_bounded_bytes(path, maximum_bytes=None)
+        elif operation == "hash":
+            control.bounded_file_sha256(path, maximum_bytes=None)
+        else:
+            control.bounded_file_contains_any(path, (b"absent",), maximum_bytes=None)
+
+
 def operate(name, root, path, maximum=64, expected=b"abcdefghij", needles=(b"ij",)):
     if name == "control-read":
         return control.read_bounded_bytes(path, maximum_bytes=maximum)

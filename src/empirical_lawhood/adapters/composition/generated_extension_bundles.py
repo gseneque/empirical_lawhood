@@ -156,51 +156,183 @@ from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.extension_
 from empirical_lawhood.adapters.simulators.reactor_staged_pulse_response.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_050,
 )
-from empirical_lawhood.adapters.methods.response_geometry_prospective.extension_bundle import (
+from empirical_lawhood.adapters.methods.recursive_scientific_authoring.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_051,
 )
-from empirical_lawhood.adapters.simulators.response_geometry_prospective.extension_bundle import (
+from empirical_lawhood.adapters.methods.recursive_scientific_authoring_bounded32.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_052,
 )
-from empirical_lawhood.adapters.methods.retained_response_geometry_analysis.extension_bundle import (
+from empirical_lawhood.adapters.methods.recursive_scientific_authoring_bounded64.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_053,
 )
-from empirical_lawhood.adapters.methods.response_geometry_development.extension_bundle import (
+from empirical_lawhood.adapters.methods.recursive_scientific_authoring_draft128.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_054,
 )
-from empirical_lawhood.adapters.simulators.response_geometry_development.extension_bundle import (
+from empirical_lawhood.adapters.methods.response_geometry_prospective.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_055,
 )
-from empirical_lawhood.adapters.methods.rc_challenges.extension_bundle import (
+from empirical_lawhood.adapters.simulators.response_geometry_prospective.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_056,
 )
-from empirical_lawhood.adapters.simulators.six_matrix_response.extension_bundle import (
+from empirical_lawhood.adapters.methods.retained_response_geometry_analysis.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_057,
 )
-from empirical_lawhood.adapters.control.matrix_response_study.extension_bundle import (
+from empirical_lawhood.adapters.methods.response_geometry_development.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_058,
 )
-from empirical_lawhood.adapters.methods.backbone_structural_fan_in.extension_bundle import (
+from empirical_lawhood.adapters.simulators.response_geometry_development.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_059,
 )
-from empirical_lawhood.adapters.methods.backbone_structural_transport.extension_bundle import (
+from empirical_lawhood.adapters.methods.rubisco_feedback.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_060,
 )
-from empirical_lawhood.adapters.methods.synthetic_material_method.extension_bundle import (
+from empirical_lawhood.adapters.methods.rc_challenges.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_061,
 )
-from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.extension_bundle import (
+from empirical_lawhood.adapters.simulators.six_matrix_response.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_062,
 )
-from empirical_lawhood.adapters.simulators.torax_native.extension_bundle import (
+from empirical_lawhood.adapters.control.matrix_response_study.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_063,
 )
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.extension_bundle import (
+from empirical_lawhood.adapters.methods.backbone_structural_fan_in.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_064,
 )
-from empirical_lawhood.adapters.methods.uniform_electron_gas_analytic_reference.extension_bundle import (
+from empirical_lawhood.adapters.methods.backbone_structural_transport.extension_bundle import (
     EXTENSION_BUNDLE_CONTRIBUTION as _contribution_065,
 )
+from empirical_lawhood.adapters.methods.synthetic_material_method.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_066,
+)
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_067,
+)
+from empirical_lawhood.adapters.simulators.torax_native.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_068,
+)
+from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_069,
+)
+from empirical_lawhood.adapters.methods.uniform_electron_gas_analytic_reference.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_070,
+)
+from empirical_lawhood.adapters.methods.analytic_material_inquiry.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_071,
+)
+from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_072,
+)
+from empirical_lawhood.adapters.methods.battery_diagnostic_obstruction.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_073,
+)
+from empirical_lawhood.adapters.methods.battery_durable_inquiry.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_074,
+)
+from empirical_lawhood.adapters.methods.battery_observation_inquiry.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_075,
+)
+from empirical_lawhood.adapters.methods.battery_recursive_construction.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_076,
+)
+from empirical_lawhood.adapters.methods.battery_refined_inquiry.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_077,
+)
+from empirical_lawhood.adapters.methods.battery_segmented_inquiry.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_078,
+)
+from empirical_lawhood.adapters.methods.battery_thermal_inquiry.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_079,
+)
+from empirical_lawhood.adapters.methods.battery_thermal_service.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_080,
+)
+from empirical_lawhood.adapters.methods.matrix_factor_confirmation.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_081,
+)
+from empirical_lawhood.adapters.methods.matrix_factor_confirmation.compact.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_082,
+)
+from empirical_lawhood.adapters.methods.matrix_factor_response.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_083,
+)
+from empirical_lawhood.adapters.methods.matrix_history_analysis.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_084,
+)
+from empirical_lawhood.adapters.methods.matrix_experimental_programme.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_085,
+)
+from empirical_lawhood.adapters.methods.matrix_parameter_factor.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_086,
+)
+from empirical_lawhood.adapters.methods.matrix_parameter_history.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_087,
+)
+from empirical_lawhood.adapters.methods.matrix_parameter_response.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_088,
+)
+from empirical_lawhood.adapters.methods.matrix_prospective.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_089,
+)
+from empirical_lawhood.adapters.methods.matrix_researcher_programme.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_090,
+)
+from empirical_lawhood.adapters.methods.matrix_scheduled_history.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_091,
+)
+from empirical_lawhood.adapters.methods.matrix_scheduled_programme.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_092,
+)
+from empirical_lawhood.adapters.methods.rc_prerequisite_chain.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_093,
+)
+from empirical_lawhood.adapters.methods.rubisco_candidate_inquiry.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_094,
+)
+from empirical_lawhood.adapters.methods.rubisco_combinations.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_095,
+)
+from empirical_lawhood.adapters.methods.rubisco_cycle_constraints.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_096,
+)
+from empirical_lawhood.adapters.methods.rubisco_historical.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_097,
+)
+from empirical_lawhood.adapters.methods.rubisco_inquiry.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_098,
+)
+from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_099,
+)
+from empirical_lawhood.adapters.methods.rubisco_insilico_mechanism.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_100,
+)
+from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_101,
+)
+from empirical_lawhood.adapters.methods.rubisco_insilico_structure.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_102,
+)
+from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_103,
+)
+from empirical_lawhood.adapters.methods.rubisco_nomination_preparation.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_104,
+)
+from empirical_lawhood.adapters.methods.rubisco_prediction.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_105,
+)
+from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.extension_bundle import (
+    EXTENSION_BUNDLE_CONTRIBUTION as _contribution_106,
+)
+from empirical_lawhood.adapters.methods.battery_diagnostic_obstruction.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS as _experiment_protocols_009
+from empirical_lawhood.adapters.methods.matrix_experimental_programme.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS as _experiment_protocols_022
+from empirical_lawhood.adapters.methods.matrix_factor_confirmation.compact.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS as _experiment_protocols_023
+from empirical_lawhood.adapters.methods.matrix_factor_confirmation.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS as _experiment_protocols_024
+from empirical_lawhood.adapters.methods.matrix_factor_response.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS as _experiment_protocols_025
+from empirical_lawhood.adapters.methods.matrix_history_analysis.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS as _experiment_protocols_026
+from empirical_lawhood.adapters.methods.matrix_researcher_programme.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS as _experiment_protocols_032
+from empirical_lawhood.adapters.methods.matrix_scheduled_programme.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS as _experiment_protocols_035
+from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS as _experiment_protocols_072
 
 EXTENSION_BUNDLE_CONTRIBUTIONS = (
     _contribution_000,
@@ -269,17 +401,71 @@ EXTENSION_BUNDLE_CONTRIBUTIONS = (
     _contribution_063,
     _contribution_064,
     _contribution_065,
+    _contribution_066,
+    _contribution_067,
+    _contribution_068,
+    _contribution_069,
+    _contribution_070,
+    _contribution_071,
+    _contribution_072,
+    _contribution_073,
+    _contribution_074,
+    _contribution_075,
+    _contribution_076,
+    _contribution_077,
+    _contribution_078,
+    _contribution_079,
+    _contribution_080,
+    _contribution_081,
+    _contribution_082,
+    _contribution_083,
+    _contribution_084,
+    _contribution_085,
+    _contribution_086,
+    _contribution_087,
+    _contribution_088,
+    _contribution_089,
+    _contribution_090,
+    _contribution_091,
+    _contribution_092,
+    _contribution_093,
+    _contribution_094,
+    _contribution_095,
+    _contribution_096,
+    _contribution_097,
+    _contribution_098,
+    _contribution_099,
+    _contribution_100,
+    _contribution_101,
+    _contribution_102,
+    _contribution_103,
+    _contribution_104,
+    _contribution_105,
+    _contribution_106,
 )
 
 GENERATED_EXTENSION_BUNDLE_AGGREGATE = compose_extension_bundle_aggregate(
     EXTENSION_BUNDLE_CONTRIBUTIONS
 )
-EXPECTED_AGGREGATE_FINGERPRINT = "61a1a64ea174568d5205dc0becf2d5db8bb6e10b56ddae8ccad03de7150c46b8"
+EXPECTED_AGGREGATE_FINGERPRINT = "757aa7521d5d042b4d359cfbc86267ea9b7edec4a2481d1de5931c6170a1bf95"
 if GENERATED_EXTENSION_BUNDLE_AGGREGATE.fingerprint() != EXPECTED_AGGREGATE_FINGERPRINT:
     raise RuntimeError("generated extension aggregate fingerprint drifted")
 
+EXPERIMENT_PROTOCOL_DECLARATIONS = tuple(sorted((
+    *_experiment_protocols_009,
+    *_experiment_protocols_022,
+    *_experiment_protocols_023,
+    *_experiment_protocols_024,
+    *_experiment_protocols_025,
+    *_experiment_protocols_026,
+    *_experiment_protocols_032,
+    *_experiment_protocols_035,
+    *_experiment_protocols_072,
+), key=lambda declaration: declaration.protocol_id))
+
 __all__ = [
     "EXPECTED_AGGREGATE_FINGERPRINT",
+    "EXPERIMENT_PROTOCOL_DECLARATIONS",
     "EXTENSION_BUNDLE_CONTRIBUTIONS",
     "GENERATED_EXTENSION_BUNDLE_AGGREGATE",
 ]

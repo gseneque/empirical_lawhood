@@ -18,12 +18,15 @@ from empirical_lawhood.api.authoring_output import report_incomplete_output
 from empirical_lawhood.api.results import CompileCandidateRequest
 from empirical_lawhood.api.rc_challenge_results import authenticate_rc_challenge_result_authority
 from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes, MAX_RUNTIME_PLAN_JSON_BYTES
+from empirical_lawhood.api.recursive_prospective_authoring import _capture_prospective_source, _publish_source_provenance
+from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
 from empirical_lawhood.infrastructure.source_closure import capture_clean_target_closure
+from empirical_lawhood.api.authoring_handoff import authenticate_selected_authoring_source, require_authoring_source_kind_layout
 from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
 from empirical_lawhood.api.integration_artifact_profiles import INTEGRATION_ARTIFACT_PROFILE_VALIDATORS
 from empirical_lawhood.kernel.provenance import ObjectIdentity
 from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure
+from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
 from empirical_lawhood.runtime.artifacts import ArtifactWriter
 from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_run_plan
 from empirical_lawhood.runtime.study_issue import MAX_COMPOSED_PROGRAMME_CONTROL_BYTES, project_standard_study_extensions
@@ -49,7 +52,8 @@ def author_rc_challenge_phase(*, root: Path, config: SimulatorMorphismChallengeC
     """
     output_dir = preflight_authoring_output_directory(directory=output_dir, repo_root=root,
         artifact_writer=artifact_writer)
-    closure = capture_clean_target_closure(root, f"{config.config_id}.source-closure")
+    captured = _capture_prospective_source(root, f"{config.config_id}.source-closure", artifact_writer=artifact_writer)
+    closure = captured.closure
     source_files = {path: read_bounded_bytes(root / path, maximum_bytes=2 * 1024**2)
                     for path in SIMULATOR_MORPHISM_CHALLENGE_SOURCE_CLOSURE_PATHS}
     if sum(len(payload) for payload in source_files.values()) > 32 * 1024**2:
@@ -92,6 +96,8 @@ def author_rc_challenge_phase(*, root: Path, config: SimulatorMorphismChallengeC
                              ("resources.json", resources), ("preissue-run-plan.json", projected),
                              ("preissue-execution-plan.json", lowered)):
             save(name, record)
+        _publish_source_provenance(captured=captured, destination=output_dir, artifact_writer=artifact_writer)
+        GitStudySourceClosureInspector(Path(root)).observe(closure)
         return {"phase": config.phase.value, "candidate_sha256": candidate.fingerprint(),
                 "implementation_commit": closure.implementation_commit,
                 "implementation_source_closure_sha256": composition.issued_inputs.implementation_source_closure_sha256,
@@ -157,8 +163,13 @@ def load_rc_challenge_handoff(*, directory: Path, root: Path,
                                     RCChallengeIssuedInputs, maximum_bytes=8 * 1024**2)
     closure = decode_canonical_bytes(read_bounded_bytes(selected / "source-closure.json", maximum_bytes=65536),
                                      ImplementationSourceClosure, maximum_bytes=65536)
-    if capture_clean_target_closure(root, closure.source_closure_id) != closure:
-        raise ValueError("RC retained authoring actual source archive has changed")
+    require_authoring_source_kind_layout(directory=selected, closure=closure)
+    if closure.kind is SourceClosureKind.CLEAN_GIT_COMMIT:
+        if capture_clean_target_closure(root, closure.source_closure_id) != closure:
+            raise ValueError("RC retained authoring actual source archive has changed")
+    else:
+        authenticate_selected_authoring_source(directory=selected, project_root=root,
+            artifact_writer=artifact_writer, closure=closure)
     source_files = {path: read_bounded_bytes(root / path, maximum_bytes=2 * 1024**2)
                     for path in SIMULATOR_MORPHISM_CHALLENGE_SOURCE_CLOSURE_PATHS}
     composition = compose_simulator_morphism_challenges_phase(

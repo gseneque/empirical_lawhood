@@ -128,7 +128,7 @@ def test_exact_receipt_rejects_run_task_and_materialization_substitution(custody
     exact = publish_receipt(plane, store, f"{RUN}.{TASK}.attempt-001")
     with pytest.raises(ValueError, match="different run"):
         runtime.dependency_receipt("synthetic-other-run", binding(exact))
-    with pytest.raises(ArtifactIdentityConflict, match="run or task"):
+    with pytest.raises(ValueError, match="exact committed task receipt"):
         runtime.dependency_receipt(RUN, replace(binding(exact), task_id="synthetic.other-task"))
     with pytest.raises(ValueError, match="exact committed task receipt"):
         runtime.dependency_receipt(

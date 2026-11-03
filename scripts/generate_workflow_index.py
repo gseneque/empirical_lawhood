@@ -1,4 +1,4 @@
-"""Render only the shared workflow table in the experiment directory entry.
+"""Render the shared workflow table from the installed workflow facts.
 
 SPDX-License-Identifier: MPL-2.0
 """
@@ -6,6 +6,7 @@ SPDX-License-Identifier: MPL-2.0
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 
 from empirical_lawhood.api.workflows import list_workflows
@@ -14,9 +15,22 @@ from empirical_lawhood.cli.workflows import workflow_details
 START = "<!-- BEGIN GENERATED WORKFLOWS -->"
 END = "<!-- END GENERATED WORKFLOWS -->"
 ROOT = Path(__file__).resolve().parents[1]
+DESTINATION = ROOT / "docs/reference/workflows.md"
 
 # Presentation only: scientific limits remain in the workflow facts.
 DISPLAY_STATES = {
+    'matrix-programme': '🔵 Finite installed composition; 🟠 Full scientific acceptance pending',
+    'matrix-selected-e4-revision': '🔵 Declared researcher route; 🟠 Current workflow acceptance required',
+    'matrix-selected-e4-protected': '🔵 Declared researcher route; 🟠 Current workflow acceptance required',
+    'matrix-selected-opportunity': '🔵 Declared researcher route; 🟠 Current workflow acceptance required',
+    'matrix-selected-revision': '🔵 Declared researcher route; 🟠 Current workflow acceptance required',
+    'battery-obstruction-reassessment': '🔵 Declared researcher route; 🟠 Current workflow acceptance required',
+    'battery-initial-window-observation': '🟠 Concise programme software remains unavailable',
+    'matrix-response-experiment': '🔵 Declarative preparation; 🟠 Scientific entry unresolved',
+    'matrix-native-utility': '🔵 Declared native E2 route; 🟠 Scientific selections and workflow acceptance required',
+    'rubisco-kinetic-join': '🟡 Exposed conditional software; 🟠 Biological prediction unresolved',
+    'recursive-inquiry': '🟡 Exposed development; 🟠 Unresolved physical premises',
+    'rc-prerequisite-chain': '🟡 Exposed numerical development experiment',
     'matrix-geometry': '🟢 Current operation',
     'selected-events': '🟢 Current operation',
     'matrix-history-analysis': '🟢 Current acquisition / analysis; 🟠 Exposed-array import',
@@ -67,7 +81,7 @@ def render_table() -> str:
         inputs = "; ".join(
             f"`{Path(item.path).name}`: {item.role}" for item in workflow.inputs
         )
-        guide = workflow.guide.removeprefix("experiments/")
+        guide = Path(os.path.relpath(ROOT / workflow.guide, DESTINATION.parent)).as_posix()
         lines.append(
             f"| [{workflow.title}]({guide})<br>{workflow.kind} | "
             f"{DISPLAY_STATES[workflow.workflow_id]} | {commands}<br>{inputs} | {workflow.environment}<br>"
@@ -80,10 +94,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    path = ROOT / "experiments/README.md"
+    path = DESTINATION
     text = path.read_text(encoding="utf-8")
     if text.count(START) != 1 or text.count(END) != 1:
-        raise ValueError("Experiment entry must have exactly one workflow table region")
+        raise ValueError("Workflow reference must have exactly one generated table region")
     before, remainder = text.split(START)
     _, after = remainder.split(END)
     generated = before + START + "\n\n" + render_table() + "\n" + END + after

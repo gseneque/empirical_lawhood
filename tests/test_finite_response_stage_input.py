@@ -15,7 +15,7 @@ from empirical_lawhood.adapters.composition.finite_response_law.stage_input impo
 from empirical_lawhood.adapters.methods.finite_response_law.science import FiniteResponseLawScienceSpec
 from empirical_lawhood.api.codecs import load_registered_authoring
 
-ROOT = Path(__file__).parents[1] / "experiments/finite-response-law"
+ROOT = Path(__file__).parents[1] / "programmes/foundations/emergent-structure/workflows/finite-response-law"
 FILES = {
     "informative-composition": 'informative-composition-input.json',
     "calibration": "calibration-stage-input.json",

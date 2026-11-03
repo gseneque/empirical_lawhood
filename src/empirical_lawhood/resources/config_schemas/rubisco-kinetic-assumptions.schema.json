@@ -1,0 +1,58 @@
+{
+  "$defs": {
+    "DisclosedAssumption_8f7f8c9f65ed": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/examples/disclosed-rubisco-kinetic-assumption"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "assumption_id": {
+              "description": "assumption id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "description": {
+              "description": "description; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "evidence_role": {
+              "description": "evidence role; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "independent_biological_units": {
+              "description": "independent biological units; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "assumption_id",
+            "description",
+            "evidence_role",
+            "independent_biological_units"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:rubisco-kinetic-assumptions",
+  "$ref": "#/$defs/DisclosedAssumption_8f7f8c9f65ed",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Rubisco Kinetic Assumptions",
+  "x-consumer": "rubisco-kinetic-assumptions",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "retained",
+  "x-preparation-allowed": false
+}

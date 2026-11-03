@@ -137,7 +137,8 @@ def _validate_source_selection(
         > _OUTCOME_ACCESS_RANK[source_manifest.maximum_outcome_access]
     ):
         raise ValueError("source profile exceeds the registered source outcome access")
-    if source_manifest.resource_budget.source_scan_bytes < profile.expected_source_size_bytes:
+    if (source_manifest.resource_budget.source_scan_bytes is None
+        or source_manifest.resource_budget.source_scan_bytes < profile.expected_source_size_bytes):
         raise ValueError("source materialization exceeds the registered source scan budget")
 
 
@@ -233,7 +234,9 @@ def compile_source_pipeline(
         )
         capability_registry.require(requirement)
         if (
-            registration.limits.max_input_bytes < edge.resource_budget.source_scan_bytes
+            edge.resource_budget.source_scan_bytes is None
+            or edge.resource_budget.output_bytes is None
+            or registration.limits.max_input_bytes < edge.resource_budget.source_scan_bytes
             or registration.limits.max_output_bytes < edge.resource_budget.output_bytes
             or registration.limits.max_records < profile.maximum_row_count
         ):

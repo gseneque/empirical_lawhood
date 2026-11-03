@@ -917,16 +917,22 @@ def _verify_projected_artifacts(
         ):
             raise CatalogRebuildError("catalog storage root differs from the guarded root")
         try:
-            sidecar = artifact_plane.root.resolve(
-                f"{locator.relative_path}.manifest.json",
-                for_write=False,
-            )
-            manifest = decode_artifact_manifest(
-                read_bounded_bytes(
-                    sidecar,
-                    maximum_bytes=MAX_ARTIFACT_MANIFEST_BYTES,
+            try:
+                read_manifest = artifact_plane.read_manifest
+            except AttributeError:
+                manifest = decode_artifact_manifest(
+                    read_bounded_bytes(
+                        artifact_plane.root.resolve(
+                            f"{locator.relative_path}.manifest.json", for_write=False,
+                        ),
+                        maximum_bytes=MAX_ARTIFACT_MANIFEST_BYTES,
+                    )
                 )
-            )
+            else:
+                if not callable(read_manifest):
+                    raise TypeError("artifact plane manifest reader hook must be callable")
+                manifest = read_manifest(locator.relative_path,
+                    maximum_bytes=MAX_ARTIFACT_MANIFEST_BYTES)
             artifact_plane.verify_manifest(manifest)
         except (ArtifactPlaneError, BoundedFileIOError, OSError, ValueError) as error:
             raise CatalogRebuildError(

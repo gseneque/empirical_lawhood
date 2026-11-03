@@ -683,20 +683,18 @@ def validate_experiment_contract_closure(
         if len(task.outputs) > 64:
             bound_reasons.append(f"PUBLICATION_MEMBER_BOUND_EXCEEDED:{task.task_id}")
         maximum_output_bytes = task.capability.requested_resources.output_bytes
-        if maximum_output_bytes <= 0:
+        if maximum_output_bytes is not None and maximum_output_bytes <= 0:
             bound_reasons.append(f"OUTPUT_BYTE_BOUND_INVALID:{task.task_id}")
         input_budget = task.capability.requested_resources.source_scan_bytes
-        if (task.external_inputs or task.dependency_task_ids) and input_budget <= 0:
+        if (task.external_inputs or task.dependency_task_ids) and input_budget is not None and input_budget <= 0:
             bound_reasons.append(f"INPUT_SCAN_BUDGET_MISSING:{task.task_id}")
         known_input_bytes = sum(value.expected_size_bytes or 0 for value in task.external_inputs)
-        if known_input_bytes > input_budget:
+        if input_budget is not None and known_input_bytes > input_budget:
             bound_reasons.append(f"INPUT_SCAN_BUDGET_EXCEEDED:{task.task_id}")
         if task.maximum_attempts < 1 or task.maximum_attempts > 8:
             bound_reasons.append(f"ATTEMPT_BOUND_INVALID:{task.task_id}")
-    if execution_plan.minimum_free_bytes != sum(
-        task.capability.requested_resources.output_bytes for task in execution_plan.tasks
-    ):
-        bound_reasons.append("WORST_CASE_STORAGE_BOUND_DIFFERS")
+    # Frozen output ceilings do not determine actual storage requirements.
+    # Guarded I/O owns current mount, write and operator free-space checks.
     if contract_evidence is not None:
         if contract_evidence.maximum_resident_bytes < 1:
             bound_reasons.append("MAXIMUM_RESIDENCY_INVALID")
@@ -704,9 +702,8 @@ def validate_experiment_contract_closure(
             if len(batch.member_output_ids) > MAX_ARTIFACT_PUBLICATION_MEMBERS:
                 bound_reasons.append(f"PUBLICATION_MEMBER_BOUND_EXCEEDED:{batch.batch_id}")
             planned_task = tasks.get(batch.producer_task_id)
-            if planned_task is not None and batch.maximum_resident_bytes > (
-                planned_task.capability.requested_resources.output_bytes
-            ):
+            if (planned_task is not None and planned_task.capability.requested_resources.output_bytes is not None
+                    and batch.maximum_resident_bytes > planned_task.capability.requested_resources.output_bytes):
                 bound_reasons.append(f"PUBLICATION_RESIDENCY_EXCEEDS_TASK:{batch.batch_id}")
             if batch.maximum_resident_bytes > contract_evidence.maximum_resident_bytes:
                 bound_reasons.append(f"MAXIMUM_RESIDENCY_EXCEEDED:{batch.batch_id}")

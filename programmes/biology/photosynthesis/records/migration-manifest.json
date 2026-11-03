@@ -1,0 +1,3072 @@
+{
+  "schema": "rubisco.migration-selection-manifest.v1",
+  "destination_branch": "recchain",
+  "destination_base": "9c670a3127cb652f839e56463758226749b07c73",
+  "source_heads": {
+    "primary": "70ad6708799f0e8070526ef15c1da4870e080238",
+    "r1": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+    "completion": "aa9346547560abcb6500f2e97b53b96f456d9be3"
+  },
+  "selected_files": [
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_sha256": "611541278b376996835d64cc1b339c8971920098c158d34bfc319e1402dac875",
+      "source_bytes": 13762,
+      "selected_meaning": "source quantities, uncertainty meanings, measurement joins",
+      "destination_owner": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/records.py",
+      "disposition": "adapt",
+      "owner_authored_public_contribution_license": "MPL-2.0 for adapted code; CC-BY-4.0 for maintained prose",
+      "historical_original_bytes_unchanged": true
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/xlsx.py",
+      "source_sha256": "b7016ebe232e28230f8ceeff27c370b4a7068fb52e46cd7de30d2b997430d292",
+      "source_bytes": 16471,
+      "selected_meaning": "bounded native workbook cells and formula lineage",
+      "destination_owner": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/workbook.py",
+      "disposition": "adapt",
+      "owner_authored_public_contribution_license": "MPL-2.0 for adapted code; CC-BY-4.0 for maintained prose",
+      "historical_original_bytes_unchanged": true
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/rr2018.py",
+      "source_sha256": "15a9089564ac3f3f8e2c6b82ee55817567d2186bd78b6ed527b42f3f9b5ecfb8",
+      "source_bytes": 8592,
+      "selected_meaning": "nine-row source curation and exact role slices",
+      "destination_owner": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr2018.py",
+      "disposition": "adapt",
+      "owner_authored_public_contribution_license": "MPL-2.0 for adapted code; CC-BY-4.0 for maintained prose",
+      "historical_original_bytes_unchanged": true
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_sha256": "9643cb4f617fcf74fdf7784012eb4fdc6e7c85f2054812d14931492b5f05b704",
+      "source_bytes": 6463,
+      "selected_meaning": "stationary occupancy, products, rates, finite feedback, sensitivity",
+      "destination_owner": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+      "disposition": "adapt",
+      "owner_authored_public_contribution_license": "MPL-2.0 for adapted code; CC-BY-4.0 for maintained prose",
+      "historical_original_bytes_unchanged": true
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/records.py",
+      "source_sha256": "305e43c5bbcb3dfcf9e3a208adbe66f8b159360d3d7a8fec0c444cf8afb06bdf",
+      "source_bytes": 8034,
+      "selected_meaning": "strict conditional assay inputs and commitment histories",
+      "destination_owner": "src/empirical_lawhood/adapters/simulators/rubisco_assay/records.py",
+      "disposition": "adapt",
+      "owner_authored_public_contribution_license": "MPL-2.0 for adapted code; CC-BY-4.0 for maintained prose",
+      "historical_original_bytes_unchanged": true
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/analysis.py",
+      "source_sha256": "d7255de1848a4a008dbf20f3becca4d3df6462ecf9611ca03b9fd9b48bfb9c4d",
+      "source_bytes": 7857,
+      "selected_meaning": "fixed parent/nearest/ridge, complete folds and adverse point errors",
+      "destination_owner": "src/empirical_lawhood/adapters/methods/rubisco_historical/analysis.py",
+      "disposition": "adapt",
+      "owner_authored_public_contribution_license": "MPL-2.0 for adapted code; CC-BY-4.0 for maintained prose",
+      "historical_original_bytes_unchanged": true
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "selected_meaning": "model/forecast/fold records with exposed scope",
+      "destination_owner": "src/empirical_lawhood/adapters/methods/rubisco_historical/records.py",
+      "disposition": "adapt",
+      "owner_authored_public_contribution_license": "MPL-2.0 for adapted code; CC-BY-4.0 for maintained prose",
+      "historical_original_bytes_unchanged": true
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/preparation.py",
+      "source_sha256": "90f98f2a0888ba30b7d3e9b6510c41f522585ad8e59bcf578fda406560215fa0",
+      "source_bytes": 11948,
+      "selected_meaning": "exact preparation, isolated KCX parameters, stereochemistry",
+      "destination_owner": "src/empirical_lawhood/adapters/simulators/rubisco_molecular/",
+      "disposition": "conditional",
+      "owner_authored_public_contribution_license": "MPL-2.0 for adapted code; CC-BY-4.0 for maintained prose",
+      "historical_original_bytes_unchanged": true
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "source_sha256": "bfafd825a58b5ccda6dff141f9bb240ceabb2e6ce03e6f357eec2a584ba408f2",
+      "source_bytes": 12863,
+      "selected_meaning": "explicit compatible checkpoint state and cumulative clocks",
+      "destination_owner": "src/empirical_lawhood/adapters/simulators/rubisco_molecular/",
+      "disposition": "conditional",
+      "owner_authored_public_contribution_license": "MPL-2.0 for adapted code; CC-BY-4.0 for maintained prose",
+      "historical_original_bytes_unchanged": true
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v6/analysis.py",
+      "source_sha256": "88b2386152540dbc5d7e3c0e6b527b52e12faea6581c6f7f084a99921c00b553",
+      "source_bytes": 7599,
+      "selected_meaning": "fixed sampling drift/block/adequacy diagnostics",
+      "destination_owner": "src/empirical_lawhood/adapters/simulators/rubisco_molecular/",
+      "disposition": "conditional",
+      "owner_authored_public_contribution_license": "MPL-2.0 for adapted code; CC-BY-4.0 for maintained prose",
+      "historical_original_bytes_unchanged": true
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "docs/programmes/rubisco-el/plans/r02s-m1-hardware-benchmark-v1.md",
+      "source_sha256": "755fd8b93a63a3c256c4c1b22bd103aa0a2fdb217d2022e783e13a3b864636b2",
+      "source_bytes": 17142,
+      "selected_meaning": "unentered CPU/OpenCL benchmark contract",
+      "destination_owner": null,
+      "disposition": "retain-history",
+      "owner_authored_public_contribution_license": "MPL-2.0 for adapted code; CC-BY-4.0 for maintained prose",
+      "historical_original_bytes_unchanged": true
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "docs/programmes/rubisco-el/plans/phase-04c-prospective-search-and-control.md",
+      "source_sha256": "8d75dcca8d98d85dbc90f88dd3afba712bd591b18a97a53f2f77b9ef14e7f279",
+      "source_bytes": 13221,
+      "selected_meaning": "matched adaptive comparisons and committed update chronology; conventional-only completion superseded",
+      "destination_owner": "docs/rubisco-inquiry/assessment-protocol.md",
+      "disposition": "adapt",
+      "owner_authored_public_contribution_license": "MPL-2.0 for adapted code; CC-BY-4.0 for maintained prose",
+      "historical_original_bytes_unchanged": true
+    }
+  ],
+  "excluded": [
+    "legacy operator identities/signers/approval records",
+    "old runtime paths and sibling imports",
+    "legacy schedulers and generated aggregates",
+    "wholesale six-version M1 source copy"
+  ],
+  "execution_authority": "owner-requested exposed development only; no scientific issue/reveal/qualification authority",
+  "source_repository": "/home/chevre/gs-ml/icf-yolo",
+  "selected_symbols": [
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_sha256": "611541278b376996835d64cc1b339c8971920098c158d34bfc319e1402dac875",
+      "source_bytes": 13762,
+      "name": "Endpoint",
+      "kind": "ClassDef",
+      "line_start": 24,
+      "line_end": 30,
+      "selected_source_bytes": 212,
+      "selected_source_sha256": "b556c7a3dfeaa5e73bc12a6a741df3fc098f0608940d4dc2f5876bd0d71232e1",
+      "declared_record_fields": [],
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/csv_source.py",
+          "name": "ReportedQuantityKind",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "partial_native_record_adaptation",
+      "adaptation_note": "Native source-specific roles/error/condition records exist; legacy generic conversion, direct/derived lineage, endpoint-join and measurement-dedup contracts are not reproduced by this correspondence."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_sha256": "611541278b376996835d64cc1b339c8971920098c158d34bfc319e1402dac875",
+      "source_bytes": 13762,
+      "name": "MeasurementKind",
+      "kind": "ClassDef",
+      "line_start": 33,
+      "line_end": 36,
+      "selected_source_bytes": 98,
+      "selected_source_sha256": "6f6eb9457725a19c2c3a0cd60bbeb4b62771930a4d81ef17c00ffd54e1c29620",
+      "declared_record_fields": [],
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/csv_source.py",
+          "name": "SourceQuantityAdmission",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "partial_native_record_adaptation",
+      "adaptation_note": "Native source-specific roles/error/condition records exist; legacy generic conversion, direct/derived lineage, endpoint-join and measurement-dedup contracts are not reproduced by this correspondence."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_sha256": "611541278b376996835d64cc1b339c8971920098c158d34bfc319e1402dac875",
+      "source_bytes": 13762,
+      "name": "UncertaintyKind",
+      "kind": "ClassDef",
+      "line_start": 39,
+      "line_end": 43,
+      "selected_source_bytes": 98,
+      "selected_source_sha256": "0be0a5eabd6b21a4e2d59ace013882662371cd1c54cb5ea24c53af7d9ec574f8",
+      "declared_record_fields": [],
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/direct_panels.py",
+          "name": "DirectEndpointObservationV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "partial_native_record_adaptation",
+      "adaptation_note": "Native source-specific roles/error/condition records exist; legacy generic conversion, direct/derived lineage, endpoint-join and measurement-dedup contracts are not reproduced by this correspondence."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_sha256": "611541278b376996835d64cc1b339c8971920098c158d34bfc319e1402dac875",
+      "source_bytes": 13762,
+      "name": "ReplicateKind",
+      "kind": "ClassDef",
+      "line_start": 46,
+      "line_end": 49,
+      "selected_source_bytes": 154,
+      "selected_source_sha256": "5b965bed25cc139907e6ff4b05da67668d3b46f9d6ecbaaec0feb4de186772c3",
+      "declared_record_fields": [],
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/wilson2017.py",
+          "name": "NativeReplicationDescriptorV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "partial_native_record_adaptation",
+      "adaptation_note": "Native source-specific roles/error/condition records exist; legacy generic conversion, direct/derived lineage, endpoint-join and measurement-dedup contracts are not reproduced by this correspondence."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_sha256": "611541278b376996835d64cc1b339c8971920098c158d34bfc319e1402dac875",
+      "source_bytes": 13762,
+      "name": "KineticUncertaintyV1",
+      "kind": "ClassDef",
+      "line_start": 52,
+      "line_end": 102,
+      "selected_source_bytes": 2541,
+      "selected_source_sha256": "c4a3e0702e20a53735330a9aca282e9393a0253b08dfa613292de9d5b4259572",
+      "declared_record_fields": [
+        "kind",
+        "spread",
+        "lower",
+        "upper",
+        "confidence",
+        "replicate_count",
+        "replicate_kind",
+        "unknown_reason"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/kinetic-uncertainty/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/direct_panels.py",
+          "name": "DirectEndpointObservationV1",
+          "kind": "ClassDef"
+        },
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/wilson2017.py",
+          "name": "WilsonReportedEndpointV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "partial_native_record_adaptation",
+      "adaptation_note": "Native source-specific roles/error/condition records exist; legacy generic conversion, direct/derived lineage, endpoint-join and measurement-dedup contracts are not reproduced by this correspondence."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_sha256": "611541278b376996835d64cc1b339c8971920098c158d34bfc319e1402dac875",
+      "source_bytes": 13762,
+      "name": "KineticObservationV1",
+      "kind": "ClassDef",
+      "line_start": 105,
+      "line_end": 179,
+      "selected_source_bytes": 3825,
+      "selected_source_sha256": "ae777bd9f687d5a74951aaca516b53e5a35d87c8d33c926cee48411cab74279b",
+      "declared_record_fields": [
+        "observation_id",
+        "study_id",
+        "original_measurement_id",
+        "source_sha256",
+        "source_locator",
+        "native_enzyme_id",
+        "exact_complex_sha256",
+        "assay_context_sha256",
+        "preparation_id",
+        "endpoint",
+        "measurement_kind",
+        "native_value",
+        "native_unit",
+        "normalization",
+        "raw_text",
+        "uncertainty",
+        "parent_observation_ids",
+        "unknown_fields",
+        "missing_reason",
+        "exposure"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/kinetic-observation/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/csv_source.py",
+          "name": "ReportedKineticQuantityV1",
+          "kind": "ClassDef"
+        },
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/csv_source.py",
+          "name": "NativeKineticCSVTableV1",
+          "kind": "ClassDef"
+        },
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/direct_panels.py",
+          "name": "DirectEndpointObservationV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "partial_native_record_adaptation",
+      "adaptation_note": "Native source-specific roles/error/condition records exist; legacy generic conversion, direct/derived lineage, endpoint-join and measurement-dedup contracts are not reproduced by this correspondence."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_sha256": "611541278b376996835d64cc1b339c8971920098c158d34bfc319e1402dac875",
+      "source_bytes": 13762,
+      "name": "canonical_value",
+      "kind": "FunctionDef",
+      "line_start": 182,
+      "line_end": 204,
+      "selected_source_bytes": 1490,
+      "selected_source_sha256": "ba3106ee1629c8b280e3b55d2138bcab3e48e5aff1731abcd0925b842b961bac",
+      "destination_selectors": [],
+      "adaptation_status": "not_ported",
+      "adaptation_note": "No current selected equivalent; legacy record/helper retained as explicit migration gap."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_sha256": "611541278b376996835d64cc1b339c8971920098c158d34bfc319e1402dac875",
+      "source_bytes": 13762,
+      "name": "JoinClass",
+      "kind": "ClassDef",
+      "line_start": 207,
+      "line_end": 211,
+      "selected_source_bytes": 202,
+      "selected_source_sha256": "bd372c3daec1a6dac836b2c17e5514c47ef004c35fb45bb388478a5344bf4705",
+      "declared_record_fields": [],
+      "destination_selectors": [],
+      "adaptation_status": "not_ported",
+      "adaptation_note": "No current selected equivalent; legacy record/helper retained as explicit migration gap."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_sha256": "611541278b376996835d64cc1b339c8971920098c158d34bfc319e1402dac875",
+      "source_bytes": 13762,
+      "name": "EndpointJoinV1",
+      "kind": "ClassDef",
+      "line_start": 214,
+      "line_end": 235,
+      "selected_source_bytes": 1042,
+      "selected_source_sha256": "c5ff187e71f8b79bd128c1d9a02352c04788e6958b469b40e1c3fe8e7653544f",
+      "declared_record_fields": [
+        "specificity",
+        "turnover",
+        "join_class",
+        "reason_codes",
+        "covariance_known"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/endpoint-join/v1",
+      "destination_selectors": [],
+      "adaptation_status": "not_ported",
+      "adaptation_note": "No current selected equivalent; legacy record/helper retained as explicit migration gap."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_sha256": "611541278b376996835d64cc1b339c8971920098c158d34bfc319e1402dac875",
+      "source_bytes": 13762,
+      "name": "join_endpoints",
+      "kind": "FunctionDef",
+      "line_start": 238,
+      "line_end": 285,
+      "selected_source_bytes": 2009,
+      "selected_source_sha256": "889aff520dba94b31782101026ee91afac4386b1e39da1a42ccd1c049de88db1",
+      "destination_selectors": [],
+      "adaptation_status": "not_ported",
+      "adaptation_note": "No current selected equivalent; legacy record/helper retained as explicit migration gap."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_sha256": "611541278b376996835d64cc1b339c8971920098c158d34bfc319e1402dac875",
+      "source_bytes": 13762,
+      "name": "unique_measurement_groups",
+      "kind": "FunctionDef",
+      "line_start": 288,
+      "line_end": 323,
+      "selected_source_bytes": 1480,
+      "selected_source_sha256": "c674cf79bd36e15f83afc9f6e2b80f0f079064acd47b2c62c31cbff8e36dbb5a",
+      "destination_selectors": [],
+      "adaptation_status": "not_ported",
+      "adaptation_note": "No current selected equivalent; legacy record/helper retained as explicit migration gap."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/xlsx.py",
+      "source_sha256": "b7016ebe232e28230f8ceeff27c370b4a7068fb52e46cd7de30d2b997430d292",
+      "source_bytes": 16471,
+      "name": "WorkbookDecodeError",
+      "kind": "ClassDef",
+      "line_start": 34,
+      "line_end": 35,
+      "selected_source_bytes": 113,
+      "selected_source_sha256": "cd04f91052b2516a75bef3d4a60bf0e562a546a0e1d19bd97e625fd73b59930d",
+      "declared_record_fields": [],
+      "destination_selectors": [],
+      "adaptation_status": "not_ported",
+      "adaptation_note": "No current selected equivalent; legacy record/helper retained as explicit migration gap."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/xlsx.py",
+      "source_sha256": "b7016ebe232e28230f8ceeff27c370b4a7068fb52e46cd7de30d2b997430d292",
+      "source_bytes": 16471,
+      "name": "WorkbookLimitsV1",
+      "kind": "ClassDef",
+      "line_start": 38,
+      "line_end": 65,
+      "selected_source_bytes": 1107,
+      "selected_source_sha256": "5ea68ed50cb916188d40768afe2357d4f8fdef9e71665c4c436be6e7161f7a19",
+      "declared_record_fields": [
+        "maximum_input_bytes",
+        "maximum_expanded_bytes",
+        "maximum_member_bytes",
+        "maximum_members",
+        "maximum_rows",
+        "maximum_columns",
+        "maximum_cells",
+        "maximum_text_characters"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/workbook-limits/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/workbook.py",
+          "name": "decode_native_workbook",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/xlsx.py",
+      "source_sha256": "b7016ebe232e28230f8ceeff27c370b4a7068fb52e46cd7de30d2b997430d292",
+      "source_bytes": 16471,
+      "name": "NativeCellV1",
+      "kind": "ClassDef",
+      "line_start": 68,
+      "line_end": 93,
+      "selected_source_bytes": 1249,
+      "selected_source_sha256": "dc6710af169b548cc7994a6ba40b17fbc8f0f84736a4a030a9961926718e0b76",
+      "declared_record_fields": [
+        "sheet_name",
+        "coordinate",
+        "native_type",
+        "raw_value",
+        "text",
+        "formula",
+        "formula_attributes",
+        "style_index"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/native-xlsx-cell/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/workbook.py",
+          "name": "NativeWorkbookCellV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/xlsx.py",
+      "source_sha256": "b7016ebe232e28230f8ceeff27c370b4a7068fb52e46cd7de30d2b997430d292",
+      "source_bytes": 16471,
+      "name": "WorkbookViewV1",
+      "kind": "ClassDef",
+      "line_start": 96,
+      "line_end": 140,
+      "selected_source_bytes": 2216,
+      "selected_source_sha256": "e3861a6ec4c954d6ad3720c36f67f212b057db19310171d92995848af8729d52",
+      "declared_record_fields": [
+        "source_sha256",
+        "source_size_bytes",
+        "limits",
+        "sheet_inventory",
+        "selected_sheets",
+        "cells",
+        "expanded_bytes",
+        "member_count"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/native-xlsx-view/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/workbook.py",
+          "name": "NativeWorksheetV1",
+          "kind": "ClassDef"
+        },
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/workbook.py",
+          "name": "NativeWorkbookV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/xlsx.py",
+      "source_sha256": "b7016ebe232e28230f8ceeff27c370b4a7068fb52e46cd7de30d2b997430d292",
+      "source_bytes": 16471,
+      "name": "_xml",
+      "kind": "FunctionDef",
+      "line_start": 143,
+      "line_end": 159,
+      "selected_source_bytes": 808,
+      "selected_source_sha256": "93bf2c476e2c13c94f23cdddde5aeb3bb0241eddbcf698e7718862e4f1901050",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/workbook.py",
+          "name": "_xml",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/xlsx.py",
+      "source_sha256": "b7016ebe232e28230f8ceeff27c370b4a7068fb52e46cd7de30d2b997430d292",
+      "source_bytes": 16471,
+      "name": "_guard_archive",
+      "kind": "FunctionDef",
+      "line_start": 162,
+      "line_end": 201,
+      "selected_source_bytes": 2052,
+      "selected_source_sha256": "4587659be62f83993c6c2ffae6dd5e044332b0973234f452cd3aee6dcc94bace",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/workbook.py",
+          "name": "decode_native_workbook",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/xlsx.py",
+      "source_sha256": "b7016ebe232e28230f8ceeff27c370b4a7068fb52e46cd7de30d2b997430d292",
+      "source_bytes": 16471,
+      "name": "_inventory",
+      "kind": "FunctionDef",
+      "line_start": 204,
+      "line_end": 239,
+      "selected_source_bytes": 1968,
+      "selected_source_sha256": "94de1c09e80fa1390440c97ba84101d264bea68608d42795ded143383b795580",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/workbook.py",
+          "name": "NativeArchiveMemberV1",
+          "kind": "ClassDef"
+        },
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/workbook.py",
+          "name": "decode_native_workbook",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/xlsx.py",
+      "source_sha256": "b7016ebe232e28230f8ceeff27c370b4a7068fb52e46cd7de30d2b997430d292",
+      "source_bytes": 16471,
+      "name": "_native_text",
+      "kind": "FunctionDef",
+      "line_start": 242,
+      "line_end": 243,
+      "selected_source_bytes": 115,
+      "selected_source_sha256": "a0c30e23f219fba0d4a13c47f916ccc38d730192a874b13d95bfddc856df0bc1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/workbook.py",
+          "name": "_rich_text",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/xlsx.py",
+      "source_sha256": "b7016ebe232e28230f8ceeff27c370b4a7068fb52e46cd7de30d2b997430d292",
+      "source_bytes": 16471,
+      "name": "decode_workbook",
+      "kind": "FunctionDef",
+      "line_start": 246,
+      "line_end": 357,
+      "selected_source_bytes": 5766,
+      "selected_source_sha256": "a09f083c3d8bef4d613f2feb8de550b2bcd467dded22fc6051c7d1ff6518b673",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/workbook.py",
+          "name": "decode_native_workbook",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/rr2018.py",
+      "source_sha256": "15a9089564ac3f3f8e2c6b82ee55817567d2186bd78b6ed527b42f3f9b5ecfb8",
+      "source_bytes": 8592,
+      "name": "Rr2018NativeRowV1",
+      "kind": "ClassDef",
+      "line_start": 88,
+      "line_end": 114,
+      "selected_source_bytes": 1074,
+      "selected_source_sha256": "b02947cfddb796f4bda269eb1bf268c4628db396a34132fbbb01a454e30dbccc",
+      "declared_record_fields": [
+        "table_row",
+        "native_cells",
+        "reported_substitutions",
+        "disposition"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/rr2018-native-row/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr2018.py",
+          "name": "Rr2018NativeRowV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/rr2018.py",
+      "source_sha256": "15a9089564ac3f3f8e2c6b82ee55817567d2186bd78b6ed527b42f3f9b5ecfb8",
+      "source_bytes": 8592,
+      "name": "Rr2018NativeAuditV1",
+      "kind": "ClassDef",
+      "line_start": 117,
+      "line_end": 139,
+      "selected_source_bytes": 1013,
+      "selected_source_sha256": "772442eda2ab575247a24cbd10769a61dc3ad16c9e72b7cbabb633d28913a10c",
+      "declared_record_fields": [
+        "audit_id",
+        "source_sha256",
+        "supplement_sha256",
+        "native_headers",
+        "rows",
+        "limitations",
+        "physical_independent_units_known",
+        "biological_joint_uncertainty_available"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/rr2018-native-audit/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr2018.py",
+          "name": "Rr2018NativeAuditV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/rr2018.py",
+      "source_sha256": "15a9089564ac3f3f8e2c6b82ee55817567d2186bd78b6ed527b42f3f9b5ecfb8",
+      "source_bytes": 8592,
+      "name": "decode_rr2018",
+      "kind": "FunctionDef",
+      "line_start": 142,
+      "line_end": 187,
+      "selected_source_bytes": 2080,
+      "selected_source_sha256": "648569653fd511fafa828633ed9a095ebfd26905be8476977e9bbeae2ed7208c",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr2018.py",
+          "name": "decode_rr2018",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/rr2018.py",
+      "source_sha256": "15a9089564ac3f3f8e2c6b82ee55817567d2186bd78b6ed527b42f3f9b5ecfb8",
+      "source_bytes": 8592,
+      "name": "reported_mean",
+      "kind": "FunctionDef",
+      "line_start": 190,
+      "line_end": 194,
+      "selected_source_bytes": 301,
+      "selected_source_sha256": "f4b201d1b5e24a4dbefc56845eb927f069cdb66f359d78de70b57d0ae58ca299",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr2018.py",
+          "name": "reported_mean",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/rr2018.py",
+      "source_sha256": "15a9089564ac3f3f8e2c6b82ee55817567d2186bd78b6ed527b42f3f9b5ecfb8",
+      "source_bytes": 8592,
+      "name": "role_slices",
+      "kind": "FunctionDef",
+      "line_start": 200,
+      "line_end": 236,
+      "selected_source_bytes": 1536,
+      "selected_source_sha256": "a0ad0053d1d6892f6d1d5438665230ce938bf0feb99f99e2f222e4744604dd07",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr2018.py",
+          "name": "role_slices",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_sha256": "9643cb4f617fcf74fdf7784012eb4fdc6e7c85f2054812d14931492b5f05b704",
+      "source_bytes": 6463,
+      "name": "_positive",
+      "kind": "FunctionDef",
+      "line_start": 19,
+      "line_end": 21,
+      "selected_source_bytes": 263,
+      "selected_source_sha256": "77ce8a973cc39345228ac346d7c52ea23f5bebeca4202c4b89ab69daa198a1b4",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+          "name": "_positive",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_sha256": "9643cb4f617fcf74fdf7784012eb4fdc6e7c85f2054812d14931492b5f05b704",
+      "source_bytes": 6463,
+      "name": "Kinetics",
+      "kind": "ClassDef",
+      "line_start": 24,
+      "line_end": 37,
+      "selected_source_bytes": 373,
+      "selected_source_sha256": "2f9262c6e9ddfa38f2a4dc60d78f3563a5417d0cae500f57804be33df2298c04",
+      "declared_record_fields": [
+        "kcat_c",
+        "kc",
+        "kcat_o",
+        "ko"
+      ],
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+          "name": "Kinetics",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_sha256": "9643cb4f617fcf74fdf7784012eb4fdc6e7c85f2054812d14931492b5f05b704",
+      "source_bytes": 6463,
+      "name": "GasQuery",
+      "kind": "ClassDef",
+      "line_start": 40,
+      "line_end": 51,
+      "selected_source_bytes": 450,
+      "selected_source_sha256": "b44088811a085eab5da368f3ff23638806de98bea84fe5864748503ffc54055c",
+      "declared_record_fields": [
+        "co2_um",
+        "o2_um",
+        "duration_s"
+      ],
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+          "name": "GasQuery",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_sha256": "9643cb4f617fcf74fdf7784012eb4fdc6e7c85f2054812d14931492b5f05b704",
+      "source_bytes": 6463,
+      "name": "Products",
+      "kind": "ClassDef",
+      "line_start": 54,
+      "line_end": 59,
+      "selected_source_bytes": 151,
+      "selected_source_sha256": "9c6d2ed099bd588dae3fe33bbbc05a3e25c9a389b73b6b414d8191e0f3042a4d",
+      "declared_record_fields": [
+        "pga_per_site",
+        "pgly_per_site",
+        "duration_s",
+        "balance_residual"
+      ],
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+          "name": "Products",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_sha256": "9643cb4f617fcf74fdf7784012eb4fdc6e7c85f2054812d14931492b5f05b704",
+      "source_bytes": 6463,
+      "name": "execute_assay",
+      "kind": "FunctionDef",
+      "line_start": 62,
+      "line_end": 80,
+      "selected_source_bytes": 1048,
+      "selected_source_sha256": "a095a839d39f2a6979c1d0d7019423d70b1aeeb06d464e034281fd45de42e6c0",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+          "name": "execute_assay",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_sha256": "9643cb4f617fcf74fdf7784012eb4fdc6e7c85f2054812d14931492b5f05b704",
+      "source_bytes": 6463,
+      "name": "reduce_products",
+      "kind": "FunctionDef",
+      "line_start": 83,
+      "line_end": 93,
+      "selected_source_bytes": 626,
+      "selected_source_sha256": "97e6e0c2816d34d97a2faa6641afc348fcdb3fc73eb778d8f9353802285c08b7",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+          "name": "reduce_products",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_sha256": "9643cb4f617fcf74fdf7784012eb4fdc6e7c85f2054812d14931492b5f05b704",
+      "source_bytes": 6463,
+      "name": "reference_rates",
+      "kind": "FunctionDef",
+      "line_start": 96,
+      "line_end": 102,
+      "selected_source_bytes": 406,
+      "selected_source_sha256": "2ccb44176778feea4831f9611f0653752a7c019dccd2da17ea3e34fd2b6fb75c",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+          "name": "reference_rates",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_sha256": "9643cb4f617fcf74fdf7784012eb4fdc6e7c85f2054812d14931492b5f05b704",
+      "source_bytes": 6463,
+      "name": "next_query",
+      "kind": "FunctionDef",
+      "line_start": 105,
+      "line_end": 118,
+      "selected_source_bytes": 814,
+      "selected_source_sha256": "89def99a6d672f2f82212ca7140a5dfc426e47de9436ae6e55b5901d5023a835",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+          "name": "next_query",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_sha256": "9643cb4f617fcf74fdf7784012eb4fdc6e7c85f2054812d14931492b5f05b704",
+      "source_bytes": 6463,
+      "name": "compatible_kinetics",
+      "kind": "FunctionDef",
+      "line_start": 121,
+      "line_end": 138,
+      "selected_source_bytes": 697,
+      "selected_source_sha256": "79ce69de99168c8d1253647d4bfe754c0619674d56968946f56f4bcd5a39aa33",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+          "name": "compatible_kinetics",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_sha256": "9643cb4f617fcf74fdf7784012eb4fdc6e7c85f2054812d14931492b5f05b704",
+      "source_bytes": 6463,
+      "name": "log_sensitivity",
+      "kind": "FunctionDef",
+      "line_start": 141,
+      "line_end": 152,
+      "selected_source_bytes": 640,
+      "selected_source_sha256": "6cbf185ee946a6783a1391da90ae64f04c9e4f975d372df6412cbf73cb9ce685",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+          "name": "log_sensitivity",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_sha256": "9643cb4f617fcf74fdf7784012eb4fdc6e7c85f2054812d14931492b5f05b704",
+      "source_bytes": 6463,
+      "name": "specificity_energy_scale",
+      "kind": "FunctionDef",
+      "line_start": 155,
+      "line_end": 159,
+      "selected_source_bytes": 314,
+      "selected_source_sha256": "2c6f35fe50752ff3f891edc6a58da0fca2de582c9295e2a05ad28040739bbf6b",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+          "name": "specificity_energy_scale",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/records.py",
+      "source_sha256": "305e43c5bbcb3dfcf9e3a208adbe66f8b159360d3d7a8fec0c444cf8afb06bdf",
+      "source_bytes": 8034,
+      "name": "finite",
+      "kind": "FunctionDef",
+      "line_start": 22,
+      "line_end": 27,
+      "selected_source_bytes": 293,
+      "selected_source_sha256": "dce2ca534aaf09f2f484931f1b0f5be0022811115502303060492f60f9b343ec",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/records.py",
+          "name": "finite",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/records.py",
+      "source_sha256": "305e43c5bbcb3dfcf9e3a208adbe66f8b159360d3d7a8fec0c444cf8afb06bdf",
+      "source_bytes": 8034,
+      "name": "AssayQueryV1",
+      "kind": "ClassDef",
+      "line_start": 30,
+      "line_end": 42,
+      "selected_source_bytes": 439,
+      "selected_source_sha256": "1e857b887335fe8024733a1a887fecb38e8270d95deb38154a0f6a514f2ddf4f",
+      "declared_record_fields": [
+        "co2_um",
+        "o2_um",
+        "duration_s"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/assay-query/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/records.py",
+          "name": "AssayQuery",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/records.py",
+      "source_sha256": "305e43c5bbcb3dfcf9e3a208adbe66f8b159360d3d7a8fec0c444cf8afb06bdf",
+      "source_bytes": 8034,
+      "name": "AssayCaseV1",
+      "kind": "ClassDef",
+      "line_start": 45,
+      "line_end": 77,
+      "selected_source_bytes": 1421,
+      "selected_source_sha256": "21ff783cf2386d7c5618ad164658eb1f09cd98ddff83ba4fd992aece7dae6e1c",
+      "declared_record_fields": [
+        "case_id",
+        "kcat_c",
+        "kc",
+        "kcat_o",
+        "ko",
+        "calibration_summary_ids",
+        "initial_query",
+        "initial_forecast",
+        "preparation_scope"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/assay-case/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/records.py",
+          "name": "AssayCase",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/records.py",
+      "source_sha256": "305e43c5bbcb3dfcf9e3a208adbe66f8b159360d3d7a8fec0c444cf8afb06bdf",
+      "source_bytes": 8034,
+      "name": "AssayConfigV1",
+      "kind": "ClassDef",
+      "line_start": 80,
+      "line_end": 134,
+      "selected_source_bytes": 2399,
+      "selected_source_sha256": "20b8bf128da1a1b2407d56c37ad1e42e46a3697cdecaeb8ac223ea9d9b22ba9f",
+      "declared_record_fields": [
+        "config_id",
+        "cases",
+        "curation_audit_sha256",
+        "plan_sha256",
+        "initial_fixed_queries",
+        "assumed_air_o2_um",
+        "assumed_ko_um",
+        "maximum_native_calls",
+        "rounds_per_case",
+        "feedback_policy",
+        "temperature_k",
+        "numerical_relative_tolerance",
+        "molecular_prediction_claimed"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/conditional-assay-config/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/records.py",
+          "name": "AssayConfig",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/records.py",
+      "source_sha256": "305e43c5bbcb3dfcf9e3a208adbe66f8b159360d3d7a8fec0c444cf8afb06bdf",
+      "source_bytes": 8034,
+      "name": "AssayResultV1",
+      "kind": "ClassDef",
+      "line_start": 137,
+      "line_end": 196,
+      "selected_source_bytes": 2832,
+      "selected_source_sha256": "b7f6172a302308d18ad44fafb73c71d4824b31b3ac9dae27204b1b5c2d95bfe6",
+      "declared_record_fields": [
+        "result_id",
+        "config",
+        "case",
+        "round_index",
+        "prior_commitment",
+        "requested_query",
+        "accepted_query",
+        "applied_query",
+        "realized_query",
+        "pga_per_active_site",
+        "pgly_per_active_site",
+        "balance_residual",
+        "native_start_s",
+        "native_end_s",
+        "committed_next_query",
+        "committed_next_forecast"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/conditional-assay-result/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/simulators/rubisco_assay/records.py",
+          "name": "AssayResult",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/analysis.py",
+      "source_sha256": "d7255de1848a4a008dbf20f3becca4d3df6462ecf9611ca03b9fd9b48bfb9c4d",
+      "source_bytes": 7857,
+      "name": "fit",
+      "kind": "FunctionDef",
+      "line_start": 21,
+      "line_end": 51,
+      "selected_source_bytes": 1447,
+      "selected_source_sha256": "ed5f60f78e9b00ba26f6ce4b8d384f167d6238ba68ce74c76d5a5a1110e5e879",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/analysis.py",
+          "name": "fit",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/analysis.py",
+      "source_sha256": "d7255de1848a4a008dbf20f3becca4d3df6462ecf9611ca03b9fd9b48bfb9c4d",
+      "source_bytes": 7857,
+      "name": "predict",
+      "kind": "FunctionDef",
+      "line_start": 54,
+      "line_end": 131,
+      "selected_source_bytes": 3196,
+      "selected_source_sha256": "16df4fcae35d9d6e894a8afa3e81aa0fc7ca2f48d2de8f6f6f41800a251bf011",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/analysis.py",
+          "name": "predict",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/analysis.py",
+      "source_sha256": "d7255de1848a4a008dbf20f3becca4d3df6462ecf9611ca03b9fd9b48bfb9c4d",
+      "source_bytes": 7857,
+      "name": "evaluate",
+      "kind": "FunctionDef",
+      "line_start": 134,
+      "line_end": 189,
+      "selected_source_bytes": 2768,
+      "selected_source_sha256": "4c1e1a15f9f0bce1d4f48a0bfa92070260d1924f25cf1eb3cb88e45e6329ccad",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/analysis.py",
+          "name": "evaluate",
+          "kind": "FunctionDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "BaselineV1",
+      "kind": "ClassDef",
+      "line_start": 28,
+      "line_end": 31,
+      "selected_source_bytes": 130,
+      "selected_source_sha256": "aee33a18a5c656580145bf9dbbf78c3076465df0faefa3f23a4f0641416c3160",
+      "declared_record_fields": [],
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/records.py",
+          "name": "BaselineV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "ReportedSubstitutionV1",
+      "kind": "ClassDef",
+      "line_start": 34,
+      "line_end": 58,
+      "selected_source_bytes": 1108,
+      "selected_source_sha256": "552565879f68f1efeb57bc1c9ae92ae7e4ec88e8edd381c4bd0b2b325a2dfefb",
+      "declared_record_fields": [
+        "sample_id",
+        "substitution"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/historical/reported-substitution/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/records.py",
+          "name": "ReportedSubstitutionV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "ReportedEndpointsV1",
+      "kind": "ClassDef",
+      "line_start": 61,
+      "line_end": 73,
+      "selected_source_bytes": 594,
+      "selected_source_sha256": "22b13536ad35831d739a4630ff8a8cac50ccfb799981ac124e636cccf4f40311",
+      "declared_record_fields": [
+        "sample_id",
+        "turnover_s_inv",
+        "specificity_dimensionless"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/historical/reported-endpoints/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/records.py",
+          "name": "ReportedEndpointsV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalTrainingSliceV1",
+      "kind": "ClassDef",
+      "line_start": 76,
+      "line_end": 95,
+      "selected_source_bytes": 925,
+      "selected_source_sha256": "9717ad05dbc04f25e3401c22dc0d0cecc3d2ccc876f5298127b539aae36df6e5",
+      "declared_record_fields": [
+        "slice_id",
+        "fold_id",
+        "source",
+        "features",
+        "endpoints"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/historical/training-slice/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/records.py",
+          "name": "HistoricalTrainingSliceV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalFeatureSliceV1",
+      "kind": "ClassDef",
+      "line_start": 98,
+      "line_end": 111,
+      "selected_source_bytes": 643,
+      "selected_source_sha256": "1a7df7f0c7da5c82444fe1b78ab259bdd82f3d25339ab08de1617800cb5bf499",
+      "declared_record_fields": [
+        "slice_id",
+        "fold_id",
+        "source",
+        "features"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/historical/feature-slice/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/records.py",
+          "name": "HistoricalFeatureSliceV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalLabelSliceV1",
+      "kind": "ClassDef",
+      "line_start": 114,
+      "line_end": 127,
+      "selected_source_bytes": 638,
+      "selected_source_sha256": "5b905ffb71bfd1fce00a414f7d52c1bae9381a37ca6b005406d771656e15e161",
+      "declared_record_fields": [
+        "slice_id",
+        "fold_id",
+        "source",
+        "endpoints"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/historical/label-slice/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/records.py",
+          "name": "HistoricalLabelSliceV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalScienceV1",
+      "kind": "ClassDef",
+      "line_start": 130,
+      "line_end": 179,
+      "selected_source_bytes": 2515,
+      "selected_source_sha256": "0b8e604bbf70321da824c6d83d0cca09239cfb0d0fc555e2e5c7c4b1abf53e59",
+      "declared_record_fields": [
+        "science_id",
+        "plan",
+        "source",
+        "samples",
+        "folds",
+        "inputs",
+        "substitutions",
+        "ridge_penalty",
+        "turnover_relative_tolerance",
+        "specificity_relative_tolerance",
+        "claim_scope"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/historical/science/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/records.py",
+          "name": "HistoricalScienceV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalFittedModelV1",
+      "kind": "ClassDef",
+      "line_start": 207,
+      "line_end": 224,
+      "selected_source_bytes": 1026,
+      "selected_source_sha256": "216522ff68fea0e43b5e80071b939237fb2205528ae23df3e42a4d2d0ebb7e91",
+      "declared_record_fields": [
+        "training",
+        "parent",
+        "ridge_coefficients",
+        "calibration_status"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/historical/fitted-model/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/records.py",
+          "name": "HistoricalFittedModelV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalForecastV1",
+      "kind": "ClassDef",
+      "line_start": 227,
+      "line_end": 237,
+      "selected_source_bytes": 447,
+      "selected_source_sha256": "233bfecc9a9e3905e31d2f16874219ff3eb009cd3f7bd388b71cc6b49e71f0f0",
+      "declared_record_fields": [
+        "forecast_id",
+        "method",
+        "endpoints"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/historical/forecast/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/records.py",
+          "name": "HistoricalForecastV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalPointErrorV1",
+      "kind": "ClassDef",
+      "line_start": 240,
+      "line_end": 277,
+      "selected_source_bytes": 1917,
+      "selected_source_sha256": "4270eaf56d34aee0c2e120b73f45a4102c04374783c1c13240df76aba130d434",
+      "declared_record_fields": [
+        "forecast",
+        "observed",
+        "turnover_relative_error",
+        "specificity_relative_error",
+        "turnover_log_contrast_error",
+        "specificity_log_contrast_error",
+        "jointly_within_point_tolerance"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/historical/point-error/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/records.py",
+          "name": "HistoricalPointErrorV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalEvaluationV1",
+      "kind": "ClassDef",
+      "line_start": 280,
+      "line_end": 302,
+      "selected_source_bytes": 1019,
+      "selected_source_sha256": "44ceb346eb386a96ce2b307c244d19965a26cc900bf9810767e6ddb9b8d3e117",
+      "declared_record_fields": [
+        "errors",
+        "paired_table_contrasts",
+        "independent_biological_units",
+        "joint_coverage",
+        "interval_width",
+        "biological_gate"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/historical/evaluation/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/records.py",
+          "name": "HistoricalEvaluationV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "adapted_invariant",
+      "adaptation_note": "Selected invariant has current definitions; namespace, strict records and ownership follow the destination architecture. This is not a byte-equivalent port or scientific qualification."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalProjectionConfigV1",
+      "kind": "ClassDef",
+      "line_start": 182,
+      "line_end": 189,
+      "selected_source_bytes": 325,
+      "selected_source_sha256": "2e45078026720b687a8dd16c1a2b2768716d77e4543b9552ae12475a2bf0b8a5",
+      "declared_record_fields": [
+        "config_id",
+        "science"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/historical/projection-config/v1",
+      "destination_selectors": [],
+      "adaptation_status": "not_ported",
+      "adaptation_note": "No current selected equivalent; legacy record/helper retained as explicit migration gap."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalModelConfigV1",
+      "kind": "ClassDef",
+      "line_start": 192,
+      "line_end": 194,
+      "selected_source_bytes": 171,
+      "selected_source_sha256": "f80b66834515cb7ba38b81d1fb74acce6baf0c2d75c53a407922eb95d27576dd",
+      "declared_record_fields": [],
+      "declared_record_schema": "icf-yolo/rubisco/historical/model-config/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/operation_contracts.py",
+          "name": "HistoricalFitConfigV1",
+          "kind": "ClassDef"
+        },
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/operation_contracts.py",
+          "name": "HistoricalPredictConfigV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "replaced_by_current_operation_contract",
+      "adaptation_note": "Current operation-specific configuration replaces legacy stage configuration; old operator identities/authority are excluded."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalCommitConfigV1",
+      "kind": "ClassDef",
+      "line_start": 197,
+      "line_end": 199,
+      "selected_source_bytes": 173,
+      "selected_source_sha256": "b303cb102852db90ce1ce2a6d05c63e784a97478d6d95208f540ee5441f656d8",
+      "declared_record_fields": [],
+      "declared_record_schema": "icf-yolo/rubisco/historical/commit-config/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/operation_contracts.py",
+          "name": "HistoricalCommitConfigV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "replaced_by_current_operation_contract",
+      "adaptation_note": "Current operation-specific configuration replaces legacy stage configuration; old operator identities/authority are excluded."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalEvaluationConfigV1",
+      "kind": "ClassDef",
+      "line_start": 202,
+      "line_end": 204,
+      "selected_source_bytes": 181,
+      "selected_source_sha256": "a1d20df632e77dcf7ffdec2a8b3479bbefd844cd007f548241ae5134788c1049",
+      "declared_record_fields": [],
+      "declared_record_schema": "icf-yolo/rubisco/historical/evaluation-config/v1",
+      "destination_selectors": [
+        {
+          "path": "src/empirical_lawhood/adapters/methods/rubisco_historical/operation_contracts.py",
+          "name": "HistoricalEvaluateConfigV1",
+          "kind": "ClassDef"
+        }
+      ],
+      "adaptation_status": "replaced_by_current_operation_contract",
+      "adaptation_note": "Current operation-specific configuration replaces legacy stage configuration; old operator identities/authority are excluded."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_sha256": "74153a1921f53027183db016f52827568984180cb3033527d76bd0ae4e5f4d28",
+      "source_bytes": 14942,
+      "name": "HistoricalProductV1",
+      "kind": "ClassDef",
+      "line_start": 305,
+      "line_end": 353,
+      "selected_source_bytes": 2343,
+      "selected_source_sha256": "2e899e02b41e951318077295c9ada9e5d62c89e24a2e23d6e67a8f622b84bbb7",
+      "declared_record_fields": [
+        "product_id",
+        "role",
+        "fold_id",
+        "science",
+        "parents",
+        "training",
+        "features",
+        "model",
+        "forecasts",
+        "labels",
+        "evaluation"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/historical/product/v1",
+      "destination_selectors": [],
+      "adaptation_status": "not_ported",
+      "adaptation_note": "No current selected equivalent; legacy record/helper retained as explicit migration gap."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/preparation.py",
+      "source_sha256": "90f98f2a0888ba30b7d3e9b6510c41f522585ad8e59bcf578fda406560215fa0",
+      "source_bytes": 11948,
+      "name": "ReconstructionAuditV1",
+      "kind": "ClassDef",
+      "line_start": 36,
+      "line_end": 60,
+      "selected_source_bytes": 1018,
+      "selected_source_sha256": "72c596b9faaefb27e051c9c528af7e623ad2a4424e844752d5a2c49f7a54190d",
+      "declared_record_fields": [
+        "variant",
+        "preparation",
+        "source_sha256",
+        "coordinate_sha256",
+        "protein_residues",
+        "omitted_zero_occupancy_atoms",
+        "mutation_and_repair_sites",
+        "active_site_residues",
+        "observed_heavy_atom_count",
+        "physical_biological_units"
+      ],
+      "declared_record_schema": "icf-yolo/rubisco/m1-v5-reconstruction-audit/v1",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/preparation.py",
+      "source_sha256": "90f98f2a0888ba30b7d3e9b6510c41f522585ad8e59bcf578fda406560215fa0",
+      "source_bytes": 11948,
+      "name": "reconstruct_coordinates",
+      "kind": "FunctionDef",
+      "line_start": 63,
+      "line_end": 197,
+      "selected_source_bytes": 6091,
+      "selected_source_sha256": "9be5320826a9dd9469b733951f4b759716d175a6eefd7d358efb845f503b3536",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/preparation.py",
+      "source_sha256": "90f98f2a0888ba30b7d3e9b6510c41f522585ad8e59bcf578fda406560215fa0",
+      "source_bytes": 11948,
+      "name": "isolated_kcx_parameters",
+      "kind": "FunctionDef",
+      "line_start": 200,
+      "line_end": 263,
+      "selected_source_bytes": 3058,
+      "selected_source_sha256": "f3cdb63061dea9f9ec22f0ef2109c6c2a2ff4832ebee8bdc1eb315f514df532a",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/preparation.py",
+      "source_sha256": "90f98f2a0888ba30b7d3e9b6510c41f522585ad8e59bcf578fda406560215fa0",
+      "source_bytes": 11948,
+      "name": "leap_commands",
+      "kind": "FunctionDef",
+      "line_start": 266,
+      "line_end": 290,
+      "selected_source_bytes": 818,
+      "selected_source_sha256": "482d2a0b786f49a26c737451a485f2d6143ff3fef310d428d2dd0df9cb105ea7",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "source_sha256": "bfafd825a58b5ccda6dff141f9bb240ceabb2e6ce03e6f357eec2a584ba408f2",
+      "source_bytes": 12863,
+      "name": "hardware_fingerprint",
+      "kind": "FunctionDef",
+      "line_start": 31,
+      "line_end": 45,
+      "selected_source_bytes": 561,
+      "selected_source_sha256": "23b0ba02c1fac65c3794f8f869becff38e2d66500d29f63160ff5745333c3f67",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "source_sha256": "bfafd825a58b5ccda6dff141f9bb240ceabb2e6ce03e6f357eec2a584ba408f2",
+      "source_bytes": 12863,
+      "name": "read_regular",
+      "kind": "FunctionDef",
+      "line_start": 48,
+      "line_end": 63,
+      "selected_source_bytes": 702,
+      "selected_source_sha256": "82e409f1deafca2b41679c2dda2e8f85be25c131e9a3fecc9ac8aabca1bef7f9",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "source_sha256": "bfafd825a58b5ccda6dff141f9bb240ceabb2e6ce03e6f357eec2a584ba408f2",
+      "source_bytes": 12863,
+      "name": "_sync_directory",
+      "kind": "FunctionDef",
+      "line_start": 66,
+      "line_end": 71,
+      "selected_source_bytes": 192,
+      "selected_source_sha256": "b7a4e2e8f9a37b60b79d6bf36d2c4157903445f732345d50ce9874d9692e01eb",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "source_sha256": "bfafd825a58b5ccda6dff141f9bb240ceabb2e6ce03e6f357eec2a584ba408f2",
+      "source_bytes": 12863,
+      "name": "_immutable_write",
+      "kind": "FunctionDef",
+      "line_start": 74,
+      "line_end": 106,
+      "selected_source_bytes": 1417,
+      "selected_source_sha256": "146df0356605012a75ff2d6be35083f0a926025daebd3079c1e137e99c88e856",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "source_sha256": "bfafd825a58b5ccda6dff141f9bb240ceabb2e6ce03e6f357eec2a584ba408f2",
+      "source_bytes": 12863,
+      "name": "LoadedCheckpoint",
+      "kind": "ClassDef",
+      "line_start": 109,
+      "line_end": 113,
+      "selected_source_bytes": 151,
+      "selected_source_sha256": "a2bd4ed7af8050e1b3a0b563fb9ab539ffebdd637090eb52c36f890784a1faab",
+      "declared_record_fields": [
+        "record",
+        "prepared",
+        "context"
+      ],
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "source_sha256": "bfafd825a58b5ccda6dff141f9bb240ceabb2e6ce03e6f357eec2a584ba408f2",
+      "source_bytes": 12863,
+      "name": "validate_checkpoint",
+      "kind": "FunctionDef",
+      "line_start": 116,
+      "line_end": 139,
+      "selected_source_bytes": 1544,
+      "selected_source_sha256": "5d9610b49d968f8217d7ea8daca5fe43f6cf343c29a46bf373ae72c96808009c",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "source_sha256": "bfafd825a58b5ccda6dff141f9bb240ceabb2e6ce03e6f357eec2a584ba408f2",
+      "source_bytes": 12863,
+      "name": "_from_members",
+      "kind": "FunctionDef",
+      "line_start": 142,
+      "line_end": 160,
+      "selected_source_bytes": 986,
+      "selected_source_sha256": "42bc5a6fe87caeb6d3067c9fccd9af4e52a9f3d4ca244abdaf33cb41f4799394",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "source_sha256": "bfafd825a58b5ccda6dff141f9bb240ceabb2e6ce03e6f357eec2a584ba408f2",
+      "source_bytes": 12863,
+      "name": "unpack_checkpoint",
+      "kind": "FunctionDef",
+      "line_start": 163,
+      "line_end": 197,
+      "selected_source_bytes": 1883,
+      "selected_source_sha256": "80b4fdb1e2b167ce5418a00f1c7433a9eb80fe1da5305c0cae47a92eee0a0f88",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "source_sha256": "bfafd825a58b5ccda6dff141f9bb240ceabb2e6ce03e6f357eec2a584ba408f2",
+      "source_bytes": 12863,
+      "name": "CheckpointStore",
+      "kind": "ClassDef",
+      "line_start": 200,
+      "line_end": 251,
+      "selected_source_bytes": 2585,
+      "selected_source_sha256": "7abc679b723bd79994be9fa9e424a54812727bd9b50557dc11586d9167c41438",
+      "declared_record_fields": [],
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "source_sha256": "bfafd825a58b5ccda6dff141f9bb240ceabb2e6ce03e6f357eec2a584ba408f2",
+      "source_bytes": 12863,
+      "name": "pack_latest_checkpoint",
+      "kind": "FunctionDef",
+      "line_start": 254,
+      "line_end": 289,
+      "selected_source_bytes": 1998,
+      "selected_source_sha256": "74a71f3f51f363252b2c0588a3228ece9a755d8ddaeae7bd1e3b075c07c59034",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v6/analysis.py",
+      "source_sha256": "88b2386152540dbc5d7e3c0e6b527b52e12faea6581c6f7f084a99921c00b553",
+      "source_bytes": 7599,
+      "name": "_mean",
+      "kind": "FunctionDef",
+      "line_start": 24,
+      "line_end": 27,
+      "selected_source_bytes": 181,
+      "selected_source_sha256": "4510abc5319981928c1d1cebd1a575fbf8ea978407ab3b3d56eebe05bfd8f308",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v6/analysis.py",
+      "source_sha256": "88b2386152540dbc5d7e3c0e6b527b52e12faea6581c6f7f084a99921c00b553",
+      "source_bytes": 7599,
+      "name": "_values",
+      "kind": "FunctionDef",
+      "line_start": 30,
+      "line_end": 31,
+      "selected_source_bytes": 173,
+      "selected_source_sha256": "a2edb89abd1e3ce6971676481f81e2a7decc89d5922323d65eb0f6af1154b324",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v6/analysis.py",
+      "source_sha256": "88b2386152540dbc5d7e3c0e6b527b52e12faea6581c6f7f084a99921c00b553",
+      "source_bytes": 7599,
+      "name": "project",
+      "kind": "FunctionDef",
+      "line_start": 34,
+      "line_end": 148,
+      "selected_source_bytes": 4933,
+      "selected_source_sha256": "21bcff589e258fbf2c1a078c13f0e2653ef3d53ca3f42757553a03db9cd6817e",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v6/analysis.py",
+      "source_sha256": "88b2386152540dbc5d7e3c0e6b527b52e12faea6581c6f7f084a99921c00b553",
+      "source_bytes": 7599,
+      "name": "evaluate",
+      "kind": "FunctionDef",
+      "line_start": 151,
+      "line_end": 200,
+      "selected_source_bytes": 1764,
+      "selected_source_sha256": "a8445411b190789e0fec78461c82ef8e9d15cff6e620909605bcf473d264c8ef",
+      "destination_selectors": [],
+      "adaptation_status": "conditional_not_ported",
+      "adaptation_note": "Selected future molecular invariant; no molecular destination owner or native execution admitted."
+    }
+  ],
+  "selected_legacy_tests": [
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "tests/adapters/test_rubisco_kinetics_v1.py",
+      "source_sha256": "162bfc91a8927b56e6fb1997e4c303291b982973dac8f17dff69b1954fb5f060",
+      "source_bytes": 13433,
+      "selected_test_names": [
+        "test_native_cells_preserve_formula_missingness_and_hidden_inventory",
+        "test_formula_cached_value_cannot_lose_formula_provenance",
+        "test_unsafe_archive_members_are_rejected",
+        "test_xml_entities_and_external_relationships_are_rejected",
+        "test_duplicate_archive_members_are_rejected",
+        "test_archive_and_decoded_output_envelopes_are_enforced",
+        "test_wrong_custody_hash_and_absent_sheet_fail_before_decode",
+        "test_native_units_and_separate_assay_join_preserve_uncertainty",
+        "test_incompatible_or_derived_targets_do_not_form_direct_joint_evidence",
+        "test_unknown_complex_or_missing_target_stays_unresolved",
+        "test_measurement_reuse_is_deduplicated_but_conflicts_require_adjudication",
+        "test_unknowns_and_derived_lineage_cannot_be_silently_relabelled",
+        "test_technical_repetition_retains_its_meaning_and_ci_requires_level",
+        "test_canonical_record_rejects_unknown_fields_and_binary_float_values"
+      ],
+      "test_mappings": [
+        {
+          "name": "test_native_cells_preserve_formula_missingness_and_hidden_inventory",
+          "kind": "FunctionDef",
+          "line_start": 112,
+          "line_end": 124,
+          "selected_source_bytes": 740,
+          "selected_source_sha256": "10738db1b8b7cb35bed480aaa99ec01118c067e5af2dd19dc9a05aac4a1e8d0d",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_direct_panels.py",
+              "name": "test_native_formula_cache_roles_complete_census_and_raw_uncertainty_conflict",
+              "kind": "FunctionDef"
+            },
+            {
+              "path": "tests/test_rubisco_direct_panels.py",
+              "name": "test_unselected_curve_member_is_inventoried_but_never_expanded_or_parsed",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_formula_cached_value_cannot_lose_formula_provenance",
+          "kind": "FunctionDef",
+          "line_start": 127,
+          "line_end": 136,
+          "selected_source_bytes": 481,
+          "selected_source_sha256": "7f341386b2d6934f6cface0717a0a6470ba00bb08bd379c16d183b0a04024376",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_direct_panels.py",
+              "name": "test_changed_formula_join_and_raw_header_units_are_refused",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_unsafe_archive_members_are_rejected",
+          "kind": "FunctionDef",
+          "line_start": 139,
+          "line_end": 150,
+          "selected_source_bytes": 422,
+          "selected_source_sha256": "6dd82218c51d61678616d533bf699d5b756122c54ca8c12a21c44d7aa7b5f0c8",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_direct_panels.py",
+              "name": "test_zip_unsafe_names_refused_before_any_xml_decode",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_xml_entities_and_external_relationships_are_rejected",
+          "kind": "FunctionDef",
+          "line_start": 153,
+          "line_end": 170,
+          "selected_source_bytes": 761,
+          "selected_source_sha256": "7cc9815357c9884bea4501b8aaa82b57ef66a25c9ef44dc58ba5b8e79d54ece1",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_direct_panels.py",
+              "name": "test_selected_xml_entities_encoding_size_and_coordinate_refused",
+              "kind": "FunctionDef"
+            },
+            {
+              "path": "tests/test_rubisco_direct_panels.py",
+              "name": "test_external_relationship_and_missing_requested_sheet_refused",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_duplicate_archive_members_are_rejected",
+          "kind": "FunctionDef",
+          "line_start": 173,
+          "line_end": 179,
+          "selected_source_bytes": 344,
+          "selected_source_sha256": "4161e045f4aa907ad45282f15cc2a252d2399a557aeaf2766eb95f95ebf66424",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_direct_panels.py",
+              "name": "test_duplicate_members_symlinks_unsupported_compression_and_hash_refused",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_archive_and_decoded_output_envelopes_are_enforced",
+          "kind": "FunctionDef",
+          "line_start": 182,
+          "line_end": 197,
+          "selected_source_bytes": 621,
+          "selected_source_sha256": "3ed50f90c310f082bb112fa765bc330bc1dfd72eef9a529dfad5fec6aff0b123",
+          "adaptation_status": "partial_successor_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_direct_panels.py",
+              "name": "test_selected_xml_entities_encoding_size_and_coordinate_refused",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Current tests cover narrower native/strict-record invariants; the complete original case/interface is not reproduced."
+        },
+        {
+          "name": "test_wrong_custody_hash_and_absent_sheet_fail_before_decode",
+          "kind": "FunctionDef",
+          "line_start": 200,
+          "line_end": 207,
+          "selected_source_bytes": 439,
+          "selected_source_sha256": "2ffbed1f955396b249da00e22a0b4d60e9bfeeb82b3c087b6461ecfd5577a01c",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_direct_panels.py",
+              "name": "test_duplicate_members_symlinks_unsupported_compression_and_hash_refused",
+              "kind": "FunctionDef"
+            },
+            {
+              "path": "tests/test_rubisco_direct_panels.py",
+              "name": "test_external_relationship_and_missing_requested_sheet_refused",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_native_units_and_separate_assay_join_preserve_uncertainty",
+          "kind": "FunctionDef",
+          "line_start": 210,
+          "line_end": 223,
+          "selected_source_bytes": 806,
+          "selected_source_sha256": "90aca7c7f6a842768ae0168c16cbd2fb550b669af57fa8107b553e4f7ec48f98",
+          "adaptation_status": "partial_successor_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_sources.py",
+              "name": "test_missing_endpoint_ambiguous_conditions_and_native_sd_header_are_preserved",
+              "kind": "FunctionDef"
+            },
+            {
+              "path": "tests/test_rubisco_sources.py",
+              "name": "test_endpoint_specific_conditions_override_shared_metadata_without_dropping_it",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Current tests cover narrower native/strict-record invariants; the complete original case/interface is not reproduced."
+        },
+        {
+          "name": "test_incompatible_or_derived_targets_do_not_form_direct_joint_evidence",
+          "kind": "FunctionDef",
+          "line_start": 226,
+          "line_end": 241,
+          "selected_source_bytes": 724,
+          "selected_source_sha256": "53edd09ee295bf14fd2883c251697b13e95980c790611cfd4f7a4d581a8205fe",
+          "adaptation_status": "not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_unknown_complex_or_missing_target_stays_unresolved",
+          "kind": "FunctionDef",
+          "line_start": 244,
+          "line_end": 253,
+          "selected_source_bytes": 556,
+          "selected_source_sha256": "86a41dbac42e3da3ccc5098fe13d0ec3d5abd3bde454e8f2debf75e88d93bc6b",
+          "adaptation_status": "not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_measurement_reuse_is_deduplicated_but_conflicts_require_adjudication",
+          "kind": "FunctionDef",
+          "line_start": 256,
+          "line_end": 263,
+          "selected_source_bytes": 601,
+          "selected_source_sha256": "8def11eb73fb951078306a70664502d4f5f116efe8c72c02219ae799a23c5772",
+          "adaptation_status": "not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_unknowns_and_derived_lineage_cannot_be_silently_relabelled",
+          "kind": "FunctionDef",
+          "line_start": 266,
+          "line_end": 275,
+          "selected_source_bytes": 566,
+          "selected_source_sha256": "5536612a996cece357fe7da2bffe9a7830c6ebf5604c2d25c63fb3a07f069e2e",
+          "adaptation_status": "not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_technical_repetition_retains_its_meaning_and_ci_requires_level",
+          "kind": "FunctionDef",
+          "line_start": 278,
+          "line_end": 305,
+          "selected_source_bytes": 891,
+          "selected_source_sha256": "7f599b482a57ea4f301714da6e7aad0ccc093c6b23b56f39fe54b04c1fd07dc2",
+          "adaptation_status": "not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_canonical_record_rejects_unknown_fields_and_binary_float_values",
+          "kind": "FunctionDef",
+          "line_start": 308,
+          "line_end": 320,
+          "selected_source_bytes": 616,
+          "selected_source_sha256": "d953c2e9471e157861ae4ce61fedecc8b66cc9044b34d2f1f4d5430f6535b79b",
+          "adaptation_status": "partial_successor_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_historical.py",
+              "name": "test_strict_successor_records_round_trip_and_refuse_coverage_promotion",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Current tests cover narrower native/strict-record invariants; the complete original case/interface is not reproduced."
+        }
+      ]
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "tests/adapters/test_rubisco_rr2018_curation.py",
+      "source_sha256": "27fab13e3520be1409c0d80cc2d4382b8edf72f1b9b0817e74d50bcc4a886320",
+      "source_bytes": 2982,
+      "selected_test_names": [
+        "test_complete_native_roster_and_no_target_labels_in_feature_slices",
+        "test_hostile_or_changed_source_refused",
+        "test_hash_substitution_refused"
+      ],
+      "test_mappings": [
+        {
+          "name": "test_complete_native_roster_and_no_target_labels_in_feature_slices",
+          "kind": "FunctionDef",
+          "line_start": 45,
+          "line_end": 64,
+          "selected_source_bytes": 1116,
+          "selected_source_sha256": "4de8dd9f6559f0ae5976e4fd5ad6388ca5f86df37d84de949e5484e797f5d9df",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_sources.py",
+              "name": "test_complete_roster_exclusions_and_feature_label_separation",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_hostile_or_changed_source_refused",
+          "kind": "FunctionDef",
+          "line_start": 67,
+          "line_end": 79,
+          "selected_source_bytes": 477,
+          "selected_source_sha256": "b8b6e041eebd7050dc53b68f0cbf7b913f04b5315587f0ac23d4ade824cc7a39",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_sources.py",
+              "name": "test_changed_or_hostile_article_refused",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_hash_substitution_refused",
+          "kind": "FunctionDef",
+          "line_start": 82,
+          "line_end": 84,
+          "selected_source_bytes": 150,
+          "selected_source_sha256": "cc20c66e0f76833f6a21140f22ff060b8d2d526c081cc85dee6dd905f6a6b487",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_sources.py",
+              "name": "test_source_hash_and_unverified_supplement_refused",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        }
+      ]
+    },
+    {
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "tests/adapters/test_rubisco_assay_v1.py",
+      "source_sha256": "b44444bac377df896a3fab9293039dcb5c23552cc570370f30df768cc13b5650",
+      "source_bytes": 3390,
+      "selected_test_names": [
+        "test_stationary_products_agree_with_independent_rate_reduction",
+        "test_specificity_is_concentration_normalized_and_units_scale_together",
+        "test_feedback_consumes_observation_and_keeps_action_domain",
+        "test_three_reported_parameters_do_not_identify_oxygenation_constants",
+        "test_paired_gas_variation_identifies_four_local_parameters",
+        "test_ten_percent_specificity_energy_scale",
+        "test_hostile_concentrations_refused",
+        "test_nonphysical_reduction_and_zero_rate_feedback_refused"
+      ],
+      "test_mappings": [
+        {
+          "name": "test_stationary_products_agree_with_independent_rate_reduction",
+          "kind": "FunctionDef",
+          "line_start": 23,
+          "line_end": 28,
+          "selected_source_bytes": 364,
+          "selected_source_sha256": "004caee8de496a25d3feefe40b7fc082807892c25a22729bb529fddf1e2f0bbe",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_assay.py",
+              "name": "test_products_match_independent_competitive_equations",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_specificity_is_concentration_normalized_and_units_scale_together",
+          "kind": "FunctionDef",
+          "line_start": 31,
+          "line_end": 36,
+          "selected_source_bytes": 364,
+          "selected_source_sha256": "fa40429b2666cc514fde1bccb49fd0e829bcd64d4670a65abb9bbfb487d5c982",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_assay.py",
+              "name": "test_specificity_and_concentration_units_scale_together",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_feedback_consumes_observation_and_keeps_action_domain",
+          "kind": "FunctionDef",
+          "line_start": 39,
+          "line_end": 44,
+          "selected_source_bytes": 334,
+          "selected_source_sha256": "09db19ff03ae74f9bb83448e7e91621abfe9d72a00958e153c439572486fd23e",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_assay.py",
+              "name": "test_feedback_uses_observation_and_declared_threshold",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_three_reported_parameters_do_not_identify_oxygenation_constants",
+          "kind": "FunctionDef",
+          "line_start": 47,
+          "line_end": 56,
+          "selected_source_bytes": 471,
+          "selected_source_sha256": "91004b53fc3f3783a1f9e1b77ea53137769130ebbef5044d404082a82f0a2c2d",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_assay.py",
+              "name": "test_three_summary_values_leave_oxygenation_parameters_nonidentified",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_paired_gas_variation_identifies_four_local_parameters",
+          "kind": "FunctionDef",
+          "line_start": 59,
+          "line_end": 74,
+          "selected_source_bytes": 858,
+          "selected_source_sha256": "87a35590e831121aeab11dc19de6dbdec37fd3690cd7872dc96b470ed49485c6",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_assay.py",
+              "name": "test_local_sensitivity_rank_and_independent_finite_difference",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_ten_percent_specificity_energy_scale",
+          "kind": "FunctionDef",
+          "line_start": 77,
+          "line_end": 78,
+          "selected_source_bytes": 126,
+          "selected_source_sha256": "fe43233a53b3be1276c05dc41ed52bf2b1a2fba768b34aec5c67c4618d9ca574",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_assay.py",
+              "name": "test_local_sensitivity_rank_and_independent_finite_difference",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_hostile_concentrations_refused",
+          "kind": "FunctionDef",
+          "line_start": 81,
+          "line_end": 84,
+          "selected_source_bytes": 187,
+          "selected_source_sha256": "084e99dc7ed455aec0660a7aaa5552401c0af2f546ca93d2bd893d353f55828b",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_assay.py",
+              "name": "test_invalid_gases_and_parameters_refuse",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_nonphysical_reduction_and_zero_rate_feedback_refused",
+          "kind": "FunctionDef",
+          "line_start": 87,
+          "line_end": 91,
+          "selected_source_bytes": 311,
+          "selected_source_sha256": "349da55f9c7382de0d065b749021957a7a47331ebd95a76178fe9b169b237efc",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_assay.py",
+              "name": "test_invalid_products_and_bounds_refuse",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        }
+      ]
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "tests/adapters/test_rubisco_historical_prediction.py",
+      "source_sha256": "3d6e8c9308ac81c83f966150f58a8cd56cbdc18d01dc66759485635750c09d30",
+      "source_bytes": 24402,
+      "selected_test_names": [
+        "test_synthetic_fifteen_stage_chain_is_descriptive_and_retains_unevaluable_gate",
+        "test_missing_global_commit_refused_before_label_payload_read",
+        "test_frozen_prediction_unchanged_when_withheld_labels_change",
+        "test_evaluator_rejects_omitted_method_or_fold_and_no_coverage_fabrication",
+        "test_unknown_fields_and_unsafe_features_refused",
+        "test_installed_protocol_and_factories_accept_exact_records_without_reading_data",
+        "test_actual_task_ports_refuse_label_injection_and_absent_historical_root",
+        "test_current_kernel_reveal_root_cannot_relabel_historical_evidence"
+      ],
+      "test_mappings": [
+        {
+          "name": "test_synthetic_fifteen_stage_chain_is_descriptive_and_retains_unevaluable_gate",
+          "kind": "FunctionDef",
+          "line_start": 326,
+          "line_end": 338,
+          "selected_source_bytes": 822,
+          "selected_source_sha256": "46ba3b91dc20a0cfa10c6b01bff6ab091bb83c457f8a45591505ba01d9fd67da",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_historical.py",
+              "name": "test_exposed_two_folds_all_six_forecasts_preserve_null_added_value",
+              "kind": "FunctionDef"
+            },
+            {
+              "path": "tests/test_rubisco_historical_recursive.py",
+              "name": "test_historical_public_service_retains_negative_census_and_recovers_without_execution",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_missing_global_commit_refused_before_label_payload_read",
+          "kind": "FunctionDef",
+          "line_start": 341,
+          "line_end": 350,
+          "selected_source_bytes": 476,
+          "selected_source_sha256": "6e251746b28c55a0146a87e1c8c517dd579a407b4e2eab291ac1acf048114456",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_historical.py",
+              "name": "test_evaluate_worker_checks_incomplete_global_commit_before_label_bytes",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_frozen_prediction_unchanged_when_withheld_labels_change",
+          "kind": "FunctionDef",
+          "line_start": 353,
+          "line_end": 365,
+          "selected_source_bytes": 658,
+          "selected_source_sha256": "aeaac1cbc17604567b36a8899b231f75d299ad233ef74365fca4538ccb6e386b",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_historical.py",
+              "name": "test_label_change_cannot_change_already_frozen_forecasts",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_evaluator_rejects_omitted_method_or_fold_and_no_coverage_fabrication",
+          "kind": "FunctionDef",
+          "line_start": 368,
+          "line_end": 388,
+          "selected_source_bytes": 914,
+          "selected_source_sha256": "1bcb185d8b0cbe02b4fe46c3c14839ccd3213bd0ec388a26efd48902050f0fdb",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_historical.py",
+              "name": "test_global_barrier_refuses_before_any_label_access",
+              "kind": "FunctionDef"
+            },
+            {
+              "path": "tests/test_rubisco_historical.py",
+              "name": "test_strict_successor_records_round_trip_and_refuse_coverage_promotion",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_unknown_fields_and_unsafe_features_refused",
+          "kind": "FunctionDef",
+          "line_start": 391,
+          "line_end": 399,
+          "selected_source_bytes": 474,
+          "selected_source_sha256": "c4f9b6ad889b981b2392c8714d5cf9abd2c90e2c1357b9e246652d2c6bc048da",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_historical.py",
+              "name": "test_fit_and_predict_refuse_target_label_information_roles",
+              "kind": "FunctionDef"
+            },
+            {
+              "path": "tests/test_rubisco_historical.py",
+              "name": "test_strict_successor_records_round_trip_and_refuse_coverage_promotion",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_installed_protocol_and_factories_accept_exact_records_without_reading_data",
+          "kind": "FunctionDef",
+          "line_start": 402,
+          "line_end": 456,
+          "selected_source_bytes": 2571,
+          "selected_source_sha256": "125a3e2fdd06db5eccf743496fcaee561057ac86a656cd24134205099b53fb47",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_historical.py",
+              "name": "test_historical_binding_construction_is_cold_and_complete",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_actual_task_ports_refuse_label_injection_and_absent_historical_root",
+          "kind": "FunctionDef",
+          "line_start": 600,
+          "line_end": 645,
+          "selected_source_bytes": 1898,
+          "selected_source_sha256": "22dd77ba2287fc1a7245234db4511c628e1eefc340a07ee7b55b608c6f5b7a94",
+          "adaptation_status": "adapted_invariant_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_historical.py",
+              "name": "test_forecast_worker_refuses_label_injection_before_any_data_reads",
+              "kind": "FunctionDef"
+            },
+            {
+              "path": "tests/test_rubisco_historical.py",
+              "name": "test_exact_analysis_root_and_role_joins_refuse_world_science_or_barrier_substitution",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Selected legacy test invariant; current tests exercise a successor implementation, not copied legacy execution."
+        },
+        {
+          "name": "test_current_kernel_reveal_root_cannot_relabel_historical_evidence",
+          "kind": "FunctionDef",
+          "line_start": 648,
+          "line_end": 660,
+          "selected_source_bytes": 469,
+          "selected_source_sha256": "565bafc2f22521a971408259a6514eadca604e03816ee7d930c6a2061ae5801e",
+          "adaptation_status": "partial_successor_coverage",
+          "current_tests": [
+            {
+              "path": "tests/test_rubisco_historical.py",
+              "name": "test_strict_successor_records_round_trip_and_refuse_coverage_promotion",
+              "kind": "FunctionDef"
+            }
+          ],
+          "adaptation_note": "Current tests cover narrower native/strict-record invariants; the complete original case/interface is not reproduced."
+        }
+      ]
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "tests/adapters/test_rubisco_m1_checkpoints_v5.py",
+      "source_sha256": "568662fa5523f835717cb5ab8666091181a25c052f664e0dfbca30626f50437c",
+      "source_bytes": 14060,
+      "selected_test_names": [
+        "test_committed_state_is_atomic_and_immutable",
+        "test_symlinks_and_unauthenticated_objects_fail_closed",
+        "test_wrong_protocol_hardware_and_cost_are_rejected",
+        "test_interrupted_observe_resumes_exact_next_operation",
+        "test_second_attempt_without_checkpoint_never_restarts"
+      ],
+      "test_mappings": [
+        {
+          "name": "test_committed_state_is_atomic_and_immutable",
+          "kind": "FunctionDef",
+          "line_start": 65,
+          "line_end": 78,
+          "selected_source_bytes": 817,
+          "selected_source_sha256": "9f52b4b69c9fc9ce92efb0acfa16efb6b9fe0fd660fecb241ed998170603d9a3",
+          "adaptation_status": "conditional_not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_symlinks_and_unauthenticated_objects_fail_closed",
+          "kind": "FunctionDef",
+          "line_start": 81,
+          "line_end": 95,
+          "selected_source_bytes": 726,
+          "selected_source_sha256": "ad828a1f03ad670b140f1ade5927c4262083f4b7dc67016c51114c2e29c12783",
+          "adaptation_status": "conditional_not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_wrong_protocol_hardware_and_cost_are_rejected",
+          "kind": "FunctionDef",
+          "line_start": 98,
+          "line_end": 118,
+          "selected_source_bytes": 1135,
+          "selected_source_sha256": "42df42de7c65f4ae1cee40b79791c2b62d74289db0070dda62c2af51b6942dad",
+          "adaptation_status": "conditional_not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_interrupted_observe_resumes_exact_next_operation",
+          "kind": "FunctionDef",
+          "line_start": 227,
+          "line_end": 269,
+          "selected_source_bytes": 1849,
+          "selected_source_sha256": "eae9735d11717e87af1660a12b1453347a24f29e8318891c9f11872bd5c5b41b",
+          "adaptation_status": "conditional_not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_second_attempt_without_checkpoint_never_restarts",
+          "kind": "FunctionDef",
+          "line_start": 359,
+          "line_end": 374,
+          "selected_source_bytes": 633,
+          "selected_source_sha256": "31ce6067a37dce4b27bf281e05d69f1a0a72c97c28167dc07d223b44214b00ca",
+          "adaptation_status": "conditional_not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        }
+      ]
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "tests/adapters/test_rubisco_m1_native_v5.py",
+      "source_sha256": "b022160768f174fe0a6de11146b7df9b9cec5f764c509c5f8af8121ba2ef7f51",
+      "source_bytes": 21129,
+      "selected_test_names": [
+        "test_corrected_native_recipe_is_rectangular_and_bounded",
+        "test_adjudication_of_a_failed_preparation_remains_unevaluable",
+        "test_kcx_parameters_never_replace_ordinary_protein_keys"
+      ],
+      "test_mappings": [
+        {
+          "name": "test_corrected_native_recipe_is_rectangular_and_bounded",
+          "kind": "FunctionDef",
+          "line_start": 406,
+          "line_end": 432,
+          "selected_source_bytes": 1221,
+          "selected_source_sha256": "0d7f180b93cb433341464a0f0a527a10b2dcb8794bd245a50ef9164e8ff6fbf9",
+          "adaptation_status": "conditional_not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_adjudication_of_a_failed_preparation_remains_unevaluable",
+          "kind": "FunctionDef",
+          "line_start": 435,
+          "line_end": 469,
+          "selected_source_bytes": 1658,
+          "selected_source_sha256": "b4cd9221fff05f333010e0303e3b192abc592ff128b4b6ef610ddd58b057f8c9",
+          "adaptation_status": "conditional_not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_kcx_parameters_never_replace_ordinary_protein_keys",
+          "kind": "FunctionDef",
+          "line_start": 503,
+          "line_end": 532,
+          "selected_source_bytes": 1292,
+          "selected_source_sha256": "4cc851e02e4562652806505116e15ec5d5cd71e2a9733f2f7cfca90c289af315",
+          "adaptation_status": "conditional_not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        }
+      ]
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "tests/adapters/test_rubisco_m1_sampling_v6.py",
+      "source_sha256": "28a2b11a95047b03ab6f9a1dec3b300b114bae2bbcc01a4f6d56753b2dbd3588",
+      "source_bytes": 12234,
+      "selected_test_names": [
+        "test_finite_signal_is_not_equilibrium_or_biological_qualification",
+        "test_preparation_reversal_is_an_honest_negative",
+        "test_invalid_or_incomplete_native_input_withholds_contrast",
+        "test_thermalization_checkpoint_keeps_exact_clock_and_cannot_skip_a_case"
+      ],
+      "test_mappings": [
+        {
+          "name": "test_finite_signal_is_not_equilibrium_or_biological_qualification",
+          "kind": "FunctionDef",
+          "line_start": 139,
+          "line_end": 147,
+          "selected_source_bytes": 581,
+          "selected_source_sha256": "66e8026d70c9c25237a1c350f1295d49879f58436aa9631ab6b6a40ff748a08c",
+          "adaptation_status": "conditional_not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_preparation_reversal_is_an_honest_negative",
+          "kind": "FunctionDef",
+          "line_start": 150,
+          "line_end": 154,
+          "selected_source_bytes": 310,
+          "selected_source_sha256": "e5075927e9dd1b447e9a158dc3f59290797e583d82e6cf6477f91882a6b22389",
+          "adaptation_status": "conditional_not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_invalid_or_incomplete_native_input_withholds_contrast",
+          "kind": "FunctionDef",
+          "line_start": 157,
+          "line_end": 175,
+          "selected_source_bytes": 947,
+          "selected_source_sha256": "d7a6641e0a3e5b105b1ef13a51fec36d3da2fc41ea81565b8aaafcbeb2a01b4a",
+          "adaptation_status": "conditional_not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        },
+        {
+          "name": "test_thermalization_checkpoint_keeps_exact_clock_and_cannot_skip_a_case",
+          "kind": "FunctionDef",
+          "line_start": 178,
+          "line_end": 189,
+          "selected_source_bytes": 692,
+          "selected_source_sha256": "031dab0e4b28298b605aecdf65849137295a63b3c4f5a0f57ca9e15f917fd87b",
+          "adaptation_status": "conditional_not_ported",
+          "current_tests": [],
+          "adaptation_note": "No current selected test counterpart; no passed-test or implementation-completion claim."
+        }
+      ]
+    }
+  ],
+  "selected_file_destination_audit": [
+    {
+      "selected_file_index": 0,
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/observations.py",
+      "source_hash_verified": true,
+      "declared_destination_owner": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/records.py",
+      "declared_destination_is_current_file": true,
+      "disposition": "current_owner_exists"
+    },
+    {
+      "selected_file_index": 1,
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/xlsx.py",
+      "source_hash_verified": true,
+      "declared_destination_owner": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/workbook.py",
+      "declared_destination_is_current_file": true,
+      "disposition": "current_owner_exists"
+    },
+    {
+      "selected_file_index": 2,
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/physical/rubisco_kinetics_v1/rr2018.py",
+      "source_hash_verified": true,
+      "declared_destination_owner": "src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr2018.py",
+      "declared_destination_is_current_file": true,
+      "disposition": "current_owner_exists"
+    },
+    {
+      "selected_file_index": 3,
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/core.py",
+      "source_hash_verified": true,
+      "declared_destination_owner": "src/empirical_lawhood/adapters/simulators/rubisco_assay/core.py",
+      "declared_destination_is_current_file": true,
+      "disposition": "current_owner_exists"
+    },
+    {
+      "selected_file_index": 4,
+      "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_assay_v1/records.py",
+      "source_hash_verified": true,
+      "declared_destination_owner": "src/empirical_lawhood/adapters/simulators/rubisco_assay/records.py",
+      "declared_destination_is_current_file": true,
+      "disposition": "current_owner_exists"
+    },
+    {
+      "selected_file_index": 5,
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/analysis.py",
+      "source_hash_verified": true,
+      "declared_destination_owner": "src/empirical_lawhood/adapters/methods/rubisco_historical/analysis.py",
+      "declared_destination_is_current_file": true,
+      "disposition": "current_owner_exists"
+    },
+    {
+      "selected_file_index": 6,
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/methods/rubisco_historical_v1/records.py",
+      "source_hash_verified": true,
+      "declared_destination_owner": "src/empirical_lawhood/adapters/methods/rubisco_historical/records.py",
+      "declared_destination_is_current_file": true,
+      "disposition": "current_owner_exists"
+    },
+    {
+      "selected_file_index": 7,
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/preparation.py",
+      "source_hash_verified": true,
+      "declared_destination_owner": "src/empirical_lawhood/adapters/simulators/rubisco_molecular/",
+      "declared_destination_is_current_file": false,
+      "disposition": "conditional_not_ported"
+    },
+    {
+      "selected_file_index": 8,
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/checkpoints.py",
+      "source_hash_verified": true,
+      "declared_destination_owner": "src/empirical_lawhood/adapters/simulators/rubisco_molecular/",
+      "declared_destination_is_current_file": false,
+      "disposition": "conditional_not_ported"
+    },
+    {
+      "selected_file_index": 9,
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v6/analysis.py",
+      "source_hash_verified": true,
+      "declared_destination_owner": "src/empirical_lawhood/adapters/simulators/rubisco_molecular/",
+      "declared_destination_is_current_file": false,
+      "disposition": "conditional_not_ported"
+    },
+    {
+      "selected_file_index": 10,
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "docs/programmes/rubisco-el/plans/r02s-m1-hardware-benchmark-v1.md",
+      "source_hash_verified": true,
+      "declared_destination_owner": null,
+      "declared_destination_is_current_file": false,
+      "disposition": "retain_history"
+    },
+    {
+      "selected_file_index": 11,
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "docs/programmes/rubisco-el/plans/phase-04c-prospective-search-and-control.md",
+      "source_hash_verified": true,
+      "declared_destination_owner": "docs/rubisco-inquiry/assessment-protocol.md",
+      "declared_destination_is_current_file": true,
+      "disposition": "current_owner_exists"
+    }
+  ],
+  "selector_contract": {
+    "source_selection": "Exact original git object and top-level AST selector. Decorators through definition end are included in selected-source hash/byte count.",
+    "destination_selection": "Actual current top-level AST definitions/tests only; empty lists explicitly mean not ported.",
+    "test_scope": "Named historical tests selected by invariant. Correspondence does not assert identical tests, full original behavior, execution or qualification.",
+    "preservation": "The twelve original selected_files objects remain unchanged. Legacy repositories/worktrees are read-only."
+  },
+  "licensing_and_authority": {
+    "legacy_declarations": [
+      {
+        "source_head": "primary",
+        "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+        "source_path": "pyproject.toml",
+        "source_sha256": "ca0bf44351e7bd57af56a0c4088374f25a45640a8be87014dae43cd41cb2e0d5",
+        "source_bytes": 13298,
+        "native_license_declaration": "license = { text = \"Proprietary\" }",
+        "root_license_notice_paths": []
+      },
+      {
+        "source_head": "r1",
+        "source_commit": "ec4f7ad3c81ffb2d9734babd866f933c794398cc",
+        "source_path": "pyproject.toml",
+        "source_sha256": "3877c010415e502e580722a25e66c36bcefb1f86d10f98436db568495eb9eb61",
+        "source_bytes": 13075,
+        "native_license_declaration": "license = { text = \"Proprietary\" }",
+        "root_license_notice_paths": []
+      },
+      {
+        "source_head": "completion",
+        "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+        "source_path": "pyproject.toml",
+        "source_sha256": "c23ddc2f4f20a7f5e41f3ecb44187133241b94916d43fde274c8395f01d87b6a",
+        "source_bytes": 13422,
+        "native_license_declaration": "license = { text = \"Proprietary\" }",
+        "root_license_notice_paths": []
+      }
+    ],
+    "destination_declaration": "Existing owner_authored_public_contribution_license values are preserved as stated destination contribution declarations, not inferred legacy licenses.",
+    "limitation": "Git-object custody verifies source identity, not independent copyright ownership, permission to relicense third-party material or external redistribution authority. Legacy pyproject declarations are Proprietary; no root license notice object was found.",
+    "authority": "This manifest selects owner-requested exposed development work only. It creates no issue, reveal, laboratory, qualification, publication or submission authority."
+  },
+  "selector_verification": {
+    "verified_on": "2026-10-09",
+    "original_selected_file_count": 12,
+    "selected_symbol_count": 78,
+    "selected_legacy_test_file_count": 7,
+    "selected_document_section_count": 6,
+    "selected_legacy_test_count": 45,
+    "symbol_status_counts": {
+      "partial_native_record_adaptation": 6,
+      "not_ported": 8,
+      "adapted_invariant": 43,
+      "replaced_by_current_operation_contract": 3,
+      "conditional_not_ported": 18
+    },
+    "test_status_counts": {
+      "adapted_invariant_coverage": 24,
+      "partial_successor_coverage": 4,
+      "not_ported": 5,
+      "conditional_not_ported": 12
+    },
+    "checks": [
+      "All twelve original git-object SHA256 and byte counts match.",
+      "Every selected source definition/test exists at its pinned commit.",
+      "Every nonempty mapped destination definition/test exists in the current checkout.",
+      "Conditional molecular destination absence is explicit; assessment protocol maps comparison principles only, not full adaptive execution.",
+      "Original selected_files objects are semantically unchanged."
+    ]
+  },
+  "selected_document_sections": [
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "docs/programmes/rubisco-el/plans/r02s-m1-hardware-benchmark-v1.md",
+      "source_sha256": "755fd8b93a63a3c256c4c1b22bd103aa0a2fdb217d2022e783e13a3b864636b2",
+      "source_bytes": 17142,
+      "heading": "## Four-arm benchmark",
+      "line_start": 104,
+      "line_end": 152,
+      "selected_source_sha256": "e2437ca05bc1f039f8b061deb0f735baa55341b2059e7d6169e50ec7d52e965c",
+      "selected_source_bytes": 2982,
+      "adaptation_status": "retain_history",
+      "destination_selectors": [],
+      "adaptation_note": "Historical benchmark contract remains unentered."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "docs/programmes/rubisco-el/plans/r02s-m1-hardware-benchmark-v1.md",
+      "source_sha256": "755fd8b93a63a3c256c4c1b22bd103aa0a2fdb217d2022e783e13a3b864636b2",
+      "source_bytes": 17142,
+      "heading": "## Comparison rules fixed before native observation",
+      "line_start": 153,
+      "line_end": 202,
+      "selected_source_sha256": "1ada5cf53033fbd7d0efdbba020354900dd92972fc81bad8bc7c2b5120b78b6e",
+      "selected_source_bytes": 3047,
+      "adaptation_status": "retain_history",
+      "destination_selectors": [],
+      "adaptation_note": "Historical benchmark contract remains unentered."
+    },
+    {
+      "source_commit": "70ad6708799f0e8070526ef15c1da4870e080238",
+      "source_path": "docs/programmes/rubisco-el/plans/r02s-m1-hardware-benchmark-v1.md",
+      "source_sha256": "755fd8b93a63a3c256c4c1b22bd103aa0a2fdb217d2022e783e13a3b864636b2",
+      "source_bytes": 17142,
+      "heading": "## Implementation and entry gates",
+      "line_start": 203,
+      "line_end": 243,
+      "selected_source_sha256": "c9b86e46d9059ae18b19b3d19e408f883ce9d3ab5bee10d9f474a6f27aff9485",
+      "selected_source_bytes": 3513,
+      "adaptation_status": "retain_history",
+      "destination_selectors": [],
+      "adaptation_note": "Historical benchmark contract remains unentered."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "docs/programmes/rubisco-el/plans/phase-04c-prospective-search-and-control.md",
+      "source_sha256": "8d75dcca8d98d85dbc90f88dd3afba712bd591b18a97a53f2f77b9ef14e7f279",
+      "source_bytes": 13221,
+      "heading": "## Episode chronology and causal contract",
+      "line_start": 47,
+      "line_end": 92,
+      "selected_source_sha256": "06f661195b76bc20e32f59869495ef62c6fcf635838a8378a72ef328c7c0f86e",
+      "selected_source_bytes": 2604,
+      "adaptation_status": "partial_comparison_principle_adaptation",
+      "destination_selectors": [
+        {
+          "path": "docs/rubisco-inquiry/assessment-protocol.md",
+          "heading": "## Wilson combination diagnostic v1"
+        }
+      ],
+      "adaptation_note": "Successor selects source-only no-advantage disposition and exposed Wilson three-corner conventional diagnostic with committed role joins. It does not port legacy adaptive chronology or establish full matched adaptive execution."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "docs/programmes/rubisco-el/plans/phase-04c-prospective-search-and-control.md",
+      "source_sha256": "8d75dcca8d98d85dbc90f88dd3afba712bd591b18a97a53f2f77b9ef14e7f279",
+      "source_bytes": 13221,
+      "heading": "## Baselines, budgets and outcomes",
+      "line_start": 119,
+      "line_end": 158,
+      "selected_source_sha256": "0e4c4977c37770a6f2b8ee5099fcaed3e6f4c0caf1cc4d676868e02ed07702f8",
+      "selected_source_bytes": 3184,
+      "adaptation_status": "partial_comparison_principle_adaptation",
+      "destination_selectors": [
+        {
+          "path": "docs/rubisco-inquiry/assessment-protocol.md",
+          "heading": "## Source-only construction disposition"
+        },
+        {
+          "path": "docs/rubisco-inquiry/assessment-protocol.md",
+          "heading": "## Conventional capability and costs"
+        }
+      ],
+      "adaptation_note": "Successor selects source-only no-advantage disposition and exposed Wilson three-corner conventional diagnostic with committed role joins. It does not port legacy adaptive chronology or establish full matched adaptive execution."
+    },
+    {
+      "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+      "source_path": "docs/programmes/rubisco-el/plans/phase-04c-prospective-search-and-control.md",
+      "source_sha256": "8d75dcca8d98d85dbc90f88dd3afba712bd591b18a97a53f2f77b9ef14e7f279",
+      "source_bytes": 13221,
+      "heading": "## Verification, exit and negative branches",
+      "line_start": 179,
+      "line_end": 194,
+      "selected_source_sha256": "7250393445f5031c1b728f401d9f53ecb171f2c84281c72d06e4019ce81d98c0",
+      "selected_source_bytes": 1070,
+      "adaptation_status": "partial_comparison_principle_adaptation",
+      "destination_selectors": [
+        {
+          "path": "docs/rubisco-inquiry/assessment-protocol.md",
+          "heading": "## Conventional capability and costs"
+        },
+        {
+          "path": "docs/rubisco-inquiry/assessment-protocol.md",
+          "heading": "## Candidate-domain stop"
+        }
+      ],
+      "adaptation_note": "Successor selects source-only no-advantage disposition and exposed Wilson three-corner conventional diagnostic with committed role joins. It does not port legacy adaptive chronology or establish full matched adaptive execution."
+    }
+  ],
+  "documentary_location_successor": {
+    "parent_manifest_sha256": "b600131552168143d36e2e04e23bf57608b01048d670386c673f50bbe1c276a8",
+    "retained_parent_archive": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/documentary-before-location-successor.zip",
+    "retained_parent_archive_sha256": "ad41831afa9d41c495ba9b59b3c8349148e6d66ebc92e30189b265aca3bdfac1",
+    "reason": "Workflow bundles own editable JSON inputs; documentary registers belong to docs. Source bindings and scientific findings unchanged."
+  }
+}

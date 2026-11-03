@@ -72,7 +72,7 @@ from empirical_lawhood.adapters.methods.preparation_applicability.exposure impor
 from .science import system, budget, UNIT, CLOCK, CUTOFF, CHART, FRAME
 from .protocol import study_template
 
-SPECIFICATION_PATH = "docs/plans/empirical-lawhood.preparation-applicability.md"
+SPECIFICATION_PATH = "programmes/foundations/emergent-structure/records/empirical-lawhood.preparation-applicability.md"
 
 
 def experiment_spec(stage: PreparationApplicabilityStage) -> ExperimentSpec:

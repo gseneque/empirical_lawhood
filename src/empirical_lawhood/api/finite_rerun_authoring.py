@@ -31,7 +31,10 @@ from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
 from empirical_lawhood.infrastructure.bounded_io import MAX_RUNTIME_PLAN_JSON_BYTES, file_matches_bytes, read_bounded_bytes
 from empirical_lawhood.infrastructure.candidate_payloads import ExternalCandidatePayloadPlane
 from empirical_lawhood.infrastructure.candidate_sources import ExternalContentAddressedInputResolver, ExternalCandidateInputPublisher
+from empirical_lawhood.api.recursive_prospective_authoring import _capture_prospective_source, _publish_source_provenance
+from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
 from empirical_lawhood.infrastructure.source_closure import capture_clean_target_closure
+from empirical_lawhood.api.authoring_handoff import authenticate_selected_authoring_source, require_authoring_source_kind_layout
 from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_ISSUE_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID
 from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_artifact_manifest
 from empirical_lawhood.kernel.decoding import decode_canonical_bytes
@@ -40,7 +43,7 @@ from empirical_lawhood.kernel.provenance import ObjectIdentity
 from empirical_lawhood.kernel.references import ArtifactIdentity
 from empirical_lawhood.kernel.serialization import CanonicalRecord
 from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, require_study_authority
+from empirical_lawhood.planning.study_issue import SourceClosureKind, StudyAuthorityKind, require_study_authority
 from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest
 from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_run_plan
 from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort, LayeredCampaignRuntimeProviderResolver
@@ -328,7 +331,8 @@ def author_finite_response_rerun(*, root: Path, packet: FiniteResponseLawRerunIn
     """Compile the selected current act; source acquisition remains an issued later operation."""
     output_dir = preflight_authoring_output_directory(directory=output_dir, repo_root=root,
         artifact_writer=artifact_writer, allow_existing_empty=True)
-    closure = capture_clean_target_closure(root, f'{packet.config_id}.source-closure')
+    captured = _capture_prospective_source(root, f'{packet.config_id}.source-closure', artifact_writer=artifact_writer)
+    closure = captured.closure
     nomination = current_nomination_operand_import(nomination_directory / 'nomination.canonical.json', source_directory=nomination_directory)
     if nomination != packet.nomination:
         raise ValueError('FINITE_RERUN_AUTHENTICATED_FIXED_NOMINATION_MISMATCH')
@@ -372,6 +376,8 @@ def author_finite_response_rerun(*, root: Path, packet: FiniteResponseLawRerunIn
         run_id = projected.run_plan_id
         for name, record in (('candidate-report.json', report), ('candidate.json', candidate), ('base-candidate.json', candidate.base_candidate), ('source-closure.json', closure), ('resources.json', resources), ('preissue-run-plan.json', projected), ('preissue-execution-plan.json', lowered)):
             save(name, record)
+        _publish_source_provenance(captured=captured, destination=output_dir, artifact_writer=artifact_writer)
+        GitStudySourceClosureInspector(Path(root)).observe(closure)
     return {'stage': packet.stage, 'candidate_sha256': candidate.fingerprint(), 'run_id': run_id,
             'independent_units': packet.allocation.root_count, 'task_count': len(lowered.tasks),
             'output_count': sum(len(task.outputs) for task in lowered.tasks), 'authoring_dir': str(output_dir),
@@ -445,9 +451,14 @@ def load_finite_response_rerun_handoff(*, directory: Path, root: Path, storage_p
     exposure = _read_record(directory, 'exposure.json', FiniteResponseLawCurrentExposure)
     from empirical_lawhood.planning.study_issue import ImplementationSourceClosure
     closure = _read_record(directory, 'source-closure.json', ImplementationSourceClosure)
-    observed = capture_clean_target_closure(root, closure.source_closure_id)
-    if observed != closure:
-        raise ValueError('FINITE_RERUN_ACTUAL_SOURCE_CLOSURE_CHANGED')
+    require_authoring_source_kind_layout(directory=directory, closure=closure)
+    if closure.kind is SourceClosureKind.CLEAN_GIT_COMMIT:
+        observed = capture_clean_target_closure(root, closure.source_closure_id)
+        if observed != closure:
+            raise ValueError('FINITE_RERUN_ACTUAL_SOURCE_CLOSURE_CHANGED')
+    else:
+        authenticate_selected_authoring_source(directory=directory, project_root=root,
+            artifact_writer=artifact_writer, closure=closure)
     parent = None if packet.stage == 'calibration' else _read_record(directory, 'current-parent.json', FiniteResponseLawCurrentParent)
     _validate_parent(packet, parent, artifact_writer)
     if parent is not None and (not {root.physical_unit_id for root in parent.native_source.roots} <= set(exposure.excluded_unit_ids) or not set(native_seed_ids(parent.native_source)) <= set(exposure.excluded_seed_ids)):

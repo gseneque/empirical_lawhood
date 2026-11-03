@@ -1,0 +1,53 @@
+{
+  "$defs": {
+    "SelectedE4RevisionAcquisitionSource_f86583ddbae6": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-selected-e4/revision-acquisition-source"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "allow_partial": {
+              "description": "allow partial; constructor checks semantics and units.",
+              "type": "boolean"
+            },
+            "authored_directory": {
+              "description": "authored directory; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "record_id",
+            "authored_directory",
+            "allow_partial"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-selected-e4-revision-acquisition",
+  "$ref": "#/$defs/SelectedE4RevisionAcquisitionSource_f86583ddbae6",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Selected E4 Revision Acquisition",
+  "x-consumer": "matrix-selected-e4-revision-acquisition",
+  "x-consumer-maximum-bytes": 65536,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

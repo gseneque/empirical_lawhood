@@ -31,7 +31,7 @@ def test_reference_retains_exact_existing_prose_and_every_leaf_has_prerequisites
         if entry.fact.command_kind == "command":
             assert entry.metadata.native_software
             assert entry.metadata.native_status
-    assert render() == (ROOT / "docs/cli.md").read_text()
+    assert render() == (ROOT / "docs/reference/cli.md").read_text()
 
 
 @pytest.mark.parametrize("changed", ("missing", "extra", "duplicate"))

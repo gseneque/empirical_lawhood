@@ -1,0 +1,212 @@
+{
+  "$defs": {
+    "E1CompactCriterionChoices_d700468c0521": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-factor-confirmation/compact-criterion-choices"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "alpha_denominator": {
+              "description": "alpha denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "alpha_numerator": {
+              "description": "alpha numerator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "criterion_id": {
+              "description": "criterion id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "factor_rule": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "factor rule; constructor checks semantics and units."
+            },
+            "family_requirements": {
+              "description": "family requirements; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/E1FamilySize_0df5a170a9b5"
+              },
+              "type": "array"
+            },
+            "independent_unit_id": {
+              "description": "independent unit id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "multiplicity": {
+              "description": "multiplicity; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "occurrence_end_tick": {
+              "description": "occurrence end tick; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "occurrence_estimand": {
+              "description": "occurrence estimand; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "relation": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "relation; constructor checks semantics and units."
+            },
+            "survival_duration_ticks": {
+              "description": "survival duration ticks; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "survival_endpoints": {
+              "description": "survival endpoints; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "survival_origin_end_tick": {
+              "description": "survival origin end tick; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "system_id": {
+              "description": "system id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "uncertainty": {
+              "description": "uncertainty; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "views": {
+              "description": "views; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "world_id": {
+              "description": "world id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "criterion_id",
+            "factor_rule",
+            "system_id",
+            "world_id",
+            "relation",
+            "independent_unit_id",
+            "family_requirements",
+            "views",
+            "survival_endpoints",
+            "occurrence_estimand",
+            "occurrence_end_tick",
+            "survival_duration_ticks",
+            "alpha_numerator",
+            "alpha_denominator",
+            "survival_origin_end_tick",
+            "uncertainty",
+            "multiplicity"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "2.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "E1FamilySize_0df5a170a9b5": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-factor-confirmation/occurrence-family-size"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "family_id": {
+              "description": "family id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "requested_roots": {
+              "description": "requested roots; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "family_id",
+            "requested_roots"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-e1-criterion-choices",
+  "$ref": "#/$defs/E1CompactCriterionChoices_d700468c0521",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix E1 Criterion Choices",
+  "x-consumer": "matrix-e1-criterion-choices",
+  "x-consumer-maximum-bytes": 4194304,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

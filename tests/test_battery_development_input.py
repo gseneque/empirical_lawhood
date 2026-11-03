@@ -16,7 +16,7 @@ from empirical_lawhood.adapters.simulators.pybamm_development_input import PyBaM
 from empirical_lawhood.kernel.decoding import decode_canonical_bytes
 
 CONFIG = (
-    Path(__file__).resolve().parents[1] / "experiments/battery-response-and-restart/config.json"
+    Path(__file__).resolve().parents[1] / "programmes/energy/battery-charging/workflows/battery-response-and-restart/config.json"
 )
 
 

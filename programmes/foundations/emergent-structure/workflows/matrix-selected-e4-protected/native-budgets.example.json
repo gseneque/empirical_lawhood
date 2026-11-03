@@ -1,0 +1,231 @@
+{
+  "schema": "empirical-lawhood/matrix-selected-e4/native-budgets",
+  "value": {
+    "record_id": "budgets.selected-e4",
+    "phase_budgets": [
+      [
+        "account",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "check",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "collect",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "continue",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "entry",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "full-numerical",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "measure",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "mechanical",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "numerical",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "prefix",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "project",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "reduce",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "response-score",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "responses",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "memory_bytes": 268435456,
+            "gpu_devices": 0,
+            "wall_time_seconds": null,
+            "source_scan_bytes": 67108864,
+            "output_bytes": 67108864
+          },
+          "version": "1.0.0"
+        }
+      ]
+    ],
+    "collector_budget": {
+      "schema": "empirical-lawhood/kernel/resource-budget",
+      "value": {
+        "cpu_cores": 1,
+        "memory_bytes": 268435456,
+        "gpu_devices": 0,
+        "wall_time_seconds": null,
+        "source_scan_bytes": 67108864,
+        "output_bytes": 67108864
+      },
+      "version": "1.0.0"
+    }
+  },
+  "version": "1.0.0"
+}

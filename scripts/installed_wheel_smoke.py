@@ -15,6 +15,114 @@ import sys
 import tomllib
 
 
+
+def _matrix_offline_checks(invoke, checkout: Path, output_dir: Path) -> dict:
+    """Exercise copied Matrix designs without source, storage or native entry."""
+    matrix_dir = output_dir / "matrix-experiment"
+    matrix_dir.mkdir()
+    cases = (
+        ("selected64", "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/specification.json"),
+        ("alternative", "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/alternative.json"),
+    )
+    observed = []
+    source_pins = []
+    for label, relative in cases:
+        source = checkout / relative
+        raw = source.read_bytes()
+        specification = json.loads(raw)
+        expected = {
+            row["value"]["role"].lower(): row["value"]["expected_units"]
+            for row in specification["value"]["populations"]
+        }
+        attempt = matrix_dir / (label + "-explain-attempt")
+        report = json.loads(invoke([
+            "campaign", "experiment-explain", "--input", str(source),
+            "--attempt-dir", str(attempt),
+        ]).stdout)
+        assert report["census"]["roles"] == expected
+        assert set(report["census"]["resolved_roles"].values()) == {0}
+        assert report["executable"] is False
+        assert report["native_contact"] == "NONE"
+        assert report["scientific_execution_performed"] is False
+        assert report["scientific_authority"] == "NONE"
+        assert report["qualification"] == "NOT_ESTABLISHED"
+        invocation = json.loads((attempt / "invocation.json").read_bytes())
+        assert invocation["exit_code"] == 0 and invocation["operation_completed"] is True
+        assert (attempt / "report.json").is_file() and not (attempt / "failure.json").exists()
+        source_pins.append((source, raw))
+        observed.append({"input": relative, "sha256": hashlib.sha256(raw).hexdigest(),
+                         "roles": expected, "executable": False})
+    source = checkout / cases[1][1]
+    preparation_path = matrix_dir / "alternative-preparation.json"
+    unentered = matrix_dir / "unentered-scientific-storage"
+    prepared = json.loads(invoke([
+        "campaign", "experiment-prepare", "--input", str(source),
+        "--protocol", str(checkout / "programmes/foundations/emergent-structure/records/matrix-e2-e3-candidate/candidate-design02.json"),
+        "--environment-id", "matrix.release.declared-main", "--workers", "4",
+        "--output-root", str(unentered), "--output", str(preparation_path),
+        "--attempt-dir", str(matrix_dir / "prepare-attempt"),
+    ]).stdout)
+    assert prepared.pop("preparation_report") == str(preparation_path)
+    assert json.loads(preparation_path.read_bytes()) == prepared
+    assert prepared["census"]["roles"] == observed[1]["roles"]
+    assert prepared["execution"]["workers"] == 4
+    assert prepared["execution"]["environment_id"] == "matrix.release.declared-main"
+    assert prepared["execution"]["output_root"] == str(unentered)
+    dependencies = {row["code"] for row in prepared["dependencies"]}
+    assert "matrix.e3.source-snapshot" in dependencies
+    assert "matrix.e3.protocol.0" not in dependencies
+    assert "matrix.e3.environment" not in dependencies
+    assert prepared["executable"] is False and prepared["native_contact"] == "NONE"
+    assert prepared["scientific_execution_performed"] is False
+    assert prepared["scientific_authority"] == "NONE"
+    assert prepared["qualification"] == "NOT_ESTABLISHED"
+    assert not unentered.exists()
+    assert all(path.read_bytes() == raw for path, raw in source_pins)
+    return {"exposed_metadata_only": True, "designs": observed,
+            "preparation_retained": True, "declared_workers": 4,
+            "scientific_entry": False, "source_admission": "NOT_GRANTED"}
+
+
+def _matrix_source_refusals(invoke, checkout: Path, output_dir: Path) -> dict:
+    """Check read input validation and recovery source refusal at their boundaries."""
+    matrix_dir = output_dir / "matrix-experiment"
+    missing_profile = matrix_dir / "missing-operator-profile.json"
+    assert not missing_profile.exists()
+    authored = matrix_dir / "absent-authored-custody"
+    authored.mkdir()
+    observed = []
+    for command in ("experiment-read", "experiment-recover"):
+        attempt = matrix_dir / (command + "-source-refusal")
+        profile = missing_profile if command == "experiment-read" else checkout / "configs/operator-storage.example.json"
+        arguments = [
+            "--project-root", str(checkout),
+            "--operator-profile", str(profile),
+            "campaign", command, "--authoring-dir", str(authored),
+            "--attempt-dir", str(attempt),
+        ]
+        if command == "experiment-recover":
+            arguments.append("--custody-only")
+        result = invoke(arguments, code=2)
+        invocation = json.loads((attempt / "invocation.json").read_bytes())
+        assert invocation["operation"] == "campaign " + command
+        assert invocation["exit_code"] == 2 and invocation["operation_completed"] is False
+        assert (attempt / "failure.json").is_file() and not (attempt / "report.json").exists()
+        failure = json.loads((attempt / "failure.json").read_bytes())
+        if command == "experiment-read":
+            assert failure["cause_types"] == ["FileNotFoundError"]
+            assert invocation["native_contact"] == "none"
+            disposition = "MISSING_OPERATOR_PROFILE_REFUSED"
+        else:
+            assert "executing" in result.stderr
+            assert "ExecutingSourceMismatch" in failure["cause_types"]
+            disposition = "EXECUTING_SOURCE_REFUSED"
+        assert not tuple(authored.iterdir())
+        observed.append({"command": command, "exit_code": 2,
+                         "disposition": disposition,
+                         "native_contact": invocation["native_contact"],
+                         "attempt": attempt.relative_to(output_dir).as_posix()})
+    return {"checks": observed, "positive_selected_source_lifecycle": "SEPARATE_REQUIRED_EVIDENCE"}
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--checkout", required=True, type=Path)
@@ -87,7 +195,16 @@ def main() -> None:
     assert {"rc-information", "rc-challenges", "matrix-inputs", "finite-response-law", "preparation-applicability", "matrix-geometry", "selected-events", "matrix-history-analysis", "matrix-tangent", "matrix-transient", "preparation-diagnostics"} <= {item["workflow_id"] for item in workflows["workflows"]}
     rc_workflow = json.loads(invoke(["workflow", "show", "rc-ladder-response", "--format", "json"]).stdout)
     assert rc_workflow["prerequisites_inspected"] is False
-    model_path = checkout / "experiments/rc-ladder-response/model.json"
+    recursive_workflow = json.loads(invoke(["workflow", "show", "recursive-inquiry", "--format", "json"]).stdout)
+    assert recursive_workflow["prerequisites_inspected"] is False
+    recursive_path = checkout / "programmes/materials/superconductivity/workflows/recursive-materials/materials-partial.json"
+    recursive_schema = json.loads(invoke(["config", "schema", "--schema-id", "empirical-lawhood/planning/recursive-study-draft"]).stdout)
+    assert recursive_schema["x-consumer"] == "recursive-inquiry"
+    recursive_validation = json.loads(invoke(["config", "validate", "--config", str(recursive_path), "--consumer", "recursive-inquiry", "--format", "json"]).stdout)
+    assert recursive_validation["canonical_byte_ready"] is True
+    recursive_explanation = json.loads(invoke(["campaign", "recursive-explain", "--input", str(recursive_path)]).stdout)
+    assert recursive_explanation["native_contact"] == "none"
+    model_path = checkout / "programmes/foundations/measurement-and-response/workflows/rc-ladder-response/model.json"
     model = model_path.read_bytes()
     schema_id = json.loads(model)["schema"]
     schema = json.loads(invoke(["config", "schema", "--schema-id", schema_id]).stdout)
@@ -101,7 +218,9 @@ def main() -> None:
     prepared = output_dir / "prepared-model.json"
     invoke(["config", "prepare", "--config", str(pretty), "--output-file", str(prepared), "--format", "json"])
     assert prepared.read_bytes() == model and model_path.read_bytes() == model
-    analytical = json.loads(invoke(["example", "rc-information", "--config", str(checkout / "experiments/rc-information/input.json")]).stdout)
+    matrix_offline = _matrix_offline_checks(invoke, checkout, output_dir)
+    matrix_source_refusals = _matrix_source_refusals(invoke, checkout, output_dir)
+    analytical = json.loads(invoke(["example", "rc-information", "--config", str(checkout / "programmes/foundations/measurement-and-response/workflows/rc-information/input.json")]).stdout)
     assert analytical["schema"] == "empirical-lawhood/api/rc-information-report"
     lower_dir = output_dir / "original-f"
     lower = json.loads(invoke(["campaign", "original-f-export", "--output-dir", str(lower_dir), "--payload-id", "wheel.original-f"]).stdout)
@@ -111,7 +230,7 @@ def main() -> None:
     nominated = json.loads(invoke(["campaign", "nomination-export", "--output-dir", str(nomination_dir), "--nomination-id", "wheel.nomination"]).stdout)
     authenticated = json.loads(invoke(["campaign", "nomination-check", "--operand", str(nomination_dir / "nomination.canonical.json"), "--source-directory", str(nomination_dir)]).stdout)
     assert nominated["identity"] == authenticated["identity"] and authenticated["refitting_performed"] is False
-    geometry = json.loads(invoke(["campaign", "matrix-geometry-prove", "--input", str(checkout / "experiments/matrix-geometry/input.json")]).stdout)
+    geometry = json.loads(invoke(["campaign", "matrix-geometry-prove", "--input", str(checkout / "programmes/foundations/emergent-structure/workflows/matrix-geometry/input-current.json")]).stdout)
     assert geometry["scientific_execution_performed"] is False and geometry["potential_task_count"] == 17118
     for consumer in ("matrix-geometry", "selected-parent", "matrix-history-allocation", "matrix-history-source", "matrix-history-analysis", "matrix-tangent", "matrix-transient-analysis", "matrix-baseline-analysis", "preparation-diagnostics"):
         schema_id = consumer_by_id(consumer).schema_id
@@ -142,14 +261,14 @@ def main() -> None:
     assert "executing" in source_refusal.stderr
 
     for command, relative, reason in (
-        ("reactor-batch-input-check", "experiments/reactor-response/batch-input.json", "SOURCE_ROOT_REQUIRED"),
-        ('dependent-response-input-check', "experiments/prepared-response/prepared-dependent-refinement-input.json", "SOURCE_ROOT_REQUIRED"),
-        ('finite-response-input-check', "experiments/finite-response-law/finite-calibration-input.json", "SOURCE_ROOT_REQUIRED"),
+        ("reactor-batch-input-check", "programmes/foundations/measurement-and-response/workflows/reactor-response/batch-input.json", "SOURCE_ROOT_REQUIRED"),
+        ('dependent-response-input-check', "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-dependent-refinement-input.json", "SOURCE_ROOT_REQUIRED"),
+        ('finite-response-input-check', "programmes/foundations/emergent-structure/workflows/finite-response-law/finite-calibration-input.json", "SOURCE_ROOT_REQUIRED"),
     ):
         result = invoke(["campaign", command, "--config", str(checkout / relative)], code=3)
         assert reason in result.stderr, result.stderr
     canary = json.loads(invoke(["campaign", 'prepared-response-native-check', "--config",
-                               str(checkout / "experiments/prepared-response/prepared-canary.json")]).stdout)
+                               str(checkout / "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-canary.json")]).stdout)
     assert canary["campaign_issued"] is False
 
     demo = output_dir / "reactor-prefix"
@@ -193,6 +312,8 @@ def main() -> None:
         "workflow_count": len(workflows["workflows"]), "offline_schema_and_preparation": True,
         "current_analytical_and_frozen_operand_delivery": True,
         "retained_early_refusal": True,
+        "matrix_offline_preparation": matrix_offline,
+        "matrix_source_admission_refusals": matrix_source_refusals,
     }, indent=2) + "\n")
     print("installed wheel smoke passed", flush=True)
 

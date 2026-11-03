@@ -1,0 +1,22 @@
+{
+  "schema": "empirical-lawhood/matrix-selected-e4/declarative-specification",
+  "version": "1.0.0",
+  "value": {
+    "specification_id": "specification.selected-e4.declarative.confirmation",
+    "bank": null,
+    "bank_recipe": {
+      "schema": "empirical-lawhood/kernel/object-identity",
+      "version": "1.0.0",
+      "value": {
+        "object_id": "replace-with-actual-selected-e4-bank-recipe",
+        "object_schema": "empirical-lawhood/matrix-selected-e4/bank-recipe",
+        "object_version": "1.0.0",
+        "object_fingerprint": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    "population_phase": "CONFIRMATION",
+    "independent_group_count": 64,
+    "cases_per_group": 9,
+    "question": "Assess all declared paired response targets under the frozen selected E4 confirmation protocol."
+  }
+}

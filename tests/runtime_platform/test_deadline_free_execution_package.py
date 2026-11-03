@@ -60,6 +60,13 @@ from empirical_lawhood.runtime.scientific_graph_preservation import ResourceGrap
 from tests.issued_study_support import IssuedStudyFixture, build_issued_study_fixture
 
 
+@pytest.mark.parametrize("coordinate", ("memory_bytes", "output_bytes", "source_byte_limit"))
+def test_issued_non_time_budget_requires_explicit_finite_bounds(coordinate):
+    finite = NonTimeResourceBudget("exposed-issued-resource-bound", 1, 100, 100, 1, 100)
+    with pytest.raises(ValueError, match="finite resource bounds"):
+        replace(finite, **{coordinate: None})
+
+
 def _digest(value: str) -> str:
     return hashlib.sha256(value.encode()).hexdigest()
 

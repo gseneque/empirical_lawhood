@@ -38,7 +38,7 @@ def test_shipped_causal_response_source_has_bank_prediction_and_parent_zero_nati
     None
 ):
     authoring = load_registered_authoring(
-        ROOT / "experiments/causal-response/causal-author.json",
+        ROOT / "programmes/foundations/emergent-structure/workflows/causal-response/causal-author.json",
         root_schemas={PreparedResponseNativeAuthoringInput.SCHEMA: PreparedResponseNativeAuthoringInput},
         maximum_bytes=16 * 1024,
     )

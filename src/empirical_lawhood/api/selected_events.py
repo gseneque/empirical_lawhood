@@ -180,11 +180,12 @@ def _custody(config, writer, implementation_commit, *, read_only=False):
         maximum_output_bytes=config.maximum_output_bytes, read_only=read_only)
 
 
-def read_selected_parent(*, config: MatrixSelectedParentRequest, artifact_writer: ExternalArtifactPlane, implementation_commit: str):
-    if config.scientific_code_sha256 != matrix_scientific_code_sha256():
-        raise ValueError("Selected parent scientific source owners changed after preparation")
+def read_selected_parent(*, config: MatrixSelectedParentRequest, artifact_writer: ExternalArtifactPlane,
+                         implementation_commit: str | None = None):
+    config.__post_init__()
     custody = _custody(config, artifact_writer, implementation_commit, read_only=True)
     operand = custody.load("parent", MatrixSelectedParentOperand)
+    implementation_commit = custody.implementation_commit
     if (operand is None or operand.request_sha256 != config.fingerprint()
         or operand.implementation_commit != implementation_commit
         or operand.source_config != ObjectIdentity.from_record(config.source.config_id, config.source)):
@@ -267,11 +268,17 @@ def prepare_selected_event(*, config_id: str, parent_request: MatrixSelectedPare
         tuple(seed(0, i, "bridge") for i in range(1, 1025)), prior_exposed_seed_sha256s)
 
 
-def prove_selected_event(*, config: MatrixSelectedEventInput, artifact_writer: ExternalArtifactPlane, implementation_commit: str):
+def _selected_event_parent(config, artifact_writer, implementation_commit):
+    config.__post_init__()
     parent, manifest = read_selected_parent(config=config.parent_request, artifact_writer=artifact_writer, implementation_commit=implementation_commit)
     if manifest != config.parent or config.protocol != selected_event_protocol(config_id=config.protocol.config_id,
         source=config.source, parent=parent, parent_locator=manifest.materialization.relative_path):
         raise ValueError("Selected event changes its exact parent or locked mathematical protocol")
+    return parent
+
+
+def prove_selected_event(*, config: MatrixSelectedEventInput, artifact_writer: ExternalArtifactPlane, implementation_commit: str):
+    parent = _selected_event_parent(config, artifact_writer, implementation_commit)
     geometry_proof = prove_matrix_geometry_scan(config.null_reference)
     return {"config_sha256": config.fingerprint(), "conditional_source_instance": parent.conditional_source_instance,
         "exposed_parent": True, "independent_selected_events": 1, "checkpoint_count": 7,
@@ -451,9 +458,11 @@ def selected_event_summary(report, parent):
         "selection_exposed": True, "evidence_ceiling": "NON_PROMOTABLE"}
 
 
-def read_selected_event_result(*, config: MatrixSelectedEventInput, artifact_writer: ExternalArtifactPlane, implementation_commit: str):
-    prove_selected_event(config=config, artifact_writer=artifact_writer, implementation_commit=implementation_commit)
-    parent, _ = read_selected_parent(config=config.parent_request, artifact_writer=artifact_writer, implementation_commit=implementation_commit)
+def read_selected_event_result(*, config: MatrixSelectedEventInput, artifact_writer: ExternalArtifactPlane,
+                               implementation_commit: str | None = None):
+    """Read the complete original census without Git, provider proof or native work."""
+    parent = _selected_event_parent(config, artifact_writer, implementation_commit)
+    implementation_commit = parent.implementation_commit
     custody = _custody(config, artifact_writer, implementation_commit, read_only=True)
     terminal = custody.load("terminal", shooting.MatrixResponseShootingCommittorTerminalReport)
     if terminal is None:

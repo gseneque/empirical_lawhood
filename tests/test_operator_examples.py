@@ -13,7 +13,7 @@ from empirical_lawhood.adapters.composition.prepared_response.native_authoring i
 from empirical_lawhood.adapters.composition.finite_response_law.native_input import _census
 from scripts.generate_operator_examples import examples
 
-DIRECTORY = Path(__file__).resolve().parents[1] / "experiments/reactor-response/exposed-inputs"
+DIRECTORY = Path(__file__).resolve().parents[1] / "programmes/foundations/measurement-and-response/workflows/reactor-response/exposed-inputs"
 
 
 def test_assigned_example_is_not_a_prospective_roster_and_inventory_is_exact():

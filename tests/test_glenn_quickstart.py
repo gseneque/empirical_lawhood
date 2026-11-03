@@ -11,7 +11,7 @@ import pytest
 from empirical_lawhood.adapters.physical.glenn.quickstart import GlennInputQuickstart, run_local_import_check
 from empirical_lawhood.api.codecs import load_registered_authoring
 
-STARTER = Path("experiments/laser-archive-inspection/config.json")
+STARTER = Path("programmes/foundations/measurement-and-response/workflows/laser-archive-inspection/config.json")
 
 
 def _config() -> GlennInputQuickstart:

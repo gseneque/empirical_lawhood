@@ -1,0 +1,206 @@
+{
+  "schema": "rubisco.exposed-plant-structural-screen-inspection.v1",
+  "date": "2026-10-10",
+  "selected_artifact_root": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution",
+  "selected_output_directory": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1",
+  "status": "COMPLETED_EXPOSED_ANALYTICAL_SCREEN",
+  "recursive_execution": false,
+  "task_receipts": 0,
+  "producing_code_sha256": "1bbff5155f47471f42d2972572e4f167abc88195a24cd8e6b54264c9adfceb2f",
+  "dependency_lock_sha256": "3cef16f27c77c598fc98c218f05ed6d3e8f089431e6bf8c66986a9840c1e3e88",
+  "protocol_sha256": "79abe9a72cd30103ec813965df34a011e54a890e25f86eb0324a9087d71ed59d",
+  "inspection_summary": {
+    "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/inspection-summary.json",
+    "size_bytes": 117292,
+    "sha256": "8a2424d90d7f257134a65b62c3440fac632a8d24c82d340559d7fec2426b638f"
+  },
+  "retained_members": [
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.artifact-pair.119bd4bbb7f43e601ea5fbce.lock",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.artifact-pair.26049a3074f37358a1f7a70f.lock",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.artifact-pair.83d087cbcb5ba381c77980a9.lock",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.artifact-pair.85fc7207289224c75ade9afb.lock",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.artifact-pair.bb64a90a6f1c606ed879e8cb.lock",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.artifact-pair.c66fa5c3c6ac53815c9dae26.lock",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.artifact-pair.df9f9e400f4f2e72ccae834e.lock",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.artifact-pair.f7b24d0ca5a343469c3e888a.lock",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.publication-batches/7c4f6646fc65e959f501d10a/.publication-batch.6ae76986cf13038272b2ecc4.lock",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.publication-batches/7c4f6646fc65e959f501d10a/.publication-batch.d37a99928f2ccaabdcb35cc2.lock",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.publication-batches/7c4f6646fc65e959f501d10a/.publication-batch.e798ca48c026565fca8ac451.lock",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.publication-batches/7c4f6646fc65e959f501d10a/artifact-publication.63ac2fc622646a3d7f45a91bcbb65aad0ee8e394009abe9a0db4d287a74f59d9.commit.json",
+      "size_bytes": 1213,
+      "sha256": "1f8a872a58513152524c1f82e2777cb22b8d4bde074d53778355e74b38dbe133"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.publication-batches/7c4f6646fc65e959f501d10a/artifact-publication.7ed479adfaa75528630ae2f4efb6cc9fc955b1d45e31d8db92dc724a8232cddc.commit.json",
+      "size_bytes": 1214,
+      "sha256": "b4b945b227ed3a2a2412ada9319fd7e3c98d9f22348f0721e94d277771b6ac59"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/.publication-batches/7c4f6646fc65e959f501d10a/artifact-publication.8efc044f5bb10af9ab4868a1a51af506e4b8a648b406cd20683f0f0f393811e8.commit.json",
+      "size_bytes": 5178,
+      "sha256": "66ee6e363f0130e55b015afc70d31a6384016a7d389a361398030b51677011aa"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/evaluation.json",
+      "size_bytes": 94447,
+      "sha256": "7b64669b316afcedfa275f7236b02e972704d1bd89c5fa178b5b44ff2d05f2be"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/evaluation.json.manifest.json",
+      "size_bytes": 3121,
+      "sha256": "43d22d0e607c525a7229e6d194a92d7b62e9579b15064100f4493e9d97ca4a2b"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/forecasts.json",
+      "size_bytes": 1374477,
+      "sha256": "dc0c32f780e0281f29b3aa1e7dfd4a7d2da5e03f814a282e9174be9e355efd95"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/forecasts.json.manifest.json",
+      "size_bytes": 3116,
+      "sha256": "a80987ec31a45fe174a8106c93e1445e175ac217271a0f5c643d4dea34da35fb"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/inspection-summary.json",
+      "size_bytes": 117292,
+      "sha256": "8a2424d90d7f257134a65b62c3440fac632a8d24c82d340559d7fec2426b638f"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/originals/.artifact-pair.e696578a8859289ab552f2bc.lock",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/originals/sciadv.aeh3246_table_s1.xlsx",
+      "size_bytes": 698031,
+      "sha256": "01c58e35fa43a8cc1a363d58ca4e4c5e3ff2c262c5c4f3b10002ceb3c869ff26"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/originals/sciadv.aeh3246_table_s1.xlsx.manifest.json",
+      "size_bytes": 7197,
+      "sha256": "d5563ab215b51506ceb6ebb54fc10e66d5b4dbdd7f7e4d72124abd52c3553e1a"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/plant-structural-screen-protocol-v1.md",
+      "size_bytes": 10412,
+      "sha256": "79abe9a72cd30103ec813965df34a011e54a890e25f86eb0324a9087d71ed59d"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/plant-structural-screen-protocol-v1.md.manifest.json",
+      "size_bytes": 7120,
+      "sha256": "33ba6b1c11f26976b90e5e0d7f203cbf789ad239151c772a822932be97e09485"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/producing-launcher.py",
+      "size_bytes": 14287,
+      "sha256": "f517f9656b4b50efed69120b7dd1a022052e8a71a055b9e5b913d926a22966da"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/producing-launcher.py.manifest.json",
+      "size_bytes": 7103,
+      "sha256": "95df5cb8f6873d63d699a6cd017afadb5fdfcfc982129ba3ffc0c6bc93c0c271"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/producing-package.zip",
+      "size_bytes": 12265639,
+      "sha256": "192aa56ee892d1311b9e900f629058f99601447566af8beb5ad89222fe188a8c"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/producing-package.zip.manifest.json",
+      "size_bytes": 7108,
+      "sha256": "83fe4b0157595b6e0c8ad36d88abf16d40b647867a78d8bfd73842dc16327a73"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/producing-provenance.json",
+      "size_bytes": 298788,
+      "sha256": "94cce1d014d6c6b02ab19aa5a83f63fe8eb9acc10e125dd3371f8dac6c2a4b02"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/producing-provenance.json.manifest.json",
+      "size_bytes": 7098,
+      "sha256": "9b452645f2872d5659d72fe9868e65d442270dd2f3c771d480c7f99ad6943a69"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/source-score-panel.json",
+      "size_bytes": 581346,
+      "sha256": "7481b9a8aa81cd61cfe03c9d9c47e04b0e6b390bf227b91d6e2c51270b04d8e0"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/source-score-panel.json.manifest.json",
+      "size_bytes": 7097,
+      "sha256": "caffc9fc3b7dc67dd74a0d05d2ba3dff080d56b4e01cb17ce0bb2528e98649ca"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/source-snapshot.json",
+      "size_bytes": 432403,
+      "sha256": "ded455156a4af6bf69d2a4ec99e56a344511ecb31306fe9a88206e85ad704e3d"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/plant-structural-screen-v1/source-snapshot.json.manifest.json",
+      "size_bytes": 7101,
+      "sha256": "2f727c5167c129907ea7021d836f624018a2ed6679bba2cab8cab70b4f70ccc3"
+    }
+  ],
+  "retained_bytes": 15950788,
+  "source_packet_dependencies": [
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/source-panels-v2-plant/storage-contract.json",
+      "size_bytes": 525,
+      "sha256": "cbc691111ce0014a8ecf913649a9942bd9ac791e476fa397ad2808505591521a"
+    },
+    {
+      "path": "/tmp/empirical-lawhood-rubisco-20261009/retained-execution/source-panels-v2-plant/canonical/mcdonald2026-panel.json.manifest.json",
+      "size_bytes": 10963,
+      "sha256": "55401dab438090c68296385c1eb359700d37341179029b1f414e115ea65b5214"
+    }
+  ],
+  "qualification": "NOT_ESTABLISHED",
+  "scientific_disposition": "PRIMARY_FAMILY_FAILS_BOTH_ENDPOINT_BASELINE_CRITERIA",
+  "independent_read_new_fits_or_evaluations": 0,
+  "inspection_authority": "Derivative exact member/hash census; original9manifests and3publication markers are primary custody, with direct ordering in producing launcher and no taskreceipt ordering claim"
+}

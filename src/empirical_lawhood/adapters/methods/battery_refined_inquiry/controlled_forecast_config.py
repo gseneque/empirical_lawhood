@@ -1,0 +1,216 @@
+# SPDX-License-Identifier: MPL-2.0
+"""Closed role-bound projection of the original controlled forecast operands.
+
+The editable wrapper selects existing records. Its request digest and scientific
+graph are derived from those records; neither is an admission or replay grant.
+"""
+
+from dataclasses import dataclass, replace
+from hashlib import sha256
+from typing import ClassVar, Mapping
+
+from empirical_lawhood.adapters.methods.battery_diagnostic_obstruction.contracts import ObstructionAssessment
+from empirical_lawhood.adapters.methods.battery_observation_inquiry.contracts import ObservationReadout
+from empirical_lawhood.adapters.methods.battery_observation_inquiry.precision_assessment import PrecisionReassessment
+from empirical_lawhood.adapters.methods.battery_refined_inquiry.operation_bindings import SourcePolicyAdmission
+from empirical_lawhood.adapters.methods.battery_refined_inquiry.source_derived_preparation import SourceRootPreparation, SourceRootAssessment
+from empirical_lawhood.adapters.methods.battery_segmented_inquiry import operation_bindings as original
+from empirical_lawhood.adapters.methods.battery_segmented_inquiry import recursive_translation as translation
+from empirical_lawhood.adapters.methods.battery_segmented_inquiry.runner import require_forecast_records
+from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.kernel.recursive_requirements import ConditionRole, ContributionRole, DevelopmentStudySpec, ScientificConnectionSpec, ScientificRequirementSpec
+from empirical_lawhood.kernel.scientific_contributions import ContributionManifest
+from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_json_bytes, validate_sha256
+from . import contracts as c, durable_roster as dr, forecast_step_control as control
+from . import preparation_contracts as pc, segmented_contracts as sc, segmented_native as native, segmented_roster as sr
+from .representable_clock import RepresentableClockAssessment
+
+
+CAPABILITY_KEY = original.NAMESPACE + ".controlled-forecast"
+ROLE_TYPES = {
+    "admission": SourcePolicyAdmission,
+    "baseline-request": native.SegmentRequest,
+    "comparison-budget": control.ForecastComparisonBudget,
+    "control": control.ForecastStepPolicy,
+    "entry": sr.ProspectiveMethodDisposition,
+    "forecast-config": original.SegmentedOperationConfig,
+    "history": ObstructionAssessment,
+    "history-contribution": ContributionManifest,
+    "method": sc.SegmentedMethodProtocol,
+    "native-config": sc.SegmentedNativeConfig,
+    "original-negative": ObservationReadout,
+    "original-roster": dr.FrozenForecastRoster,
+    "policy": c.NumericalPolicy,
+    "precision": PrecisionReassessment,
+    "preparation-chen": SourceRootPreparation,
+    "preparation-oregan": SourceRootPreparation,
+    "producing-provenance": NumericalProducingProvenance,
+    "representable-clock-0": RepresentableClockAssessment,
+    "representable-clock-1": RepresentableClockAssessment,
+    "roster": sr.SegmentedQualificationRoster,
+    "selected-protocol": pc.PreparationProtocol,
+    "selected-roster": dr.FrozenForecastRoster,
+    "selection": c.NumericalSelection,
+    "source": c.RefinedSource,
+    "source-assessment-chen": SourceRootAssessment,
+    "source-assessment-oregan": SourceRootAssessment,
+    "uncertain-work": dr.UnknownDiagnosticWork,
+}
+_IDENTITY_FIELDS = {
+    "admission": "admission_id", "baseline-request": "request_id", "comparison-budget": "budget_id",
+    "control": "policy_id", "entry": "disposition_id", "forecast-config": "config_id",
+    "history": "product_id", "history-contribution": "contribution_id", "method": "method_id",
+    "native-config": "config_id", "original-negative": "readout_id", "original-roster": "roster_id",
+    "policy": "policy_id", "precision": "assessment_id", "preparation-chen": "preparation_id",
+    "preparation-oregan": "preparation_id", "representable-clock-0": "assessment_id",
+    "representable-clock-1": "assessment_id", "roster": "roster_id", "selected-protocol": "protocol_id",
+    "selected-roster": "roster_id", "source": "source_id", "source-assessment-chen": "assessment_id",
+    "source-assessment-oregan": "assessment_id", "uncertain-work": "record_id",
+}
+
+
+def record_identity(role, record):
+    """Role, rather than object ID or schema, selects each original record."""
+    if role not in ROLE_TYPES or type(record) is not ROLE_TYPES[role]:
+        raise ValueError("controlled forecast substitutes a closed typed scientific role")
+    record.__post_init__()
+    if role == "producing-provenance":
+        return record.identity
+    if role == "selection":
+        return ObjectIdentity.from_record("selection." + record.policy_id, record)
+    return ObjectIdentity.from_record(getattr(record, _IDENTITY_FIELDS[role]), record)
+
+
+def request_sha256(native_config, selected_control):
+    """Only the original physical recipe and actual selected step define work."""
+    if type(native_config) is not sc.SegmentedNativeConfig or type(selected_control) is not control.ForecastStepPolicy:
+        raise ValueError("controlled request requires its original native recipe and exact step policy")
+    native_config.__post_init__()
+    selected_control.__post_init__()
+    return sha256(canonical_json_bytes({"original_forecast_primitive": original.forecast_primitive(native_config).decode(),
+        "maximum_internal_step_s": selected_control.maximum_internal_step_s})).hexdigest()
+
+
+def node_id(index):
+    if type(index) is not int or not 0 <= index < 54:
+        raise ValueError("controlled forecast requires an original complete-roster ordinal")
+    return CAPABILITY_KEY + "." + f"{index:03d}"
+
+
+@dataclass(frozen=True, slots=True)
+class ControlledForecastConfig(CanonicalRecord):
+    SCHEMA: ClassVar[str] = "empirical-lawhood/battery-segmented-inquiry/controlled-forecast-config"
+    config_id: str
+    index: int
+    role_bindings: tuple[tuple[str, ObjectIdentity], ...]
+    native_request_sha256: str
+    development_root: DevelopmentStudySpec
+    history_requirement: ScientificRequirementSpec
+    history_connection: ScientificConnectionSpec
+
+    def __post_init__(self):
+        if (self.config_id != "config." + node_id(self.index) or type(self.role_bindings) is not tuple
+                or tuple(role for role, _ in self.role_bindings) != tuple(sorted(ROLE_TYPES))):
+            raise ValueError("controlled forecast changes its complete role/config census")
+        for role, ref in self.role_bindings:
+            kind = ROLE_TYPES[role]
+            if type(ref) is not ObjectIdentity or (ref.object_schema, ref.object_version) != (kind.SCHEMA, kind.VERSION):
+                raise ValueError("controlled forecast changes an original role schema/revision")
+        validate_sha256(self.native_request_sha256)
+        if (type(self.development_root) is not DevelopmentStudySpec
+                or type(self.history_requirement) is not ScientificRequirementSpec
+                or type(self.history_connection) is not ScientificConnectionSpec):
+            raise ValueError("controlled forecast needs its derived original scientific graph")
+        for record in (self.development_root, self.history_requirement, self.history_connection):
+            record.__post_init__()
+        refs = dict(self.role_bindings)
+        node, requirement, connection = node_id(self.index), self.history_requirement, self.history_connection
+        if (self.development_root.question != original.QUESTION or self.development_root.assigned_unit_ids != (c.UNIT,)
+                or requirement.requirement_id != "requirement." + node + ".actual-unknown-history"
+                or requirement.consumer_operation_id != node or requirement.assessment_operation_id != node
+                or requirement.condition_role is not ConditionRole.EVIDENTIAL
+                or requirement.permitted_roles != (ContributionRole.RETAINED_ANALYSIS_INPUT,)
+                or connection.connection_id != "connection." + node + ".actual-unknown-history"
+                or connection.requirement_id != requirement.requirement_id or connection.assessment_operation_id != node
+                or connection.consumer_input_id != "history" or connection.external_input_id != "external." + node + ".history"
+                or connection.supplier_operation_id is not None or connection.supplier_output_id is not None
+                or connection.supplier_contribution != refs["history-contribution"]
+                or connection.claim_id != "claim." + original.NAMESPACE
+                or connection.evidence_role is not ContributionRole.RETAINED_ANALYSIS_INPUT):
+            raise ValueError("controlled forecast substitutes its original adverse-history condition/connection")
+        root_refs = set(self.development_root.scientific_operands)
+        required_refs = {ref for role, ref in self.role_bindings if not (
+            role == "original-roster" and ref.object_id == refs["selected-roster"].object_id and ref != refs["selected-roster"])}
+        if not required_refs.issubset(root_refs):
+            raise ValueError("controlled forecast omits an exact role operand from its scientific root")
+
+    @property
+    def identity(self):
+        return ObjectIdentity.from_record(self.config_id, self)
+
+    @property
+    def operands(self):
+        return self.development_root.scientific_operands
+
+
+def control_operands(records):
+    return (records["control"], records["original-roster"], records["selected-roster"], records["precision"],
+        (records["representable-clock-0"], records["representable-clock-1"]), records["original-negative"], records["baseline-request"])
+
+
+def require_scientific_inputs(records):
+    """Validate actual scientific witnesses without claiming their publication."""
+    if set(records) != set(ROLE_TYPES) - {"history-contribution"}:
+        raise ValueError("controlled forecast omits or adds an original scientific witness role")
+    for role, record in records.items():
+        record_identity(role, record)
+    base, selected_control = records["forecast-config"], records["control"]
+    require_forecast_records(base, records)
+    control.require_retained_evidence(*control_operands(records))
+    control.require_config(selected_control, records["selected-roster"], records["native-config"])
+    if (records["roster"].original_selection != records["selected-roster"]
+            or records["comparison-budget"] != selected_control.comparison_budget):
+        raise ValueError("controlled forecast substitutes the selected complete roster or comparison budget")
+
+
+def build_config(records: Mapping[str, CanonicalRecord], *, study_id):
+    """Recompute all original gates from complete actual records; execute nothing."""
+    if set(records) != set(ROLE_TYPES):
+        raise ValueError("controlled forecast omits or adds an original scientific role")
+    bindings = tuple((role, record_identity(role, records[role])) for role in sorted(ROLE_TYPES))
+    base, selected_control = records["forecast-config"], records["control"]
+    require_scientific_inputs({role: value for role, value in records.items() if role != "history-contribution"})
+    parent = records["history-contribution"]
+    products = tuple(row for row in parent.products if row.record == base.source.diagnostic
+        and row.role is ContributionRole.RETAINED_ANALYSIS_INPUT)
+    if len(products) != 1:
+        raise ValueError("controlled forecast loses its exact original adverse-history contribution")
+    root = original.development_root(base, study_id=study_id)
+    # Both roster roles remain exact config/port bindings. A repeated scientific
+    # label cannot represent two different operands in the existing flat root.
+    values = {row.object_id: row for row in root.scientific_operands}
+    for role, ref in bindings:
+        if (role == "original-roster" and ref.object_id == records["control"].selected_roster.object_id
+                and ref != records["control"].selected_roster):
+            continue
+        if values.setdefault(ref.object_id, ref) != ref:
+            raise ValueError("controlled scientific root collides outside its explicit original-roster alias")
+    root = replace(root, scientific_operands=tuple(values[key] for key in sorted(values)))
+    requirement, connection = translation.requirement_pair(base, parent, products[0])
+    node = node_id(base.index)
+    requirement = replace(requirement, requirement_id="requirement." + node + ".actual-unknown-history",
+        consumer_operation_id=node, assessment_operation_id=node)
+    connection = replace(connection, connection_id="connection." + node + ".actual-unknown-history",
+        requirement_id=requirement.requirement_id, assessment_operation_id=node, external_input_id="external." + node + ".history")
+    return ControlledForecastConfig("config." + node, base.index, bindings,
+        request_sha256(records["native-config"], selected_control), root, requirement, connection)
+
+
+def require_config_records(config, records):
+    if type(config) is not ControlledForecastConfig or build_config(records, study_id=config.development_root.study_id) != config:
+        raise ValueError("controlled forecast config/root/request differs from its complete original role-bound records")
+
+
+def native_effect_slot_ids(config):
+    return ("native.battery-charging." + config.native_request_sha256,)

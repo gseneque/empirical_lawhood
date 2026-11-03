@@ -1,0 +1,19 @@
+{
+  "schema": "empirical-lawhood/matrix-selected-e4/programme-request",
+  "value": {
+    "record_id": "request.selected-e4",
+    "programme": {
+      "schema": "empirical-lawhood/kernel/object-identity",
+      "value": {
+        "object_id": "replace-with-actual-programme-plan",
+        "object_schema": "empirical-lawhood/matrix-selected-e4/protected-programme-plan",
+        "object_version": "3.0.0",
+        "object_fingerprint": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "version": "1.0.0"
+    },
+    "components": [],
+    "collection": null
+  },
+  "version": "1.0.0"
+}

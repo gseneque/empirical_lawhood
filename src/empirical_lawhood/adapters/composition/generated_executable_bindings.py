@@ -16,325 +16,520 @@ from empirical_lawhood.runtime.static_codecs import (
     CanonicalRecordCodecRegistration,
     CanonicalRecordCodecRegistry,
 )
-from empirical_lawhood.adapters.methods.reactor_prefix_response.assigned.executable_binding import (
+from empirical_lawhood.adapters.methods.analytic_material_inquiry.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_000_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_000_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_000_record_types,
 )
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.assigned_binding.executable_binding import (
+from empirical_lawhood.adapters.methods.reactor_prefix_response.assigned.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_001_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_001_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_001_record_types,
 )
-from empirical_lawhood.adapters.methods.causal_response.executable_binding import (
+from empirical_lawhood.adapters.simulators.reactor_prefix_response.assigned_binding.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_002_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_002_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_002_record_types,
 )
-from empirical_lawhood.adapters.simulators.causal_response.executable_binding import (
+from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_003_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_003_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_003_record_types,
 )
-from empirical_lawhood.adapters.methods.backbone_confirmatory_replication.executable_binding import (
+from empirical_lawhood.adapters.methods.battery_diagnostic_obstruction.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_004_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_004_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_004_record_types,
 )
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.executable_binding import (
+from empirical_lawhood.adapters.methods.battery_durable_inquiry.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_005_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_005_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_005_record_types,
 )
-from empirical_lawhood.adapters.simulators.constructed_preparation_applicability.executable_binding import (
+from empirical_lawhood.adapters.methods.battery_observation_inquiry.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_006_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_006_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_006_record_types,
 )
-from empirical_lawhood.adapters.methods.backbone_finite_action.executable_binding import (
+from empirical_lawhood.adapters.methods.battery_recursive_construction.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_007_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_007_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_007_record_types,
 )
-from empirical_lawhood.adapters.simulators.finite_response_law.calibration.executable_binding import (
+from empirical_lawhood.adapters.methods.battery_refined_inquiry.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_008_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_008_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_008_record_types,
 )
-from empirical_lawhood.adapters.methods.finite_response_law.completion.executable_binding import (
+from empirical_lawhood.adapters.methods.battery_segmented_inquiry.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_009_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_009_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_009_record_types,
 )
-from empirical_lawhood.adapters.simulators.finite_response_law.evaluation.executable_binding import (
+from empirical_lawhood.adapters.methods.battery_thermal_inquiry.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_010_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_010_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_010_record_types,
 )
-from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.executable_binding import (
+from empirical_lawhood.adapters.methods.battery_thermal_service.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_011_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_011_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_011_record_types,
 )
-from empirical_lawhood.adapters.methods.finite_response_law.executable_binding import (
+from empirical_lawhood.adapters.methods.causal_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_012_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_012_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_012_record_types,
 )
-from empirical_lawhood.adapters.simulators.finite_response_law.preparation_policy_screen.executable_binding import (
+from empirical_lawhood.adapters.simulators.causal_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_013_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_013_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_013_record_types,
 )
-from empirical_lawhood.adapters.simulators.finite_response_law.executable_binding import (
+from empirical_lawhood.adapters.methods.backbone_confirmatory_replication.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_014_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_014_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_014_record_types,
 )
-from empirical_lawhood.adapters.simulators.freegsnke.executable_binding import (
+from empirical_lawhood.adapters.methods.constructed_preparation_applicability.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_015_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_015_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_015_record_types,
 )
-from empirical_lawhood.adapters.simulators.gym_torax_native.executable_binding import (
+from empirical_lawhood.adapters.simulators.constructed_preparation_applicability.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_016_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_016_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_016_record_types,
 )
-from empirical_lawhood.adapters.methods.information_response.executable_binding import (
+from empirical_lawhood.adapters.methods.backbone_finite_action.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_017_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_017_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_017_record_types,
 )
-from empirical_lawhood.adapters.simulators.information_response.executable_binding import (
+from empirical_lawhood.adapters.simulators.finite_response_law.calibration.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_018_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_018_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_018_record_types,
 )
-from empirical_lawhood.adapters.control.backbone_linked_campaign.executable_binding import (
+from empirical_lawhood.adapters.methods.finite_response_law.completion.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_019_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_019_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_019_record_types,
 )
-from empirical_lawhood.adapters.physical.mast_archive_response_qualification.executable_binding import (
+from empirical_lawhood.adapters.simulators.finite_response_law.evaluation.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_020_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_020_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_020_record_types,
 )
-from empirical_lawhood.adapters.methods.matrix_preparation.executable_binding import (
+from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_021_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_021_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_021_record_types,
 )
-from empirical_lawhood.adapters.simulators.matrix_preparation.executable_binding import (
+from empirical_lawhood.adapters.methods.finite_response_law.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_022_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_022_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_022_record_types,
 )
-from empirical_lawhood.adapters.methods.matrix_response_study.executable_binding import (
+from empirical_lawhood.adapters.simulators.finite_response_law.preparation_policy_screen.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_023_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_023_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_023_record_types,
 )
-from empirical_lawhood.adapters.methods.preparation_applicability.executable_binding import (
+from empirical_lawhood.adapters.simulators.finite_response_law.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_024_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_024_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_024_record_types,
 )
-from empirical_lawhood.adapters.simulators.preparation_applicability.executable_binding import (
+from empirical_lawhood.adapters.simulators.freegsnke.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_025_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_025_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_025_record_types,
 )
-from empirical_lawhood.adapters.simulators.prepared_response.executable_binding import (
+from empirical_lawhood.adapters.simulators.gym_torax_native.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_026_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_026_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_026_record_types,
 )
-from empirical_lawhood.adapters.methods.prepared_response.executable_binding import (
+from empirical_lawhood.adapters.methods.information_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_027_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_027_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_027_record_types,
 )
-from empirical_lawhood.adapters.simulators.rc_ladder_response.executable_binding import (
+from empirical_lawhood.adapters.simulators.information_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_028_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_028_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_028_record_types,
 )
-from empirical_lawhood.adapters.methods.rc_ladder_numerical_comparison.executable_binding import (
+from empirical_lawhood.adapters.control.backbone_linked_campaign.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_029_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_029_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_029_record_types,
 )
-from empirical_lawhood.adapters.simulators.reactor_causal_response.executable_binding import (
+from empirical_lawhood.adapters.physical.mast_archive_response_qualification.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_030_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_030_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_030_record_types,
 )
-from empirical_lawhood.adapters.methods.reactor_causal_response.executable_binding import (
+from empirical_lawhood.adapters.methods.matrix_factor_confirmation.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_031_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_031_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_031_record_types,
 )
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.executable_binding import (
+from empirical_lawhood.adapters.methods.matrix_factor_confirmation.compact.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_032_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_032_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_032_record_types,
 )
-from empirical_lawhood.adapters.simulators.reactor_finite_control_frontier.executable_binding import (
+from empirical_lawhood.adapters.methods.matrix_factor_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_033_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_033_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_033_record_types,
 )
-from empirical_lawhood.adapters.methods.reactor_matched_replay_forecast.executable_binding import (
+from empirical_lawhood.adapters.methods.matrix_experimental_programme.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_034_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_034_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_034_record_types,
 )
-from empirical_lawhood.adapters.simulators.reactor_matched_replay_forecast.executable_binding import (
+from empirical_lawhood.adapters.methods.matrix_parameter_factor.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_035_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_035_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_035_record_types,
 )
-from empirical_lawhood.adapters.methods.reactor_selected_action_response.executable_binding import (
+from empirical_lawhood.adapters.methods.matrix_parameter_history.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_036_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_036_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_036_record_types,
 )
-from empirical_lawhood.adapters.simulators.reactor_selected_action_response.executable_binding import (
+from empirical_lawhood.adapters.methods.matrix_parameter_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_037_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_037_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_037_record_types,
 )
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.executable_binding import (
+from empirical_lawhood.adapters.methods.matrix_preparation.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_038_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_038_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_038_record_types,
 )
-from empirical_lawhood.adapters.simulators.reactor_staged_pulse_response.executable_binding import (
+from empirical_lawhood.adapters.simulators.matrix_preparation.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_039_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_039_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_039_record_types,
 )
-from empirical_lawhood.adapters.methods.response_geometry_prospective.executable_binding import (
+from empirical_lawhood.adapters.methods.matrix_prospective.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_040_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_040_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_040_record_types,
 )
-from empirical_lawhood.adapters.simulators.response_geometry_prospective.executable_binding import (
+from empirical_lawhood.adapters.methods.matrix_response_study.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_041_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_041_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_041_record_types,
 )
-from empirical_lawhood.adapters.methods.retained_response_geometry_analysis.executable_binding import (
+from empirical_lawhood.adapters.methods.matrix_scheduled_history.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_042_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_042_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_042_record_types,
 )
-from empirical_lawhood.adapters.methods.response_geometry_development.executable_binding import (
+from empirical_lawhood.adapters.methods.matrix_scheduled_programme.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_043_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_043_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_043_record_types,
 )
-from empirical_lawhood.adapters.simulators.response_geometry_development.executable_binding import (
+from empirical_lawhood.adapters.methods.preparation_applicability.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_044_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_044_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_044_record_types,
 )
-from empirical_lawhood.adapters.methods.rc_challenges.executable_binding import (
+from empirical_lawhood.adapters.simulators.preparation_applicability.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_045_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_045_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_045_record_types,
 )
-from empirical_lawhood.adapters.simulators.six_matrix_response.executable_binding import (
+from empirical_lawhood.adapters.simulators.prepared_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_046_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_046_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_046_record_types,
 )
-from empirical_lawhood.adapters.control.matrix_response_study.executable_binding import (
+from empirical_lawhood.adapters.methods.prepared_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_047_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_047_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_047_record_types,
 )
-from empirical_lawhood.adapters.methods.backbone_structural_transport.executable_binding import (
+from empirical_lawhood.adapters.simulators.rc_ladder_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_048_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_048_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_048_record_types,
 )
-from empirical_lawhood.adapters.methods.synthetic_material_method.executable_binding import (
+from empirical_lawhood.adapters.methods.rc_ladder_numerical_comparison.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_049_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_049_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_049_record_types,
 )
-from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.executable_binding import (
+from empirical_lawhood.adapters.methods.rc_prerequisite_chain.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_050_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_050_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_050_record_types,
 )
-from empirical_lawhood.adapters.methods.reactor_reference_policy_forecast.executable_binding import (
+from empirical_lawhood.adapters.simulators.reactor_causal_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_051_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_051_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_051_record_types,
 )
-from empirical_lawhood.adapters.simulators.reactor_reference_policy_forecast.executable_binding import (
+from empirical_lawhood.adapters.methods.reactor_causal_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_052_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_052_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_052_record_types,
 )
-from empirical_lawhood.adapters.methods.reactor_prepared_feed_qualification.executable_binding import (
+from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_053_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_053_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_053_record_types,
 )
-from empirical_lawhood.adapters.simulators.reactor_prepared_feed_qualification.executable_binding import (
+from empirical_lawhood.adapters.simulators.reactor_finite_control_frontier.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_054_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_054_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_054_record_types,
 )
-from empirical_lawhood.adapters.methods.reactor_local_domain_qualification.executable_binding import (
+from empirical_lawhood.adapters.methods.reactor_matched_replay_forecast.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_055_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_055_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_055_record_types,
 )
-from empirical_lawhood.adapters.simulators.reactor_local_domain_qualification.executable_binding import (
+from empirical_lawhood.adapters.simulators.reactor_matched_replay_forecast.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_056_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_056_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_056_record_types,
 )
-from empirical_lawhood.adapters.methods.reactor_regime_response.executable_binding import (
+from empirical_lawhood.adapters.methods.reactor_selected_action_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_057_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_057_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_057_record_types,
 )
-from empirical_lawhood.adapters.simulators.reactor_regime_response.executable_binding import (
+from empirical_lawhood.adapters.simulators.reactor_selected_action_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_058_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_058_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_058_record_types,
 )
-from empirical_lawhood.adapters.methods.reactor_prefix_response.executable_binding import (
+from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_059_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_059_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_059_record_types,
 )
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.executable_binding import (
+from empirical_lawhood.adapters.simulators.reactor_staged_pulse_response.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_060_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_060_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_060_record_types,
 )
-from empirical_lawhood.adapters.simulators.torax_native.executable_binding import (
+from empirical_lawhood.adapters.methods.recursive_scientific_authoring.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_061_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_061_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_061_record_types,
 )
-from empirical_lawhood.adapters.methods.uniform_electron_gas_analytic_reference.executable_binding import (
+from empirical_lawhood.adapters.methods.recursive_scientific_authoring_bounded32.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_062_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_062_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_062_record_types,
 )
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.executable_binding import (
+from empirical_lawhood.adapters.methods.recursive_scientific_authoring_bounded64.executable_binding import (
     EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_063_contribution,
     EXECUTABLE_BINDING_FACTORIES as _descriptor_063_factories,
     EXECUTABLE_RECORD_TYPES as _descriptor_063_record_types,
+)
+from empirical_lawhood.adapters.methods.recursive_scientific_authoring_draft128.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_064_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_064_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_064_record_types,
+)
+from empirical_lawhood.adapters.methods.response_geometry_prospective.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_065_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_065_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_065_record_types,
+)
+from empirical_lawhood.adapters.simulators.response_geometry_prospective.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_066_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_066_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_066_record_types,
+)
+from empirical_lawhood.adapters.methods.retained_response_geometry_analysis.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_067_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_067_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_067_record_types,
+)
+from empirical_lawhood.adapters.methods.response_geometry_development.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_068_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_068_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_068_record_types,
+)
+from empirical_lawhood.adapters.simulators.response_geometry_development.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_069_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_069_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_069_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_candidate_inquiry.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_070_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_070_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_070_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_combinations.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_071_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_071_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_071_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_cycle_constraints.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_072_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_072_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_072_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_feedback.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_073_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_073_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_073_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_historical.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_074_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_074_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_074_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_inquiry.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_075_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_075_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_075_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_076_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_076_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_076_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_insilico_mechanism.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_077_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_077_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_077_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_078_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_078_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_078_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_insilico_structure.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_079_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_079_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_079_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_080_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_080_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_080_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_nomination_preparation.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_081_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_081_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_081_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_prediction.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_082_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_082_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_082_record_types,
+)
+from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_083_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_083_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_083_record_types,
+)
+from empirical_lawhood.adapters.methods.rc_challenges.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_084_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_084_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_084_record_types,
+)
+from empirical_lawhood.adapters.simulators.six_matrix_response.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_085_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_085_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_085_record_types,
+)
+from empirical_lawhood.adapters.control.matrix_response_study.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_086_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_086_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_086_record_types,
+)
+from empirical_lawhood.adapters.methods.backbone_structural_transport.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_087_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_087_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_087_record_types,
+)
+from empirical_lawhood.adapters.methods.synthetic_material_method.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_088_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_088_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_088_record_types,
+)
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_089_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_089_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_089_record_types,
+)
+from empirical_lawhood.adapters.methods.reactor_reference_policy_forecast.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_090_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_090_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_090_record_types,
+)
+from empirical_lawhood.adapters.simulators.reactor_reference_policy_forecast.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_091_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_091_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_091_record_types,
+)
+from empirical_lawhood.adapters.methods.reactor_prepared_feed_qualification.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_092_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_092_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_092_record_types,
+)
+from empirical_lawhood.adapters.simulators.reactor_prepared_feed_qualification.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_093_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_093_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_093_record_types,
+)
+from empirical_lawhood.adapters.methods.reactor_local_domain_qualification.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_094_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_094_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_094_record_types,
+)
+from empirical_lawhood.adapters.simulators.reactor_local_domain_qualification.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_095_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_095_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_095_record_types,
+)
+from empirical_lawhood.adapters.methods.reactor_regime_response.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_096_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_096_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_096_record_types,
+)
+from empirical_lawhood.adapters.simulators.reactor_regime_response.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_097_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_097_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_097_record_types,
+)
+from empirical_lawhood.adapters.methods.reactor_prefix_response.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_098_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_098_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_098_record_types,
+)
+from empirical_lawhood.adapters.simulators.reactor_prefix_response.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_099_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_099_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_099_record_types,
+)
+from empirical_lawhood.adapters.simulators.torax_native.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_100_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_100_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_100_record_types,
+)
+from empirical_lawhood.adapters.methods.uniform_electron_gas_analytic_reference.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_101_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_101_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_101_record_types,
+)
+from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.executable_binding import (
+    EXECUTABLE_BINDING_CONTRIBUTION as _descriptor_102_contribution,
+    EXECUTABLE_BINDING_FACTORIES as _descriptor_102_factories,
+    EXECUTABLE_RECORD_TYPES as _descriptor_102_record_types,
 )
 
 EXECUTABLE_BINDING_CONTRIBUTIONS = (
@@ -402,6 +597,45 @@ EXECUTABLE_BINDING_CONTRIBUTIONS = (
     _descriptor_061_contribution,
     _descriptor_062_contribution,
     _descriptor_063_contribution,
+    _descriptor_064_contribution,
+    _descriptor_065_contribution,
+    _descriptor_066_contribution,
+    _descriptor_067_contribution,
+    _descriptor_068_contribution,
+    _descriptor_069_contribution,
+    _descriptor_070_contribution,
+    _descriptor_071_contribution,
+    _descriptor_072_contribution,
+    _descriptor_073_contribution,
+    _descriptor_074_contribution,
+    _descriptor_075_contribution,
+    _descriptor_076_contribution,
+    _descriptor_077_contribution,
+    _descriptor_078_contribution,
+    _descriptor_079_contribution,
+    _descriptor_080_contribution,
+    _descriptor_081_contribution,
+    _descriptor_082_contribution,
+    _descriptor_083_contribution,
+    _descriptor_084_contribution,
+    _descriptor_085_contribution,
+    _descriptor_086_contribution,
+    _descriptor_087_contribution,
+    _descriptor_088_contribution,
+    _descriptor_089_contribution,
+    _descriptor_090_contribution,
+    _descriptor_091_contribution,
+    _descriptor_092_contribution,
+    _descriptor_093_contribution,
+    _descriptor_094_contribution,
+    _descriptor_095_contribution,
+    _descriptor_096_contribution,
+    _descriptor_097_contribution,
+    _descriptor_098_contribution,
+    _descriptor_099_contribution,
+    _descriptor_100_contribution,
+    _descriptor_101_contribution,
+    _descriptor_102_contribution,
 )
 
 GENERATED_EXECUTABLE_BINDING_AGGREGATE = compose_executable_binding_aggregate(
@@ -477,6 +711,45 @@ _EXECUTABLE_FACTORIES: tuple[ExecutableFactory, ...] = tuple(
                 *_descriptor_061_factories,
                 *_descriptor_062_factories,
                 *_descriptor_063_factories,
+                *_descriptor_064_factories,
+                *_descriptor_065_factories,
+                *_descriptor_066_factories,
+                *_descriptor_067_factories,
+                *_descriptor_068_factories,
+                *_descriptor_069_factories,
+                *_descriptor_070_factories,
+                *_descriptor_071_factories,
+                *_descriptor_072_factories,
+                *_descriptor_073_factories,
+                *_descriptor_074_factories,
+                *_descriptor_075_factories,
+                *_descriptor_076_factories,
+                *_descriptor_077_factories,
+                *_descriptor_078_factories,
+                *_descriptor_079_factories,
+                *_descriptor_080_factories,
+                *_descriptor_081_factories,
+                *_descriptor_082_factories,
+                *_descriptor_083_factories,
+                *_descriptor_084_factories,
+                *_descriptor_085_factories,
+                *_descriptor_086_factories,
+                *_descriptor_087_factories,
+                *_descriptor_088_factories,
+                *_descriptor_089_factories,
+                *_descriptor_090_factories,
+                *_descriptor_091_factories,
+                *_descriptor_092_factories,
+                *_descriptor_093_factories,
+                *_descriptor_094_factories,
+                *_descriptor_095_factories,
+                *_descriptor_096_factories,
+                *_descriptor_097_factories,
+                *_descriptor_098_factories,
+                *_descriptor_099_factories,
+                *_descriptor_100_factories,
+                *_descriptor_101_factories,
+                *_descriptor_102_factories,
             ),
         ),
         key=lambda value: value.binding.binding_id,
@@ -554,6 +827,45 @@ EXECUTABLE_RECORD_TYPES = tuple(
             *_descriptor_061_record_types,
             *_descriptor_062_record_types,
             *_descriptor_063_record_types,
+            *_descriptor_064_record_types,
+            *_descriptor_065_record_types,
+            *_descriptor_066_record_types,
+            *_descriptor_067_record_types,
+            *_descriptor_068_record_types,
+            *_descriptor_069_record_types,
+            *_descriptor_070_record_types,
+            *_descriptor_071_record_types,
+            *_descriptor_072_record_types,
+            *_descriptor_073_record_types,
+            *_descriptor_074_record_types,
+            *_descriptor_075_record_types,
+            *_descriptor_076_record_types,
+            *_descriptor_077_record_types,
+            *_descriptor_078_record_types,
+            *_descriptor_079_record_types,
+            *_descriptor_080_record_types,
+            *_descriptor_081_record_types,
+            *_descriptor_082_record_types,
+            *_descriptor_083_record_types,
+            *_descriptor_084_record_types,
+            *_descriptor_085_record_types,
+            *_descriptor_086_record_types,
+            *_descriptor_087_record_types,
+            *_descriptor_088_record_types,
+            *_descriptor_089_record_types,
+            *_descriptor_090_record_types,
+            *_descriptor_091_record_types,
+            *_descriptor_092_record_types,
+            *_descriptor_093_record_types,
+            *_descriptor_094_record_types,
+            *_descriptor_095_record_types,
+            *_descriptor_096_record_types,
+            *_descriptor_097_record_types,
+            *_descriptor_098_record_types,
+            *_descriptor_099_record_types,
+            *_descriptor_100_record_types,
+            *_descriptor_101_record_types,
+            *_descriptor_102_record_types,
         ),
         key=lambda value: value.SCHEMA,
     )
@@ -1604,6 +1916,15 @@ _EXECUTABLE_CODEC_REGISTRATIONS = (
         decoder_implementation_sha256="e7e2ee6dee84a6c2d9f4a72c5af74dee1257351ccc121ce5dbaf80fb25fa80e9",
     ),
     CanonicalRecordCodecRegistration(
+        codec_id="executable-canonical-json.empirical-lawhood.planning.recursive-scientific-selection",
+        record_schema="empirical-lawhood/planning/recursive-scientific-selection",
+        record_version="1.0.0",
+        maximum_bytes=16777216,
+        decoder_key="recursive.scientific-selection",
+        decoder_version="1.0.0",
+        decoder_implementation_sha256="56258ecf31b95328f9528e40a055ec3ce10844b6015d623753b10d011d435fa0",
+    ),
+    CanonicalRecordCodecRegistration(
         codec_id="executable-canonical-json.empirical-lawhood.planning.response-experiment-extension-set",
         record_schema="empirical-lawhood/planning/response-experiment-extension-set",
         record_version="1.0.0",
@@ -2069,7 +2390,7 @@ _EXECUTABLE_CODEC_REGISTRATIONS = (
         maximum_bytes=33554432,
         decoder_key="gym-torax-parameterised-acquisition-manifest-decoder",
         decoder_version="1.0.0",
-        decoder_implementation_sha256="14b6ebc522460c84fbf9f589ef4f2973c5cea2bab5caf89f8b84367b34b86968",
+        decoder_implementation_sha256="07be24cc883a81eec58abd46e1bc38ad127103a9dedf1b9b932c4d736581283a",
     ),
     CanonicalRecordCodecRegistration(
         codec_id="executable-canonical-json.empirical-lawhood.simulators.gym-torax-native.gym-torax-parameterised-projection-config",
@@ -2078,7 +2399,7 @@ _EXECUTABLE_CODEC_REGISTRATIONS = (
         maximum_bytes=16777216,
         decoder_key="gym-torax-parameterised-projection-config-decoder",
         decoder_version="1.0.0",
-        decoder_implementation_sha256="14b6ebc522460c84fbf9f589ef4f2973c5cea2bab5caf89f8b84367b34b86968",
+        decoder_implementation_sha256="07be24cc883a81eec58abd46e1bc38ad127103a9dedf1b9b932c4d736581283a",
     ),
     CanonicalRecordCodecRegistration(
         codec_id="executable-canonical-json.empirical-lawhood.simulators.gym-torax-native.gym-torax-parameterised-source-config",
@@ -2087,7 +2408,7 @@ _EXECUTABLE_CODEC_REGISTRATIONS = (
         maximum_bytes=33554432,
         decoder_key="gym-torax-parameterised-source-config-decoder",
         decoder_version="1.0.0",
-        decoder_implementation_sha256="14b6ebc522460c84fbf9f589ef4f2973c5cea2bab5caf89f8b84367b34b86968",
+        decoder_implementation_sha256="07be24cc883a81eec58abd46e1bc38ad127103a9dedf1b9b932c4d736581283a",
     ),
     CanonicalRecordCodecRegistration(
         codec_id="executable-canonical-json.empirical-lawhood.simulators.information-response.information-response-native-config",
@@ -2315,15 +2636,48 @@ _EXECUTABLE_CODEC_REGISTRATIONS = (
         decoder_implementation_sha256="69b94eb40c20fd094a34e26023bc8011b5c86062ca4e248768da6aee8219c527",
     ),
 )
+_EXECUTABLE_ADDITIONAL_CODEC_REGISTRATIONS = (
+    CanonicalRecordCodecRegistration(
+        codec_id="executable-canonical-json.empirical-lawhood.planning.recursive-scientific-selection.decoder-999137a515012e7e77459048b03b33b07ffd873a32f2623001f9c487f50d8529",
+        record_schema="empirical-lawhood/planning/recursive-scientific-selection",
+        record_version="1.0.0",
+        maximum_bytes=33554432,
+        decoder_key="recursive.scientific-selection-bounded32",
+        decoder_version="1.0.0",
+        decoder_implementation_sha256="8667080c044d3116a82519af62f29d5004bf85a0cae7194b8d0c8ea04faa83f9",
+    ),
+    CanonicalRecordCodecRegistration(
+        codec_id="executable-canonical-json.empirical-lawhood.planning.recursive-scientific-selection.decoder-ccd7fe7ca5524cd8a53f674810c0b0f321f10e4e3432cd15cf476e53ebeb7c61",
+        record_schema="empirical-lawhood/planning/recursive-scientific-selection",
+        record_version="1.0.0",
+        maximum_bytes=67108864,
+        decoder_key="recursive.scientific-selection-draft128",
+        decoder_version="1.0.0",
+        decoder_implementation_sha256="051af356a26cefc1d35214fe786e33db6f7b299ac81dd714c8d96eedf8fca292",
+    ),
+    CanonicalRecordCodecRegistration(
+        codec_id="executable-canonical-json.empirical-lawhood.planning.recursive-scientific-selection.decoder-f120b56c48189cb7f8d7db30c9d5db7da8548f374c67fda3eb96a01dc63b8836",
+        record_schema="empirical-lawhood/planning/recursive-scientific-selection",
+        record_version="1.0.0",
+        maximum_bytes=67108864,
+        decoder_key="recursive.scientific-selection-bounded64",
+        decoder_version="1.0.0",
+        decoder_implementation_sha256="f5ed86eec0fe2a745ebcce9f5b42c73420f080cd4f7ad8add34df0f2a6e6886a",
+    ),
+)
 EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY = CanonicalRecordCodecRegistry(
     registry_id="canonical-codecs.generated-executable-bindings",
     registrations=_EXECUTABLE_CODEC_REGISTRATIONS,
     record_types={value.SCHEMA: value for value in EXECUTABLE_RECORD_TYPES},
+    additional_registrations=_EXECUTABLE_ADDITIONAL_CODEC_REGISTRATIONS,
 )
 
-EXPECTED_AGGREGATE_FINGERPRINT = "4291383a0ff4aa422a624520bc2da53633be8455adf39f346cd4d9b82cf90e76"
+EXPECTED_AGGREGATE_FINGERPRINT = "e1ba4ae60417db9b0ffb8eb908d8c985dea56c68d06643b3891e4c43930f038f"
 EXPECTED_CODEC_REGISTRY_FINGERPRINT = (
-    "0867cc4b9d94054fcea8aac53d1f640d056e9a6017993b02f38adae350593c39"
+    "cef1fc400c4adb95255072c081d35a5f14f5948f563496a39f43ea033c0603d1"
+)
+EXPECTED_ADDITIONAL_CODEC_REGISTRY_FINGERPRINT = (
+    "b56a28c7c0cea6ead06556cf60d72ff390c2922980ab25c836b6f37881809ebc"
 )
 if GENERATED_EXECUTABLE_BINDING_AGGREGATE.fingerprint() != EXPECTED_AGGREGATE_FINGERPRINT:
     raise RuntimeError("generated executable aggregate fingerprint drifted")
@@ -2332,6 +2686,11 @@ if (
     != EXPECTED_CODEC_REGISTRY_FINGERPRINT
 ):
     raise RuntimeError("generated executable codec registry fingerprint drifted")
+if (
+    hashlib.sha256(canonical_json_bytes(_EXECUTABLE_ADDITIONAL_CODEC_REGISTRATIONS)).hexdigest()
+    != EXPECTED_ADDITIONAL_CODEC_REGISTRY_FINGERPRINT
+):
+    raise RuntimeError("generated additional executable codec registry fingerprint drifted")
 
 __all__ = [
     "EXECUTABLE_BINDING_CONTRIBUTIONS",
@@ -2340,5 +2699,6 @@ __all__ = [
     "EXECUTABLE_RECORD_TYPES",
     "EXPECTED_AGGREGATE_FINGERPRINT",
     "EXPECTED_CODEC_REGISTRY_FINGERPRINT",
+    "EXPECTED_ADDITIONAL_CODEC_REGISTRY_FINGERPRINT",
     "GENERATED_EXECUTABLE_BINDING_AGGREGATE",
 ]

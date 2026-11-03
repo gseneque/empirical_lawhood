@@ -25,7 +25,7 @@ def _error(error) -> None:
     raise typer.Exit(code=2) from error
 
 
-def _selected_input(path: Path, *, maximum_bytes: int = 16 * 1024**2, copy: bool = True, consumer: str | None = None) -> Path:
+def _selected_input(path: Path, *, maximum_bytes: int | None = 16 * 1024**2, copy: bool = True, consumer: str | None = None) -> Path:
     return attempt_input(path, maximum_bytes=maximum_bytes, copy=copy,
                          role="config" if consumer is None else consumer, consumer=consumer)
 
@@ -34,22 +34,34 @@ def _configuration(path: Path, consumer: str):
     from empirical_lawhood.api.configuration import load_configuration_record
     from empirical_lawhood.api.configuration_registry import consumer_by_id
     owner = consumer_by_id(consumer)
-    return load_configuration_record(_selected_input(path, maximum_bytes=owner.authoring_maximum_bytes or 16 * 1024**2, consumer=consumer), consumer=consumer)
+    return load_configuration_record(_selected_input(path, maximum_bytes=owner.authoring_maximum_bytes, consumer=consumer), consumer=consumer)
 
 
-def _storage():
+def _storage(*, read_only=False):
     from empirical_lawhood.cli import platform
     from empirical_lawhood.api.codecs import load_registered_authoring
     from empirical_lawhood.api.integration_handoffs import integration_artifact_profile_validators
     from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-    from empirical_lawhood.infrastructure.source_origin import require_executing_target_source
     from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile, resolve_external_root_contract
+    if type(read_only) is not bool:
+        raise TypeError('Storage read-only selection must be an exact boolean')
     root, profile_path = platform.CLI_PROJECT_ROOT, platform.CLI_OPERATOR_PROFILE
-    if root is None or profile_path is None:
+    if read_only:
+        if profile_path is None:
+            raise ValueError('Result reads require --operator-profile; select the retained storage described in the guide.')
+        # This path only excludes local storage. It makes no source identity
+        # assertion and is never used to authorize authoring or execution.
+        root = Path.cwd() if root is None else root
+    elif root is None or profile_path is None:
         raise ValueError('This operation requires --project-root and --operator-profile; select the storage profile described in the guide.')
-    require_executing_target_source(root)
+    if not read_only:
+        from empirical_lawhood.infrastructure.source_origin import require_selected_implementation
+        require_selected_implementation(root)
     profile = load_registered_authoring(profile_path, root_schemas={OperatorStorageProfile.SCHEMA: OperatorStorageProfile})
-    plane = ExternalArtifactPlane(GuardedExternalRoot(resolve_external_root_contract(profile, repo_root=root, home_root=Path.home())), integration_artifact_profile_validators())
+    plane = ExternalArtifactPlane(GuardedExternalRoot(resolve_external_root_contract(profile, repo_root=root, home_root=Path.home(),
+        for_write=not read_only, selected_contract=platform._selected_artifact_root_contract())), integration_artifact_profile_validators(),
+        maximum_parallel_verifications=profile.maximum_parallel_tasks,
+        artifact_verification=platform.CLI_ARTIFACT_VERIFICATION)
     plane.root.verify(for_write=False)
     return root, profile, plane
 
@@ -70,6 +82,12 @@ def _destination(path: Path, plane=None) -> Path:
 
 
 def register_integration_commands(campaign_app: typer.Typer) -> None:
+    from empirical_lawhood.cli.experiment_preparation import register_experiment_commands
+    register_experiment_commands(campaign_app)
+    from empirical_lawhood.cli.rc_prerequisite_chain import register_rc_chain_commands
+    register_rc_chain_commands(campaign_app)
+    from empirical_lawhood.cli.recursive_authoring import register_recursive_commands
+    register_recursive_commands(campaign_app)
     from empirical_lawhood.cli.preparation_integrations import register_preparation_commands
     register_preparation_commands(campaign_app)
     from empirical_lawhood.cli.preparation_diagnostics import register_preparation_diagnostic_commands

@@ -13,7 +13,6 @@ from hashlib import sha256
 import os
 from pathlib import Path
 import sys
-from tempfile import TemporaryDirectory
 
 # Match the installed CLI bootstrap before importing any numerical module.
 for _variable in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS",
@@ -38,9 +37,11 @@ from empirical_lawhood.planning.approval import (
     ApprovalCheckerRegistration, ApprovalCheckerRegistry, ApprovalGateKind,
     ApprovalSignatureAlgorithm, AttestationResult, issue_approval_gate_attestation,
 )
-from empirical_lawhood.planning.study_issue import AccountableHumanIdentity, HumanProposerAttestation, ImplementationSourceClosure, StudyAuthorityKind, StudyOperationAuthority
+from empirical_lawhood.planning.study_issue import AccountableHumanIdentity, HumanProposerAttestation, ImplementationSourceClosure, SourceClosureKind, StudyAuthorityKind, StudyOperationAuthority
 from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCompilationReport
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
+from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile, resolve_external_root_contract
+from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.api.reactor_source_provenance import authenticate_reactor_authoring_source
 from empirical_lawhood.runtime.plans import CandidateExecutionPlan
 from scripts.operator_records import (
     authorize_reviewed, export_record, freeze_for_review, identity, open_stores,
@@ -63,14 +64,14 @@ def snapshot(root):
             for p in root.rglob("*") if p.is_file()}
 
 
-def scenario(repo, trust_dir, storage, *, scale=False, exposed=False):
+def scenario(repo, trust_dir, storage, mount, catalog_relative_path, *, scale=False, exposed=False):
     run_id = "synthetic-public-reactor-lifecycle"
     (storage / "artifacts").mkdir()
-    (storage / "scratch").mkdir()
+    (storage / "scratch").mkdir(exist_ok=True)
     profile = OperatorStorageProfile(
         "synthetic-lifecycle-storage", "external-filesystem", "1.0.0", str(storage),
-        "/dev/shm", "artifacts", "scratch", OperatorStorageAccessMode.READ_WRITE,
-        None, None, ("tmpfs",), "strict-mount-contained-no-symlink", 1, (), 1, False,
+        str(mount), "artifacts", "scratch", OperatorStorageAccessMode.READ_WRITE,
+        None, None, (), "strict-mount-contained-no-symlink", 1, (), 1, False,
     )
     prior_units = tuple(f"unit.synthetic.prior-programme.context-a.independent-root-{i:06d}" for i in range(20_000)) if scale else ("synthetic.previously-exposed",)
     prior_seeds = tuple(sorted((
@@ -93,7 +94,8 @@ def scenario(repo, trust_dir, storage, *, scale=False, exposed=False):
         "synthetic.profile", run_id, load_packaged_reactor_source().fingerprint(), assignment, census,
     )
     directory = storage / "artifacts" / "operator-inputs"
-    authored = author_fresh_reactor(root=repo, profile=authoring, output_dir=directory)
+    writer = ExternalArtifactPlane(GuardedExternalRoot(resolve_external_root_contract(profile, repo_root=repo, home_root=Path.home())))
+    authored = author_fresh_reactor(root=repo, profile=authoring, output_dir=directory, artifact_writer=writer)
     assert authored["task_count"] == 21 and authored["native_tasks_executed"] == 0
     # The positive fixture models an eligible assignment only inside this test
     # world. Its disclosed values/roles never become a real qualification roster.
@@ -104,6 +106,21 @@ def scenario(repo, trust_dir, storage, *, scale=False, exposed=False):
     base = candidate.base_candidate.base_candidate
     system = base.system
     closure = read_record(directory / "source-closure.json", ImplementationSourceClosure)
+    assert closure.kind is SourceClosureKind.EXACT_SOURCE_CLOSURE
+    assert authenticate_reactor_authoring_source(directory=directory, project_root=repo, artifact_writer=writer) == closure
+    companion = directory/'provenance/selected-source-manifest.json'
+    retained = companion.read_bytes()
+    companion.write_bytes(retained+b' ')
+    try:
+        try:
+            create_cli_api(repo_root=repo, operator_storage_profile=profile,
+                reactor_authoring_dir=directory, catalog_relative_path=catalog_relative_path)
+        except (OSError, PermissionError, RuntimeError, ValueError):
+            pass
+        else:
+            raise AssertionError('changed original source companion reached public provider composition')
+    finally:
+        companion.write_bytes(retained)
     trust_dir.mkdir(mode=0o700)
     registrations, signers = [], {}
     for gate_id in system.authority_policy.required_gate_ids:
@@ -118,11 +135,14 @@ def scenario(repo, trust_dir, storage, *, scale=False, exposed=False):
     trust = export_record(trust_dir / "trust.json", ApprovalCheckerRegistry("synthetic.checkers", tuple(registrations)))
     stores = open_stores(repo_root=repo, profile=profile, trust_path=trust)
     proof = prove_fresh_reactor(repo_root=repo, storage_profile=profile, directory=directory,
-                               approval_checker_trust_path=trust)
+                               approval_checker_trust_path=trust, catalog_relative_path=catalog_relative_path)
     assert all(passed for _, passed, _ in proof["closure_sections"])
+    assert proof["output_publication_admission"] == "DEFERRED_UNTIL_ACTUAL_OUTPUTS"
+    assert all(not stores.plane.root.resolve(path, for_write=False).exists()
+        for path in proof["output_locators"])
     assert proof["native_tasks_executed"] == 0 and len(proof["control_persistence"]) == 4
     api = create_cli_api(repo_root=repo, operator_storage_profile=profile,
-                         approval_checker_trust_path=trust, reactor_authoring_dir=directory)
+                         approval_checker_trust_path=trust, reactor_authoring_dir=directory, catalog_relative_path=catalog_relative_path)
     owner = AccountableHumanIdentity("synthetic.human", "synthetic.test-role", "synthetic.provider", "1" * 64)
 
     def grant(label, kind, subject, prerequisite=None):
@@ -199,7 +219,7 @@ def scenario(repo, trust_dir, storage, *, scale=False, exposed=False):
             stream.truncate(MAX_ISSUE_PAYLOAD_BYTES + 1)
         try:
             prove_fresh_reactor(repo_root=repo, storage_profile=profile, directory=directory,
-                               approval_checker_trust_path=trust)
+                               approval_checker_trust_path=trust, catalog_relative_path=catalog_relative_path)
         except ValueError as error:
             assert str(error) == "REACTOR_AUTHORING_EXCEEDS_PRODUCTION_ISSUE_BYTE_BOUND"
         else:
@@ -305,11 +325,11 @@ def scenario(repo, trust_dir, storage, *, scale=False, exposed=False):
                             for task in preissue_plan.tasks for output in task.outputs)
     completed_outputs = {locator: completed_snapshot[locator] for locator in output_locators}
     # Discard only this test's rebuildable SQLite projection; custody stays intact.
-    catalog = repo / ".empirical-lawhood" / "experiment_catalog.sqlite3"
+    catalog = storage/profile.scientific_scratch_namespace/catalog_relative_path
     assert catalog.is_file()
     catalog.rename(catalog.with_suffix(".sqlite3.test-backup"))
     recovered_api = create_cli_api(repo_root=repo, operator_storage_profile=profile,
-                                   approval_checker_trust_path=trust, reactor_authoring_dir=directory)
+                                   approval_checker_trust_path=trust, reactor_authoring_dir=directory, catalog_relative_path=catalog_relative_path)
     recovered = checked(recovered_api.resume_campaign(ResumeCampaignRequest(run_id, True, reveal.authority_id)))
     assert recovered.receipt_ids == finished.receipt_ids
     assert recovered.adjudication_fingerprint == finished.adjudication_fingerprint
@@ -319,6 +339,5 @@ def scenario(repo, trust_dir, storage, *, scale=False, exposed=False):
 
 
 if __name__ == "__main__":
-    with TemporaryDirectory(prefix="empirical-lawhood-lifecycle-", dir="/dev/shm") as temporary:
-        scenario(Path(sys.argv[1]), Path(sys.argv[2]), Path(temporary),
-                 scale=sys.argv[3] == "scale", exposed=sys.argv[3] == "exposed")
+    scenario(Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[4]), Path(sys.argv[5]), sys.argv[6],
+        scale=sys.argv[3] == 'scale', exposed=sys.argv[3] == 'exposed')

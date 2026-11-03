@@ -40,7 +40,7 @@ def _fixture_preparation(design, unit_id: str, full_seed: int) -> SelectiveDepen
 def _shipped_config(slug: str) -> ReactionDiffusionDevelopmentInput:
     bundle = {"cantera": "reactor-flow-response", "fipy": "reaction-diffusion-response"}[slug]
     return decode_canonical_bytes(
-        (ROOT / "experiments" / bundle / "config.json").read_bytes(),
+        (ROOT / "programmes/foundations/measurement-and-response/workflows" / bundle / "config.json").read_bytes(),
         ReactionDiffusionDevelopmentInput,
         maximum_bytes=32 * 1024,
     )

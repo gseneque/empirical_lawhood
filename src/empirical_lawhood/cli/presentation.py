@@ -62,6 +62,8 @@ def render_doctor(summary: DoctorSummary, *, project_root: Path | None = None) -
         f"External storage: read_ready={summary.storage_read_ready}, write_ready={summary.storage_write_ready}",
         "Issued execution readiness (separate from the public demonstration):",
     ))
+    if summary.catalog_relative_path.startswith("external-scratch:"):
+        lines.append("Selected catalog: " + summary.catalog_relative_path)
     for action in summary.action_readiness:
         authority = ", ".join(action.authority_required) or "none"
         reasons = ", ".join(action.reason_codes) or "none"
@@ -76,7 +78,7 @@ def render_doctor(summary: DoctorSummary, *, project_root: Path | None = None) -
     hint = _source_version_hint(project_root, summary.package_version)
     if hint is not None:
         lines.append(hint)
-    lines.append("Next: workflow list for task selection; docs/results-and-failures.md for result interpretation.")
+    lines.append("Next: workflow list for task selection; docs/using/results-and-failures.md for result interpretation.")
     return "\n".join(lines)
 
 

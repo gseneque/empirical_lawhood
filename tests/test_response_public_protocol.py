@@ -26,7 +26,7 @@ def test_packaged_protocol_drives_real_stage_preflight_and_tamper_stop(tmp_path)
         == science.FiniteResponseLawScienceSpec().plan_sha256
     )
     config = load_registered_authoring(
-        ROOT / "experiments/finite-response-law/calibration-stage-input.json",
+        ROOT / "programmes/foundations/emergent-structure/workflows/finite-response-law/calibration-stage-input.json",
         root_schemas={
             stage_input.FiniteResponseLawStageInput.SCHEMA: stage_input.FiniteResponseLawStageInput
         },

@@ -1,0 +1,51 @@
+{
+  "kind": "DEVELOPMENT_DECISION_EVIDENCE_NO_AUTHORITY",
+  "files": [
+    {
+      "path": "candidate-design.json",
+      "original_path": "/tmp/el-matrix-continuation-20261014/e2-e3-candidate01/candidate-design.json",
+      "bytes": 30616,
+      "sha256": "4b12ecd9563a1190dfa7ca234bf88bf59d48522ece622d8f03e6ee836172c8e3"
+    },
+    {
+      "path": "matrix.e3.deanneal.e6-nearby.canonical.json",
+      "original_path": "/tmp/el-matrix-continuation-20261014/e2-e3-candidate01/matrix.e3.deanneal.e6-nearby.canonical.json",
+      "bytes": 2310,
+      "sha256": "e2d8fc7329fbf15a25551935f1825b1f95d833821dc387686fed340a13130284"
+    },
+    {
+      "path": "matrix.e3.deanneal.e6-shifted.canonical.json",
+      "original_path": "/tmp/el-matrix-continuation-20261014/e2-e3-candidate01/matrix.e3.deanneal.e6-shifted.canonical.json",
+      "bytes": 2309,
+      "sha256": "0089de88fc87b3b556bfb83b806f902f9e9a08b0c3342b66470f04d67df5e80d"
+    },
+    {
+      "path": "matrix.e3.deanneal.nominal.canonical.json",
+      "original_path": "/tmp/el-matrix-continuation-20261014/e2-e3-candidate01/matrix.e3.deanneal.nominal.canonical.json",
+      "bytes": 2294,
+      "sha256": "37828bbe1f0e322cabf1fd723f33b80c60c0a3e0cd6409e3f56ff242abe90896"
+    },
+    {
+      "path": "missing-records.json",
+      "original_path": "/tmp/el-matrix-continuation-20261014/e3-entry-records02/missing-records.json",
+      "bytes": 11756,
+      "sha256": "50a2ad4c1306ed8c97dd6e849a151a21d6aa8ef7381a54abe16224bcffb25d11"
+    },
+    {
+      "path": "operation-refusal.json",
+      "original_path": "/tmp/el-matrix-continuation-20261014/e3-entry-records02/operation-refusal.json",
+      "bytes": 11468,
+      "sha256": "cf0e59df7e3b787ce600a85ff7f18feb461b43f56d65799713bad8edae5e686a"
+    },
+    {
+      "path": "candidate-design02.json",
+      "original_path": "/tmp/el-matrix-continuation-20261014/e2-e3-candidate01/candidate-design02.json",
+      "bytes": 31287,
+      "sha256": "39009418c5368c6b83c1d7fef2de120d4b3cf87b4ff01fa6f17ae0e8e700f0c6"
+    }
+  ],
+  "scientific_entry": false,
+  "fits": 0,
+  "genuine_E6_reservation": false,
+  "current_candidate": "candidate-design02.json"
+}

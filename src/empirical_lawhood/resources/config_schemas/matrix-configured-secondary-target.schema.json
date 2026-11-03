@@ -1,0 +1,691 @@
+{
+  "$defs": {
+    "ArtifactIdentity_3b360fc69225": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/artifact-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "description": "artifact id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "extensions": {
+              "description": "extensions; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ExtensionBinding_d34345d4218d"
+              },
+              "type": "array"
+            },
+            "media_type": {
+              "description": "media type; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "payload_schema": {
+              "description": "payload schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "role": {
+              "description": "role; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sha256": {
+              "description": "sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "size_bytes": {
+              "description": "size bytes; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "artifact_id",
+            "role",
+            "payload_schema",
+            "sha256",
+            "media_type",
+            "size_bytes",
+            "extensions"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ExtensionBinding_d34345d4218d": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/extension-binding"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "namespace": {
+              "description": "namespace; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "payload_sha256": {
+              "description": "payload sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "schema": {
+              "description": "schema; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "namespace",
+            "schema",
+            "payload_sha256"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "FactorEventSpec_d5bbd1ffea0c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-factor-lifetime/event-spec"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "adjacent_angle_maximum_degrees": {
+              "additionalProperties": false,
+              "description": "adjacent angle maximum degrees; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "associative_leakage_maximum": {
+              "additionalProperties": false,
+              "description": "associative leakage maximum; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "exposure": {
+              "description": "exposure; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "factor_fit_angle_maximum_degrees": {
+              "additionalProperties": false,
+              "description": "factor fit angle maximum degrees; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "frame_alignment_minimum_overlap": {
+              "additionalProperties": false,
+              "description": "frame alignment minimum overlap; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "identifiability_absolute_fourth": {
+              "additionalProperties": false,
+              "description": "identifiability absolute fourth; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "identifiability_relative_gap": {
+              "additionalProperties": false,
+              "description": "identifiability relative gap; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "lattice": {
+              "description": "lattice; constructor checks semantics and units.",
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "lie_leakage_maximum": {
+              "additionalProperties": false,
+              "description": "lie leakage maximum; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "origin_angle_maximum_degrees": {
+              "additionalProperties": false,
+              "description": "origin angle maximum degrees; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "primary_dt": {
+              "additionalProperties": false,
+              "description": "primary dt; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "risk_start_tick": {
+              "description": "risk start tick; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "scalar_closure": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ScalarClosureSpec_5a0d2a0a4137"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "scalar closure; constructor checks semantics and units."
+            },
+            "sectors": {
+              "description": "sectors; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "spec_id": {
+              "description": "spec id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "trailing_persistence_ticks": {
+              "description": "trailing persistence ticks; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "spec_id",
+            "sectors",
+            "lattice",
+            "primary_dt",
+            "risk_start_tick",
+            "trailing_persistence_ticks",
+            "associative_leakage_maximum",
+            "lie_leakage_maximum",
+            "factor_fit_angle_maximum_degrees",
+            "adjacent_angle_maximum_degrees",
+            "origin_angle_maximum_degrees",
+            "identifiability_relative_gap",
+            "identifiability_absolute_fourth",
+            "frame_alignment_minimum_overlap",
+            "scalar_closure",
+            "exposure"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MatrixE3SecondaryTarget_4c0241f8ba03": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-experiment/secondary-response-target"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "mathematical_protocol": {
+              "$ref": "#/$defs/MatrixResponseFrontierProtocol_6238938325ef",
+              "description": "mathematical protocol; constructor checks semantics and units."
+            },
+            "normalized_adequacy_tolerance": {
+              "additionalProperties": false,
+              "description": "normalized adequacy tolerance; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "record_id",
+            "mathematical_protocol",
+            "normalized_adequacy_tolerance"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MatrixResponseActionScale_8aaacc264e3e": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-frontier/action-scale"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "amplitude": {
+              "additionalProperties": false,
+              "description": "amplitude; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "force_norm": {
+              "additionalProperties": false,
+              "description": "force norm; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "pulse_steps": {
+              "description": "pulse steps; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "role": {
+              "description": "role; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "role",
+            "amplitude",
+            "force_norm",
+            "pulse_steps"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MatrixResponseFactorRuleCompatibility_2d5afe6d9516": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-frontier/factor-rule-compatibility"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "compatibility_id": {
+              "description": "compatibility id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "original": {
+              "$ref": "#/$defs/FactorEventSpec_d5bbd1ffea0c",
+              "description": "original; constructor checks semantics and units."
+            },
+            "target": {
+              "$ref": "#/$defs/FactorEventSpec_d5bbd1ffea0c",
+              "description": "target; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "compatibility_id",
+            "original",
+            "target"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MatrixResponseFrontierProtocol_6238938325ef": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-response-frontier/protocol"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "action_scales": {
+              "description": "action scales; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/MatrixResponseActionScale_8aaacc264e3e"
+              },
+              "type": "array"
+            },
+            "aggregation": {
+              "description": "aggregation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "estimand": {
+              "description": "estimand; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "factor_rule": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "factor rule; constructor checks semantics and units."
+            },
+            "factor_rule_compatibilities": {
+              "description": "factor rule compatibilities; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/MatrixResponseFactorRuleCompatibility_2d5afe6d9516"
+              },
+              "type": "array"
+            },
+            "horizon_steps": {
+              "description": "horizon steps; constructor checks semantics and units.",
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "inference": {
+              "description": "inference; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "metric": {
+              "description": "metric; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "panel_roles": {
+              "description": "panel roles; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "primary_timestep": {
+              "additionalProperties": false,
+              "description": "primary timestep; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "protocol_id": {
+              "description": "protocol id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "receiver_gram_tolerance": {
+              "additionalProperties": false,
+              "description": "receiver gram tolerance; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "protocol_id",
+            "factor_rule",
+            "primary_timestep",
+            "horizon_steps",
+            "action_scales",
+            "receiver_gram_tolerance",
+            "panel_roles",
+            "factor_rule_compatibilities",
+            "estimand",
+            "metric",
+            "aggregation",
+            "inference"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ScalarClosureSpec_5a0d2a0a4137": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-factor-lifetime/scalar-closure-spec"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "normalization_owner": {
+              "$ref": "#/$defs/ArtifactIdentity_3b360fc69225",
+              "description": "normalization owner; constructor checks semantics and units."
+            },
+            "spec_id": {
+              "description": "spec id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "threshold": {
+              "additionalProperties": false,
+              "description": "threshold; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "spec_id",
+            "normalization_owner",
+            "threshold"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-configured-secondary-target",
+  "$ref": "#/$defs/MatrixE3SecondaryTarget_4c0241f8ba03",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Configured Secondary Target",
+  "x-consumer": "matrix-configured-secondary-target",
+  "x-consumer-maximum-bytes": 134217728,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

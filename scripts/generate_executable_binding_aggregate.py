@@ -108,6 +108,7 @@ def _codec_registrations(
     aggregate: GeneratedExecutableBindingAggregate,
 ) -> tuple[
     tuple[CanonicalRecordCodecRegistration, ...],
+    tuple[CanonicalRecordCodecRegistration, ...],
     tuple[type[CanonicalRecord], ...],
 ]:
     record_types = tuple(
@@ -126,25 +127,34 @@ def _codec_registrations(
                 for binding in aggregate.bindings
                 for registration in binding.issued_decoder_registrations
             ),
-            key=lambda value: value.payload_schema,
+            key=lambda value: (value.payload_schema, value.decoder_key, value.decoder_version),
         )
     )
-    by_decoder_schema: dict[str, StudyExtensionDecoderRegistration] = {}
+    by_decoder_key: dict[tuple[str, str], StudyExtensionDecoderRegistration] = {}
     for decoder in all_decoders:
-        previous = by_decoder_schema.setdefault(decoder.payload_schema, decoder)
+        previous = by_decoder_key.setdefault((decoder.decoder_key, decoder.decoder_version), decoder)
         if previous != decoder:
-            raise ValueError("executable bindings duplicate an issued decoder schema")
-    decoders = tuple(by_decoder_schema[schema] for schema in sorted(by_decoder_schema))
-    decoder_schemas = tuple(value.payload_schema for value in decoders)
-    if schemas != decoder_schemas:
+            raise ValueError("executable bindings conflict on an exact issued decoder key/version")
+    if set(schemas) != {value.payload_schema for value in by_decoder_key.values()}:
         raise ValueError("executable record types differ from issued decoder schemas")
     by_schema = {value.SCHEMA: value for value in record_types}
-    registrations = tuple(
-        CanonicalRecordCodecRegistration(
-            codec_id=(
-                "executable-canonical-json."
-                + decoder.payload_schema.replace("/", ".").replace("_", "-")
-            ),
+    primary_decoders = {}
+    for descriptor in descriptors:
+        for record_type in descriptor.record_types:
+            owned = {(decoder.decoder_key, decoder.decoder_version): decoder
+                for binding in descriptor.contribution.bindings
+                for decoder in binding.issued_decoder_registrations
+                if decoder.payload_schema == record_type.SCHEMA}
+            if len(owned) != 1:
+                raise ValueError("canonical record owner lacks its unique issued decoder registration")
+            primary_decoders[record_type.SCHEMA] = next(iter(owned.values()))
+
+    def registration(decoder, *, primary):
+        codec_id = "executable-canonical-json." + decoder.payload_schema.replace("/", ".").replace("_", "-")
+        if not primary:
+            codec_id += ".decoder-" + decoder.fingerprint()
+        return CanonicalRecordCodecRegistration(
+            codec_id=codec_id,
             record_schema=decoder.payload_schema,
             record_version=decoder.payload_version,
             maximum_bytes=decoder.maximum_payload_bytes,
@@ -152,18 +162,23 @@ def _codec_registrations(
             decoder_version=decoder.decoder_version,
             decoder_implementation_sha256=decoder.implementation_sha256,
         )
-        for decoder in decoders
-    )
-    for registration in registrations:
-        record_type = by_schema[registration.record_schema]
-        if record_type.VERSION != registration.record_version:
+    registrations = tuple(registration(primary_decoders[schema], primary=True) for schema in schemas)
+    additional = tuple(sorted(
+        (registration(decoder, primary=False) for decoder in by_decoder_key.values()
+            if decoder != primary_decoders[decoder.payload_schema]),
+        key=lambda value: value.codec_id,
+    ))
+    for value in (*registrations, *additional):
+        record_type = by_schema[value.record_schema]
+        if record_type.VERSION != value.record_version:
             raise ValueError("executable codec record version differs from its decoder")
     CanonicalRecordCodecRegistry(
         registry_id="canonical-codecs.generated-executable-bindings",
         registrations=registrations,
         record_types=by_schema,
+        additional_registrations=additional,
     )
-    return registrations, record_types
+    return registrations, additional, record_types
 
 
 def compose_loaded_descriptors(
@@ -189,7 +204,7 @@ def compose_loaded_descriptors(
         aggregate=aggregate,
         factories=factories,  # type: ignore[arg-type]
     )
-    codec_registrations, record_types = _codec_registrations(descriptors, aggregate)
+    codec_registrations, _additional, record_types = _codec_registrations(descriptors, aggregate)
     return aggregate, factory_registry, codec_registrations, record_types
 
 
@@ -215,6 +230,7 @@ def render_generated_module(paths: tuple[Path, ...]) -> str:
     aggregate, _factories, codec_registrations, _record_types = compose_loaded_descriptors(
         descriptors
     )
+    _primary, additional_registrations, _types = _codec_registrations(descriptors, aggregate)
     aliases = {
         value.contribution.contribution_id: f"_descriptor_{index:03d}"
         for index, value in enumerate(descriptors)
@@ -243,7 +259,9 @@ def render_generated_module(paths: tuple[Path, ...]) -> str:
         for value in descriptors
     )
     codec_values = "\n".join(_render_codec_registration(value) for value in codec_registrations)
+    additional_codec_values = "\n".join(_render_codec_registration(value) for value in additional_registrations)
     codec_fingerprint = hashlib.sha256(canonical_json_bytes(codec_registrations)).hexdigest()
+    additional_codec_fingerprint = hashlib.sha256(canonical_json_bytes(additional_registrations)).hexdigest()
     return "\n".join(
         (
             '"""Generated by scripts/generate_executable_binding_aggregate.py; do not edit."""',
@@ -301,15 +319,22 @@ def render_generated_module(paths: tuple[Path, ...]) -> str:
             "_EXECUTABLE_CODEC_REGISTRATIONS = (",
             f"{codec_values}",
             ")",
+            "_EXECUTABLE_ADDITIONAL_CODEC_REGISTRATIONS = (",
+            f"{additional_codec_values}",
+            ")",
             "EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY = CanonicalRecordCodecRegistry(",
             '    registry_id="canonical-codecs.generated-executable-bindings",',
             "    registrations=_EXECUTABLE_CODEC_REGISTRATIONS,",
             "    record_types={value.SCHEMA: value for value in EXECUTABLE_RECORD_TYPES},",
+            "    additional_registrations=_EXECUTABLE_ADDITIONAL_CODEC_REGISTRATIONS,",
             ")",
             "",
             f'EXPECTED_AGGREGATE_FINGERPRINT = "{aggregate.fingerprint()}"',
             "EXPECTED_CODEC_REGISTRY_FINGERPRINT = (",
             f'    "{codec_fingerprint}"',
+            ")",
+            "EXPECTED_ADDITIONAL_CODEC_REGISTRY_FINGERPRINT = (",
+            f'    "{additional_codec_fingerprint}"',
             ")",
             "if GENERATED_EXECUTABLE_BINDING_AGGREGATE.fingerprint() != EXPECTED_AGGREGATE_FINGERPRINT:",
             '    raise RuntimeError("generated executable aggregate fingerprint drifted")',
@@ -318,6 +343,11 @@ def render_generated_module(paths: tuple[Path, ...]) -> str:
             "    != EXPECTED_CODEC_REGISTRY_FINGERPRINT",
             "):",
             '    raise RuntimeError("generated executable codec registry fingerprint drifted")',
+            "if (",
+            "    hashlib.sha256(canonical_json_bytes(_EXECUTABLE_ADDITIONAL_CODEC_REGISTRATIONS)).hexdigest()",
+            "    != EXPECTED_ADDITIONAL_CODEC_REGISTRY_FINGERPRINT",
+            "):",
+            '    raise RuntimeError("generated additional executable codec registry fingerprint drifted")',
             "",
             "__all__ = [",
             '    "EXECUTABLE_BINDING_CONTRIBUTIONS",',
@@ -326,6 +356,7 @@ def render_generated_module(paths: tuple[Path, ...]) -> str:
             '    "EXECUTABLE_RECORD_TYPES",',
             '    "EXPECTED_AGGREGATE_FINGERPRINT",',
             '    "EXPECTED_CODEC_REGISTRY_FINGERPRINT",',
+            '    "EXPECTED_ADDITIONAL_CODEC_REGISTRY_FINGERPRINT",',
             '    "GENERATED_EXECUTABLE_BINDING_AGGREGATE",',
             "]",
             "",

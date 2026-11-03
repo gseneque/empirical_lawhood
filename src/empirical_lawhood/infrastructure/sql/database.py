@@ -14,7 +14,7 @@ from alembic import command
 from alembic.config import Config
 from sqlalchemy import Connection, Engine, create_engine, event
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.pool import NullPool, StaticPool
+from sqlalchemy.pool import NullPool, QueuePool
 
 from .schema import DATASET_TABLE_NAMES, PROJECTION_TABLE_NAMES
 from .migrations.dataset_tables import DATASET_PROJECTION_DIRTY_TRIGGER_DEFINITIONS, DATASET_PROJECTION_DIRTY_TRIGGER_NAMES, normalize_dataset_projection_trigger_sql
@@ -327,7 +327,10 @@ def create_catalog_engine(
         "connect_args": {"check_same_thread": False},
     }
     if in_memory:
-        options["poolclass"] = StaticPool
+        # One persistent connection owns this in-memory database. Serialize
+        # checkouts so a worker's bounded read cannot replace another reader's
+        # progress callback or roll back the scheduler's open transaction.
+        options.update(poolclass=QueuePool, pool_size=1, max_overflow=0)
     engine = create_engine(database_url, **options)
     event.listen(engine, "connect", _configure_sqlite_read_write)
     return engine

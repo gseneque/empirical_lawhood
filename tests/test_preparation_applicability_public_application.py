@@ -5,10 +5,12 @@ Native conformance runs one short interval once. All Q reports/signers below
 are explicitly software fixtures and can never qualify an actual study.
 """
 
+from tests.prospective_source_capture_fixture import install_historical_source_capture
 from dataclasses import replace
 from decimal import Decimal
 from hashlib import sha256
 from pathlib import Path
+import os
 from time import perf_counter
 
 import pytest
@@ -46,8 +48,9 @@ def actual_short_conformance(tmp_path_factory):
 
 def _setup(tmp_path,monkeypatch,conformance):
     store=tmp_path/"software-store";store.mkdir()
+    mount=next(parent for parent in (store,*store.parents) if os.path.ismount(parent))
     plane=ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract("synthetic.preparation-store",
-        "fictional preparation software store",str(store),"/",OperatorStorageProfile.SCHEMA,1,None,None,())))
+        "fictional preparation software store",str(store),str(mount),OperatorStorageProfile.SCHEMA,1,None,None,())))
     lower_dir=store/"original-f";lower_dir.mkdir()
     lower=original_f_operand_export(lower_dir,payload_id="synthetic.preparation.original-f")
     inspection=inspect_preparation_exposure(prior_inputs=(),inspection_id="synthetic.complete-known-exposure",original_f=lower)
@@ -58,7 +61,7 @@ def _setup(tmp_path,monkeypatch,conformance):
         "0"*40,"d"*64,"e"*64,True)
     from empirical_lawhood.api import preparation_applicability as ordinary, constructed_preparation_applicability as constructed
     for application in (ordinary,constructed):
-        monkeypatch.setattr(application,"capture_clean_target_closure",lambda *args:closure)
+        install_historical_source_capture(monkeypatch, application, closure)
         monkeypatch.setattr(application,"resolve_authoring_directory",lambda directory,**kwargs:(directory,plane.root.contract))
     from empirical_lawhood.api import composition, integration_handoffs
     from empirical_lawhood.infrastructure import source_origin

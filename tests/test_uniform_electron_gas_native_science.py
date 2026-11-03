@@ -19,7 +19,7 @@ from empirical_lawhood.kernel.decoding import decode_canonical_bytes
 
 def _config() -> UniformElectronGasAnalyticReferenceConfig:
     return decode_canonical_bytes(
-        Path("experiments/electron-gas-response/config.json").read_bytes(),
+        Path("programmes/materials/superconductivity/workflows/electron-gas-response/config.json").read_bytes(),
         UniformElectronGasAnalyticReferenceConfig,
         maximum_bytes=32 * 1024,
     )

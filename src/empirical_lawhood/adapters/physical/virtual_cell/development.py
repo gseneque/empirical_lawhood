@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
 import math
+from typing import Protocol
 
 import numpy as np
 from numpy.typing import NDArray
@@ -38,6 +39,15 @@ COMPETITION_SELECTION_INTEGRITY_FALSIFIER_IDS = (
     "falsifier.leaderboard-lineage-empty",
     "falsifier.matched-control-contract",
 )
+
+
+class OfficialValidationObservation(Protocol):
+    """The unchanged selection/refit math consumes scores and target identities."""
+
+    candidate_id: str
+    target_ids: tuple[str, ...]
+    score: OfficialAggregateScore
+    score_standard_error: Decimal
 
 
 @dataclass(frozen=True, slots=True)
@@ -87,17 +97,31 @@ class CandidateOfficialValidation:
     pdex_version: str
     response_outcome_read: bool
 
+    @property
+    def metrics_payload(self):
+        return self.metrics_arrow
+
+    @property
+    def metrics_schema(self):
+        from .records import OFFICIAL_METRICS_TABLE_SCHEMA
+
+        return OFFICIAL_METRICS_TABLE_SCHEMA
+
     def __post_init__(self) -> None:
         if tuple(sorted(set(self.target_ids))) != self.target_ids:
             raise ValueError("candidate validation targets must be sorted and unique")
         if not self.metrics_arrow:
             raise ValueError("candidate validation requires exact per-target metrics")
         if not self.score_standard_error.is_finite() or self.score_standard_error < 0:
-            raise ValueError("candidate validation score SE must be finite and nonnegative")
+            raise ValueError(
+                "candidate validation score SE must be finite and nonnegative"
+            )
         if not self.cell_eval_version or not self.pdex_version:
             raise ValueError("candidate validation evaluator versions are required")
         if not self.response_outcome_read:
-            raise ValueError("candidate validation must acknowledge its validation outcome read")
+            raise ValueError(
+                "candidate validation must acknowledge its validation outcome read"
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -118,7 +142,7 @@ class CandidateDevelopmentRefit:
 @dataclass(frozen=True, slots=True)
 class TierL0Development:
     candidates: tuple[DevelopedCandidate, ...]
-    official_validations: tuple[CandidateOfficialValidation, ...]
+    official_validations: tuple[OfficialValidationObservation, ...]
     development_refits: tuple[CandidateDevelopmentRefit, ...]
     tournament: TournamentRecord
     selected_validation_model: LinearResponseModel
@@ -135,14 +159,23 @@ class TierL0Development:
             raise ValueError("developed candidate IDs must be sorted and unique")
         if self.tournament.selected_candidate_id not in ids:
             raise ValueError("tournament selection is absent from candidate models")
-        validation_ids = tuple(value.candidate_id for value in self.official_validations)
+        validation_ids = tuple(
+            value.candidate_id for value in self.official_validations
+        )
         if validation_ids != ids:
-            raise ValueError("official validation must cover every selectable candidate exactly")
-        if self.selected_validation_model.model_id != self.tournament.selected_candidate_id:
+            raise ValueError(
+                "official validation must cover every selectable candidate exactly"
+            )
+        if (
+            self.selected_validation_model.model_id
+            != self.tournament.selected_candidate_id
+        ):
             raise ValueError("selected validation model differs from the tournament")
         refit_ids = tuple(value.candidate_id for value in self.development_refits)
         if refit_ids != ids:
-            raise ValueError("development refits must cover every selectable candidate exactly")
+            raise ValueError(
+                "development refits must cover every selectable candidate exactly"
+            )
         if set(self.train_target_ids) & set(self.validation_target_ids):
             raise ValueError("training and validation actions must be disjoint")
         if self.development_target_ids != tuple(
@@ -154,7 +187,9 @@ class TierL0Development:
 
     def refit_for(self, candidate_id: str) -> CandidateDevelopmentRefit:
         return next(
-            value for value in self.development_refits if value.candidate_id == candidate_id
+            value
+            for value in self.development_refits
+            if value.candidate_id == candidate_id
         )
 
     @property
@@ -238,18 +273,29 @@ def _choices(contract: ModelSelectionContract) -> tuple[HyperparameterChoice, ..
     alphas = tuple(float(value) for value in contract.ridge_alphas)
     values = [
         HyperparameterChoice(ModelFamily.NO_CHANGE_BASELINE, 0.0, None, None),
-        HyperparameterChoice(ModelFamily.WEIGHTED_COMMON_RESPONSE_BASELINE, 0.0, None, None),
+        HyperparameterChoice(
+            ModelFamily.WEIGHTED_COMMON_RESPONSE_BASELINE, 0.0, None, None
+        ),
     ]
     values.extend(
-        HyperparameterChoice(ModelFamily.TARGET_FEATURE_RIDGE_RESPONSE, alpha, None, None) for alpha in alphas
+        HyperparameterChoice(
+            ModelFamily.TARGET_FEATURE_RIDGE_RESPONSE, alpha, None, None
+        )
+        for alpha in alphas
     )
-    for family in (ModelFamily.REDUCED_RANK_TARGET_FEATURE_RIDGE_RESPONSE, ModelFamily.ADMISSION_CONDITIONED_REDUCED_RANK_RIDGE_RESPONSE):
+    for family in (
+        ModelFamily.REDUCED_RANK_TARGET_FEATURE_RIDGE_RESPONSE,
+        ModelFamily.ADMISSION_CONDITIONED_REDUCED_RANK_RIDGE_RESPONSE,
+    ):
         values.extend(
             HyperparameterChoice(
                 family,
                 alpha,
                 rank,
-                alpha if family is ModelFamily.ADMISSION_CONDITIONED_REDUCED_RANK_RIDGE_RESPONSE else None,
+                alpha
+                if family
+                is ModelFamily.ADMISSION_CONDITIONED_REDUCED_RANK_RIDGE_RESPONSE
+                else None,
             )
             for alpha in alphas
             for rank in contract.reduced_ranks
@@ -268,7 +314,10 @@ def _fit_choice(
     admission_seed: int,
     response_basis: NDArray[np.float64] | None,
 ) -> tuple[LinearResponseModel, ModelFitRecord]:
-    if choice.family in {ModelFamily.NO_CHANGE_BASELINE, ModelFamily.WEIGHTED_COMMON_RESPONSE_BASELINE}:
+    if choice.family in {
+        ModelFamily.NO_CHANGE_BASELINE,
+        ModelFamily.WEIGHTED_COMMON_RESPONSE_BASELINE,
+    }:
         return fit_tier_l0_model(
             model_id=model_id,
             family=choice.family,
@@ -362,7 +411,10 @@ def fit_tier_l0_candidates(
             )
             basis = _maximum_basis(training_response, maximum_rank)
             for choice in choices:
-                if choice.reduced_rank is not None and choice.reduced_rank > maximum_rank:
+                if (
+                    choice.reduced_rank is not None
+                    and choice.reduced_rank > maximum_rank
+                ):
                     continue
                 model, _fit = _fit_choice(
                     choice=choice,
@@ -378,7 +430,10 @@ def fit_tier_l0_candidates(
                     response_basis=(
                         basis
                         if choice.family
-                        in {ModelFamily.REDUCED_RANK_TARGET_FEATURE_RIDGE_RESPONSE, ModelFamily.ADMISSION_CONDITIONED_REDUCED_RANK_RIDGE_RESPONSE}
+                        in {
+                            ModelFamily.REDUCED_RANK_TARGET_FEATURE_RIDGE_RESPONSE,
+                            ModelFamily.ADMISSION_CONDITIONED_REDUCED_RANK_RIDGE_RESPONSE,
+                        }
                         else None
                     ),
                 )
@@ -387,7 +442,11 @@ def fit_tier_l0_candidates(
                     target_ids=held_response.target_ids,
                     features=(
                         None
-                        if choice.family in {ModelFamily.NO_CHANGE_BASELINE, ModelFamily.WEIGHTED_COMMON_RESPONSE_BASELINE}
+                        if choice.family
+                        in {
+                            ModelFamily.NO_CHANGE_BASELINE,
+                            ModelFamily.WEIGHTED_COMMON_RESPONSE_BASELINE,
+                        }
                         else features
                     ),
                 )
@@ -401,7 +460,9 @@ def fit_tier_l0_candidates(
             if choice.family is family and metric_rows[choice.choice_id]
         ]
         if not eligible:
-            raise VirtualCellAnalysisError(f"no evaluable hyperparameters for {family.value}")
+            raise VirtualCellAnalysisError(
+                f"no evaluable hyperparameters for {family.value}"
+            )
         best_by_family[family] = min(
             eligible,
             key=lambda choice: (
@@ -435,7 +496,11 @@ def fit_tier_l0_candidates(
             admission_seed=contract.repeat_seeds[0],
             response_basis=(
                 full_basis
-                if family in {ModelFamily.REDUCED_RANK_TARGET_FEATURE_RIDGE_RESPONSE, ModelFamily.ADMISSION_CONDITIONED_REDUCED_RANK_RIDGE_RESPONSE}
+                if family
+                in {
+                    ModelFamily.REDUCED_RANK_TARGET_FEATURE_RIDGE_RESPONSE,
+                    ModelFamily.ADMISSION_CONDITIONED_REDUCED_RANK_RIDGE_RESPONSE,
+                }
                 else None
             ),
         )
@@ -453,7 +518,9 @@ def fit_tier_l0_candidates(
         )
     result = tuple(sorted(developed, key=lambda value: value.candidate_id))
     if tuple(value.candidate_id for value in result) != contract.candidate_ids:
-        raise VirtualCellAnalysisError("fitted candidate roster differs from the frozen contract")
+        raise VirtualCellAnalysisError(
+            "fitted candidate roster differs from the frozen contract"
+        )
     return result
 
 
@@ -465,14 +532,16 @@ def finalize_tier_l0_development(
     contract: ModelSelectionContract,
     realized_admission_repression_scale: float,
     candidates: tuple[DevelopedCandidate, ...],
-    official_validations: tuple[CandidateOfficialValidation, ...],
+    official_validations: tuple[OfficialValidationObservation, ...],
 ) -> TierL0Development:
     """Select by exact official validation score, then refit every family."""
 
     candidate_ids = tuple(value.candidate_id for value in candidates)
     validation_ids = tuple(value.candidate_id for value in official_validations)
     if candidate_ids != contract.candidate_ids or validation_ids != candidate_ids:
-        raise VirtualCellAnalysisError("candidate and official-validation rosters do not close")
+        raise VirtualCellAnalysisError(
+            "candidate and official-validation rosters do not close"
+        )
     if set(train.target_ids) & set(validation.target_ids):
         raise VirtualCellAnalysisError("training and validation targets overlap")
     if train.gene_ids != validation.gene_ids:
@@ -501,7 +570,9 @@ def finalize_tier_l0_development(
         entries=entries,
     )
     selected = next(
-        value for value in candidates if value.candidate_id == tournament.selected_candidate_id
+        value
+        for value in candidates
+        if value.candidate_id == tournament.selected_candidate_id
     )
     development = merge_development_responses(train, validation)
     development_labels = realized_admission_labels(
@@ -529,7 +600,10 @@ def finalize_tier_l0_development(
             response_basis=(
                 final_basis
                 if candidate.hyperparameters.family
-                in {ModelFamily.REDUCED_RANK_TARGET_FEATURE_RIDGE_RESPONSE, ModelFamily.ADMISSION_CONDITIONED_REDUCED_RANK_RIDGE_RESPONSE}
+                in {
+                    ModelFamily.REDUCED_RANK_TARGET_FEATURE_RIDGE_RESPONSE,
+                    ModelFamily.ADMISSION_CONDITIONED_REDUCED_RANK_RIDGE_RESPONSE,
+                }
                 else None
             ),
         )

@@ -17,7 +17,7 @@ from empirical_lawhood.adapters.simulators.finite_response_law.randomness import
 from empirical_lawhood.api.codecs import load_registered_authoring
 
 ROOT = Path(__file__).parents[1]
-CONFIG = ROOT / "experiments/finite-response-law/finite-calibration-input.json"
+CONFIG = ROOT / "programmes/foundations/emergent-structure/workflows/finite-response-law/finite-calibration-input.json"
 
 
 def _assignment(stage: str) -> FiniteResponseLawCohortAssignment:

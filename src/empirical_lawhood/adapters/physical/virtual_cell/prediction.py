@@ -33,7 +33,9 @@ CELL_EVAL_LOG1P_MAXIMUM = 14.999
 
 @dataclass(frozen=True, slots=True)
 class PredictionTargetAllocation(CanonicalRecord):
-    SCHEMA: ClassVar[str] = 'empirical-lawhood/physical/virtual-cell/prediction-target-allocation'
+    SCHEMA: ClassVar[str] = (
+        "empirical-lawhood/physical/virtual-cell/prediction-target-allocation"
+    )
 
     target_id: str
     recommended_cells: int
@@ -60,7 +62,7 @@ class PredictionTargetAllocation(CanonicalRecord):
 
 @dataclass(frozen=True, slots=True)
 class PredictionRoster(CanonicalRecord):
-    SCHEMA: ClassVar[str] = 'empirical-lawhood/physical/virtual-cell/prediction-roster'
+    SCHEMA: ClassVar[str] = "empirical-lawhood/physical/virtual-cell/prediction-roster"
 
     roster_id: str
     prefix_source_sha256: str
@@ -73,7 +75,9 @@ class PredictionRoster(CanonicalRecord):
     def __post_init__(self) -> None:
         validate_stable_id(self.roster_id, field_name="roster_id")
         validate_sha256(self.prefix_source_sha256, field_name="prefix_source_sha256")
-        require_sorted_unique_ids(self.targets, attribute="target_id", field_name="targets")
+        require_sorted_unique_ids(
+            self.targets, attribute="target_id", field_name="targets"
+        )
         if not self.targets or not self.control_label:
             raise ValueError("prediction roster requires targets and a control label")
         if isinstance(self.control_cells, bool) or self.control_cells <= 0:
@@ -81,7 +85,9 @@ class PredictionRoster(CanonicalRecord):
         if isinstance(self.total_cell_limit, bool) or self.total_cell_limit <= 0:
             raise ValueError("prediction roster total-cell limit must be positive")
         if self.total_cells != self.total_cell_limit:
-            raise ValueError("prediction allocation must exactly fill its frozen cell limit")
+            raise ValueError(
+                "prediction allocation must exactly fill its frozen cell limit"
+            )
         if not self.allocation_rule:
             raise ValueError("prediction allocation rule must be nonempty")
 
@@ -101,11 +107,15 @@ class PredictionMeanCompilation:
     def __post_init__(self) -> None:
         if not self.target_ids or len(set(self.target_ids)) != len(self.target_ids):
             raise ValueError("prediction means require unique target IDs")
-        if self.absolute_means.ndim != 2 or self.absolute_means.shape[0] != len(self.target_ids):
+        if self.absolute_means.ndim != 2 or self.absolute_means.shape[0] != len(
+            self.target_ids
+        ):
             raise ValueError("absolute prediction means are not target aligned")
         if self.control_mean.shape != (self.absolute_means.shape[1],):
             raise ValueError("control mean is not gene aligned")
-        if not np.all(np.isfinite(self.absolute_means)) or np.any(self.absolute_means < 0):
+        if not np.all(np.isfinite(self.absolute_means)) or np.any(
+            self.absolute_means < 0
+        ):
             raise ValueError("absolute prediction means must be finite and nonnegative")
         if float(np.max(self.absolute_means)) > CELL_EVAL_LOG1P_MAXIMUM:
             raise ValueError("absolute prediction means exceed cell-eval's log1p range")
@@ -117,7 +127,9 @@ class PredictionMeanCompilation:
 
 @dataclass(frozen=True, slots=True)
 class PredictionH5ADBuildReceipt(CanonicalRecord):
-    SCHEMA: ClassVar[str] = 'empirical-lawhood/adapters/physical/virtual-cell/prediction-h5-ad-build-receipt'
+    SCHEMA: ClassVar[str] = (
+        "empirical-lawhood/adapters/physical/virtual-cell/prediction-h5-ad-build-receipt"
+    )
 
     receipt_id: str
     roster_sha256: str
@@ -160,7 +172,9 @@ class PredictionH5ADBuildReceipt(CanonicalRecord):
             field_name="maximum_mean_error",
             minimum=Decimal("0"),
         )
-        validate_decimal(self.maximum_value, field_name="maximum_value", minimum=Decimal("0"))
+        validate_decimal(
+            self.maximum_value, field_name="maximum_value", minimum=Decimal("0")
+        )
         if self.output_dtype != "float32":
             raise ValueError("the 2025 prediction H5AD must use float32 X")
         if self.outcome_read:
@@ -192,7 +206,9 @@ def _strict_roster_rows(payload: bytes) -> tuple[tuple[str, int, Decimal], ...]:
                 raise VirtualCellContractError("perturbation roster values are invalid")
             rows.append((target, count, median))
     except (ArithmeticError, TypeError, ValueError) as error:
-        raise VirtualCellContractError("perturbation roster numeric value is invalid") from error
+        raise VirtualCellContractError(
+            "perturbation roster numeric value is invalid"
+        ) from error
     if not rows or len({value[0] for value in rows}) != len(rows):
         raise VirtualCellContractError("perturbation roster is empty or duplicated")
     return tuple(sorted(rows))
@@ -312,7 +328,9 @@ def _file_sha256(path: Path) -> str:
 
 def _write_string_array(group: h5py.Group, name: str, values: tuple[str, ...]) -> None:
     dtype = h5py.string_dtype(encoding="utf-8")
-    dataset = group.create_dataset(name, data=np.asarray(values, dtype=object), dtype=dtype)
+    dataset = group.create_dataset(
+        name, data=np.asarray(values, dtype=object), dtype=dtype
+    )
     dataset.attrs["encoding-type"] = "string-array"
     dataset.attrs["encoding-version"] = "0.2.0"
 
@@ -335,7 +353,7 @@ def _write_dataframe(
         _write_string_array(group, name, values)
 
 
-def _mean_preserving_cells(
+def _historical_mean_preserving_cells(
     *,
     residual_source: NDArray[np.float64],
     requested_mean: NDArray[np.float64],
@@ -344,7 +362,9 @@ def _mean_preserving_cells(
     maximum_value: float,
 ) -> NDArray[np.float32]:
     sampled = np.asarray(
-        residual_source[rng.integers(0, residual_source.shape[0], size=cell_count, endpoint=False)],
+        residual_source[
+            rng.integers(0, residual_source.shape[0], size=cell_count, endpoint=False)
+        ],
         dtype=np.float64,
     )
     sampled -= np.mean(sampled, axis=0, keepdims=True)
@@ -366,11 +386,13 @@ def _mean_preserving_cells(
     scale = np.maximum(scale, 0.0)
     cells = requested_mean[None, :] + sampled * scale[None, :]
     if np.any(cells < -1e-10) or np.any(cells > maximum_value + 1e-10):
-        raise VirtualCellContractError("residual compiler violated its bounded log1p range")
+        raise VirtualCellContractError(
+            "residual compiler violated its bounded log1p range"
+        )
     return np.asarray(np.clip(cells, 0.0, maximum_value), dtype=np.float32)
 
 
-def write_prediction_h5ad(
+def write_historical_mean_preserving_prediction_h5ad(
     *,
     path: Path,
     roster: PredictionRoster,
@@ -382,10 +404,12 @@ def write_prediction_h5ad(
     mean_tolerance: float,
     maximum_value: float = CELL_EVAL_LOG1P_MAXIMUM,
 ) -> PredictionH5ADBuildReceipt:
-    """Stream an AnnData-compatible dense float32 H5AD without test truth."""
+    """Preservation-only original compiler; this is not the selected v2 method."""
 
     if path.exists() or path.is_symlink():
-        raise VirtualCellContractError("prediction H5AD destination must not already exist")
+        raise VirtualCellContractError(
+            "prediction H5AD destination must not already exist"
+        )
     validate_sha256(control_reservoir_sha256, field_name="control_reservoir_sha256")
     if gene_ids != control_reservoir.gene_ids:
         raise VirtualCellContractError("prediction and control gene registries differ")
@@ -429,7 +453,7 @@ def write_prediction_h5ad(
             cell_target_ids.extend([roster.control_label] * roster.control_cells)
             offset += roster.control_cells
             for target_index, allocation in enumerate(roster.targets):
-                values = _mean_preserving_cells(
+                values = _historical_mean_preserving_cells(
                     residual_source=residual_source,
                     requested_mean=predicted_means.absolute_means[target_index],
                     cell_count=allocation.allocated_cells,
@@ -438,11 +462,15 @@ def write_prediction_h5ad(
                 )
                 observed = np.mean(values, axis=0, dtype=np.float64)
                 error = float(
-                    np.max(np.abs(observed - predicted_means.absolute_means[target_index]))
+                    np.max(
+                        np.abs(observed - predicted_means.absolute_means[target_index])
+                    )
                 )
                 maximum_error = max(maximum_error, error)
                 matrix[offset : offset + allocation.allocated_cells, :] = values
-                cell_target_ids.extend([allocation.target_id] * allocation.allocated_cells)
+                cell_target_ids.extend(
+                    [allocation.target_id] * allocation.allocated_cells
+                )
                 offset += allocation.allocated_cells
             if offset != roster.total_cells or maximum_error > mean_tolerance:
                 raise VirtualCellContractError(
@@ -466,7 +494,9 @@ def write_prediction_h5ad(
     except VirtualCellContractError:
         raise
     except (OSError, TypeError, ValueError) as error:
-        raise VirtualCellContractError("prediction H5AD construction failed closed") from error
+        raise VirtualCellContractError(
+            "prediction H5AD construction failed closed"
+        ) from error
     h5ad_sha256 = _file_sha256(path)
     return PredictionH5ADBuildReceipt(
         receipt_id="prediction-h5ad.virtual-cell-2025-tier-l0",
@@ -487,6 +517,15 @@ def write_prediction_h5ad(
     )
 
 
+def write_prediction_h5ad(**_kwargs):
+    """Refuse an unversioned prospective use of the defective original compiler."""
+    raise VirtualCellContractError(
+        "SOFTWARE: select write_shared_template_shift_v2_prediction_h5ad with "
+        "original requested deltas and its versioned selection; historical absolute "
+        "means cannot be silently reinterpreted as count-specific v2 actions"
+    )
+
+
 __all__ = [
     "CELL_EVAL_LOG1P_MAXIMUM",
     "MAXIMUM_PERTURBATION_ROSTER_BYTES",
@@ -497,4 +536,5 @@ __all__ = [
     "build_prediction_roster",
     "compile_absolute_prediction_means",
     "write_prediction_h5ad",
+    "write_historical_mean_preserving_prediction_h5ad",
 ]

@@ -1,6 +1,6 @@
-"""Closed adapter compositions for additive platform successors."""
+"""Closed adapter compositions; static discovery leaves scientific owners cold."""
 
-from .acquisition_recurrence_margin_contracts import BOUNDED_ACQUISITION_CAPABILITY_KEY, GATE_MARGIN_CAPABILITY_KEY, MAXIMIN_CONTINUATION_CAPABILITY_KEY, RECURRENCE_CAPABILITY_KEY, ACQUISITION_RECURRENCE_MARGIN_CAPABILITY_KEYS, AcquisitionRecurrenceMarginContractRegistry, build_acquisition_recurrence_margin_contract_registry, acquisition_recurrence_margin_capability_manifests
+from importlib import import_module
 
 __all__ = [
     "BOUNDED_ACQUISITION_CAPABILITY_KEY",
@@ -12,3 +12,12 @@ __all__ = [
     'build_acquisition_recurrence_margin_contract_registry',
     'acquisition_recurrence_margin_capability_manifests',
 ]
+
+
+def __getattr__(name):
+    if name not in __all__:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    owner = import_module(".acquisition_recurrence_margin_contracts", __name__)
+    value = getattr(owner, name)
+    globals()[name] = value
+    return value

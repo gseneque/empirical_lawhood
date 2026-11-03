@@ -1,0 +1,330 @@
+{
+  "$defs": {
+    "MatrixFunctionalCriterion_b00d897c6b92": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-experimental-programme/functional-criterion"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "alpha_denominator": {
+              "description": "alpha denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "alpha_numerator": {
+              "description": "alpha numerator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "effort_unit": {
+              "description": "effort unit; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "family_slots": {
+              "description": "family slots; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "familywise_alpha_denominator": {
+              "description": "familywise alpha denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "familywise_alpha_numerator": {
+              "description": "familywise alpha numerator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "horizon_tick": {
+              "description": "horizon tick; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "maximum_false_admissions": {
+              "description": "maximum false admissions; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "minimum_admitted_groups": {
+              "description": "minimum admitted groups; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "minimum_usable_groups": {
+              "description": "minimum usable groups; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "missing_policy": {
+              "description": "missing policy; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "multiplicity_rule": {
+              "description": "multiplicity rule; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "normalized_error_maximum": {
+              "additionalProperties": false,
+              "description": "normalized error maximum; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "null_success_denominator": {
+              "description": "null success denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "null_success_numerator": {
+              "description": "null success numerator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "paired_view_discrepancy_maximum": {
+              "additionalProperties": false,
+              "description": "paired view discrepancy maximum; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "predictor": {
+              "description": "predictor; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "procedure": {
+              "description": "procedure; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sampling_assumptions": {
+              "description": "sampling assumptions; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "predictor",
+            "horizon_tick",
+            "normalized_error_maximum",
+            "paired_view_discrepancy_maximum",
+            "minimum_usable_groups",
+            "minimum_admitted_groups",
+            "maximum_false_admissions",
+            "null_success_numerator",
+            "null_success_denominator",
+            "alpha_numerator",
+            "alpha_denominator",
+            "family_slots",
+            "sampling_assumptions",
+            "effort_unit",
+            "familywise_alpha_numerator",
+            "familywise_alpha_denominator",
+            "multiplicity_rule",
+            "procedure",
+            "missing_policy"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "2.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MatrixLaterExperimentSpecification_94c9be592762": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-experimental-programme/specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "arm_ids": {
+              "description": "arm ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "campaign": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "campaign; constructor checks semantics and units."
+            },
+            "criterion": {
+              "$ref": "#/$defs/MatrixFunctionalCriterion_b00d897c6b92",
+              "description": "criterion; constructor checks semantics and units."
+            },
+            "evidence": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "evidence; constructor checks semantics and units."
+            },
+            "expected_groups": {
+              "description": "expected groups; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "future_noise_policy": {
+              "description": "future noise policy; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "hold_arm_id": {
+              "description": "hold arm id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "minimum_recoverable_groups": {
+              "description": "minimum recoverable groups; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "mode": {
+              "description": "mode; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "nomination": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "nomination; constructor checks semantics and units."
+            },
+            "package": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "package; constructor checks semantics and units."
+            },
+            "phase": {
+              "description": "phase; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "roster": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "roster; constructor checks semantics and units."
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "tie_policy": {
+              "description": "tie policy; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "transfer_domain_claims": {
+              "description": "transfer domain claims; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "transfer_regime_ids": {
+              "description": "transfer regime ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "specification_id",
+            "phase",
+            "roster",
+            "package",
+            "evidence",
+            "campaign",
+            "criterion",
+            "expected_groups",
+            "arm_ids",
+            "hold_arm_id",
+            "nomination",
+            "minimum_recoverable_groups",
+            "tie_policy",
+            "transfer_regime_ids",
+            "transfer_domain_claims",
+            "mode",
+            "future_noise_policy"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-later-experiment",
+  "$ref": "#/$defs/MatrixLaterExperimentSpecification_94c9be592762",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Later Experiment",
+  "x-consumer": "matrix-later-experiment",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

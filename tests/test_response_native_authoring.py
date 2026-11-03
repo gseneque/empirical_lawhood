@@ -12,9 +12,9 @@ from empirical_lawhood.api.codecs import load_registered_authoring
 
 ROOT = Path(__file__).parents[1]
 CONFIGS = {
-    "source-qualification": ROOT / "experiments/prepared-response/prepared-source-qualification-author.json",
-    "information-prediction": ROOT / "experiments/information-response/information-author.json",
-    "causal-response-prediction": ROOT / "experiments/causal-response/causal-author.json",
+    "source-qualification": ROOT / "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-source-qualification-author.json",
+    "information-prediction": ROOT / "programmes/foundations/emergent-structure/workflows/information-response/information-author.json",
+    "causal-response-prediction": ROOT / "programmes/foundations/emergent-structure/workflows/causal-response/causal-author.json",
 }
 
 
@@ -98,8 +98,8 @@ def test_synthetic_prior_compiles_target_source_qualification_candidate_without_
         config,
         repo_root=ROOT,
         source_root=held,
-        plan=ROOT / "experiments/prepared-response/guide.md",
-        design_packet=ROOT / "experiments/prepared-response/guide.md",
+        plan=ROOT / "programmes/foundations/emergent-structure/workflows/prepared-response/guide.md",
+        design_packet=ROOT / "programmes/foundations/emergent-structure/workflows/prepared-response/guide.md",
         prior_exposure=prior,
         model_bank=None,
         output_dir=tmp_path / "candidate",

@@ -38,7 +38,7 @@ class CanonicalRecordCodecRegistration(CanonicalRecord):
         validate_stable_id(self.codec_id, field_name="codec_id")
         validate_schema(self.record_schema)
         validate_semantic_version(self.record_version)
-        if self.maximum_bytes < 1:
+        if type(self.maximum_bytes) is not int or self.maximum_bytes < 1:
             raise ValueError("canonical codec byte ceiling must be positive")
         validate_stable_id(self.decoder_key, field_name="decoder_key")
         validate_semantic_version(self.decoder_version)
@@ -55,20 +55,39 @@ class CanonicalRecordCodecRegistry:
     registry_id: str
     registrations: tuple[CanonicalRecordCodecRegistration, ...]
     record_types: Mapping[str, type[CanonicalRecord]]
+    additional_registrations: tuple[CanonicalRecordCodecRegistration, ...] = ()
 
     def __post_init__(self) -> None:
         validate_stable_id(self.registry_id, field_name="registry_id")
+        for name in ("registrations", "additional_registrations"):
+            values = getattr(self, name)
+            if type(values) is not tuple or any(type(value) is not CanonicalRecordCodecRegistration for value in values):
+                raise ValueError("static codec registry requires exact canonical registration tuples")
+            for value in values:
+                value.__post_init__()
         require_sorted_unique_ids(
             self.registrations,
             attribute="record_schema",
             field_name="registrations",
         )
-        if not self.registrations or len(self.registrations) > MAX_STATIC_CODEC_REGISTRATIONS:
+        require_sorted_unique_ids(
+            self.additional_registrations,
+            attribute="codec_id",
+            field_name="additional_registrations",
+        )
+        complete = (*self.registrations, *self.additional_registrations)
+        if not self.registrations or len(complete) > MAX_STATIC_CODEC_REGISTRATIONS:
             raise ValueError("static codec registry has an invalid closed size")
+        if len({value.codec_id for value in complete}) != len(complete):
+            raise ValueError("static codec registry duplicates a canonical codec ID")
+        if len({(value.record_schema, value.decoder_key, value.decoder_version) for value in complete}) != len(complete):
+            raise ValueError("static codec registry duplicates an exact canonical decoder key/version")
         snapshot = dict(self.record_types)
         if set(snapshot) != {value.record_schema for value in self.registrations}:
             raise ValueError("static codec types differ from canonical registrations")
-        for registration in self.registrations:
+        if not {value.record_schema for value in self.additional_registrations}.issubset(snapshot):
+            raise ValueError("additional canonical codec lacks its primary record type")
+        for registration in complete:
             record_type = snapshot[registration.record_schema]
             if (
                 not isinstance(record_type, type)
@@ -79,11 +98,21 @@ class CanonicalRecordCodecRegistry:
                 raise ValueError("static codec registration differs from its record type")
         object.__setattr__(self, "record_types", types.MappingProxyType(snapshot))
 
-    def registration(self, record_schema: str) -> CanonicalRecordCodecRegistration:
+    def registration(self, record_schema: str, *, decoder_key: str | None = None,
+                     decoder_version: str | None = None) -> CanonicalRecordCodecRegistration:
         validate_schema(record_schema)
-        for value in self.registrations:
-            if value.record_schema == record_schema:
+        if (decoder_key is None) != (decoder_version is None):
+            raise ValueError("canonical codec lookup requires both decoder key and version")
+        if decoder_key is not None:
+            validate_stable_id(decoder_key, field_name="decoder_key")
+            validate_semantic_version(decoder_version)
+        selected = self.registrations if decoder_key is None else (*self.registrations, *self.additional_registrations)
+        for value in selected:
+            if value.record_schema == record_schema and (decoder_key is None or
+                    (value.decoder_key, value.decoder_version) == (decoder_key, decoder_version)):
                 return value
+        if decoder_key is not None:
+            raise KeyError(f"unregistered canonical decoder: {record_schema} {decoder_key}@{decoder_version}")
         raise KeyError(f"unregistered canonical record schema: {record_schema}")
 
     def decode(self, payload: bytes, *, expected_schema: str) -> CanonicalRecord:

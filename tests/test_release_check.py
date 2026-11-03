@@ -12,6 +12,7 @@ import subprocess
 import sys
 from types import SimpleNamespace
 import threading
+import tomllib
 
 import pytest
 
@@ -25,6 +26,7 @@ def release_runner(monkeypatch):
     identity = {"commit": "synthetic", "tree_object": "synthetic-tree",
                 "tree_inventory_sha256": "synthetic-inventory", "clean": True}
     monkeypatch.setattr(module, "source_identity", lambda root: identity)
+    monkeypatch.setattr(module, "preserve_source_archive", lambda *args: {"synthetic_archive": True})
     monkeypatch.setattr(module, "output", lambda command, **kwargs: "synthetic uv")
     return module
 
@@ -91,6 +93,61 @@ def test_nonzero_child_exit_retains_observed_exit(release_runner, monkeypatch, t
     assert manifest["status"] == "FAILED"
     assert manifest["checks"][0]["exit_code"] == 9
     assert manifest["checks"][0]["disposition"] == "FAILED"
+
+
+@pytest.mark.parametrize("profile", ["native-open", "native-brian2"])
+def test_gate_reuses_sole_checkout_and_seals_archive_before_fresh_environment(release_runner, monkeypatch, tmp_path, profile):
+    packet = tmp_path / "packet"
+    events = []
+
+    def archive(root, destination, source):
+        assert root == release_runner.ROOT and destination == packet
+        events.append("verified-archive")
+        return {"synthetic_archive": True}
+
+    def child(command, **kwargs):
+        assert events[0] == "verified-archive"
+        assert "clone" not in command and "worktree" not in command
+        assert kwargs["cwd"] in {release_runner.ROOT,
+            release_runner.ROOT / "programmes/biology/cell-responses/workflows/neuron-current-response/native-env"}
+        selected = Path(kwargs["env"]["UV_PROJECT_ENVIRONMENT"])
+        assert selected.is_relative_to(packet / "environments")
+        assert not selected.is_relative_to(release_runner.ROOT)
+        assert Path(kwargs["env"]["TMPDIR"]).is_relative_to(packet / "environments")
+        events.append(command)
+        kwargs["stdout"].write("selected-source synthetic boundary\n")
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(release_runner, "preserve_source_archive", archive)
+    monkeypatch.setattr(release_runner.subprocess, "run", child)
+    monkeypatch.setattr(release_runner.sys, "argv", ["release_check.py", "--profile", profile,
+                                                    "--output-dir", str(packet)])
+    release_runner.main()
+    manifest = read_packet(packet)
+    assert manifest["status"] == "PASSED" and manifest["source_archive"] == {"synthetic_archive": True}
+    assert manifest["checkout"] == str(release_runner.ROOT)
+    assert any(command[:2] == ["uv", "sync"] and "--locked" in command for command in events[1:])
+
+
+def test_archive_failure_retains_terminal_packet_before_any_environment_contact(release_runner, monkeypatch, tmp_path):
+    def refuse(*args):
+        raise ValueError("source archive refused")
+
+    monkeypatch.setattr(release_runner, "preserve_source_archive", refuse)
+    packet = tmp_path / "packet"
+    with pytest.raises(ValueError, match="source archive refused"):
+        invoke(release_runner, monkeypatch, packet, lambda *a, **k: pytest.fail("unsealed source contacted child"))
+    manifest = read_packet(packet)
+    assert manifest["status"] == "FAILED" and manifest["checks"] == []
+
+
+def test_source_stability_compares_selection_and_discloses_status_separately(release_runner):
+    before = {"commit": "selected", "selected_inventory": [{"sha256": "1" * 64}],
+              "checkout_disclosure": {"raw_status": "untracked plan"}}
+    after = before | {"checkout_disclosure": {"raw_status": "untracked plan and unrelated prose"}}
+    release_runner.require_stable_source(before, after)
+    with pytest.raises(RuntimeError, match="source identity changed"):
+        release_runner.require_stable_source(before, after | {"selected_inventory": [{"sha256": "2" * 64}]})
 
 
 def test_final_identity_refusal_cannot_pass(release_runner, monkeypatch, tmp_path):
@@ -162,13 +219,13 @@ def test_interrupted_snapshot_survives_inherited_writer(release_runner, monkeypa
             assert not thread.is_alive()
 
 
-def test_initial_dirty_refusal_creates_no_packet(release_runner, monkeypatch, tmp_path):
+def test_initial_selected_source_refusal_creates_no_packet(release_runner, monkeypatch, tmp_path):
     def dirty(root):
-        raise SystemExit("dirty source")
+        raise SystemExit("selected source differs")
 
     monkeypatch.setattr(release_runner, "source_identity", dirty)
     packet = tmp_path / "packet"
-    with pytest.raises(SystemExit, match="dirty source"):
+    with pytest.raises(SystemExit, match="selected source differs"):
         invoke(release_runner, monkeypatch, packet, lambda *args, **kwargs: pytest.fail("unexpected child"))
     assert not packet.exists()
 
@@ -186,6 +243,7 @@ def test_uv_prerequisite_interrupt_creates_no_unfinalized_packet(release_runner,
 
 @pytest.mark.parametrize(("script", "check_name"), (
     ("scripts/generate_integration_examples.py", "generated-integration_examples"),
+    ("scripts/generate_matrix_experiment_examples.py", "generated-matrix_experiment_examples"),
     ("scripts/check_frozen_rc_inputs.py", "frozen-rc-numerical-inputs"),
 ))
 def test_source_drift_refuses_before_portable_suite(release_runner, monkeypatch, tmp_path, script, check_name):
@@ -311,8 +369,9 @@ def test_project_environment_checks_real_origin_and_version(release_runner, monk
     assert good.returncode == 0, good.stderr
     evidence = json.loads(good.stdout)
     assert Path(evidence["package_origin"]).resolve() == root / "src/empirical_lawhood/__init__.py"
-    assert evidence["selected_version"] == "0.2.0"
-    wrong_version = environment_command.replace("selected='0.2.0'", "selected='0.1.0'")
+    selected_version = tomllib.loads((root / "pyproject.toml").read_text())["project"]["version"]
+    assert evidence["selected_version"] == selected_version
+    wrong_version = environment_command.replace(f"selected={selected_version!r}", "selected='0.0.0'")
     assert wrong_version != environment_command
     bad = real_run([sys.executable, "-c", wrong_version], cwd=root,
                    capture_output=True, text=True, timeout=30)
@@ -338,3 +397,209 @@ def test_release_destinations_refuse_aliases_before_child_effects(release_runner
     with pytest.raises(SystemExit, match="outside"):
         release_runner.main()
     assert not packet.exists() and not (tmp_path / "never-created").exists()
+
+
+def test_sdist_researcher_closure_checks_exact_guides_inputs_and_excludes_plans(release_runner, monkeypatch, tmp_path):
+    import io
+    import tarfile
+
+    checkout = tmp_path / "checkout"
+    from empirical_lawhood.infrastructure.source_policy import ROOT_WORK_PLAN_NAMES, DOCUMENT_WORK_PLAN_PATHS
+
+    names = ("README.md", "docs/development/architecture.md", "programmes/foundations/example/records/current-science.md",
+             "programmes/materials/superconductivity/workflows/recursive-materials/materials-partial.json")
+    for name in names:
+        path = checkout / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes((name + "\n").encode())
+    monkeypatch.setattr(release_runner, "output", lambda *args, **kwargs: "\n".join(names))
+
+    def export(target, *, changed=None, extra=None):
+        with tarfile.open(target, "w:gz") as archive:
+            for name in (*names, *((extra,) if extra else ())):
+                raw = b"altered" if name == changed else ((name + "\n").encode())
+                member = tarfile.TarInfo("source-0.6.0/" + name)
+                member.size = len(raw)
+                archive.addfile(member, io.BytesIO(raw))
+
+    good = tmp_path / "good.tar.gz"
+    export(good)
+    assert [row["path"] for row in release_runner.compare_sdist_researcher_inputs(checkout, good)] == sorted(names)
+    changed = tmp_path / "changed.tar.gz"
+    export(changed, changed=names[-1])
+    with pytest.raises(RuntimeError, match="researcher inputs differ"):
+        release_runner.compare_sdist_researcher_inputs(checkout, changed)
+    for ordinal, name in enumerate(("FINALISEARCH.md", "docs/plans/preserved.md",
+                                    *sorted(ROOT_WORK_PLAN_NAMES | DOCUMENT_WORK_PLAN_PATHS))):
+        leaked = tmp_path / f"leaked-{ordinal}.tar.gz"
+        export(leaked, extra=name)
+        with pytest.raises(RuntimeError, match="working plan"):
+            release_runner.compare_sdist_researcher_inputs(checkout, leaked)
+
+
+def test_historical_matrix_recovery_is_not_a_release_profile(release_runner):
+    assert "held-matrix-retained" not in release_runner.PROFILES
+    assert all("test_matrix_e3_public_retained_recovery.py" not in selector
+               for _, selection in release_runner.PROFILES.values() for selector in selection)
+    assert release_runner.PROFILES["portable"][1] == ["tests", "-m", "not native and not held"]
+
+
+@pytest.mark.parametrize("profile", ("portable", "native-open"))
+def test_release_keeps_passed_and_failed_fixture_evidence_in_its_packet(
+        release_runner, monkeypatch, tmp_path, profile):
+    """Actual isolated pytest bodies survive both outcomes; no native source is contacted."""
+    packet = tmp_path / "packet"
+    fixture_file = tmp_path / "retention_control.py"
+    fixture_file.write_text(
+        "def test_passing_contact(tmp_path):\n"
+        "    (tmp_path / 'contact.json').write_text('passed-evidence')\n\n"
+        "def test_failed_contact(tmp_path):\n"
+        "    (tmp_path / 'contact.json').write_text('failed-evidence')\n"
+        "    assert False, 'deliberately retained control failure'\n",
+        encoding="utf-8")
+    actual_run = subprocess.run
+    selections = []
+
+    def child(command, **kwargs):
+        if "pytest" not in command:
+            kwargs["stdout"].write("synthetic non-test release boundary\n")
+            return SimpleNamespace(returncode=0)
+        selections.append(tuple(command))
+        # Preserve the actual runner's selected pytest storage/retention options.
+        # Replace only its scientific suite with two disclosed byte-only controls.
+        options = []
+        for index, item in enumerate(command):
+            if item in ("--basetemp", "-o"):
+                options.extend((item, command[index + 1]))
+        environment = dict(kwargs["env"], PYTEST_DISABLE_PLUGIN_AUTOLOAD="1")
+        environment.pop("PYTEST_ADDOPTS", None)
+        environment.pop("PYTEST_PLUGINS", None)
+        return actual_run(
+            [sys.executable, "-B", "-m", "pytest", "-q", "--noconftest",
+             "-p", "no:cacheprovider", *options, str(fixture_file)],
+            cwd=packet, env=environment, stdout=kwargs["stdout"],
+            stderr=subprocess.STDOUT, text=True)
+
+    monkeypatch.setattr(release_runner.subprocess, "run", child)
+    monkeypatch.setattr(release_runner.sys, "argv",
+        ["release_check.py", "--profile", profile, "--output-dir", str(packet)])
+    with pytest.raises(RuntimeError, match="tests failed"):
+        release_runner.main()
+    assert len(selections) == 1
+    retained = {path.read_text() for path in (packet / "test-artifacts").rglob("contact.json")}
+    assert retained == {"passed-evidence", "failed-evidence"}
+    manifest = read_packet(packet)
+    assert manifest["status"] == "FAILED"
+    assert manifest["test_environment_policy"] == {
+        "basetemp": str(packet / "test-artifacts"),
+        "tmp_path_retention_policy": "all", "tmp_path_retention_count": 1}
+    assert next(row for row in manifest["checks"] if row["name"] == "tests")["exit_code"] == 1
+
+
+def test_portable_partitions_and_module_shards_preserve_the_complete_census():
+    from scripts import test_profiles as profiles
+
+    ci = sorted(profiles.CI_FILES)[0]
+    scale = sorted(profiles.SCALE_FILES)[0]
+    nodeids = [f"{ci}::test_contract", f"{scale}::test_scale[a]", f"{scale}::test_scale[b]",
+               "tests/test_new_workflow.py::test_case[a]", "tests/test_new_workflow.py::test_case[b]",
+               "tests/test_other_workflow.py::test_case"]
+    partitions = [profiles.selection_record(nodeids, name) for name in profiles.PARTITION_PROFILES]
+    selections = [set(record["selected_nodeids"]) for record in partitions]
+    assert set.union(*selections) == set(nodeids)
+    assert sum(map(len, selections)) == len(nodeids)
+    assert profiles.profile_for("tests/test_new_module.py::test_future") == "integration"
+    for name in ("integration", "scale"):
+        records = [profiles.selection_record(nodeids, name, index, 4) for index in range(4)]
+        sharded = [node for record in records for node in record["selected_nodeids"]]
+        assert set(sharded) == {node for node in nodeids if profiles.profile_for(node) == name}
+        assert len(sharded) == len(set(sharded))
+        for module in {node.split("::")[0] for node in sharded}:
+            assert sum(any(node.startswith(module + "::") for node in record["selected_nodeids"])
+                       for record in records) == 1
+        assert profiles.selection_record(list(reversed(nodeids)), name, 1, 4) == records[1]
+
+
+def test_test_profile_refuses_invalid_shards_and_missing_or_overlapping_declarations(monkeypatch, tmp_path):
+    from scripts import test_profiles as profiles
+
+    for name, index, count in (("ci", 1, 2), ("portable", 0, 2), ("integration", -1, 2),
+                               ("scale", 2, 2), ("scale", 0, 0), ("integration", False, 1)):
+        with pytest.raises(ValueError, match="shard"):
+            profiles.validate_shard(name, index, count)
+    with pytest.raises(ValueError, match="unknown"):
+        profiles.selection_record([], "typo")
+    with pytest.raises(ValueError, match="duplicate"):
+        profiles.selection_record(["test.py::test_a"] * 2, "ci")
+    monkeypatch.setattr(profiles, "CI_FILES", frozenset({"tests/test_missing.py"}))
+    monkeypatch.setattr(profiles, "SCALE_FILES", frozenset())
+    with pytest.raises(ValueError, match="missing modules"):
+        profiles.validate_declarations(tmp_path)
+    monkeypatch.setattr(profiles, "SCALE_FILES", profiles.CI_FILES)
+    with pytest.raises(ValueError, match="overlap"):
+        profiles.validate_declarations(tmp_path)
+
+
+def test_portable_partition_hook_excludes_native_and_held_after_marker_selection(tmp_path):
+    """Actual collection verifies plugin ordering without executing any fixture."""
+    from scripts import test_profiles as profiles
+
+    root = tmp_path / "partition-fixture"
+    root.mkdir()
+    (root / "tests").mkdir()
+    module = root / "tests/test_bounded.py"
+    module.write_text("import pytest\n"
+                      "def test_bounded(): raise AssertionError('collection only')\n"
+                      "@pytest.mark.native\ndef test_native(): pass\n"
+                      "@pytest.mark.held\ndef test_held(): pass\n")
+    (root / "conftest.py").write_text(
+        "import profile_fixture\n"
+        "profile_fixture.CI_FILES = frozenset({'tests/test_bounded.py'})\n"
+        "profile_fixture.SCALE_FILES = frozenset()\n")
+    (root / "profile_fixture.py").write_bytes(Path(profiles.__file__).read_bytes())
+    census = root / "selection.json"
+    command = [sys.executable, "-B", "-m", "pytest", "--collect-only", "-q", "-p", "profile_fixture",
+               "tests", "-m", "not native and not held", "--test-profile", "ci",
+               "--test-selection-output", str(census), "-p", "no:cacheprovider"]
+    result = subprocess.run(command, cwd=root, capture_output=True, text=True,
+                            env=dict(os.environ, PYTEST_DISABLE_PLUGIN_AUTOLOAD="1", PYTEST_ADDOPTS=""))
+    assert result.returncode == 0, result.stdout + result.stderr
+    record = json.loads(census.read_text())
+    assert record["selected_nodeids"] == ["tests/test_bounded.py::test_bounded"]
+    assert record["eligible_collected_cases"] == 1
+    # A filtered invocation cannot masquerade as the complete partition census.
+    result = subprocess.run([*command, "-k", "bounded"], cwd=root, capture_output=True, text=True,
+                            env=dict(os.environ, PYTEST_DISABLE_PLUGIN_AUTOLOAD="1", PYTEST_ADDOPTS=""))
+    assert result.returncode != 0 and "without -k" in result.stderr
+
+
+@pytest.mark.parametrize("profile", ("ci", "integration", "scale"))
+def test_partitioned_release_retains_failed_selection_and_does_not_run_coverage(
+        release_runner, monkeypatch, tmp_path, profile):
+    packet = tmp_path / "packet"
+    commands = []
+
+    def child(command, **kwargs):
+        commands.append(command)
+        kwargs["stdout"].write("synthetic profile control\n")
+        if "--test-selection-output" in command:
+            census = Path(command[command.index("--test-selection-output") + 1])
+            census.write_text('{"selected_cases": 1}\n')
+            return SimpleNamespace(returncode=1)
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(release_runner.subprocess, "run", child)
+    index, count = (0, 1) if profile == "ci" else (2, 4)
+    monkeypatch.setattr(release_runner.sys, "argv", ["release_check.py", "--profile", profile,
+        "--shard-index", str(index), "--shard-count", str(count), "--output-dir", str(packet)])
+    with pytest.raises(RuntimeError, match="tests failed"):
+        release_runner.main()
+    manifest = read_packet(packet)
+    assert manifest["test_shard"] == {"index": index, "count": count}
+    assert manifest["test_selection"]["sha256"] == hashlib.sha256((packet / "test-selection.json").read_bytes()).hexdigest()
+    assert not any("coverage" in command or command[:2] == ["uv", "build"] for command in commands)
+    if profile == "ci":
+        assert "no complete portable coverage claim" in manifest["software_scope"]
+        assert any("scripts/check_documentation.py" in command for command in commands)
+    else:
+        assert "no distribution build or complete coverage claim" in manifest["software_scope"]

@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 @pytest.fixture(scope="module")
 def local_boundary(tmp_path_factory):
     temporary = tmp_path_factory.mktemp("worked-rc-copy")
-    guide = (ROOT / "docs/extending-the-engine.md").read_text()
+    guide = (ROOT / "docs/development/extending-the-engine.md").read_text()
     region = guide.split("<!-- BEGIN WORKED RC PYTHON -->", 1)[1].split(
         "<!-- END WORKED RC PYTHON -->", 1
     )[0]

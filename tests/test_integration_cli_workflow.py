@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Public input journeys preserve immutable evidence and editable allocation joins."""
 
+from tests.prospective_source_capture_fixture import install_historical_source_capture
 import json
 from pathlib import Path
 
@@ -42,7 +43,7 @@ def test_meaningful_allocation_edit_prepares_actual_current_source_without_nativ
     def forbidden(*args, **kwargs):
         raise AssertionError('configuration contacted native acquisition')
     monkeypatch.setattr('empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source.acquire_current_preparation_root', forbidden)
-    document = json.loads((ROOT / 'experiments/matrix-inputs/allocation.json').read_bytes())
+    document = json.loads((ROOT / 'programmes/foundations/emergent-structure/workflows/matrix-inputs/allocation.json').read_bytes())
     seeds = document['value']['roots'][0]['value']['scientific_seeds']
     seeds[0]['value']['seed'] += 1
     edited = tmp_path / 'allocation.editable.json'
@@ -53,7 +54,7 @@ def test_meaningful_allocation_edit_prepares_actual_current_source_without_nativ
     invoke('config', 'prepare', '--config', str(edited), '--consumer', 'matrix-allocation', '--output-file', str(canonical), '--format', 'json')
     source = tmp_path / 'source.json'
     attempt = tmp_path / 'attempt'
-    prepared = invoke('campaign', 'matrix-source-config', '--config-id', 'study.edited-source', '--allocation', str(canonical), '--output', str(source), '--attempt-dir', str(attempt))
+    prepared = invoke('--project-root', str(ROOT), 'campaign', 'matrix-source-config', '--config-id', 'study.edited-source', '--allocation', str(canonical), '--output', str(source), '--attempt-dir', str(attempt))
     assert prepared['native_contact'] == 'none'
     from empirical_lawhood.api.configuration import load_configuration_record
     allocation = load_configuration_record(canonical, consumer='matrix-allocation')
@@ -72,7 +73,7 @@ def test_current_finite_allocation_is_a_numeric_proposal_and_missing_storage_ref
     ready = invoke('config', 'validate', '--config', str(allocation), '--consumer', 'finite-current-allocation', '--format', 'json')
     assert ready['canonical_byte_ready'] is True
     output = tmp_path / 'native'
-    refused = RUNNER.invoke(app, ['campaign', 'matrix-source-export', '--config', str(ROOT / 'experiments/matrix-inputs/matrix-source.json'), '--allocation', str(ROOT / 'experiments/matrix-inputs/allocation.json'), '--output-dir', str(output)])
+    refused = RUNNER.invoke(app, ['campaign', 'matrix-source-export', '--config', str(ROOT / 'programmes/foundations/emergent-structure/workflows/matrix-inputs/matrix-source-current.json'), '--allocation', str(ROOT / 'programmes/foundations/emergent-structure/workflows/matrix-inputs/allocation.json'), '--output-dir', str(output)])
     assert refused.exit_code == 2 and '--operator-profile' in refused.stderr
     assert not output.exists()
 
@@ -104,7 +105,7 @@ def test_rc_source_output_refused_before_custody_or_publication(tmp_path, monkey
 
     monkeypatch.setattr('empirical_lawhood.cli.integrations._storage', forbidden)
     monkeypatch.setattr('empirical_lawhood.api.rc_challenge_inputs.publish_rc_source_export', forbidden)
-    refused = RUNNER.invoke(app, ['campaign', 'rc-challenge-source-export', '--config', str(ROOT / 'experiments/rc-challenges/source-export.json'), '--output', str(output)])
+    refused = RUNNER.invoke(app, ['campaign', 'rc-challenge-source-export', '--config', str(ROOT / 'programmes/foundations/measurement-and-response/workflows/rc-challenges/source-export.json'), '--output', str(output)])
     assert refused.exit_code == 2, refused.output
     assert not refused.stdout
     assert 'output' in refused.stderr.lower() or 'traverse' in refused.stderr.lower()
@@ -135,8 +136,9 @@ def _rc_cli_plane(tmp_path, monkeypatch):
 
     store = tmp_path / 'synthetic-rc-cli-store'
     store.mkdir()
+    mount = next(parent for parent in (store, *store.parents) if parent.is_mount())
     plane = ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
-        'synthetic.rc-cli-store', 'exposed RC CLI software fixture', str(store), '/',
+        'synthetic.rc-cli-store', 'exposed RC CLI software fixture', str(store), str(mount),
         OperatorStorageProfile.SCHEMA, 1, None, None, (),
     )))
     monkeypatch.setattr('empirical_lawhood.cli.integrations._storage', lambda: (ROOT, None, plane))
@@ -150,14 +152,14 @@ def test_rc_canary_cli_authors_new_directory_and_loads_public_handoff(tmp_path, 
     plane, store = _rc_cli_plane(tmp_path, monkeypatch)
     closure = ImplementationSourceClosure('synthetic.rc-cli-source', SourceClosureKind.CLEAN_GIT_COMMIT,
         '0' * 40, 'd' * 64, 'e' * 64, True)
-    monkeypatch.setattr(rc_challenge_authoring, 'capture_clean_target_closure', lambda *args: closure)
+    install_historical_source_capture(monkeypatch, rc_challenge_authoring, closure)
     monkeypatch.setattr(rc_challenge_authoring, 'resolve_authoring_directory',
         lambda directory, **kwargs: (directory, plane.root.contract))
     monkeypatch.setattr(integration_handoffs, 'resolve_authoring_directory',
         lambda directory, **kwargs: (directory, plane.root.contract))
     destination = store / 'canary'
     report = invoke('campaign', 'rc-challenge-author', '--config',
-        str(ROOT / 'experiments/rc-challenges/canary.json'), '--output-dir', str(destination))
+        str(ROOT / 'programmes/foundations/measurement-and-response/workflows/rc-challenges/canary.json'), '--output-dir', str(destination))
     assert report['scientific_execution_performed'] is False
     handoff = integration_handoffs.load_integration_handoff(directory=destination, root=ROOT,
         storage_profile=None, artifact_writer=plane)
@@ -181,7 +183,7 @@ def test_rc_cli_author_refuses_output_before_protected_prerequisite_contact(tmp_
     monkeypatch.setattr('empirical_lawhood.api.rc_challenge_inputs.read_rc_challenge_numeric_input', forbidden)
     monkeypatch.setattr('empirical_lawhood.api.rc_challenge_results.read_rc_challenge_result', forbidden)
     refused = RUNNER.invoke(app, ['campaign', 'rc-challenge-author', '--config',
-        str(ROOT / 'experiments/rc-challenges/canary.json'), '--output-dir', str(destination),
+        str(ROOT / 'programmes/foundations/measurement-and-response/workflows/rc-challenges/canary.json'), '--output-dir', str(destination),
         '--numeric-input', str(tmp_path / 'not-contacted.json')])
     assert refused.exit_code == 2, refused.output
     assert not refused.stdout
@@ -201,7 +203,7 @@ def test_preparation_directory_refuses_file_ancestor_before_input_or_native_cont
     monkeypatch.setattr('empirical_lawhood.cli.integrations._configuration', forbidden)
     monkeypatch.setattr('empirical_lawhood.api.preparation_conformance.preparation_native_conformance', forbidden)
     monkeypatch.setattr('empirical_lawhood.api.preparation_screens.ordinary_preparation_operands_export', forbidden)
-    source = str(ROOT / 'experiments/preparation-applicability/conformance-allocation.json')
+    source = str(ROOT / 'programmes/foundations/emergent-structure/workflows/preparation-applicability/conformance-allocation.json')
     options = ['--allocation', source, '--conformance-id', 'synthetic.refused-conformance'] if command == 'preparation-conformance' else [
         '--stage', source, '--original-f', source, '--panel', source,
     ]

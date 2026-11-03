@@ -6,6 +6,7 @@ this scientific assay. None of these records grants qualification or authority.
 
 from dataclasses import dataclass, field, fields
 from decimal import Decimal
+from hashlib import sha256
 from typing import ClassVar
 
 from empirical_lawhood.kernel.matrix_inputs import MatrixArrayMember, MAXIMUM_MATRIX_ARRAY_BYTES
@@ -28,6 +29,25 @@ HISTORY_FAMILIES = (
 EXPOSED = "EXPOSED_DEVELOPMENT_NONPROMOTABLE"
 PUBLIC_HISTORY_MASTER_SEED = 706256
 HISTORY_TRANSPORT_SCHEMA = "empirical-lawhood/source/checksummed-uninterpreted-public-bytes"
+
+
+def matrix_history_numeric_roots(namespace, master_seed):
+    """Owned numeric inputs; namespaces change identities, never draws."""
+    if type(master_seed) is not int or not 0 <= master_seed < 2**256:
+        raise ValueError("History master input must be an explicit unsigned256-bit integer")
+    validate_stable_id(namespace)
+    return tuple(MatrixHistoryRootAllocation(f"{namespace}.h{index:03d}", index,
+        tuple(MatrixHistorySeed(purpose, sha256(b"empirical-lawhood/history/numeric/v1\0" + master_seed.to_bytes(32, "big") + index.to_bytes(2, "big") + bytes([ordinal])).hexdigest()) for ordinal, purpose in enumerate(HISTORY_PURPOSES)))
+        for index in range(256))
+
+
+def matrix_known_exposed_effective_seeds(prior_effective_seeds=()):
+    """Original/public streams remain excluded even under an omitted prior list."""
+    from empirical_lawhood.adapters.simulators.six_matrix_response.observation_order_scientific_inputs import observation_order_scientific_stream_inputs
+    known = {int(s.scientific_seed_sha256[:32], 16) for qualification in (False, True) for s in observation_order_scientific_stream_inputs(qualification=qualification)}
+    known.update(s.effective_seed for r in matrix_history_numeric_roots("public.history", PUBLIC_HISTORY_MASTER_SEED) for s in r.seeds)
+    known.update(prior_effective_seeds)
+    return frozenset(known)
 
 
 @dataclass(frozen=True, slots=True)

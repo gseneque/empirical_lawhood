@@ -5,7 +5,7 @@ The target is #{sigma_i(A) > tau}, where
 tau = max(A.shape) * 2**-160 * max(1, ||A||_2).
 All error propagation and comparisons stay in Arb. Exact rational rank can
 only reduce the upper bound; it never promotes a subthreshold direction.
-See docs/scientific-integrity.md for the enclosure argument and limitations.
+See docs/reference/scientific-integrity.md for the enclosure argument and limitations.
 """
 
 from dataclasses import dataclass

@@ -13,7 +13,7 @@ from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.mater
 from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_raw import encode_raw_archive_hdf5
 from empirical_lawhood.api.codecs import load_registered_authoring
 
-STARTER = Path("experiments/material-control-inputs/control-inputs.json")
+STARTER = Path("programmes/materials/superconductivity/workflows/material-control-inputs/control-inputs.json")
 
 
 def test_material_control_builder_selects_solver_views_before_explicit_source_refusal(monkeypatch) -> None:

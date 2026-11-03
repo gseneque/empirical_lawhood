@@ -1,6 +1,182 @@
 {
   "consumers": [
     {
+      "authoring_maximum_bytes": 262144,
+      "command": "--operational-config",
+      "consumer": "operational-configuration",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 65536,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "OperationalConfiguration",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/runtime/operational-configuration",
+      "schema_resource": "operational-configuration.schema.json",
+      "supplied_inputs": [
+        "configs/operational.example.yaml"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign recursive-author",
+      "consumer": "rubisco-kinetic-supply",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "retained",
+      "owner": "JointKineticSupply",
+      "preparation_allowed": false,
+      "schema_id": "empirical-lawhood/rubisco/kinetic-supply/joint-supply",
+      "schema_resource": "rubisco-kinetic-supply.schema.json",
+      "supplied_inputs": [
+        "programmes/biology/photosynthesis/workflows/rubisco-kinetic-join/supply.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign recursive-author",
+      "consumer": "rubisco-kinetic-query",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "retained",
+      "owner": "AssayQuery",
+      "preparation_allowed": false,
+      "schema_id": "empirical-lawhood/simulators/rubisco-assay/query",
+      "schema_resource": "rubisco-kinetic-query.schema.json",
+      "supplied_inputs": [
+        "programmes/biology/photosynthesis/workflows/rubisco-kinetic-join/query.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign recursive-author",
+      "consumer": "rubisco-kinetic-comparison",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "retained",
+      "owner": "KineticTargetComparison",
+      "preparation_allowed": false,
+      "schema_id": "empirical-lawhood/rubisco/kinetic-supply/target-comparison",
+      "schema_resource": "rubisco-kinetic-comparison.schema.json",
+      "supplied_inputs": [
+        "programmes/biology/photosynthesis/workflows/rubisco-kinetic-join/comparison.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign recursive-author",
+      "consumer": "rubisco-kinetic-assumptions",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "retained",
+      "owner": "DisclosedAssumption",
+      "preparation_allowed": false,
+      "schema_id": "empirical-lawhood/examples/disclosed-rubisco-kinetic-assumption",
+      "schema_resource": "rubisco-kinetic-assumptions.schema.json",
+      "supplied_inputs": [
+        "programmes/biology/photosynthesis/workflows/rubisco-kinetic-join/assumptions.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign recursive-inquiry-decide",
+      "consumer": "recursive-inquiry-decision",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "InquiryDecisionRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/runtime/inquiry-decision-request",
+      "schema_resource": "recursive-inquiry-decision.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign recursive-inquiry-decide",
+      "consumer": "recursive-inquiry-decision-v2",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "RobustInquiryDecisionRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/runtime/inquiry-decision-request",
+      "schema_resource": "recursive-inquiry-decision-v2.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign recursive-inquiry-decide",
+      "consumer": "recursive-inquiry-decision-v3",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "WorkBoundInquiryDecisionRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/runtime/inquiry-decision-request",
+      "schema_resource": "recursive-inquiry-decision-v3.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 67108864,
+      "command": "campaign recursive-author",
+      "consumer": "recursive-prospective",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 16777216,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "RecursiveProspectiveAuthoringSpec",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/runtime/recursive-prospective-authoring-spec",
+      "schema_resource": "recursive-prospective.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign recursive-author",
+      "consumer": "recursive-inquiry",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "RecursiveStudyDraft",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/planning/recursive-study-draft",
+      "schema_resource": "recursive-inquiry.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/measurement-and-response/workflows/recursive-rc/rc-original.json",
+        "programmes/foundations/measurement-and-response/workflows/recursive-rc/rc-menu-v2.json",
+        "programmes/foundations/measurement-and-response/workflows/recursive-rc/rc-budget-v3.json",
+        "programmes/energy/battery-charging/workflows/recursive-battery/battery-wave-a.json",
+        "programmes/materials/superconductivity/workflows/recursive-materials/materials-partial.json",
+        "programmes/biology/photosynthesis/workflows/rubisco-kinetic-join/draft.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 262144,
+      "command": "campaign rc-chain-run",
+      "consumer": "rc-prerequisite-chain",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 65536,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "RCPrerequisiteChainConfig",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/methods/rc-prerequisite-chain/config",
+      "schema_resource": "rc-prerequisite-chain.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/measurement-and-response/workflows/rc-prerequisite-chain/input.json",
+        "programmes/foundations/measurement-and-response/workflows/recursive-rc/rc-original-scientific.json",
+        "programmes/foundations/measurement-and-response/workflows/recursive-rc/rc-menu-v2-scientific.json",
+        "programmes/foundations/measurement-and-response/workflows/recursive-rc/rc-budget-v3-scientific.json"
+      ]
+    },
+    {
       "authoring_maximum_bytes": 16777216,
       "command": "campaign preparation-diagnostic-phase-prepare",
       "consumer": "preparation-diagnostic-phase",
@@ -41,7 +217,7 @@
       "schema_id": "empirical-lawhood/matrix-geometry/scan-input",
       "schema_resource": "matrix-geometry.schema.json",
       "supplied_inputs": [
-        "experiments/matrix-geometry/input.json"
+        "programmes/foundations/emergent-structure/workflows/matrix-geometry/input-current.json"
       ]
     },
     {
@@ -57,7 +233,7 @@
       "schema_id": "empirical-lawhood/selected-events/parent-request",
       "schema_resource": "selected-parent.schema.json",
       "supplied_inputs": [
-        "experiments/selected-events/parent.json"
+        "programmes/foundations/emergent-structure/workflows/selected-events/parent-current.json"
       ]
     },
     {
@@ -87,7 +263,7 @@
       "schema_id": "empirical-lawhood/matrix-history-analysis/allocation",
       "schema_resource": "matrix-history-allocation.schema.json",
       "supplied_inputs": [
-        "experiments/matrix-history-analysis/allocation.json"
+        "programmes/foundations/emergent-structure/workflows/matrix-history-analysis/allocation.json"
       ]
     },
     {
@@ -103,7 +279,7 @@
       "schema_id": "empirical-lawhood/matrix-history-analysis/source-config",
       "schema_resource": "matrix-history-source.schema.json",
       "supplied_inputs": [
-        "experiments/matrix-history-analysis/source.json"
+        "programmes/foundations/emergent-structure/workflows/matrix-history-analysis/source-current.json"
       ]
     },
     {
@@ -119,8 +295,8 @@
       "schema_id": "empirical-lawhood/matrix-history-analysis/analysis-config",
       "schema_resource": "matrix-history-analysis.schema.json",
       "supplied_inputs": [
-        "experiments/matrix-history-analysis/algebra.json",
-        "experiments/matrix-history-analysis/passive.json"
+        "programmes/foundations/emergent-structure/workflows/matrix-history-analysis/algebra-current.json",
+        "programmes/foundations/emergent-structure/workflows/matrix-history-analysis/passive-current.json"
       ]
     },
     {
@@ -136,7 +312,7 @@
       "schema_id": "empirical-lawhood/methods/matrix-preparation-analysis/transient-analysis-config",
       "schema_resource": "matrix-transient-analysis.schema.json",
       "supplied_inputs": [
-        "experiments/matrix-transient/input.json"
+        "programmes/foundations/emergent-structure/workflows/matrix-transient/input.json"
       ]
     },
     {
@@ -152,7 +328,7 @@
       "schema_id": "empirical-lawhood/methods/matrix-preparation-analysis/baseline-support-config",
       "schema_resource": "matrix-baseline-analysis.schema.json",
       "supplied_inputs": [
-        "experiments/matrix-transient/baseline.json"
+        "programmes/foundations/emergent-structure/workflows/matrix-transient/baseline.json"
       ]
     },
     {
@@ -168,7 +344,7 @@
       "schema_id": "empirical-lawhood/methods/matrix-preparation-analysis/tangent-preparation-config",
       "schema_resource": "matrix-tangent.schema.json",
       "supplied_inputs": [
-        "experiments/matrix-tangent/input.json"
+        "programmes/foundations/emergent-structure/workflows/matrix-tangent/input-current.json"
       ]
     },
     {
@@ -338,7 +514,7 @@
       "schema_id": "empirical-lawhood/methods/finite-response-law/current-preparation-source-config",
       "schema_resource": "preparation-source.schema.json",
       "supplied_inputs": [
-        "experiments/matrix-inputs/preparation-source.json"
+        "programmes/foundations/emergent-structure/workflows/matrix-inputs/preparation-source-current.json"
       ]
     },
     {
@@ -354,7 +530,7 @@
       "schema_id": "empirical-lawhood/methods/finite-response-law/matrix-preparation-source-config",
       "schema_resource": "matrix-source.schema.json",
       "supplied_inputs": [
-        "experiments/matrix-inputs/matrix-source.json"
+        "programmes/foundations/emergent-structure/workflows/matrix-inputs/matrix-source-current.json"
       ]
     },
     {
@@ -370,7 +546,7 @@
       "schema_id": "empirical-lawhood/simulator-morphism-challenges/source-export-config",
       "schema_resource": "rc-challenge-source.schema.json",
       "supplied_inputs": [
-        "experiments/rc-challenges/source-export.json"
+        "programmes/foundations/measurement-and-response/workflows/rc-challenges/source-export.json"
       ]
     },
     {
@@ -386,10 +562,10 @@
       "schema_id": "empirical-lawhood/simulator-morphism-challenges/simulator-morphism-challenge-config",
       "schema_resource": "rc-challenge-phase.schema.json",
       "supplied_inputs": [
-        "experiments/rc-challenges/canary.json",
-        "experiments/rc-challenges/nomination.json",
-        "experiments/rc-challenges/development.json",
-        "experiments/rc-challenges/evaluation.json"
+        "programmes/foundations/measurement-and-response/workflows/rc-challenges/canary.json",
+        "programmes/foundations/measurement-and-response/workflows/rc-challenges/nomination.json",
+        "programmes/foundations/measurement-and-response/workflows/rc-challenges/development.json",
+        "programmes/foundations/measurement-and-response/workflows/rc-challenges/evaluation.json"
       ]
     },
     {
@@ -405,7 +581,7 @@
       "schema_id": "empirical-lawhood/composition/finite-response-law/rerun-input",
       "schema_resource": "finite-rerun.schema.json",
       "supplied_inputs": [
-        "experiments/finite-response-law/rerun-calibration.json"
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/rerun-calibration.json"
       ]
     },
     {
@@ -421,8 +597,8 @@
       "schema_id": "empirical-lawhood/composition/finite-response-law/current-allocation",
       "schema_resource": "finite-current-allocation.schema.json",
       "supplied_inputs": [
-        "experiments/finite-response-law/current-calibration-allocation.json",
-        "experiments/finite-response-law/current-evaluation-allocation.json"
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/current-calibration-allocation.json",
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/current-evaluation-allocation.json"
       ]
     },
     {
@@ -438,7 +614,7 @@
       "schema_id": "empirical-lawhood/composition/finite-response-law/current-exposure",
       "schema_resource": "finite-current-exposure.schema.json",
       "supplied_inputs": [
-        "experiments/finite-response-law/current-exposure.json"
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/current-exposure.json"
       ]
     },
     {
@@ -566,7 +742,7 @@
       "schema_id": "empirical-lawhood/methods/rc-information/config",
       "schema_resource": "rc-information.schema.json",
       "supplied_inputs": [
-        "experiments/rc-information/input.json"
+        "programmes/foundations/measurement-and-response/workflows/rc-information/input.json"
       ]
     },
     {
@@ -582,8 +758,8 @@
       "schema_id": "empirical-lawhood/kernel/matrix-allocation",
       "schema_resource": "matrix-allocation.schema.json",
       "supplied_inputs": [
-        "experiments/matrix-inputs/allocation.json",
-        "experiments/preparation-applicability/conformance-allocation.json"
+        "programmes/foundations/emergent-structure/workflows/matrix-inputs/allocation.json",
+        "programmes/foundations/emergent-structure/workflows/preparation-applicability/conformance-allocation.json"
       ]
     },
     {
@@ -599,7 +775,7 @@
       "schema_id": "empirical-lawhood/adapters/simulators/rc-ladder-response/resistor-capacitor-ladder-model-config",
       "schema_resource": "rc-ladder-model.schema.json",
       "supplied_inputs": [
-        "experiments/rc-ladder-response/model.json"
+        "programmes/foundations/measurement-and-response/workflows/rc-ladder-response/model.json"
       ]
     },
     {
@@ -615,7 +791,7 @@
       "schema_id": "empirical-lawhood/composition/finite-response-law/finite-response-law-calibration-input",
       "schema_resource": "finite-calibration-input.schema.json",
       "supplied_inputs": [
-        "experiments/finite-response-law/finite-calibration-input.json"
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/finite-calibration-input.json"
       ]
     },
     {
@@ -631,13 +807,13 @@
       "schema_id": "empirical-lawhood/composition/finite-response-law/finite-response-law-stage-input",
       "schema_resource": "finite-stage-input.schema.json",
       "supplied_inputs": [
-        "experiments/finite-response-law/calibration-input.json",
-        "experiments/finite-response-law/calibration-stage-input.json",
-        "experiments/finite-response-law/informative-composition-input.json",
-        "experiments/finite-response-law/preparation-screen-input.json",
-        "experiments/finite-response-law/prospective-continuation-input.json",
-        "experiments/finite-response-law/prospective-evaluation-input.json",
-        "experiments/finite-response-law/supplemental-development-input.json"
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/calibration-input.json",
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/calibration-stage-input.json",
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/informative-composition-input.json",
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/preparation-screen-input.json",
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/prospective-continuation-input.json",
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/prospective-evaluation-input.json",
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/supplemental-development-input.json"
       ]
     },
     {
@@ -653,7 +829,7 @@
       "schema_id": "empirical-lawhood/composition/prepared-response/prepared-exposure-inspection",
       "schema_resource": "prepared-prior-census.schema.json",
       "supplied_inputs": [
-        "experiments/reactor-response/exposed-inputs/prepared-response-prior-exposure.json"
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/exposed-inputs/prepared-response-prior-exposure.json"
       ]
     },
     {
@@ -669,8 +845,8 @@
       "schema_id": "empirical-lawhood/composition/prepared-response/prepared-response-dependent-input",
       "schema_resource": "prepared-dependent-input.schema.json",
       "supplied_inputs": [
-        "experiments/prepared-response/prepared-dependent-refinement-input.json",
-        "experiments/prepared-response/prepared-fresh-response-calibration-input.json"
+        "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-dependent-refinement-input.json",
+        "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-fresh-response-calibration-input.json"
       ]
     },
     {
@@ -686,9 +862,9 @@
       "schema_id": "empirical-lawhood/composition/prepared-response/prepared-response-native-authoring-input",
       "schema_resource": "matrix-response-authoring.schema.json",
       "supplied_inputs": [
-        "experiments/causal-response/causal-author.json",
-        "experiments/information-response/information-author.json",
-        "experiments/prepared-response/prepared-source-qualification-author.json"
+        "programmes/foundations/emergent-structure/workflows/causal-response/causal-author.json",
+        "programmes/foundations/emergent-structure/workflows/information-response/information-author.json",
+        "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-source-qualification-author.json"
       ]
     },
     {
@@ -704,7 +880,7 @@
       "schema_id": "empirical-lawhood/composition/reactor-prefix-response/assigned-reactor-authoring-profile",
       "schema_resource": "reactor-assigned-profile.schema.json",
       "supplied_inputs": [
-        "experiments/reactor-response/exposed-inputs/reactor-assigned-exposed.json"
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/exposed-inputs/reactor-assigned-exposed.json"
       ]
     },
     {
@@ -720,7 +896,7 @@
       "schema_id": "empirical-lawhood/composition/reactor-prefix-response/fresh-reactor-authoring-profile",
       "schema_resource": "reactor-fresh-profile.schema.json",
       "supplied_inputs": [
-        "experiments/reactor-response/profile.json"
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/profile.json"
       ]
     },
     {
@@ -736,7 +912,7 @@
       "schema_id": "empirical-lawhood/composition/response-composition/response-composition-input",
       "schema_resource": "response-composition-input.schema.json",
       "supplied_inputs": [
-        "experiments/causal-transfer-audit/analysis-input.json"
+        "programmes/foundations/emergent-structure/workflows/causal-transfer-audit/analysis-input.json"
       ]
     },
     {
@@ -752,7 +928,7 @@
       "schema_id": "empirical-lawhood/examples/exposed-inventory",
       "schema_resource": "exposed-inventory.schema.json",
       "supplied_inputs": [
-        "experiments/reactor-response/exposed-inputs/exposed-inventory.json"
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/exposed-inputs/exposed-inventory.json"
       ]
     },
     {
@@ -768,7 +944,7 @@
       "schema_id": "empirical-lawhood/methods/finite-response-law/native-exposure-metadata",
       "schema_resource": "finite-prior-census.schema.json",
       "supplied_inputs": [
-        "experiments/reactor-response/exposed-inputs/finite-response-prior-exposure.json"
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/exposed-inputs/finite-response-prior-exposure.json"
       ]
     },
     {
@@ -784,7 +960,7 @@
       "schema_id": "empirical-lawhood/methods/synthetic-propulsion-development-input",
       "schema_resource": "propulsion-reference.schema.json",
       "supplied_inputs": [
-        "experiments/propulsion-reliability-reference/config.json"
+        "programmes/foundations/measurement-and-response/workflows/propulsion-reliability-reference/config.json"
       ]
     },
     {
@@ -800,7 +976,7 @@
       "schema_id": "empirical-lawhood/physical/glenn/glenn-input-quickstart",
       "schema_resource": "glenn-import-selection.schema.json",
       "supplied_inputs": [
-        "experiments/laser-archive-inspection/config.json"
+        "programmes/foundations/measurement-and-response/workflows/laser-archive-inspection/config.json"
       ]
     },
     {
@@ -816,7 +992,7 @@
       "schema_id": "empirical-lawhood/physical/mast-archive/fair-mast-public-selection",
       "schema_resource": "fair-mast-selection.schema.json",
       "supplied_inputs": [
-        "configs/sources/fair-mast-level2.json"
+        "programmes/energy/fusion/workflows/fair-mast-source/fair-mast-level2.json"
       ]
     },
     {
@@ -832,8 +1008,8 @@
       "schema_id": "empirical-lawhood/reaction-diffusion-development/reaction-diffusion-development-input",
       "schema_resource": "reaction-development.schema.json",
       "supplied_inputs": [
-        "experiments/reaction-diffusion-response/config.json",
-        "experiments/reactor-flow-response/config.json"
+        "programmes/foundations/measurement-and-response/workflows/reaction-diffusion-response/config.json",
+        "programmes/foundations/measurement-and-response/workflows/reactor-flow-response/config.json"
       ]
     },
     {
@@ -849,8 +1025,22 @@
       "schema_id": "empirical-lawhood/reference-worlds/physical-scale-morphism/physical-scale-morphism-truth-suite-config",
       "schema_resource": "scale-morphism-reference.schema.json",
       "supplied_inputs": [
-        "experiments/response-method-reference/config.json"
+        "programmes/foundations/measurement-and-response/workflows/response-method-reference/config.json"
       ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-read --artifact-root-contract",
+      "consumer": "operator-artifact-root-access",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "ExternalRootContract",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/runtime/external-root-contract",
+      "schema_resource": "operator-artifact-root-access.schema.json",
+      "supplied_inputs": []
     },
     {
       "authoring_maximum_bytes": 134217728,
@@ -881,7 +1071,7 @@
       "schema_id": "empirical-lawhood/simulators/ambient-pressure-superconductor/material-control-input-preflight",
       "schema_resource": "material-control-input.schema.json",
       "supplied_inputs": [
-        "experiments/material-control-inputs/control-inputs.json"
+        "programmes/materials/superconductivity/workflows/material-control-inputs/control-inputs.json"
       ]
     },
     {
@@ -897,7 +1087,7 @@
       "schema_id": "empirical-lawhood/simulators/ambient-pressure-superconductor/synthetic-material-response-method-config",
       "schema_resource": "lattice-method-authoring.schema.json",
       "supplied_inputs": [
-        "experiments/lattice-pairing-method/authoring.json"
+        "programmes/materials/superconductivity/workflows/lattice-pairing-method/authoring.json"
       ]
     },
     {
@@ -913,7 +1103,7 @@
       "schema_id": "empirical-lawhood/simulators/brian2-neuron-current-response/brian2-lif-native-config",
       "schema_resource": "brian2-current.schema.json",
       "supplied_inputs": [
-        "experiments/neuron-current-response/config.json"
+        "programmes/biology/cell-responses/workflows/neuron-current-response/config.json"
       ]
     },
     {
@@ -929,7 +1119,7 @@
       "schema_id": "empirical-lawhood/simulators/finite-response-law/finite-response-law-canary",
       "schema_resource": "finite-canary.schema.json",
       "supplied_inputs": [
-        "experiments/finite-response-law/finite-canary.json"
+        "programmes/foundations/emergent-structure/workflows/finite-response-law/finite-canary.json"
       ]
     },
     {
@@ -945,7 +1135,7 @@
       "schema_id": "empirical-lawhood/simulators/grid2op-response/grid2-op-development-input",
       "schema_resource": "grid-development.schema.json",
       "supplied_inputs": [
-        "experiments/grid-response-inputs/config.json"
+        "programmes/energy/electricity-grids/workflows/grid-response-inputs/config.json"
       ]
     },
     {
@@ -961,7 +1151,7 @@
       "schema_id": "empirical-lawhood/simulators/gym-torax-native/gym-torax-native-quickstart",
       "schema_resource": "tokamak-control.schema.json",
       "supplied_inputs": [
-        "experiments/tokamak-control-response/config.json"
+        "programmes/energy/fusion/workflows/tokamak-control-response/config.json"
       ]
     },
     {
@@ -977,7 +1167,7 @@
       "schema_id": "empirical-lawhood/simulators/prepared-response/prepared-response-prepared-canary",
       "schema_resource": "prepared-canary.schema.json",
       "supplied_inputs": [
-        "experiments/prepared-response/prepared-canary.json"
+        "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-canary.json"
       ]
     },
     {
@@ -993,7 +1183,7 @@
       "schema_id": "empirical-lawhood/simulators/py-ba-mm-development-input",
       "schema_resource": "battery-development.schema.json",
       "supplied_inputs": [
-        "experiments/battery-response-and-restart/config.json"
+        "programmes/energy/battery-charging/workflows/battery-response-and-restart/config.json"
       ]
     },
     {
@@ -1009,7 +1199,7 @@
       "schema_id": "empirical-lawhood/simulators/rc-ladder-response/resistor-capacitor-ladder-study-config",
       "schema_resource": "rc-ladder-study.schema.json",
       "supplied_inputs": [
-        "experiments/rc-ladder-response/study.json"
+        "programmes/foundations/measurement-and-response/workflows/rc-ladder-response/study.json"
       ]
     },
     {
@@ -1025,7 +1215,7 @@
       "schema_id": "empirical-lawhood/simulators/reactor-prefix-response/reactor-batch-input",
       "schema_resource": "reactor-batch-input.schema.json",
       "supplied_inputs": [
-        "experiments/reactor-response/batch-input.json"
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/batch-input.json"
       ]
     },
     {
@@ -1041,14 +1231,14 @@
       "schema_id": "empirical-lawhood/simulators/reactor-prefix-response/reactor-prepared-input",
       "schema_resource": "reactor-prepared-input.schema.json",
       "supplied_inputs": [
-        "experiments/reactor-response/causal-response-study-input.json",
-        "experiments/reactor-response/feed-input.json",
-        "experiments/reactor-response/finite-control-frontier-input.json",
-        "experiments/reactor-response/local-input.json",
-        "experiments/reactor-response/matched-replay-history-input.json",
-        "experiments/reactor-response/regime-input.json",
-        "experiments/reactor-response/selected-action-response-input.json",
-        "experiments/reactor-response/staged-pulse-response-input.json"
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/causal-response-study-input.json",
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/feed-input.json",
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/finite-control-frontier-input.json",
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/local-input.json",
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/matched-replay-history-input.json",
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/regime-input.json",
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/selected-action-response-input.json",
+        "programmes/foundations/measurement-and-response/workflows/reactor-response/staged-pulse-response-input.json"
       ]
     },
     {
@@ -1064,7 +1254,7 @@
       "schema_id": "empirical-lawhood/simulators/torax-native/native-torax-quickstart",
       "schema_resource": "tokamak-heat.schema.json",
       "supplied_inputs": [
-        "experiments/tokamak-heat-response/config.json"
+        "programmes/energy/fusion/workflows/tokamak-heat-response/config.json"
       ]
     },
     {
@@ -1080,7 +1270,7 @@
       "schema_id": "empirical-lawhood/simulators/uniform-electron-gas-response/analytic-reference-config",
       "schema_resource": "electron-gas-reference.schema.json",
       "supplied_inputs": [
-        "experiments/electron-gas-response/config.json"
+        "programmes/materials/superconductivity/workflows/electron-gas-response/config.json"
       ]
     },
     {
@@ -1098,6 +1288,1335 @@
       "supplied_inputs": [
         "configs/templates/evidence-provenance.yaml"
       ]
+    },
+    {
+      "authoring_maximum_bytes": 4194304,
+      "command": "campaign experiment-prepare",
+      "consumer": "battery-obstruction-experiment",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 1048576,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "ObstructionExperimentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/battery-diagnostic-obstruction/experiment-specification",
+      "schema_resource": "battery-obstruction-experiment.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-e4-declared-selection",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "ScheduledRevisionExperimentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-scheduled-programme/revision-experiment-specification",
+      "schema_resource": "matrix-e4-declared-selection.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-e4-factorial",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "ScheduledFactorialSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-scheduled-programme/factorial-specification",
+      "schema_resource": "matrix-e4-factorial.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-e4-protected-factorial",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "ProtectedFactorialExperimentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-scheduled-programme/protected-factorial-experiment-specification",
+      "schema_resource": "matrix-e4-protected-factorial.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "experiment.matrix-e4-full-factor-development",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "ScheduledFullFactorDevelopmentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/full-factor-development-specification",
+      "schema_resource": "experiment.matrix-e4-full-factor-development.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "experiment.matrix-e4-full-factor-protected",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "ScheduledFullFactorProtectedSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/full-factor-protected-specification",
+      "schema_resource": "experiment.matrix-e4-full-factor-protected.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-selected-e4-component",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 67108864,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "SelectedE4NativeComponentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/native-component-specification",
+      "schema_resource": "matrix-selected-e4-component.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-selected-e4-declarative",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 67108864,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "SelectedE4DeclarativeSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/declarative-specification",
+      "schema_resource": "matrix-selected-e4-declarative.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-selected-e4-protected/declarative-calibration.example.json",
+        "programmes/foundations/emergent-structure/workflows/matrix-selected-e4-protected/declarative-confirmation.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-selected-e4-programme",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 67108864,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "SelectedE4ProtectedProgrammeSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/protected-programme-specification",
+      "schema_resource": "matrix-selected-e4-programme.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-factor-confirmation-compact",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "E1CompactExperimentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-factor-confirmation/compact-experiment-specification",
+      "schema_resource": "matrix-factor-confirmation-compact.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-factor-confirmation/compact-specification.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-factor-confirmation",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "E1ConfirmationSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-factor-confirmation/experiment-specification",
+      "schema_resource": "matrix-factor-confirmation.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-factor-confirmation/specification.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-native-utility",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "NativeUtilitySpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-factor-response/native-utility-specification",
+      "schema_resource": "matrix-native-utility.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-native-utility/specification.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-history-descriptive-programme",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixHistoryProgrammeSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-history-analysis/programme-specification",
+      "schema_resource": "matrix-history-descriptive-programme.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-history-analysis/programme.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-later-experiment",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixLaterExperimentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-experimental-programme/specification",
+      "schema_resource": "matrix-later-experiment.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-preparation-initialization-inputs",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixPreparationInitializationSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-experimental-programme/initialization-specification",
+      "schema_resource": "matrix-preparation-initialization-inputs.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-selected-revision/initialization.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-prepared-functional-experiment",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixPreparedFunctionalExperimentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-experimental-programme/prepared-functional-experiment",
+      "schema_resource": "matrix-prepared-functional-experiment.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 16777216,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-programme-curve-amendment",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 4194304,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeCurveAmendmentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/curve-amendment-specification",
+      "schema_resource": "matrix-programme-curve-amendment.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-programme-e1-allocation",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeE1AllocationSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/e1-allocation-specification",
+      "schema_resource": "matrix-programme-e1-allocation.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-programme/e1-allocation.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-programme-e1-assembly",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeE1AssemblySpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/e1-assembly-specification",
+      "schema_resource": "matrix-programme-e1-assembly.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-programme-e2-assembly",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeE2AssemblySpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/e2-assembly-specification",
+      "schema_resource": "matrix-programme-e2-assembly.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 67108864,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-programme-e3-cal-closeout",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 16777216,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeE3CloseoutSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/e3-cal-closeout-specification",
+      "schema_resource": "matrix-programme-e3-cal-closeout.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-programme-input-assembly",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeInputAssemblySpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/input-assembly-specification",
+      "schema_resource": "matrix-programme-input-assembly.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 16777216,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-programme-output-allowance-continuation",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 4194304,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeOutputContinuationSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/output-allowance-continuation-specification",
+      "schema_resource": "matrix-programme-output-allowance-continuation.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 67108864,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-programme-retained-e3-continuation",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 16777216,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeRetainedE3ContinuationSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/retained-e3-continuation-specification",
+      "schema_resource": "matrix-programme-retained-e3-continuation.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-programme/retained-e3-continuation.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 16777216,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-programme-retained-training-continuation",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 4194304,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeRetainedTrainingContinuationSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/retained-training-continuation-specification",
+      "schema_resource": "matrix-programme-retained-training-continuation.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-programme/retained-training-continuation.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 16777216,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-programme-source-continuation",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 4194304,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeSourceContinuationSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/source-continuation-specification",
+      "schema_resource": "matrix-programme-source-continuation.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-programme/source-continuation.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-continued-programme",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 67108864,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixContinuedProgrammeSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/continued-specification",
+      "schema_resource": "matrix-continued-programme.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-curve-amended-programme",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 67108864,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixCurveAmendedProgrammeSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/curve-amended-specification",
+      "schema_resource": "matrix-curve-amended-programme.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-researcher-programme",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 67108864,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixResearchProgrammeSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/specification",
+      "schema_resource": "matrix-researcher-programme.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-programme/specification.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-configured-protected-input-assembly",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "ConfiguredProtectedE3AssemblySpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/scientific-configured-protected-assembly-specification",
+      "schema_resource": "matrix-configured-protected-input-assembly.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/configured-scientific-assembly.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-configured-protected-e3",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "ConfiguredProtectedE3Specification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/configured-protected-specification",
+      "schema_resource": "matrix-configured-protected-e3.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/configured-protected-v2.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-native-training-acquisition",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "NativeTrainingAcquisitionSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/native-training-acquisition-specification",
+      "schema_resource": "matrix-native-training-acquisition.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-native-training-input-assembly",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "NativeTrainingAssemblySpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/scientific-native-training-assembly-specification",
+      "schema_resource": "matrix-native-training-input-assembly.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/native-training-assembly.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-response-experiment",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixResponseErrorSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/specification",
+      "schema_resource": "matrix-response-experiment.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/alternative.json",
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/specification.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-response-experiment-v2",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "ConfiguredMatrixResponseErrorSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/specification",
+      "schema_resource": "matrix-response-experiment-v2.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/configured-v2.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "experiment.matrix-selected-e3-e4-development",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "SelectedE3E4ExperimentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e3-e4/development-experiment",
+      "schema_resource": "experiment.matrix-selected-e3-e4-development.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "experiment.matrix-selected-e4-declared-revision",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "SelectedE4RevisionExperimentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/revision-experiment-specification",
+      "schema_resource": "experiment.matrix-selected-e4-declared-revision.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "experiment.matrix-selected-e4-revision-from-acquisition",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "SelectedE4RevisionAcquisitionSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/revision-acquisition-specification",
+      "schema_resource": "experiment.matrix-selected-e4-revision-from-acquisition.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-selected-e4-revision/specification.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-selected-declarative-development",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "SelectedPreparedDevelopmentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-experimental-programme/selected-declarative-development-specification",
+      "schema_resource": "matrix-selected-declarative-development.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-selected-revision/declarative-opportunity.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-selected-declarative-protected",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "SelectedPreparedProtectedSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-experimental-programme/selected-declarative-protected-specification",
+      "schema_resource": "matrix-selected-declarative-protected.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-selected-revision/declarative-transfer.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-finite-dt-source-input-assembly",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixFiniteDtSourceAssemblySpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-source/finite-dt-input-assembly-specification",
+      "schema_resource": "matrix-finite-dt-source-input-assembly.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/finite-dt-source-assembly.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-finite-dt-source-qualification",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixFiniteDtSourceQualificationSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-source/finite-dt-qualification-specification",
+      "schema_resource": "matrix-finite-dt-source-qualification.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-finite-dt-retained-e3-input-assembly",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixFiniteDtRetainedE3AssemblySpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-source/finite-dt-retained-e3-assembly-specification",
+      "schema_resource": "matrix-finite-dt-retained-e3-input-assembly.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-prepared-finite-dt-source-input-assembly",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixPreparedSourceAssemblySpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-source/prepared-finite-dt-input-assembly-specification",
+      "schema_resource": "matrix-prepared-finite-dt-source-input-assembly.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/prepared-source-assembly.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-prepared-finite-dt-source-qualification",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixPreparedSourceQualificationSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-source/prepared-finite-dt-qualification-specification",
+      "schema_resource": "matrix-prepared-finite-dt-source-qualification.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-prepared-retained-e3-input-assembly",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "MatrixPreparedRetainedE3AssemblySpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-source/prepared-retained-e3-assembly-specification",
+      "schema_resource": "matrix-prepared-retained-e3-input-assembly.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "rubisco-kinetic-experiment",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "RubiscoKineticExperimentSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/rubisco-kinetic-experiment/specification",
+      "schema_resource": "rubisco-kinetic-experiment.schema.json",
+      "supplied_inputs": [
+        "programmes/biology/photosynthesis/workflows/rubisco-kinetic-join/experiment.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "experiment.matrix-e4-full-factor-development.resources",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "ScheduledFullFactorResources",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/full-factor-resources",
+      "schema_resource": "experiment.matrix-e4-full-factor-development.resources.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "experiment.matrix-e4-full-factor-development.request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "ScheduledFullFactorDevelopmentRequestV3",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/full-factor-development-request",
+      "schema_resource": "experiment.matrix-e4-full-factor-development.request.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "experiment.matrix-e4-full-factor-protected.resources",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "ScheduledFullFactorResources",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/full-factor-resources",
+      "schema_resource": "experiment.matrix-e4-full-factor-protected.resources.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "experiment.matrix-e4-full-factor-protected.request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "ScheduledFullFactorProtectedRequestV4",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/full-factor-protected-request",
+      "schema_resource": "experiment.matrix-e4-full-factor-protected.request.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-selected-e4-request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 67108864,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "SelectedE4DeclarativeRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/declarative-request",
+      "schema_resource": "matrix-selected-e4-request.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-factor-confirmation-compact-declarative-selection",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "E1CompactExperimentSelectionV2",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-factor-confirmation/compact-declarative-selection",
+      "schema_resource": "matrix-factor-confirmation-compact-declarative-selection.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-factor-confirmation-compact-selection",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "E1CompactExperimentSelection",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-factor-confirmation/compact-experiment-selection",
+      "schema_resource": "matrix-factor-confirmation-compact-selection.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-factor-confirmation-selection",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "E1ConfirmationSelection",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-factor-confirmation/experiment-selection",
+      "schema_resource": "matrix-factor-confirmation-selection.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-preparation-initialization-request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixPreparationInitializationRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-experimental-programme/initialization-request",
+      "schema_resource": "matrix-preparation-initialization-request.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 16777216,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-e1-criterion-choices",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 4194304,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "E1CompactCriterionChoices",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-factor-confirmation/compact-criterion-choices",
+      "schema_resource": "matrix-e1-criterion-choices.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 67108864,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-programme-e1-allocation-request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 16777216,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeE1AllocationRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/e1-allocation-request",
+      "schema_resource": "matrix-programme-e1-allocation-request.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 16777216,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-programme-e1-context",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 4194304,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeE1ScientificContext",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/e1-scientific-context",
+      "schema_resource": "matrix-programme-e1-context.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 67108864,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-programme-e1-assembly-selection",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 16777216,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeE1AssemblySelection",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/e1-assembly-selection",
+      "schema_resource": "matrix-programme-e1-assembly-selection.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 67108864,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-programme-e2-assembly-request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 16777216,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeE2AssemblyRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/e2-assembly-request",
+      "schema_resource": "matrix-programme-e2-assembly-request.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-programme-scientific-design",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 67108864,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeScientificDesign",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/scientific-design",
+      "schema_resource": "matrix-programme-scientific-design.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 16777216,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-programme-allocation-request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 4194304,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeAllocationRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/allocation-request",
+      "schema_resource": "matrix-programme-allocation-request.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 16777216,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-programme-input-commitments",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 4194304,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeInputCommitments",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/input-commitments",
+      "schema_resource": "matrix-programme-input-commitments.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 16777216,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-programme-input-publication",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 4194304,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixProgrammePublishedInput",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/published-input",
+      "schema_resource": "matrix-programme-input-publication.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 67108864,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-programme-operation-selection",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 16777216,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeOperationSelection",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/operation-selection",
+      "schema_resource": "matrix-programme-operation-selection.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 4194304,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-programme-product-export",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 1048576,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeProductExportSelection",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/product-export-selection",
+      "schema_resource": "matrix-programme-product-export.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 4194304,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-programme-portable-product-export",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 1048576,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixProgrammePortableProductExportSelection",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/portable-product-export-selection",
+      "schema_resource": "matrix-programme-portable-product-export.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 16777216,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-programme-produced-input",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 4194304,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixProgrammeProducedInput",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-programme/produced-input",
+      "schema_resource": "matrix-programme-produced-input.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 4194304,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-configured-protected-assembly-request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 1048576,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "ConfiguredProtectedE3AssemblyRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/scientific-configured-protected-assembly-request",
+      "schema_resource": "matrix-configured-protected-assembly-request.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/configured-scientific-assembly.request.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 4194304,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-configured-primary-family-amendment",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 1048576,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixE3PrimaryFamilyAmendment",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/primary-family-amendment",
+      "schema_resource": "matrix-configured-primary-family-amendment.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 4194304,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-configured-protected-assembly-sources",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 1048576,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "ExperimentFileInputSelection",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/experiment-inputs/file-selection",
+      "schema_resource": "matrix-configured-protected-assembly-sources.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/configured-scientific-assembly.sources.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-configured-secondary-target",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixE3SecondaryTarget",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/secondary-response-target",
+      "schema_resource": "matrix-configured-secondary-target.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/secondary-response-target.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 4194304,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-configured-protected-product-export",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 1048576,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "ConfiguredProtectedE3ProductExportSelection",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/configured-protected-product-export-selection",
+      "schema_resource": "matrix-configured-protected-product-export.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/configured-protected-export.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 4194304,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-native-training-bank-export",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 1048576,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "NativeTrainingBankExportSelection",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/native-training-bank-export-selection",
+      "schema_resource": "matrix-native-training-bank-export.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/native-training-export.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-native-training-assembly-request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "NativeTrainingAssemblyRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/scientific-native-training-assembly-request",
+      "schema_resource": "matrix-native-training-assembly-request.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/native-training-request.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-native-training-scientific-protocol",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "NativeTrainingScientificProtocol",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/native-training-scientific-protocol",
+      "schema_resource": "matrix-native-training-scientific-protocol.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/native-training-scientific-protocol.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-native-training-response-assay",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "ScheduledResponseAssay",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-scheduled-history/response-assay",
+      "schema_resource": "matrix-native-training-response-assay.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/native-training-assay.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-factor-exposure-census",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixFactorExposureCensus",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-factor-response/exposure-census",
+      "schema_resource": "matrix-factor-exposure-census.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/exposure-census.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 16777216,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-response-e3-resources-v2",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 4194304,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "ConfiguredE3Resources",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-response-experiment/configured-resources",
+      "schema_resource": "matrix-response-e3-resources-v2.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-selected-e3-e4-resources",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "SelectedE3E4OperationalSelection",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e3-e4/operational-selection",
+      "schema_resource": "matrix-selected-e3-e4-resources.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-selected-e4-revision-resources",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "SelectedE4MethodResources",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/method-resources",
+      "schema_resource": "matrix-selected-e4-revision-resources.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 262144,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-selected-e4-revision-acquisition",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 65536,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "SelectedE4RevisionAcquisitionSource",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-selected-e4/revision-acquisition-source",
+      "schema_resource": "matrix-selected-e4-revision-acquisition.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 524288,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-selected-phase-resources",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 131072,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixSelectedOperationalResources",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-experimental-programme/selected-operational-resources",
+      "schema_resource": "matrix-selected-phase-resources.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-selected-e4-protected/resources.example.json",
+        "programmes/foundations/emergent-structure/workflows/matrix-selected-opportunity/resources.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-selected-declarative-request-v2",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "SelectedPreparedDerivationRequestV2",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-experimental-programme/selected-declarative-request-v2",
+      "schema_resource": "matrix-selected-declarative-request-v2.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-selected-declarative-request-v3",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "SelectedPreparedDerivationRequestV3",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-experimental-programme/selected-declarative-request-v3",
+      "schema_resource": "matrix-selected-declarative-request-v3.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-finite-dt-source-assembly-request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixFiniteDtSourceAssemblyRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-source/finite-dt-input-assembly-request",
+      "schema_resource": "matrix-finite-dt-source-assembly-request.schema.json",
+      "supplied_inputs": [
+        "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/finite-dt-source-request.example.json"
+      ]
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-finite-dt-retained-e3-assembly-request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixFiniteDtRetainedE3AssemblyRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-source/finite-dt-retained-e3-assembly-request",
+      "schema_resource": "matrix-finite-dt-retained-e3-assembly-request.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-prepared-finite-dt-source-assembly-request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixPreparedSourceAssemblyRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-source/prepared-finite-dt-input-assembly-request",
+      "schema_resource": "matrix-prepared-finite-dt-source-assembly-request.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": 134217728,
+      "command": "campaign experiment-prepare --sources",
+      "consumer": "matrix-prepared-retained-e3-assembly-request",
+      "consumer_loader": "api.codecs.load_registered_authoring",
+      "consumer_maximum_bytes": 134217728,
+      "consumer_requires_canonical": false,
+      "disposition": "editable",
+      "owner": "MatrixPreparedRetainedE3AssemblyRequest",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-source/prepared-retained-e3-assembly-request",
+      "schema_resource": "matrix-prepared-retained-e3-assembly-request.schema.json",
+      "supplied_inputs": []
     }
   ],
   "format_version": "1.0.0"

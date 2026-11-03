@@ -1,4 +1,4 @@
-"""Bounded identity proof for exact files in one clean Git worktree."""
+"""Bounded selected-file identity proof against an exact Git commit."""
 
 from __future__ import annotations
 
@@ -17,6 +17,9 @@ from empirical_lawhood.kernel.serialization import (
 )
 
 from .bounded_process import BoundedProcessError, run_bounded_command
+from .source_policy import (
+    CheckoutSourceAdmission, SourcePolicyError, inspect_checkout_source, require_unchanged_source_admission,
+)
 
 
 _MAX_REPOSITORY_STATUS_BYTES: Final[int] = 1024 * 1024
@@ -24,7 +27,16 @@ _READ_CHUNK_BYTES: Final[int] = 1024 * 1024
 
 
 class RepositoryIdentityError(RuntimeError):
-    """The worktree or a requested tracked file lacks an exact clean identity."""
+    """A requested tracked file or its owning source observation is invalid."""
+
+
+@dataclass(frozen=True, slots=True)
+class AdmittedRepositoryArtifacts:
+    """Tracked identities plus the separate operational checkout disclosure."""
+
+    artifacts: tuple[ArtifactIdentity, ...]
+    source_admission: CheckoutSourceAdmission
+    final_source_admission: CheckoutSourceAdmission
 
 
 @dataclass(frozen=True, slots=True)
@@ -76,7 +88,8 @@ def _git(repo_root: Path, *arguments: str, maximum_stdout_bytes: int = 4096) -> 
     return result.stdout
 
 
-def _verify_clean_commit(repo_root: Path, expected_commit: str) -> None:
+def _verify_clean_commit(repo_root: Path, expected_commit: str, *, allow_local_plan=False,
+                         selected_paths=()) -> CheckoutSourceAdmission:
     if len(expected_commit) != 40 or any(
         character not in "0123456789abcdef" for character in expected_commit
     ):
@@ -91,11 +104,16 @@ def _verify_clean_commit(repo_root: Path, expected_commit: str) -> None:
         repo_root,
         "status",
         "--porcelain=v1",
+        "-z",
         "--untracked-files=all",
         maximum_stdout_bytes=_MAX_REPOSITORY_STATUS_BYTES,
     )
-    if status:
+    if status and not allow_local_plan:
         raise RepositoryIdentityError("dataset composition requires a clean worktree")
+    try:
+        return inspect_checkout_source(repo_root, status, selected_paths=selected_paths)
+    except SourcePolicyError as error:
+        raise RepositoryIdentityError(str(error)) from error
 
 
 def _open_relative_read_only(root_path: str, relative_path: str) -> int:
@@ -130,7 +148,7 @@ def _open_relative_read_only(root_path: str, relative_path: str) -> int:
             os.close(root_descriptor)
 
 
-def _descriptor_identity(value: os.stat_result) -> tuple[int, int, int, int, int, int]:
+def _descriptor_identity(value: os.stat_result) -> tuple[int, int, int, int, int, int, int]:
     return (
         value.st_dev,
         value.st_ino,
@@ -138,10 +156,15 @@ def _descriptor_identity(value: os.stat_result) -> tuple[int, int, int, int, int
         value.st_mtime_ns,
         value.st_ctime_ns,
         value.st_nlink,
+        value.st_mode,
     )
 
 
 def _read_exact_file(repo_root: Path, spec: RepositoryArtifactSpec) -> bytes:
+    return _read_exact_file_snapshot(repo_root, spec)[0]
+
+
+def _read_exact_file_snapshot(repo_root: Path, spec: RepositoryArtifactSpec):
     descriptor = _open_relative_read_only(str(repo_root), spec.relative_path)
     try:
         before = os.fstat(descriptor)
@@ -162,9 +185,18 @@ def _read_exact_file(repo_root: Path, spec: RepositoryArtifactSpec) -> bytes:
         after = os.fstat(descriptor)
         if _descriptor_identity(before) != _descriptor_identity(after):
             raise RepositoryIdentityError("tracked repository input changed during read")
-        return b"".join(chunks)
+        return b"".join(chunks), _descriptor_identity(after)
     except OSError as error:
         raise RepositoryIdentityError("tracked repository input read failed") from error
+    finally:
+        os.close(descriptor)
+
+
+def _require_file_snapshot(repo_root, spec, expected):
+    descriptor = _open_relative_read_only(str(repo_root), spec.relative_path)
+    try:
+        if _descriptor_identity(os.fstat(descriptor)) != expected:
+            raise RepositoryIdentityError("selected repository input changed during verification")
     finally:
         os.close(descriptor)
 
@@ -175,7 +207,31 @@ def load_clean_repository_artifacts(
     expected_commit: str,
     specifications: tuple[RepositoryArtifactSpec, ...],
 ) -> tuple[ArtifactIdentity, ...]:
-    """Authenticate exact tracked worktree bytes against one clean Git commit."""
+    """Retain the historical raw-clean-only artifact API.
+
+    Use ``load_admitted_repository_artifacts`` for the explicit local-plan route;
+    that route returns its separate disclosure rather than claiming raw cleanliness.
+    """
+    return _load_repository_artifacts(repo_root, expected_commit=expected_commit,
+        specifications=specifications, allow_local_plan=False).artifacts
+
+
+def load_admitted_repository_artifacts(
+    repo_root: Path,
+    *,
+    expected_commit: str,
+    specifications: tuple[RepositoryArtifactSpec, ...],
+) -> AdmittedRepositoryArtifacts:
+    """Authenticate exact selected files regardless of unrelated checkout edits.
+
+    Raw status and the optional local plan are separate operational disclosures.
+    Requested worktree files must still match their exact selected commit.
+    """
+    return _load_repository_artifacts(repo_root, expected_commit=expected_commit,
+        specifications=specifications, allow_local_plan=True)
+
+
+def _load_repository_artifacts(repo_root, *, expected_commit, specifications, allow_local_plan):
 
     if not isinstance(repo_root, Path):
         raise TypeError("repo_root must be a Path")
@@ -193,11 +249,15 @@ def load_clean_repository_artifacts(
     root = repo_root.resolve(strict=True)
     if repo_root.is_symlink() or not root.is_dir():
         raise RepositoryIdentityError("repository root must be a real directory")
-    _verify_clean_commit(root, expected_commit)
+    scope = tuple(sorted(relative_paths))
+    admission = _verify_clean_commit(root, expected_commit, allow_local_plan=allow_local_plan,
+        selected_paths=scope)
     values: list[ArtifactIdentity] = []
+    snapshots = []
     for spec in specifications:
         _git(root, "ls-files", "--error-unmatch", "--", spec.relative_path)
-        worktree_payload = _read_exact_file(root, spec)
+        worktree_payload, snapshot = _read_exact_file_snapshot(root, spec)
+        snapshots.append((spec, snapshot))
         committed_payload = _git(
             root,
             "show",
@@ -216,12 +276,21 @@ def load_clean_repository_artifacts(
                 size_bytes=len(worktree_payload),
             )
         )
-    _verify_clean_commit(root, expected_commit)
-    return tuple(values)
+    final = _verify_clean_commit(root, expected_commit, allow_local_plan=allow_local_plan,
+        selected_paths=scope)
+    try:
+        require_unchanged_source_admission(admission, final)
+    except SourcePolicyError as error:
+        raise RepositoryIdentityError(str(error)) from error
+    for spec, snapshot in snapshots:
+        _require_file_snapshot(root, spec, snapshot)
+    return AdmittedRepositoryArtifacts(tuple(values), admission, final)
 
 
 __all__ = [
+    "AdmittedRepositoryArtifacts",
     "RepositoryArtifactSpec",
     "RepositoryIdentityError",
     "load_clean_repository_artifacts",
+    "load_admitted_repository_artifacts",
 ]

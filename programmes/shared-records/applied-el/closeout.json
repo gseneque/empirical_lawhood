@@ -1,0 +1,123 @@
+{
+  "actual_outcome": {
+    "attempts": 1,
+    "automatic_retry": false,
+    "domain_outcome": "unresolved",
+    "failure": "MemoryError: child process memory failure",
+    "limit_kind": "RLIMIT_AS",
+    "native_contacts": 0,
+    "retained_decision": "STOP",
+    "retryable": false,
+    "scientific_products": 0,
+    "status": "FAILED",
+    "task": "rubisco-inquiry.supply",
+    "worker_memory_bytes": 536870912
+  },
+  "branch": "recchain",
+  "checks": {
+    "affected_ruff": "PASSED",
+    "cli_reference_check": "PASSED",
+    "diff_whitespace_check": "PASSED",
+    "documentation_check": "PASSED",
+    "executable_aggregate_check": "PASSED",
+    "extension_aggregate_check": "PASSED",
+    "focused_tests": {
+      "command": "uv run --no-sync pytest -q tests/test_recursive_inquiry.py tests/test_recursive_inquiry_projection.py tests/test_recursive_inquiry_service.py tests/test_recursive_input_origins.py tests/test_recursive_operational_census.py tests/test_rubisco_inquiry_acceptance.py tests/test_analytic_material_inquiry_acceptance.py tests/test_cli_contracts.py::test_every_leaf_has_exact_output_format_and_error_metadata tests/test_import_boundaries.py tests/test_workflow_discovery.py",
+      "failed": 0,
+      "passed": 97,
+      "seconds": "72.98"
+    },
+    "historical_portable_gate": "FAILED: 2514 passed, 1 failed external free-space floor, 49 deselected; not rerun or superseded",
+    "legacy_custody_focused_worker_checks": {
+      "note": "separate prior check; no aggregate unique-test-count claim",
+      "passed": 2
+    }
+  },
+  "costs": {
+    "comparison_cost_advantage": "UNEVALUATED",
+    "durable_copy": {
+      "cpu_seconds": 0.13164399999999926,
+      "wall_seconds": 17.34971566707827
+    },
+    "failed_invocation": {
+      "cpu_seconds": null,
+      "peak_rss_bytes": null,
+      "wall_seconds": null
+    },
+    "historical_and_engineering_cpu": null,
+    "unknown_reason": "Original harness raised before persisting its invocation measurements; no retrospective estimate replaces unknown expense."
+  },
+  "custody": {
+    "complete_directory": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/failed-acceptance-custody",
+    "cost_event_count": 1,
+    "decision_packet": {
+      "schema": "empirical-lawhood/kernel/object-identity",
+      "value": {
+        "object_fingerprint": "8f79ac1574e4d234e8ecd9b1af1e401aa366b76fea4afa7c9606874c4ac3acf9",
+        "object_id": "inquiry-packet.9acb8215220295a0d49378fb",
+        "object_schema": "empirical-lawhood/runtime/inquiry-decision-packet",
+        "object_version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "exact_copy_verified": true,
+    "member_bytes": 2138135,
+    "member_count": 99,
+    "primary_report": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/acceptance-stop.json",
+    "primary_report_bytes": 437443,
+    "primary_report_sha256": "06d6412e242dd87525d1874041bdecad524e09f29261ca72586453700b7f5bd5"
+  },
+  "deferred": [
+    "RA8",
+    "production RA5-T/M/S/E",
+    "other TOP5 domains",
+    "expanded comparators/reuse",
+    "optional impossibility",
+    "molecular Rubisco reopening",
+    "submission/publication/merge/push"
+  ],
+  "head": "9a4c29cb017cae6338dcf7c422f202062bc2a8cd",
+  "independent_authorized_work": "Battery strict thermal-service and RA5-C interfaces continue under unchanged shared engineering allowance; native entry remains separately gated.",
+  "milestones": {
+    "RA0": "FROZEN",
+    "RA1_RA2_RA3_RA6": "IMPLEMENTED_WITH_FOCUSED_SOFTWARE_CHECKS",
+    "RA4": "EXISTING_MATH_REUSED_NO_EXTRACTION",
+    "RA5_C": "NOT_IMPLEMENTED_AUTHENTIC_CURRENT_STAGE_STOCK_MISSING",
+    "RA7_compact_pair": "NOT_ACCEPTED",
+    "RA8": "DEFERRED",
+    "battery_D0_D1": "SOURCE_VALUE_SELECTION_PROPOSED_EXACT_TYPED_ROUTE_MISSING",
+    "battery_D2_D6": "NOT_ENTERED",
+    "battery_native": "NOT_EXECUTED",
+    "rubisco_cheap_programme": "PROPOSED_ONLY_GATED_NOT_EXECUTED",
+    "rubisco_molecular": "PARK",
+    "rubisco_nomination": "NOT_PRODUCED"
+  },
+  "next_entry_requirements": [
+    "Diagnose the guarded pure-worker address-space requirement; preserve failed source/receipt and unknown expense.",
+    "Before a further contact, explicitly freeze a supported finite operational allocation and complete failure measurement handling; do not retry this exhausted one-attempt selection.",
+    "Accept the actual compact supplier/use pair and selected battery controller composition before the integrated Rubisco programme.",
+    "Add the separately versioned exact thermal-service input/provider/current-stage binding through existing battery owners before its D1 native premise contact."
+  ],
+  "original_paper_assets_preserved": true,
+  "preexisting_inputs_preserved": true,
+  "production": {
+    "authored_packet_sha256": "d35c55ab0dbae81c59662e74c1bdd46b666449372988b951d46ad774bd2426a5",
+    "code_sources_sha256": "723bda07169c96f11ce9661ba5fbf9c955b8bfb116f02ac94437a11ee9781520",
+    "execution_plan_sha256": "6c1c3a2530f16f7dfc6b0934cdd508e8fc72996b77a2b160094a4f501f58a10f",
+    "lock_sha256": "ea491f9e8789d6cd5a18d89908d16ef7db4ee3c9ed4729e32354bc713b135f24",
+    "producing_harness_sha256": "76d03cdb09644c9260e1cb2606381379e7fd82b2a40dde3e8da996f8e90a6fe6",
+    "run_id": "recursive.59509ef5afa9c577c84c8866"
+  },
+  "protected_file_count": 62,
+  "record": "empirical-lawhood/applied-el-bounded-closeout",
+  "scientific_dispositions": {
+    "candidate": "NO_NEW_NOMINATION_OR_BIOLOGICAL_RESULT",
+    "comparison": "UNEVALUATED",
+    "method": "UNASSESSED_BY_SCIENTIFIC_EXECUTION",
+    "reuse": "UNASSESSED_BY_SCIENTIFIC_EXECUTION"
+  },
+  "scope": "COMPACT_ACCEPTANCE_ALLOCATION",
+  "source_checkout_clean": false,
+  "status": "BOUNDED_OPERATIONAL_STOP",
+  "version": "1.0.0"
+}

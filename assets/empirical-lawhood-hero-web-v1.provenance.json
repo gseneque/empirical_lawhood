@@ -1,0 +1,16 @@
+{
+  "artifact": "assets/empirical-lawhood-hero-web-v1.png",
+  "mode": "built-in image_gen",
+  "prompt": "Use case: precise-object-edit.\nAsset type: Empirical Lawhood WordPress landing-page hero, a non-destructive website derivative.\nInput image: the sole referenced image is the edit target.\nPrimary request: Remove all existing lettering from the bottom-left of this artwork: \"Empirical Lawhood:\" and \"A civilisational response-law engine\". Seamlessly reconstruct only the floor and reflected light behind that lettering.\nConstraints: Preserve the two stone rings, their shapes and positions, the diagonal warm beam, pillars, reflective floor, stairs, wide 16:9 composition, lighting, colour, texture and atmosphere. Change only the areas containing lettering. No replacement lettering, no logo, no watermark. All page titles and the new subtitle will be added separately as editable WordPress text. Keep the original artwork recognisable. Output an opaque landscape image.",
+  "original": {
+    "path": "assets/empirical-lawhood-hero.jpg",
+    "sha256": "dc76b02720a90380dbbea19bf70ec2f32f6a733ee44f6e48a9a72c477f386a70"
+  },
+  "derivative": {
+    "sha256": "60dc60ac43051935d411876e5ecc96971e9a966c5a0539a78a04919de1ad0e2c",
+    "wordpress_media_id": 6,
+    "url": "https://empiricallawhood.wordpress.com/wp-content/uploads/2026/10/empirical-lawhood-hero-web-v1.png"
+  },
+  "purpose": "Remove baked-in lettering for the FINALMIG.md section 4.3 WordPress draft. Titles and subtitle remain editable WordPress text.",
+  "created_date": "2026-10-10"
+}

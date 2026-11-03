@@ -1,5 +1,6 @@
 """Full-size software issue/package proofs; no native scientific campaign is run."""
 
+from tests.prospective_source_capture_fixture import install_historical_source_capture
 from pathlib import Path
 from time import perf_counter
 from contextlib import nullcontext
@@ -37,10 +38,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @pytest.fixture
 def finite_plane(tmp_path):
+    import os
+
     store = tmp_path / "synthetic-finite-store"
     store.mkdir()
+    mount = next(parent for parent in (store, *store.parents) if os.path.ismount(parent))
     return ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
-        "synthetic.finite-store", "synthetic finite software store", str(store), "/",
+        "synthetic.finite-store", "synthetic finite software store", str(store), str(mount),
         OperatorStorageProfile.SCHEMA, 1, None, None, (),
     )))
 
@@ -65,8 +69,8 @@ def _software_application_seams(monkeypatch, plane):
     from tests.approval_support import FixedDecisionClock
     closure = ImplementationSourceClosure("synthetic.current-source", SourceClosureKind.CLEAN_GIT_COMMIT,
         "0" * 40, "d" * 64, "e" * 64, True)
-    monkeypatch.setattr(application, "capture_clean_target_closure", lambda *args: closure)
-    monkeypatch.setattr(public_composition, "require_executing_target_source", lambda *args: None)
+    install_historical_source_capture(monkeypatch, application, closure)
+    monkeypatch.setattr(public_composition, "require_selected_implementation", lambda *args: None)
     monkeypatch.setattr(public_composition, "SystemDecisionClock", lambda: FixedDecisionClock(
         clock_id="synthetic.current-prospective-evaluation.clock", value="2026-10-07T00:00:00Z"))
     monkeypatch.setattr(application, "resolve_authoring_directory", lambda directory, **kwargs: (directory, plane.root.contract))

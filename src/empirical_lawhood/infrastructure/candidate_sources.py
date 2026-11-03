@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
@@ -11,15 +12,18 @@ import stat
 import time
 from typing import Final, Protocol
 
+from empirical_lawhood.infrastructure.atomic_files import rename_noreplace
 from empirical_lawhood.infrastructure.artifacts import (
     ArtifactIdentityConflict,
     ExternalRootUnavailable,
     GuardedExternalRoot,
 )
+from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError, file_matches_bytes
 from empirical_lawhood.infrastructure.dataset_io import ExternalDatasetSourceOpener
 from empirical_lawhood.kernel.provenance import ObjectIdentity
 from empirical_lawhood.kernel.serialization import canonical_json_bytes
 from empirical_lawhood.planning.dataset_authority import DatasetStorageScope
+from empirical_lawhood.runtime.progress import report_progress
 from empirical_lawhood.runtime.source_resolution import (
     ContentAddressedInputRequirement,
     ContentAddressedResolutionError,
@@ -29,7 +33,6 @@ from empirical_lawhood.runtime.source_resolution import (
 
 
 _DEFAULT_CHUNK_BYTES: Final[int] = 1024 * 1024
-_MAXIMUM_MATERIALIZED_BYTES: Final[int] = 16 * 1024**2
 
 
 class CandidateSourceClock(Protocol):
@@ -79,10 +82,6 @@ class ExternalContentAddressedInputResolver:
             raise TypeError("requirement must be a ContentAddressedInputRequirement")
         if type(materialize) is not bool:
             raise TypeError("materialize must be a boolean")
-        if materialize and requirement.maximum_bytes > _MAXIMUM_MATERIALIZED_BYTES:
-            raise ContentAddressedResolutionError(
-                "materialized control input exceeds the 16 MiB memory boundary"
-            )
         try:
             path = self.root.resolve(
                 requirement.relative_locator,
@@ -94,7 +93,7 @@ class ExternalContentAddressedInputResolver:
                     "content address is not a regular non-symlink file"
                 )
             observed_size = before.st_size
-            if observed_size > requirement.maximum_bytes:
+            if requirement.maximum_bytes is not None and observed_size > requirement.maximum_bytes:
                 raise ContentAddressedResolutionError(
                     "content address exceeds its read-work envelope"
                 )
@@ -124,7 +123,12 @@ class ExternalContentAddressedInputResolver:
                 source_scope=source_scope,
                 expected_size_bytes=observed_size,
                 expected_sha256=requirement.content_sha256,
-                maximum_bytes=requirement.maximum_bytes,
+                # Exact observed size supplies the read guard when the caller
+                # selects no resource ceiling. The opener's positive envelope
+                # represents an empty file with 1, while expected_size_bytes
+                # still requires exactly zero bytes.
+                maximum_bytes=(max(1, observed_size) if requirement.maximum_bytes is None
+                               else requirement.maximum_bytes),
                 trusted_at_utc=trusted_at_utc,
             ) as guarded:
                 while True:
@@ -244,11 +248,92 @@ class ExternalCandidateInputPublisher:
         self,
         payload: bytes,
         *,
-        maximum_bytes: int = _MAXIMUM_MATERIALIZED_BYTES,
+        maximum_bytes: int | None = None,
+    ) -> CandidateInputPublication:
+        return self.publish_many((payload,), maximum_bytes=maximum_bytes, batch_size=1)[0]
+
+    def publish_many(
+        self,
+        payloads: Iterable[bytes],
+        *,
+        maximum_bytes: int | None = None,
+        batch_size: int = 64,
+    ) -> tuple[CandidateInputPublication, ...]:
+        """Publish each input atomically, sharing only directory durability work.
+
+        One input is written and file-synced at a time. At most ``batch_size``
+        input publications share a directory-sync window; payloads are not
+        buffered. A failed iterator or member leaves complete content addresses
+        already published, which are synced before the error propagates. This
+        is not an atomic multi-input transaction.
+        """
+        if type(batch_size) is not int or batch_size <= 0:
+            raise ValueError("candidate publication batch_size must be a positive integer")
+        publications = []
+        dirty_directories: set[Path] = set()
+        report_progress(phase="publish_inputs", done=0)
+        try:
+            try:
+                for payload in payloads:
+                    publications.append(self._publish(payload, maximum_bytes, dirty_directories))
+                    if len(publications) % batch_size == 0:
+                        self._sync_directories(dirty_directories)
+                        report_progress(phase="publish_inputs", done=len(publications))
+            finally:
+                self._sync_directories(dirty_directories)
+        except Exception:
+            report_progress(phase="publish_inputs", failed=1)
+            raise
+        result = tuple(publications)
+        report_progress(phase="publish_inputs", done=len(publications), total=len(publications))
+        return result
+
+    @staticmethod
+    def _sync_directories(directories: set[Path]) -> None:
+        # Children must reach storage before the entries naming their parents.
+        # Attempt every pending directory even if one sync fails. A failed
+        # operation returns no publications and does not claim durability.
+        pending = sorted(directories, key=lambda path: (-len(path.parts), str(path)))
+        directories.clear()
+        first_error: BaseException | None = None
+        for path in pending:
+            descriptor = None
+            try:
+                descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
+                    | getattr(os, "O_NOFOLLOW", 0))
+                os.fsync(descriptor)
+            except BaseException as error:
+                if first_error is None:
+                    first_error = error
+            finally:
+                if descriptor is not None:
+                    try:
+                        os.close(descriptor)
+                    except BaseException as error:
+                        if first_error is None:
+                            first_error = error
+        if first_error is not None:
+            raise first_error
+
+    @staticmethod
+    def _require_exact_replay(target: Path, payload: bytes) -> None:
+        try:
+            before = target.lstat()
+            if not stat.S_ISREG(before.st_mode) or not file_matches_bytes(target, payload):
+                raise ArtifactIdentityConflict("candidate input content address contains different bytes")
+            after = target.lstat()
+            fields = ("st_dev", "st_ino", "st_mode", "st_size", "st_mtime_ns", "st_ctime_ns")
+            if tuple(getattr(before, key) for key in fields) != tuple(getattr(after, key) for key in fields):
+                raise ArtifactIdentityConflict("candidate input changed during exact replay")
+        except (OSError, BoundedFileIOError) as error:
+            raise ArtifactIdentityConflict("candidate input destination is not a stable regular file") from error
+
+    def _publish(
+        self, payload: bytes, maximum_bytes: int | None, dirty_directories: set[Path],
     ) -> CandidateInputPublication:
         if not isinstance(payload, bytes):
             raise TypeError("candidate input payload must be bytes")
-        if not payload or len(payload) > maximum_bytes:
+        if not payload or (maximum_bytes is not None and len(payload) > maximum_bytes):
             raise ValueError("candidate input payload violates its byte envelope")
         digest = hashlib.sha256(payload).hexdigest()
         relative = f"candidate-inputs/sha256/{digest[:2]}/{digest}"
@@ -257,24 +342,36 @@ class ExternalCandidateInputPublisher:
             for_write=True,
             operation_minimum_free_bytes=len(payload),
         )
-        target.parent.mkdir(parents=True, exist_ok=True)
+        root_path = Path(self.root.contract.canonical_path)
+        directory = root_path
+        for component in target.parent.relative_to(root_path).parts:
+            parent, directory = directory, directory / component
+            try:
+                directory.mkdir()
+            except FileExistsError:
+                if directory.is_symlink() or not directory.is_dir():
+                    raise ExternalRootUnavailable("candidate input parent is not a regular directory") from None
+            else:
+                dirty_directories.add(parent)
         target = self.root.resolve(
             relative,
             for_write=True,
             operation_minimum_free_bytes=len(payload),
         )
+        # Also sync existing ancestry: a concurrent publisher or an interrupted
+        # earlier call may have installed an entry without completing its sync.
+        directory = target.parent
+        while True:
+            dirty_directories.add(directory)
+            if directory == root_path:
+                break
+            directory = directory.parent
         try:
             before = target.lstat()
         except FileNotFoundError:
             before = None
         if before is not None:
-            if stat.S_ISLNK(before.st_mode) or not stat.S_ISREG(before.st_mode):
-                raise ArtifactIdentityConflict("candidate input destination is not a regular file")
-            observed = target.read_bytes()
-            if observed != payload:
-                raise ArtifactIdentityConflict(
-                    "candidate input content address contains different bytes"
-                )
+            self._require_exact_replay(target, payload)
             return CandidateInputPublication(
                 content_sha256=digest,
                 size_bytes=len(payload),
@@ -288,12 +385,14 @@ class ExternalCandidateInputPublisher:
         ]
         staged = target.parent / f".{digest}.{token}.stage"
         descriptor: int | None = None
+        staged_created = False
         try:
             descriptor = os.open(
                 staged,
                 os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0),
                 0o440,
             )
+            staged_created = True
             view = memoryview(payload)
             while view:
                 written = os.write(descriptor, view)
@@ -301,63 +400,35 @@ class ExternalCandidateInputPublisher:
                     raise OSError("candidate input publication made no progress")
                 view = view[written:]
             os.fsync(descriptor)
-            os.close(descriptor)
-            descriptor = None
+            synced_descriptor, descriptor = descriptor, None
+            os.close(synced_descriptor)
             try:
-                os.link(staged, target, follow_symlinks=False)
-            except PermissionError:
-                # Some accepted removable filesystems do not implement hard
-                # links. Exclusive creation still prevents replacement; a
-                # process-interrupted partial target fails future hash checks.
-                target_descriptor = os.open(
-                    target,
-                    os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0),
-                    0o440,
-                )
                 try:
-                    target_view = memoryview(payload)
-                    while target_view:
-                        written = os.write(target_descriptor, target_view)
-                        if written <= 0:
-                            raise OSError("candidate input publication made no progress")
-                        target_view = target_view[written:]
-                    os.fsync(target_descriptor)
-                except BaseException:
-                    os.close(target_descriptor)
-                    target_descriptor = -1
-                    target.unlink(missing_ok=True)
-                    raise
-                finally:
-                    if target_descriptor >= 0:
-                        os.close(target_descriptor)
-                publication_mode = "EXCLUSIVE_CREATE_FAIL_CLOSED"
+                    os.link(staged, target, follow_symlinks=False)
+                except PermissionError:
+                    # The same synced staging inode can be installed on VFAT.
+                    # Unsupported exclusive rename fails closed; never copy
+                    # bytes into a visible target or replace an address.
+                    rename_noreplace(staged, target)
+                    publication_mode = "ATOMIC_RENAME_NO_REPLACE"
+                else:
+                    publication_mode = "ATOMIC_HARDLINK_NO_REPLACE"
+            except FileExistsError:
+                self._require_exact_replay(target, payload)
+                replayed = True
+                publication_mode = "EXACT_REPLAY"
             else:
-                publication_mode = "ATOMIC_HARDLINK_NO_REPLACE"
-            directory_descriptor = os.open(
-                target.parent,
-                os.O_RDONLY | getattr(os, "O_DIRECTORY", 0),
-            )
-            try:
-                os.fsync(directory_descriptor)
-            finally:
-                os.close(directory_descriptor)
-        except FileExistsError:
-            observed = target.read_bytes()
-            if observed != payload:
-                raise ArtifactIdentityConflict(
-                    "candidate input publication conflicted at its content address"
-                ) from None
-            replayed = True
-            publication_mode = "EXACT_REPLAY"
-        else:
-            replayed = False
+                replayed = False
         finally:
-            if descriptor is not None:
-                os.close(descriptor)
             try:
-                staged.unlink()
-            except FileNotFoundError:
-                pass
+                if descriptor is not None:
+                    os.close(descriptor)
+            finally:
+                if staged_created:
+                    try:
+                        staged.unlink()
+                    except FileNotFoundError:
+                        pass
         return CandidateInputPublication(
             content_sha256=digest,
             size_bytes=len(payload),

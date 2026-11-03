@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import Final, Protocol
+from typing import TYPE_CHECKING, Callable, Final, Protocol
 
 from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
 from empirical_lawhood.kernel.serialization import (
@@ -17,6 +17,10 @@ from empirical_lawhood.kernel.serialization import (
     validate_sha256,
     validate_stable_id,
 )
+from empirical_lawhood.planning.study_authoring import CapabilitySelection
+
+if TYPE_CHECKING:
+    from .recursive_compiler import RegisteredProvenanceRequirement
 
 from .artifacts import (
     ArtifactLineageParent,
@@ -379,12 +383,86 @@ class ExternalInputPayload:
         self.source.close()
 
 
+@dataclass(frozen=True, slots=True)
+class CapabilityWorkerPreparation:
+    """Code-owned worker requirements for one exact installed capability.
+
+    This operational product is neither serialized authority nor a substitute
+    for the actual implementation/source observation performed before workers.
+    """
+
+    selection: CapabilitySelection
+    provenance_requirements: tuple[RegisteredProvenanceRequirement, ...] = ()
+    native_effect: bool = False
+    native_work_preparer: Callable | None = None
+    worker_environment_selector: Callable | None = None
+
+    def __post_init__(self) -> None:
+        from .recursive_compiler import RegisteredProvenanceRequirement
+
+        if type(self.selection) is not CapabilitySelection:
+            raise TypeError("worker preparation requires its exact capability selection")
+        self.selection.__post_init__()
+        requirements = self.provenance_requirements
+        if (type(requirements) is not tuple
+                or any(type(value) is not RegisteredProvenanceRequirement for value in requirements)
+                or tuple(value.requirement_id for value in requirements)
+                != tuple(sorted({value.requirement_id for value in requirements}))):
+            raise ValueError("worker preparation requires sorted unique registered provenance requirements")
+        if type(self.native_effect) is not bool:
+            raise TypeError("worker preparation requires its explicit native effect")
+        if self.native_work_preparer is not None and (
+                not self.native_effect or not callable(self.native_work_preparer)):
+            raise ValueError("worker native preparation requires its declared effect and code-owned callback")
+        if self.worker_environment_selector is not None and not callable(self.worker_environment_selector):
+            raise TypeError("worker environment selection requires its code-owned callback")
+
+
+def validate_worker_preparations(
+    values: tuple[CapabilityWorkerPreparation, ...],
+    registry: CapabilityRegistry,
+    execution_plan: ProtocolExecutionPlan | None = None,
+) -> tuple[CapabilityWorkerPreparation, ...]:
+    """Authenticate static ownership, then retain exact selected plan products."""
+    if type(values) is not tuple or any(type(value) is not CapabilityWorkerPreparation for value in values):
+        raise TypeError("provider worker preparations require their exact typed tuple")
+    identifiers = tuple(value.selection.selection_id for value in values)
+    if identifiers != tuple(sorted(set(identifiers))):
+        raise ValueError("provider worker preparations must be sorted and unique")
+    for value in values:
+        value.__post_init__()
+        selection = value.selection
+        manifest = registry.resolve(selection.capability_key, selection.capability_version)
+        if manifest.implementation_sha256 != selection.implementation_sha256:
+            raise ValueError("worker preparation differs from its exact registry implementation")
+    if execution_plan is None:
+        return values
+    if execution_plan.registry_sha256 != registry.fingerprint():
+        raise ValueError("worker preparation plan differs from its exact registry")
+    selected = set()
+    for task in execution_plan.tasks:
+        manifest = registry.resolve(task.capability.capability_key, task.capability.capability_version)
+        if manifest.implementation_sha256 != task.capability_implementation_sha256:
+            raise ValueError("worker preparation task differs from its exact registry implementation")
+        selected.add((manifest.capability_key, manifest.capability_version, manifest.implementation_sha256))
+    return tuple(value for value in values if (value.selection.capability_key,
+        value.selection.capability_version, value.selection.implementation_sha256) in selected)
+
+
 class CampaignRuntimeProvider:
     """Static capability implementation and source provisioning boundary."""
 
     registry_sha256: str
     capability_count: int
     issued_source_schema_ids: tuple[str, ...] = ()
+
+    def worker_preparations(
+        self,
+        registry: CapabilityRegistry,
+        execution_plan: ProtocolExecutionPlan | None = None,
+    ) -> tuple[CapabilityWorkerPreparation, ...]:
+        """Legacy providers retain their existing worker lifecycle by default."""
+        return ()
 
     def runners(
         self,

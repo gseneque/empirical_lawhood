@@ -112,6 +112,7 @@ class DatasetCatalogReadSessionProvider:
         "trusted_anchor",
         "trusted_snapshot",
         "_engine_factory",
+        "_catalog_access",
     )
 
     def __init__(
@@ -121,6 +122,7 @@ class DatasetCatalogReadSessionProvider:
         trusted_anchor: DatasetCatalogProjectionAnchor,
         *,
         engine_factory: _ReadOnlyCatalogEngineFactory = create_read_only_catalog_engine,
+        catalog_access=None,
     ) -> None:
         if not isinstance(database_path, Path):
             raise TypeError("database_path must be a Path")
@@ -135,6 +137,13 @@ class DatasetCatalogReadSessionProvider:
 
         # Retain the exact caller-supplied path and trust records.  In particular,
         # construction performs no filesystem access and derives nothing from SQLite.
+        if catalog_access is not None:
+            from empirical_lawhood.infrastructure.guarded_catalog import GuardedCatalogAccess
+
+            if (type(catalog_access) is not GuardedCatalogAccess or catalog_access.database_path != database_path
+                    or engine_factory is not create_read_only_catalog_engine):
+                raise ValueError("trusted dataset catalog changes its exact guarded read-only selection")
+        self._catalog_access = catalog_access
         self.database_path = database_path
         self.trusted_snapshot = trusted_snapshot
         self.trusted_anchor = trusted_anchor
@@ -146,7 +155,8 @@ class DatasetCatalogReadSessionProvider:
     def open(self) -> Iterator[DatasetCatalogReadService]:
         """Yield a trusted read service and dispose its read-only engine on exit."""
 
-        engine = self._engine_factory(self.database_path)
+        engine = (self._engine_factory(self.database_path) if self._catalog_access is None
+            else self._catalog_access.read_only_engine())
         if not isinstance(engine, Engine):
             raise TypeError("engine_factory must return a SQLAlchemy Engine")
         try:

@@ -1,0 +1,1389 @@
+{
+  "authority": "Local development and assessment closeout only; no issue, reveal, publication, submission, merge, push or release authority is created.",
+  "branch": "recchain",
+  "canonical_scientific_record": false,
+  "current_archive_preflight": {
+    "path": "/tmp/empirical-lawhood-applied-el-20261011-reopen01/preflight-custody-repair01.json",
+    "sha256": "74ef5c206a03204d63851a4d397dbab749c0cf8716ac1ebbe68dfdae2d19f39f",
+    "size_bytes": 912984
+  },
+  "expense_interpretation": "Per-invocation, per-phase and entry cost windows overlap and cannot be summed as independent expenses. Filesystem copies are separate footprints, not independent evidence. Historical engineering and unmetered tails remain unknown.",
+  "head": "9a4c29cb017cae6338dcf7c422f202062bc2a8cd",
+  "preservation": {
+    "authorized_amendment_count": 4,
+    "baseline_protected_inventory": {
+      "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/limit-removal-before/docs/applied-el/programme-closeout.json",
+      "sha256": "1a94042b4ae31dc60bea7a703b3fed1cf7b653da2fd6a95a9b3617dfb488fe6d",
+      "size_bytes": 654526
+    },
+    "before_amendment_manifest": {
+      "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/limit-removal-before/manifest.json",
+      "sha256": "bf220c8ff4f6a86fb4aa307521715235a69169342bcff2b5508d0d6e394a3c4b",
+      "size_bytes": 2021
+    },
+    "dependency_lock": {
+      "path": "/home/chevre/gs-ml/empirical_lawhood/uv.lock",
+      "sha256": "ea491f9e8789d6cd5a18d89908d16ef7db4ee3c9ed4729e32354bc713b135f24",
+      "size_bytes": 995920
+    },
+    "files": [
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "68f25f8a0b56289e87ccae8567c4101030ed4a801feed080ae7cb03161a4a5b0",
+        "baseline_size_bytes": 106718,
+        "current_sha256": "68f25f8a0b56289e87ccae8567c4101030ed4a801feed080ae7cb03161a4a5b0",
+        "current_size_bytes": 106718,
+        "path": "ELSC.md",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": true,
+        "baseline_sha256": "5127cca22abebcb53f0f305280ccc1d69d1dd76f36772f87a0a2b878d9f182a3",
+        "baseline_size_bytes": 127137,
+        "current_sha256": "4fa96a4529953aeeb1f442d4136352d8320ab8faecb78f25ce8229c6266bc507",
+        "current_size_bytes": 128136,
+        "path": "ELTOP5.md",
+        "unchanged": false
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "4202b48a05a4f40cf9c3c6c97d3c58f3bf55bb4eedd459aaa6ed735896dc1454",
+        "baseline_size_bytes": 40116,
+        "current_sha256": "4202b48a05a4f40cf9c3c6c97d3c58f3bf55bb4eedd459aaa6ed735896dc1454",
+        "current_size_bytes": 40116,
+        "path": "PREPRINTNOVELTY.md",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": true,
+        "baseline_sha256": "cf7d6813c0010ce899707caa9b4e6afea8c4bb036598ca3ebd25a5b36f66e7bf",
+        "baseline_size_bytes": 54380,
+        "current_sha256": "f223a21c03d2dd6e53b3e66520da4e12cafec7b890dd932b7acbe6e3e88c8e4d",
+        "current_size_bytes": 55508,
+        "path": "RECURARCH.md",
+        "unchanged": false
+      },
+      {
+        "authorized_plan_amendment": true,
+        "baseline_sha256": "c5f35bb8da915e54e965d2b1f7e14e947fcfdb9d265d79f7ca0c4417ac112bf4",
+        "baseline_size_bytes": 68784,
+        "current_sha256": "8fbd36ed4bb03af014182b016a23513070f70b87ce8c71d952eb25a2e0534a86",
+        "current_size_bytes": 69900,
+        "path": "RUBISCO-PRIZE-REFINED-PLAN.md",
+        "unchanged": false
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "addcb9a04a8a629a7ef2c1a8ae62f6379b56d0bcc340a9fb6dbd6dabab5b524f",
+        "baseline_size_bytes": 32273,
+        "current_sha256": "addcb9a04a8a629a7ef2c1a8ae62f6379b56d0bcc340a9fb6dbd6dabab5b524f",
+        "current_size_bytes": 32273,
+        "path": "THEMATRIX.md",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": true,
+        "baseline_sha256": "510eb1e422fceec01e269cc21f45916e26cdaf7a1b191b54c8ad1904f8e65589",
+        "baseline_size_bytes": 19768,
+        "current_sha256": "f9bb33db9d5d05db64b458d8367886da080bb2ddbc4dbb6499c0ae19dcad3a11",
+        "current_size_bytes": 21061,
+        "path": "docs/applied-el-handoff.md",
+        "unchanged": false
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "cc4fe5c22061b4834ffee5443a90bbcc228f0e1686206fa6566c9cd4566572c3",
+        "baseline_size_bytes": 14755,
+        "current_sha256": "cc4fe5c22061b4834ffee5443a90bbcc228f0e1686206fa6566c9cd4566572c3",
+        "current_size_bytes": 14755,
+        "path": "experiments/recursive-inquiry/materials-partial.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "2aa2af9d503a630574f20800549a4d7175d5ba8481855f5e67df49322ecb83c4",
+        "baseline_size_bytes": 12619,
+        "current_sha256": "2aa2af9d503a630574f20800549a4d7175d5ba8481855f5e67df49322ecb83c4",
+        "current_size_bytes": 12619,
+        "path": "paper/README.md",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "07fc96985af2463df8dc67fae9b71ddb2a1b2bdec1468787b637a851ec09c58e",
+        "baseline_size_bytes": 14160,
+        "current_sha256": "07fc96985af2463df8dc67fae9b71ddb2a1b2bdec1468787b637a851ec09c58e",
+        "current_size_bytes": 14160,
+        "path": "paper/SOURCES.md",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "7a49b7cc703d8c42c8615b5600e61a99d6af72ccf0f5c5624ad50193da333c9d",
+        "baseline_size_bytes": 190515,
+        "current_sha256": "7a49b7cc703d8c42c8615b5600e61a99d6af72ccf0f5c5624ad50193da333c9d",
+        "current_size_bytes": 190515,
+        "path": "paper/assets/figure1.pdf",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "836a3c7f173194177b382c097f9db6aecee8e298252da7a3201ec23a5b635581",
+        "baseline_size_bytes": 191150,
+        "current_sha256": "836a3c7f173194177b382c097f9db6aecee8e298252da7a3201ec23a5b635581",
+        "current_size_bytes": 191150,
+        "path": "paper/assets/figure1.png",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "ec89c367e11467d06ae4f82e3aa7b511ded82cbc55935fb3bb9017b830ffabaf",
+        "baseline_size_bytes": 275835,
+        "current_sha256": "ec89c367e11467d06ae4f82e3aa7b511ded82cbc55935fb3bb9017b830ffabaf",
+        "current_size_bytes": 275835,
+        "path": "paper/assets/figure2.pdf",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "076bda1e86a00f0a3f03aa54e5e949f30059e2fbafa2bda570ad69aa0759cc5d",
+        "baseline_size_bytes": 274881,
+        "current_sha256": "076bda1e86a00f0a3f03aa54e5e949f30059e2fbafa2bda570ad69aa0759cc5d",
+        "current_size_bytes": 274881,
+        "path": "paper/assets/figure2.png",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "a7598f5d09752b34456809e0de7ce1c08df94d6810a7860b0974c1d32229c1fc",
+        "baseline_size_bytes": 215780,
+        "current_sha256": "a7598f5d09752b34456809e0de7ce1c08df94d6810a7860b0974c1d32229c1fc",
+        "current_size_bytes": 215780,
+        "path": "paper/assets/figure3.pdf",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "7dfa99b66582d4c0f82dd3decfffca075ea8990efecfc53f0916e5ce4d87327f",
+        "baseline_size_bytes": 216673,
+        "current_sha256": "7dfa99b66582d4c0f82dd3decfffca075ea8990efecfc53f0916e5ce4d87327f",
+        "current_size_bytes": 216673,
+        "path": "paper/assets/figure3.png",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "e0153a1f1827417e5649d58d6c61b3f31450b46e9bcced99a53d616d31bff936",
+        "baseline_size_bytes": 2490,
+        "current_sha256": "e0153a1f1827417e5649d58d6c61b3f31450b46e9bcced99a53d616d31bff936",
+        "current_size_bytes": 2490,
+        "path": "paper/assets/inherited_figure_provenance.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "49d41b928316cc322d71be5462976c5495e17c8cd639f112adf68efa538a61b8",
+        "baseline_size_bytes": 8942,
+        "current_sha256": "49d41b928316cc322d71be5462976c5495e17c8cd639f112adf68efa538a61b8",
+        "current_size_bytes": 8942,
+        "path": "paper/bundle-manifest.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "9e3ea52ae38cf9113f21dc4f479ac6f51f64e0a0d58a1f70fb977674c15df1b5",
+        "baseline_size_bytes": 2128309,
+        "current_sha256": "9e3ea52ae38cf9113f21dc4f479ac6f51f64e0a0d58a1f70fb977674c15df1b5",
+        "current_size_bytes": 2128309,
+        "path": "paper/editions/Empirical_Lawhood_v0.60_Selected_Source.zip",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "542c7450f5504316ffab6a28f4f626a963225ff6536753577781acafbd7760db",
+        "baseline_size_bytes": 875723,
+        "current_sha256": "542c7450f5504316ffab6a28f4f626a963225ff6536753577781acafbd7760db",
+        "current_size_bytes": 875723,
+        "path": "paper/editions/v0.60-deposit/Empirical_Lawhood_Manuscript_v0.60.pdf",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "12d0ae5ff3c2b0145cd92f0a806ea1a50232beaf2f57ffcf6f756c52095b0f76",
+        "baseline_size_bytes": 6863,
+        "current_sha256": "12d0ae5ff3c2b0145cd92f0a806ea1a50232beaf2f57ffcf6f756c52095b0f76",
+        "current_size_bytes": 6863,
+        "path": "paper/editions/v0.60-deposit/zenodo-record.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "49bcc63664e537c5a4bd3d09b9e8c76653376ca4a19a15ef714234c2058b1d34",
+        "baseline_size_bytes": 22081,
+        "current_sha256": "49bcc63664e537c5a4bd3d09b9e8c76653376ca4a19a15ef714234c2058b1d34",
+        "current_size_bytes": 22081,
+        "path": "paper/editions/v0.60/Empirical_Lawhood_Evidence_and_Provenance_v0.60.md",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "0e2216ba1d18839eed387bec93302b6e00a0dd4e70bd53d1e945bb05bb07ff9c",
+        "baseline_size_bytes": 87824,
+        "current_sha256": "0e2216ba1d18839eed387bec93302b6e00a0dd4e70bd53d1e945bb05bb07ff9c",
+        "current_size_bytes": 87824,
+        "path": "paper/editions/v0.60/Empirical_Lawhood_Evidence_and_Provenance_v0.60.pdf",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "dcce819ca073c680a89434eec8101422f1dcbee886e768e28a91056ee617bc3d",
+        "baseline_size_bytes": 70802,
+        "current_sha256": "dcce819ca073c680a89434eec8101422f1dcbee886e768e28a91056ee617bc3d",
+        "current_size_bytes": 70802,
+        "path": "paper/editions/v0.60/Empirical_Lawhood_Manuscript_v0.60.md",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "b000a94eeeaa014b6e79491e09ea3d526450457bb0f06236c1d9007e7632f1c7",
+        "baseline_size_bytes": 823033,
+        "current_sha256": "b000a94eeeaa014b6e79491e09ea3d526450457bb0f06236c1d9007e7632f1c7",
+        "current_size_bytes": 823033,
+        "path": "paper/editions/v0.60/Empirical_Lawhood_Manuscript_v0.60.pdf",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "d01b144389341917d6ea845d91d57d12543ef3c2e5845e9eb724ec4392dd5285",
+        "baseline_size_bytes": 1822,
+        "current_sha256": "d01b144389341917d6ea845d91d57d12543ef3c2e5845e9eb724ec4392dd5285",
+        "current_size_bytes": 1822,
+        "path": "paper/editions/v0.60/Revision_Summary_v0.60.md",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "7a49b7cc703d8c42c8615b5600e61a99d6af72ccf0f5c5624ad50193da333c9d",
+        "baseline_size_bytes": 190515,
+        "current_sha256": "7a49b7cc703d8c42c8615b5600e61a99d6af72ccf0f5c5624ad50193da333c9d",
+        "current_size_bytes": 190515,
+        "path": "paper/editions/v0.60/assets/figure1.pdf",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "836a3c7f173194177b382c097f9db6aecee8e298252da7a3201ec23a5b635581",
+        "baseline_size_bytes": 191150,
+        "current_sha256": "836a3c7f173194177b382c097f9db6aecee8e298252da7a3201ec23a5b635581",
+        "current_size_bytes": 191150,
+        "path": "paper/editions/v0.60/assets/figure1.png",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "ec89c367e11467d06ae4f82e3aa7b511ded82cbc55935fb3bb9017b830ffabaf",
+        "baseline_size_bytes": 275835,
+        "current_sha256": "ec89c367e11467d06ae4f82e3aa7b511ded82cbc55935fb3bb9017b830ffabaf",
+        "current_size_bytes": 275835,
+        "path": "paper/editions/v0.60/assets/figure2.pdf",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "076bda1e86a00f0a3f03aa54e5e949f30059e2fbafa2bda570ad69aa0759cc5d",
+        "baseline_size_bytes": 274881,
+        "current_sha256": "076bda1e86a00f0a3f03aa54e5e949f30059e2fbafa2bda570ad69aa0759cc5d",
+        "current_size_bytes": 274881,
+        "path": "paper/editions/v0.60/assets/figure2.png",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "a7598f5d09752b34456809e0de7ce1c08df94d6810a7860b0974c1d32229c1fc",
+        "baseline_size_bytes": 215780,
+        "current_sha256": "a7598f5d09752b34456809e0de7ce1c08df94d6810a7860b0974c1d32229c1fc",
+        "current_size_bytes": 215780,
+        "path": "paper/editions/v0.60/assets/figure3.pdf",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "7dfa99b66582d4c0f82dd3decfffca075ea8990efecfc53f0916e5ce4d87327f",
+        "baseline_size_bytes": 216673,
+        "current_sha256": "7dfa99b66582d4c0f82dd3decfffca075ea8990efecfc53f0916e5ce4d87327f",
+        "current_size_bytes": 216673,
+        "path": "paper/editions/v0.60/assets/figure3.png",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "e0153a1f1827417e5649d58d6c61b3f31450b46e9bcced99a53d616d31bff936",
+        "baseline_size_bytes": 2490,
+        "current_sha256": "e0153a1f1827417e5649d58d6c61b3f31450b46e9bcced99a53d616d31bff936",
+        "current_size_bytes": 2490,
+        "path": "paper/editions/v0.60/assets/inherited_figure_provenance.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "a7dd4da3b3d518a68cb5fe38dba8edd6252ae39b63bd4155897f7331d62cc3dc",
+        "baseline_size_bytes": 1245,
+        "current_sha256": "a7dd4da3b3d518a68cb5fe38dba8edd6252ae39b63bd4155897f7331d62cc3dc",
+        "current_size_bytes": 1245,
+        "path": "paper/editions/v0.60/build.sh",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "5a5d5f973b39f84a5cd3f807f8afe986d63e601f43d52ab12d9b3ae952f4986e",
+        "baseline_size_bytes": 220,
+        "current_sha256": "5a5d5f973b39f84a5cd3f807f8afe986d63e601f43d52ab12d9b3ae952f4986e",
+        "current_size_bytes": 220,
+        "path": "paper/editions/v0.60/evidence_metadata.tex",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "61c19159dea0146a2664578b83ccd09d61de9bfd05329930aef7fc179f423c20",
+        "baseline_size_bytes": 2131,
+        "current_sha256": "61c19159dea0146a2664578b83ccd09d61de9bfd05329930aef7fc179f423c20",
+        "current_size_bytes": 2131,
+        "path": "paper/editions/v0.60/header.tex",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "6965306e3832d1164aad02047149e73fee61e5c6305bdd79cc1db21194c9b2d0",
+        "baseline_size_bytes": 2900,
+        "current_sha256": "6965306e3832d1164aad02047149e73fee61e5c6305bdd79cc1db21194c9b2d0",
+        "current_size_bytes": 2900,
+        "path": "paper/editions/v0.60/layout.lua",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "dae4f559e53c9217891a420ef0cd4e3e69cbd536ce985e259ad9b068daaeb71e",
+        "baseline_size_bytes": 3034,
+        "current_sha256": "dae4f559e53c9217891a420ef0cd4e3e69cbd536ce985e259ad9b068daaeb71e",
+        "current_size_bytes": 3034,
+        "path": "paper/editions/v0.60/validation_report.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "dcce819ca073c680a89434eec8101422f1dcbee886e768e28a91056ee617bc3d",
+        "baseline_size_bytes": 70802,
+        "current_sha256": "dcce819ca073c680a89434eec8101422f1dcbee886e768e28a91056ee617bc3d",
+        "current_size_bytes": 70802,
+        "path": "paper/manuscript.md",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "b000a94eeeaa014b6e79491e09ea3d526450457bb0f06236c1d9007e7632f1c7",
+        "baseline_size_bytes": 823033,
+        "current_sha256": "b000a94eeeaa014b6e79491e09ea3d526450457bb0f06236c1d9007e7632f1c7",
+        "current_size_bytes": 823033,
+        "path": "paper/manuscript.pdf",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "8fae8d0d60de37a2b5ccb29278421263a78f64303071fbfa712f6c0563b49212",
+        "baseline_size_bytes": 795,
+        "current_sha256": "8fae8d0d60de37a2b5ccb29278421263a78f64303071fbfa712f6c0563b49212",
+        "current_size_bytes": 795,
+        "path": "paper/metadata.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "49bcc63664e537c5a4bd3d09b9e8c76653376ca4a19a15ef714234c2058b1d34",
+        "baseline_size_bytes": 22081,
+        "current_sha256": "49bcc63664e537c5a4bd3d09b9e8c76653376ca4a19a15ef714234c2058b1d34",
+        "current_size_bytes": 22081,
+        "path": "paper/revision-and-evidence-notes.md",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "0e2216ba1d18839eed387bec93302b6e00a0dd4e70bd53d1e945bb05bb07ff9c",
+        "baseline_size_bytes": 87824,
+        "current_sha256": "0e2216ba1d18839eed387bec93302b6e00a0dd4e70bd53d1e945bb05bb07ff9c",
+        "current_size_bytes": 87824,
+        "path": "paper/revision-and-evidence-notes.pdf",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "d01b144389341917d6ea845d91d57d12543ef3c2e5845e9eb724ec4392dd5285",
+        "baseline_size_bytes": 1822,
+        "current_sha256": "d01b144389341917d6ea845d91d57d12543ef3c2e5845e9eb724ec4392dd5285",
+        "current_size_bytes": 1822,
+        "path": "paper/revision-summary.md",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "38bda03449a05094870e52750f6977fedecfd6f0523fb4deb9355e9291fabd4f",
+        "baseline_size_bytes": 7332,
+        "current_sha256": "38bda03449a05094870e52750f6977fedecfd6f0523fb4deb9355e9291fabd4f",
+        "current_size_bytes": 7332,
+        "path": "paper/source/bibliography.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "689b675abd076a0feb1f6a65647e3d2f3fd8b36678f2c8904ef4c987995a8026",
+        "baseline_size_bytes": 10695,
+        "current_sha256": "689b675abd076a0feb1f6a65647e3d2f3fd8b36678f2c8904ef4c987995a8026",
+        "current_size_bytes": 10695,
+        "path": "paper/source/build_pdfs.py",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "e1d73c38d362ee912c3497691421c27d7cb2b71916db62650bce3ab695de2031",
+        "baseline_size_bytes": 13943,
+        "current_sha256": "e1d73c38d362ee912c3497691421c27d7cb2b71916db62650bce3ab695de2031",
+        "current_size_bytes": 13943,
+        "path": "paper/source/canonical-inputs.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "f74edd3b33c529f78382c746739ebeabe6226b0368851282a70bcebcd08661d8",
+        "baseline_size_bytes": 25894,
+        "current_sha256": "f74edd3b33c529f78382c746739ebeabe6226b0368851282a70bcebcd08661d8",
+        "current_size_bytes": 25894,
+        "path": "paper/source/claim-evidence-inventory.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "8ffe0db95ebf351adf51484e6841d724baf69d9e51dcf47f57f3760bfd2ccea4",
+        "baseline_size_bytes": 5171,
+        "current_sha256": "8ffe0db95ebf351adf51484e6841d724baf69d9e51dcf47f57f3760bfd2ccea4",
+        "current_size_bytes": 5171,
+        "path": "paper/source/evidence-manifest.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "5a5d5f973b39f84a5cd3f807f8afe986d63e601f43d52ab12d9b3ae952f4986e",
+        "baseline_size_bytes": 220,
+        "current_sha256": "5a5d5f973b39f84a5cd3f807f8afe986d63e601f43d52ab12d9b3ae952f4986e",
+        "current_size_bytes": 220,
+        "path": "paper/source/evidence_metadata.tex",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "743e3f1d591fd5eec8b68e4d02b3602523b932ced7fe207cc60765e8dec9751e",
+        "baseline_size_bytes": 188,
+        "current_sha256": "743e3f1d591fd5eec8b68e4d02b3602523b932ced7fe207cc60765e8dec9751e",
+        "current_size_bytes": 188,
+        "path": "paper/source/pdf-compatibility.tex",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "9ecd6d0ec799d04b07082904fc6daafb289e3c0b155d2cbe9766df81557f671c",
+        "baseline_size_bytes": 15295,
+        "current_sha256": "9ecd6d0ec799d04b07082904fc6daafb289e3c0b155d2cbe9766df81557f671c",
+        "current_size_bytes": 15295,
+        "path": "paper/source/pdf-preflight.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "6965306e3832d1164aad02047149e73fee61e5c6305bdd79cc1db21194c9b2d0",
+        "baseline_size_bytes": 2900,
+        "current_sha256": "6965306e3832d1164aad02047149e73fee61e5c6305bdd79cc1db21194c9b2d0",
+        "current_size_bytes": 2900,
+        "path": "paper/source/pdf_filter.lua",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "61c19159dea0146a2664578b83ccd09d61de9bfd05329930aef7fc179f423c20",
+        "baseline_size_bytes": 2131,
+        "current_sha256": "61c19159dea0146a2664578b83ccd09d61de9bfd05329930aef7fc179f423c20",
+        "current_size_bytes": 2131,
+        "path": "paper/source/preamble.tex",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "0145686123d9d7cd187a3b33412d8e4a9563d75c45a7b48e397de9f550516576",
+        "baseline_size_bytes": 4568,
+        "current_sha256": "0145686123d9d7cd187a3b33412d8e4a9563d75c45a7b48e397de9f550516576",
+        "current_size_bytes": 4568,
+        "path": "paper/source/reported-values.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "030c9244cafe61b4868c8bda010174bb323eceb29fb52a824c38841a7d62098c",
+        "baseline_size_bytes": 18084,
+        "current_sha256": "030c9244cafe61b4868c8bda010174bb323eceb29fb52a824c38841a7d62098c",
+        "current_size_bytes": 18084,
+        "path": "paper/source/source-preservation.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "7e01f3774700d14ce1c60e908ba92caeb770906474c28083042b5df8cb5dd4c8",
+        "baseline_size_bytes": 876,
+        "current_sha256": "7e01f3774700d14ce1c60e908ba92caeb770906474c28083042b5df8cb5dd4c8",
+        "current_size_bytes": 876,
+        "path": "paper/source/storage.py",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "a7461547da283fc6f5601b5e4c3718a01405b52b6b01165bae91664d6e50e6eb",
+        "baseline_size_bytes": 5155,
+        "current_sha256": "a7461547da283fc6f5601b5e4c3718a01405b52b6b01165bae91664d6e50e6eb",
+        "current_size_bytes": 5155,
+        "path": "paper/source/tests/test_validate_bundle.py",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "b1cc921ff020bebbb6599f4252d40054a5cd8bb4621cfe125381b7a2c5387ce4",
+        "baseline_size_bytes": 21045,
+        "current_sha256": "b1cc921ff020bebbb6599f4252d40054a5cd8bb4621cfe125381b7a2c5387ce4",
+        "current_size_bytes": 21045,
+        "path": "paper/source/validate_bundle.py",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "ca3f8f8c54dcef371255019c6b58987c8680fefe23be4406b26ecad3663d0647",
+        "baseline_size_bytes": 1401,
+        "current_sha256": "ca3f8f8c54dcef371255019c6b58987c8680fefe23be4406b26ecad3663d0647",
+        "current_size_bytes": 1401,
+        "path": "paper/source/write_manifest.py",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "ef56fd85b9fc15af5383d0f5160dc02b86a955b032ee7619cf8ab30fde7bf05a",
+        "baseline_size_bytes": 4163,
+        "current_sha256": "ef56fd85b9fc15af5383d0f5160dc02b86a955b032ee7619cf8ab30fde7bf05a",
+        "current_size_bytes": 4163,
+        "path": "paper/source_inventory.json",
+        "unchanged": true
+      },
+      {
+        "authorized_plan_amendment": false,
+        "baseline_sha256": "ea491f9e8789d6cd5a18d89908d16ef7db4ee3c9ed4729e32354bc713b135f24",
+        "baseline_size_bytes": 995920,
+        "current_sha256": "ea491f9e8789d6cd5a18d89908d16ef7db4ee3c9ed4729e32354bc713b135f24",
+        "current_size_bytes": 995920,
+        "path": "uv.lock",
+        "unchanged": true
+      }
+    ],
+    "original_paper_files_unchanged": 53,
+    "protected_count": 62,
+    "unchanged_count": 58,
+    "workspace_checkpoint": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/workspace-checkpoint/manifest.json",
+    "workspace_checkpoint_basis": "Separate local snapshot of changed and untracked bytes, including preexisting work; its manifest binds this closeout after final validation."
+  },
+  "producing_archives": {
+    "compact_acceptance": {
+      "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/producing-source-repair02.zip",
+      "sha256": "d7da0041ecd0a3f80037d958eb25087251220e30de0fd44fb5dec82cc2f3b05a",
+      "size_bytes": 11890519
+    },
+    "original_rubisco_operations": {
+      "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/producing-source-rubisco-candidate01.zip",
+      "sha256": "f547e26e182139bc5b05c3061f31a4cb31f0a2de72610c6b4cf6bfdac13a94bf",
+      "size_bytes": 11927457
+    },
+    "terminal_and_battery": {
+      "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/producing-source-custody-repair01.zip",
+      "sha256": "cfbbc56dcfb1ea982b05e5de5d9bb30d879681ea3804d3b0b966379cba4a9e47",
+      "size_bytes": 11935663
+    }
+  },
+  "record_date": "2026-10-11",
+  "record_type": "local-reopened-applied-el-closeout",
+  "remaining_scientific_boundaries": [
+    "Rubisco actual matched Galdieria I95M paired kinetics and preparation joins unresolved",
+    "Biological candidate and scientific method qualification not established; comparison unevaluated",
+    "TOP5 whole-time certificate absent and physical qualification not established",
+    "TOP5 comparison, EL advantage and later supplier/reuse unevaluated"
+  ],
+  "resource_rule": "No active study CPU, elapsed, RAM, payload, retained-byte, wave, operation, depth, candidate, setup or repair ceiling. Optional finite caller limits retain exact authority semantics.",
+  "retained_integrity": [
+    "Exact source sizes/digests, canonical identities and historical bytes",
+    "Cutoffs, assay/preparation compatibility and endpoint joins",
+    "Complete denominators, independent units and nested-view accounting",
+    "Negative and unevaluable outcomes, receipts and one-contact custody",
+    "Actual unknown costs and finite authority boundaries"
+  ],
+  "rubisco": {
+    "biological_candidate_qualification": "NOT_ESTABLISHED",
+    "comparison": "UNEVALUATED",
+    "continuation_status": "OPEN_TO_NEW_SOURCE_BACKED_DECISION_CHANGING_DESIGNS",
+    "cumulative_unique_operation_attempts": 2,
+    "custody": {
+      "member_bytes": 150677406,
+      "member_count": 505
+    },
+    "episode_completion_basis": {
+      "actual_candidate_verdict_rows": 12,
+      "assessment": {
+        "schema": "empirical-lawhood/kernel/object-identity",
+        "value": {
+          "object_fingerprint": "4533d7246858d0d4e1cb8171a0fc496c46e20a34e27612f049693d2f91e1b411",
+          "object_id": "assessment.rubisco-candidate-inquiry.use",
+          "object_schema": "empirical-lawhood/rubisco-candidate-inquiry/assessment",
+          "object_version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "candidate_decision": "RETAIN_EXPLORATORY_I95M_REQUIRE_MATCHED_CANDIDATE_BACKGROUND_KINETICS_REJECT_UNIT_TRANSFER_NOMINATION_AND_ASSAY_SUBSTITUTION",
+      "conditional_frontier_rows": 36,
+      "investigation_ceiling": null,
+      "programme_exhaustion_established": false,
+      "reason_codes": [
+        "CONDITIONAL_QUESTION_ANSWERED",
+        "REFERENCE_SENSITIVE_ALPHA3_BOUNDARY_IDENTIFIED",
+        "ACTUAL_GP_I95M_RESPONSE_UNKNOWN",
+        "MATCHED_ASSAY_JOIN_UNRESOLVED"
+      ],
+      "reference_thresholds": 2,
+      "unknown_actual_gp_i95m_verdict_rows": 4,
+      "unresolved": [
+        "ACTUAL_GP_I95M_ENDPOINTS_UNKNOWN",
+        "GP_PREPARATION_UNRESOLVED",
+        "MATCHED_ASSAY_PREPARATION_UNRESOLVED",
+        "GTG_INITIATION_M1_V1_UNRESOLVED"
+      ]
+    },
+    "final_invocation_cost": {
+      "durable": {
+        "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/rubisco-candidate-resume.terminal01/invocation-cost.json",
+        "sha256": "0f040b5b56e61ff855a80b4dc0a52d7fc5a786beadb1c28e29dd722bab339ea6",
+        "size_bytes": 868
+      },
+      "exact_copy_verified": true,
+      "primary": {
+        "path": "/tmp/empirical-lawhood-applied-el-20261011-reopen01/rubisco-candidate-resume.terminal01/invocation-cost.json",
+        "sha256": "0f040b5b56e61ff855a80b4dc0a52d7fc5a786beadb1c28e29dd722bab339ea6",
+        "size_bytes": 868
+      }
+    },
+    "local_reuse": "ASSESSED_BY_INDEPENDENT_CONSUMER",
+    "method_construction": "LOCAL_CONDITIONAL_CONTRIBUTION_CONSTRUCTED",
+    "native_contacts": 0,
+    "new_biological_independent_units": 0,
+    "new_terminal_operations": 0,
+    "original_455_member_prefix_unchanged": true,
+    "original_invocation_cost": {
+      "cpu_seconds": 471.885783,
+      "known_process_cpu_before_explicit_entry_seconds": 0.045841999999999994,
+      "storage_footprints_before_cost_receipt_writes": {
+        "basis": "Separate actual filesystem copies; footprints are not unique scientific bytes or cost-window sums.",
+        "durable_copy_and_report_bytes": 217869975,
+        "selected_log_bytes": 15553729,
+        "selected_tmpfs_bytes": 150296062
+      },
+      "unknown_costs": [
+        "historical source creation and engineering",
+        "per-operation peak RSS",
+        "wall time before explicit entry",
+        "final cost receipt writes and process exit"
+      ],
+      "unmetered_tail": "Final cost receipt writes and process exit.",
+      "wall_seconds": 528.659203582094,
+      "window": "Explicit entry, imports, source intake, author/run/read/recovery, decisions, exports, complete custody and report writes."
+    },
+    "original_invocation_cost_record": {
+      "durable": {
+        "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/rubisco-candidate-custody/invocation-cost.json",
+        "sha256": "0d675ca00e455422b8383485e29c0e23ba794fc6eeb2a1dae41d00c01ab380eb",
+        "size_bytes": 836
+      },
+      "exact_copy_verified": true,
+      "primary": {
+        "path": "/tmp/empirical-lawhood-applied-el-20261011-reopen01/rubisco-candidate-logs/invocation-cost.json",
+        "sha256": "0d675ca00e455422b8383485e29c0e23ba794fc6eeb2a1dae41d00c01ab380eb",
+        "size_bytes": 836
+      }
+    },
+    "original_operation_report": {
+      "durable": {
+        "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/rubisco-candidate-custody/programme-report.json",
+        "sha256": "8185d5711018e7752481a5c08a657a46b71bab8392ec45cb2623c3b7abd4dfbd",
+        "size_bytes": 15545913
+      },
+      "exact_copy_verified": true,
+      "primary": {
+        "path": "/tmp/empirical-lawhood-applied-el-20261011-reopen01/rubisco-candidate-logs/programme-report.json",
+        "sha256": "8185d5711018e7752481a5c08a657a46b71bab8392ec45cb2623c3b7abd4dfbd",
+        "size_bytes": 15545913
+      }
+    },
+    "overall_programme_disposition": "UNRESOLVED_MATCHED_GP_I95M_RESPONSE",
+    "programme_status": "OPEN_TO_FURTHER_USEFUL_INQUIRY",
+    "report": {
+      "durable": {
+        "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/rubisco-candidate-resume.terminal01/programme-report.json",
+        "sha256": "2ff9928cb8c3d078c6205c65cb6b56831f9464059e4617f211a004bbf3f3adad",
+        "size_bytes": 17802585
+      },
+      "exact_copy_verified": true,
+      "primary": {
+        "path": "/tmp/empirical-lawhood-applied-el-20261011-reopen01/rubisco-candidate-resume.terminal01/programme-report.json",
+        "sha256": "2ff9928cb8c3d078c6205c65cb6b56831f9464059e4617f211a004bbf3f3adad",
+        "size_bytes": 17802585
+      }
+    },
+    "reporter_failure": "Original successful supply/use were retained after a terminal reporting KeyError; receipt-backed terminal repair reran no science.",
+    "scientific_method_qualification": "NOT_ESTABLISHED",
+    "scientific_outcome": {
+      "actual_candidate_verdict_rows": 12,
+      "actual_gp_i95m_verdicts": [
+        {
+          "schema": "empirical-lawhood/rubisco-candidate-inquiry/candidate-verdict",
+          "value": {
+            "biological_admission": "UNEVALUABLE_MATCHED_ASSAY_PREPARATION",
+            "candidate_id": "gp.i95m",
+            "disposition": "UNEVALUABLE",
+            "reference_view": "historical-radiometric-conditional",
+            "specificity_ratio": null,
+            "ssu_view": "m1",
+            "turnover_ratio": null
+          },
+          "version": "1.0.0"
+        },
+        {
+          "schema": "empirical-lawhood/rubisco-candidate-inquiry/candidate-verdict",
+          "value": {
+            "biological_admission": "UNEVALUABLE_MATCHED_ASSAY_PREPARATION",
+            "candidate_id": "gp.i95m",
+            "disposition": "UNEVALUABLE",
+            "reference_view": "historical-coupled-conditional",
+            "specificity_ratio": null,
+            "ssu_view": "m1",
+            "turnover_ratio": null
+          },
+          "version": "1.0.0"
+        },
+        {
+          "schema": "empirical-lawhood/rubisco-candidate-inquiry/candidate-verdict",
+          "value": {
+            "biological_admission": "UNEVALUABLE_MATCHED_ASSAY_PREPARATION",
+            "candidate_id": "gp.i95m",
+            "disposition": "UNEVALUABLE",
+            "reference_view": "historical-radiometric-conditional",
+            "specificity_ratio": null,
+            "ssu_view": "v1",
+            "turnover_ratio": null
+          },
+          "version": "1.0.0"
+        },
+        {
+          "schema": "empirical-lawhood/rubisco-candidate-inquiry/candidate-verdict",
+          "value": {
+            "biological_admission": "UNEVALUABLE_MATCHED_ASSAY_PREPARATION",
+            "candidate_id": "gp.i95m",
+            "disposition": "UNEVALUABLE",
+            "reference_view": "historical-coupled-conditional",
+            "specificity_ratio": null,
+            "ssu_view": "v1",
+            "turnover_ratio": null
+          },
+          "version": "1.0.0"
+        }
+      ],
+      "alpha_three_alpha_s_zero": [
+        {
+          "schema": "empirical-lawhood/rubisco-candidate-inquiry/frontier-row",
+          "value": {
+            "alpha_k": {
+              "decimal": "3"
+            },
+            "alpha_s": {
+              "decimal": "0"
+            },
+            "conditional_nondominated_candidate_views": [
+              "gp.i95m.m1",
+              "gp.i95m.v1",
+              "te.p415a-v98m.native"
+            ],
+            "joint_conditional_pass": false,
+            "reference_view": "historical-radiometric-conditional",
+            "specificity_dimensionless": {
+              "decimal": "238"
+            },
+            "specificity_ratio": {
+              "decimal": "1"
+            },
+            "turnover_ratio": {
+              "decimal": "0.76480529070869061554248261461762461735065225380557"
+            },
+            "turnover_s_inv": {
+              "decimal": "4.1758368872694507608619550758122304107345613057784"
+            }
+          },
+          "version": "1.0.0"
+        },
+        {
+          "schema": "empirical-lawhood/rubisco-candidate-inquiry/frontier-row",
+          "value": {
+            "alpha_k": {
+              "decimal": "3"
+            },
+            "alpha_s": {
+              "decimal": "0"
+            },
+            "conditional_nondominated_candidate_views": [
+              "gp.i95m.m1",
+              "gp.i95m.v1",
+              "te.p415a-v98m.native"
+            ],
+            "joint_conditional_pass": true,
+            "reference_view": "historical-coupled-conditional",
+            "specificity_dimensionless": {
+              "decimal": "238"
+            },
+            "specificity_ratio": {
+              "decimal": "1"
+            },
+            "turnover_ratio": {
+              "decimal": "1.1286045641268785840167446150843865974958273799401"
+            },
+            "turnover_s_inv": {
+              "decimal": "4.1758368872694507608619550758122304107345613057784"
+            }
+          },
+          "version": "1.0.0"
+        }
+      ],
+      "biological_admission": "UNEVALUABLE_MATCHED_ASSAY_PREPARATION",
+      "biological_effect": "UNEVALUABLE",
+      "candidate_decision": "RETAIN_EXPLORATORY_I95M_REQUIRE_MATCHED_CANDIDATE_BACKGROUND_KINETICS_REJECT_UNIT_TRANSFER_NOMINATION_AND_ASSAY_SUBSTITUTION",
+      "comparison": "UNEVALUATED",
+      "conditional_arithmetic": "COMPUTED",
+      "conditional_frontier_rows": 36,
+      "fresh_independent_evidence": false,
+      "independently_checked_thresholds": [
+        {
+          "schema": "empirical-lawhood/rubisco-candidate-inquiry/threshold",
+          "value": {
+            "alpha_k_required": {
+              "decimal": "3.8385204208996444633470402757365139215500597856598"
+            },
+            "alpha_s_required": {
+              "decimal": "0"
+            },
+            "maize_turnover_s_inv": {
+              "decimal": "5.46"
+            },
+            "minimum_turnover_multiplier": {
+              "decimal": "3.4125"
+            },
+            "reference_view": "historical-radiometric-conditional"
+          },
+          "version": "1.0.0"
+        },
+        {
+          "schema": "empirical-lawhood/rubisco-candidate-inquiry/threshold",
+          "value": {
+            "alpha_k_required": {
+              "decimal": "2.6216598674468263210837306281660291468517195225975"
+            },
+            "alpha_s_required": {
+              "decimal": "0"
+            },
+            "maize_turnover_s_inv": {
+              "decimal": "3.7"
+            },
+            "minimum_turnover_multiplier": {
+              "decimal": "2.3125"
+            },
+            "reference_view": "historical-coupled-conditional"
+          },
+          "version": "1.0.0"
+        }
+      ],
+      "new_biological_independent_units": 0,
+      "nomination": "UNSUPPORTED",
+      "nominee": null,
+      "procedure_disposition": "SATISFIED",
+      "unresolved": [
+        "ACTUAL_GP_I95M_ENDPOINTS_UNKNOWN",
+        "GP_PREPARATION_UNRESOLVED",
+        "MATCHED_ASSAY_PREPARATION_UNRESOLVED",
+        "GTG_INITIATION_M1_V1_UNRESOLVED"
+      ]
+    },
+    "status": "CONDITIONAL_EPISODE_COMPLETED",
+    "terminal_invocation_cost": {
+      "cpu_seconds": 382.567426,
+      "known_process_cpu_before_explicit_entry_seconds": 0.044674,
+      "storage_footprints_before_cost_receipt_writes": {
+        "basis": "Separate actual filesystem copies; footprints are not unique scientific bytes or cost-window sums.",
+        "durable_copy_and_report_bytes": 168479991,
+        "selected_log_bytes": 18225062,
+        "selected_tmpfs_bytes": 150677406
+      },
+      "unknown_costs": [
+        "historical source creation and engineering",
+        "per-operation peak RSS",
+        "wall time before explicit entry",
+        "final cost receipt writes and process exit"
+      ],
+      "unmetered_tail": "Final cost receipt writes and process exit.",
+      "wall_seconds": 436.50853648607153,
+      "window": "Explicit receipt-backed resume entry, original archive/checkpoint reads, retained supply/use authentication, terminal decision, new durable copy and report writes."
+    }
+  },
+  "software_acceptance": {
+    "cost_through_report_write": {
+      "cpu_seconds": 96.13265700000001,
+      "unknown_costs": [
+        "historical source creation",
+        "prior engineering and agent expense",
+        "original failed compact CPU/wall/RSS",
+        "per-operation peak RSS",
+        "final cost receipt writes and process exit"
+      ],
+      "unmetered_tail": "Writing this final cost receipt and process exit; no scientific work remains.",
+      "wall_seconds": 211.2272202919703,
+      "window": "Explicit parent launch through dependency imports, retained failures, durable custody and primary report writes."
+    },
+    "custody": {
+      "member_bytes": 11569595,
+      "member_count": 942
+    },
+    "final_invocation_cost": {
+      "durable": {
+        "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/acceptance-resume02/invocation-cost.json",
+        "sha256": "6b1dccba200a19946a51fb7ef2a8041ea2862d328efc79d75e81e18375122425",
+        "size_bytes": 531
+      },
+      "exact_copy_verified": true,
+      "primary": {
+        "path": "/tmp/empirical-lawhood-applied-el-20261011-reopen01/acceptance-resume02/invocation-cost.json",
+        "sha256": "6b1dccba200a19946a51fb7ef2a8041ea2862d328efc79d75e81e18375122425",
+        "size_bytes": 531
+      }
+    },
+    "final_invocation_new_registered_operations": 3,
+    "interpretation": "Selected RECURARCH research route accepted; does not establish full RA8, release acceptance or scientific qualification.",
+    "native_contacts": 0,
+    "new_direct_pure_controls": 11,
+    "report": {
+      "durable": {
+        "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/acceptance-resume02/acceptance-report.json",
+        "sha256": "c9b076d8fb921a2aee065038c387f046ef8701578cd2c74fe969ade8ba4423e5",
+        "size_bytes": 5809812
+      },
+      "exact_copy_verified": true,
+      "primary": {
+        "path": "/tmp/empirical-lawhood-applied-el-20261011-reopen01/acceptance-resume02/acceptance-report.json",
+        "sha256": "c9b076d8fb921a2aee065038c387f046ef8701578cd2c74fe969ade8ba4423e5",
+        "size_bytes": 5809812
+      }
+    },
+    "reused_registered_operations": 1,
+    "selected_logical_pure_operations": 15,
+    "status": "SOFTWARE_ACCEPTANCE_COMPLETED",
+    "unknown_costs": [
+      "historical source creation",
+      "prior engineering and agent expense",
+      "original failed compact CPU/wall/RSS",
+      "per-operation peak RSS",
+      "final cost receipt writes and process exit"
+    ]
+  },
+  "top5_battery_d1": {
+    "actual_invocation_including_copy": {
+      "cpu_seconds": 24.179959,
+      "wall_seconds": 49.350901187979616
+    },
+    "custody": {
+      "member_bytes": 1797685,
+      "member_count": 242
+    },
+    "delivery_projection_and_recovery_new_native_contacts": 0,
+    "historical_and_shared_engineering_cost": "UNKNOWN_NOT_ZERO",
+    "historical_d1_observation_failure": {
+      "authored_packet_identities": [
+        {
+          "schema": "empirical-lawhood/runtime/authored-recursive-wave",
+          "value": {
+            "draft": {
+              "schema": "empirical-lawhood/kernel/object-identity",
+              "value": {
+                "object_fingerprint": "294e42d31bca95655a7ef468a2fe148ea7214483b2d3b9dd67e0b75b647fd293",
+                "object_id": "battery-thermal-service.23c.standard-cc900.primary",
+                "object_schema": "empirical-lawhood/planning/recursive-study-draft",
+                "object_version": "1.0.0"
+              },
+              "version": "1.0.0"
+            },
+            "implementation": {
+              "schema": "empirical-lawhood/kernel/object-identity",
+              "value": {
+                "object_fingerprint": "a082ecb3d2ac7e4d370c3a87cc6781f8d29f393b5434169f187a7d405ce1808e",
+                "object_id": "recursive-member.implementation",
+                "object_schema": "empirical-lawhood/runtime/recursive-implementation-binding",
+                "object_version": "1.0.0"
+              },
+              "version": "1.0.0"
+            },
+            "members": [
+              {
+                "schema": "empirical-lawhood/runtime/recursive-wave-member",
+                "value": {
+                  "filename": "config-7132e7e2fd3fd7a9a179f11c.json",
+                  "identity": {
+                    "schema": "empirical-lawhood/kernel/object-identity",
+                    "value": {
+                      "object_fingerprint": "fab2f3d9f7596e0ff832a8539f05f1ea2d38259b5942af4cf75ee176dfd7cc7a",
+                      "object_id": "recursive-member.config-7132e7e2fd3fd7a9a179f11c",
+                      "object_schema": "empirical-lawhood/battery-thermal-service/config",
+                      "object_version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "size_bytes": 1542
+                },
+                "version": "1.0.0"
+              },
+              {
+                "schema": "empirical-lawhood/runtime/recursive-wave-member",
+                "value": {
+                  "filename": "config-e3f7ff9054330323b127faad.json",
+                  "identity": {
+                    "schema": "empirical-lawhood/kernel/object-identity",
+                    "value": {
+                      "object_fingerprint": "6bf6a9cff8ae613c5a77ca2bad25b44bbd2e5fb934415d6a9407f383b8062bef",
+                      "object_id": "recursive-member.config-e3f7ff9054330323b127faad",
+                      "object_schema": "empirical-lawhood/battery-thermal-service/config",
+                      "object_version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "size_bytes": 1540
+                },
+                "version": "1.0.0"
+              },
+              {
+                "schema": "empirical-lawhood/runtime/recursive-wave-member",
+                "value": {
+                  "filename": "draft.json",
+                  "identity": {
+                    "schema": "empirical-lawhood/kernel/object-identity",
+                    "value": {
+                      "object_fingerprint": "294e42d31bca95655a7ef468a2fe148ea7214483b2d3b9dd67e0b75b647fd293",
+                      "object_id": "battery-thermal-service.23c.standard-cc900.primary",
+                      "object_schema": "empirical-lawhood/planning/recursive-study-draft",
+                      "object_version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "size_bytes": 10674
+                },
+                "version": "1.0.0"
+              },
+              {
+                "schema": "empirical-lawhood/runtime/recursive-wave-member",
+                "value": {
+                  "filename": "execution-plan.json",
+                  "identity": {
+                    "schema": "empirical-lawhood/kernel/object-identity",
+                    "value": {
+                      "object_fingerprint": "7e40a01b6d1e658e2c6a509e6f24d84cb565bbdb1c81903c2b0454eb74554e55",
+                      "object_id": "recursive-member.execution-plan",
+                      "object_schema": "empirical-lawhood/runtime/development-execution-plan",
+                      "object_version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "size_bytes": 7849
+                },
+                "version": "1.0.0"
+              },
+              {
+                "schema": "empirical-lawhood/runtime/recursive-wave-member",
+                "value": {
+                  "filename": "graph-preservation.json",
+                  "identity": {
+                    "schema": "empirical-lawhood/kernel/object-identity",
+                    "value": {
+                      "object_fingerprint": "0070f70a4d76b3d89aa757546b0117700ca49630ab05df87f7028ac2e98d42a4",
+                      "object_id": "recursive-member.graph-preservation",
+                      "object_schema": "empirical-lawhood/runtime/development-graph-preservation-receipt",
+                      "object_version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "size_bytes": 2018
+                },
+                "version": "1.0.0"
+              },
+              {
+                "schema": "empirical-lawhood/runtime/recursive-wave-member",
+                "value": {
+                  "filename": "implementation.json",
+                  "identity": {
+                    "schema": "empirical-lawhood/kernel/object-identity",
+                    "value": {
+                      "object_fingerprint": "a082ecb3d2ac7e4d370c3a87cc6781f8d29f393b5434169f187a7d405ce1808e",
+                      "object_id": "recursive-member.implementation",
+                      "object_schema": "empirical-lawhood/runtime/recursive-implementation-binding",
+                      "object_version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "size_bytes": 303591
+                },
+                "version": "1.0.0"
+              },
+              {
+                "schema": "empirical-lawhood/runtime/recursive-wave-member",
+                "value": {
+                  "filename": "registry.json",
+                  "identity": {
+                    "schema": "empirical-lawhood/kernel/object-identity",
+                    "value": {
+                      "object_fingerprint": "9725a2a521bbd40006d706056b11c161a306cb46315c2916fb4de3b5b353c4fb",
+                      "object_id": "recursive-member.registry",
+                      "object_schema": "empirical-lawhood/runtime/capability-registry",
+                      "object_version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "size_bytes": 64154
+                },
+                "version": "1.0.0"
+              },
+              {
+                "schema": "empirical-lawhood/runtime/recursive-wave-member",
+                "value": {
+                  "filename": "resource-ceiling.json",
+                  "identity": {
+                    "schema": "empirical-lawhood/kernel/object-identity",
+                    "value": {
+                      "object_fingerprint": "6f26fe6afd2927a0937eb5937230206918f67ea7cdbc199b64c36fce0c2369e1",
+                      "object_id": "recursive-member.resource-ceiling",
+                      "object_schema": "empirical-lawhood/kernel/resource-budget",
+                      "object_version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "size_bytes": 214
+                },
+                "version": "1.0.0"
+              },
+              {
+                "schema": "empirical-lawhood/runtime/recursive-wave-member",
+                "value": {
+                  "filename": "run-plan.json",
+                  "identity": {
+                    "schema": "empirical-lawhood/kernel/object-identity",
+                    "value": {
+                      "object_fingerprint": "c39bf9bc8a6f68a0c57077b2631b38d96ab68c43cdc52366dd3d4bbb9364a880",
+                      "object_id": "recursive-member.run-plan",
+                      "object_schema": "empirical-lawhood/runtime/development-run-plan",
+                      "object_version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "size_bytes": 9001
+                },
+                "version": "1.0.0"
+              },
+              {
+                "schema": "empirical-lawhood/runtime/recursive-wave-member",
+                "value": {
+                  "filename": "scientific-projection.json",
+                  "identity": {
+                    "schema": "empirical-lawhood/kernel/object-identity",
+                    "value": {
+                      "object_fingerprint": "ccc23db96c22707c7b7ba9dc6c325ca2df23b890e71dd7cc33864407ca53fd72",
+                      "object_id": "recursive-member.scientific-projection",
+                      "object_schema": "empirical-lawhood/planning/recursive-scientific-selection",
+                      "object_version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "size_bytes": 6235
+                },
+                "version": "1.0.0"
+              },
+              {
+                "schema": "empirical-lawhood/runtime/recursive-wave-member",
+                "value": {
+                  "filename": "template.json",
+                  "identity": {
+                    "schema": "empirical-lawhood/kernel/object-identity",
+                    "value": {
+                      "object_fingerprint": "58a52a5c2cd9c342af650375ad4e7ab883edb62fcdf685e43ad0d268056c1129",
+                      "object_id": "recursive-member.template",
+                      "object_schema": "empirical-lawhood/runtime/study-template",
+                      "object_version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "size_bytes": 7425
+                },
+                "version": "1.0.0"
+              }
+            ],
+            "packet_id": "recursive-authoring.294e42d31bca95655a7ef468"
+          },
+          "version": "1.0.0"
+        }
+      ],
+      "complete_invocation_cost": {
+        "cpu_seconds": 12.744944,
+        "largest_process_peak_rss_bytes": 368209920,
+        "wall_seconds": 12.738817065954208
+      },
+      "complete_invocation_including_copy_cost": {
+        "cpu_seconds": 12.854932,
+        "wall_seconds": 25.47958117502276
+      },
+      "copy_cost": {
+        "cpu_seconds": 0.09383699999999884,
+        "exact_census_match": true,
+        "member_count": 121,
+        "wall_seconds": 12.72462374495808
+      },
+      "cost_interpretation": "The complete and including-copy windows overlap; preserve their measurements without adding them.",
+      "custody": {
+        "exact_census_verified": true,
+        "member_bytes": 879537,
+        "member_count": 121,
+        "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/battery-d1-custody"
+      },
+      "durable_report_path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/battery-d1-report.json",
+      "fresh_independent_evidence": false,
+      "historical_and_shared_engineering_cost": "UNKNOWN_NOT_ZERO",
+      "individual_attempt_cpu_wall_rss": "UNKNOWN; complete invocation is metered without inventing per-task allocation",
+      "native_contacts": 1,
+      "new_native_contacts_from_history_read": 0,
+      "receiver_count": 0,
+      "report_path": "/tmp/empirical-lawhood-applied-el-20261011/battery-d1/d1-report.json",
+      "report_sha256": "4839878045ec85e1ad7291b029cfbe9f237854fe16bdeb14b29734a814a9bd55",
+      "reported_status_preserved": "STOP_NATIVE_TERMINAL_CV_ALTERNATIVE_UNEVALUATED",
+      "retained_exception_type": "NotImplementedError",
+      "scientific_interpretation": "Technical observation failure with no native receivers; no voltage or CV termination was established.",
+      "trace_disposition": "TECHNICAL_OBSERVATION_FAILURE"
+    },
+    "individual_attempt_cpu_wall_rss": "UNKNOWN; complete invocation is metered without inventing per-task allocation",
+    "interpretation": "Both selected sampled numerical services pass. Whole-time certification remains absent; the historical technical observation failure is not a physical service failure.",
+    "measurement_windows": {
+      "complete_cpu": "Whole fresh process coordinator and reaped-child CPU, including startup imports.",
+      "complete_wall": "Monotonic observation after standard-library imports.",
+      "cost_interpretation": "Entry, per-preparation and complete windows overlap; do not add them.",
+      "cpu_before_explicit_entry_seconds": 0.037422,
+      "entry_cpu_wall": "Explicit CLI entry before composed imports through the reported checkpoint."
+    },
+    "physical_independent_units": 0,
+    "report": {
+      "durable": {
+        "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/battery-d1-report.json",
+        "sha256": "1ec8cac3fd65ddfc25842298fe9b7a02dd3ce419ece5248046bcf8269f7d1640",
+        "size_bytes": 1957065
+      },
+      "exact_copy_verified": true,
+      "primary": {
+        "path": "/tmp/empirical-lawhood-applied-el-20261011-reopen01/battery-d1/d1-report.json",
+        "sha256": "1ec8cac3fd65ddfc25842298fe9b7a02dd3ce419ece5248046bcf8269f7d1640",
+        "size_bytes": 1957065
+      }
+    },
+    "scientific_outcome": {
+      "comparison": "UNEVALUATED",
+      "competent_cv_or_adaptive_whole_inquiry": "UNEVALUATED",
+      "el_advantage": "UNEVALUATED",
+      "physical_independent_units": 0,
+      "physical_qualification": "NOT_ESTABLISHED",
+      "premise_at_sampled_numerical_scope": "SOLVED_NONDISCRIMINATING",
+      "preparations": {
+        "296.15": {
+          "disposition": "PASS",
+          "initial_current_acceptance_and_application_agree": true,
+          "native_termination": "final time",
+          "native_trace_disposition": "COMPLETE",
+          "numerical_event_guarded": true,
+          "physical_independent_units": 0,
+          "realized_receiver_current_agrees": true,
+          "registered_assessment_disposition": "UNEVALUABLE",
+          "registered_reason_codes": [
+            "whole-time-certificate-absent"
+          ],
+          "sampled_service_reason_codes": [],
+          "whole_time_certified": false
+        },
+        "300.15": {
+          "disposition": "PASS",
+          "initial_current_acceptance_and_application_agree": true,
+          "native_termination": "final time",
+          "native_trace_disposition": "COMPLETE",
+          "numerical_event_guarded": true,
+          "physical_independent_units": 0,
+          "realized_receiver_current_agrees": true,
+          "registered_assessment_disposition": "UNEVALUABLE",
+          "registered_reason_codes": [
+            "whole-time-certificate-absent"
+          ],
+          "sampled_service_reason_codes": [],
+          "whole_time_certified": false
+        }
+      },
+      "sampled_ordinary_service": "PASS_BOTH_SELECTED_PREPARATIONS",
+      "simulated_parameter_families": 1,
+      "supplier_and_later_reuse": "NOT_ENTERED",
+      "whole_time_service_and_risk": "UNEVALUABLE_CONTINUOUS_CERTIFICATE_ABSENT"
+    },
+    "selected_native_operations": 2,
+    "selected_pure_assessments": 2,
+    "selection_sha256": "dca5201fbcffbf7c1955dfeacf8458b253d43fb7620ca069d16051c51cbc7d41",
+    "simulated_parameter_families": 1,
+    "status": "STOP_ESSENTIAL_WHOLE_TIME_CERTIFICATE_ABSENT",
+    "storage_footprints": {
+      "durable_full_copy": {
+        "exact_census_match": true,
+        "member_bytes": 1797685,
+        "member_count": 242,
+        "path": "/media/chevre/SEMIOS/empirical-lawhood-applied-el/20261011/reopen01/battery-d1-custody"
+      },
+      "interpretation": "Runtime custody, its durable full copy and primary logs are separate materializations. Producing-source archives and historical custody are accounted separately.",
+      "primary_logs_before_terminal_report": {
+        "member_bytes": 2169657,
+        "member_count": 4,
+        "path": "/tmp/empirical-lawhood-applied-el-20261011-reopen01/battery-d1"
+      },
+      "runtime_custody": {
+        "member_bytes": 1797685,
+        "member_count": 242,
+        "path": "/dev/shm/empirical-lawhood-applied-el-20261011-reopen01/battery-d1-artifacts"
+      }
+    }
+  },
+  "user_instruction": "Retain all limits necessary for scientific integrity, but otherwise prioritise scientific execution/results of RUBISCO/TOP5 plans",
+  "validation": {
+    "claim_scope": "No full portable suite, full RA8 or release claim is made for this reopened invocation.",
+    "final_documentation_check": "Performed after this record is written; the local workspace checkpoint follows successful validation.",
+    "focused_custody_cases_passed": 133,
+    "focused_terminal_battery_and_live_compiler_cases_passed": 12,
+    "generation": "Extension, executable, CLI, workflow, configuration, fixture and selected operator projections verified current.",
+    "independent_actual_result_audits": "Battery actual traces, current, bindings, preserved history and full copy passed; Rubisco actual terminal join, original receipts, complete copy and source bindings passed. No native replay.",
+    "lint": "ruff check src tests scripts passed",
+    "test_count_interpretation": "Selected disjoint groups only; earlier overlapping runs are not added to create a larger total."
+  },
+  "working_tree_basis": "Producing archives include selected uncommitted source bytes; HEAD alone does not identify execution.",
+  "workspace": "/home/chevre/gs-ml/empirical_lawhood"
+}

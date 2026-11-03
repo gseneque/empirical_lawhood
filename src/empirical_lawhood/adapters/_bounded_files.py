@@ -18,8 +18,8 @@ class AdapterFileBoundError(ValueError):
 _identity = bounded_io._identity
 
 
-def _open_regular(path: Path, maximum_bytes: int) -> tuple[int, os.stat_result]:
-    if maximum_bytes < 0:
+def _open_regular(path: Path, maximum_bytes: int | None) -> tuple[int, os.stat_result]:
+    if maximum_bytes is not None and maximum_bytes < 0:
         raise ValueError("adapter file maximum_bytes must be nonnegative")
     try:
         return bounded_io._open_regular(
@@ -30,7 +30,7 @@ def _open_regular(path: Path, maximum_bytes: int) -> tuple[int, os.stat_result]:
         raise AdapterFileBoundError(str(error).replace("bounded", "adapter")) from error
 
 
-def read_bounded_regular(path: Path, *, maximum_bytes: int) -> bytes:
+def read_bounded_regular(path: Path, *, maximum_bytes: int | None) -> bytes:
     """Read one adapter-owned file only after its descriptor passes the byte limit."""
 
     descriptor, before = _open_regular(path, maximum_bytes)
@@ -49,7 +49,7 @@ def _read_regular_descriptor(descriptor: int, before: os.stat_result) -> bytes:
         raise AdapterFileBoundError(str(error).replace("bounded", "adapter")) from error
 
 
-def read_bounded_contained(root: Path, path: Path, *, maximum_bytes: int) -> bytes:
+def read_bounded_contained(root: Path, path: Path, *, maximum_bytes: int | None) -> bytes:
     """Read a regular member through directory descriptors with no symlink traversal.
 
     Adapted from the repository identity reader: each component is opened
@@ -66,9 +66,9 @@ def read_bounded_contained(root: Path, path: Path, *, maximum_bytes: int) -> byt
 
 
 def _open_contained_regular(
-    root: Path, path: Path, maximum_bytes: int
+    root: Path, path: Path, maximum_bytes: int | None
 ) -> tuple[int, os.stat_result]:
-    if maximum_bytes < 0:
+    if maximum_bytes is not None and maximum_bytes < 0:
         raise ValueError("adapter file maximum_bytes must be nonnegative")
     try:
         return bounded_io._open_contained_regular(root, path, maximum_bytes)
@@ -76,7 +76,7 @@ def _open_contained_regular(
         raise AdapterFileBoundError(str(error).replace("bounded", "adapter")) from error
 
 
-def sha256_bounded_regular(path: Path, *, maximum_bytes: int) -> str:
+def sha256_bounded_regular(path: Path, *, maximum_bytes: int | None) -> str:
     """Hash one adapter-owned regular file under an explicit work ceiling."""
 
     descriptor, before = _open_regular(path, maximum_bytes)
@@ -84,7 +84,7 @@ def sha256_bounded_regular(path: Path, *, maximum_bytes: int) -> str:
 
 
 def sha256_bounded_contained(
-    root: Path, path: Path, *, maximum_bytes: int
+    root: Path, path: Path, *, maximum_bytes: int | None
 ) -> tuple[int, str]:
     """Stream a contained member under its opened size bound, without buffering it."""
 

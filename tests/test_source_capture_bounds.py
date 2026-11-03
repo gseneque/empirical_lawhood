@@ -12,7 +12,7 @@ import time
 import pytest
 
 from empirical_lawhood.infrastructure import bounded_process, source_closure
-from tests.test_source_origin import build_source_repo
+from tests.test_source_origin import ROOT
 
 
 @pytest.mark.parametrize("size", (8, 9))
@@ -137,21 +137,26 @@ def test_nonzero_git_exit_is_handled_source_refusal(tmp_path):
         source_closure._git(tmp_path, "archive", "HEAD")
 
 
-def test_complete_clean_capture_checks_actual_executing_package(tmp_path):
-    repo, commit, tree = build_source_repo(tmp_path)
+def test_complete_selected_capture_checks_actual_executing_package_without_copy(tmp_path):
+    repo = ROOT
+    commit = subprocess.check_output(["git", "-C", str(repo), "rev-parse", "HEAD"], text=True).strip()
+    tree = sha256(subprocess.check_output(["git", "-C", str(repo), "ls-tree", "-r", "-z", "--full-tree", "HEAD"])).hexdigest()
     original_archive = subprocess.check_output(["git", "-C", str(repo), "archive", "HEAD"])
     program = '''
 from pathlib import Path
 import json, sys
-from empirical_lawhood.infrastructure.source_closure import capture_clean_target_closure
+from empirical_lawhood.infrastructure.source_closure import capture_target_closure
 from empirical_lawhood.infrastructure.source_origin import require_executing_target_source
 root = Path(sys.argv[1]); require_executing_target_source(root)
-closure = capture_clean_target_closure(root, "synthetic.capture")
+captured = capture_target_closure(root, "synthetic.capture")
+closure = captured.closure
+from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
+assert GitStudySourceClosureInspector(root).observe(closure) == closure
 print(json.dumps({"commit":closure.implementation_commit,
                   "archive":closure.implementation_sha256,"tree":closure.source_tree_sha256}))
 '''
     result = subprocess.run([sys.executable, "-c", program, str(repo)], cwd=tmp_path,
                             env=dict(os.environ, PYTHONPATH=str(repo / "src"), PYTHONDONTWRITEBYTECODE="1"),
-                            capture_output=True, text=True, timeout=30)
+                            capture_output=True, text=True, timeout=60)
     assert result.returncode == 0, result.stdout + result.stderr
     assert json.loads(result.stdout) == {"commit": commit, "archive": sha256(original_archive).hexdigest(), "tree": tree}

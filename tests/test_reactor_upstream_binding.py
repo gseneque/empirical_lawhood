@@ -99,7 +99,7 @@ def test_upstream_binding_requires_a_trusted_store_before_provider() -> None:
     if not source_name or not discovery_name:
         pytest.skip("authentic held reactor source and discovery are not mounted")
     config = load_registered_authoring(
-        ROOT / "experiments/reactor-response/local-input.json",
+        ROOT / "programmes/foundations/measurement-and-response/workflows/reactor-response/local-input.json",
         root_schemas={ReactorPreparedInput.SCHEMA: ReactorPreparedInput},
         maximum_bytes=16 * 1024,
     )
@@ -171,7 +171,7 @@ def test_frontier_input_tuple_must_contain_the_authenticated_study_source() -> N
     if not source_name or not discovery_name:
         pytest.skip("authentic held reactor source and discovery are not mounted")
     config = load_registered_authoring(
-        ROOT / 'experiments/reactor-response/finite-control-frontier-input.json',
+        ROOT / 'programmes/foundations/measurement-and-response/workflows/reactor-response/finite-control-frontier-input.json',
         root_schemas={ReactorPreparedInput.SCHEMA: ReactorPreparedInput},
         maximum_bytes=16 * 1024,
     )
@@ -234,7 +234,7 @@ def test_all_reactor_factories_with_synthetic_guarded_ports(route: str) -> None:
     source_root = Path(source_name)
     discovery = None if route == "causal-response-study" else Path(discovery_name)
     config = load_registered_authoring(
-        ROOT / f"experiments/reactor-response/{route}-input.json",
+        ROOT / f"programmes/foundations/measurement-and-response/workflows/reactor-response/{route}-input.json",
         root_schemas={ReactorPreparedInput.SCHEMA: ReactorPreparedInput},
         maximum_bytes=16 * 1024,
     )

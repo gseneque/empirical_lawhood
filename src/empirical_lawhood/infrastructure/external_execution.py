@@ -97,7 +97,7 @@ class ExternalWorkerTransport(Protocol):
         runner: TaskRunner,
         context: TaskContext,
         *,
-        timeout_seconds: int,
+        timeout_seconds: int | None,
     ) -> RunnerResult: ...
 
 
@@ -136,7 +136,7 @@ class RegisteredExternalTaskExecutor:
         runner: TaskRunner,
         context: TaskContext,
         *,
-        timeout_seconds: int,
+        timeout_seconds: int | None,
     ) -> RunnerResult:
         self._validate_request(runner, context, timeout_seconds)
         try:
@@ -157,16 +157,20 @@ class RegisteredExternalTaskExecutor:
         self,
         runner: TaskRunner,
         context: TaskContext,
-        timeout_seconds: int,
+        timeout_seconds: int | None,
     ) -> None:
         manifest = runner.manifest
         if not self.backend.enabled:
             raise ExternalExecutionError("external execution backend is disabled")
         if manifest.registry_id not in self.backend.allowed_capability_ids:
             raise ExternalExecutionError("capability is absent from the external backend allowlist")
+        if (timeout_seconds is None or context.resource_budget.wall_time_seconds is None
+            or context.resource_budget.output_bytes is None):
+            raise ExternalExecutionError("external backend requires finite timeout and output budgets")
         if timeout_seconds <= 0 or timeout_seconds > self.backend.maximum_timeout_seconds:
             raise ExternalExecutionError("task timeout exceeds the external backend ceiling")
-        if timeout_seconds > manifest.resource_ceiling.wall_time_seconds:
+        if (manifest.resource_ceiling.wall_time_seconds is not None
+            and timeout_seconds > manifest.resource_ceiling.wall_time_seconds):
             raise ExternalExecutionError("task timeout exceeds the capability resource ceiling")
         self._validate_task_context(manifest, context)
         if (
@@ -181,6 +185,8 @@ class RegisteredExternalTaskExecutor:
         manifest: CapabilityManifest,
         context: TaskContext,
     ) -> None:
+        if not manifest.resource_ceiling.contains(context.resource_budget):
+            raise ExternalExecutionError("task resources exceed the capability resource ceiling")
         if context.config.config_schema != manifest.config_schema:
             raise ExternalExecutionError("task configuration schema differs from capability")
         if not set(context.permissions).issubset(manifest.permissions):
@@ -212,10 +218,10 @@ class RegisteredExternalTaskExecutor:
                 "external worker streaming is disabled until equivalence is enforced"
             )
         output_bytes = sum(len(output.payload) for output in outputs)
-        if output_bytes > min(
-            self.backend.maximum_output_bytes,
-            runner.manifest.resource_ceiling.output_bytes,
-        ):
+        capability_limit = runner.manifest.resource_ceiling.output_bytes
+        maximum_output = (self.backend.maximum_output_bytes if capability_limit is None
+            else min(self.backend.maximum_output_bytes, capability_limit))
+        if output_bytes > maximum_output:
             raise ExternalExecutionError("external worker exceeded its output ceiling")
         expected_output_ids = tuple(port.output_id for port in context.output_ports)
         if tuple(output.output_id for output in result.outputs) != expected_output_ids:

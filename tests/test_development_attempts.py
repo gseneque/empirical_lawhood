@@ -20,7 +20,7 @@ from empirical_lawhood.infrastructure import development_attempts as storage
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MODEL = ROOT / "experiments/rc-ladder-response/model.json"
+MODEL = ROOT / "programmes/foundations/measurement-and-response/workflows/rc-ladder-response/model.json"
 RUNNER = CliRunner()
 
 
@@ -366,20 +366,50 @@ def test_start_record_write_failure_stops_before_contact(tmp_path, native, monke
     assert "No durable development attempt" in result.stderr
 
 
-def test_report_and_event_limits_are_bounded_and_not_success(tmp_path, native, monkeypatch):
+def test_complete_source_and_receipt_censuses_export_without_repeating_operation(tmp_path, native, monkeypatch):
+    module, calls, _ = native
+    census = [{"relative_path": f"src/empirical_lawhood/member_{index:05d}.py",
+        "mode": "100644", "size_bytes": 4096, "sha256": "a" * 64} for index in range(4832)]
+    report = {"operational_terminal": "AUTHENTICATED", "new_native_contact_count": 0,
+        "source_before": census, "source_after": census, "original_bundle_members": census}
+    def completed(path):
+        calls.append(path)
+        return report
+    monkeypatch.setattr(module, "check_native_model", completed)
+    destination = tmp_path / "complete-custody-report"
+    result = invoke(MODEL, destination)
+    assert result.exit_code == 0
+    assert len(calls) == 1
+    assert record(destination)["state"] == "SUCCEEDED"
+    assert record(destination)["operation_completed"] is True
+    raw = (destination / "report.json").read_bytes()
+    assert len(raw) > 1024 * 1024
+    assert json.loads(raw) == report
+    assert json.loads(result.stdout) == report
+
+
+def test_complete_report_uses_producer_allocation_and_diagnostics_remain_bounded(tmp_path, native, monkeypatch):
     module, calls, _ = native
 
     def large(path):
         calls.append(path)
-        return {"large": "x" * (storage.MAX_REPORT_BYTES + 1)}
+        return {"large": "x" * (64 * 1024 * 1024 + 1)}
 
     monkeypatch.setattr(module, "check_native_model", large)
-    destination = tmp_path / "bounded-report"
+    destination = tmp_path / "complete-report"
     result = invoke(MODEL, destination)
-    assert result.exit_code == 1
+    assert result.exit_code == 0
     assert len(calls) == 1
-    assert record(destination)["state"] == "EXPORT_FAILED"
-    assert not (destination / "report.json").exists()
+    invocation = record(destination)
+    assert invocation["state"] == "SUCCEEDED"
+    assert invocation["operation_completed"] is True
+    raw = (destination / "report.json").read_bytes()
+    assert len(raw) > 64 * 1024 * 1024
+    assert raw == result.stdout.encode("ascii")
+    product, = invocation["products"]
+    assert product["complete"] is True
+    assert product["bytes"] == len(raw)
+    assert product["sha256"] == hashlib.sha256(raw).hexdigest()
     attempt = storage.DevelopmentAttempt(tmp_path / "events", "controlled")
     try:
         for _ in range(100):
@@ -403,7 +433,7 @@ def test_help_remains_read_only_even_when_output_option_is_present(tmp_path, nat
 
 def test_closed_authoring_early_failure_does_not_precreate_scientific_output(tmp_path):
     scientific, operational = tmp_path / "science", tmp_path / "operational"
-    result = RUNNER.invoke(app, ["campaign", "circuit-author", "--study", str(ROOT / "experiments/rc-ladder-response/study.json"), "--experiment-id", "development-test", "--output-dir", str(scientific), "--attempt-dir", str(operational)])
+    result = RUNNER.invoke(app, ["campaign", "circuit-author", "--study", str(ROOT / "programmes/foundations/measurement-and-response/workflows/rc-ladder-response/study.json"), "--experiment-id", "development-test", "--output-dir", str(scientific), "--attempt-dir", str(operational)])
     assert result.exit_code == 2
     assert not scientific.exists()
     assert record(operational)["state"] == "FAILED"
@@ -520,7 +550,7 @@ def test_matrix_operational_export_does_not_add_members_to_closed_products(tmp_p
         return {"authoring_dir": str(directory), "campaign_candidate_compiled": True, "campaign_issued": False}
 
     monkeypatch.setattr(native_authoring, "author_matrix_response", author)
-    result = RUNNER.invoke(app, ["--project-root", str(ROOT), "campaign", "matrix-response-author", "--config", str(ROOT / "experiments/prepared-response/prepared-source-qualification-author.json"), "--output-dir", str(science), "--attempt-dir", str(operational)])
+    result = RUNNER.invoke(app, ["--project-root", str(ROOT), "campaign", "matrix-response-author", "--config", str(ROOT / "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-source-qualification-author.json"), "--output-dir", str(science), "--attempt-dir", str(operational)])
     assert result.exit_code == 0, result.output
     assert len(calls) == 1
     assert {path.name: path.read_bytes() for path in science.iterdir()} == members

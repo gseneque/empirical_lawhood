@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+
 import json
 import hashlib
+import heapq
+import logging
 import multiprocessing
 import os
 import resource
@@ -13,17 +16,21 @@ import threading
 import time
 from datetime import datetime, timezone
 from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
-from dataclasses import dataclass
+from collections.abc import Collection, Mapping
+from contextlib import ExitStack, contextmanager
+from dataclasses import dataclass, replace
 from decimal import Decimal
 from enum import StrEnum
 from multiprocessing.connection import Connection
 from pathlib import Path
 from typing import Any, BinaryIO, Callable, Protocol
+from uuid import uuid4
 
 from empirical_lawhood.infrastructure.worker_bootstrap import (
     join_worker_process,
     numerical_spawn_environment,
 )
+from empirical_lawhood.infrastructure.sql.operations import OperationalWriteConflict
 
 from empirical_lawhood.kernel.authority import ResourceBudget
 from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
@@ -37,6 +44,7 @@ from empirical_lawhood.runtime.artifacts import (
     ArtifactStreamWriteRequest,
     ArtifactWriter,
     ArtifactWriteRequest,
+    ArtifactWriteResult,
     CanonicalTaskReceipt,
     ReceiptCheck,
     lineage_parent_sort_key,
@@ -44,17 +52,36 @@ from empirical_lawhood.runtime.artifacts import (
     most_restrictive_outcome_access,
     verify_artifact_manifests,
 )
-from empirical_lawhood.runtime.execution_envelope import ExecutionEnvelopeEvent, ExecutionEnvelopeSpec, ExecutionEnvelopeState, ExecutionResourceEnvelopeState, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec, JitCellSignatureProjection, JitGraphSignatureManifest, ProgressHeartbeat, ProgressLivenessContract, RosterCapacityDecision, RunExecutionEnvelope, RunExecutionEnvelopeMachine, RunExecutionResourceEnvelopeMachine, RunExecutionResourceEnvelope
+from empirical_lawhood.runtime.execution_envelope import NonTimeResourceBudget, ExecutionEnvelopeEvent, ExecutionEnvelopeSpec, ExecutionEnvelopeState, ExecutionResourceEnvelopeState, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec, JitCellSignatureProjection, JitGraphSignatureManifest, ProgressHeartbeat, ProgressLivenessContract, RosterCapacityDecision, RunExecutionEnvelope, RunExecutionEnvelopeMachine, RunExecutionResourceEnvelopeMachine, RunExecutionResourceEnvelope
 from empirical_lawhood.runtime.adjudication import ScientificAdjudicationContext
 from empirical_lawhood.runtime.input_access import planned_input_access_allowed
 from empirical_lawhood.runtime.campaign_elapsed_budget import CampaignElapsedReservationPlan, DurableCampaignElapsedBudgetCoordinator
-from empirical_lawhood.runtime.execution import validate_runner_resource_interface, ExecutorEnforcementCapability, ExecutionAssuranceProfile, DependencyReceiptBinding, EpochClock, ExternalInputResolver, OperationalAttempt, OperationalFailureClass, OperationalRepository, RunnerRegistry, RunnerResult, SchedulerResult, StreamedTaskOutput, StreamingOutputEmitter, TaskAttemptDisposition, TaskBlockKind, TaskBlockReason, TaskContext, TaskExecutor, TaskOutputPayload, TaskReceiptStore, TaskRunner, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerInputPortFactory, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.runtime.execution import ParentPreparedTaskRunner, prepare_task_runner, validate_runner_resource_interface, ExecutorEnforcementCapability, ExecutionAssuranceProfile, DependencyReceiptBinding, EpochClock, ExternalInputResolver, OperationalAttempt, OperationalFailureClass, OperationalRepository, RunnerRegistry, RunnerResult, SchedulerResult, StreamedTaskOutput, StreamingOutputEmitter, TaskAttemptDisposition, TaskBlockKind, TaskBlockReason, TaskContext, TaskExecutor, TaskOutputPayload, TaskReceiptStore, TaskRunner, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerInputPortFactory, WorkerIsolationProfile, WorkerOutputPort
 from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, ProtocolExecutionTask, ExecutionTask, ExecutionPlan, PlanLane
 from empirical_lawhood.runtime.providers import CapabilityOutputSemanticContract
-from empirical_lawhood.runtime.retry_amendment import LeaseExpiryRetryAmendment, RetainedCustodyCompletionAmendment
+from empirical_lawhood.runtime.native_effects import NativeEffectContact, NativeEffectContactStore, NativeEntryRefused
+from empirical_lawhood.runtime.native_subwork import NativeSubworkProgress
+from empirical_lawhood.runtime.prepared_native_invocation import (
+    PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment, PreparedNativeWork,
+    WorkerPreflightMismatch, WorkerPreflightResult,
+)
+from empirical_lawhood.runtime.progress import active_progress, report_progress
+from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.infrastructure.numerical_provenance import (
+    observe_worker_environment, observe_prepared_worker, selected_worker_environment,
+)
+from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.infrastructure.native_parent_finalization import (
+    NativeParentFinalizationPending,
+    authenticate_native_parent_return,
+    completed_native_parent_scope,
+)
+from empirical_lawhood.infrastructure.native_subwork_ipc import (
+    NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress,
+)
 from empirical_lawhood.runtime.recovery import OperationalFailureDiagnostic, ProtocolRunRecoveryIndex, EnvelopeRunRecoveryIndex, RunRecoveryIndex, RunRecoveryReport
 
-from .artifacts import (
+from empirical_lawhood.infrastructure.artifacts import (
     ArtifactInputLimitExceeded,
     GuardedExternalRoot,
     STREAM_CHUNK_BYTES,
@@ -77,6 +104,10 @@ class ExecutionErrorKind(StrEnum):
 
 class SchedulerConsistencyError(RuntimeError):
     pass
+
+
+class _KnownNativeReturnFailure(RuntimeError):
+    """A native child returned a durable failure; its contact is not unknown."""
 
 
 class LiveLeaseError(RuntimeError):
@@ -115,12 +146,39 @@ class ResourceAdmissionError(RuntimeError):
     """The frozen task cannot be enforced within the local compute boundary."""
 
 
+class WorkerPreflightError(ResourceAdmissionError):
+    """Actual worker refused before contact; retain the complete typed census."""
+
+    def __init__(self, result):
+        self.result = result
+        super().__init__("worker preflight refused: " + "; ".join(
+            row.operand_id + ": " + row.reason for row in result.mismatches))
+
+
 class ProgressStalledError(RuntimeError):
     """Native work made no monotone progress for its source-qualified gap."""
 
 
 class CampaignElapsedBoundaryReached(RuntimeError):
     """The absolute cumulative campaign-time boundary stopped in-flight work."""
+
+
+def execution_error_types(name: str) -> tuple[type[BaseException], ...]:
+    """Select an actual runtime error class from the closed execution contract."""
+    local_types = {
+        "SchedulerConsistencyError": SchedulerConsistencyError,
+        "LiveLeaseError": LiveLeaseError,
+        "InjectedSchedulerCrash": InjectedSchedulerCrash,
+        "ResourceLockUnavailable": ResourceLockUnavailable,
+        "TaskProcessError": TaskProcessError,
+        "ResourceAdmissionError": ResourceAdmissionError,
+        "WorkerPreflightError": WorkerPreflightError,
+        "ProgressStalledError": ProgressStalledError,
+        "CampaignElapsedBoundaryReached": CampaignElapsedBoundaryReached,
+    }
+    if type(name) is not str or name not in local_types:
+        raise ValueError("execution error family is outside the closed SDK contract")
+    return (local_types[name],)
 
 
 def _sanitize_exception_type(value: str) -> str:
@@ -157,23 +215,26 @@ def operational_failure_diagnostic(
 
     resolved = failure_class
     if resolved is None:
-        if isinstance(error, SchedulerConsistencyError):
+        if isinstance(error, execution_error_types("SchedulerConsistencyError")):
             resolved = OperationalFailureClass.CONTRACT_REFUSAL
-        elif isinstance(error, (ResourceAdmissionError, ArtifactInputLimitExceeded)):
+        elif isinstance(error, (*execution_error_types("ResourceAdmissionError"), ArtifactInputLimitExceeded)):
             resolved = OperationalFailureClass.RESOURCE_REFUSAL
-        elif isinstance(error, (TaskProcessError, TimeoutError, ProgressStalledError)):
+        elif isinstance(error, (*execution_error_types("TaskProcessError"), TimeoutError,
+                *execution_error_types("ProgressStalledError"))):
             resolved = OperationalFailureClass.CHILD_PROCESS_FAILURE
         elif isinstance(error, OSError):
             resolved = OperationalFailureClass.TRANSIENT_INFRASTRUCTURE_FAILURE
         else:
             resolved = OperationalFailureClass.PROVIDER_RUNNER_DEFECT
     exception_type = (
-        error.sanitized_exception_type
-        if isinstance(error, TaskProcessError)
+        _sanitize_exception_type(error.sanitized_exception_type)
+        if isinstance(error, execution_error_types("TaskProcessError"))
         else _sanitize_exception_type(type(error).__name__)
     )
-    if isinstance(error, TaskProcessError):
-        message = error.sanitized_message
+    if isinstance(error, execution_error_types("TaskProcessError")):
+        message = _sanitize_child_message(exception_type, None)
+    elif isinstance(error, execution_error_types("WorkerPreflightError")):
+        message = "worker preflight refused the prepared invocation; inspect its guarded diagnostic"
     elif resolved is OperationalFailureClass.CONTRACT_REFUSAL:
         message = "execution contract refused the task result"
     elif resolved is OperationalFailureClass.RESOURCE_REFUSAL:
@@ -186,6 +247,8 @@ def operational_failure_diagnostic(
         message = "transient infrastructure operation failed"
     elif resolved is OperationalFailureClass.RETRY_EXHAUSTION:
         message = "automatic retry budget was exhausted"
+    elif resolved is OperationalFailureClass.NATIVE_RETURN_FAILURE:
+        message = "native work returned a durable failure; retained child custody records the full census"
     else:
         message = "bounded recovery was obstructed"
     return OperationalFailureDiagnostic.create(
@@ -223,17 +286,44 @@ class ExecutionResourceAdmission:
 
     admitted: bool
     required_cpu_cores: int
-    required_memory_bytes: int
+    required_memory_bytes: int | None
     required_gpu_devices: int
-    required_scratch_bytes: int
-    required_source_scan_bytes: int
-    required_output_bytes: int
+    required_scratch_bytes: int | None
+    required_source_scan_bytes: int | None
+    required_output_bytes: int | None
     available_cpu_cores: int
     available_memory_bytes: int
     available_gpu_devices: int
     available_scratch_bytes: int
     reason_codes: tuple[str, ...]
     assurance_codes: tuple[str, ...]
+
+
+def selected_execution_resource_budgets(
+    plan: ProtocolExecutionPlan, resource_spec: ExecutionResourceEnvelopeSpec | None,
+) -> tuple[ResourceBudget, ...]:
+    """Check exact finite cells; never fill or widen frozen task requests."""
+    budgets = tuple(task.capability.requested_resources for task in plan.tasks)
+    if resource_spec is None:
+        return budgets
+    if type(resource_spec) is not ExecutionResourceEnvelopeSpec:
+        raise TypeError("selected resources require the exact non-time envelope specification")
+    resource_spec.__post_init__()
+    cells = {cell.task_id: cell for cell in resource_spec.task_cells}
+    if set(cells) != {task.task_id for task in plan.tasks} or len(cells) != len(resource_spec.task_cells):
+        raise ValueError("selected resource cell census differs from the complete execution plan")
+    for task in plan.tasks:
+        cell = cells[task.task_id]
+        if type(cell) is not ExecutionResourceTaskCellSpec or type(cell.resource_budget) is not NonTimeResourceBudget:
+            raise TypeError("selected resources require exact finite task cells")
+        cell.__post_init__()
+        cell.resource_budget.__post_init__()
+        budget = task.capability.requested_resources
+        if (cell.resource_budget.cpu_cores, cell.resource_budget.memory_bytes,
+                cell.resource_budget.output_bytes, cell.resource_budget.source_byte_limit) != (
+                budget.cpu_cores, budget.memory_bytes, budget.output_bytes, budget.source_scan_bytes):
+            raise ValueError("selected non-time resource cell differs from the frozen task budget")
+    return budgets
 
 
 class LocalExecutionResourceAdmitter:
@@ -277,34 +367,49 @@ class LocalExecutionResourceAdmitter:
         executor_enforces_resources: bool,
         executor_enforces_no_network: bool,
         assurance_profile: ExecutionAssuranceProfile = ExecutionAssuranceProfile.STRICT_ISOLATED,
+        resource_spec: ExecutionResourceEnvelopeSpec | None = None,
+        maximum_parallel_tasks: int = 1,
     ) -> ExecutionResourceAdmission:
         if available_scratch_bytes < 0:
             raise ValueError("available scratch bytes must be nonnegative")
-        budgets = tuple(task.capability.requested_resources for task in plan.tasks)
+        if type(maximum_parallel_tasks) is not int or maximum_parallel_tasks < 1:
+            raise ValueError("selected worker limit must be a positive integer")
+        budgets = selected_execution_resource_budgets(plan, resource_spec)
         required_cpu = max(value.cpu_cores for value in budgets)
-        required_memory = max(value.memory_bytes for value in budgets)
+        combined = ResourceBudget.aggregate(budgets)
+        required_memory = combined.memory_bytes
         required_gpu = max(value.gpu_devices for value in budgets)
-        # Resource admission derives scratch from each task's frozen output
-        # allocation until a separately authored scratch field is versioned.
-        required_scratch = max(value.output_bytes for value in budgets)
-        required_scan = max(value.source_scan_bytes for value in budgets)
-        required_output = max(value.output_bytes for value in budgets)
+        # Output ceilings are not measured scratch requirements. Keep their
+        # arithmetic visible without refusing storage from an invented bound.
+        required_scratch = None
+        required_output = (
+            None if combined.output_bytes is None else max(value.output_bytes for value in budgets)
+        )
+        required_scan = (
+            None if combined.source_scan_bytes is None
+            else max(value.source_scan_bytes for value in budgets)
+        )
         reasons: list[str] = []
         assurances: list[str] = []
+        if resource_spec is not None and maximum_parallel_tasks > resource_spec.maximum_parallel_tasks:
+            reasons.append("ISSUED_PARALLEL_LIMIT_EXCEEDED")
         if required_cpu > self.capacity.cpu_cores:
             reasons.append("CPU_CAPACITY_UNAVAILABLE")
-        if required_memory > self.capacity.memory_bytes:
+        memory_ceiling = (self.capacity.memory_bytes if resource_spec is None
+            else min(self.capacity.memory_bytes, resource_spec.aggregate_memory_ceiling_bytes))
+        if required_memory is not None and required_memory > memory_ceiling:
             reasons.append("MEMORY_CAPACITY_UNAVAILABLE")
         if required_gpu > self.capacity.gpu_devices:
             reasons.append("GPU_CAPACITY_UNAVAILABLE")
-        if required_scratch > available_scratch_bytes:
-            reasons.append("SCRATCH_CAPACITY_UNAVAILABLE")
+        for coordinate in ("memory_bytes", "wall_time_seconds", "source_scan_bytes", "output_bytes"):
+            if getattr(combined, coordinate) is None:
+                assurances.append(f"{coordinate.upper()}_UNLIMITED")
         if assurance_profile is ExecutionAssuranceProfile.STRICT_ISOLATED:
             if not executor_enforces_resources:
                 reasons.append("EXECUTOR_RESOURCE_ENFORCEMENT_UNAVAILABLE")
-            if not self.capacity.enforced_cpu_limit:
+            if combined.wall_time_seconds is not None and not self.capacity.enforced_cpu_limit:
                 reasons.append("CPU_LIMIT_ENFORCEMENT_UNAVAILABLE")
-            if not self.capacity.enforced_address_space_limit:
+            if required_memory is not None and not self.capacity.enforced_address_space_limit:
                 reasons.append("MEMORY_LIMIT_ENFORCEMENT_UNAVAILABLE")
             if plan.lane is PlanLane.EXPLORATORY and (
                 not self.capacity.enforced_no_network or not executor_enforces_no_network
@@ -349,15 +454,8 @@ class FailureInjector(Protocol):
 class RunRecoveryStore(Protocol):
     def freeze(self, index: ProtocolRunRecoveryIndex) -> None: ...
 
-    def reconcile(
-        self,
-        index: ProtocolRunRecoveryIndex,
-        plan: ProtocolExecutionPlan,
-        repository: OperationalRepository,
-        receipt_store: TaskReceiptStore,
-        *,
-        retry_amendment: LeaseExpiryRetryAmendment | None = None,
-    ) -> RunRecoveryReport: ...
+    def reconcile(self, index: ProtocolRunRecoveryIndex, plan: ProtocolExecutionPlan, repository: OperationalRepository, receipt_store: TaskReceiptStore) -> RunRecoveryReport:
+        ...
 
     def record_receipt(
         self,
@@ -375,6 +473,18 @@ class RunRecoveryStore(Protocol):
         failure: OperationalFailureDiagnostic,
         blocked: bool = False,
     ) -> None: ...
+
+    def record_worker_preflight(
+        self, index: ProtocolRunRecoveryIndex, *, task_id: str, attempt_id: str,
+        result: WorkerPreflightResult, visibility_ceiling: VisibilityCeiling,
+        outcome_access: OutcomeAccess,
+    ) -> str: ...
+
+    def record_native_failure_diagnostic(
+        self, index: ProtocolRunRecoveryIndex, *, task_id: str, attempt_id: str,
+        contact: NativeEffectContact, diagnostic: OperationalFailureDiagnostic,
+        visibility_ceiling: VisibilityCeiling, outcome_access: OutcomeAccess,
+    ) -> str: ...
 
     def record_not_attempted(
         self,
@@ -457,57 +567,36 @@ class DirectTaskExecutor:
         runner: TaskRunner,
         context: TaskContext,
         *,
-        timeout_seconds: int,
+        timeout_seconds: int | None,
+        native_subwork: NativeSubworkProgress | None = None,
     ) -> RunnerResult:
-        if timeout_seconds <= 0:
+        if timeout_seconds is not None and timeout_seconds <= 0:
             raise ValueError("task timeout must be positive")
+        if native_subwork is not None:
+            return runner.execute_with_native_subwork(context, native_subwork)
         return runner.execute(context)
 
-    def execute_deadline_free(
-        self,
-        runner: TaskRunner,
-        context: TaskContext,
-        *,
-        progress_contract: ProgressLivenessContract | None,
-        progress_callback: Callable[[Decimal], None],
-    ) -> RunnerResult:
-        "Synthetic-only path; production stall enforcement is process based."
-
+    def execute_deadline_free(self, runner: TaskRunner, context: TaskContext, *, progress_contract: ProgressLivenessContract | None, progress_callback: Callable[[Decimal], None], native_subwork: NativeSubworkProgress | None=None) -> RunnerResult:
+        """Synthetic-only path; production stall enforcement is process based."""
+        if native_subwork is not None:
+            progress = None if progress_contract is None else _DirectProgressEmitter(progress_callback)
+            return runner.execute_with_native_subwork(context, native_subwork, progress)
         if progress_contract is None:
             return runner.execute(context)
-        execute_with_progress = getattr(runner, "execute_with_progress", None)
+        execute_with_progress = getattr(runner, 'execute_with_progress', None)
         if not callable(execute_with_progress):
-            raise ResourceAdmissionError(
-                "native deadline-free runner lacks a monotone progress interface"
-            )
-        result = execute_with_progress(
-            context,
-            _DirectProgressEmitter(progress_callback),
-        )
+            raise ResourceAdmissionError('native deadline-free runner lacks a monotone progress interface')
+        result = execute_with_progress(context, _DirectProgressEmitter(progress_callback))
         if not isinstance(result, RunnerResult):
-            raise ResourceAdmissionError("progress runner returned an invalid result")
+            raise ResourceAdmissionError('progress runner returned an invalid result')
         return result
 
-    def execute_deadline_free_until(
-        self,
-        runner: TaskRunner,
-        context: TaskContext,
-        *,
-        progress_contract: ProgressLivenessContract | None,
-        progress_callback: Callable[[Decimal], None],
-        hard_remaining_seconds: Decimal,
-    ) -> RunnerResult:
+    def execute_deadline_free_until(self, runner: TaskRunner, context: TaskContext, *, progress_contract: ProgressLivenessContract | None, progress_callback: Callable[[Decimal], None], hard_remaining_seconds: Decimal, native_subwork: NativeSubworkProgress | None=None) -> RunnerResult:
         """Synthetic boundary probe; production enforcement is process based."""
-
         if hard_remaining_seconds <= 0:
             raise CampaignElapsedBoundaryReached(context.task_id)
         started = time.monotonic()
-        result = self.execute_deadline_free(
-            runner,
-            context,
-            progress_contract=progress_contract,
-            progress_callback=progress_callback,
-        )
+        result = self.execute_deadline_free(runner, context, progress_contract=progress_contract, progress_callback=progress_callback, native_subwork=native_subwork)
         if Decimal(str(time.monotonic() - started)) >= hard_remaining_seconds:
             raise CampaignElapsedBoundaryReached(context.task_id)
         return result
@@ -536,6 +625,269 @@ class _ProcessMessage:
 @dataclass(frozen=True, slots=True)
 class _ProcessStarted:
     process_group_id: int
+
+
+@dataclass(frozen=True, slots=True)
+class _WorkerProceed:
+    invocation: ObjectIdentity
+    proceed: bool
+
+
+def _prepare_native_work(callback, runner, context, expected_parent):
+    """One installed PURE projection over independent authenticated cursors."""
+    cursors = []
+    try:
+        for port in context.input_ports:
+            cursors.append(port.cursor())
+        work = callback(runner=runner, context=replace(context, input_ports=tuple(cursors)),
+            expected_parent=expected_parent)
+        if type(work) is not PreparedNativeWork or work.expected_parent != expected_parent:
+            raise ValueError("native preparer changes its exact typed anticipated effect scope")
+        work.__post_init__()
+        nested = any(callable(getattr(runner, name, None)) for name in (
+            "execute_with_native_subwork", "execute_streaming_with_native_subwork"))
+        if nested != bool(work.definitions):
+            raise ValueError("native preparer changes ordinary versus initial nested work applicability")
+        return work
+    finally:
+        for cursor in cursors:
+            cursor.close()
+
+
+def _select_worker_environment(selector=None):
+    """Freeze declared operational additions before worker preparation and hashing."""
+    current = dict(selected_worker_environment())
+    if selector is None:
+        return tuple(sorted(current.items()))
+    if not callable(selector):
+        raise TypeError("worker environment selection requires a code-owned callback")
+    selected = selector(dict(current))
+    if (not isinstance(selected, Mapping)
+            or any(type(name) is not str or type(value) is not str for name, value in selected.items())):
+        raise ValueError("worker environment selector requires string settings in a mapping")
+    selected = dict(selected)
+    if any(selected.get(name) != value for name, value in current.items()):
+        raise ValueError("worker environment selector changes or removes an existing selected setting")
+    from empirical_lawhood.infrastructure.numerical_provenance import WORKER_ENVIRONMENT_OPTIONAL
+    if set(selected) - set(current) - set(WORKER_ENVIRONMENT_OPTIONAL):
+        raise ValueError("worker environment selector adds an unsupported execution setting")
+    return tuple(sorted(selected.items()))
+
+
+def prepare_worker_invocation(runner, context, inputs, *, implementation, execution_plan,
+                              execution_task, execution_task_record=None, native_effect=False,
+                              resource_cell=None, provenance_requirements=(),
+                              required_input_artifact_ids=(), native_work_preparer=None,
+                              worker_environment_selector=None, prepared_worker_environment=None):
+    """Join the original task and PURE domain preparation without entry effects."""
+    observed = observe_worker_environment()
+    environment = PreparedWorkerEnvironment(observed.interpreter_path, observed.interpreter_sha256,
+        observed.prefix, _select_worker_environment(worker_environment_selector))
+    if prepared_worker_environment is not None:
+        if (type(prepared_worker_environment) is not PreparedWorkerEnvironment
+                or prepared_worker_environment.selected_environment != environment.selected_environment):
+            raise ValueError('explicit frozen worker changes its selected numerical environment')
+        prepared_worker_environment.__post_init__()
+        environment = prepared_worker_environment
+    by_id = {value.artifact_id: value for value in inputs}
+    contracts = tuple(PreparedNativeInputContract(by_id[binding.artifact_id].logical, binding,
+        by_id[binding.artifact_id].materialization.physical_sha256) for binding in context.input_bindings)
+    expected_parent = NativeEffectContact(context.run_id, context.task_id, context.attempt_id,
+        execution_plan, execution_task, implementation.observed_git_head,
+        context.input_materialization_ids, context.dependency_receipt_ids)
+    work = None
+    preparation_error = None
+    if native_effect and native_work_preparer is not None and not isinstance(runner, ParentPreparedTaskRunner):
+        try:
+            work = _prepare_native_work(native_work_preparer, runner, context, expected_parent)
+        except Exception as error:  # noqa: BLE001 - actual worker must still collect all prerequisites
+            preparation_error = str(error) or type(error).__name__
+    if execution_task_record is not None:
+        required = set(execution_task_record.external_input_artifact_ids)
+        if type(execution_task_record) is ExecutionTask:
+            required.update(row.operational_logical_artifact_id for row in execution_task_record.scientific_inputs)
+        else:
+            required.update(row.artifact_id for row in contracts if row.binding.kind is WorkerInputKind.DEPENDENCY)
+    else:
+        required = set((*required_input_artifact_ids, context.config.artifact_id))
+    contract = PreparedInvocationContract(invocation_id="prepared." + context.attempt_id,
+        manifest=runner.manifest, implementation=implementation, environment=environment,
+        run_id=context.run_id, task_id=context.task_id, attempt_id=context.attempt_id,
+        config=context.config, inputs=contracts, output_ports=context.output_ports,
+        permissions=context.permissions, outcome_access=context.outcome_access,
+        resource_budget=context.resource_budget, isolation_profile=context.isolation_profile,
+        dependency_receipts=context.dependency_receipts, cpu_affinity=context.cpu_affinity,
+        execution_plan=execution_plan, execution_task=execution_task, native_work=work,
+        resource_cell=resource_cell,
+        provenance_requirement_ids=tuple(sorted(row.requirement_id for row in provenance_requirements)),
+        required_input_artifact_ids=tuple(sorted(required)), native_effect=native_effect,
+        execution_task_record=execution_task_record,
+        scientific_adjudication_context=context.scientific_adjudication_context,
+        native_preparation_error=preparation_error)
+    if work is not None and native_work_preparer is not None:
+        try:
+            bound_context = replace(context, prepared_invocation=contract)
+            selected = _prepare_native_work(native_work_preparer, runner, bound_context, expected_parent)
+            if replace(selected, isolated_selection=None, isolated_environment=None, isolated_diagnostics=()) != work:
+                raise ValueError("native specialization changes its original scientific initial work projection")
+            contract = replace(contract, native_work=selected)
+        except Exception as error:  # noqa: BLE001 - actual worker still collects all known prerequisites
+            diagnostic = getattr(error, "result", None)
+            if type(diagnostic) is WorkerPreflightResult and not diagnostic.ready:
+                work = replace(work, isolated_diagnostics=(diagnostic,))
+            contract = replace(contract, native_work=work,
+                native_preparation_error=str(error) or type(error).__name__)
+    return contract
+
+
+def _prepare_parent_native_runner(runner, context, contract, native_work_preparer):
+    """Prepare the actual parent before projecting work or launching a child.
+
+    A native parent callback needs the complete issued contract but cannot run
+    its numerical decoder until current/prior custody has been authenticated.
+    The initial contract therefore carries no native work. The returned plain
+    runner supplies the original PURE projection; the existing child preflight
+    independently checks that final projection before Ready/Proceed and BEGIN.
+    """
+    if not isinstance(runner, ParentPreparedTaskRunner) or not runner.native_effect:
+        return prepare_task_runner(runner, context), context, contract
+    if (type(contract) is not PreparedInvocationContract or not contract.native_effect
+            or contract.manifest != runner.manifest or native_work_preparer is None):
+        raise ResourceAdmissionError("native parent preparation requires its complete installed invocation and PURE work hook")
+    contract.__post_init__()
+    contract.require_complete()
+    contract.validate_context(context)
+    if contract.native_work is not None or contract.native_preparation_error is not None:
+        raise ResourceAdmissionError("unprepared native parent must retain its initial no-work invocation")
+    bound = replace(context, prepared_invocation=contract)
+    prepared = prepare_task_runner(runner, bound)
+    work, error = None, None
+    try:
+        work = _prepare_native_work(native_work_preparer, prepared, bound, contract.expected_parent_contact)
+    except Exception as caught:  # noqa: BLE001 - actual worker still collects independent prerequisites
+        error = str(caught) or type(caught).__name__
+    final = replace(contract, native_work=work, native_preparation_error=error)
+    if work is not None:
+        try:
+            selected = _prepare_native_work(native_work_preparer, prepared,
+                replace(context, prepared_invocation=final), final.expected_parent_contact)
+            if replace(selected, isolated_selection=None, isolated_environment=None, isolated_diagnostics=()) != work:
+                raise ValueError("native specialization changes its original scientific initial work projection")
+            final = replace(final, native_work=selected)
+        except Exception as caught:  # noqa: BLE001 - retain actual readiness without entry
+            diagnostic = getattr(caught, "result", None)
+            if type(diagnostic) is WorkerPreflightResult and not diagnostic.ready:
+                work = replace(work, isolated_diagnostics=(diagnostic,))
+            final = replace(final, native_work=work, native_preparation_error=str(caught) or type(caught).__name__)
+    return prepared, replace(context, prepared_invocation=final), final
+
+
+def _worker_preflight(runner, context, contract, provenance_requirements, initial_mismatches=(), native_work_preparer=None):
+    """Actual-worker observation and installed predicates, before effect access."""
+    mismatches = list(initial_mismatches)
+    provenance = environment = native_work = None
+    sanitized_environment = dict(os.environ)
+
+    def check(operand_id, callback):
+        try:
+            callback()
+        except Exception as error:  # noqa: BLE001 - retain all independent prerequisites
+            mismatches.append(WorkerPreflightMismatch(operand_id, str(error) or type(error).__name__))
+
+    check(contract.invocation_id, contract.require_complete)
+    check(contract.task_id, lambda: contract.validate_context(context))
+    if runner.manifest != contract.manifest:
+        mismatches.append(WorkerPreflightMismatch(contract.task_id, "worker changes its exact installed capability manifest"))
+    actual_ids = {port.artifact_id for port in context.input_ports}
+    for missing in sorted(set(contract.required_input_artifact_ids) - actual_ids):
+        mismatches.append(WorkerPreflightMismatch(missing, "declared direct worker input is missing"))
+    for row in contract.inputs:
+        def verify_input(selected=row):
+            port = next((value for value in context.input_ports if value.artifact_id == selected.artifact_id), None)
+            if port is None or port.binding != selected.binding:
+                raise ValueError("worker input differs from its exact authenticated binding")
+            cursor = port.cursor()
+            digest, count = hashlib.sha256(), 0
+            try:
+                while chunk := cursor.read(min(STREAM_CHUNK_BYTES, selected.binding.size_bytes - count + 1)):
+                    digest.update(chunk)
+                    count += len(chunk)
+                if (count, digest.hexdigest()) != (selected.binding.size_bytes, selected.physical_sha256):
+                    raise ValueError("worker input changes its complete authenticated physical bytes")
+            finally:
+                cursor.close()
+        check(row.artifact_id, verify_input)
+    if contract.native_effect:
+        if native_work_preparer is None:
+            mismatches.append(WorkerPreflightMismatch("native.preparer", "SOFTWARE: installed PURE native preparation hook is unavailable"))
+        else:
+            try:
+                native_work = _prepare_native_work(native_work_preparer, runner, context, contract.expected_parent_contact)
+                if native_work != contract.native_work:
+                    raise ValueError("actual worker native projection differs from selected PURE preparation")
+            except Exception as error:  # noqa: BLE001 - keep all actual worker prerequisites
+                mismatches.append(WorkerPreflightMismatch("native.work", str(error) or type(error).__name__))
+        if contract.native_preparation_error is not None:
+            mismatches.append(WorkerPreflightMismatch("native.preparation", contract.native_preparation_error))
+    for definition in contract.native_definitions:
+        if (definition.code_sources_sha256, definition.dependency_lock_sha256,
+                definition.parent_contact.implementation_commit, definition.parent_contact) != (
+                contract.implementation.code_sources_sha256, contract.implementation.dependency_lock_sha256,
+                contract.implementation.observed_git_head, contract.expected_parent_contact):
+            mismatches.append(WorkerPreflightMismatch(definition.subwork_id, "native definition changes selected implementation/environment"))
+        for identity in (definition.configuration, *definition.sources, *definition.streams):
+            def verify_scientific(selected=identity):
+                matches = tuple(row for row in contract.inputs if (row.logical.payload_schema,
+                    row.logical.content_sha256) == (selected.object_schema, selected.object_fingerprint))
+                if len(matches) != 1:
+                    raise ValueError("native scientific operand lacks its unique authenticated worker input")
+                row = matches[0]
+                if row.logical.profile is ArtifactProfile.CANONICAL_JSON:
+                    port = next(value for value in context.input_ports if value.artifact_id == row.artifact_id)
+                    cursor = port.cursor()
+                    encode = lambda value: json.dumps(value, ensure_ascii=True, separators=(",", ":")).encode()
+                    prefix = b'{"schema":' + encode(selected.object_schema) + b',"value":'
+                    suffix = b',"version":' + encode(selected.object_version) + b'}\n'
+                    tail = b""
+                    try:
+                        if cursor.read(len(prefix)) != prefix:
+                            raise ValueError("native operand changes its exact canonical schema envelope")
+                        while chunk := cursor.read(STREAM_CHUNK_BYTES):
+                            tail = (tail + chunk)[-len(suffix):]
+                        if tail != suffix:
+                            raise ValueError("native operand changes its original canonical revision")
+                    finally:
+                        cursor.close()
+            check(identity.object_id, verify_scientific)
+    if contract.resource_cell is not None:
+        check(contract.task_id, lambda: validate_runner_resource_interface(runner, contract.resource_cell))
+    callback = getattr(runner, "preflight", None)
+    if callable(callback):
+        def validate_domain():
+            cursors = []
+            try:
+                for port in context.input_ports:
+                    cursors.append(port.cursor())
+                prepared_context = replace(context, input_ports=tuple(cursors))
+                if callback(prepared_context) is not None:
+                    raise ValueError("worker preflight must return None or refuse")
+            finally:
+                for cursor in cursors:
+                    cursor.close()
+        check(contract.task_id, validate_domain)
+    check(contract.task_id, lambda: contract.validate_context(context))
+    # Observe after every installed preparation hook, including imports made by
+    # domain preflight. Readiness must describe the interpreter that will run.
+    provenance, environment, observed_mismatches = observe_prepared_worker(contract, provenance_requirements)
+    mismatches.extend(observed_mismatches)
+    final_environment = dict(os.environ)
+    changed = tuple(sorted(name for name in set(sanitized_environment) | set(final_environment)
+        if sanitized_environment.get(name) != final_environment.get(name)))
+    if changed:
+        mismatches.append(WorkerPreflightMismatch("worker.environment",
+            "actual worker complete sanitized environment changed during preflight: " + ", ".join(changed)))
+    return WorkerPreflightResult(contract.identity, provenance, environment,
+        tuple(sorted(set(mismatches), key=lambda row: (row.operand_id, row.reason))), native_work)
 
 
 @dataclass(frozen=True, slots=True)
@@ -585,7 +937,7 @@ class _PipeOutputEmitter(StreamingOutputEmitter):
         if len(chunk) > STREAM_CHUNK_BYTES:
             raise ResourceAdmissionError("streaming runner chunk exceeds its byte limit")
         self._written += len(chunk)
-        if self._written > self._maximum_bytes:
+        if self._maximum_bytes is not None and self._written > self._maximum_bytes:
             raise ResourceAdmissionError("streaming runner exceeded its output-byte budget")
         self._connection.send(_ProcessChunk(output_id, chunk))
 
@@ -626,7 +978,9 @@ class _PathOutputSource:
 
 
 class _ScratchOutputCollector:
-    def __init__(self, context: TaskContext, scratch_directory: Path) -> None:
+    def __init__(self, context: TaskContext, scratch_directory: Path,
+                 native_subwork_service: NativeSubworkPipeService | None = None) -> None:
+        self._native_subwork_service = native_subwork_service
         self._maximum_bytes = context.resource_budget.output_bytes
         self._written = 0
         self._paths: dict[str, Path] = {}
@@ -651,8 +1005,10 @@ class _ScratchOutputCollector:
             raise ResourceAdmissionError("worker emitted an unknown output stream")
         if len(message.payload) > STREAM_CHUNK_BYTES:
             raise ResourceAdmissionError("worker output stream chunk exceeds its limit")
+        if self._native_subwork_service is not None and not self._native_subwork_service.account_ordinary_output_bytes(len(message.payload)):
+            raise ResourceAdmissionError("combined native and ordinary output exceeds its selected parent allowance")
         self._written += len(message.payload)
-        if self._written > self._maximum_bytes:
+        if self._maximum_bytes is not None and self._written > self._maximum_bytes:
             raise ResourceAdmissionError("worker output stream exceeds its budget")
         handle.write(message.payload)
         self._digests[message.output_id].update(message.payload)
@@ -700,15 +1056,17 @@ def _apply_resource_limits(
     cpu_affinity: tuple[int, ...] = (),
     deadline_free: bool = False,
 ) -> None:
-    if not deadline_free:
+    if not deadline_free and budget.wall_time_seconds is not None:
         cpu_seconds = max(1, budget.cpu_cores * budget.wall_time_seconds)
         resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, cpu_seconds))
-    resource.setrlimit(
-        resource.RLIMIT_AS,
-        (budget.memory_bytes, budget.memory_bytes),
-    )
-    file_limit = max(1, budget.output_bytes)
-    resource.setrlimit(resource.RLIMIT_FSIZE, (file_limit, file_limit))
+    if budget.memory_bytes is not None:
+        resource.setrlimit(
+            resource.RLIMIT_AS,
+            (budget.memory_bytes, budget.memory_bytes),
+        )
+    if budget.output_bytes is not None:
+        file_limit = max(1, budget.output_bytes)
+        resource.setrlimit(resource.RLIMIT_FSIZE, (file_limit, file_limit))
     if hasattr(os, "sched_getaffinity") and hasattr(os, "sched_setaffinity"):
         available = tuple(sorted(os.sched_getaffinity(0)))
         if cpu_affinity:
@@ -724,24 +1082,24 @@ def _sanitize_worker_process(
     scratch_directory: Path,
     *,
     deadline_free: bool = False,
+    prepared_environment: PreparedWorkerEnvironment | None = None,
 ) -> None:
     from threadpoolctl import threadpool_limits  # type: ignore[import-untyped]
 
     if context.isolation_profile is WorkerIsolationProfile.EXPLORATION_NO_NETWORK:
         raise ResourceAdmissionError("enforceable exploration no-network isolation is unavailable")
+    settings = selected_worker_environment() if prepared_environment is None else prepared_environment.selected_environment
+    from empirical_lawhood.infrastructure.numerical_provenance import WORKER_ENVIRONMENT_DEFAULTS, WORKER_ENVIRONMENT_OPTIONAL
+    if not set(name for name, _ in settings).issubset({*WORKER_ENVIRONMENT_DEFAULTS, *WORKER_ENVIRONMENT_OPTIONAL}):
+        raise ResourceAdmissionError("worker environment contains unsupported execution settings")
+    if any(dict(settings).get(name) != value for name, value in WORKER_ENVIRONMENT_DEFAULTS.items()):
+        raise ResourceAdmissionError("worker environment changes code-owned thread/runtime settings")
     os.chdir(scratch_directory)
     os.environ.clear()
     os.environ.update(
         {
             "HOME": str(scratch_directory),
-            "LANG": "C.UTF-8",
-            "LC_ALL": "C.UTF-8",
-            "MKL_NUM_THREADS": "1",
-            "NUMEXPR_NUM_THREADS": "1",
-            "OMP_NUM_THREADS": "1",
-            "OPENBLAS_NUM_THREADS": "1",
-            "VECLIB_MAXIMUM_THREADS": "1",
-            "PYTHONHASHSEED": "0",
+            **dict(settings),
             "TMPDIR": str(scratch_directory),
         }
     )
@@ -758,8 +1116,8 @@ def _sanitize_worker_process(
 def _bounded_scratch_bytes(
     scratch_directory: Path,
     *,
-    maximum_bytes: int,
-    maximum_entries: int = MAX_SCRATCH_SCAN_ENTRIES,
+    maximum_bytes: int | None,
+    maximum_entries: int | None = MAX_SCRATCH_SCAN_ENTRIES,
 ) -> int:
     """Inspect scratch with explicit byte and entry stops.
 
@@ -767,7 +1125,10 @@ def _bounded_scratch_bytes(
     an aggregate scratch-quota capability.
     """
 
-    if maximum_bytes < 0 or maximum_entries <= 0:
+    if (
+        (maximum_bytes is not None and maximum_bytes < 0)
+        or (maximum_entries is not None and maximum_entries <= 0)
+    ):
         raise ValueError("scratch inspection limits are invalid")
     pending = [scratch_directory]
     entry_count = 0
@@ -785,7 +1146,7 @@ def _bounded_scratch_bytes(
             with entries:
                 for entry in entries:
                     entry_count += 1
-                    if entry_count > maximum_entries:
+                    if maximum_entries is not None and entry_count > maximum_entries:
                         raise ResourceAdmissionError(
                             "task scratch entry count exceeds the bounded inspection limit"
                         )
@@ -805,9 +1166,9 @@ def _bounded_scratch_bytes(
                     if not stat.S_ISREG(entry_state.st_mode):
                         raise ResourceAdmissionError("task scratch contains a non-file entry")
                     total_bytes += entry_state.st_size
-                    if total_bytes > maximum_bytes:
+                    if maximum_bytes is not None and total_bytes > maximum_bytes:
                         return total_bytes
-    except ResourceAdmissionError:
+    except execution_error_types("ResourceAdmissionError"):
         raise
     except OSError as error:
         raise ResourceAdmissionError("task scratch cannot be inspected safely") from error
@@ -849,6 +1210,10 @@ def _execute_in_child(
     deadline_free: bool = False,
     expected_source_root: str | None = None,
     grouped: bool = False,
+    native_subwork_enabled: bool = False,
+    prepared_contract: PreparedInvocationContract | None = None,
+    provenance_requirements: tuple = (),
+    native_work_preparer: Callable | None = None,
 ) -> None:
     try:
         if not grouped:
@@ -859,11 +1224,35 @@ def _execute_in_child(
             and str(Path(__file__).resolve().parents[2]) != expected_source_root
         ):
             raise ResourceAdmissionError("worker imported a different installed source tree")
-        _sanitize_worker_process(
-            context,
-            scratch_directory,
-            deadline_free=deadline_free,
-        )
+        preparation_errors = ()
+        try:
+            _sanitize_worker_process(
+                context,
+                scratch_directory,
+                deadline_free=deadline_free,
+                prepared_environment=None if prepared_contract is None else prepared_contract.environment,
+            )
+        except execution_error_types("ResourceAdmissionError") as error:
+            if prepared_contract is None:
+                raise
+            preparation_errors = (WorkerPreflightMismatch("worker.resources", str(error)),)
+        if prepared_contract is not None:
+            try:
+                prepared_contract.require_complete()
+                prepared_contract.validate_context(context)
+                context = replace(context, prepared_invocation=prepared_contract)
+            except ValueError as error:
+                preparation_errors += (WorkerPreflightMismatch("worker.invocation", str(error)),)
+            readiness = _worker_preflight(runner, context, prepared_contract, provenance_requirements, preparation_errors, native_work_preparer)
+            connection.send(readiness)
+            acknowledgement = connection.recv()
+            if (type(acknowledgement) is not _WorkerProceed
+                    or acknowledgement.invocation != prepared_contract.identity):
+                raise ResourceAdmissionError("worker lacks its exact prepared invocation acknowledgement")
+            if not acknowledgement.proceed:
+                return
+            if not readiness.ready:
+                raise ResourceAdmissionError("worker cannot execute a refused prepared invocation")
         execute_streaming = getattr(runner, "execute_streaming", None)
         execute_streaming_with_progress = getattr(
             runner,
@@ -871,7 +1260,23 @@ def _execute_in_child(
             None,
         )
         execute_with_progress = getattr(runner, "execute_with_progress", None)
-        if progress_contract is not None and callable(execute_streaming_with_progress):
+        if native_subwork_enabled:
+            execute_native = getattr(runner, "execute_with_native_subwork", None)
+            execute_native_streaming = getattr(runner, "execute_streaming_with_native_subwork", None)
+            native_progress = PipeNativeSubworkProgress(connection)
+            telemetry = None if progress_contract is None else _PipeProgressEmitter(connection)
+            if callable(execute_native_streaming):
+                checks = execute_native_streaming(context, native_progress,
+                    _PipeOutputEmitter(connection, context), telemetry)
+                if not isinstance(checks, tuple) or not all(isinstance(check, ReceiptCheck) for check in checks):
+                    raise ResourceAdmissionError("streaming runner returned invalid receipt checks")
+                connection.send(_ProcessStreamComplete(checks))
+            elif callable(execute_native):
+                result = execute_native(context, native_progress, telemetry)
+                _return_nonstreaming_result(connection, context, result)
+            else:
+                raise ResourceAdmissionError("native subwork runner lacks its exposed progress interface")
+        elif progress_contract is not None and callable(execute_streaming_with_progress):
             checks = execute_streaming_with_progress(
                 context,
                 _PipeOutputEmitter(connection, context),
@@ -905,7 +1310,7 @@ def _execute_in_child(
         else:
             result = runner.execute(context)
             _return_nonstreaming_result(connection, context, result)
-    except (ResourceAdmissionError, ArtifactInputLimitExceeded) as error:
+    except (*execution_error_types("ResourceAdmissionError"), ArtifactInputLimitExceeded) as error:
         connection.send(
             _ProcessMessage(
                 None,
@@ -935,7 +1340,7 @@ def _execute_task_chunk(connection: Connection, expected_source_root: str) -> No
     original_affinity = os.sched_getaffinity(0) if hasattr(os, "sched_getaffinity") else None
     try:
         for _ in range(2):
-            runner, context, scratch_directory = connection.recv()
+            runner, context, scratch_directory, prepared_contract, provenance_requirements, native_work_preparer = connection.recv()
             if original_affinity is not None:
                 os.sched_setaffinity(0, original_affinity)
             _execute_in_child(
@@ -946,6 +1351,9 @@ def _execute_task_chunk(connection: Connection, expected_source_root: str) -> No
                 deadline_free=True,
                 expected_source_root=expected_source_root,
                 grouped=True,
+                prepared_contract=prepared_contract,
+                provenance_requirements=provenance_requirements,
+                native_work_preparer=native_work_preparer,
             )
             for port in context.input_ports:
                 port.close()
@@ -970,9 +1378,8 @@ def _return_nonstreaming_result(
     if len(buffered_outputs) != len(result.outputs):
         raise ResourceAdmissionError("non-streaming runner returned a streamed output handle")
     output_bytes = sum(len(output.payload) for output in buffered_outputs)
-    if output_bytes > min(
-        context.resource_budget.output_bytes,
-        MAX_IN_MEMORY_TASK_OUTPUT_BYTES,
+    if context.resource_budget.output_bytes is not None and output_bytes > min(
+        context.resource_budget.output_bytes, MAX_IN_MEMORY_TASK_OUTPUT_BYTES,
     ):
         raise ResourceAdmissionError("in-memory task output exceeds its bounded convenience limit")
     if any(len(output.payload) > STREAM_CHUNK_BYTES for output in buffered_outputs):
@@ -993,21 +1400,29 @@ def _return_nonstreaming_result(
 
 
 class _ProgressPersistence:
-    """Persist monotone progress without blocking native output on telemetry.
+    """Persist actual progress milestones and the final received counter.
 
-    Keep one callback in flight and the latest unpersisted counter. Every pipe
-    sample is checked for monotonicity and liveness before submission; samples
-    superseded here have not created canonical events. The final counter must
-    cross the durable callback before a task result can be acknowledged.
+    Every live pipe sample is checked for monotonicity and liveness before
+    submission. Optional durable sampling accepts the first positive counter,
+    then counters at least twice the last scheduled sample, including an
+    in-flight callback. Coalescing preserves that doubling bound. Normal drain
+    retains the actual final counter once; exceptional close forces no sample.
+    These work milestones read no clock and create no elapsed-time claim.
     """
 
-    def __init__(self, callback: Callable[[Decimal], None]) -> None:
+    def __init__(self, callback: Callable[[Decimal], None], *, milestone_sampling: bool = False) -> None:
+        if type(milestone_sampling) is not bool:
+            raise TypeError("progress milestone sampling requires an explicit boolean")
         self._callback = callback
+        self._milestone_sampling = milestone_sampling
+        self._latest: Decimal | None = None
+        self._scheduled_counter: Decimal | None = None
         self._pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="native-progress")
         self._lock = threading.Lock()
         self._pending: Decimal | None = None
         self._future: Future[None] | None = None
         self._running = False
+        self._closed = False
         self._failure: BaseException | None = None
 
     def _persist(self, counter: Decimal) -> None:
@@ -1031,24 +1446,43 @@ class _ProgressPersistence:
             if self._failure is not None:
                 raise self._failure
 
+    def _schedule_locked(self, counter: Decimal) -> None:
+        self._scheduled_counter = counter
+        if self._running:
+            self._pending = counter
+        else:
+            self._running = True
+            self._future = self._pool.submit(self._persist, counter)
+
     def submit(self, counter: Decimal) -> None:
         with self._lock:
             if self._failure is not None:
                 raise self._failure
-            if self._running:
-                self._pending = counter
-            else:
-                self._running = True
-                self._future = self._pool.submit(self._persist, counter)
+            if self._closed:
+                raise RuntimeError("progress persistence is closed")
+            self._latest = counter
+            if (self._milestone_sampling and self._scheduled_counter is not None
+                    and counter < 2 * self._scheduled_counter):
+                return
+            self._schedule_locked(counter)
 
     def drain(self) -> None:
         # The pipe owner calls drain after its final sample, so no producer can
-        # submit while this future consumes the final pending counter.
-        if self._future is not None:
-            self._future.result()
+        # submit while this future consumes the actual final pending counter.
+        with self._lock:
+            if self._failure is not None:
+                raise self._failure
+            if not self._closed and self._latest is not None and self._latest != self._scheduled_counter:
+                self._schedule_locked(self._latest)
+            future = self._future
+        if future is not None:
+            future.result()
         self.check()
 
     def close(self) -> None:
+        with self._lock:
+            self._closed = True
+            self._pending = None
         self._pool.shutdown(wait=True, cancel_futures=True)
 
 
@@ -1076,13 +1510,25 @@ class LocalProcessExecutor:
         *,
         scratch_root: GuardedExternalRoot | None = None,
         start_method: str = "spawn",
+        worker_environment: PreparedWorkerEnvironment | None = None,
+        worker_package_root: str | None = None,
     ) -> None:
         if start_method not in multiprocessing.get_all_start_methods():
             raise ValueError("unsupported multiprocessing start method")
         self._context: Any = multiprocessing.get_context(start_method)
+        self._expected_source_root = str(Path(__file__).resolve().parents[2])
+        if (worker_environment is None) != (worker_package_root is None):
+            raise ValueError('selected scientific worker needs both its environment and package root')
+        if worker_environment is not None:
+            from .selected_worker_process import SelectedWorkerSpawnContext
+            if start_method != 'spawn' or not Path(worker_package_root).is_absolute():
+                raise ValueError('selected scientific worker requires its isolated spawn and absolute package root')
+            self._context = SelectedWorkerSpawnContext(worker_environment)
+            self._expected_source_root = worker_package_root
         self._scratch_root = scratch_root
         self._group_lock = threading.Lock()
         self._idle_workers: dict[tuple[object, ...], _GroupedWorker] = {}
+        self.attempt_lease_heartbeat: Callable[[TaskContext], None] | None = None
 
     @staticmethod
     def _stop_group_worker(worker: _GroupedWorker) -> None:
@@ -1103,7 +1549,15 @@ class LocalProcessExecutor:
         execution_group_id: str,
         progress_contract: ProgressLivenessContract | None,
         progress_callback: Callable[[Decimal], None],
+        prepared_contract: PreparedInvocationContract | None = None,
+        provenance_requirements: tuple = (),
+        native_work_preparer: Callable | None = None,
+        native_entry: Callable[[], tuple[NativeEffectContact, NativeSubworkProgress | None]] | None = None,
     ) -> RunnerResult:
+        if native_entry is not None:
+            raise ResourceAdmissionError("native entry cannot use a reusable pure worker group")
+        if isinstance(runner, ParentPreparedTaskRunner):
+            raise ResourceAdmissionError('parent-prepared runners require a dedicated task process')
         if (
             getattr(runner, "worker_chunk_limit", None) != 2
             or progress_contract is not None
@@ -1120,6 +1574,8 @@ class LocalProcessExecutor:
             context.outcome_access,
             context.resource_budget.fingerprint(),
             context.isolation_profile,
+            None if prepared_contract is None else prepared_contract.implementation.fingerprint(),
+            None if prepared_contract is None else prepared_contract.environment.fingerprint(),
         )
         with self._group_lock:
             worker = self._idle_workers.pop(key, None)
@@ -1132,7 +1588,7 @@ class LocalProcessExecutor:
                 parent, child = self._context.Pipe(duplex=True)
                 process = self._context.Process(
                     target=_execute_task_chunk,
-                    args=(child, str(Path(__file__).resolve().parents[2])),
+                    args=(child, self._expected_source_root),
                     name=f"empirical-lawhood-chunk-{context.task_id}",
                 )
                 try:
@@ -1152,6 +1608,9 @@ class LocalProcessExecutor:
                 progress_contract=None,
                 progress_callback=progress_callback,
                 worker=worker,
+                prepared_contract=prepared_contract,
+                provenance_requirements=provenance_requirements,
+                native_work_preparer=native_work_preparer,
             )
         except BaseException:
             self._stop_group_worker(worker)
@@ -1161,51 +1620,100 @@ class LocalProcessExecutor:
                 self._idle_workers[key] = worker
         return result
 
-    def execute(
-        self,
-        runner: TaskRunner,
-        context: TaskContext,
-        *,
-        timeout_seconds: int,
-    ) -> RunnerResult:
+    def execute(self, runner, context, *, timeout_seconds, native_subwork=None,
+                prepared_contract=None, provenance_requirements=(), native_entry=None,
+                native_work_preparer=None, completed_native_work=None):
+        result = self._execute(runner, context, timeout_seconds=timeout_seconds,
+            native_subwork=native_subwork, prepared_contract=prepared_contract,
+            provenance_requirements=provenance_requirements, native_entry=native_entry,
+            native_work_preparer=native_work_preparer, completed_native_work=completed_native_work)
+        if type(result) is not RunnerResult:
+            raise TaskProcessError("execution returned a diagnostic preflight result")
+        return result
+
+    def preflight(self, runner, context, *, prepared_contract, timeout_seconds=60,
+                  provenance_requirements=(), native_work_preparer=None):
+        """Use the actual execution child/Pipe, then Stop without native entry."""
+        result = self._execute(runner, context, timeout_seconds=timeout_seconds,
+            prepared_contract=prepared_contract, provenance_requirements=provenance_requirements,
+            native_work_preparer=native_work_preparer, preflight_only=True)
+        if type(result) is not WorkerPreflightResult:
+            raise TaskProcessError("preflight returned scientific execution output")
+        return result
+
+    @staticmethod
+    def _admit_worker(result, contract, connection, context, scratch_directory,
+                      native_entry, subwork_service):
+        if not result.ready:
+            connection.send(_WorkerProceed(contract.identity, False))
+            raise WorkerPreflightError(result)
+        if (result.environment != contract.environment
+                or result.producing_provenance.code_sources_sha256 != contract.implementation.code_sources_sha256
+                or result.producing_provenance.dependency_lock_sha256 != contract.implementation.dependency_lock_sha256
+                or result.producing_provenance.observed_git_head != contract.implementation.observed_git_head):
+            raise TaskProcessError("worker readiness changes its observed source/environment")
+        if contract.native_effect and result.native_work != contract.native_work:
+            raise TaskProcessError("worker readiness changes its prepared original native scope")
+        if native_entry is not None:
+            entered = native_entry()  # Parent-only: durable contact precedes Proceed.
+            if (type(entered) is not tuple or len(entered) != 2
+                    or type(entered[0]) is not NativeEffectContact
+                    or entered[0] != contract.expected_parent_contact):
+                raise TaskProcessError("native entry changes its complete anticipated contact")
+            _, progress = entered
+            if contract.native_definitions and progress is None:
+                raise TaskProcessError("prepared nested work lacks its exact native progress parent")
+            if progress is not None:
+                parent = progress.parent_contact
+                if parent != contract.expected_parent_contact:
+                    raise TaskProcessError("native entry changes the acknowledged worker parent")
+                subwork_service = NativeSubworkPipeService(progress, context, scratch_directory)
+        connection.send(_WorkerProceed(contract.identity, True))
+        return subwork_service
+
+    def _execute(self, runner: TaskRunner, context: TaskContext, *, timeout_seconds: int | None, native_subwork: NativeSubworkProgress | None=None, prepared_contract: PreparedInvocationContract | None=None, provenance_requirements: tuple=(), native_work_preparer: Callable | None=None, native_entry: Callable[[], tuple[NativeEffectContact, NativeSubworkProgress | None]] | None=None, preflight_only: bool=False, completed_native_work: PreparedNativeWork | None=None) -> RunnerResult | WorkerPreflightResult:
         self.close_run_workers()
-        if timeout_seconds <= 0:
-            raise ValueError("task timeout must be positive")
-        if timeout_seconds != context.resource_budget.wall_time_seconds:
-            raise ResourceAdmissionError("worker timeout differs from frozen budget")
+        if timeout_seconds is not None and timeout_seconds <= 0:
+            raise ValueError('task timeout must be positive')
+        if not preflight_only and timeout_seconds != context.resource_budget.wall_time_seconds:
+            raise ResourceAdmissionError('worker timeout differs from frozen budget')
         if self._scratch_root is None:
-            raise ResourceAdmissionError("scoped external scratch is not composed")
-        scratch_directory = self._scratch_root.resolve(
-            f"scratch/task-execution/{context.run_id}/{context.attempt_id}",
-            for_write=True,
-            operation_minimum_free_bytes=context.resource_budget.output_bytes,
-        )
+            raise ResourceAdmissionError('scoped external scratch is not composed')
+        if native_entry is not None and prepared_contract is None:
+            raise ResourceAdmissionError('native entry requires its complete prepared invocation')
+        if prepared_contract is not None and (not prepared_contract.native_effect) and (native_entry is not None):
+            raise ResourceAdmissionError('pure prepared invocation cannot enter a native effect')
+        if preflight_only and prepared_contract is None:
+            raise ResourceAdmissionError('worker preflight requires its complete prepared invocation')
+        if prepared_contract is not None and prepared_contract.native_effect and (not preflight_only) and (native_entry is None) and (completed_native_work is None):
+            raise ResourceAdmissionError('prepared native execution requires its actual parent entry callback')
+        if prepared_contract is not None:
+            prepared_contract.__post_init__()
+        runner, context, prepared_contract = _prepare_parent_native_runner(runner, context, prepared_contract, native_work_preparer)
+        if completed_native_work is not None:
+            if preflight_only or native_entry is not None or prepared_contract is None or (not prepared_contract.native_effect) or (type(completed_native_work) is not PreparedNativeWork) or (completed_native_work != prepared_contract.native_work) or (native_subwork is None):
+                raise ResourceAdmissionError('parent finalization requires its exact prepared work and read-only progress')
+            context = replace(context, prepared_invocation=prepared_contract)
+        scratch_relative = f'scratch/task-finalization/{context.run_id}/{context.attempt_id}/{uuid4().hex}' if completed_native_work is not None else f"scratch/{('task-preflight' if preflight_only else 'task-execution')}/{context.run_id}/{context.attempt_id}"
+        scratch_directory = self._scratch_root.resolve(scratch_relative, for_write=True)
         if scratch_directory.exists():
-            raise ResourceAdmissionError("task scratch identity already exists")
+            raise ResourceAdmissionError('task scratch identity already exists')
         scratch_directory.mkdir(parents=True)
         collector: _ScratchOutputCollector | None = None
-        parent, child = self._context.Pipe(duplex=False)
-        process = self._context.Process(
-            target=_execute_in_child,
-            args=(
-                runner,
-                context,
-                child,
-                scratch_directory,
-                None,
-                False,
-                str(Path(__file__).resolve().parents[2]),
-            ),
-            name=f"empirical-lawhood-{context.task_id}",
-        )
+        subwork_service = None if native_subwork is None else NativeSubworkPipeService(native_subwork, context, scratch_directory, completed_work=completed_native_work)
+        parent, child = self._context.Pipe(duplex=native_subwork is not None or prepared_contract is not None)
+        process = self._context.Process(target=_execute_in_child, args=(runner, context, child, scratch_directory, None, False, self._expected_source_root, False, native_subwork is not None or (native_entry is not None and any((callable(getattr(runner, name, None)) for name in ('execute_with_native_subwork', 'execute_streaming_with_native_subwork')))), prepared_contract, provenance_requirements, native_work_preparer), name=f'empirical-lawhood-{context.task_id}')
         message: object | None = None
         process_group_id: int | None = None
+        acknowledged = False
         try:
             with numerical_spawn_environment():
                 process.start()
             child.close()
-            deadline = time.monotonic() + timeout_seconds
+            deadline = None if timeout_seconds is None else time.monotonic() + timeout_seconds
             while message is None:
+                if self.attempt_lease_heartbeat is not None:
+                    self.attempt_lease_heartbeat(context)
                 if parent.poll(0.05):
                     try:
                         observed = parent.recv()
@@ -1213,40 +1721,46 @@ class LocalProcessExecutor:
                         break
                     if isinstance(observed, _ProcessStarted):
                         if process_group_id is not None or observed.process_group_id != process.pid:
-                            raise TaskProcessError(
-                                "worker process-group acknowledgement is invalid"
-                            )
+                            raise TaskProcessError('worker process-group acknowledgement is invalid')
                         process_group_id = observed.process_group_id
                         continue
+                    if isinstance(observed, WorkerPreflightResult):
+                        if process_group_id is None or acknowledged or prepared_contract is None:
+                            raise TaskProcessError('worker readiness is outside its exact live invocation')
+                        if observed.invocation != prepared_contract.identity:
+                            raise TaskProcessError('worker readiness substitutes its prepared invocation')
+                        acknowledged = True
+                        if preflight_only:
+                            parent.send(_WorkerProceed(prepared_contract.identity, False))
+                            message = observed
+                            break
+                        subwork_service = self._admit_worker(observed, prepared_contract, parent, context, scratch_directory, native_entry, subwork_service)
+                        continue
                     if isinstance(observed, _ProcessChunk):
+                        if prepared_contract is not None and (not acknowledged):
+                            raise TaskProcessError('worker emitted output before prepared readiness')
                         if process_group_id is None:
-                            raise TaskProcessError(
-                                "worker emitted output before isolation acknowledgement"
-                            )
+                            raise TaskProcessError('worker emitted output before isolation acknowledgement')
                         if collector is None:
-                            collector = _ScratchOutputCollector(context, scratch_directory)
+                            collector = _ScratchOutputCollector(context, scratch_directory, subwork_service)
                         collector.write(observed)
                         continue
+                    if isinstance(observed, NativeSubworkRequest):
+                        if process_group_id is None or subwork_service is None:
+                            raise TaskProcessError('worker requested native progress outside its live parent')
+                        subwork_service.handle(observed, parent)
+                        continue
                     if isinstance(observed, _ProcessStreamComplete) and collector is None:
-                        collector = _ScratchOutputCollector(context, scratch_directory)
+                        collector = _ScratchOutputCollector(context, scratch_directory, subwork_service)
                     message = observed
                     break
-                if time.monotonic() >= deadline:
-                    _terminate_process_group(
-                        process,
-                        process_group_id=process_group_id,
-                    )
-                    raise TimeoutError(f"task process timed out: {context.task_id}")
-                scratch_bytes = _bounded_scratch_bytes(
-                    scratch_directory,
-                    maximum_bytes=context.resource_budget.output_bytes,
-                )
-                if scratch_bytes > context.resource_budget.output_bytes:
-                    _terminate_process_group(
-                        process,
-                        process_group_id=process_group_id,
-                    )
-                    raise ResourceAdmissionError("task exceeded its derived scratch budget")
+                if deadline is not None and time.monotonic() >= deadline:
+                    _terminate_process_group(process, process_group_id=process_group_id)
+                    raise TimeoutError(f'task process timed out: {context.task_id}')
+                scratch_bytes = _bounded_scratch_bytes(scratch_directory, maximum_bytes=context.resource_budget.output_bytes, maximum_entries=None if context.resource_budget.output_bytes is None else MAX_SCRATCH_SCAN_ENTRIES)
+                if context.resource_budget.output_bytes is not None and scratch_bytes > context.resource_budget.output_bytes:
+                    _terminate_process_group(process, process_group_id=process_group_id)
+                    raise ResourceAdmissionError('task exceeded its derived scratch budget')
                 if not process.is_alive():
                     break
             if message is None and parent.poll():
@@ -1256,20 +1770,15 @@ class LocalProcessExecutor:
                     message = None
             if message is None:
                 join_worker_process(process)
-                raise TaskProcessError(
-                    f"task process exited without a typed result (exitcode={process.exitcode})"
-                )
+                raise TaskProcessError(f'task process exited without a typed result (exitcode={process.exitcode})')
             join_worker_process(process)
         finally:
+            if subwork_service is not None:
+                subwork_service.close()
             parent.close()
             if process.is_alive():
-                _terminate_process_group(
-                    process,
-                    process_group_id=process_group_id,
-                )
+                _terminate_process_group(process, process_group_id=process_group_id)
             elif process_group_id is not None:
-                # A runner may leave descendants alive after returning.  The
-                # acknowledged worker group is always dedicated to this task.
                 try:
                     os.killpg(process_group_id, signal.SIGTERM)
                 except ProcessLookupError:
@@ -1278,14 +1787,15 @@ class LocalProcessExecutor:
                     os.killpg(process_group_id, signal.SIGKILL)
                 except ProcessLookupError:
                     pass
-            if collector is not None and not isinstance(
-                message,
-                _ProcessStreamComplete,
-            ):
+            if collector is not None and (not isinstance(message, _ProcessStreamComplete)):
                 collector.abort()
+        if isinstance(message, WorkerPreflightResult):
+            if not preflight_only or process.exitcode != 0:
+                raise TaskProcessError('worker preflight exited without its normal Stop return')
+            return message
         if isinstance(message, _ProcessStreamComplete):
             if collector is None:
-                raise TaskProcessError("stream completion lacks an output collector")
+                raise TaskProcessError('stream completion lacks an output collector')
             try:
                 outputs = collector.finish(message.logical_content_sha256_by_output)
             except Exception:
@@ -1299,123 +1809,86 @@ class LocalProcessExecutor:
                 raise
         elif isinstance(message, _ProcessMessage):
             if message.result is None:
-                if message.error_kind == "RESOURCE":
-                    raise ResourceAdmissionError("task resource boundary is unavailable")
-                raise TaskProcessError(
-                    "task child process reported a typed failure",
-                    child_exception_type=message.error_type,
-                    child_message=message.error_message,
-                )
+                if message.error_kind == 'RESOURCE':
+                    raise ResourceAdmissionError('task resource boundary is unavailable')
+                raise TaskProcessError('task child process reported a typed failure', child_exception_type=message.error_type, child_message=message.error_message)
             result = message.result
         else:
-            raise TaskProcessError("task process returned an invalid message")
+            raise TaskProcessError('task process returned an invalid message')
         if process.exitcode != 0:
             self._close_streamed_outputs(result)
-            raise TaskProcessError(f"task process exited with code {process.exitcode}")
-        scratch_bytes = _bounded_scratch_bytes(
-            scratch_directory,
-            maximum_bytes=context.resource_budget.output_bytes,
-        )
-        if scratch_bytes > context.resource_budget.output_bytes:
+            raise TaskProcessError(f'task process exited with code {process.exitcode}')
+        scratch_bytes = _bounded_scratch_bytes(scratch_directory, maximum_bytes=context.resource_budget.output_bytes, maximum_entries=None if context.resource_budget.output_bytes is None else MAX_SCRATCH_SCAN_ENTRIES)
+        if context.resource_budget.output_bytes is not None and scratch_bytes > context.resource_budget.output_bytes:
             self._close_streamed_outputs(result)
-            raise ResourceAdmissionError("task exceeded its derived scratch budget")
+            raise ResourceAdmissionError('task exceeded its derived scratch budget')
         return result
 
-    def execute_deadline_free(
-        self,
-        runner: TaskRunner,
-        context: TaskContext,
-        *,
-        progress_contract: ProgressLivenessContract | None,
-        progress_callback: Callable[[Decimal], None],
-    ) -> RunnerResult:
+    def execute_deadline_free(self, runner: TaskRunner, context: TaskContext, *, progress_contract: ProgressLivenessContract | None, progress_callback: Callable[[Decimal], None], native_subwork: NativeSubworkProgress | None=None, prepared_contract: PreparedInvocationContract | None=None, provenance_requirements: tuple=(), native_work_preparer: Callable | None=None, native_entry: Callable[[], tuple[NativeEffectContact, NativeSubworkProgress | None]] | None=None, completed_native_work: PreparedNativeWork | None=None) -> RunnerResult:
         self.close_run_workers()
-        return self._execute_deadline_free(
-            runner,
-            context,
-            progress_contract=progress_contract,
-            progress_callback=progress_callback,
-        )
+        return self._execute_deadline_free(runner, context, progress_contract=progress_contract, progress_callback=progress_callback, native_subwork=native_subwork, prepared_contract=prepared_contract, provenance_requirements=provenance_requirements, native_work_preparer=native_work_preparer, native_entry=native_entry, completed_native_work=completed_native_work)
 
-    def execute_deadline_free_until(
-        self,
-        runner: TaskRunner,
-        context: TaskContext,
-        *,
-        progress_contract: ProgressLivenessContract | None,
-        progress_callback: Callable[[Decimal], None],
-        hard_remaining_seconds: Decimal,
-    ) -> RunnerResult:
-        "Enforce the companion campaign boundary with its exact execution-envelope prerequisites."
-
+    def execute_deadline_free_until(self, runner: TaskRunner, context: TaskContext, *, progress_contract: ProgressLivenessContract | None, progress_callback: Callable[[Decimal], None], hard_remaining_seconds: Decimal, native_subwork: NativeSubworkProgress | None=None, prepared_contract: PreparedInvocationContract | None=None, provenance_requirements: tuple=(), native_work_preparer: Callable | None=None, native_entry: Callable[[], tuple[NativeEffectContact, NativeSubworkProgress | None]] | None=None) -> RunnerResult:
+        """Enforce the companion campaign boundary with its exact execution-envelope prerequisites."""
         if hard_remaining_seconds <= 0:
             raise CampaignElapsedBoundaryReached(context.task_id)
         self.close_run_workers()
-        return self._execute_deadline_free(
-            runner,
-            context,
-            progress_contract=progress_contract,
-            progress_callback=progress_callback,
-            campaign_hard_limit_seconds=hard_remaining_seconds,
-        )
+        return self._execute_deadline_free(runner, context, progress_contract=progress_contract, progress_callback=progress_callback, campaign_hard_limit_seconds=hard_remaining_seconds, native_subwork=native_subwork, prepared_contract=prepared_contract, provenance_requirements=provenance_requirements, native_work_preparer=native_work_preparer, native_entry=native_entry)
 
-    def _execute_deadline_free(
-        self,
-        runner: TaskRunner,
-        context: TaskContext,
-        *,
-        progress_contract: ProgressLivenessContract | None,
-        progress_callback: Callable[[Decimal], None],
-        worker: _GroupedWorker | None = None,
-        campaign_hard_limit_seconds: Decimal | None = None,
-    ) -> RunnerResult:
-        "Execute without a total-duration stop; only qualified stalls terminate.\n\n        The ``ResourceBudget.wall_time_seconds`` field is deliberately\n        neither read nor translated into an RLIMIT on this deadline-free path.  Memory,\n        output, scratch and CPU-placement limits remain enforced.\n        "
+    def _execute_deadline_free(self, runner: TaskRunner, context: TaskContext, *, progress_contract: ProgressLivenessContract | None, progress_callback: Callable[[Decimal], None], worker: _GroupedWorker | None=None, campaign_hard_limit_seconds: Decimal | None=None, native_subwork: NativeSubworkProgress | None=None, prepared_contract: PreparedInvocationContract | None=None, provenance_requirements: tuple=(), native_work_preparer: Callable | None=None, native_entry: Callable[[], tuple[NativeEffectContact, NativeSubworkProgress | None]] | None=None, completed_native_work: PreparedNativeWork | None=None) -> RunnerResult:
+        """Execute without a total-duration stop; only qualified stalls terminate.
 
+            The ``ResourceBudget.wall_time_seconds`` field is deliberately
+            neither read nor translated into an RLIMIT on this deadline-free path.  Memory,
+            output, scratch and CPU-placement limits remain enforced.
+            """
+        if worker is not None and native_subwork is not None:
+            raise ResourceAdmissionError('native subwork requires its dedicated parent worker')
+        if worker is not None and isinstance(runner, ParentPreparedTaskRunner):
+            raise ResourceAdmissionError('parent-prepared runners require a dedicated task process')
         if self._scratch_root is None:
-            raise ResourceAdmissionError("scoped external scratch is not composed")
-        scratch_directory = self._scratch_root.resolve(
-            f"scratch/task-execution/{context.run_id}/{context.attempt_id}",
-            for_write=True,
-            operation_minimum_free_bytes=context.resource_budget.output_bytes,
-        )
+            raise ResourceAdmissionError('scoped external scratch is not composed')
+        if native_entry is not None and prepared_contract is None:
+            raise ResourceAdmissionError('native entry requires its complete prepared invocation')
+        if prepared_contract is not None and (not prepared_contract.native_effect) and (native_entry is not None):
+            raise ResourceAdmissionError('pure prepared invocation cannot enter a native effect')
+        if prepared_contract is not None and prepared_contract.native_effect and (native_entry is None) and (completed_native_work is None):
+            raise ResourceAdmissionError('prepared native execution requires its actual parent entry callback')
+        if prepared_contract is not None:
+            prepared_contract.__post_init__()
+        runner, context, prepared_contract = _prepare_parent_native_runner(runner, context, prepared_contract, native_work_preparer)
+        if completed_native_work is not None:
+            if worker is not None or native_entry is not None or prepared_contract is None or (not prepared_contract.native_effect) or (type(completed_native_work) is not PreparedNativeWork) or (completed_native_work != prepared_contract.native_work) or (native_subwork is None):
+                raise ResourceAdmissionError('parent finalization requires its exact prepared work and read-only progress')
+            context = replace(context, prepared_invocation=prepared_contract)
+        scratch_relative = f'scratch/task-execution/{context.run_id}/{context.attempt_id}'
+        if completed_native_work is not None:
+            scratch_relative = f'scratch/task-finalization/{context.run_id}/{context.attempt_id}/{uuid4().hex}'
+        scratch_directory = self._scratch_root.resolve(scratch_relative, for_write=True)
         if scratch_directory.exists():
-            raise ResourceAdmissionError("task scratch identity already exists")
+            raise ResourceAdmissionError('task scratch identity already exists')
         scratch_directory.mkdir(parents=True)
         collector: _ScratchOutputCollector | None = None
+        subwork_service = None if native_subwork is None else NativeSubworkPipeService(native_subwork, context, scratch_directory, completed_work=completed_native_work)
         if worker is None:
-            parent, child = self._context.Pipe(duplex=False)
-            process = self._context.Process(
-                target=_execute_in_child,
-                args=(
-                    runner,
-                    context,
-                    child,
-                    scratch_directory,
-                    progress_contract,
-                    True,
-                    str(Path(__file__).resolve().parents[2]),
-                ),
-                name=f"empirical-lawhood-{context.task_id}",
-            )
+            parent, child = self._context.Pipe(duplex=native_subwork is not None or prepared_contract is not None)
+            process_arguments = dict(target=_execute_in_child, args=(runner, context, child, scratch_directory, progress_contract, True, self._expected_source_root, False, native_subwork is not None or (native_entry is not None and any((callable(getattr(runner, name, None)) for name in ('execute_with_native_subwork', 'execute_streaming_with_native_subwork')))), prepared_contract, provenance_requirements, native_work_preparer), name=f'empirical-lawhood-{context.task_id}')
+            process = self._context.Process(**process_arguments)
         else:
-            parent, process = worker.connection, worker.process
+            parent, process = (worker.connection, worker.process)
         task_finished = False
         keep_alive = False
         message: object | None = None
         process_group_id: int | None = None
+        acknowledged = False
         last_progress_counter = Decimal(0)
-        last_progress_monotonic = time.monotonic()
-        no_progress_gap = (
-            None
-            if progress_contract is None
-            else float(progress_contract.maximum_no_progress_gap_seconds)
-        )
-        campaign_deadline_monotonic = (
-            None
-            if campaign_hard_limit_seconds is None
-            else time.monotonic() + float(campaign_hard_limit_seconds)
-        )
-        progress = None if progress_contract is None else _ProgressPersistence(progress_callback)
+        # A prepared worker cannot do native work until parent admission sends
+        # Proceed. Source/input checks and process startup are not native work
+        # and must not consume its frozen no-progress allowance.
+        last_progress_monotonic = time.monotonic() if prepared_contract is None else None
+        no_progress_gap = None if progress_contract is None else float(progress_contract.maximum_no_progress_gap_seconds)
+        campaign_deadline_monotonic = None if campaign_hard_limit_seconds is None else time.monotonic() + float(campaign_hard_limit_seconds)
+        progress = None if progress_contract is None else _ProgressPersistence(progress_callback, milestone_sampling=True)
         progress_drained = progress is None
         try:
             if worker is None:
@@ -1423,8 +1896,10 @@ class LocalProcessExecutor:
                     process.start()
                 child.close()
             else:
-                parent.send((runner, context, scratch_directory))
-            while message is None or (worker is not None and not task_finished):
+                parent.send((runner, context, scratch_directory, prepared_contract, provenance_requirements, native_work_preparer))
+            while message is None or (worker is not None and (not task_finished)):
+                if self.attempt_lease_heartbeat is not None:
+                    self.attempt_lease_heartbeat(context)
                 if progress is not None:
                     progress.check()
                 if parent.poll(0.05):
@@ -1433,80 +1908,76 @@ class LocalProcessExecutor:
                     except EOFError:
                         break
                     if isinstance(observed, _ProcessTaskFinished):
-                        if (
-                            worker is None
-                            or message is None
-                            or observed.attempt_id != context.attempt_id
-                        ):
-                            raise TaskProcessError("worker chunk completion is invalid")
+                        if worker is None or message is None or observed.attempt_id != context.attempt_id:
+                            raise TaskProcessError('worker chunk completion is invalid')
                         task_finished = True
                         continue
                     if message is not None:
-                        raise TaskProcessError("worker emitted data after its task result")
+                        raise TaskProcessError('worker emitted data after its task result')
                     if isinstance(observed, _ProcessStarted):
                         if process_group_id is not None or observed.process_group_id != process.pid:
-                            raise TaskProcessError(
-                                "worker process-group acknowledgement is invalid"
-                            )
+                            raise TaskProcessError('worker process-group acknowledgement is invalid')
                         process_group_id = observed.process_group_id
                         continue
+                    if isinstance(observed, WorkerPreflightResult):
+                        if process_group_id is None or acknowledged or prepared_contract is None:
+                            raise TaskProcessError('worker readiness is outside its exact live invocation')
+                        if observed.invocation != prepared_contract.identity:
+                            raise TaskProcessError('worker readiness substitutes its prepared invocation')
+                        acknowledged = True
+                        subwork_service = self._admit_worker(observed, prepared_contract, parent, context, scratch_directory, native_entry, subwork_service)
+                        last_progress_monotonic = time.monotonic()
+                        continue
                     if isinstance(observed, _ProcessProgress):
+                        if prepared_contract is not None and (not acknowledged):
+                            raise TaskProcessError('worker emitted progress before prepared readiness')
                         if process_group_id is None or progress_contract is None:
-                            raise TaskProcessError(
-                                "worker emitted progress outside its live progress contract"
-                            )
+                            raise TaskProcessError('worker emitted progress outside its live progress contract')
                         if observed.work_counter <= last_progress_counter:
-                            raise TaskProcessError("worker progress counter is non-monotone")
+                            raise TaskProcessError('worker progress counter is non-monotone')
                         last_progress_counter = observed.work_counter
                         last_progress_monotonic = time.monotonic()
                         assert progress is not None
                         progress.submit(observed.work_counter)
                         continue
+                    if isinstance(observed, NativeSubworkRequest):
+                        if process_group_id is None or subwork_service is None:
+                            raise TaskProcessError('worker requested native progress outside its live parent')
+                        servicing_started = time.monotonic()
+                        subwork_service.handle(observed, parent)
+                        # The worker blocks awaiting this controller-owned
+                        # custody reply. Preserve its already spent idle time,
+                        # but do not charge our service time as a native stall.
+                        # This emits no work counter and changes no hard limit.
+                        if last_progress_monotonic is not None:
+                            last_progress_monotonic += time.monotonic() - servicing_started
+                        continue
                     if isinstance(observed, _ProcessChunk):
+                        if prepared_contract is not None and (not acknowledged):
+                            raise TaskProcessError('worker emitted output before prepared readiness')
                         if process_group_id is None:
-                            raise TaskProcessError(
-                                "worker emitted output before isolation acknowledgement"
-                            )
+                            raise TaskProcessError('worker emitted output before isolation acknowledgement')
                         if collector is None:
-                            collector = _ScratchOutputCollector(context, scratch_directory)
+                            collector = _ScratchOutputCollector(context, scratch_directory, subwork_service)
                         collector.write(observed)
                         continue
                     if isinstance(observed, _ProcessStreamComplete) and collector is None:
-                        collector = _ScratchOutputCollector(context, scratch_directory)
+                        collector = _ScratchOutputCollector(context, scratch_directory, subwork_service)
                     message = observed
                     if worker is None:
                         break
                     continue
-                if (
-                    no_progress_gap is not None
-                    and time.monotonic() - last_progress_monotonic >= no_progress_gap
-                ):
-                    _terminate_process_group(
-                        process,
-                        process_group_id=process_group_id,
-                    )
-                    raise ProgressStalledError(
-                        f"task process made no qualified progress: {context.task_id}"
-                    )
-                if (
-                    campaign_deadline_monotonic is not None
-                    and time.monotonic() >= campaign_deadline_monotonic
-                ):
-                    _terminate_process_group(
-                        process,
-                        process_group_id=process_group_id,
-                    )
+                if (no_progress_gap is not None and last_progress_monotonic is not None
+                        and time.monotonic() - last_progress_monotonic >= no_progress_gap):
+                    _terminate_process_group(process, process_group_id=process_group_id)
+                    raise ProgressStalledError(f'task process made no qualified progress: {context.task_id}')
+                if campaign_deadline_monotonic is not None and time.monotonic() >= campaign_deadline_monotonic:
+                    _terminate_process_group(process, process_group_id=process_group_id)
                     raise CampaignElapsedBoundaryReached(context.task_id)
-                scratch_bytes = _bounded_scratch_bytes(
-                    scratch_directory,
-                    maximum_bytes=context.resource_budget.output_bytes,
-                )
-                if scratch_bytes > context.resource_budget.output_bytes:
-                    _terminate_process_group(
-                        process,
-                        process_group_id=process_group_id,
-                    )
-                    raise ResourceAdmissionError("task exceeded its derived scratch budget")
+                scratch_bytes = _bounded_scratch_bytes(scratch_directory, maximum_bytes=context.resource_budget.output_bytes, maximum_entries=None if context.resource_budget.output_bytes is None else MAX_SCRATCH_SCAN_ENTRIES)
+                if context.resource_budget.output_bytes is not None and scratch_bytes > context.resource_budget.output_bytes:
+                    _terminate_process_group(process, process_group_id=process_group_id)
+                    raise ResourceAdmissionError('task exceeded its derived scratch budget')
                 if not process.is_alive():
                     break
             if message is None and parent.poll():
@@ -1514,39 +1985,29 @@ class LocalProcessExecutor:
                     message = parent.recv()
                 except EOFError:
                     message = None
-            if (
-                campaign_deadline_monotonic is not None
-                and time.monotonic() >= campaign_deadline_monotonic
-            ):
-                _terminate_process_group(
-                    process,
-                    process_group_id=process_group_id,
-                )
+            if campaign_deadline_monotonic is not None and time.monotonic() >= campaign_deadline_monotonic:
+                _terminate_process_group(process, process_group_id=process_group_id)
                 raise CampaignElapsedBoundaryReached(context.task_id)
             if message is None:
                 join_worker_process(process)
-                raise TaskProcessError(
-                    f"task process exited without a typed result (exitcode={process.exitcode})"
-                )
-            if worker is not None and not task_finished:
-                raise TaskProcessError("worker chunk exited before releasing task inputs")
+                raise TaskProcessError(f'task process exited without a typed result (exitcode={process.exitcode})')
+            if worker is not None and (not task_finished):
+                raise TaskProcessError('worker chunk exited before releasing task inputs')
             if progress is not None:
-                # The final observed counter must be durable before a receipt.
                 progress.drain()
                 progress_drained = True
             keep_alive = worker is not None and worker.tasks_used < 2
             if not keep_alive:
                 join_worker_process(process)
         finally:
+            if subwork_service is not None:
+                subwork_service.close()
             if progress is not None:
                 progress.close()
             if not keep_alive:
                 parent.close()
             if not keep_alive and process.is_alive():
-                _terminate_process_group(
-                    process,
-                    process_group_id=process_group_id,
-                )
+                _terminate_process_group(process, process_group_id=process_group_id)
             elif not keep_alive and process_group_id is not None:
                 try:
                     os.killpg(process_group_id, signal.SIGTERM)
@@ -1556,15 +2017,11 @@ class LocalProcessExecutor:
                     os.killpg(process_group_id, signal.SIGKILL)
                 except ProcessLookupError:
                     pass
-            if collector is not None and (
-                not isinstance(message, _ProcessStreamComplete)
-                or (worker is not None and not task_finished)
-                or not progress_drained
-            ):
+            if collector is not None and (not isinstance(message, _ProcessStreamComplete) or (worker is not None and (not task_finished)) or (not progress_drained)):
                 collector.abort()
         if isinstance(message, _ProcessStreamComplete):
             if collector is None:
-                raise TaskProcessError("stream completion lacks an output collector")
+                raise TaskProcessError('stream completion lacks an output collector')
             try:
                 outputs = collector.finish(message.logical_content_sha256_by_output)
             except Exception:
@@ -1578,26 +2035,19 @@ class LocalProcessExecutor:
                 raise
         elif isinstance(message, _ProcessMessage):
             if message.result is None:
-                if message.error_kind == "RESOURCE":
-                    raise ResourceAdmissionError("task resource boundary is unavailable")
-                raise TaskProcessError(
-                    "task child process reported a typed failure",
-                    child_exception_type=message.error_type,
-                    child_message=message.error_message,
-                )
+                if message.error_kind == 'RESOURCE':
+                    raise ResourceAdmissionError('task resource boundary is unavailable')
+                raise TaskProcessError('task child process reported a typed failure', child_exception_type=message.error_type, child_message=message.error_message)
             result = message.result
         else:
-            raise TaskProcessError("task process returned an invalid message")
+            raise TaskProcessError('task process returned an invalid message')
         if not keep_alive and process.exitcode != 0:
             self._close_streamed_outputs(result)
-            raise TaskProcessError(f"task process exited with code {process.exitcode}")
-        scratch_bytes = _bounded_scratch_bytes(
-            scratch_directory,
-            maximum_bytes=context.resource_budget.output_bytes,
-        )
-        if scratch_bytes > context.resource_budget.output_bytes:
+            raise TaskProcessError(f'task process exited with code {process.exitcode}')
+        scratch_bytes = _bounded_scratch_bytes(scratch_directory, maximum_bytes=context.resource_budget.output_bytes, maximum_entries=None if context.resource_budget.output_bytes is None else MAX_SCRATCH_SCAN_ENTRIES)
+        if context.resource_budget.output_bytes is not None and scratch_bytes > context.resource_budget.output_bytes:
             self._close_streamed_outputs(result)
-            raise ResourceAdmissionError("task exceeded its derived scratch budget")
+            raise ResourceAdmissionError('task exceeded its derived scratch budget')
         return result
 
     @staticmethod
@@ -1652,6 +2102,7 @@ class _PreparedTask:
     dependency_receipts: tuple[DependencyReceiptBinding, ...]
     spent_attempt_count: int
     next_attempt_number: int
+    finalizing_native_contact: NativeEffectContact | None = None
 
 
 @dataclass(slots=True)
@@ -1668,6 +2119,8 @@ class _ParallelAttempt:
     cpu_affinity: tuple[int, ...]
 
 
+
+
 class _RetryableBlockRecorded(RuntimeError):
     """A running attempt was durably closed as a retryable block."""
 
@@ -1675,138 +2128,54 @@ class _RetryableBlockRecorded(RuntimeError):
 class LocalScheduler:
     """One-writer local executor; workers receive only an immutable TaskContext."""
 
-    def __init__(
-        self,
-        *,
-        operational_repository: OperationalRepository,
-        artifact_writer: ArtifactWriter,
-        receipt_store: TaskReceiptStore,
-        recovery_index: ProtocolRunRecoveryIndex,
-        recovery_store: RunRecoveryStore,
-        runner_registry: RunnerRegistry,
-        implementation_commit: str,
-        external_input_resolver: ExternalInputResolver | None = None,
-        owner_id: str = "local-scheduler",
-        lease_seconds: int = 60,
-        clock: EpochClock | None = None,
-        lock_manager: ResourceLockManager | None = None,
-        failure_injector: FailureInjector | None = None,
-        executor: TaskExecutor | None = None,
-        input_port_factory: WorkerInputPortFactory | None = None,
-        lane: PlanLane = PlanLane.PROSPECTIVE,
-        minimum_free_bytes: int = 0,
-        output_semantic_contracts: tuple[CapabilityOutputSemanticContract, ...] = (),
-        adjudication_task_id: str | None = None,
-        scientific_adjudication_context: ScientificAdjudicationContext | None = None,
-        assurance_profile: ExecutionAssuranceProfile = ExecutionAssuranceProfile.STRICT_ISOLATED,
-        assurance_codes: tuple[str, ...] = (),
-        maximum_parallel_tasks: int = 1,
-        parallel_resource_capacity: ExecutionResourceCapacity | None = None,
-        execution_envelope_coordinator: DurableExecutionEnvelopeCoordinator | None = None,
-        execution_envelope_event_store: ExecutionEnvelopeEventStore | None = None,
-        execution_envelope_id: str | None = None,
-        execution_resource_envelope_coordinator: (
-            DurableExecutionResourceEnvelopeCoordinator | None
-        ) = None,
-        execution_resource_envelope_id: str | None = None,
-        campaign_elapsed_budget_coordinator: (
-            DurableCampaignElapsedBudgetCoordinator | None
-        ) = None,
-        campaign_elapsed_reservation_plan: CampaignElapsedReservationPlan | None = None,
-        jit_graph_signature_manifest: JitGraphSignatureManifest | None = None,
-        roster_capacity_decisions: tuple[RosterCapacityDecision, ...] = (),
-        execution_envelope_event_clock: ExecutionEnvelopeEventClock | None = None,
-        authorized_barriers: tuple[BarrierKind, ...] = (BarrierKind.REVEAL,),
-        retry_amendment: LeaseExpiryRetryAmendment | None = None,
-    ) -> None:
-        validate_stable_id(owner_id, field_name="owner_id")
+    def __init__(self, *, operational_repository: OperationalRepository, artifact_writer: ArtifactWriter, receipt_store: TaskReceiptStore, recovery_index: ProtocolRunRecoveryIndex, recovery_store: RunRecoveryStore, runner_registry: RunnerRegistry, implementation_commit: str, external_input_resolver: ExternalInputResolver | None=None, owner_id: str='local-scheduler', lease_seconds: int=60, clock: EpochClock | None=None, lock_manager: ResourceLockManager | None=None, failure_injector: FailureInjector | None=None, executor: TaskExecutor | None=None, input_port_factory: WorkerInputPortFactory | None=None, lane: PlanLane=PlanLane.PROSPECTIVE, minimum_free_bytes: int=0, output_semantic_contracts: tuple[CapabilityOutputSemanticContract, ...]=(), adjudication_task_id: str | None=None, scientific_adjudication_context: ScientificAdjudicationContext | None=None, assurance_profile: ExecutionAssuranceProfile=ExecutionAssuranceProfile.STRICT_ISOLATED, assurance_codes: tuple[str, ...]=(), maximum_parallel_tasks: int=1, parallel_resource_capacity: ExecutionResourceCapacity | None=None, execution_envelope_coordinator: DurableExecutionEnvelopeCoordinator | None=None, execution_envelope_event_store: ExecutionEnvelopeEventStore | None=None, execution_envelope_id: str | None=None, execution_resource_envelope_coordinator: DurableExecutionResourceEnvelopeCoordinator | None=None, execution_resource_envelope_id: str | None=None, campaign_elapsed_budget_coordinator: DurableCampaignElapsedBudgetCoordinator | None=None, campaign_elapsed_reservation_plan: CampaignElapsedReservationPlan | None=None, jit_graph_signature_manifest: JitGraphSignatureManifest | None=None, roster_capacity_decisions: tuple[RosterCapacityDecision, ...]=(), execution_envelope_event_clock: ExecutionEnvelopeEventClock | None=None, authorized_barriers: tuple[BarrierKind, ...]=(BarrierKind.REVEAL,), native_effect_contact_store: NativeEffectContactStore | None=None, native_effect_capability_keys: tuple[str, ...]=(), implementation_binding: RecursiveImplementationBinding | None=None, provenance_requirements: dict[str, tuple] | None=None, native_work_preparers: dict[str, Callable] | None=None, worker_environment_selectors: dict[str, Callable] | None=None, native_entry_guard: Callable | None=None, original_input_access_guard: Callable | None=None, before_input_member: Callable | None=None) -> None:
+        validate_stable_id(owner_id, field_name='owner_id')
         if lease_seconds <= 0:
-            raise ValueError("scheduler lease duration must be positive")
+            raise ValueError('scheduler lease duration must be positive')
         if minimum_free_bytes < 0:
-            raise ValueError("scheduler free-space floor must be nonnegative")
+            raise ValueError('scheduler free-space floor must be nonnegative')
         if (adjudication_task_id is None) != (scientific_adjudication_context is None):
-            raise ValueError("adjudication task and context must be composed together")
+            raise ValueError('adjudication task and context must be composed together')
         if adjudication_task_id is not None:
-            validate_stable_id(adjudication_task_id, field_name="adjudication_task_id")
-        semantic_keys = tuple(contract.key for contract in output_semantic_contracts)
+            validate_stable_id(adjudication_task_id, field_name='adjudication_task_id')
+        semantic_keys = tuple((contract.key for contract in output_semantic_contracts))
         if tuple(sorted(set(semantic_keys), key=str)) != semantic_keys:
-            raise ValueError("output semantic contracts must be sorted and unique")
+            raise ValueError('output semantic contracts must be sorted and unique')
         if tuple(sorted(set(assurance_codes))) != assurance_codes:
-            raise ValueError("execution assurance codes must be sorted and unique")
+            raise ValueError('execution assurance codes must be sorted and unique')
         if maximum_parallel_tasks <= 0:
-            raise ValueError("maximum parallel tasks must be positive")
+            raise ValueError('maximum parallel tasks must be positive')
         if maximum_parallel_tasks > 1 and parallel_resource_capacity is None:
-            raise ValueError("parallel execution requires an explicit resource capacity")
-        envelope_values = (
-            execution_envelope_coordinator,
-            execution_envelope_event_store,
-            execution_envelope_id,
-        )
-        if any(value is None for value in envelope_values) != all(
-            value is None for value in envelope_values
-        ):
-            raise ValueError("execution-envelope scheduler composition is incomplete")
+            raise ValueError('parallel execution requires an explicit resource capacity')
+        envelope_values = (execution_envelope_coordinator, execution_envelope_event_store, execution_envelope_id)
+        if any((value is None for value in envelope_values)) != all((value is None for value in envelope_values)):
+            raise ValueError('execution-envelope scheduler composition is incomplete')
         if execution_envelope_id is not None:
-            validate_stable_id(execution_envelope_id, field_name="execution_envelope_id")
-        resource_envelope_values = (
-            execution_resource_envelope_coordinator,
-            execution_resource_envelope_id,
-        )
-        if any(value is None for value in resource_envelope_values) != all(
-            value is None for value in resource_envelope_values
-        ):
-            raise ValueError("resource envelope scheduler composition is incomplete")
-        if (
-            jit_graph_signature_manifest is not None
-            and execution_resource_envelope_coordinator is None
-        ):
-            raise ValueError("JIT manifest requires resource-envelope composition")
+            validate_stable_id(execution_envelope_id, field_name='execution_envelope_id')
+        resource_envelope_values = (execution_resource_envelope_coordinator, execution_resource_envelope_id)
+        if any((value is None for value in resource_envelope_values)) != all((value is None for value in resource_envelope_values)):
+            raise ValueError('resource envelope scheduler composition is incomplete')
+        if jit_graph_signature_manifest is not None and execution_resource_envelope_coordinator is None:
+            raise ValueError('JIT manifest requires resource-envelope composition')
         if execution_resource_envelope_id is not None:
-            validate_stable_id(
-                execution_resource_envelope_id,
-                field_name="execution_resource_envelope_id",
-            )
-        elapsed_values = (
-            campaign_elapsed_budget_coordinator,
-            campaign_elapsed_reservation_plan,
-        )
-        if any(value is None for value in elapsed_values) != all(
-            value is None for value in elapsed_values
-        ):
-            raise ValueError("campaign elapsed-budget scheduler composition is incomplete")
-        if campaign_elapsed_budget_coordinator is not None and (
-            execution_resource_envelope_coordinator is None
-            or campaign_elapsed_reservation_plan is None
-            or campaign_elapsed_reservation_plan.budget
-            != campaign_elapsed_budget_coordinator.budget_identity
-        ):
-            raise ValueError(
-                "campaign elapsed budget requires its exact deadline-free resource envelope"
-            )
-        if execution_envelope_coordinator is not None and (
-            execution_resource_envelope_coordinator is not None
-        ):
-            raise ValueError("deadline-bearing and deadline-free envelopes are exclusive")
-        decision_groups = tuple(value.group_id for value in roster_capacity_decisions)
+            validate_stable_id(execution_resource_envelope_id, field_name='execution_resource_envelope_id')
+        elapsed_values = (campaign_elapsed_budget_coordinator, campaign_elapsed_reservation_plan)
+        if any((value is None for value in elapsed_values)) != all((value is None for value in elapsed_values)):
+            raise ValueError('campaign elapsed-budget scheduler composition is incomplete')
+        if campaign_elapsed_budget_coordinator is not None and (execution_resource_envelope_coordinator is None or campaign_elapsed_reservation_plan is None or campaign_elapsed_reservation_plan.budget != campaign_elapsed_budget_coordinator.budget_identity):
+            raise ValueError('campaign elapsed budget requires its exact deadline-free resource envelope')
+        if execution_envelope_coordinator is not None and execution_resource_envelope_coordinator is not None:
+            raise ValueError('deadline-bearing and deadline-free envelopes are exclusive')
+        decision_groups = tuple((value.group_id for value in roster_capacity_decisions))
         if tuple(sorted(set(decision_groups))) != decision_groups:
-            raise ValueError("roster capacity decisions must be sorted and group-unique")
+            raise ValueError('roster capacity decisions must be sorted and group-unique')
         if roster_capacity_decisions and execution_resource_envelope_coordinator is None:
-            raise ValueError("roster capacity decisions require resource envelope")
-        if tuple(sorted(set(authorized_barriers), key=lambda value: value.value)) != (
-            authorized_barriers
-        ):
-            raise ValueError("authorized barriers must be sorted and unique")
-        available_cpu_ids = (
-            tuple(sorted(os.sched_getaffinity(0)))
-            if hasattr(os, "sched_getaffinity")
-            else tuple(range(os.cpu_count() or 1))
-        )
-        if (
-            maximum_parallel_tasks > 1
-            and parallel_resource_capacity is not None
-            and parallel_resource_capacity.cpu_cores > len(available_cpu_ids)
-        ):
-            raise ValueError("parallel CPU capacity exceeds the available affinity")
+            raise ValueError('roster capacity decisions require resource envelope')
+        if tuple(sorted(set(authorized_barriers), key=lambda value: value.value)) != authorized_barriers:
+            raise ValueError('authorized barriers must be sorted and unique')
+        available_cpu_ids = tuple(sorted(os.sched_getaffinity(0))) if hasattr(os, 'sched_getaffinity') else tuple(range(os.cpu_count() or 1))
+        if maximum_parallel_tasks > 1 and parallel_resource_capacity is not None and (parallel_resource_capacity.cpu_cores > len(available_cpu_ids)):
+            raise ValueError('parallel CPU capacity exceeds the available affinity')
         self.operational_repository = operational_repository
         self.artifact_writer = artifact_writer
         self.receipt_store = receipt_store
@@ -1821,27 +2190,30 @@ class LocalScheduler:
         self.lock_manager = lock_manager or ResourceLockManager()
         self.failure_injector = failure_injector or NoFailureInjector()
         self.executor = executor or LocalProcessExecutor()
+        self._lease_owner_thread = threading.get_ident()
+        self._native_attempt_refresh_epochs: dict[str, int] = {}
+        if isinstance(self.executor, LocalProcessExecutor):
+            self.executor.attempt_lease_heartbeat = self._heartbeat_worker_attempt
         self.input_port_factory = input_port_factory
         self.lane = lane
         self.minimum_free_bytes = minimum_free_bytes
-        self.output_semantic_contracts = {
-            contract.key: contract for contract in output_semantic_contracts
-        }
+        self.output_semantic_contracts = {contract.key: contract for contract in output_semantic_contracts}
         self.adjudication_task_id = adjudication_task_id
         self.scientific_adjudication_context = scientific_adjudication_context
         self.assurance_profile = assurance_profile
         self.assurance_codes = assurance_codes
         self.maximum_parallel_tasks = maximum_parallel_tasks
         self.parallel_resource_capacity = parallel_resource_capacity
-        self.parallel_cpu_ids = (
-            available_cpu_ids[: parallel_resource_capacity.cpu_cores]
-            if maximum_parallel_tasks > 1 and parallel_resource_capacity is not None
-            else ()
-        )
+        self._selected_resource_spec: ExecutionResourceEnvelopeSpec | None = None
+        self._batch_memory_ceiling = None if parallel_resource_capacity is None else parallel_resource_capacity.memory_bytes
+        self.parallel_cpu_ids = available_cpu_ids[:parallel_resource_capacity.cpu_cores] if maximum_parallel_tasks > 1 and parallel_resource_capacity is not None else ()
         self.execution_envelope_coordinator = execution_envelope_coordinator
         self.execution_envelope_event_store = execution_envelope_event_store
         self.execution_envelope_id = execution_envelope_id
-        self.execution_resource_envelope_coordinator = execution_resource_envelope_coordinator
+        self.execution_resource_envelope_coordinator = (
+            execution_resource_envelope_coordinator._for_execution()
+            if type(execution_resource_envelope_coordinator) is DurableExecutionResourceEnvelopeCoordinator
+            else execution_resource_envelope_coordinator)
         self.execution_resource_envelope_id = execution_resource_envelope_id
         self.campaign_elapsed_budget_coordinator = campaign_elapsed_budget_coordinator
         self.campaign_elapsed_reservation_plan = campaign_elapsed_reservation_plan
@@ -1849,11 +2221,198 @@ class LocalScheduler:
         self.jit_graph_signature_manifest = jit_graph_signature_manifest
         self.roster_capacity_decisions = roster_capacity_decisions
         self._resource_envelope_transition_lock = threading.RLock()
-        self.execution_envelope_event_clock = (
-            execution_envelope_event_clock or SystemExecutionEnvelopeEventClock()
-        )
+        self.execution_envelope_event_clock = execution_envelope_event_clock or SystemExecutionEnvelopeEventClock()
         self.authorized_barriers = frozenset(authorized_barriers)
-        self.retry_amendment = retry_amendment
+        if tuple(sorted(set(native_effect_capability_keys))) != native_effect_capability_keys:
+            raise ValueError('native effect capabilities must be sorted and unique')
+        if bool(native_effect_capability_keys) != (native_effect_contact_store is not None):
+            raise ValueError('native effect contact store and capability roster must be composed together')
+        for key in native_effect_capability_keys:
+            validate_stable_id(key, field_name='native_effect_capability_key')
+        if native_entry_guard is not None and not callable(native_entry_guard):
+            raise TypeError("native entry guard must be a parent-owned permission callback")
+        self.native_entry_guard = native_entry_guard
+        if original_input_access_guard is not None and not callable(original_input_access_guard):
+            raise TypeError("original input access guard must be a parent-owned input callback")
+        self.original_input_access_guard = original_input_access_guard
+        if before_input_member is not None and not callable(before_input_member):
+            raise TypeError("input member guard must be a parent-owned custody callback")
+        self.before_input_member = before_input_member
+        self.native_effect_contact_store = native_effect_contact_store
+        self.native_effect_capability_keys = frozenset(native_effect_capability_keys)
+        if implementation_binding is not None and type(implementation_binding) is not RecursiveImplementationBinding:
+            raise ValueError('scheduler requires its exact selected implementation binding')
+        self.implementation_binding = implementation_binding
+        self.provenance_requirements = dict(provenance_requirements or {})
+        self.native_work_preparers = dict(native_work_preparers or {})
+        self.worker_environment_selectors = dict(worker_environment_selectors or {})
+        if any((not callable(selector) for selector in self.worker_environment_selectors.values())):
+            raise TypeError('scheduler worker environment selectors must be code-owned callbacks')
+
+    def _native_contact(self, run_id: str, task: ProtocolExecutionTask) -> NativeEffectContact | None:
+        if task.capability.capability_key not in self.native_effect_capability_keys:
+            return None
+        assert self.native_effect_contact_store is not None
+        return self.native_effect_contact_store.read(run_id, task.task_id)
+
+
+    def _implementation_commit_for(self, task_id: str, attempt_id: str) -> str:
+        return self.implementation_commit
+
+
+
+
+
+
+    def _anticipated_native_contact(self, task: ProtocolExecutionTask, *, run_id: str,
+            attempt_id: str, input_materialization_ids: tuple[str, ...],
+            dependency_receipt_ids: tuple[str, ...]) -> NativeEffectContact:
+        return NativeEffectContact(run_id, task.task_id, attempt_id,
+            self._active_execution_plan, ObjectIdentity.from_record(task.task_id, task),
+            self._implementation_commit_for(task.task_id, attempt_id),
+            input_materialization_ids, dependency_receipt_ids)
+
+
+    def _record_not_attempted(self, task_id: str, reason: TaskBlockReason) -> None:
+        self.recovery_store.record_not_attempted(self.recovery_index, task_id=task_id, reason=reason)
+
+
+    def _require_native_entry(self, context, runner, *, prepared_contract):
+        """Recheck actual permission and one owned lease after worker Ready.
+
+        The run claim already excludes a second coordinator. This bounded row
+        check still refuses an expired, replaced or foreign original attempt;
+        preparation and worker readiness do not extend execution authority.
+        """
+        if self.native_entry_guard is not None:
+            try:
+                self.native_entry_guard(context, runner, prepared_contract=prepared_contract)
+            except (PermissionError, ValueError, KeyError) as error:
+                raise NativeEntryRefused("current native-entry permission refused") from error
+        try:
+            lease = self.operational_repository.current_attempt_lease(
+                run_id=context.run_id,
+                execution_plan_sha256=self._active_execution_plan.object_fingerprint,
+                task_id=context.task_id, attempt_id=context.attempt_id,
+                lease_id="lease."+context.attempt_id, owner_id=self.owner_id,
+                at_epoch_seconds=self.clock.now())
+        except (*execution_error_types("LiveLeaseError"), OperationalWriteConflict, ValueError) as error:
+            raise NativeEntryRefused("current native-entry attempt lease refused") from error
+        # Sample again after the bounded query; no heavy work follows before
+        # durable contact and Proceed. An expired lease never gains entry.
+        if lease.lease_expires_epoch_seconds is None or lease.lease_expires_epoch_seconds <= self.clock.now():
+            raise NativeEntryRefused("current native-entry attempt lease expired")
+
+    def _begin_native_contact(self, task: ProtocolExecutionTask, context: TaskContext) -> NativeEffectContact | None:
+        if task.capability.capability_key not in self.native_effect_capability_keys:
+            return None
+        assert self.native_effect_contact_store is not None
+        contact = self._anticipated_native_contact(task, run_id=context.run_id, attempt_id=context.attempt_id, input_materialization_ids=context.input_materialization_ids, dependency_receipt_ids=context.dependency_receipt_ids)
+        self.native_effect_contact_store.begin(contact)
+        return contact
+
+    def _native_subwork_progress(self, runner: TaskRunner, contact: NativeEffectContact | None,
+                                inputs: tuple[VerifiedArtifactInput, ...], *, context=None,
+                                prepared_contract=None):
+        if not (isinstance(runner, ParentPreparedTaskRunner) and runner.native_effect
+                or any(callable(getattr(runner, method, None)) for method in (
+                    "execute_with_native_subwork", "execute_streaming_with_native_subwork"))):
+            return None
+        if contact is None:
+            raise ResourceAdmissionError("native subwork runner has no selected native-effect parent")
+        contact_store = self.native_effect_contact_store
+        select_task = getattr(contact_store, "for_task", None)
+        if callable(select_task):
+            contact_store = select_task(contact.task_id)
+        before_contact = None
+        if context is not None:
+            def before_contact(definition):
+                if definition.parent_contact != contact:
+                    raise NativeEntryRefused("native leaf substitutes its original parent contact")
+                self._require_native_entry(context, runner, prepared_contract=prepared_contract)
+        return ExternalNativeSubworkStore(plane=self.artifact_writer,
+            parent_contacts=contact_store, parent_contact=contact,
+            parent_inputs=tuple(ArtifactManifest(value.logical, value.materialization) for value in inputs),
+            prepared_invocation=prepared_contract, before_contact=before_contact)
+
+    def _heartbeat_worker_attempt(self, context):
+        # Parallel worker threads never write SQLite; their scheduler owner
+        # renews the same leases while waiting for admitted futures.
+        if threading.get_ident() == self._lease_owner_thread:
+            self._refresh_owned_attempt_lease(context.run_id, context.task_id, context.attempt_id)
+
+    def _refresh_owned_attempt_lease(self, run_id, task_id, attempt_id):
+        previous = self._native_attempt_refresh_epochs.get(attempt_id)
+        now = self.clock.now()
+        if previous is None or now - previous < max(1, self.lease_seconds // 3):
+            return
+        try:
+            self.operational_repository.refresh_attempt_lease(run_id=run_id,
+                execution_plan_sha256=self._active_execution_plan.object_fingerprint,
+                task_id=task_id, attempt_id=attempt_id, lease_id="lease." + attempt_id,
+                owner_id=self.owner_id, at_epoch_seconds=now,
+                expires_epoch_seconds=now + self.lease_seconds)
+        except (OperationalWriteConflict, ValueError) as error:
+            raise NativeEntryRefused("original native attempt lease cannot be refreshed") from error
+        self._native_attempt_refresh_epochs[attempt_id] = now
+
+    def _block_native_failure(
+        self, run_id: str, task: ProtocolExecutionTask, *,
+        initiating_error: BaseException | None = None,
+        inputs: tuple[VerifiedArtifactInput, ...] = (),
+    ) -> bool:
+        """An unreceipted native contact survives failure and catalog loss."""
+        contact = self._native_contact(run_id, task)
+        if contact is None:
+            return False
+        if self.receipt_store.read(run_id, task.task_id, contact.attempt_id) is not None:
+            raise SchedulerConsistencyError("native completion receipt survived interruption; recover its original bytes")
+        if contact.attempt_id not in {value.attempt_id for value in self.recovery_index.task(task.task_id).attempts}:
+            raise SchedulerConsistencyError("native contact attempt differs from its frozen recovery index")
+        if initiating_error is not None:
+            self._retain_native_failure(task, contact, initiating_error, inputs)
+        failure = operational_failure_diagnostic(
+            SchedulerConsistencyError("native contact has uncertain completion"),
+            failure_class=OperationalFailureClass.RECOVERY_OBSTRUCTION)
+        self.recovery_store.record_failure(self.recovery_index, task_id=task.task_id,
+            attempt_id=contact.attempt_id, reason_code=TaskBlockReason.UNKNOWN_COMPLETION.value,
+            failure=failure, blocked=True)
+        prior = next((value for value in self.operational_repository.attempts(run_id)
+                      if value.attempt_id == contact.attempt_id), None)
+        if prior is None:
+            # This reconstructs the catalog projection from external contact
+            # custody. It neither launches a worker nor renews a native lease.
+            self.operational_repository.start_attempt(run_id=run_id, task_id=task.task_id,
+                attempt_id=contact.attempt_id, lease_id=f"lease.recovered.{contact.attempt_id}",
+                owner_id="external-native-contact-recovery", expires_epoch_seconds=1)
+        elif prior.disposition is TaskAttemptDisposition.BLOCKED:
+            if prior.reason_code != TaskBlockReason.UNKNOWN_COMPLETION.value:
+                raise SchedulerConsistencyError("native contact contradicts its terminal catalog projection")
+            return True
+        elif prior.disposition is not TaskAttemptDisposition.RUNNING:
+            raise SchedulerConsistencyError("native contact contradicts a non-running catalog attempt")
+        self.operational_repository.block_attempt(contact.attempt_id, TaskBlockReason.UNKNOWN_COMPLETION)
+        self._unknown_envelope_completion(task.task_id, contact.attempt_id)
+        return True
+
+    def _retain_native_failure(self, task: ProtocolExecutionTask, contact: NativeEffectContact, error: BaseException, inputs: tuple[VerifiedArtifactInput, ...]) -> None:
+        """Keep the cause separate from the immutable UNKNOWN obstruction."""
+        diagnostic = operational_failure_diagnostic(error)
+        try:
+            relative = self.recovery_store.record_native_failure_diagnostic(self.recovery_index, task_id=task.task_id, attempt_id=contact.attempt_id, contact=contact, diagnostic=diagnostic, visibility_ceiling=VisibilityCeiling.most_restrictive(VisibilityCeiling.PROSPECTIVE, *(value.logical.visibility_ceiling for value in inputs), *(value.visibility_ceiling for value in task.outputs)), outcome_access=derived_outcome_access(task.capability.requested_outcome_access, *(value.logical.outcome_access for value in inputs)))
+        except Exception:
+            self._native_closeout_error = SchedulerConsistencyError('native failure diagnostic could not be retained')
+            self._worker_preflight_refused.set()
+            logging.getLogger(__name__).warning('Native failure diagnostic retention refused: task=%s attempt=%s diagnostic_sha256=%s', task.task_id, contact.attempt_id, diagnostic.diagnostic_sha256)
+        else:
+            logging.getLogger(__name__).warning('Native failure diagnostic retained at %s; diagnostic_sha256=%s', relative, diagnostic.diagnostic_sha256)
+
+    def _raise_dispatch_refusal(self) -> None:
+        """Surface a retained operational refusal only after admitted work drains."""
+        for name in ("_native_entry_refusal", "_native_closeout_error"):
+            error = getattr(self, name, None)
+            if error is not None:
+                raise error
 
     def _envelope_cell_id(self, task_id: str) -> str:
         coordinator = self.execution_envelope_coordinator
@@ -1882,14 +2441,12 @@ class LocalScheduler:
             envelope = coordinator.current(envelope_id)
         if envelope.envelope_id != envelope_id:
             raise SchedulerConsistencyError("resource-envelope lookup received a substitution")
-        matches = tuple(
-            value.cell_id for value in envelope.spec.task_cells if value.task_id == task_id
-        )
-        if len(matches) != 1:
+        try:
+            return envelope.cell_for_task(task_id).cell_id
+        except KeyError as error:
             raise SchedulerConsistencyError(
                 "resource-envelope task does not resolve to exactly one cell"
-            )
-        return matches[0]
+            ) from error
 
     def _resource_progress_contract(
         self,
@@ -1993,6 +2550,13 @@ class LocalScheduler:
                 outcome_access=OutcomeAccess.OUTCOME_BLIND,
             )
 
+    def _start_attempt(self, run_id, task, attempt_id):
+        self._reserve_envelope_attempt(task.task_id, attempt_id)
+        self.operational_repository.start_attempt(run_id=run_id, task_id=task.task_id, attempt_id=attempt_id, lease_id='lease.' + attempt_id, owner_id=self.owner_id, expires_epoch_seconds=self.clock.now() + self.lease_seconds)
+        if task.capability.capability_key in self.native_effect_capability_keys:
+            self._native_attempt_refresh_epochs[attempt_id] = self.clock.now()
+        return
+
     def _reserve_envelope_attempt(self, task_id: str, attempt_id: str) -> None:
         resource_coordinator = self.execution_resource_envelope_coordinator
         resource_envelope_id = self.execution_resource_envelope_id
@@ -2077,6 +2641,11 @@ class LocalScheduler:
                     cell.state is ExecutionResourceEnvelopeState.LAUNCHED
                     and cell.current_attempt_id == attempt_id
                 ):
+                    resource_coordinator.ensure_launch_publication(
+                        envelope_id=resource_envelope_id,
+                        task_id=task_id,
+                        attempt_id=attempt_id,
+                    )
                     return
                 spec = envelope.spec.cell(cell_id)
                 manifest = self.jit_graph_signature_manifest
@@ -2203,6 +2772,45 @@ class LocalScheduler:
             reason_code=reason_code,
         )
         self._retain_envelope_transition(updated_envelope)
+
+    def _stop_failed_envelope_task(
+        self,
+        task_id: str,
+        *,
+        failure_class: OperationalFailureClass,
+        reason_code: str | None = None,
+    ) -> None:
+        """Finish failure bookkeeping using only an applicable declared stop.
+
+        The failure event and receipt-free operational observation already retain
+        the failed attempt. A resource profile need not declare a matching stop;
+        that does not prevent the task and run from retaining their disposition.
+        Legacy envelopes retain their existing callsite reason unchanged.
+        """
+        if not isinstance(failure_class, OperationalFailureClass):
+            raise SchedulerConsistencyError("failure finalization requires a typed failure class")
+        applicable = (failure_class.value,)
+        if failure_class is OperationalFailureClass.RETRY_EXHAUSTION:
+            applicable += ("RETRY_BUDGET_EXHAUSTED",)
+        elif failure_class is OperationalFailureClass.RESOURCE_REFUSAL:
+            applicable += ("RESOURCE_COMPUTABILITY_UNAVAILABLE",)
+        reason_code = failure_class.value if reason_code is None else reason_code
+        if reason_code not in applicable:
+            raise SchedulerConsistencyError("failure finalization reason differs from its failure class")
+        resource_coordinator = self.execution_resource_envelope_coordinator
+        resource_envelope_id = self.execution_resource_envelope_id
+        if resource_coordinator is not None and resource_envelope_id is not None:
+            with self._resource_envelope_transition_lock:
+                declared = resource_coordinator.current(
+                    resource_envelope_id
+                ).spec.allowlisted_resource_stop_reason_codes
+                selected = next((value for value in (reason_code, *applicable)
+                    if value in declared), None)
+                if selected is None:
+                    return
+                self._stop_envelope_task(task_id, reason_code=selected)
+            return
+        self._stop_envelope_task(task_id, reason_code=reason_code)
 
     def _unknown_envelope_completion(
         self,
@@ -2467,17 +3075,62 @@ class LocalScheduler:
                 "execution envelope differs from its first valid task receipt"
             )
 
+    def _require_selected_resource_admission(self, plan: ProtocolExecutionPlan) -> None:
+        """Read the installed selected contract before locks, ledgers or entry."""
+        self._selected_resource_spec = None
+        capacity = self.parallel_resource_capacity
+        self._batch_memory_ceiling = None if capacity is None else capacity.memory_bytes
+        coordinator = self.execution_resource_envelope_coordinator
+        if coordinator is None:
+            return
+        if self.execution_resource_envelope_id is None:
+            raise SchedulerConsistencyError("selected resources lack their exact retained envelope")
+        envelope = coordinator.current(self.execution_resource_envelope_id)
+        if envelope.execution_plan != ObjectIdentity.from_record(plan.execution_plan_id, plan):
+            raise SchedulerConsistencyError("selected resources bind another execution plan")
+        capacity = capacity or LocalExecutionResourceAdmitter.detect_capacity()
+        # This no-effect gate admits selected compute/concurrency. Actual free
+        # scratch is checked by the API, guarded workers and publication owners.
+        admission = LocalExecutionResourceAdmitter(capacity).assess(
+            plan, available_scratch_bytes=plan.minimum_free_bytes,
+            executor_enforces_resources=True, executor_enforces_no_network=False,
+            assurance_profile=ExecutionAssuranceProfile.TRUSTED_LOCAL,
+            resource_spec=envelope.spec, maximum_parallel_tasks=self.maximum_parallel_tasks)
+        if not admission.admitted:
+            raise ResourceAdmissionError(",".join(admission.reason_codes))
+        self._selected_resource_spec = envelope.spec
+        self._batch_memory_ceiling = min(capacity.memory_bytes, envelope.spec.aggregate_memory_ceiling_bytes)
+
     def execute(self, run_id: str, plan: ProtocolExecutionPlan) -> SchedulerResult:
-        self._worker_group_ids: dict[str, str | None] = {}
-        self._worker_group_specs: dict[str, ExecutionResourceTaskCellSpec] = {}
-        self._begin_campaign_elapsed_interval(run_id)
-        try:
+        with self._execution_claims(run_id, plan):
             return self._execute(run_id, plan)
-        finally:
-            self._close_campaign_elapsed_interval()
-            close_workers = getattr(self.executor, "close_run_workers", None)
-            if callable(close_workers):
-                close_workers(run_id)
+
+
+
+
+    @contextmanager
+    def _execution_claims(self, run_id: str, plan: ProtocolExecutionPlan):
+        """Retain source/resource admission and the run claim through worker close."""
+        self._require_selected_resource_admission(plan)
+        self._native_closeout_error = None
+        self._native_entry_refusal = None
+        self._worker_preflight_refused = threading.Event()
+        with ExitStack() as claims:
+            if self.native_effect_contact_store is not None:
+                try:
+                    claims.enter_context(self.native_effect_contact_store.execution_lock(run_id))
+                except BlockingIOError as error:
+                    raise LiveLeaseError('native run already has a live execution claim') from error
+            self._worker_group_ids: dict[str, str | None] = {}
+            self._worker_group_specs: dict[str, ExecutionResourceTaskCellSpec] = {}
+            self._begin_campaign_elapsed_interval(run_id)
+            try:
+                yield
+            finally:
+                self._close_campaign_elapsed_interval()
+                close_workers = getattr(self.executor, 'close_run_workers', None)
+                if callable(close_workers):
+                    close_workers(run_id)
 
     def _begin_campaign_elapsed_interval(self, run_id: str) -> None:
         coordinator = self.campaign_elapsed_budget_coordinator
@@ -2521,203 +3174,148 @@ class LocalScheduler:
         elif current.open_interval_id is not None:
             raise SchedulerConsistencyError("another campaign elapsed interval replaced this run")
 
-    def _execute(self, run_id: str, plan: ProtocolExecutionPlan) -> SchedulerResult:
-        validate_stable_id(run_id, field_name="run_id")
+    def _initialize_execution_run(self, run_id: str, plan: ProtocolExecutionPlan) -> None:
+        validate_stable_id(run_id, field_name='run_id')
+        self._active_execution_plan = ObjectIdentity.from_record(plan.execution_plan_id, plan)
+        for task in plan.tasks:
+            if task.capability.capability_key in self.native_effect_capability_keys and task.maximum_attempts != 1:
+                raise SchedulerConsistencyError('native contact tasks forbid automatic effect retries')
+        if plan.lane.value == 'DEVELOPMENT':
+            from empirical_lawhood.runtime.capabilities import CapabilityPermission
+            if self.authorized_barriers.intersection({BarrierKind.REVEAL, BarrierKind.AUTHORITY}):
+                raise SchedulerConsistencyError('development execution cannot authorize reveal or authority barriers')
+            if self.scientific_adjudication_context is not None:
+                raise SchedulerConsistencyError('development execution cannot inherit issued adjudication or retry authority')
+            for task in plan.tasks:
+                if set(task.capability.required_permissions).intersection({CapabilityPermission.COMMAND_ACTUATOR, CapabilityPermission.READ_SEALED_OUTCOMES, CapabilityPermission.REVEAL_OUTCOMES, CapabilityPermission.APPROVE_NONACTUATING}):
+                    raise SchedulerConsistencyError('development task requests protected or physical authority')
+                access = task.capability.requested_outcome_access
+                if access not in {OutcomeAccess.DEVELOPMENT_VISIBLE, OutcomeAccess.EVALUATION_REVEALED}:
+                    raise SchedulerConsistencyError('development task changes its exposed input role')
+                from empirical_lawhood.runtime.plans import development_task_output_custody
+                expected = ((OutcomeAccess.EVALUATION_REVEALED, VisibilityCeiling.OUTCOME_VISIBLE)
+                    if access is OutcomeAccess.EVALUATION_REVEALED else development_task_output_custody(task))
+                if any((output.outcome_access, output.visibility_ceiling) != expected for output in task.outputs):
+                    raise SchedulerConsistencyError('development outputs change their exact parent-derived custody')
+                if access is OutcomeAccess.EVALUATION_REVEALED and (task.capability.capability_key in self.native_effect_capability_keys or task.barrier is not BarrierKind.NONE):
+                    raise SchedulerConsistencyError('revealed follow-up permits only pure operations without authority barriers')
         if run_id != plan.source_plan.object_id:
-            raise SchedulerConsistencyError("run ID differs from the frozen source plan")
+            raise SchedulerConsistencyError('run ID differs from the frozen source plan')
         if plan.implementation_commit != self.implementation_commit:
-            raise SchedulerConsistencyError("execution commit differs from frozen plan")
+            raise SchedulerConsistencyError('execution commit differs from frozen plan')
         if plan.registry_sha256 != self.runner_registry.registry_sha256:
-            raise SchedulerConsistencyError("runner registry differs from frozen plan")
+            raise SchedulerConsistencyError('runner registry differs from frozen plan')
         if plan.lane is not self.lane:
-            raise SchedulerConsistencyError("scheduler lane differs from frozen plan")
-        if self.scientific_adjudication_context is not None and (
-            self.scientific_adjudication_context.execution_plan
-            != ObjectIdentity.from_record(plan.execution_plan_id, plan)
-        ):
-            raise SchedulerConsistencyError(
-                "scientific adjudication context binds another execution plan"
-            )
+            raise SchedulerConsistencyError('scheduler lane differs from frozen plan')
+        if self.scientific_adjudication_context is not None and self.scientific_adjudication_context.execution_plan != ObjectIdentity.from_record(plan.execution_plan_id, plan):
+            raise SchedulerConsistencyError('scientific adjudication context binds another execution plan')
         try:
-            self.recovery_index.validate_plan(plan, retry_amendment=self.retry_amendment)
+            self.recovery_index.validate_plan(plan)
         except ValueError as error:
-            raise SchedulerConsistencyError(
-                "run recovery index differs from the frozen plan"
-            ) from error
+            raise SchedulerConsistencyError('run recovery index differs from the frozen plan') from error
         if self.recovery_index.run_id != run_id:
-            raise SchedulerConsistencyError("run recovery index binds another run")
+            raise SchedulerConsistencyError('run recovery index binds another run')
         if self.execution_resource_envelope_coordinator is not None:
-            if not isinstance(self.recovery_index, RunRecoveryIndex) or not isinstance(
-                plan,
-                ExecutionPlan,
-            ):
-                raise SchedulerConsistencyError(
-                    "resource envelope requires a resource execution plan and recovery index"
-                )
+            if not isinstance(self.recovery_index, RunRecoveryIndex) or not isinstance(plan, ExecutionPlan):
+                raise SchedulerConsistencyError('resource envelope requires a resource execution plan and recovery index')
             assert self.execution_resource_envelope_id is not None
-            resource_envelope = self.execution_resource_envelope_coordinator.current(
-                self.execution_resource_envelope_id
-            )
-            if resource_envelope.execution_plan != ObjectIdentity.from_record(
-                plan.execution_plan_id,
-                plan,
-            ):
-                raise SchedulerConsistencyError("resource envelope binds another execution plan")
-            self._worker_group_specs = {
-                value.task_id: value for value in resource_envelope.spec.task_cells
-            }
+            resource_envelope = self.execution_resource_envelope_coordinator.current(self.execution_resource_envelope_id)
+            if resource_envelope.execution_plan != ObjectIdentity.from_record(plan.execution_plan_id, plan) or resource_envelope.spec != self._selected_resource_spec:
+                raise SchedulerConsistencyError('resource envelope changes its admitted plan or selected specification')
+            self._worker_group_specs = {value.task_id: value for value in resource_envelope.spec.task_cells}
             if self.campaign_elapsed_reservation_plan is not None:
                 self.campaign_elapsed_reservation_plan.validate_task_census(resource_envelope.spec)
                 elapsed = self.campaign_elapsed_budget_coordinator
                 assert elapsed is not None
                 ledger = elapsed.current()
-                if (
-                    not ledger.envelope_bindings
-                    or ledger.envelope_bindings[-1].binding_id
-                    != self.campaign_elapsed_reservation_plan.envelope_binding_id
-                    or ledger.envelope_bindings[-1].governed_envelope
-                    != self.campaign_elapsed_reservation_plan.governed_envelope
-                ):
-                    raise SchedulerConsistencyError(
-                        "campaign elapsed ledger lacks the current execution envelope"
-                    )
-            if (
-                None
-                if self.jit_graph_signature_manifest is None
-                else ObjectIdentity.from_record(
-                    self.jit_graph_signature_manifest.manifest_id,
-                    self.jit_graph_signature_manifest,
-                )
-            ) != plan.jit_graph_signature_manifest:
-                raise SchedulerConsistencyError(
-                    "scheduler JIT manifest differs from the resource execution plan"
-                )
+                if not ledger.envelope_bindings or ledger.envelope_bindings[-1].binding_id != self.campaign_elapsed_reservation_plan.envelope_binding_id or ledger.envelope_bindings[-1].governed_envelope != self.campaign_elapsed_reservation_plan.governed_envelope:
+                    raise SchedulerConsistencyError('campaign elapsed ledger lacks the current execution envelope')
+            if (None if self.jit_graph_signature_manifest is None else ObjectIdentity.from_record(self.jit_graph_signature_manifest.manifest_id, self.jit_graph_signature_manifest)) != plan.jit_graph_signature_manifest:
+                raise SchedulerConsistencyError('scheduler JIT manifest differs from the resource execution plan')
             existing_groups = {value.group_id for value in resource_envelope.roster_decisions}
             for decision in self.roster_capacity_decisions:
                 if decision.group_id in existing_groups:
                     continue
-                resource_envelope = (
-                    self.execution_resource_envelope_coordinator.select_roster_branch(
-                        envelope_id=self.execution_resource_envelope_id,
-                        event_id=f"resource-envelope-event.{decision.decision_id}",
-                        occurred_at_utc=self.execution_envelope_event_clock.now_utc(),
-                        decision=decision,
-                    )
-                )
+                resource_envelope = self.execution_resource_envelope_coordinator.select_roster_branch(envelope_id=self.execution_resource_envelope_id, event_id=f'resource-envelope-event.{decision.decision_id}', occurred_at_utc=self.execution_envelope_event_clock.now_utc(), decision=decision)
                 existing_groups.add(decision.group_id)
-            required_groups = {
-                value.group_id for value in resource_envelope.spec.roster_capacity_branches
-            }
+            required_groups = {value.group_id for value in resource_envelope.spec.roster_capacity_branches}
             if existing_groups != required_groups:
-                raise SchedulerConsistencyError(
-                    "resource envelope lacks an exact outcome-blind roster decision"
-                )
+                raise SchedulerConsistencyError('resource envelope lacks an exact outcome-blind roster decision')
         elif isinstance(plan, ExecutionPlan):
-            raise SchedulerConsistencyError(
-                "resource execution plan requires deadline-free resource-envelope dispatch"
-            )
+            raise SchedulerConsistencyError('resource execution plan requires deadline-free resource-envelope dispatch')
         if self.execution_envelope_coordinator is not None:
             if not isinstance(self.recovery_index, EnvelopeRunRecoveryIndex):
-                raise SchedulerConsistencyError("execution envelope requires an execution envelope recovery index")
+                raise SchedulerConsistencyError('execution envelope requires an execution envelope recovery index')
             assert self.execution_envelope_id is not None
             envelope = self.execution_envelope_coordinator.load(self.execution_envelope_id)
-            if envelope.execution_plan != ObjectIdentity.from_record(
-                plan.execution_plan_id,
-                plan,
-            ):
-                raise SchedulerConsistencyError("execution envelope binds another execution plan")
+            if envelope.execution_plan != ObjectIdentity.from_record(plan.execution_plan_id, plan):
+                raise SchedulerConsistencyError('execution envelope binds another execution plan')
+
+    def _execute(self, run_id: str, plan: ProtocolExecutionPlan) -> SchedulerResult:
+        return self._execute_in_recovery_scope(run_id, plan)
+
+    def _dispatch_task(self, task):
+        """Apply only the selected additive PURE output reservation."""
+        from empirical_lawhood.runtime.development_output_repair import DevelopmentOutputRepairRecoveryIndex
+        if not isinstance(self.recovery_index, DevelopmentOutputRepairRecoveryIndex):
+            return task
+        repair = self.recovery_index.repair
+        if task.task_id not in dict(repair.completed_receipts) and task.capability.capability_key in self.native_effect_capability_keys:
+            from empirical_lawhood.runtime.development_controller_repair import DevelopmentControllerRepairRecoveryIndex
+            from empirical_lawhood.runtime.native_continuation_execution import DevelopmentNativeContinuationRecoveryIndex
+            allowed = (repair.uncontacted_native_task_ids if type(self.recovery_index) is DevelopmentControllerRepairRecoveryIndex
+                else (*repair.uncontacted_native_task_ids, *repair.continued_native_task_ids)
+                if type(self.recovery_index) is DevelopmentNativeContinuationRecoveryIndex else ())
+            if task.task_id not in allowed or task.task_id in repair.output_task_ids:
+                raise SchedulerConsistencyError('development repair cannot dispatch previously entered native acquisition')
+        selected = repair.task(task)
+        if not self.runner_registry.resolve(selected).manifest.resource_ceiling.contains(selected.capability.requested_resources):
+            raise ResourceAdmissionError('development output repair exceeds its original capability ceiling')
+        return selected
+
+    def _execute_in_recovery_scope(self, run_id: str, plan: ProtocolExecutionPlan) -> SchedulerResult:
+        self._initialize_execution_run(run_id, plan)
+        report_progress(phase='execution.recovery', total=len(plan.tasks))
         self.recovery_store.freeze(self.recovery_index)
         self._sync_envelope_events()
-        recovery = self.recovery_store.reconcile(
-            self.recovery_index,
-            plan,
-            self.operational_repository,
-            self.receipt_store,
-            retry_amendment=self.retry_amendment,
-        )
+        recovery = self.recovery_store.reconcile(self.recovery_index, plan, self.operational_repository, self.receipt_store)
+        self._progress_task_total = len(plan.tasks)
+        self._progress_recovered_task_ids = frozenset((receipt.task_id for receipt in recovery.recovered_receipts if receipt.operational_status is OperationalStatus.SUCCEEDED))
         if recovery.terminal_status is not None:
             self._validate_terminal_replay(plan, recovery)
-            return SchedulerResult(
-                run_id=run_id,
-                status=OperationalStatus(recovery.terminal_status),
-                completed_task_ids=recovery.completed_task_ids,
-                failed_task_ids=recovery.failed_task_ids,
-                blocked_task_ids=recovery.blocked_task_ids,
-                receipt_ids=recovery.recovered_receipt_ids,
-                receipts=recovery.recovered_receipts,
-            )
+            self._report_task_progress(recovery.completed_task_ids, recovery.failed_task_ids)
+            return SchedulerResult(run_id=run_id, status=OperationalStatus(recovery.terminal_status), completed_task_ids=recovery.completed_task_ids, failed_task_ids=recovery.failed_task_ids, blocked_task_ids=recovery.blocked_task_ids, receipt_ids=recovery.recovered_receipt_ids, receipts=recovery.recovered_receipts)
+        self._report_task_progress((), ())
         self.operational_repository.register_run(run_id, plan.fingerprint())
         if self.operational_repository.run_status(run_id) is not OperationalStatus.SUCCEEDED:
             self.operational_repository.set_run_status(run_id, OperationalStatus.RUNNING)
-        tasks = {task.task_id: task for task in plan.tasks}
+        tasks = {task.task_id: self._dispatch_task(task) for task in plan.tasks}
         outputs: dict[str, tuple[VerifiedArtifactInput, ...]] = {}
         receipts: dict[str, CanonicalTaskReceipt] = {}
-        if isinstance(self.retry_amendment, RetainedCustodyCompletionAmendment):
-            # Reconcile has authenticated these receipts against the retained
-            # terminal. Open only inputs consumed by the remaining pure task.
-            for receipt in recovery.recovered_receipts:
-                outputs[receipt.task_id] = self._receipt_outputs(receipt)
-                receipts[receipt.task_id] = receipt
-            if set(tasks) - set(receipts) != set(self.retry_amendment.task_ids):
-                raise SchedulerConsistencyError("minimal retry has work outside its pure-task scope")
         failed: set[str] = set()
         blocked: set[str] = set()
         attempt_lists: dict[str, list[OperationalAttempt]] = {}
         for attempt in self.operational_repository.attempts(run_id):
             attempt_lists.setdefault(attempt.task_id, []).append(attempt)
         attempts_by_task = {task_id: tuple(values) for task_id, values in attempt_lists.items()}
-
         if self.maximum_parallel_tasks == 1:
             for task_id in plan.topological_task_ids():
                 if task_id in receipts:
                     continue
                 task = tasks[task_id]
-                outcome = self._process_task(
-                    run_id,
-                    task,
-                    outputs,
-                    receipts,
-                    failed,
-                    blocked,
-                    attempts_by_task.get(task_id, ()),
-                )
-                self._record_task_outcome(
-                    task_id,
-                    outcome,
-                    outputs=outputs,
-                    receipts=receipts,
-                    failed=failed,
-                    blocked=blocked,
-                )
+                outcome = self._process_task(run_id, task, outputs, receipts, failed, blocked, attempts_by_task.get(task_id, ()))
+                self._record_task_outcome(task_id, outcome, outputs=outputs, receipts=receipts, failed=failed, blocked=blocked)
+                if self._worker_preflight_refused.is_set():
+                    break
         else:
-            self._process_parallel_tasks(
-                run_id,
-                tuple(tasks[task_id] for task_id in plan.topological_task_ids() if task_id not in receipts),
-                outputs=outputs,
-                receipts=receipts,
-                failed=failed,
-                blocked=blocked,
-                attempts_by_task=attempts_by_task,
-            )
-
+            self._process_parallel_tasks(run_id, tuple((tasks[task_id] for task_id in plan.topological_task_ids() if task_id not in receipts)), outputs=outputs, receipts=receipts, failed=failed, blocked=blocked, attempts_by_task=attempts_by_task)
+        self._raise_dispatch_refusal()
         status = self._terminal_status(failed, blocked)
-        terminal_receipts = tuple(sorted(receipts.values(), key=lambda value: value.receipt_id))
-        self.recovery_store.record_terminal(
-            self.recovery_index,
-            status=status,
-            attempts=self.operational_repository.attempts(run_id),
-            receipts=terminal_receipts,
-        )
+        original_receipts = {key: value for key, value in receipts.items() if key == value.task_id}
+        terminal_receipts = tuple(sorted(original_receipts.values(), key=lambda value: value.receipt_id))
+        self.recovery_store.record_terminal(self.recovery_index, status=status, attempts=self.operational_repository.attempts(run_id), receipts=terminal_receipts)
         self.operational_repository.set_run_status(run_id, status)
-        return SchedulerResult(
-            run_id=run_id,
-            status=status,
-            completed_task_ids=tuple(sorted(outputs)),
-            failed_task_ids=tuple(sorted(failed)),
-            blocked_task_ids=tuple(sorted(blocked)),
-            receipt_ids=tuple(sorted(receipt.receipt_id for receipt in receipts.values())),
-            receipts=terminal_receipts,
-        )
+        return SchedulerResult(run_id=run_id, status=status, completed_task_ids=tuple(sorted(original_receipts)), failed_task_ids=tuple(sorted(failed)), blocked_task_ids=tuple(sorted(blocked)), receipt_ids=tuple(sorted((receipt.receipt_id for receipt in original_receipts.values()))), receipts=terminal_receipts)
 
     def _validate_terminal_replay(
         self,
@@ -2726,13 +3324,16 @@ class LocalScheduler:
     ) -> None:
         """Recheck current inputs/implementations without reopening terminal work."""
 
-        tasks = {task.task_id: task for task in plan.tasks}
+        tasks = {task.task_id: self._dispatch_task(task) for task in plan.tasks}
         receipts = {receipt.task_id: receipt for receipt in recovery.recovered_receipts}
         attempts = {
             attempt.attempt_id: attempt
             for attempt in self.operational_repository.attempts(self.recovery_index.run_id)
         }
         outputs: dict[str, tuple[VerifiedArtifactInput, ...]] = {}
+        if getattr(self, "derivative_dependencies", None) is not None:
+            outputs.update((slot, self._receipt_outputs(receipt))
+                for slot, receipt in self.derivative_dependencies.receipts_by_slot.items())
         for task_id in plan.topological_task_ids():
             task = tasks[task_id]
             self.runner_registry.resolve(task)
@@ -2795,8 +3396,9 @@ class LocalScheduler:
                 prepared.dependency_receipts,
                 spent_attempt_count=prepared.spent_attempt_count,
                 next_attempt_number=prepared.next_attempt_number,
+                _finalizing_native_contact=prepared.finalizing_native_contact,
             )
-        except ResourceLockUnavailable:
+        except execution_error_types("ResourceLockUnavailable"):
             self.operational_repository.block_task(
                 run_id,
                 task.task_id,
@@ -2809,31 +3411,20 @@ class LocalScheduler:
             return _TaskOutcome(TaskAttemptDisposition.FAILED)
         return _TaskOutcome(TaskAttemptDisposition.SUCCEEDED, receipt)
 
-    def _prepare_task(
-        self,
-        run_id: str,
-        task: ProtocolExecutionTask,
-        outputs: dict[str, tuple[VerifiedArtifactInput, ...]],
-        receipts: dict[str, CanonicalTaskReceipt],
-        failed_dependencies: set[str],
-        blocked_dependencies: set[str],
-        prior_attempts: tuple[OperationalAttempt, ...],
-    ) -> _PreparedTask | _TaskOutcome:
+    def _metadata_task_outcome(self, run_id, task, failed_dependencies, blocked_dependencies,
+            prior_attempts):
+        """Settle existing no-input guards without preparing an entry."""
         elapsed_exhausted = (
             self.campaign_elapsed_budget_coordinator is not None
             and self.campaign_elapsed_budget_coordinator.current().exhausted
         )
-        if elapsed_exhausted:
+        if elapsed_exhausted and self._native_contact(run_id, task) is None:
             if not any(
                 attempt.disposition is TaskAttemptDisposition.BLOCKED
                 and attempt.block_kind is TaskBlockKind.DURABLE
                 for attempt in prior_attempts
             ):
-                self.recovery_store.record_not_attempted(
-                    self.recovery_index,
-                    task_id=task.task_id,
-                    reason=TaskBlockReason.CAMPAIGN_ELAPSED_BUDGET_EXHAUSTED,
-                )
+                self._record_not_attempted(task.task_id, TaskBlockReason.CAMPAIGN_ELAPSED_BUDGET_EXHAUSTED)
                 self.operational_repository.block_task(
                     run_id,
                     task.task_id,
@@ -2842,16 +3433,8 @@ class LocalScheduler:
             return _TaskOutcome(TaskAttemptDisposition.BLOCKED)
         dependency_ids = set(task.dependency_task_ids)
         if dependency_ids.intersection(failed_dependencies):
-            self.recovery_store.record_not_attempted(
-                self.recovery_index,
-                task_id=task.task_id,
-                reason=TaskBlockReason.DEPENDENCY_FAILED,
-            )
-            self.operational_repository.block_task(
-                run_id,
-                task.task_id,
-                TaskBlockReason.DEPENDENCY_FAILED,
-            )
+            self._record_not_attempted(task.task_id, TaskBlockReason.DEPENDENCY_FAILED)
+            self.operational_repository.block_task(run_id, task.task_id, TaskBlockReason.DEPENDENCY_FAILED)
             return _TaskOutcome(TaskAttemptDisposition.BLOCKED)
         if dependency_ids.intersection(blocked_dependencies):
             self.operational_repository.block_task(
@@ -2860,63 +3443,65 @@ class LocalScheduler:
                 TaskBlockReason.DEPENDENCY_BLOCKED,
             )
             return _TaskOutcome(TaskAttemptDisposition.BLOCKED)
+        return None
+
+    def _prepare_task(self, run_id: str, task: ProtocolExecutionTask, outputs: dict[str, tuple[VerifiedArtifactInput, ...]], receipts: dict[str, CanonicalTaskReceipt], failed_dependencies: set[str], blocked_dependencies: set[str], prior_attempts: tuple[OperationalAttempt, ...]) -> _PreparedTask | _TaskOutcome:
+        early = self._metadata_task_outcome(run_id, task, failed_dependencies, blocked_dependencies, prior_attempts)
+        if early is not None:
+            return early
         dependency_outputs = self._dependency_outputs(task, outputs)
-        dependency_receipts = self._dependency_receipt_bindings(
-            task,
-            dependency_outputs=dependency_outputs,
-            receipts=receipts,
-        )
+        dependency_receipts = self._dependency_receipt_bindings(task, dependency_outputs=dependency_outputs, receipts=receipts)
         if task.barrier is BarrierKind.REVEAL and task.barrier not in self.authorized_barriers:
-            self.operational_repository.block_task(
-                run_id,
-                task.task_id,
-                TaskBlockReason.AUTHORITY_REQUIRED,
-            )
+            self.operational_repository.block_task(run_id, task.task_id, TaskBlockReason.AUTHORITY_REQUIRED)
             return _TaskOutcome(TaskAttemptDisposition.BLOCKED)
         try:
             external_inputs = self._resolve_external_inputs(task)
-        except (ResourceAdmissionError, ArtifactInputLimitExceeded):
-            self.operational_repository.block_task(
-                run_id,
-                task.task_id,
-                TaskBlockReason.RESOURCE_COMPUTABILITY_UNAVAILABLE,
-            )
+        except (*execution_error_types('ResourceAdmissionError'), ArtifactInputLimitExceeded):
+            self.operational_repository.block_task(run_id, task.task_id, TaskBlockReason.RESOURCE_COMPUTABILITY_UNAVAILABLE)
             return _TaskOutcome(TaskAttemptDisposition.BLOCKED)
-        recovery = self._recover_task(
-            run_id,
-            task,
-            dependency_outputs,
-            external_inputs,
-            prior_attempts,
-        )
+        contact = self._native_contact(run_id, task)
+        if contact is not None:
+            expected = self._anticipated_native_contact(task, run_id=run_id, attempt_id=contact.attempt_id, input_materialization_ids=tuple(sorted((value.materialization.materialization_id for value in (*dependency_outputs, *external_inputs)))), dependency_receipt_ids=tuple((value.receipt_id for value in dependency_receipts)))
+            if contact != expected:
+                raise SchedulerConsistencyError('native contact substitutes its exact task, input census or dependency receipts')
+            if self.receipt_store.read(run_id, task.task_id, contact.attempt_id) is None:
+                live = next((value for value in prior_attempts if value.attempt_id == contact.attempt_id and value.disposition is TaskAttemptDisposition.RUNNING and (value.lease_expires_epoch_seconds is not None) and (value.lease_expires_epoch_seconds > self.clock.now())), None)
+                if live is not None:
+                    raise LiveLeaseError('native task has a live lease and no completion receipt')
+                original_projection = next((row for row in prior_attempts if row.attempt_id == contact.attempt_id), None)
+                if original_projection is not None:
+                    if original_projection.disposition is TaskAttemptDisposition.FAILED and original_projection.reason_code == OperationalFailureClass.NATIVE_RETURN_FAILURE.reason_code:
+                        return _TaskOutcome(TaskAttemptDisposition.FAILED)
+                    if original_projection.disposition is TaskAttemptDisposition.BLOCKED and original_projection.reason_code == TaskBlockReason.UNKNOWN_COMPLETION.value:
+                        return _TaskOutcome(TaskAttemptDisposition.BLOCKED)
+                    if original_projection.disposition is not TaskAttemptDisposition.RUNNING:
+                        raise SchedulerConsistencyError('native contact contradicts its terminal attempt')
+                runner = self.runner_registry.resolve(task)
+                if task.capability.capability_key in self.native_work_preparers and (isinstance(runner, ParentPreparedTaskRunner) and runner.native_effect or any((callable(getattr(runner, name, None)) for name in ('execute_with_native_subwork', 'execute_streaming_with_native_subwork')))):
+                    candidates = self.recovery_index.task(task.task_id)
+                    original = next((row for row in candidates.attempts if row.attempt_id == contact.attempt_id), None)
+                    if original is None:
+                        raise SchedulerConsistencyError('native contact has no original declared attempt')
+                    if not any((row.attempt_id == contact.attempt_id for row in prior_attempts)):
+                        self.operational_repository.start_attempt(run_id=run_id, task_id=task.task_id, attempt_id=contact.attempt_id, lease_id=f'lease.recovered.{contact.attempt_id}', owner_id='native-parent-finalization', expires_epoch_seconds=1)
+                    return _PreparedTask(task=task, dependency_outputs=dependency_outputs, external_inputs=external_inputs, dependency_receipts=dependency_receipts, spent_attempt_count=candidates.maximum_attempts - 1, next_attempt_number=original.ordinal, finalizing_native_contact=contact)
+                self._block_native_failure(run_id, task)
+                return _TaskOutcome(TaskAttemptDisposition.BLOCKED)
+        recovery = self._recover_task(run_id, task, dependency_outputs, external_inputs, prior_attempts)
         if recovery.completed:
             return _TaskOutcome(TaskAttemptDisposition.SUCCEEDED, recovery.receipt)
         if recovery.durable_blocked:
             return _TaskOutcome(TaskAttemptDisposition.BLOCKED)
         if recovery.spent_attempt_count >= self.recovery_index.task(task.task_id).maximum_attempts:
-            latest_attempt = max(
-                prior_attempts,
-                key=lambda value: value.ordinal,
-                default=None,
-            )
-            if (
-                latest_attempt is not None
-                and latest_attempt.disposition is TaskAttemptDisposition.BLOCKED
-                and latest_attempt.block_kind is TaskBlockKind.RETRYABLE
-            ):
+            latest_attempt = max(prior_attempts, key=lambda value: value.ordinal, default=None)
+            if latest_attempt is not None and latest_attempt.disposition is TaskAttemptDisposition.BLOCKED and (latest_attempt.block_kind is TaskBlockKind.RETRYABLE):
                 return _TaskOutcome(TaskAttemptDisposition.BLOCKED)
             return _TaskOutcome(TaskAttemptDisposition.FAILED)
-        return _PreparedTask(
-            task=task,
-            dependency_outputs=dependency_outputs,
-            external_inputs=external_inputs,
-            dependency_receipts=dependency_receipts,
-            spent_attempt_count=recovery.spent_attempt_count,
-            next_attempt_number=recovery.next_attempt_number,
-        )
+        return _PreparedTask(task=task, dependency_outputs=dependency_outputs, external_inputs=external_inputs, dependency_receipts=dependency_receipts, spent_attempt_count=recovery.spent_attempt_count, next_attempt_number=recovery.next_attempt_number)
 
-    @staticmethod
+
     def _record_task_outcome(
+        self,
         task_id: str,
         outcome: _TaskOutcome,
         *,
@@ -2933,140 +3518,192 @@ class LocalScheduler:
             blocked.add(task_id)
         else:
             failed.add(task_id)
+        self._report_task_progress(receipts, failed)
 
-    def _process_parallel_tasks(
-        self,
-        run_id: str,
-        tasks: tuple[ProtocolExecutionTask, ...],
-        *,
-        outputs: dict[str, tuple[VerifiedArtifactInput, ...]],
-        receipts: dict[str, CanonicalTaskReceipt],
-        failed: set[str],
-        blocked: set[str],
-        attempts_by_task: dict[str, tuple[OperationalAttempt, ...]],
+    def _report_task_progress(
+        self, receipt_task_ids: Collection[str], failed_task_ids: Collection[str],
     ) -> None:
-        """Refill slots after durable completion using the frozen dependency graph."""
+        # Failed IDs reach this boundary only after persisted failed attempts.
+        # Unattempted/blocked tasks are excluded, so a returned run can remain
+        # below its total. These are operational counts, not scientific units.
+        if not active_progress():
+            return
+        completed = self._progress_recovered_task_ids.union(
+            receipt_task_ids, failed_task_ids)
+        report_progress(phase="execution.tasks", done=len(completed),
+                        total=self._progress_task_total, failed=len(failed_task_ids))
 
+    def _stop_refused_worker_dispatch(self, error: BaseException) -> None:
+        """A failed worker prerequisite stops new work; admitted work still drains.
+
+        Scientific nonuse remains an ordinary domain result. A refused prepared
+        invocation cannot be repaired by spending the remaining root roster.
+        Log only public operand identities and a digest, never child messages or
+        protected scientific values.
+        """
+        if not isinstance(error, execution_error_types("WorkerPreflightError")):
+            return
+        first = not self._worker_preflight_refused.is_set()
+        self._worker_preflight_refused.set()
+        if first:
+            logging.getLogger(__name__).warning(
+                "Worker preflight refused; stopping new dispatch: invocation=%s operands=%s diagnostic_sha256=%s",
+                error.result.invocation.object_id,
+                ",".join(sorted({row.operand_id for row in error.result.mismatches})),
+                error.result.fingerprint(),
+            )
+
+    def _retain_refused_worker(
+        self, task: ExecutionTask | ProtocolExecutionTask, attempt_id: str, error: BaseException,
+        inputs: tuple[VerifiedArtifactInput, ...],
+    ) -> None:
+        if not isinstance(error, execution_error_types("WorkerPreflightError")):
+            return
+        relative = self.recovery_store.record_worker_preflight(
+            self.recovery_index, task_id=task.task_id, attempt_id=attempt_id, result=error.result,
+            visibility_ceiling=VisibilityCeiling.most_restrictive(VisibilityCeiling.PROSPECTIVE,
+                *(value.logical.visibility_ceiling for value in inputs),
+                *(value.visibility_ceiling for value in task.outputs)),
+            outcome_access=derived_outcome_access(task.capability.requested_outcome_access,
+                *(value.logical.outcome_access for value in inputs)),
+        )
+        logging.getLogger(__name__).warning("Worker preflight diagnostic retained at %s", relative)
+
+    def _process_parallel_tasks(self, run_id: str, tasks: tuple[ProtocolExecutionTask, ...], *, outputs: dict[str, tuple[VerifiedArtifactInput, ...]], receipts: dict[str, CanonicalTaskReceipt], failed: set[str], blocked: set[str], attempts_by_task: dict[str, tuple[OperationalAttempt, ...]]) -> None:
+        """Refill slots after durable completion using the frozen dependency graph."""
         unprepared = {task.task_id: task for task in tasks}
         pending: list[_ParallelTaskState] = []
         running: dict[Future[CanonicalTaskReceipt], _ParallelAttempt] = {}
-        with ThreadPoolExecutor(
-            max_workers=self.maximum_parallel_tasks, thread_name_prefix="empirical-lawhood-task"
-        ) as pool:
+        released = set(outputs) | failed | blocked
+        successors: dict[str, list[str]] = {}
+        unresolved: dict[str, int] = {}
+        ready: list[tuple[str, str]] = []
+
+        def enqueue(task_id: str) -> None:
+            task = unprepared[task_id]
+            heapq.heappush(ready, (self._task_worker_group(task) or task_id, task_id))
+
+        for task in tasks:
+            parents = set(task.dependency_task_ids) - released
+            unresolved[task.task_id] = len(parents)
+            for parent in parents:
+                successors.setdefault(parent, []).append(task.task_id)
+            if not parents:
+                enqueue(task.task_id)
+
+        def release_settled(task_id: str) -> None:
+            # Only the coordinator's acknowledged outcome releases dependencies.
+            # A completed worker future or a pending retry does not suffice.
+            if task_id in released or not (task_id in outputs or task_id in failed or task_id in blocked):
+                return
+            released.add(task_id)
+            for child in successors.get(task_id, ()):
+                unresolved[child] -= 1
+                if unresolved[child] == 0:
+                    enqueue(child)
+
+        with ThreadPoolExecutor(max_workers=self.maximum_parallel_tasks, thread_name_prefix='empirical-lawhood-task') as pool:
 
             def admit() -> None:
                 nonlocal pending
-                admitted, deferred = self._start_parallel_batch(
-                    run_id,
-                    tuple(sorted(pending, key=lambda state: state.prepared.task.task_id)),
-                    active=tuple(running.values()),
-                    outputs=outputs,
-                    receipts=receipts,
-                    failed=failed,
-                    blocked=blocked,
-                )
+                if self._worker_preflight_refused.is_set():
+                    return
+                admitted, deferred = self._start_parallel_batch(run_id, tuple(sorted(pending, key=lambda state: state.prepared.task.task_id)), active=tuple(running.values()), outputs=outputs, receipts=receipts, failed=failed, blocked=blocked)
+                for state in pending:
+                    release_settled(state.prepared.task.task_id)
                 pending = list(deferred)
                 for attempt in admitted:
-                    future = pool.submit(
-                        self._run_and_commit_parallel_attempt,
-                        run_id,
-                        attempt,
-                    )
+                    future = pool.submit(self._run_and_commit_parallel_attempt, run_id, attempt)
                     running[future] = attempt
-
             try:
                 while unprepared or pending or running:
+                    try:
+                        for attempt in running.values():
+                            self._refresh_owned_attempt_lease(run_id,
+                                attempt.state.prepared.task.task_id, attempt.attempt_id)
+                    except NativeEntryRefused as error:
+                        self._native_entry_refusal = error
+                        self._worker_preflight_refused.set()
                     admit()
-                    settled = set(outputs) | failed | blocked
-                    ready = tuple(
-                        sorted(
-                            (
-                                task
-                                for task in unprepared.values()
-                                if set(task.dependency_task_ids).issubset(settled)
-                            ),
-                            key=lambda task: (
-                                self._task_worker_group(task) or task.task_id,
-                                task.task_id,
-                            ),
-                        )
-                    )
+                    if self._worker_preflight_refused.is_set():
+                        if not running:
+                            self._raise_dispatch_refusal()
+                            return
+                        completed, _ = wait(running, return_when=FIRST_COMPLETED)
+                        for future in sorted(completed, key=lambda item: running[item].state.prepared.task.task_id):
+                            attempt = running.pop(future)
+                            pending.extend(self._finish_parallel_attempts(run_id, (attempt,), futures={attempt.attempt_id: future}, outputs=outputs, receipts=receipts, failed=failed, blocked=blocked))
+                            release_settled(attempt.state.prepared.task.task_id)
+                        continue
                     prepared_any = False
                     preparation_slots = self.maximum_parallel_tasks - len(running)
-                    prepared_count = 0
-                    for task in ready:
-                        if prepared_count >= preparation_slots:
-                            break
-                        prepared = self._prepare_task(
-                            run_id,
-                            task,
-                            outputs,
-                            receipts,
-                            failed,
-                            blocked,
-                            attempts_by_task.get(task.task_id, ()),
-                        )
+                    # Admit each prepared task before preparing its sibling.
+                    # Returning through the coordinator loop also renews owned
+                    # leases and observes refusal between preparations. Keep
+                    # the ready heap's group/id order and existing admission.
+                    selected = tuple(heapq.heappop(ready)[1] for _ in range(min(len(ready), preparation_slots, 1)))
+                    for task_id in selected:
+                        task = unprepared[task_id]
+                        prepared = self._prepare_task(run_id, task, outputs, receipts, failed, blocked, attempts_by_task.get(task.task_id, ()))
                         del unprepared[task.task_id]
                         prepared_any = True
-                        prepared_count += 1
                         if isinstance(prepared, _TaskOutcome):
-                            self._record_task_outcome(
-                                task.task_id,
-                                prepared,
-                                outputs=outputs,
-                                receipts=receipts,
-                                failed=failed,
-                                blocked=blocked,
-                            )
+                            self._record_task_outcome(task.task_id, prepared, outputs=outputs, receipts=receipts, failed=failed, blocked=blocked)
+                            release_settled(task.task_id)
                         else:
-                            pending.append(
-                                _ParallelTaskState(
-                                    prepared=prepared,
-                                    remaining_attempts=self.recovery_index.task(
-                                        task.task_id
-                                    ).maximum_attempts
-                                    - prepared.spent_attempt_count,
-                                    next_attempt_number=prepared.next_attempt_number,
-                                )
-                            )
+                            pending.append(_ParallelTaskState(prepared=prepared, remaining_attempts=self.recovery_index.task(task.task_id).maximum_attempts - prepared.spent_attempt_count, next_attempt_number=prepared.next_attempt_number))
                     admit()
-                    if len(running) < self.maximum_parallel_tasks and any(
-                        set(task.dependency_task_ids).issubset(set(outputs) | failed | blocked)
-                        for task in unprepared.values()
-                    ):
+                    if self._worker_preflight_refused.is_set():
+                        continue
+                    if len(running) < self.maximum_parallel_tasks and ready:
                         continue
                     if not running:
-                        if pending or (unprepared and not prepared_any):
-                            raise SchedulerConsistencyError(
-                                "parallel scheduler has no admissible ready task"
-                            )
+                        if pending or (unprepared and (not prepared_any)):
+                            raise SchedulerConsistencyError('parallel scheduler has no admissible ready task')
                         continue
-                    completed, _ = wait(running, return_when=FIRST_COMPLETED)
-                    for future in sorted(
-                        completed, key=lambda item: running[item].state.prepared.task.task_id
-                    ):
+                    completed, _ = wait(running, timeout=min(10, max(0.1, self.lease_seconds / 3)), return_when=FIRST_COMPLETED)
+                    for future in sorted(completed, key=lambda item: running[item].state.prepared.task.task_id):
                         attempt = running.pop(future)
-                        pending.extend(
-                            self._finish_parallel_attempts(
-                                run_id,
-                                (attempt,),
-                                futures={attempt.attempt_id: future},
-                                outputs=outputs,
-                                receipts=receipts,
-                                failed=failed,
-                                blocked=blocked,
-                            )
-                        )
+                        pending.extend(self._finish_parallel_attempts(run_id, (attempt,), futures={attempt.attempt_id: future}, outputs=outputs, receipts=receipts, failed=failed, blocked=blocked))
+                        release_settled(attempt.state.prepared.task.task_id)
             finally:
-                # A coordinator failure cannot leave locks or streamed results
-                # owned by abandoned futures. Their issued attempts remain for
-                # exact recovery/unknown-completion handling, never silent rerun.
-                for future, attempt in running.items():
-                    if not future.cancel():
-                        try:
-                            future.result()
-                        except BaseException:
-                            pass
+                self._drain_parallel_attempts(run_id, running)
+        self._raise_dispatch_refusal()
+
+    def _drain_parallel_attempts(self, run_id, running):
+        """Keep owned leases alive while already admitted work finishes.
+
+        Worker threads cannot renew the scheduler's SQLite leases. A blocking
+        future.result() here abandons that responsibility after an interrupt,
+        potentially refusing a later native leaf inside an admitted parent.
+        No queued work or descendant is dispatched during this drain.
+        """
+        for future, attempt in tuple(running.items()):
+            if future.cancel():
+                running.pop(future)
+                self.lock_manager.release(attempt.state.prepared.task.resource_lock_ids)
+        while running:
+            for attempt in running.values():
+                try:
+                    self._refresh_owned_attempt_lease(run_id,
+                        attempt.state.prepared.task.task_id, attempt.attempt_id)
+                except NativeEntryRefused as error:
+                    # Loss of the actual owned lease stays a refusal. Waiting
+                    # never substitutes a lease or restores acquisition rights.
+                    self._native_entry_refusal = error
+                    self._worker_preflight_refused.set()
+            completed, _ = wait(running,
+                timeout=min(10, max(0.1, self.lease_seconds / 3)),
+                return_when=FIRST_COMPLETED)
+            for future in completed:
+                attempt = running.pop(future)
+                try:
+                    future.result()
+                except BaseException as error:
+                    logging.getLogger(__name__).warning(
+                        "Admitted task did not complete during controller drain: task=%s exception_type=%s",
+                        attempt.state.prepared.task.task_id, type(error).__name__)
+                finally:
                     self.lock_manager.release(attempt.state.prepared.task.resource_lock_ids)
 
     def _run_and_commit_parallel_attempt(
@@ -3080,141 +3717,71 @@ class LocalScheduler:
         """
 
         prepared = attempt.state.prepared
-        result = self._execute_runner(
-            run_id,
-            prepared.task,
-            attempt.attempt_id,
-            prepared.dependency_outputs,
-            prepared.external_inputs,
-            prepared.dependency_receipts,
-            attempt.cpu_affinity,
-        )
         try:
-            return self._commit_runner_result(
+            return self._run_attempt(
                 run_id,
                 prepared.task,
                 attempt.attempt_id,
                 prepared.dependency_outputs,
                 prepared.external_inputs,
-                result,
+                prepared.dependency_receipts,
+                cpu_affinity=attempt.cpu_affinity,
+                _finalizing_native_contact=prepared.finalizing_native_contact,
             )
-        finally:
-            self._close_runner_outputs(result)
+        except NativeEntryRefused as error:
+            self._native_entry_refusal = error
+            self._worker_preflight_refused.set()
+            raise
+        except execution_error_types("WorkerPreflightError") as error:
+            self._stop_refused_worker_dispatch(error)
+            raise
 
-    def _start_parallel_batch(
-        self,
-        run_id: str,
-        states: tuple[_ParallelTaskState, ...],
-        *,
-        active: tuple[_ParallelAttempt, ...] = (),
-        outputs: dict[str, tuple[VerifiedArtifactInput, ...]],
-        receipts: dict[str, CanonicalTaskReceipt],
-        failed: set[str],
-        blocked: set[str],
-    ) -> tuple[tuple[_ParallelAttempt, ...], tuple[_ParallelTaskState, ...]]:
+    def _start_parallel_batch(self, run_id: str, states: tuple[_ParallelTaskState, ...], *, active: tuple[_ParallelAttempt, ...]=(), outputs: dict[str, tuple[VerifiedArtifactInput, ...]], receipts: dict[str, CanonicalTaskReceipt], failed: set[str], blocked: set[str]) -> tuple[tuple[_ParallelAttempt, ...], tuple[_ParallelTaskState, ...]]:
         capacity = self.parallel_resource_capacity
+        cpu_ids = self.parallel_cpu_ids
+        memory_ceiling = self._batch_memory_ceiling
         if capacity is None:
-            raise SchedulerConsistencyError("parallel resource capacity is unavailable")
+            raise SchedulerConsistencyError('parallel resource capacity is unavailable')
         selected: list[_ParallelAttempt] = []
         deferred: list[_ParallelTaskState] = []
-        active_tasks = tuple(attempt.state.prepared.task for attempt in active)
+        active_tasks = tuple((attempt.state.prepared.task for attempt in active))
         active_worker_groups = {self._task_worker_group(task) for task in active_tasks} - {None}
         selected_lock_ids = {lock for task in active_tasks for lock in task.resource_lock_ids}
-        used_cpu_cores = sum(task.capability.requested_resources.cpu_cores for task in active_tasks)
-        used_memory_bytes = sum(
-            task.capability.requested_resources.memory_bytes for task in active_tasks
-        )
-        used_gpu_devices = sum(
-            task.capability.requested_resources.gpu_devices for task in active_tasks
-        )
+        used_cpu_cores = sum((task.capability.requested_resources.cpu_cores for task in active_tasks))
+        used_memory_bytes = sum((task.capability.requested_resources.memory_bytes or 0 for task in active_tasks))
+        used_gpu_devices = sum((task.capability.requested_resources.gpu_devices for task in active_tasks))
         occupied_cpu_ids = {cpu for attempt in active for cpu in attempt.cpu_affinity}
-        free_cpu_ids = tuple(cpu for cpu in self.parallel_cpu_ids if cpu not in occupied_cpu_ids)
+        free_cpu_ids = tuple((cpu for cpu in cpu_ids if cpu not in occupied_cpu_ids))
         for state in states:
             task = state.prepared.task
             budget = task.capability.requested_resources
-            if (
-                budget.cpu_cores > capacity.cpu_cores
-                or budget.memory_bytes > capacity.memory_bytes
-                or budget.gpu_devices > capacity.gpu_devices
-            ):
-                self.operational_repository.block_task(
-                    run_id,
-                    task.task_id,
-                    TaskBlockReason.RESOURCE_COMPUTABILITY_UNAVAILABLE,
-                )
-                self._record_task_outcome(
-                    task.task_id,
-                    _TaskOutcome(TaskAttemptDisposition.BLOCKED),
-                    outputs=outputs,
-                    receipts=receipts,
-                    failed=failed,
-                    blocked=blocked,
-                )
+            if budget.cpu_cores > capacity.cpu_cores or (budget.memory_bytes is not None and budget.memory_bytes > capacity.memory_bytes) or budget.gpu_devices > capacity.gpu_devices:
+                self.operational_repository.block_task(run_id, task.task_id, TaskBlockReason.RESOURCE_COMPUTABILITY_UNAVAILABLE)
+                self._record_task_outcome(task.task_id, _TaskOutcome(TaskAttemptDisposition.BLOCKED), outputs=outputs, receipts=receipts, failed=failed, blocked=blocked)
                 continue
-            capacity_available = (
-                len(selected) + len(active) < self.maximum_parallel_tasks
-                and used_cpu_cores + budget.cpu_cores <= capacity.cpu_cores
-                and used_memory_bytes + budget.memory_bytes <= capacity.memory_bytes
-                and used_gpu_devices + budget.gpu_devices <= capacity.gpu_devices
-            )
+            capacity_available = len(selected) + len(active) < self.maximum_parallel_tasks and used_cpu_cores + budget.cpu_cores <= capacity.cpu_cores and (budget.memory_bytes is None or used_memory_bytes + budget.memory_bytes <= memory_ceiling) and (used_gpu_devices + budget.gpu_devices <= capacity.gpu_devices)
             internally_locked = bool(selected_lock_ids.intersection(task.resource_lock_ids))
             worker_group = self._task_worker_group(task)
             if not capacity_available or internally_locked or worker_group in active_worker_groups:
                 deferred.append(state)
                 continue
             if not self.lock_manager.acquire(task.resource_lock_ids):
-                self.operational_repository.block_task(
-                    run_id,
-                    task.task_id,
-                    TaskBlockReason.RESOURCE_LOCK_UNAVAILABLE,
-                )
-                self._record_task_outcome(
-                    task.task_id,
-                    _TaskOutcome(TaskAttemptDisposition.BLOCKED),
-                    outputs=outputs,
-                    receipts=receipts,
-                    failed=failed,
-                    blocked=blocked,
-                )
+                self.operational_repository.block_task(run_id, task.task_id, TaskBlockReason.RESOURCE_LOCK_UNAVAILABLE)
+                self._record_task_outcome(task.task_id, _TaskOutcome(TaskAttemptDisposition.BLOCKED), outputs=outputs, receipts=receipts, failed=failed, blocked=blocked)
                 continue
             attempt_number = state.next_attempt_number
             attempt_id = self.recovery_index.task(task.task_id).attempts[attempt_number - 1].attempt_id
-            if not self._admit_campaign_elapsed_reservation(task.task_id, attempt_id):
+            if state.prepared.finalizing_native_contact is None and (not self._admit_campaign_elapsed_reservation(task.task_id, attempt_id)):
                 self.lock_manager.release(task.resource_lock_ids)
-                self._stop_envelope_task(
-                    task.task_id,
-                    reason_code="CAMPAIGN_ELAPSED_BUDGET_INSUFFICIENT_FOR_PROJECTED_TASK",
-                )
-                self.recovery_store.record_not_attempted(
-                    self.recovery_index,
-                    task_id=task.task_id,
-                    reason=TaskBlockReason.CAMPAIGN_ELAPSED_BUDGET_EXHAUSTED,
-                )
-                self.operational_repository.block_task(
-                    run_id,
-                    task.task_id,
-                    TaskBlockReason.CAMPAIGN_ELAPSED_BUDGET_EXHAUSTED,
-                )
-                self._record_task_outcome(
-                    task.task_id,
-                    _TaskOutcome(TaskAttemptDisposition.BLOCKED),
-                    outputs=outputs,
-                    receipts=receipts,
-                    failed=failed,
-                    blocked=blocked,
-                )
+                self._stop_envelope_task(task.task_id, reason_code='CAMPAIGN_ELAPSED_BUDGET_INSUFFICIENT_FOR_PROJECTED_TASK')
+                self._record_not_attempted(task.task_id, TaskBlockReason.CAMPAIGN_ELAPSED_BUDGET_EXHAUSTED)
+                self.operational_repository.block_task(run_id, task.task_id, TaskBlockReason.CAMPAIGN_ELAPSED_BUDGET_EXHAUSTED)
+                self._record_task_outcome(task.task_id, _TaskOutcome(TaskAttemptDisposition.BLOCKED), outputs=outputs, receipts=receipts, failed=failed, blocked=blocked)
                 continue
             try:
-                self._reserve_envelope_attempt(task.task_id, attempt_id)
-                self.operational_repository.start_attempt(
-                    run_id=run_id,
-                    task_id=task.task_id,
-                    attempt_id=attempt_id,
-                    lease_id=f"lease.{attempt_id}",
-                    owner_id=self.owner_id,
-                    expires_epoch_seconds=self.clock.now() + self.lease_seconds,
-                )
-                self._launch_envelope_attempt(task.task_id, attempt_id)
+                if state.prepared.finalizing_native_contact is None:
+                    self._start_attempt(run_id, task, attempt_id)
+                    self._launch_envelope_attempt(task.task_id, attempt_id)
             except BaseException:
                 self.lock_manager.release(task.resource_lock_ids)
                 raise
@@ -3222,19 +3789,13 @@ class LocalScheduler:
             state.next_attempt_number += 1
             if worker_group is not None:
                 active_worker_groups.add(worker_group)
-            selected.append(
-                _ParallelAttempt(
-                    state=state,
-                    attempt_id=attempt_id,
-                    cpu_affinity=free_cpu_ids[: budget.cpu_cores],
-                )
-            )
-            free_cpu_ids = free_cpu_ids[budget.cpu_cores :]
+            selected.append(_ParallelAttempt(state=state, attempt_id=attempt_id, cpu_affinity=free_cpu_ids[:budget.cpu_cores]))
+            free_cpu_ids = free_cpu_ids[budget.cpu_cores:]
             selected_lock_ids.update(task.resource_lock_ids)
             used_cpu_cores += budget.cpu_cores
-            used_memory_bytes += budget.memory_bytes
+            used_memory_bytes += budget.memory_bytes or 0
             used_gpu_devices += budget.gpu_devices
-        return tuple(selected), tuple(deferred)
+        return (tuple(selected), tuple(deferred))
 
     def _finish_parallel_attempts(
         self,
@@ -3254,7 +3815,17 @@ class LocalScheduler:
                 task = attempt.state.prepared.task
                 try:
                     receipt = futures[attempt.attempt_id].result()
-                except CampaignElapsedBoundaryReached:
+                except NativeEntryRefused:
+                    # Other admitted workers still drain before the shared
+                    # refusal is raised. This task has not contacted science.
+                    continue
+                except NativeParentFinalizationPending:
+                    raise
+                except _KnownNativeReturnFailure as error:
+                    self._record_known_native_return_failure(task, attempt.attempt_id, error)
+                    self._record_task_outcome(task.task_id, _TaskOutcome(TaskAttemptDisposition.FAILED),
+                        outputs=outputs, receipts=receipts, failed=failed, blocked=blocked)
+                except execution_error_types("CampaignElapsedBoundaryReached"):
                     self._record_campaign_elapsed_boundary(
                         task.task_id,
                         attempt.attempt_id,
@@ -3267,7 +3838,12 @@ class LocalScheduler:
                         failed=failed,
                         blocked=blocked,
                     )
-                except ProgressStalledError as error:
+                except execution_error_types("ProgressStalledError") as error:
+                    if self._block_native_failure(run_id, task, initiating_error=error,
+                            inputs=(*attempt.state.prepared.dependency_outputs, *attempt.state.prepared.external_inputs)):
+                        self._record_task_outcome(task.task_id, _TaskOutcome(TaskAttemptDisposition.BLOCKED),
+                            outputs=outputs, receipts=receipts, failed=failed, blocked=blocked)
+                        continue
                     failure = operational_failure_diagnostic(
                         error,
                         failure_class=(
@@ -3294,8 +3870,9 @@ class LocalScheduler:
                     if attempt.state.remaining_attempts:
                         retries.append(attempt.state)
                     else:
-                        self._stop_envelope_task(
+                        self._stop_failed_envelope_task(
                             task.task_id,
+                            failure_class=failure.failure_class,
                             reason_code=failure.failure_class.value,
                         )
                         self._record_task_outcome(
@@ -3306,7 +3883,15 @@ class LocalScheduler:
                             failed=failed,
                             blocked=blocked,
                         )
-                except (ResourceAdmissionError, ArtifactInputLimitExceeded) as error:
+                except (*execution_error_types("ResourceAdmissionError"), ArtifactInputLimitExceeded) as error:
+                    self._stop_refused_worker_dispatch(error)
+                    if self._block_native_failure(run_id, task, initiating_error=error,
+                            inputs=(*attempt.state.prepared.dependency_outputs, *attempt.state.prepared.external_inputs)):
+                        self._retain_refused_worker(task, attempt.attempt_id, error,
+                            (*attempt.state.prepared.dependency_outputs, *attempt.state.prepared.external_inputs))
+                        self._record_task_outcome(task.task_id, _TaskOutcome(TaskAttemptDisposition.BLOCKED),
+                            outputs=outputs, receipts=receipts, failed=failed, blocked=blocked)
+                        continue
                     failure = operational_failure_diagnostic(error)
                     self._record_envelope_operational_failure(
                         task.task_id,
@@ -3321,14 +3906,17 @@ class LocalScheduler:
                         failure=failure,
                         blocked=True,
                     )
-                    self._stop_envelope_task(
+                    self._stop_failed_envelope_task(
                         task.task_id,
+                        failure_class=failure.failure_class,
                         reason_code="RESOURCE_COMPUTABILITY_UNAVAILABLE",
                     )
                     self.operational_repository.block_attempt(
                         attempt.attempt_id,
                         TaskBlockReason.RESOURCE_COMPUTABILITY_UNAVAILABLE,
                     )
+                    self._retain_refused_worker(task, attempt.attempt_id, error,
+                        (*attempt.state.prepared.dependency_outputs, *attempt.state.prepared.external_inputs))
                     self._record_task_outcome(
                         task.task_id,
                         _TaskOutcome(TaskAttemptDisposition.BLOCKED),
@@ -3338,6 +3926,11 @@ class LocalScheduler:
                         blocked=blocked,
                     )
                 except Exception as error:
+                    if self._block_native_failure(run_id, task, initiating_error=error,
+                            inputs=(*attempt.state.prepared.dependency_outputs, *attempt.state.prepared.external_inputs)):
+                        self._record_task_outcome(task.task_id, _TaskOutcome(TaskAttemptDisposition.BLOCKED),
+                            outputs=outputs, receipts=receipts, failed=failed, blocked=blocked)
+                        continue
                     failure = operational_failure_diagnostic(error)
                     if failure.retryable and not attempt.state.remaining_attempts:
                         failure = operational_failure_diagnostic(
@@ -3363,9 +3956,9 @@ class LocalScheduler:
                     if failure.retryable and attempt.state.remaining_attempts:
                         retries.append(attempt.state)
                     else:
-                        self._stop_envelope_task(
+                        self._stop_failed_envelope_task(
                             task.task_id,
-                            reason_code=failure.failure_class.value,
+                            failure_class=failure.failure_class,
                         )
                         self._record_task_outcome(
                             task.task_id,
@@ -3390,7 +3983,7 @@ class LocalScheduler:
                 task_id,
                 attempt.attempt_id,
                 receipt,
-                recovery=False,
+                recovery=attempt.state.prepared.finalizing_native_contact is not None,
             )
             self.failure_injector.after_receipt_commit(
                 run_id,
@@ -3419,49 +4012,11 @@ class LocalScheduler:
         task: ProtocolExecutionTask,
         outputs: dict[str, tuple[VerifiedArtifactInput, ...]],
     ) -> tuple[VerifiedArtifactInput, ...]:
-        if any(dependency not in outputs for dependency in task.dependency_task_ids):
-            raise SchedulerConsistencyError("ready task lacks dependency materializations")
-        if isinstance(task, ExecutionTask):
-            selected: dict[str, VerifiedArtifactInput] = {}
-            for spec in task.scientific_inputs:
-                if spec.producer_task_id is None:
-                    continue
-                available = outputs[spec.producer_task_id]
-                matches = tuple(
-                    value
-                    for value in available
-                    if value.logical.logical_artifact_id == spec.operational_logical_artifact_id
-                )
-                if len(matches) != 1:
-                    raise SchedulerConsistencyError(
-                        "exact scientific dependency output is unavailable"
-                    )
-                value = matches[0]
-                if (
-                    value.logical.payload_schema != spec.payload_schema
-                    or value.logical.media_type != spec.media_type
-                    or value.materialization.size_bytes > spec.maximum_size_bytes
-                ):
-                    raise SchedulerConsistencyError(
-                        "scientific dependency materialization differs from its edge"
-                    )
-                selected[value.materialization.materialization_id] = value
-            return tuple(
-                sorted(
-                    selected.values(),
-                    key=lambda item: item.materialization.materialization_id,
-                )
-            )
-        return tuple(
-            sorted(
-                (
-                    output
-                    for dependency in task.dependency_task_ids
-                    for output in outputs[dependency]
-                ),
-                key=lambda item: item.materialization.materialization_id,
-            )
-        )
+        from empirical_lawhood.runtime.execution import dependency_artifact_inputs
+        try:
+            return dependency_artifact_inputs(task, outputs)
+        except (TypeError, ValueError) as error:
+            raise SchedulerConsistencyError(str(error)) from error
 
     @staticmethod
     def _dependency_receipt_bindings(
@@ -3520,321 +4075,192 @@ class LocalScheduler:
             )
         )
 
-    def _recover_task(
-        self,
-        run_id: str,
-        task: ProtocolExecutionTask,
-        dependency_outputs: tuple[VerifiedArtifactInput, ...],
-        external_inputs: tuple[VerifiedArtifactInput, ...],
-        attempts: tuple[OperationalAttempt, ...],
-    ) -> _TaskRecovery:
-        if any(attempt.run_id != run_id or attempt.task_id != task.task_id for attempt in attempts):
-            raise SchedulerConsistencyError("cached operational attempts bind another task")
-        candidate_ordinals = {
-            candidate.attempt_id: candidate.ordinal
-            for candidate in self.recovery_index.task(task.task_id).attempts
-        }
-        spent_attempt_count = sum(
-            attempt.attempt_id in candidate_ordinals
-            and attempt.disposition
-            in {
-                TaskAttemptDisposition.FAILED,
-                TaskAttemptDisposition.BLOCKED,
-            }
-            for attempt in attempts
-        )
-        durable_blocked = any(
-            attempt.disposition is TaskAttemptDisposition.BLOCKED
-            and attempt.block_kind is TaskBlockKind.DURABLE
-            and not (
-                self.retry_amendment is not None
-                and attempt.reason_code == TaskBlockReason.DEPENDENCY_FAILED.value
-                and attempt.attempt_id not in candidate_ordinals
-            )
-            for attempt in attempts
-        )
-        next_attempt_number = (
-            max(
-                (
-                    candidate_ordinals[attempt.attempt_id]
-                    for attempt in attempts
-                    if attempt.attempt_id in candidate_ordinals
-                ),
-                default=0,
-            )
-            + 1
-        )
+    def _recover_task(self, run_id: str, task: ProtocolExecutionTask, dependency_outputs: tuple[VerifiedArtifactInput, ...], external_inputs: tuple[VerifiedArtifactInput, ...], attempts: tuple[OperationalAttempt, ...]) -> _TaskRecovery:
+        if any((attempt.run_id != run_id or attempt.task_id != task.task_id for attempt in attempts)):
+            raise SchedulerConsistencyError('cached operational attempts bind another task')
+        candidate_ordinals = {candidate.attempt_id: candidate.ordinal for candidate in self.recovery_index.task(task.task_id).attempts}
+        spent_attempt_count = sum((attempt.attempt_id in candidate_ordinals and attempt.disposition in {TaskAttemptDisposition.FAILED, TaskAttemptDisposition.BLOCKED} for attempt in attempts))
+        next_attempt_number = max((candidate_ordinals[attempt.attempt_id] for attempt in attempts if attempt.attempt_id in candidate_ordinals), default=0) + 1
+        durable_blocked = any((attempt.disposition is TaskAttemptDisposition.BLOCKED and attempt.block_kind is TaskBlockKind.DURABLE for attempt in attempts))
         for attempt in attempts:
-            if attempt.disposition not in {
-                TaskAttemptDisposition.RUNNING,
-                TaskAttemptDisposition.SUCCEEDED,
-            }:
+            if attempt.disposition not in {TaskAttemptDisposition.RUNNING, TaskAttemptDisposition.SUCCEEDED}:
                 continue
-            receipt = self.receipt_store.read(
-                run_id,
-                task.task_id,
-                attempt.attempt_id,
-            )
+            receipt = self.receipt_store.read(run_id, task.task_id, attempt.attempt_id)
             if receipt is not None:
-                self._validate_receipt(
-                    receipt,
-                    run_id,
-                    task,
-                    attempt,
-                    dependency_outputs,
-                    external_inputs,
-                )
+                self._validate_receipt(receipt, run_id, task, attempt, dependency_outputs, external_inputs)
                 if attempt.disposition is TaskAttemptDisposition.RUNNING:
                     self.operational_repository.complete_attempt(attempt.attempt_id)
-                self._finalize_envelope_receipt(
-                    task.task_id,
-                    attempt.attempt_id,
-                    receipt,
-                    recovery=True,
-                )
-                return _TaskRecovery(
-                    True,
-                    False,
-                    spent_attempt_count,
-                    next_attempt_number,
-                    receipt,
-                )
+                self._finalize_envelope_receipt(task.task_id, attempt.attempt_id, receipt, recovery=True)
+                return _TaskRecovery(True, False, spent_attempt_count, next_attempt_number, receipt)
             if attempt.disposition is TaskAttemptDisposition.SUCCEEDED:
-                raise SchedulerConsistencyError("successful task has no durable receipt")
-            elapsed_exhausted = (
-                self.campaign_elapsed_budget_coordinator is not None
-                and self.campaign_elapsed_budget_coordinator.current().exhausted
-            )
+                raise SchedulerConsistencyError('successful task has no durable receipt')
+            elapsed_exhausted = self.campaign_elapsed_budget_coordinator is not None and self.campaign_elapsed_budget_coordinator.current().exhausted
             if self.execution_resource_envelope_coordinator is not None and elapsed_exhausted:
                 self._record_campaign_elapsed_boundary(task.task_id, attempt.attempt_id)
-                return _TaskRecovery(
-                    False,
-                    True,
-                    spent_attempt_count + 1,
-                    next_attempt_number,
-                    None,
-                )
-            if (
-                attempt.lease_expires_epoch_seconds is None
-                or attempt.lease_expires_epoch_seconds > self.clock.now()
-            ):
-                raise LiveLeaseError("task has an active lease and no receipt")
+                return _TaskRecovery(False, True, spent_attempt_count + 1, next_attempt_number, None)
+            if attempt.lease_expires_epoch_seconds is None or attempt.lease_expires_epoch_seconds > self.clock.now():
+                raise LiveLeaseError('task has an active lease and no receipt')
             if self.execution_envelope_coordinator is not None:
                 self._unknown_envelope_completion(task.task_id, attempt.attempt_id)
-                self.operational_repository.block_attempt(
-                    attempt.attempt_id,
-                    TaskBlockReason.UNKNOWN_COMPLETION,
-                )
-                return _TaskRecovery(
-                    False,
-                    True,
-                    spent_attempt_count + 1,
-                    next_attempt_number,
-                    None,
-                )
-            self.operational_repository.fail_attempt(
-                attempt.attempt_id,
-                "lease-expired",
-            )
+                self.operational_repository.block_attempt(attempt.attempt_id, TaskBlockReason.UNKNOWN_COMPLETION)
+                return _TaskRecovery(False, True, spent_attempt_count + 1, next_attempt_number, None)
+            self.operational_repository.fail_attempt(attempt.attempt_id, 'lease-expired')
             spent_attempt_count += 1
-        return _TaskRecovery(
-            False,
-            durable_blocked,
-            spent_attempt_count,
-            next_attempt_number,
-            None,
-        )
+        return _TaskRecovery(False, durable_blocked, spent_attempt_count, next_attempt_number, None)
 
-    def _execute_with_retries(
-        self,
-        run_id: str,
-        task: ProtocolExecutionTask,
-        dependency_outputs: tuple[VerifiedArtifactInput, ...],
-        external_inputs: tuple[VerifiedArtifactInput, ...],
-        dependency_receipts: tuple[DependencyReceiptBinding, ...],
-        *,
-        spent_attempt_count: int,
-        next_attempt_number: int,
-    ) -> CanonicalTaskReceipt | None:
-        remaining_attempts = (
-            self.recovery_index.task(task.task_id).maximum_attempts - spent_attempt_count
-        )
+    def _execute_with_retries(self, run_id: str, task: ProtocolExecutionTask, dependency_outputs: tuple[VerifiedArtifactInput, ...], external_inputs: tuple[VerifiedArtifactInput, ...], dependency_receipts: tuple[DependencyReceiptBinding, ...], *, spent_attempt_count: int, next_attempt_number: int, _finalizing_native_contact: NativeEffectContact | None=None) -> CanonicalTaskReceipt | None:
+        remaining_attempts = self.recovery_index.task(task.task_id).maximum_attempts - spent_attempt_count
         for offset in range(remaining_attempts):
             if not self.lock_manager.acquire(task.resource_lock_ids):
                 raise ResourceLockUnavailable(task.task_id)
             attempt_number = next_attempt_number + offset
             attempt_id = self.recovery_index.task(task.task_id).attempts[attempt_number - 1].attempt_id
-            lease_id = f"lease.{attempt_id}"
-            if not self._admit_campaign_elapsed_reservation(task.task_id, attempt_id):
-                self._stop_envelope_task(
-                    task.task_id,
-                    reason_code="CAMPAIGN_ELAPSED_BUDGET_INSUFFICIENT_FOR_PROJECTED_TASK",
-                )
-                self.recovery_store.record_not_attempted(
-                    self.recovery_index,
-                    task_id=task.task_id,
-                    reason=TaskBlockReason.CAMPAIGN_ELAPSED_BUDGET_EXHAUSTED,
-                )
-                self.operational_repository.block_task(
-                    run_id,
-                    task.task_id,
-                    TaskBlockReason.CAMPAIGN_ELAPSED_BUDGET_EXHAUSTED,
-                )
+            if _finalizing_native_contact is None and (not self._admit_campaign_elapsed_reservation(task.task_id, attempt_id)):
+                self._stop_envelope_task(task.task_id, reason_code='CAMPAIGN_ELAPSED_BUDGET_INSUFFICIENT_FOR_PROJECTED_TASK')
+                self._record_not_attempted(task.task_id, TaskBlockReason.CAMPAIGN_ELAPSED_BUDGET_EXHAUSTED)
+                self.operational_repository.block_task(run_id, task.task_id, TaskBlockReason.CAMPAIGN_ELAPSED_BUDGET_EXHAUSTED)
                 self.lock_manager.release(task.resource_lock_ids)
                 raise _RetryableBlockRecorded
-            self._reserve_envelope_attempt(task.task_id, attempt_id)
-            self.operational_repository.start_attempt(
-                run_id=run_id,
-                task_id=task.task_id,
-                attempt_id=attempt_id,
-                lease_id=lease_id,
-                owner_id=self.owner_id,
-                expires_epoch_seconds=self.clock.now() + self.lease_seconds,
-            )
-            self._launch_envelope_attempt(task.task_id, attempt_id)
             try:
-                receipt = self._run_attempt(
-                    run_id,
-                    task,
-                    attempt_id,
-                    dependency_outputs,
-                    external_inputs,
-                    dependency_receipts,
-                )
-            except InjectedSchedulerCrash:
+                if _finalizing_native_contact is not None:
+                    if attempt_id != _finalizing_native_contact.attempt_id:
+                        raise SchedulerConsistencyError('parent finalization changes its original attempt')
+                else:
+                    self._start_attempt(run_id, task, attempt_id)
+                if _finalizing_native_contact is None:
+                    self._launch_envelope_attempt(task.task_id, attempt_id)
+            except BaseException:
+                self.lock_manager.release(task.resource_lock_ids)
                 raise
-            except CampaignElapsedBoundaryReached as error:
+            try:
+                receipt = self._run_attempt(run_id, task, attempt_id, dependency_outputs, external_inputs, dependency_receipts, _finalizing_native_contact=_finalizing_native_contact)
+            except (NativeParentFinalizationPending, NativeEntryRefused):
+                raise
+            except _KnownNativeReturnFailure as error:
+                self._record_known_native_return_failure(task, attempt_id, error)
+                return None
+            except execution_error_types('InjectedSchedulerCrash'):
+                raise
+            except execution_error_types('CampaignElapsedBoundaryReached') as error:
                 self._record_campaign_elapsed_boundary(task.task_id, attempt_id)
                 raise _RetryableBlockRecorded from error
-            except ProgressStalledError as error:
-                failure = operational_failure_diagnostic(
-                    error,
-                    failure_class=(
-                        OperationalFailureClass.CHILD_PROCESS_FAILURE
-                        if offset + 1 < remaining_attempts
-                        else OperationalFailureClass.RETRY_EXHAUSTION
-                    ),
-                )
+            except execution_error_types('ProgressStalledError') as error:
+                if self._block_native_failure(run_id, task, initiating_error=error, inputs=(*dependency_outputs, *external_inputs)):
+                    raise _RetryableBlockRecorded from error
+                failure = operational_failure_diagnostic(error, failure_class=OperationalFailureClass.CHILD_PROCESS_FAILURE if offset + 1 < remaining_attempts else OperationalFailureClass.RETRY_EXHAUSTION)
                 self._record_resource_progress_stalled(task.task_id, attempt_id)
-                self.recovery_store.record_failure(
-                    self.recovery_index,
-                    task_id=task.task_id,
-                    attempt_id=attempt_id,
-                    reason_code=failure.failure_class.reason_code,
-                    failure=failure,
-                )
-                self.operational_repository.fail_attempt(
-                    attempt_id,
-                    failure.failure_class.reason_code,
-                )
+                self.recovery_store.record_failure(self.recovery_index, task_id=task.task_id, attempt_id=attempt_id, reason_code=failure.failure_class.reason_code, failure=failure)
+                self.operational_repository.fail_attempt(attempt_id, failure.failure_class.reason_code)
                 if offset + 1 == remaining_attempts:
-                    self._stop_envelope_task(
-                        task.task_id,
-                        reason_code="RETRY_BUDGET_EXHAUSTED",
-                    )
+                    self._stop_failed_envelope_task(task.task_id, failure_class=failure.failure_class, reason_code='RETRY_BUDGET_EXHAUSTED')
                 continue
-            except (ResourceAdmissionError, ArtifactInputLimitExceeded) as error:
+            except (*execution_error_types('ResourceAdmissionError'), ArtifactInputLimitExceeded) as error:
+                self._stop_refused_worker_dispatch(error)
+                if self._block_native_failure(run_id, task, initiating_error=error, inputs=(*dependency_outputs, *external_inputs)):
+                    self._retain_refused_worker(task, attempt_id, error, (*dependency_outputs, *external_inputs))
+                    raise _RetryableBlockRecorded from error
                 failure = operational_failure_diagnostic(error)
-                self._record_envelope_operational_failure(
-                    task.task_id,
-                    attempt_id,
-                    reason_code=failure.failure_class.value,
-                )
-                self.recovery_store.record_failure(
-                    self.recovery_index,
-                    task_id=task.task_id,
-                    attempt_id=attempt_id,
-                    reason_code=TaskBlockReason.RESOURCE_COMPUTABILITY_UNAVAILABLE.value,
-                    failure=failure,
-                    blocked=True,
-                )
-                self._stop_envelope_task(
-                    task.task_id,
-                    reason_code="RESOURCE_COMPUTABILITY_UNAVAILABLE",
-                )
-                self.operational_repository.block_attempt(
-                    attempt_id,
-                    TaskBlockReason.RESOURCE_COMPUTABILITY_UNAVAILABLE,
-                )
+                self._record_envelope_operational_failure(task.task_id, attempt_id, reason_code=failure.failure_class.value)
+                self.recovery_store.record_failure(self.recovery_index, task_id=task.task_id, attempt_id=attempt_id, reason_code=TaskBlockReason.RESOURCE_COMPUTABILITY_UNAVAILABLE.value, failure=failure, blocked=True)
+                self._stop_failed_envelope_task(task.task_id, failure_class=failure.failure_class, reason_code='RESOURCE_COMPUTABILITY_UNAVAILABLE')
+                self.operational_repository.block_attempt(attempt_id, TaskBlockReason.RESOURCE_COMPUTABILITY_UNAVAILABLE)
+                self._retain_refused_worker(task, attempt_id, error, (*dependency_outputs, *external_inputs))
                 raise _RetryableBlockRecorded from error
             except Exception as error:
+                if self._block_native_failure(run_id, task, initiating_error=error, inputs=(*dependency_outputs, *external_inputs)):
+                    raise _RetryableBlockRecorded from error
                 failure = operational_failure_diagnostic(error)
                 if failure.retryable and offset + 1 == remaining_attempts:
-                    failure = operational_failure_diagnostic(
-                        error,
-                        failure_class=OperationalFailureClass.RETRY_EXHAUSTION,
-                    )
-                self._record_envelope_operational_failure(
-                    task.task_id,
-                    attempt_id,
-                    reason_code=failure.failure_class.value,
-                )
-                self.recovery_store.record_failure(
-                    self.recovery_index,
-                    task_id=task.task_id,
-                    attempt_id=attempt_id,
-                    reason_code=failure.failure_class.reason_code,
-                    failure=failure,
-                )
-                self.operational_repository.fail_attempt(
-                    attempt_id,
-                    failure.failure_class.reason_code,
-                )
+                    failure = operational_failure_diagnostic(error, failure_class=OperationalFailureClass.RETRY_EXHAUSTION)
+                self._record_envelope_operational_failure(task.task_id, attempt_id, reason_code=failure.failure_class.value)
+                self.recovery_store.record_failure(self.recovery_index, task_id=task.task_id, attempt_id=attempt_id, reason_code=failure.failure_class.reason_code, failure=failure)
+                self.operational_repository.fail_attempt(attempt_id, failure.failure_class.reason_code)
                 if not failure.retryable:
-                    self._stop_envelope_task(
-                        task.task_id,
-                        reason_code=failure.failure_class.value,
-                    )
+                    self._stop_failed_envelope_task(task.task_id, failure_class=failure.failure_class)
                     return None
                 continue
             finally:
                 self.lock_manager.release(task.resource_lock_ids)
             self.recovery_store.record_receipt(self.recovery_index, receipt)
-            self._finalize_envelope_receipt(
-                task.task_id,
-                attempt_id,
-                receipt,
-                recovery=False,
-            )
-            self.failure_injector.after_receipt_commit(
-                run_id,
-                task.task_id,
-                attempt_id,
-            )
+            self._finalize_envelope_receipt(task.task_id, attempt_id, receipt, recovery=_finalizing_native_contact is not None)
+            self.failure_injector.after_receipt_commit(run_id, task.task_id, attempt_id)
             self.operational_repository.complete_attempt(attempt_id)
             return receipt
         return None
 
-    def _run_attempt(
-        self,
-        run_id: str,
-        task: ProtocolExecutionTask,
-        attempt_id: str,
-        dependency_outputs: tuple[VerifiedArtifactInput, ...],
-        external_inputs: tuple[VerifiedArtifactInput, ...],
-        dependency_receipts: tuple[DependencyReceiptBinding, ...],
-    ) -> CanonicalTaskReceipt:
-        result = self._execute_runner(
-            run_id,
-            task,
-            attempt_id,
-            dependency_outputs,
-            external_inputs,
-            dependency_receipts,
-        )
+    def _run_attempt(self, run_id: str, task: ProtocolExecutionTask, attempt_id: str, dependency_outputs: tuple[VerifiedArtifactInput, ...], external_inputs: tuple[VerifiedArtifactInput, ...], dependency_receipts: tuple[DependencyReceiptBinding, ...], *, cpu_affinity: tuple[int, ...]=(), _finalizing_native_contact: NativeEffectContact | None=None) -> CanonicalTaskReceipt:
+        execution_arguments = {}
+        if cpu_affinity:
+            execution_arguments['cpu_affinity'] = cpu_affinity
+        native_work = None
+
+        def prepared_work(work):
+            nonlocal native_work
+            native_work = work
+        finalization_guards = []
+
+        def validate_retained_custody():
+            for guard in finalization_guards:
+                guard()
+        result = None
+        with ExitStack() as finalization_scopes:
+            try:
+                result = self._execute_runner(run_id, task, attempt_id, dependency_outputs, external_inputs, dependency_receipts, _prepared_native_work=prepared_work, _finalizing_native_contact=_finalizing_native_contact, _finalization_scopes=finalization_scopes, _finalization_guard=finalization_guards.append, **execution_arguments)
+                publication_arguments = {} if not finalization_guards else {'validate_retained_custody': validate_retained_custody}
+                return self._commit_runner_result(run_id, task, attempt_id, dependency_outputs, external_inputs, result, **publication_arguments)
+            except execution_error_types('InjectedSchedulerCrash'):
+                raise
+            except (NativeParentFinalizationPending, NativeEntryRefused):
+                raise
+            except Exception as error:
+                if _finalizing_native_contact is not None and native_work is None:
+                    raise NativeParentFinalizationPending('native parent recovery prerequisites are unavailable; original attempt retained without further native entry') from error
+                self._raise_pending_native_finalization(run_id, task, attempt_id, native_work, (*dependency_outputs, *external_inputs), error)
+                raise
+            finally:
+                if result is not None:
+                    self._close_runner_outputs(result)
+
+    def _raise_pending_native_finalization(self, run_id, task, attempt_id, work, inputs, error):
+        """Keep known native returns available for ordinary deterministic resume."""
+        from empirical_lawhood.runtime.native_subwork import NativeSubworkUncertainContact
+
+        if isinstance(error, NativeSubworkUncertainContact) or (
+                isinstance(error, execution_error_types("TaskProcessError"))
+                and error.sanitized_exception_type == "NativeSubworkUncertainContact"):
+            # A completed-only producer may discover that its ordinary result
+            # requires a child that never entered. Preserve that refusal for
+            # the existing native obstruction path; waiting cannot supply it.
+            return
+        if type(work) is not PreparedNativeWork:
+            return
+        contact = self._native_contact(run_id, task)
+        if contact is None or contact.attempt_id != attempt_id or contact != work.expected_parent:
+            return
+        runner = self.runner_registry.resolve(task)
+        store = self._native_subwork_progress(runner, contact, inputs)
+        if store is None:
+            return
         try:
-            return self._commit_runner_result(
-                run_id,
-                task,
-                attempt_id,
-                dependency_outputs,
-                external_inputs,
-                result,
-            )
-        finally:
-            for output in result.outputs:
-                if isinstance(output, StreamedTaskOutput):
-                    output.source.close()
+            observed = authenticate_native_parent_return(store=store, work=work)
+        except NativeSubworkUncertainContact:
+            return
+        if observed.operational_status is OperationalStatus.FAILED:
+            raise _KnownNativeReturnFailure("native child has a durable failed return") from error
+        raise NativeParentFinalizationPending(
+            "native parent publication is incomplete; resume its original attempt after the worker lease expires"
+        ) from error
+
+    def _record_known_native_return_failure(self, task, attempt_id, error):
+        failure = operational_failure_diagnostic(error,
+            failure_class=OperationalFailureClass.NATIVE_RETURN_FAILURE)
+        self._record_envelope_operational_failure(task.task_id, attempt_id,
+            reason_code=failure.failure_class.value)
+        self.recovery_store.record_failure(self.recovery_index,
+            task_id=task.task_id, attempt_id=attempt_id,
+            reason_code=failure.failure_class.reason_code, failure=failure)
+        self.operational_repository.fail_attempt(attempt_id, failure.failure_class.reason_code)
+        self._stop_failed_envelope_task(task.task_id, failure_class=failure.failure_class)
 
     def _task_worker_group(self, task: ProtocolExecutionTask) -> str | None:
         if self.execution_resource_envelope_coordinator is None:
@@ -3859,157 +4285,133 @@ class LocalScheduler:
             self._worker_group_ids[task.task_id] = group
         return self._worker_group_ids[task.task_id]
 
-    def _execute_runner(
-        self,
-        run_id: str,
-        task: ProtocolExecutionTask,
-        attempt_id: str,
-        dependency_outputs: tuple[VerifiedArtifactInput, ...],
-        external_inputs: tuple[VerifiedArtifactInput, ...],
-        dependency_receipts: tuple[DependencyReceiptBinding, ...],
-        cpu_affinity: tuple[int, ...] = (),
-    ) -> RunnerResult:
+    def _execute_runner(self, run_id: str, task: ProtocolExecutionTask, attempt_id: str, dependency_outputs: tuple[VerifiedArtifactInput, ...], external_inputs: tuple[VerifiedArtifactInput, ...], dependency_receipts: tuple[DependencyReceiptBinding, ...], cpu_affinity: tuple[int, ...]=(), *, _prepared_native_work=None, _finalizing_native_contact: NativeEffectContact | None=None, _finalization_scopes: ExitStack | None=None, _finalization_guard: Callable[[Callable[[], None]], None] | None=None) -> RunnerResult:
         """Run one isolated worker without committing its scientific outputs."""
-
+        worker_implementation = self.implementation_binding
         runner = self.runner_registry.resolve(task)
-        input_bindings, input_ports = self._worker_inputs(
-            task,
-            dependency_outputs,
-            external_inputs,
-        )
-        context = TaskContext(
-            run_id=run_id,
-            task_id=task.task_id,
-            attempt_id=attempt_id,
-            config=task.capability.config,
-            input_bindings=input_bindings,
-            input_ports=input_ports,
-            output_ports=tuple(
-                WorkerOutputPort(
-                    output_id=output.output_id,
-                    payload_schema=output.payload_schema,
-                    profile=output.profile,
-                    media_type=output.media_type,
-                    logical_artifact_id=output.logical_artifact_id,
-                )
-                for output in task.outputs
-            ),
-            permissions=task.capability.required_permissions,
-            outcome_access=task.capability.requested_outcome_access,
-            resource_budget=task.capability.requested_resources,
-            isolation_profile=(
-                WorkerIsolationProfile.EXPLORATION_NO_NETWORK
-                if self.lane is PlanLane.EXPLORATORY
-                and self.assurance_profile is ExecutionAssuranceProfile.STRICT_ISOLATED
-                else WorkerIsolationProfile.TRUSTED_LOCAL
-            ),
-            dependency_receipts=dependency_receipts,
-            scientific_adjudication_context=(
-                self.scientific_adjudication_context
-                if task.task_id == self.adjudication_task_id
-                else None
-            ),
-            cpu_affinity=cpu_affinity,
-        )
+        input_bindings, input_ports = self._worker_inputs(task, dependency_outputs, external_inputs)
+        context = TaskContext(run_id=run_id, task_id=task.task_id, attempt_id=attempt_id, config=task.capability.config, input_bindings=input_bindings, input_ports=input_ports, output_ports=tuple((WorkerOutputPort(output_id=output.output_id, payload_schema=output.payload_schema, profile=output.profile, media_type=output.media_type, logical_artifact_id=output.logical_artifact_id) for output in task.outputs)), permissions=task.capability.required_permissions, outcome_access=task.capability.requested_outcome_access, resource_budget=task.capability.requested_resources, isolation_profile=WorkerIsolationProfile.EXPLORATION_NO_NETWORK if self.lane is PlanLane.EXPLORATORY and self.assurance_profile is ExecutionAssuranceProfile.STRICT_ISOLATED else WorkerIsolationProfile.TRUSTED_LOCAL, dependency_receipts=dependency_receipts, scientific_adjudication_context=self.scientific_adjudication_context if task.task_id == self.adjudication_task_id else None, cpu_affinity=cpu_affinity)
         result: RunnerResult | None = None
+        live_native_contact: NativeEffectContact | None = None
+        prepared_parent_contact: NativeEffectContact | None = None
+        prepared_parent_contract: PreparedInvocationContract | None = None
         input_close_error: Exception | None = None
+
+        def enter_native():
+            nonlocal live_native_contact
+            if prepared_parent_contact is not None and prepared_parent_contact != self._anticipated_native_contact(task, run_id=run_id, attempt_id=attempt_id, input_materialization_ids=context.input_materialization_ids, dependency_receipt_ids=context.dependency_receipt_ids):
+                raise ResourceAdmissionError('native entry changes its prepared anticipated contact')
+            if task.capability.capability_key in self.native_effect_capability_keys:
+                self._require_native_entry(context, runner, prepared_contract=prepared_parent_contract)
+            live_native_contact = self._begin_native_contact(task, context)
+            return (live_native_contact, self._native_subwork_progress(runner, live_native_contact,
+                (*dependency_outputs, *external_inputs), context=context,
+                prepared_contract=prepared_parent_contract))
+
+        def _prepared_arguments(resource_cell=None):
+            nonlocal prepared_parent_contact, prepared_parent_contract, runner, context
+            if worker_implementation is None:
+                if isinstance(runner, ParentPreparedTaskRunner) and runner.native_effect:
+                    raise ResourceAdmissionError('native parent preparation requires its exact selected worker implementation before entry')
+                return None
+            requirements = self.provenance_requirements.get(task.capability.capability_key, ())
+            native = task.capability.capability_key in self.native_effect_capability_keys
+            native_preparer = self.native_work_preparers.get(task.capability.capability_key)
+            if native and native_preparer is None:
+                if isinstance(runner, ParentPreparedTaskRunner) and runner.native_effect:
+                    raise ResourceAdmissionError('native parent preparation requires its installed PURE work hook before entry')
+                return None
+            contract = prepare_worker_invocation(runner, context, (*dependency_outputs, *external_inputs), implementation=worker_implementation, execution_plan=self._active_execution_plan, execution_task=ObjectIdentity.from_record(task.task_id, task), execution_task_record=task, native_effect=native, native_work_preparer=native_preparer, worker_environment_selector=self.worker_environment_selectors.get(task.capability.capability_key), resource_cell=resource_cell, provenance_requirements=requirements, required_input_artifact_ids=task.external_input_artifact_ids,
+                prepared_worker_environment=getattr(self, 'repair_worker_environment', None))
+            if isinstance(runner, ParentPreparedTaskRunner):
+                runner, context, contract = _prepare_parent_native_runner(runner, context, contract, native_preparer)
+                if isinstance(runner, ParentPreparedTaskRunner):
+                    raise ResourceAdmissionError('original native parent did not prepare a plain worker')
+            arguments = {'prepared_contract': contract, 'provenance_requirements': requirements, 'native_work_preparer': native_preparer}
+            if contract.native_effect:
+                prepared_parent_contract = contract
+                prepared_parent_contact = self._anticipated_native_contact(task, run_id=run_id, attempt_id=attempt_id, input_materialization_ids=context.input_materialization_ids, dependency_receipt_ids=context.dependency_receipt_ids)
+                if contract.expected_parent_contact != prepared_parent_contact:
+                    raise ResourceAdmissionError('prepared native invocation changes its anticipated contact')
+                if _prepared_native_work is not None:
+                    _prepared_native_work(contract.native_work)
+                if _finalizing_native_contact is None:
+                    arguments['native_entry'] = enter_native
+                else:
+                    if _finalizing_native_contact != prepared_parent_contact or type(contract.native_work) is not PreparedNativeWork or _finalization_scopes is None or (_finalization_guard is None):
+                        raise ResourceAdmissionError('parent finalization changes its original native work')
+                    store = self._native_subwork_progress(runner, _finalizing_native_contact, (*dependency_outputs, *external_inputs))
+                    scoped_store, _ = _finalization_scopes.enter_context(completed_native_parent_scope(store=store, work=contract.native_work))
+                    _finalization_guard(scoped_store.plane.require_verification_snapshot)
+                    arguments['native_subwork'] = scoped_store
+                    arguments['completed_native_work'] = contract.native_work
+            return arguments
+
+        def prepared_arguments(resource_cell=None):
+            return _prepared_arguments(resource_cell)
         try:
             if self.execution_resource_envelope_coordinator is not None:
                 cell_id = self._resource_envelope_cell_id(task.task_id)
                 assert self.execution_resource_envelope_id is not None
-                resource_spec = self.execution_resource_envelope_coordinator.current(
-                    self.execution_resource_envelope_id
-                ).spec.cell(cell_id)
+                resource_spec = self.execution_resource_envelope_coordinator.current(self.execution_resource_envelope_id).spec.cell(cell_id)
                 try:
                     validate_runner_resource_interface(runner, resource_spec)
                 except ValueError as error:
                     raise ResourceAdmissionError(str(error)) from error
-                projection_builder = getattr(runner, "jit_signature_projection", None)
+                projection_builder = getattr(runner, 'jit_signature_projection', None)
                 if callable(projection_builder):
                     observed_projection = projection_builder(context)
                     manifest = self.jit_graph_signature_manifest
-                    if (
-                        not isinstance(
-                            observed_projection,
-                            JitCellSignatureProjection,
-                        )
-                        or manifest is None
-                    ):
-                        raise ResourceAdmissionError(
-                            "native runner returned invalid JIT projection evidence"
-                        )
+                    if not isinstance(observed_projection, JitCellSignatureProjection) or manifest is None:
+                        raise ResourceAdmissionError('native runner returned invalid JIT projection evidence')
                     try:
                         manifest.require_projection(observed_projection)
                     except ValueError as error:
-                        raise ResourceAdmissionError(
-                            "native runner attempted an unmanifested JIT graph"
-                        ) from error
-                    if (
-                        observed_projection.cell_id != resource_spec.jit_cell_id
-                        or observed_projection.signature_sha256
-                        != resource_spec.jit_signature_sha256
-                    ):
-                        raise ResourceAdmissionError(
-                            "native runner JIT projection differs from its task cell"
-                        )
-                deadline_free_execute = getattr(
-                    self.executor,
-                    "execute_deadline_free",
-                    None,
-                )
+                        raise ResourceAdmissionError('native runner attempted an unmanifested JIT graph') from error
+                    if observed_projection.cell_id != resource_spec.jit_cell_id or observed_projection.signature_sha256 != resource_spec.jit_signature_sha256:
+                        raise ResourceAdmissionError('native runner JIT projection differs from its task cell')
+                deadline_free_execute = getattr(self.executor, 'execute_deadline_free', None)
                 if not callable(deadline_free_execute):
-                    raise ResourceAdmissionError(
-                        "resource execution plan requires a deadline-free executor"
-                    )
-                worker_group = self._task_worker_group(task)
+                    raise ResourceAdmissionError('resource execution plan requires a deadline-free executor')
+                worker_group = None if _finalizing_native_contact is not None else self._task_worker_group(task)
                 execution_kwargs: dict[str, object] = {}
                 if worker_group is not None:
-                    deadline_free_execute = getattr(self.executor, "execute_deadline_free_in_group")
-                    execution_kwargs["execution_group_id"] = worker_group
-                if (
-                    resource_spec.native_simulator_launch
-                    and self.campaign_elapsed_budget_coordinator is not None
-                ):
+                    deadline_free_execute = getattr(self.executor, 'execute_deadline_free_in_group')
+                    execution_kwargs['execution_group_id'] = worker_group
+                if resource_spec.native_simulator_launch and self.campaign_elapsed_budget_coordinator is not None and (_finalizing_native_contact is None):
                     if worker_group is not None:
-                        raise SchedulerConsistencyError(
-                            "native elapsed-governed work cannot use a reusable worker group"
-                        )
-                    deadline_free_execute = getattr(
-                        self.executor,
-                        "execute_deadline_free_until",
-                        None,
-                    )
+                        raise SchedulerConsistencyError('native elapsed-governed work cannot use a reusable worker group')
+                    deadline_free_execute = getattr(self.executor, 'execute_deadline_free_until', None)
                     if not callable(deadline_free_execute):
-                        raise ResourceAdmissionError(
-                            "campaign elapsed budget requires a hard-boundary executor"
-                        )
-                    execution_kwargs["hard_remaining_seconds"] = (
-                        self.campaign_elapsed_budget_coordinator.hard_remaining_seconds(
-                            at_utc=self.execution_envelope_event_clock.now_utc()
-                        )
-                    )
-                result = deadline_free_execute(
-                    runner,
-                    context,
-                    progress_contract=resource_spec.progress_liveness,
-                    progress_callback=lambda counter: self._record_resource_progress(
-                        task.task_id,
-                        attempt_id,
-                        counter,
-                    ),
-                    **execution_kwargs,
-                )
+                        raise ResourceAdmissionError('campaign elapsed budget requires a hard-boundary executor')
+                    execution_kwargs['hard_remaining_seconds'] = self.campaign_elapsed_budget_coordinator.hard_remaining_seconds(at_utc=self.execution_envelope_event_clock.now_utc())
+                prepared = prepared_arguments(resource_spec)
+                if prepared is not None:
+                    execution_kwargs.update(prepared)
+                else:
+                    if _finalizing_native_contact is not None:
+                        raise ResourceAdmissionError('parent finalization lacks its complete prepared invocation')
+                    _, native_progress = enter_native()
+                    if native_progress is not None:
+                        execution_kwargs['native_subwork'] = native_progress
+                result = deadline_free_execute(runner, context, progress_contract=None if _finalizing_native_contact is not None else resource_spec.progress_liveness, progress_callback=(lambda counter: None) if _finalizing_native_contact is not None else lambda counter: self._record_resource_progress(task.task_id, attempt_id, counter), **execution_kwargs)
             else:
-                result = self.executor.execute(
-                    runner,
-                    context,
-                    timeout_seconds=task.capability.requested_resources.wall_time_seconds,
-                )
+                execution_kwargs = prepared_arguments()
+                if execution_kwargs is None:
+                    if _finalizing_native_contact is not None:
+                        raise ResourceAdmissionError('parent finalization lacks its complete prepared invocation')
+                    _, native_progress = enter_native()
+                    execution_kwargs = {} if native_progress is None else {'native_subwork': native_progress}
+                result = self.executor.execute(runner, context, timeout_seconds=task.capability.requested_resources.wall_time_seconds, **execution_kwargs)
         finally:
+            if live_native_contact is not None:
+                retire = getattr(self.native_effect_contact_store, 'retire_live_creator', None)
+                if callable(retire):
+                    retire(live_native_contact)
             for port in input_ports:
                 try:
                     port.close()
-                except Exception as error:  # noqa: PERF203 - close every authorized port
+                except Exception as error:
                     if input_close_error is None:
                         input_close_error = error
             if input_close_error is not None:
@@ -4017,27 +4419,16 @@ class LocalScheduler:
                     for output in result.outputs:
                         if isinstance(output, StreamedTaskOutput):
                             output.source.close()
-                raise SchedulerConsistencyError(
-                    "worker input port could not be closed"
-                ) from input_close_error
+                raise SchedulerConsistencyError('worker input port could not be closed') from input_close_error
         assert result is not None
         return result
 
-    def _commit_runner_result(
-        self,
-        run_id: str,
-        task: ProtocolExecutionTask,
-        attempt_id: str,
-        dependency_outputs: tuple[VerifiedArtifactInput, ...],
-        external_inputs: tuple[VerifiedArtifactInput, ...],
-        result: RunnerResult,
-    ) -> CanonicalTaskReceipt:
+    def _commit_runner_result(self, run_id: str, task: ProtocolExecutionTask, attempt_id: str, dependency_outputs: tuple[VerifiedArtifactInput, ...], external_inputs: tuple[VerifiedArtifactInput, ...], result: RunnerResult, *, validate_retained_custody: Callable[[], None] | None=None) -> CanonicalTaskReceipt:
         try:
-            return self._publish_runner_result(
-                run_id, task, attempt_id, dependency_outputs, external_inputs, result
-            )
+            publication_arguments = {} if validate_retained_custody is None else {'validate_retained_custody': validate_retained_custody}
+            return self._publish_runner_result(run_id, task, attempt_id, dependency_outputs, external_inputs, result, **publication_arguments)
         except BaseException:
-            close_workers = getattr(self.executor, "close_run_workers", None)
+            close_workers = getattr(self.executor, 'close_run_workers', None)
             if callable(close_workers):
                 close_workers(run_id)
             raise
@@ -4050,197 +4441,12 @@ class LocalScheduler:
         dependency_outputs: tuple[VerifiedArtifactInput, ...],
         external_inputs: tuple[VerifiedArtifactInput, ...],
         result: RunnerResult,
+        *,
+        validate_retained_custody: Callable[[], None] | None = None,
     ) -> CanonicalTaskReceipt:
-        output_bytes = sum(
-            len(output.payload) if isinstance(output, TaskOutputPayload) else output.size_bytes
-            for output in result.outputs
-        )
-        if output_bytes > task.capability.requested_resources.output_bytes:
-            raise SchedulerConsistencyError("runner exceeded its frozen output-byte budget")
-        expected_output_ids = tuple(output.output_id for output in task.outputs)
-        observed_output_ids = tuple(output.output_id for output in result.outputs)
-        if observed_output_ids != expected_output_ids:
-            raise SchedulerConsistencyError("runner output ports differ from frozen task")
-        if not result.checks or not all(check.passed for check in result.checks):
-            raise SchedulerConsistencyError("runner output checks did not all pass")
-        self._validate_output_profiles(task, result)
-        self._validate_output_semantics(task, result)
-        payloads = {output.output_id: output for output in result.outputs}
-        write_requests: list[ArtifactWriteRequest | ArtifactStreamWriteRequest] = []
-        for spec in task.outputs:
-            payload = payloads[spec.output_id]
-            fallback_ceiling = (
-                VisibilityCeiling.most_restrictive(*spec.parent_visibility_ceilings)
-                if spec.parent_visibility_ceilings
-                else spec.visibility_ceiling
-            )
-            parents = [
-                ArtifactLineageParent(
-                    identity=ObjectIdentity.from_record(
-                        value.logical.logical_artifact_id,
-                        value.logical,
-                    ),
-                    visibility_ceiling=value.logical.visibility_ceiling,
-                    outcome_access=value.logical.outcome_access,
-                )
-                for value in external_inputs
-            ]
-            parents.extend(
-                ArtifactLineageParent(
-                    identity=ObjectIdentity.from_record(
-                        value.logical.logical_artifact_id,
-                        value.logical,
-                    ),
-                    visibility_ceiling=value.logical.visibility_ceiling,
-                    outcome_access=value.logical.outcome_access,
-                )
-                for value in dependency_outputs
-            )
-            if not parents and spec.parent_visibility_ceilings:
-                parents.append(
-                    ArtifactLineageParent(
-                        identity=ObjectIdentity.from_record(task.task_id, task),
-                        visibility_ceiling=fallback_ceiling,
-                        outcome_access=spec.outcome_access,
-                    )
-                )
-            lineage_parents = tuple(sorted(parents, key=lineage_parent_sort_key))
-            effective_outcome_access = derived_outcome_access(
-                spec.outcome_access,
-                *(parent.outcome_access for parent in lineage_parents),
-            )
-            parent_ceilings = tuple(parent.visibility_ceiling for parent in lineage_parents)
-            semantic_contract = self.output_semantic_contracts.get(
-                (
-                    task.capability.capability_key,
-                    task.capability.capability_version,
-                    spec.payload_schema,
-                    spec.profile,
-                )
-            )
-            semantic_validation = (
-                None
-                if semantic_contract is None
-                else semantic_contract.artifact_validation(
-                    task_id=task.task_id,
-                    output_id=spec.output_id,
-                )
-            )
-            if isinstance(payload, TaskOutputPayload):
-                write_requests.append(
-                    ArtifactWriteRequest(
-                        logical_artifact_id=spec.logical_artifact_id,
-                        relative_path=spec.relative_path,
-                        payload_schema=spec.payload_schema,
-                        profile=spec.profile,
-                        media_type=spec.media_type,
-                        publication_scope_id=(f"task-output-scope.{run_id}.{task.task_id}"),
-                        publication_scope_relative_root=f"runs/{run_id}",
-                        payload=payload.payload,
-                        visibility_ceiling=spec.visibility_ceiling,
-                        parent_visibility_ceilings=parent_ceilings,
-                        outcome_access=effective_outcome_access,
-                        logical_content_sha256=payload.logical_content_sha256,
-                        lineage_parents=lineage_parents,
-                        minimum_free_bytes=self.minimum_free_bytes,
-                        semantic_validation=semantic_validation,
-                    )
-                )
-            else:
-                maximum_chunk_bytes = min(
-                    STREAM_CHUNK_BYTES,
-                    task.capability.requested_resources.output_bytes,
-                )
-                write_requests.append(
-                    ArtifactStreamWriteRequest(
-                        logical_artifact_id=spec.logical_artifact_id,
-                        relative_path=spec.relative_path,
-                        payload_schema=spec.payload_schema,
-                        profile=spec.profile,
-                        media_type=spec.media_type,
-                        publication_scope_id=(f"task-output-scope.{run_id}.{task.task_id}"),
-                        publication_scope_relative_root=f"runs/{run_id}",
-                        chunks=payload.source.chunks(maximum_chunk_bytes),
-                        maximum_bytes=task.capability.requested_resources.output_bytes,
-                        maximum_chunk_bytes=maximum_chunk_bytes,
-                        expected_size_bytes=payload.size_bytes,
-                        expected_physical_sha256=payload.physical_sha256,
-                        visibility_ceiling=spec.visibility_ceiling,
-                        parent_visibility_ceilings=parent_ceilings,
-                        outcome_access=effective_outcome_access,
-                        logical_content_sha256=payload.logical_content_sha256,
-                        lineage_parents=lineage_parents,
-                        minimum_free_bytes=self.minimum_free_bytes,
-                        semantic_validation=semantic_validation,
-                    )
-                )
-        write_results = list(self.artifact_writer.write_batch(tuple(write_requests)))
-        if len(write_results) != len(task.outputs):
-            raise SchedulerConsistencyError("artifact writer returned another output batch shape")
-        for spec, payload, write_result in zip(
-            task.outputs,
-            result.outputs,
-            write_results,
-            strict=True,
-        ):
-            if isinstance(payload, StreamedTaskOutput):
-                if (
-                    write_result.materialization.size_bytes != payload.size_bytes
-                    or write_result.materialization.physical_sha256 != payload.physical_sha256
-                ):
-                    raise SchedulerConsistencyError(
-                        "streamed output identity changed before publication"
-                    )
-        ordered_results = tuple(
-            sorted(
-                write_results,
-                key=lambda item: item.materialization.materialization_id,
-            )
-        )
-        assurance_checks = (
-            ReceiptCheck(
-                f"execution-assurance-{self.assurance_profile.value.lower().replace('_', '-')}",
-                True,
-                (),
-            ),
-            *(
-                ReceiptCheck(code.lower().replace("_", "-"), True, ())
-                for code in self.assurance_codes
-            ),
-        )
-        receipt = CanonicalTaskReceipt(
-            receipt_id=f"receipt.{attempt_id}",
-            run_id=run_id,
-            task_id=task.task_id,
-            attempt_id=attempt_id,
-            implementation_commit=self.implementation_commit,
-            input_materialization_ids=self._input_materialization_ids(
-                dependency_outputs,
-                external_inputs,
-            ),
-            output_materializations=tuple(item.materialization for item in ordered_results),
-            output_logical_artifacts=tuple(item.logical for item in ordered_results),
-            checks=tuple(
-                sorted(
-                    (*result.checks, *assurance_checks),
-                    key=lambda value: value.check_id,
-                )
-            ),
-            operational_status=OperationalStatus.SUCCEEDED,
-            reason_codes=(),
-        )
-        output_visibility = VisibilityCeiling.most_restrictive(
-            *(output.visibility_ceiling for output in task.outputs)
-        )
-        self.receipt_store.commit(
-            receipt,
-            visibility_ceiling=output_visibility,
-            outcome_access=most_restrictive_outcome_access(
-                task.capability.requested_outcome_access,
-                *(item.logical.outcome_access for item in ordered_results),
-            ),
-        )
-        return receipt
+        return publish_runner_result(self, run_id, task, attempt_id,
+            dependency_outputs, external_inputs, result,
+            validate_retained_custody=validate_retained_custody)
 
     def _worker_inputs(
         self,
@@ -4294,14 +4500,18 @@ class LocalScheduler:
             raise ResourceAdmissionError(
                 "frozen input lacks read or outcome authority: " + ",".join(unauthorized)
             )
-        if budget <= 0:
+        if budget is not None and budget <= 0:
             raise ResourceAdmissionError("frozen inputs lack a positive source-scan budget")
         if self.input_port_factory is None:
             raise ResourceAdmissionError("bounded worker input ports are not composed")
-        if sum(value.materialization.size_bytes for value, _binding in inputs) > budget:
+        if (
+            budget is not None
+            and sum(value.materialization.size_bytes for value, _binding in inputs) > budget
+        ):
             raise ResourceAdmissionError("frozen inputs exceed the source-scan budget")
+        options = {} if self.before_input_member is None else {"before_member": self.before_input_member}
         result = self.input_port_factory.open_many(
-            tuple(value for value, _binding in inputs), bindings=bindings, maximum_bytes=budget
+            tuple(value for value, _binding in inputs), bindings=bindings, maximum_bytes=budget, **options
         )
         if tuple(port.binding for port in result) != bindings:
             for port in result:
@@ -4314,7 +4524,7 @@ class LocalScheduler:
         task: ProtocolExecutionTask,
         value: VerifiedArtifactInput,
     ) -> bool:
-        return planned_input_access_allowed(
+        if planned_input_access_allowed(
             task,
             value.logical.logical_artifact_id,
             value.logical.outcome_access,
@@ -4323,7 +4533,19 @@ class LocalScheduler:
                 task.barrier is BarrierKind.REVEAL
                 and BarrierKind.REVEAL in self.authorized_barriers
             ),
-        )
+        ):
+            return True
+        if (self.lane is PlanLane.DEVELOPMENT
+                and task.capability.requested_outcome_access is OutcomeAccess.DEVELOPMENT_VISIBLE
+                and value.logical.outcome_access is OutcomeAccess.EVALUATION_SEALED
+                and self.original_input_access_guard is not None):
+            try:
+                if self.original_input_access_guard(task, value) is not None:
+                    raise PermissionError("original input access guard must require access without returning a verdict")
+            except (PermissionError, ValueError, KeyError) as error:
+                raise ResourceAdmissionError("current original-input access refused") from error
+            return True
+        return False
 
     @staticmethod
     def _input_is_authorized(task: ProtocolExecutionTask, value: VerifiedArtifactInput) -> bool:
@@ -4445,73 +4667,11 @@ class LocalScheduler:
         dependency_outputs: tuple[VerifiedArtifactInput, ...],
         external_inputs: tuple[VerifiedArtifactInput, ...],
     ) -> None:
-        if (
-            receipt.run_id != run_id
-            or receipt.task_id != task.task_id
-            or receipt.attempt_id != attempt.attempt_id
-            or receipt.implementation_commit != self.implementation_commit
-            or receipt.operational_status is not OperationalStatus.SUCCEEDED
-        ):
-            raise SchedulerConsistencyError("task receipt identity differs from execution")
-        expected_inputs = self._input_materialization_ids(
-            dependency_outputs,
-            external_inputs,
-        )
-        if receipt.input_materialization_ids != expected_inputs:
-            raise SchedulerConsistencyError("task receipt input lineage differs")
-        expected_outputs = tuple(sorted(output.logical_artifact_id for output in task.outputs))
-        observed_outputs = tuple(
-            sorted(output.logical_artifact_id for output in receipt.output_materializations)
-        )
-        if expected_outputs != observed_outputs:
-            raise SchedulerConsistencyError("task receipt output identity differs")
-        if self.output_semantic_contracts:
-            logical_by_id = {
-                output.logical_artifact_id: output for output in receipt.output_logical_artifacts
-            }
-            for spec in task.outputs:
-                contract = self.output_semantic_contracts.get(
-                    (
-                        task.capability.capability_key,
-                        task.capability.capability_version,
-                        spec.payload_schema,
-                        spec.profile,
-                    )
-                )
-                if contract is None:
-                    raise SchedulerConsistencyError(
-                        "task receipt lacks a registered semantic contract"
-                    )
-                if (
-                    contract.capability_implementation_sha256
-                    != task.capability_implementation_sha256
-                ):
-                    raise SchedulerConsistencyError(
-                        "task receipt semantic validator differs from the frozen implementation"
-                    )
-                logical = logical_by_id.get(spec.logical_artifact_id)
-                expected_validation = contract.artifact_validation(
-                    task_id=task.task_id,
-                    output_id=spec.output_id,
-                )
-                if logical is None or logical.semantic_validation != expected_validation:
-                    raise SchedulerConsistencyError(
-                        "task receipt semantic validation differs from the frozen contract"
-                    )
-        verify_artifact_manifests(
-            self.artifact_writer,
-            tuple(
-                ArtifactManifest(
-                    logical=output.logical,
-                    materialization=output.materialization,
-                )
-                for output in (
-                    *dependency_outputs,
-                    *external_inputs,
-                    *self._receipt_outputs(receipt),
-                )
-            ),
-        )
+        validate_retained_receipt(receipt=receipt, run_id=run_id, task=task,
+            attempt_id=attempt.attempt_id,
+            implementation_commit=self._implementation_commit_for(task.task_id, attempt.attempt_id),
+            dependency_outputs=dependency_outputs, external_inputs=external_inputs,
+            artifact_writer=self.artifact_writer, output_semantic_contracts=self.output_semantic_contracts)
 
     @staticmethod
     def _input_materialization_ids(
@@ -4539,79 +4699,9 @@ class LocalScheduler:
                 "task has external inputs but no verified input resolver"
             )
         resolved = self.external_input_resolver.resolve(expected_ids)
-        observed_ids = tuple(input_.artifact_id for input_ in resolved)
-        if observed_ids != expected_ids:
-            raise SchedulerConsistencyError("resolved external inputs differ from the frozen task")
-        specs = {value.logical_artifact_id: value for value in task.external_inputs}
-        for input_ in resolved:
-            spec = specs[input_.artifact_id]
-            if (
-                spec.expected_content_sha256 is not None
-                and input_.logical.content_sha256 != spec.expected_content_sha256
-            ):
-                raise SchedulerConsistencyError(
-                    "resolved external input content identity differs from the frozen task"
-                )
-            if (
-                spec.expected_payload_schema is not None
-                and input_.logical.payload_schema != spec.expected_payload_schema
-            ):
-                raise SchedulerConsistencyError(
-                    "resolved external input schema differs from the frozen task"
-                )
-            if (
-                spec.expected_media_type is not None
-                and input_.logical.media_type != spec.expected_media_type
-            ):
-                raise SchedulerConsistencyError(
-                    "resolved external input media type differs from the frozen task"
-                )
-            if (
-                spec.expected_size_bytes is not None
-                and input_.materialization.size_bytes != spec.expected_size_bytes
-            ):
-                raise SchedulerConsistencyError(
-                    "resolved external input size differs from the frozen task"
-                )
-            if spec.identity_scope_sha256 is not None and not any(
-                parent.identity.object_fingerprint == spec.identity_scope_sha256
-                for parent in input_.logical.lineage_parents
-            ):
-                raise SchedulerConsistencyError(
-                    "resolved external input enclosing-scope identity differs"
-                )
-            if (
-                spec.expected_visibility_ceiling is not None
-                and input_.logical.visibility_ceiling is not spec.expected_visibility_ceiling
-            ):
-                raise SchedulerConsistencyError(
-                    "resolved external input visibility differs from the frozen task"
-                )
-            if (
-                spec.expected_outcome_access is not None
-                and input_.logical.outcome_access is not spec.expected_outcome_access
-            ):
-                raise SchedulerConsistencyError(
-                    "resolved external input outcome access differs from the frozen task"
-                )
-        config = next(
-            (
-                input_
-                for input_ in resolved
-                if input_.artifact_id == task.capability.config.artifact_id
-            ),
-            None,
-        )
-        if config is None:
-            raise SchedulerConsistencyError("task config artifact was not resolved")
-        if (
-            config.logical.content_sha256 != task.capability.config.content_sha256
-            or config.logical.payload_schema != task.capability.config.config_schema
-        ):
-            raise SchedulerConsistencyError(
-                "resolved config identity differs from the frozen capability config"
-            )
-        return resolved
+        return validate_resolved_external_inputs(task, resolved)
+
+
 
 
 class DurableExecutionEnvelopeStore(Protocol):
@@ -4937,6 +5027,10 @@ class DurableExecutionResourceEnvelopeStore(Protocol):
 
     def current(self, envelope_id: str) -> RunExecutionResourceEnvelope: ...
 
+    def ensure_launch_publication(
+        self, *, envelope_id: str, task_id: str, attempt_id: str
+    ) -> ArtifactWriteResult: ...
+
     def compare_and_append(
         self,
         *,
@@ -4950,6 +5044,30 @@ class DurableExecutionResourceEnvelopeCoordinator:
 
     def __init__(self, store: DurableExecutionResourceEnvelopeStore) -> None:
         self._store = store
+        self._incremental = False
+
+    def _for_execution(self):
+        """Confine mutable indexed state to the scheduler's operational owner.
+
+        The caller's coordinator and public load/current methods keep returning
+        immutable records. Custom stores keep the existing compare/append API.
+        """
+        from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+
+        if (type(self._store) is not ExternalExecutionResourceEnvelopeStore
+                or not self._store._supports_incremental()):
+            return self
+        operational = DurableExecutionResourceEnvelopeCoordinator(self._store)
+        operational._incremental = True
+        return operational
+
+    def ensure_launch_publication(
+        self, *, envelope_id: str, task_id: str, attempt_id: str
+    ) -> ArtifactWriteResult:
+        """Finish the derivative publication of an already durable launch."""
+        return self._store.ensure_launch_publication(
+            envelope_id=envelope_id, task_id=task_id, attempt_id=attempt_id
+        )
 
     def ensure_checkpoint(
         self,
@@ -5001,7 +5119,8 @@ class DurableExecutionResourceEnvelopeCoordinator:
         return envelope
 
     def _current(self, envelope_id: str) -> RunExecutionResourceEnvelope:
-        current = self._store.current(envelope_id)
+        current = (self._store._operational_current(envelope_id) if self._incremental
+            else self._store.current(envelope_id))
         if current.envelope_id != envelope_id:
             raise SchedulerConsistencyError(
                 "durable resource-envelope store returned a substitution"
@@ -5051,6 +5170,9 @@ class DurableExecutionResourceEnvelopeCoordinator:
         current: RunExecutionResourceEnvelope,
         updated: RunExecutionResourceEnvelope,
     ) -> RunExecutionResourceEnvelope:
+        if self._incremental:
+            self._store._compare_and_append_transition(expected=current, updated=updated)
+            return current
         if (
             updated.events[:-1] != current.events
             or updated.events[-1].sequence_number != len(current.events) + 1
@@ -5391,3 +5513,374 @@ class DurableExecutionResourceEnvelopeCoordinator:
                 reason_code=reason_code,
             ),
         )
+
+
+def publish_runner_result(
+    publisher,
+    run_id: str,
+    task: ProtocolExecutionTask,
+    attempt_id: str,
+    dependency_outputs: tuple[VerifiedArtifactInput, ...],
+    external_inputs: tuple[VerifiedArtifactInput, ...],
+    result: RunnerResult,
+    *,
+    validate_retained_custody: Callable[[], None] | None = None,
+) -> CanonicalTaskReceipt:
+    execution_commit = publisher._implementation_commit_for(task.task_id, attempt_id)
+    output_bytes = sum(
+        len(output.payload) if isinstance(output, TaskOutputPayload) else output.size_bytes
+        for output in result.outputs
+    )
+    if (
+        task.capability.requested_resources.output_bytes is not None
+        and output_bytes > task.capability.requested_resources.output_bytes
+    ):
+        raise SchedulerConsistencyError("runner exceeded its frozen output-byte budget")
+    expected_output_ids = tuple(output.output_id for output in task.outputs)
+    observed_output_ids = tuple(output.output_id for output in result.outputs)
+    if observed_output_ids != expected_output_ids:
+        raise SchedulerConsistencyError("runner output ports differ from frozen task")
+    if not result.checks or not all(check.passed for check in result.checks):
+        raise SchedulerConsistencyError("runner output checks did not all pass")
+    publisher._validate_output_profiles(task, result)
+    publisher._validate_output_semantics(task, result)
+    payloads = {output.output_id: output for output in result.outputs}
+    write_requests: list[ArtifactWriteRequest | ArtifactStreamWriteRequest] = []
+    for spec in task.outputs:
+        payload = payloads[spec.output_id]
+        fallback_ceiling = (
+            VisibilityCeiling.most_restrictive(*spec.parent_visibility_ceilings)
+            if spec.parent_visibility_ceilings
+            else spec.visibility_ceiling
+        )
+        parents = [
+            ArtifactLineageParent(
+                identity=ObjectIdentity.from_record(
+                    value.logical.logical_artifact_id,
+                    value.logical,
+                ),
+                visibility_ceiling=value.logical.visibility_ceiling,
+                outcome_access=value.logical.outcome_access,
+            )
+            for value in external_inputs
+        ]
+        parents.extend(
+            ArtifactLineageParent(
+                identity=ObjectIdentity.from_record(
+                    value.logical.logical_artifact_id,
+                    value.logical,
+                ),
+                visibility_ceiling=value.logical.visibility_ceiling,
+                outcome_access=value.logical.outcome_access,
+            )
+            for value in dependency_outputs
+        )
+        if not parents and spec.parent_visibility_ceilings:
+            parents.append(
+                ArtifactLineageParent(
+                    identity=ObjectIdentity.from_record(task.task_id, task),
+                    visibility_ceiling=fallback_ceiling,
+                    outcome_access=spec.outcome_access,
+                )
+            )
+        lineage_parents = tuple(sorted(parents, key=lineage_parent_sort_key))
+        effective_outcome_access = derived_outcome_access(
+            spec.outcome_access,
+            *(parent.outcome_access for parent in lineage_parents),
+        )
+        parent_ceilings = tuple(parent.visibility_ceiling for parent in lineage_parents)
+        semantic_contract = publisher.output_semantic_contracts.get(
+            (
+                task.capability.capability_key,
+                task.capability.capability_version,
+                spec.payload_schema,
+                spec.profile,
+            )
+        )
+        semantic_validation = (
+            None
+            if semantic_contract is None
+            else semantic_contract.artifact_validation(
+                task_id=task.task_id,
+                output_id=spec.output_id,
+            )
+        )
+        if isinstance(payload, TaskOutputPayload):
+            write_requests.append(
+                ArtifactWriteRequest(
+                    logical_artifact_id=spec.logical_artifact_id,
+                    relative_path=spec.relative_path,
+                    payload_schema=spec.payload_schema,
+                    profile=spec.profile,
+                    media_type=spec.media_type,
+                    publication_scope_id=(f"task-output-scope.{run_id}.{task.task_id}"),
+                    publication_scope_relative_root=f"runs/{run_id}",
+                    payload=payload.payload,
+                    visibility_ceiling=spec.visibility_ceiling,
+                    parent_visibility_ceilings=parent_ceilings,
+                    outcome_access=effective_outcome_access,
+                    logical_content_sha256=payload.logical_content_sha256,
+                    lineage_parents=lineage_parents,
+                    minimum_free_bytes=publisher.minimum_free_bytes,
+                    semantic_validation=semantic_validation,
+                )
+            )
+        else:
+            output_limit = task.capability.requested_resources.output_bytes
+            publication_limit = (
+                max(1, payload.size_bytes) if output_limit is None else output_limit
+            )
+            maximum_chunk_bytes = (
+                min(STREAM_CHUNK_BYTES, publication_limit)
+            )
+            write_requests.append(
+                ArtifactStreamWriteRequest(
+                    logical_artifact_id=spec.logical_artifact_id,
+                    relative_path=spec.relative_path,
+                    payload_schema=spec.payload_schema,
+                    profile=spec.profile,
+                    media_type=spec.media_type,
+                    publication_scope_id=(f"task-output-scope.{run_id}.{task.task_id}"),
+                    publication_scope_relative_root=f"runs/{run_id}",
+                    chunks=payload.source.chunks(maximum_chunk_bytes),
+                    maximum_bytes=publication_limit,
+                    maximum_chunk_bytes=maximum_chunk_bytes,
+                    expected_size_bytes=payload.size_bytes,
+                    expected_physical_sha256=payload.physical_sha256,
+                    visibility_ceiling=spec.visibility_ceiling,
+                    parent_visibility_ceilings=parent_ceilings,
+                    outcome_access=effective_outcome_access,
+                    logical_content_sha256=payload.logical_content_sha256,
+                    lineage_parents=lineage_parents,
+                    minimum_free_bytes=publisher.minimum_free_bytes,
+                    semantic_validation=semantic_validation,
+                )
+            )
+    if validate_retained_custody is not None:
+        validate_retained_custody()
+    write_results = list(publisher.artifact_writer.write_batch(tuple(write_requests)))
+    if len(write_results) != len(task.outputs):
+        raise SchedulerConsistencyError("artifact writer returned another output batch shape")
+    for spec, payload, write_result in zip(
+        task.outputs,
+        result.outputs,
+        write_results,
+        strict=True,
+    ):
+        if isinstance(payload, StreamedTaskOutput):
+            if (
+                write_result.materialization.size_bytes != payload.size_bytes
+                or write_result.materialization.physical_sha256 != payload.physical_sha256
+            ):
+                raise SchedulerConsistencyError(
+                    "streamed output identity changed before publication"
+                )
+    ordered_results = tuple(
+        sorted(
+            write_results,
+            key=lambda item: item.materialization.materialization_id,
+        )
+    )
+    assurance_checks = (
+        ReceiptCheck(
+            f"execution-assurance-{publisher.assurance_profile.value.lower().replace('_', '-')}",
+            True,
+            (),
+        ),
+        *(
+            ReceiptCheck(code.lower().replace("_", "-"), True, ())
+            for code in publisher.assurance_codes
+        ),
+    )
+    receipt = CanonicalTaskReceipt(
+        receipt_id=f"receipt.{attempt_id}",
+        run_id=run_id,
+        task_id=task.task_id,
+        attempt_id=attempt_id,
+        implementation_commit=execution_commit,
+        input_materialization_ids=publisher._input_materialization_ids(
+            dependency_outputs,
+            external_inputs,
+        ),
+        output_materializations=tuple(item.materialization for item in ordered_results),
+        output_logical_artifacts=tuple(item.logical for item in ordered_results),
+        checks=tuple(
+            sorted(
+                (*result.checks, *assurance_checks),
+                key=lambda value: value.check_id,
+            )
+        ),
+        operational_status=OperationalStatus.SUCCEEDED,
+        reason_codes=(),
+    )
+    output_visibility = VisibilityCeiling.most_restrictive(
+        *(output.visibility_ceiling for output in task.outputs)
+    )
+    if validate_retained_custody is not None:
+        validate_retained_custody()
+    publisher.receipt_store.commit(
+        receipt,
+        visibility_ceiling=output_visibility,
+        outcome_access=most_restrictive_outcome_access(
+            task.capability.requested_outcome_access,
+            *(item.logical.outcome_access for item in ordered_results),
+        ),
+    )
+    return receipt
+
+
+
+
+
+def validate_retained_receipt(*, receipt, run_id, task, attempt_id, implementation_commit,
+                              dependency_outputs, external_inputs, artifact_writer,
+                              output_semantic_contracts):
+    """Replay exact receipt/semantic/input custody without reserving or executing work."""
+    if (
+        receipt.run_id != run_id
+        or receipt.task_id != task.task_id
+        or receipt.attempt_id != attempt_id
+        or receipt.implementation_commit != implementation_commit
+        or receipt.operational_status is not OperationalStatus.SUCCEEDED
+    ):
+        raise SchedulerConsistencyError("task receipt identity differs from execution")
+    expected_inputs = LocalScheduler._input_materialization_ids(
+        dependency_outputs,
+        external_inputs,
+    )
+    if receipt.input_materialization_ids != expected_inputs:
+        raise SchedulerConsistencyError("task receipt input lineage differs")
+    expected_outputs = tuple(sorted(output.logical_artifact_id for output in task.outputs))
+    observed_outputs = tuple(
+        sorted(output.logical_artifact_id for output in receipt.output_materializations)
+    )
+    if expected_outputs != observed_outputs:
+        raise SchedulerConsistencyError("task receipt output identity differs")
+    if output_semantic_contracts:
+        logical_by_id = {
+            output.logical_artifact_id: output for output in receipt.output_logical_artifacts
+        }
+        for spec in task.outputs:
+            contract = output_semantic_contracts.get(
+                (
+                    task.capability.capability_key,
+                    task.capability.capability_version,
+                    spec.payload_schema,
+                    spec.profile,
+                )
+            )
+            if contract is None:
+                raise SchedulerConsistencyError(
+                    "task receipt lacks a registered semantic contract"
+                )
+            if (
+                contract.capability_implementation_sha256
+                != task.capability_implementation_sha256
+            ):
+                raise SchedulerConsistencyError(
+                    "task receipt semantic validator differs from the frozen implementation"
+                )
+            logical = logical_by_id.get(spec.logical_artifact_id)
+            expected_validation = contract.artifact_validation(
+                task_id=task.task_id,
+                output_id=spec.output_id,
+            )
+            if logical is None or logical.semantic_validation != expected_validation:
+                raise SchedulerConsistencyError(
+                    "task receipt semantic validation differs from the frozen contract"
+                )
+    verify_artifact_manifests(
+        artifact_writer,
+        tuple(
+            ArtifactManifest(
+                logical=output.logical,
+                materialization=output.materialization,
+            )
+            for output in (
+                *dependency_outputs,
+                *external_inputs,
+                *LocalScheduler._receipt_outputs(receipt),
+            )
+        ),
+    )
+
+
+
+def validate_resolved_external_inputs(task, resolved):
+    """Validate retained inputs against the same exact task contract as normal replay."""
+    expected_ids = task.external_input_artifact_ids
+    if not expected_ids:
+        return ()
+    observed_ids = tuple(input_.artifact_id for input_ in resolved)
+    if observed_ids != expected_ids:
+        raise SchedulerConsistencyError("resolved external inputs differ from the frozen task")
+    specs = {value.logical_artifact_id: value for value in task.external_inputs}
+    for input_ in resolved:
+        spec = specs[input_.artifact_id]
+        if (
+            spec.expected_content_sha256 is not None
+            and input_.logical.content_sha256 != spec.expected_content_sha256
+        ):
+            raise SchedulerConsistencyError(
+                "resolved external input content identity differs from the frozen task"
+            )
+        if (
+            spec.expected_payload_schema is not None
+            and input_.logical.payload_schema != spec.expected_payload_schema
+        ):
+            raise SchedulerConsistencyError(
+                "resolved external input schema differs from the frozen task"
+            )
+        if (
+            spec.expected_media_type is not None
+            and input_.logical.media_type != spec.expected_media_type
+        ):
+            raise SchedulerConsistencyError(
+                "resolved external input media type differs from the frozen task"
+            )
+        if (
+            spec.expected_size_bytes is not None
+            and input_.materialization.size_bytes != spec.expected_size_bytes
+        ):
+            raise SchedulerConsistencyError(
+                "resolved external input size differs from the frozen task"
+            )
+        if spec.identity_scope_sha256 is not None and not any(
+            parent.identity.object_fingerprint == spec.identity_scope_sha256
+            for parent in input_.logical.lineage_parents
+        ):
+            raise SchedulerConsistencyError(
+                "resolved external input enclosing-scope identity differs"
+            )
+        if (
+            spec.expected_visibility_ceiling is not None
+            and input_.logical.visibility_ceiling is not spec.expected_visibility_ceiling
+        ):
+            raise SchedulerConsistencyError(
+                "resolved external input visibility differs from the frozen task"
+            )
+        if (
+            spec.expected_outcome_access is not None
+            and input_.logical.outcome_access is not spec.expected_outcome_access
+        ):
+            raise SchedulerConsistencyError(
+                "resolved external input outcome access differs from the frozen task"
+            )
+    config = next(
+        (
+            input_
+            for input_ in resolved
+            if input_.artifact_id == task.capability.config.artifact_id
+        ),
+        None,
+    )
+    if config is None:
+        raise SchedulerConsistencyError("task config artifact was not resolved")
+    if (
+        config.logical.content_sha256 != task.capability.config.content_sha256
+        or config.logical.payload_schema != task.capability.config.config_schema
+    ):
+        raise SchedulerConsistencyError(
+            "resolved config identity differs from the frozen capability config"
+        )
+    return resolved

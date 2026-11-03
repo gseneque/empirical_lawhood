@@ -256,7 +256,7 @@ def bind_frozen_parent_input(
         }.get(resolved_access)
     ):
         raise ValueError("bound parent access differs from its frozen input slot")
-    if len(payload) > specification.maximum_size_bytes:
+    if specification.maximum_size_bytes is not None and len(payload) > specification.maximum_size_bytes:
         raise ValueError("bound parent record exceeds its frozen size")
     candidate_identity = ObjectIdentity.from_record(candidate.candidate_id, candidate)
     parent_identity = ObjectIdentity.from_record(parent_record_id, parent_record)
@@ -339,7 +339,7 @@ def instantiate_conditional_child(
     ):
         raise ValueError("conditional parent access differs from its frozen input slot")
     payload = parent_record.canonical_bytes()
-    if len(payload) > parent_input.maximum_size_bytes:
+    if parent_input.maximum_size_bytes is not None and len(payload) > parent_input.maximum_size_bytes:
         raise ValueError("conditional parent record exceeds its frozen size bound")
     parent_identity = ObjectIdentity.from_record(parent_record_id, parent_record)
     successor_identity = ObjectIdentity.from_record(

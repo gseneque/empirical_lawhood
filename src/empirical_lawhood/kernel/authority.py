@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import ClassVar
+from typing import ClassVar, Iterable
 
 from .evidence import OutcomeAccess
 from .serialization import (
@@ -58,36 +58,44 @@ _OUTCOME_ACCESS_RANK = {
 
 @dataclass(frozen=True, slots=True)
 class ResourceBudget(CanonicalRecord):
-    """Worst-case resource request or policy ceiling."""
+    """Resource request or policy ceiling; ``None`` means no selected limit.
+
+    CPU and GPU counts describe placement. Optional limits describe enforcement,
+    not an estimate of consumption. A finite authority ceiling never contains
+    an unlimited request.
+    """
 
     SCHEMA: ClassVar[str] = 'empirical-lawhood/kernel/resource-budget'
 
     cpu_cores: int
-    memory_bytes: int
+    memory_bytes: int | None
     gpu_devices: int
-    wall_time_seconds: int
-    source_scan_bytes: int
-    output_bytes: int
+    wall_time_seconds: int | None
+    source_scan_bytes: int | None
+    output_bytes: int | None
 
     def __post_init__(self) -> None:
+        if self.cpu_cores is None or self.cpu_cores <= 0:
+            raise ValueError("cpu_cores must be positive")
+        if self.gpu_devices is None or self.gpu_devices < 0:
+            raise ValueError("gpu_devices must be nonnegative")
         for name, value in (
-            ("cpu_cores", self.cpu_cores),
             ("memory_bytes", self.memory_bytes),
             ("wall_time_seconds", self.wall_time_seconds),
         ):
-            if value <= 0:
+            if value is not None and value <= 0:
                 raise ValueError(f"{name} must be positive")
         for name, value in (
-            ("gpu_devices", self.gpu_devices),
             ("source_scan_bytes", self.source_scan_bytes),
             ("output_bytes", self.output_bytes),
         ):
-            if value < 0:
+            if value is not None and value < 0:
                 raise ValueError(f"{name} must be nonnegative")
 
     def contains(self, requested: ResourceBudget) -> bool:
         return all(
-            requested_value <= ceiling_value
+            ceiling_value is None
+            or (requested_value is not None and requested_value <= ceiling_value)
             for requested_value, ceiling_value in (
                 (requested.cpu_cores, self.cpu_cores),
                 (requested.memory_bytes, self.memory_bytes),
@@ -96,6 +104,29 @@ class ResourceBudget(CanonicalRecord):
                 (requested.source_scan_bytes, self.source_scan_bytes),
                 (requested.output_bytes, self.output_bytes),
             )
+        )
+
+    @classmethod
+    def aggregate(cls, budgets: Iterable[ResourceBudget]) -> ResourceBudget:
+        """Combine sequential tasks, preserving every unlimited coordinate."""
+
+        values = tuple(budgets)
+        if not values:
+            raise ValueError("resource aggregation requires at least one budget")
+
+        def combine(name: str, *, total: bool = False) -> int | None:
+            limits = tuple(getattr(value, name) for value in values)
+            if None in limits:
+                return None
+            return sum(limits) if total else max(limits)
+
+        return cls(
+            cpu_cores=max(value.cpu_cores for value in values),
+            memory_bytes=combine("memory_bytes"),
+            gpu_devices=max(value.gpu_devices for value in values),
+            wall_time_seconds=combine("wall_time_seconds", total=True),
+            source_scan_bytes=combine("source_scan_bytes", total=True),
+            output_bytes=combine("output_bytes", total=True),
         )
 
 

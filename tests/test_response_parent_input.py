@@ -10,7 +10,7 @@ from empirical_lawhood.adapters.composition.prepared_response.dependent_input im
 from empirical_lawhood.adapters.composition.response_composition.input import ResponseCompositionInput, check_response_composition_input
 from empirical_lawhood.api.codecs import load_registered_authoring
 
-ROOT = Path(__file__).parents[1] / "experiments"
+ROOT = Path(__file__).parents[1] / "programmes/foundations/emergent-structure/workflows"
 
 
 def _dependent(route: str) -> PreparedResponseDependentInput:

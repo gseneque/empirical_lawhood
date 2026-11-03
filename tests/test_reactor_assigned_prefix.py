@@ -183,7 +183,7 @@ def test_assigned_panel_reaches_retained_projection_and_law_owners(tmp_path):
                 "synthetic.assigned",
                 "Synthetic development fixture",
                 str(root),
-                "/",
+                str(next(parent for parent in root.parents if parent.is_mount())),
                 OperatorStorageProfile.SCHEMA,
                 1,
                 None,

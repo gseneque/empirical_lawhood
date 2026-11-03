@@ -1,5 +1,6 @@
 """Exposed software fixtures for V3 custody/reconstruction and scientific controls."""
 
+from tests.prospective_source_capture_fixture import install_historical_source_capture
 from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
@@ -63,7 +64,8 @@ def plane(tmp_path):
     store = tmp_path / "synthetic-store"
     store.mkdir()
     return ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
-        "synthetic.rc-store", "synthetic RC software store", str(store), "/",
+        "synthetic.rc-store", "synthetic RC software store", str(store),
+        str(next(parent for parent in store.parents if parent.is_mount())),
         OperatorStorageProfile.SCHEMA, 1, None, None, (),
     )))
 
@@ -298,7 +300,7 @@ def test_full_phase_public_authoring_projection_and_installed_factory_proof(phas
     # public compiler, full-size graphs, codecs, factories and custody are real.
     closure = ImplementationSourceClosure("synthetic.source", SourceClosureKind.CLEAN_GIT_COMMIT,
         "0" * 40, "d" * 64, "e" * 64, True)
-    monkeypatch.setattr(application, "capture_clean_target_closure", lambda *args: closure)
+    install_historical_source_capture(monkeypatch, application, closure)
     monkeypatch.setattr(application, "resolve_authoring_directory", lambda directory, **kwargs: (directory, plane.root.contract))
     output = Path(plane.root.contract.canonical_path) / "authoring" / phase.value
     started = perf_counter()
@@ -493,7 +495,7 @@ def test_authoring_destination_refuses_before_source_or_prerequisite_reads(desti
         contacted.append("source closure")
         raise AssertionError("invalid output must refuse before upstream reads")
 
-    monkeypatch.setattr(application, "capture_clean_target_closure", source_contact)
+    monkeypatch.setattr(application, "_capture_prospective_source", source_contact)
     with pytest.raises((ValueError, FileExistsError)):
         application.author_rc_challenge_phase(root=ROOT, config=default_config(Phase.CANARY),
             external_records=(), output_dir=output, artifact_writer=plane)
@@ -519,7 +521,7 @@ def test_installed_codec_registry_remains_closed_at_declared_upper_bound():
 @pytest.mark.parametrize("writer", (None, object()))
 def test_authoring_requires_actual_guarded_plane_before_source_reads(writer, tmp_path, monkeypatch):
     contacted = []
-    monkeypatch.setattr(application, "capture_clean_target_closure", lambda *args: contacted.append(args))
+    monkeypatch.setattr(application, "_capture_prospective_source", lambda *args: contacted.append(args))
     with pytest.raises(TypeError, match="actual guarded external artifact plane"):
         application.author_rc_challenge_phase(root=ROOT, config=default_config(Phase.CANARY),
             external_records=(), output_dir=tmp_path / "unsupported-authoring", artifact_writer=writer)

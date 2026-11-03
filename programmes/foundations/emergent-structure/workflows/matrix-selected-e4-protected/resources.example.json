@@ -1,0 +1,175 @@
+{
+  "schema": "empirical-lawhood/matrix-experimental-programme/selected-operational-resources",
+  "value": {
+    "family": "PROTECTED",
+    "phase_budgets": [
+      [
+        "assess",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "gpu_devices": 0,
+            "memory_bytes": null,
+            "output_bytes": null,
+            "source_scan_bytes": null,
+            "wall_time_seconds": null
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "assess-programme",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "gpu_devices": 0,
+            "memory_bytes": null,
+            "output_bytes": null,
+            "source_scan_bytes": null,
+            "wall_time_seconds": null
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "entry",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "gpu_devices": 0,
+            "memory_bytes": null,
+            "output_bytes": null,
+            "source_scan_bytes": null,
+            "wall_time_seconds": null
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "frames",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "gpu_devices": 0,
+            "memory_bytes": null,
+            "output_bytes": null,
+            "source_scan_bytes": null,
+            "wall_time_seconds": null
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "history",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "gpu_devices": 0,
+            "memory_bytes": null,
+            "output_bytes": null,
+            "source_scan_bytes": null,
+            "wall_time_seconds": null
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "measure",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "gpu_devices": 0,
+            "memory_bytes": null,
+            "output_bytes": null,
+            "source_scan_bytes": null,
+            "wall_time_seconds": null
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "mechanical",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "gpu_devices": 0,
+            "memory_bytes": null,
+            "output_bytes": null,
+            "source_scan_bytes": null,
+            "wall_time_seconds": null
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "point",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "gpu_devices": 0,
+            "memory_bytes": null,
+            "output_bytes": null,
+            "source_scan_bytes": null,
+            "wall_time_seconds": null
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "project",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "gpu_devices": 0,
+            "memory_bytes": null,
+            "output_bytes": null,
+            "source_scan_bytes": null,
+            "wall_time_seconds": null
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "response-score",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "gpu_devices": 0,
+            "memory_bytes": null,
+            "output_bytes": null,
+            "source_scan_bytes": null,
+            "wall_time_seconds": null
+          },
+          "version": "1.0.0"
+        }
+      ],
+      [
+        "responses",
+        {
+          "schema": "empirical-lawhood/kernel/resource-budget",
+          "value": {
+            "cpu_cores": 1,
+            "gpu_devices": 0,
+            "memory_bytes": null,
+            "output_bytes": null,
+            "source_scan_bytes": null,
+            "wall_time_seconds": null
+          },
+          "version": "1.0.0"
+        }
+      ]
+    ],
+    "record_id": "resources.example.selected-protected"
+  },
+  "version": "1.0.0"
+}

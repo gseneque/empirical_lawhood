@@ -230,18 +230,17 @@ def _authenticate_current_source_completion(directory, *, manifest, allocation, 
 
 def prepare_matrix_source_configuration(*, config_id: str, allocation: MatrixAllocation,
                                         original_f: OriginalFiniteResponseLaw | None = None, project_root: Path | None = None):
-    """Bind an edited allocation to the actual current source/protocol owners."""
+    """Bind the selected implementation; checkout callers supply an explicit root."""
     from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source_records import (
         CurrentPreparationSourceConfig, MatrixPreparationSourceConfig, MatrixPreparationSourceProtocol,
     )
-    from empirical_lawhood.api.matrix_numerical_provenance import selected_dependency_lock_sha256
-    root = Path(__file__).resolve().parents[3] if project_root is None else project_root
-    lock = selected_dependency_lock_sha256(root)
+    from empirical_lawhood.infrastructure.numerical_provenance import observe_implementation_source
+    _, code, lock, _, _ = observe_implementation_source(project_root)
     if original_f is None:
         return MatrixPreparationSourceConfig(config_id, allocation.identity,
-            MatrixPreparationSourceProtocol(), current_preparation_code_sources_sha256(), dependency_lock_sha256=lock)
+            MatrixPreparationSourceProtocol(), code, dependency_lock_sha256=lock)
     return CurrentPreparationSourceConfig(config_id, allocation.identity, original_f.identity,
-        current_preparation_protocol_identity(), current_preparation_code_sources_sha256(), dependency_lock_sha256=lock)
+        current_preparation_protocol_identity(), code, dependency_lock_sha256=lock)
 
 
 def current_preparation_code_sources_sha256() -> str:

@@ -37,7 +37,7 @@ def _external(name: str) -> Path:
 
 def test_shipped_information_response_source_matches_bank_features_and_native_receiver() -> None:
     authoring = load_registered_authoring(
-        ROOT / "experiments/information-response/information-author.json",
+        ROOT / "programmes/foundations/emergent-structure/workflows/information-response/information-author.json",
         root_schemas={PreparedResponseNativeAuthoringInput.SCHEMA: PreparedResponseNativeAuthoringInput},
         maximum_bytes=16 * 1024,
     )

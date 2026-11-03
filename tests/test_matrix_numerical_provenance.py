@@ -2,6 +2,7 @@
 """Independent precontact drift refusals; no native campaign is performed."""
 
 from dataclasses import replace
+from hashlib import sha256
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -10,15 +11,77 @@ import pytest
 
 from empirical_lawhood.api import finite_operands, matrix_history_analysis
 from empirical_lawhood.api import matrix_numerical_provenance as provenance
+from empirical_lawhood.infrastructure import numerical_provenance as observation
 from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.kernel.serialization import canonical_json_bytes
 from tests.test_matrix_operand_transport import allocation
-from tests.test_matrix_history_public_api import plane as plane
+from tests.numerical_provenance_fixtures import numerical_plane
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class ProducerReached(Exception):
     pass
+
+
+@pytest.fixture
+def plane(tmp_path):
+    selected = numerical_plane(tmp_path / "exposed-software-store")
+    diagnostic = selected.root.diagnostic()
+    assert diagnostic.read_ready and diagnostic.write_ready, diagnostic
+    return selected
+
+
+def test_complete_source_inventory_has_no_additional_size_or_count_ceiling(tmp_path):
+    package = tmp_path / "package"
+    package.mkdir()
+    expected = {}
+    for index in range(8193):
+        name = f"source-{index:05d}.py"
+        raw = f"exposed software source {index}\n".encode()
+        (package / name).write_bytes(raw)
+        expected[name] = sha256(raw).hexdigest()
+    block = bytes(1024**2)
+    large_digest = sha256()
+    for _ in range(17):
+        large_digest.update(block)
+    # Sparse regular files cross both former byte ceilings without writing a
+    # large fixture into the checkout. Their complete actual bytes are hashed.
+    for index in range(16):
+        name = f"large-source-{index:02d}.data"
+        with (package / name).open("wb") as stream:
+            stream.truncate(17 * 1024**2)
+        expected[name] = large_digest.hexdigest()
+    cache = package / "__pycache__"
+    cache.mkdir()
+    (cache / "omitted.pyc").write_bytes(b"interpreter cache")
+    rows = provenance.numerical_package_sources(package)
+    assert rows == tuple(sorted(expected.items()))
+    record = NumericalProducingProvenance(
+        canonical_json_bytes({key: "software-fixture" for key in
+                              ("python", "numpy", "scipy", "system", "machine", "threadpools")}).decode(),
+        sha256(b"exposed software dependency lock").hexdigest(), rows,
+        sha256(canonical_json_bytes(rows)).hexdigest(), "a" * 40, False,
+    )
+    assert record.package_sources == rows
+    with pytest.raises(ValueError, match="producing bytes"):
+        replace(record, code_sources_sha256="0" * 64)
+    with pytest.raises(ValueError, match="producing bytes"):
+        replace(record, package_sources=(rows[0], *rows))
+
+
+def test_dependency_lock_has_no_additional_byte_ceiling(tmp_path):
+    lock = tmp_path / "uv.lock"
+    with lock.open("wb") as stream:
+        stream.truncate(17 * 1024**2)
+    expected = sha256()
+    for _ in range(17):
+        expected.update(bytes(1024**2))
+    assert provenance.selected_dependency_lock_sha256(tmp_path) == expected.hexdigest()
+    with lock.open("ab") as stream:
+        stream.write(b"changed lock")
+    assert provenance.selected_dependency_lock_sha256(tmp_path) != expected.hexdigest()
 
 
 def invocation(route, destination, writer, monkeypatch):
@@ -63,13 +126,13 @@ def test_drift_refuses_before_native_and_output(route, drift, tmp_path, monkeypa
     elif drift == "threadpool":
         monkeypatch.setattr("threadpoolctl.threadpool_info", lambda: [{"num_threads": 2}])
     elif drift == "lock":
-        monkeypatch.setattr(provenance, "selected_dependency_lock_sha256", lambda root: "0" * 64)
+        monkeypatch.setattr(observation, "selected_dependency_lock_sha256", lambda root: "0" * 64)
     else:
-        original = provenance.read_bounded_bytes
+        original = observation.read_bounded_bytes
         def changed(path, **kwargs):
             raw = original(path, **kwargs)
             return raw + b"\n# synthetic dependency drift\n" if Path(path).name == "gradients.py" else raw
-        monkeypatch.setattr(provenance, "read_bounded_bytes", changed)
+        monkeypatch.setattr(observation, "read_bounded_bytes", changed)
     with pytest.raises(ValueError):
         invoke()
     assert not tuple(destination.iterdir())

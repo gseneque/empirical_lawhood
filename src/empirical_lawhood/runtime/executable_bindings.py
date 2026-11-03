@@ -9,8 +9,9 @@ configuration.
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import StrEnum
+from types import MappingProxyType
 from typing import ClassVar, Protocol, cast, runtime_checkable
 
 from empirical_lawhood.kernel.provenance import ObjectIdentity
@@ -24,6 +25,7 @@ from empirical_lawhood.kernel.serialization import (
     validate_sha256,
     validate_stable_id,
 )
+from empirical_lawhood.planning.study_authoring import CapabilitySelection
 
 from .adjudication import ScientificAdjudicationOutputContract
 from .capabilities import CapabilityManifest, CapabilityRegistry
@@ -36,7 +38,9 @@ from .providers import (
     CampaignRuntimeProvider,
     CampaignRuntimeProviderRegistry,
     CapabilityOutputSemanticContract,
+    CapabilityWorkerPreparation,
     ExternalInputPayload,
+    validate_worker_preparations,
 )
 
 
@@ -278,6 +282,25 @@ class ExecutableCapabilityBinding(CanonicalRecord):
 
 
 @dataclass(frozen=True, slots=True)
+class ExternalConfigExecutableCapabilityBinding(ExecutableCapabilityBinding):
+    """Configs travel through exact task ports, never provider constructor records."""
+
+    SCHEMA: ClassVar[str] = 'empirical-lawhood/runtime/external-config-executable-capability-binding'
+
+    def __post_init__(self) -> None:
+        super(ExternalConfigExecutableCapabilityBinding, self).__post_init__()
+        if (self.role is not ExecutableBindingRole.CAMPAIGN_RUNTIME_PROVIDER
+            or self.accepted_profile_types or self.required_issued_payload_schemas
+            or self.required_authenticated_record_schemas or self.issued_decoder_registrations
+            or not self.required_platform_port_keys):
+            raise ValueError('external-config binding cannot capture issued constructor records')
+
+    @property
+    def construction_record_schema_ids(self) -> frozenset[str]:
+        return frozenset()
+
+
+@dataclass(frozen=True, slots=True)
 class ExecutableBindingContribution(CanonicalRecord):
     """One import-safe package descriptor containing only static bindings."""
 
@@ -285,7 +308,7 @@ class ExecutableBindingContribution(CanonicalRecord):
 
     contribution_id: str
     contribution_version: str
-    bindings: tuple[ExecutableCapabilityBinding, ...]
+    bindings: tuple[ExecutableCapabilityBinding | ExternalConfigExecutableCapabilityBinding, ...]
     grants_authority: bool = False
     embeds_scientific_payload: bool = False
 
@@ -403,7 +426,7 @@ class GeneratedExecutableBindingAggregate(CanonicalRecord):
     aggregate_version: str
     discovery_aggregate: ObjectIdentity
     contributions: tuple[ObjectIdentity, ...]
-    bindings: tuple[ExecutableCapabilityBinding, ...]
+    bindings: tuple[ExecutableCapabilityBinding | ExternalConfigExecutableCapabilityBinding, ...]
     availability: tuple[CapabilityExecutionAvailability, ...]
     grants_authority: bool = False
     embeds_scientific_payload: bool = False
@@ -851,10 +874,12 @@ class ExecutableCapabilityProviderFactoryRegistry:
                 raise ValueError(f"factory lacks the construction method for {binding.role}")
         self.aggregate = aggregate
         self._factories = factories
+        self._factories_by_id = MappingProxyType({value.binding.binding_id: value for value in factories})
+        self._binding_ids = identifiers
 
     @property
     def binding_ids(self) -> tuple[str, ...]:
-        return tuple(value.binding.binding_id for value in self._factories)
+        return self._binding_ids
 
     @property
     def capability_count(self) -> int:
@@ -866,10 +891,10 @@ class ExecutableCapabilityProviderFactoryRegistry:
 
     def factory(self, binding_id: str) -> ExecutableFactory:
         validate_stable_id(binding_id, field_name="binding_id")
-        for value in self._factories:
-            if value.binding.binding_id == binding_id:
-                return value
-        raise KeyError(f"no executable factory is registered for {binding_id}")
+        try:
+            return self._factories_by_id[binding_id]
+        except KeyError as error:
+            raise KeyError(f"no executable factory is registered for {binding_id}") from error
 
     def provider_factory(
         self,
@@ -961,6 +986,23 @@ class CompositeCampaignRuntimeProvider(CampaignRuntimeProvider):
         if registry != self.registry or registry.fingerprint() != self.registry_sha256:
             raise ValueError("composite provider registry identity differs")
 
+    def worker_preparations(
+        self,
+        registry: CapabilityRegistry,
+        execution_plan: ProtocolExecutionPlan | None = None,
+    ) -> tuple[CapabilityWorkerPreparation, ...]:
+        self._require_registry(registry)
+        values = []
+        for binding, provider in zip(self.bindings, self._providers, strict=True):
+            provided = validate_worker_preparations(provider.worker_preparations(registry), registry)
+            expected = CapabilitySelection(binding.capability_key, binding.capability_version,
+                binding.capability_implementation_sha256)
+            if any(value.selection != expected for value in provided):
+                raise ValueError("factory worker preparation ownership differs from its binding")
+            values.extend(provided)
+        return validate_worker_preparations(tuple(sorted(values,
+            key=lambda value: value.selection.selection_id)), registry, execution_plan)
+
     def _source_records_by_provider(
         self,
         source_records: tuple[CanonicalRecord, ...],
@@ -1032,7 +1074,7 @@ class CompositeCampaignRuntimeProvider(CampaignRuntimeProvider):
             for spec in task.external_inputs:
                 previous = seen_expected.get(spec.logical_artifact_id)
                 if previous is not None:
-                    if exact_specs[spec.logical_artifact_id] != spec:
+                    if replace(exact_specs[spec.logical_artifact_id], input_id=spec.input_id) != spec:
                         raise ValueError("composite providers disagree on exact shared external input")
                     if previous != owner:
                         selected = min(previous, owner)

@@ -822,7 +822,7 @@ wheels = [
 
 [[package]]
 name = "empirical-lawhood"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "alembic" },
@@ -842,6 +842,11 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
+battery-recursion = [
+    { name = "numpy" },
+    { name = "pybamm" },
+    { name = "scipy" },
+]
 build = [
     { name = "hatchling" },
 ]
@@ -892,6 +897,17 @@ reaction-response-simulators = [
 reactor-example = [
     { name = "numpy" },
 ]
+rubisco-electronic = [
+    { name = "h5py" },
+    { name = "numpy" },
+    { name = "pyscf", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux') or (platform_machine != 'x86_64' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (platform_machine != 'x86_64' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform != 'linux' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform != 'linux' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery')" },
+    { name = "scipy" },
+]
+rubisco-prediction = [
+    { name = "numpy" },
+    { name = "rapidfuzz" },
+    { name = "scipy" },
+]
 standard-discovery = [
     { name = "botorch" },
     { name = "scikit-learn" },
@@ -922,6 +938,11 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
+battery-recursion = [
+    { name = "numpy", specifier = "==2.4.6" },
+    { name = "pybamm", specifier = "==26.6.2.0" },
+    { name = "scipy", specifier = "==1.17.1" },
+]
 build = [{ name = "hatchling", specifier = "==1.32.4" }]
 dev = [
     { name = "coverage", specifier = ">=7.10,<8" },
@@ -966,6 +987,17 @@ reaction-response-simulators = [
     { name = "fipy", specifier = "==4.0.3" },
 ]
 reactor-example = [{ name = "numpy", specifier = "==2.4.6" }]
+rubisco-electronic = [
+    { name = "h5py", specifier = "==3.14.0" },
+    { name = "numpy", specifier = "==2.4.6" },
+    { name = "pyscf", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'", specifier = "==2.14.0" },
+    { name = "scipy", specifier = "==1.17.1" },
+]
+rubisco-prediction = [
+    { name = "numpy", specifier = "==2.4.6" },
+    { name = "rapidfuzz", specifier = "==3.14.3" },
+    { name = "scipy", specifier = "==1.17.1" },
+]
 standard-discovery = [
     { name = "botorch", specifier = "==0.18.1" },
     { name = "scikit-learn", specifier = ">=1.6,<1.8" },
@@ -3724,6 +3756,24 @@ wheels = [
 ]
 
 [[package]]
+name = "pyscf"
+version = "2.14.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "h5py", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux') or (platform_machine != 'x86_64' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (platform_machine != 'x86_64' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32' and extra != 'group-17-empirical-lawhood-mast-torax-response') or (sys_platform == 'linux' and extra != 'group-17-empirical-lawhood-mast-torax-response') or (sys_platform != 'linux' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform != 'linux' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform == 'emscripten' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform == 'emscripten' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform == 'win32' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform == 'win32' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery')" },
+    { name = "numpy", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux') or (platform_machine != 'x86_64' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (platform_machine != 'x86_64' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32' and extra != 'group-17-empirical-lawhood-mast-torax-response') or (sys_platform == 'linux' and extra != 'group-17-empirical-lawhood-mast-torax-response') or (sys_platform != 'linux' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform != 'linux' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform == 'emscripten' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform == 'emscripten' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform == 'win32' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform == 'win32' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery')" },
+    { name = "scipy", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux') or (platform_machine != 'x86_64' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (platform_machine != 'x86_64' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32' and extra != 'group-17-empirical-lawhood-mast-torax-response') or (sys_platform == 'linux' and extra != 'group-17-empirical-lawhood-mast-torax-response') or (sys_platform != 'linux' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform != 'linux' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform == 'emscripten' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform == 'emscripten' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform == 'win32' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform == 'win32' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery')" },
+    { name = "setuptools", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux') or (platform_machine != 'x86_64' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (platform_machine != 'x86_64' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32' and extra != 'group-17-empirical-lawhood-mast-torax-response') or (sys_platform == 'linux' and extra != 'group-17-empirical-lawhood-mast-torax-response') or (sys_platform != 'linux' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform != 'linux' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform == 'emscripten' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform == 'emscripten' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery') or (sys_platform == 'win32' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-open-simulators-gpu') or (sys_platform == 'win32' and extra == 'group-17-empirical-lawhood-mast-torax-response' and extra == 'group-17-empirical-lawhood-standard-discovery')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3b/76/4b4f33877f4ee460733bd8b9af64cb9c13be9d5111fb8f6357d227c2c908/pyscf-2.14.0.tar.gz", hash = "sha256:9b6ea3c2470baac9d0492d93b335542c04ab96277e79f1abcbe1cea0eb063c5f", size = 11565773, upload-time = "2026-07-18T22:50:28.053Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2f/6e/16109bef2ed8b276c954e5a951e14eaa501d8f79ee928b64bc6fd0d2b440/pyscf-2.14.0-py3-none-macosx_10_9_x86_64.whl", hash = "sha256:2f4964d64c5cbb7eaa363ed8a5d1b7cc8541f2008b9c3c81c22494d789fbcd33", size = 37156346, upload-time = "2026-07-18T22:27:48.81Z" },
+    { url = "https://files.pythonhosted.org/packages/48/ed/bb4aeb728505b4ce7edd55e9b2e35bcbd99ad0b0cae5c45b59e48b9ed62d/pyscf-2.14.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:a4bdc6f4155e258d78c90b4de0c88ab9260a45801264d6c471c3beec83a4da4c", size = 36492544, upload-time = "2026-07-18T22:24:50.025Z" },
+    { url = "https://files.pythonhosted.org/packages/89/f2/24c58dad0c33ab417c5a090695a6788292d5d4edceae59bad055e5377e92/pyscf-2.14.0-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:2c01234a5480e545e5e156d1fabe9b97264bf87ee274c62d14478ab9fe644100", size = 46031836, upload-time = "2026-07-19T00:57:07.889Z" },
+    { url = "https://files.pythonhosted.org/packages/88/30/8e48717aff32f11fd78f981192d0b567971eb285ea048414b7dac2a211cf/pyscf-2.14.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:37b0bccc55450311a55318cd643e851353331ddeab4fc0c0065e83c905e41502", size = 52848663, upload-time = "2026-07-18T22:49:58.707Z" },
+]
+
+[[package]]
 name = "pytest"
 version = "9.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3883,6 +3933,30 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ea/e1/33203651c73e126bba82788e3d7813330e987df1e3c31ab36f47dd5878d6/qdldl-0.1.9.post1-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e6d333d1de8f39ca3c34d0d88ee00a3d1b0d90f54dafad8d554b646c6110c7dd", size = 1453479, upload-time = "2026-02-19T16:47:48.252Z" },
     { url = "https://files.pythonhosted.org/packages/f9/c9/a3ac897afef956b0606e17baa680f9bd957304c7d85fc5dc46a6dcef55e5/qdldl-0.1.9.post1-cp311-cp311-win_amd64.whl", hash = "sha256:1f61b59fec8e5b9230bfa8dd471d6f5c2ae4ed8b3b63ca224def1e432325deb0", size = 102709, upload-time = "2026-02-19T16:47:49.468Z" },
     { url = "https://files.pythonhosted.org/packages/03/0a/ce73fc080931a9c7f7a5b018c07763fb940da38350f51474d7f1fe4314a6/qdldl-0.1.9.post1-cp311-cp311-win_arm64.whl", hash = "sha256:98a1da222112bd46fe14e2854aa43361203d488451ba300d08f8c9a43c5093e3", size = 98978, upload-time = "2026-02-19T16:47:50.396Z" },
+]
+
+[[package]]
+name = "rapidfuzz"
+version = "3.14.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d3/28/9d808fe62375b9aab5ba92fa9b29371297b067c2790b2d7cda648b1e2f8d/rapidfuzz-3.14.3.tar.gz", hash = "sha256:2491937177868bc4b1e469087601d53f925e8d270ccc21e07404b4b5814b7b5f", size = 57863900, upload-time = "2025-11-01T11:54:52.321Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/76/25/5b0a33ad3332ee1213068c66f7c14e9e221be90bab434f0cb4defa9d6660/rapidfuzz-3.14.3-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:dea2d113e260a5da0c4003e0a5e9fdf24a9dc2bb9eaa43abd030a1e46ce7837d", size = 1953885, upload-time = "2025-11-01T11:52:47.75Z" },
+    { url = "https://files.pythonhosted.org/packages/2d/ab/f1181f500c32c8fcf7c966f5920c7e56b9b1d03193386d19c956505c312d/rapidfuzz-3.14.3-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:e6c31a4aa68cfa75d7eede8b0ed24b9e458447db604c2db53f358be9843d81d3", size = 1390200, upload-time = "2025-11-01T11:52:49.491Z" },
+    { url = "https://files.pythonhosted.org/packages/14/2a/0f2de974ececad873865c6bb3ea3ad07c976ac293d5025b2d73325aac1d4/rapidfuzz-3.14.3-cp311-cp311-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:02821366d928e68ddcb567fed8723dad7ea3a979fada6283e6914d5858674850", size = 1389319, upload-time = "2025-11-01T11:52:51.224Z" },
+    { url = "https://files.pythonhosted.org/packages/ed/69/309d8f3a0bb3031fd9b667174cc4af56000645298af7c2931be5c3d14bb4/rapidfuzz-3.14.3-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:cfe8df315ab4e6db4e1be72c5170f8e66021acde22cd2f9d04d2058a9fd8162e", size = 3178495, upload-time = "2025-11-01T11:52:53.005Z" },
+    { url = "https://files.pythonhosted.org/packages/10/b7/f9c44a99269ea5bf6fd6a40b84e858414b6e241288b9f2b74af470d222b1/rapidfuzz-3.14.3-cp311-cp311-manylinux_2_31_armv7l.whl", hash = "sha256:769f31c60cd79420188fcdb3c823227fc4a6deb35cafec9d14045c7f6743acae", size = 1228443, upload-time = "2025-11-01T11:52:54.991Z" },
+    { url = "https://files.pythonhosted.org/packages/f2/0a/3b3137abac7f19c9220e14cd7ce993e35071a7655e7ef697785a3edfea1a/rapidfuzz-3.14.3-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:54fa03062124e73086dae66a3451c553c1e20a39c077fd704dc7154092c34c63", size = 2411998, upload-time = "2025-11-01T11:52:56.629Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/b6/983805a844d44670eaae63831024cdc97ada4e9c62abc6b20703e81e7f9b/rapidfuzz-3.14.3-cp311-cp311-musllinux_1_2_armv7l.whl", hash = "sha256:834d1e818005ed0d4ae38f6b87b86fad9b0a74085467ece0727d20e15077c094", size = 2530120, upload-time = "2025-11-01T11:52:58.298Z" },
+    { url = "https://files.pythonhosted.org/packages/b4/cc/2c97beb2b1be2d7595d805682472f1b1b844111027d5ad89b65e16bdbaaa/rapidfuzz-3.14.3-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:948b00e8476a91f510dd1ec07272efc7d78c275d83b630455559671d4e33b678", size = 4283129, upload-time = "2025-11-01T11:53:00.188Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/03/2f0e5e94941045aefe7eafab72320e61285c07b752df9884ce88d6b8b835/rapidfuzz-3.14.3-cp311-cp311-win32.whl", hash = "sha256:43d0305c36f504232f18ea04e55f2059bb89f169d3119c4ea96a0e15b59e2a91", size = 1724224, upload-time = "2025-11-01T11:53:02.149Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/99/5fa23e204435803875daefda73fd61baeabc3c36b8fc0e34c1705aab8c7b/rapidfuzz-3.14.3-cp311-cp311-win_amd64.whl", hash = "sha256:ef6bf930b947bd0735c550683939a032090f1d688dfd8861d6b45307b96fd5c5", size = 1544259, upload-time = "2025-11-01T11:53:03.66Z" },
+    { url = "https://files.pythonhosted.org/packages/48/35/d657b85fcc615a42661b98ac90ce8e95bd32af474603a105643963749886/rapidfuzz-3.14.3-cp311-cp311-win_arm64.whl", hash = "sha256:f3eb0ff3b75d6fdccd40b55e7414bb859a1cda77c52762c9c82b85569f5088e7", size = 814734, upload-time = "2025-11-01T11:53:05.008Z" },
+    { url = "https://files.pythonhosted.org/packages/c9/33/b5bd6475c7c27164b5becc9b0e3eb978f1e3640fea590dd3dced6006ee83/rapidfuzz-3.14.3-pp311-pypy311_pp73-macosx_10_15_x86_64.whl", hash = "sha256:7cf174b52cb3ef5d49e45d0a1133b7e7d0ecf770ed01f97ae9962c5c91d97d23", size = 1888499, upload-time = "2025-11-01T11:54:42.094Z" },
+    { url = "https://files.pythonhosted.org/packages/30/d2/89d65d4db4bb931beade9121bc71ad916b5fa9396e807d11b33731494e8e/rapidfuzz-3.14.3-pp311-pypy311_pp73-macosx_11_0_arm64.whl", hash = "sha256:442cba39957a008dfc5bdef21a9c3f4379e30ffb4e41b8555dbaf4887eca9300", size = 1336747, upload-time = "2025-11-01T11:54:43.957Z" },
+    { url = "https://files.pythonhosted.org/packages/85/33/cd87d92b23f0b06e8914a61cea6850c6d495ca027f669fab7a379041827a/rapidfuzz-3.14.3-pp311-pypy311_pp73-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:1faa0f8f76ba75fd7b142c984947c280ef6558b5067af2ae9b8729b0a0f99ede", size = 1352187, upload-time = "2025-11-01T11:54:45.518Z" },
+    { url = "https://files.pythonhosted.org/packages/22/20/9d30b4a1ab26aac22fff17d21dec7e9089ccddfe25151d0a8bb57001dc3d/rapidfuzz-3.14.3-pp311-pypy311_pp73-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1e6eefec45625c634926a9fd46c9e4f31118ac8f3156fff9494422cee45207e6", size = 3101472, upload-time = "2025-11-01T11:54:47.255Z" },
+    { url = "https://files.pythonhosted.org/packages/b1/ad/fa2d3e5c29a04ead7eaa731c7cd1f30f9ec3c77b3a578fdf90280797cbcb/rapidfuzz-3.14.3-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:56fefb4382bb12250f164250240b9dd7772e41c5c8ae976fd598a32292449cc5", size = 1511361, upload-time = "2025-11-01T11:54:49.057Z" },
 ]
 
 [[package]]

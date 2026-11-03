@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from bisect import bisect_left
 from dataclasses import InitVar, dataclass, replace
 from decimal import Decimal
 from enum import StrEnum
@@ -1124,6 +1125,10 @@ class NonTimeResourceBudget(CanonicalRecord):
 
     def __post_init__(self) -> None:
         validate_stable_id(self.budget_id, field_name="budget_id")
+        if any(getattr(self, name) is None for name in (
+            "cpu_cores", "memory_bytes", "output_bytes", "source_request_limit", "source_byte_limit",
+        )):
+            raise ValueError("issued execution envelopes require finite resource bounds")
         if self.cpu_cores <= 0 or self.memory_bytes <= 0 or self.output_bytes < 0:
             raise ValueError("non-time compute budget is invalid")
         if self.source_request_limit < 0 or self.source_byte_limit < 0:
@@ -1352,7 +1357,8 @@ class ExecutionResourceEnvelopeSpec(CanonicalRecord):
         if self.maximum_parallel_tasks <= 0 or self.aggregate_memory_ceiling_bytes <= 0:
             raise ValueError("resource envelope parallelism/memory ceiling is invalid")
         if any(
-            value.resource_budget.memory_bytes > self.aggregate_memory_ceiling_bytes
+            value.resource_budget.memory_bytes is None
+            or value.resource_budget.memory_bytes > self.aggregate_memory_ceiling_bytes
             for value in self.task_cells
         ):
             raise ValueError("task memory exceeds the aggregate envelope ceiling")
@@ -1424,9 +1430,9 @@ class ExecutionResourceEnvelopeSpec(CanonicalRecord):
                 raise ValueError("child token ceiling differs from exact maximum demand")
 
     def cell(self, cell_id: str) -> ExecutionResourceTaskCellSpec:
-        for value in self.task_cells:
-            if value.cell_id == cell_id:
-                return value
+        index = bisect_left(self.task_cells, cell_id, key=lambda value: value.cell_id)
+        if index < len(self.task_cells) and self.task_cells[index].cell_id == cell_id:
+            return self.task_cells[index]
         raise KeyError(cell_id)
 
     def cell_for_task(self, task_id: str) -> ExecutionResourceTaskCellSpec:
@@ -1485,6 +1491,7 @@ class ExecutionResourceEnvelopeState(StrEnum):
 
 
 class ExecutionResourceEnvelopeEventKind(StrEnum):
+    PURE_TASK_REPAIR = "PURE_TASK_REPAIR"
     ROSTER_BRANCH_SELECTED = "ROSTER_BRANCH_SELECTED"
     RESERVATION = "RESERVATION"
     LAUNCH = "LAUNCH"
@@ -1575,6 +1582,11 @@ class ExecutionResourceEnvelopeEvent(CanonicalRecord):
         }:
             if self.receipt is None or self.artifact is None or self.recovery_proof is None:
                 raise ValueError("recovery publication event lacks proven receipt/artifact")
+        elif self.kind is ExecutionResourceEnvelopeEventKind.PURE_TASK_REPAIR:
+            if (self.recovery_proof is None or self.recovery_proof.object_schema not in {
+                    'empirical-lawhood/runtime/retained-e3-control-repair',
+                    'empirical-lawhood/runtime/retained-e3-repair-continuation'}):
+                raise ValueError('pure repair event lacks its explicit retained E3 repair')
         elif self.recovery_proof is not None:
             raise ValueError("non-recovery event contains a recovery proof")
 
@@ -1735,15 +1747,7 @@ class RunExecutionResourceEnvelope(_ResourceEnvelopeEventIndex):
                 raise ValueError("resource-envelope events are not time ordered")
         specs = {value.cell_id: value for value in self.spec.task_cells}
         limits = {value.child_id: value for value in self.spec.child_token_limits}
-        expected_by_child: dict[str, tuple[int, int]] = {}
-        for child_id in limits:
-            child_cells = tuple(
-                value for value in self.cells if specs[value.cell_id].child_id == child_id
-            )
-            expected_by_child[child_id] = (
-                sum(value.physical_tokens_reserved for value in child_cells),
-                sum(value.retry_tokens_reserved for value in child_cells),
-            )
+        expected_by_child = _child_reservations(specs, limits, self.cells)
         for state in self.child_token_states:
             expected = expected_by_child[state.child_id]
             limit = limits[state.child_id]
@@ -1756,14 +1760,164 @@ class RunExecutionResourceEnvelope(_ResourceEnvelopeEventIndex):
                 raise ValueError("child-local resource token ceiling is exceeded")
 
     def cell(self, cell_id: str) -> ExecutionResourceCellState:
-        for value in self.cells:
-            if value.cell_id == cell_id:
-                return value
+        index = bisect_left(self.cells, cell_id, key=lambda value: value.cell_id)
+        if index < len(self.cells) and self.cells[index].cell_id == cell_id:
+            return self.cells[index]
         raise KeyError(cell_id)
+
+    def has_reserved_attempt(self, attempt_id: str) -> bool:
+        return any(attempt_id in value.attempt_ids for value in self.cells)
+
+    def cell_for_task(self, task_id: str) -> ExecutionResourceTaskCellSpec:
+        return self.spec.cell_for_task(task_id)
+
+
+@dataclass(frozen=True, slots=True)
+class _ResourceEnvelopeDelta:
+    """Private proposed update, never a serialized record or committed state."""
+
+    owner: _IndexedResourceEnvelope
+    event: ExecutionResourceEnvelopeEvent
+    cells: tuple[ExecutionResourceCellState, ...]
+    child_token_states: tuple[ChildResourceTokenState, ...]
+    roster_decisions: tuple[RosterCapacityDecision, ...] | None
+
+
+class _IndexedResourceEnvelope:
+    """Active projection of an authenticated journal, confined to its owner.
+
+    The same transition machine validates both this projection and immutable
+    records. Proposals do not mutate it; the journal commits them after fsync.
+    Public reads materialize the original record, with its complete validation.
+    """
+
+    def __init__(self, envelope: RunExecutionResourceEnvelope):
+        self.envelope_id = envelope.envelope_id
+        self.spec = envelope.spec
+        self.execution_plan = envelope.execution_plan
+        self._cells = {cell.cell_id: cell for cell in envelope.cells}
+        self._specs = {cell.cell_id: cell for cell in envelope.spec.task_cells}
+        self._tasks = {cell.task_id: cell for cell in envelope.spec.task_cells}
+        self._limits = {limit.child_id: limit for limit in envelope.spec.child_token_limits}
+        self._tokens = {row.child_id: row for row in envelope.child_token_states}
+        self._attempts = {attempt for cell in envelope.cells for attempt in cell.attempt_ids}
+        self.events = list(envelope.events)
+        self._event_index = {event.event_id: event for event in envelope.events}
+        self.roster_decisions = envelope.roster_decisions
+        self._snapshot = envelope
+
+    @property
+    def cells(self):
+        return self._cells.values()
+
+    def cell(self, cell_id):
+        return self._cells[cell_id]
+
+    def cell_for_task(self, task_id):
+        return self._tasks[task_id]
+
+    def has_reserved_attempt(self, attempt_id):
+        return attempt_id in self._attempts
+
+    def propose(self, *, event, cells, roster_decisions):
+        if event.sequence_number != len(self.events) + 1:
+            raise ValueError("resource-envelope append sequence differs")
+        if event.event_id in self._event_index:
+            raise ValueError("resource-envelope event identity is duplicated")
+        if self.events and parse_utc_timestamp(event.occurred_at_utc, field_name="occurred_at_utc") < parse_utc_timestamp(
+                self.events[-1].occurred_at_utc, field_name="occurred_at_utc"):
+            raise ValueError("resource-envelope events are not time ordered")
+        changed = tuple(cell for cell in cells if cell != self._cells[cell.cell_id])
+        totals = {}
+        for cell in changed:
+            previous = self.cell(cell.cell_id)
+            child = self._specs[cell.cell_id].child_id
+            old = totals.get(child, self._tokens[child])
+            totals[child] = replace(old,
+                physical_tokens_reserved=old.physical_tokens_reserved + cell.physical_tokens_reserved - previous.physical_tokens_reserved,
+                retry_tokens_reserved=old.retry_tokens_reserved + cell.retry_tokens_reserved - previous.retry_tokens_reserved)
+        for child, row in totals.items():
+            limit = self._limits[child]
+            if (row.physical_tokens_reserved > limit.physical_execution_token_limit
+                    or row.retry_tokens_reserved > limit.retry_token_limit):
+                raise ValueError("child-local resource token ceiling is exceeded")
+        return _ResourceEnvelopeDelta(self, event, changed,
+            tuple(totals[key] for key in sorted(totals) if totals[key] != self._tokens[key]), roster_decisions)
+
+    def commit(self, delta):
+        if delta.owner is not self or delta.event.sequence_number != len(self.events) + 1:
+            raise ValueError("resource-envelope compare-and-append conflict")
+        for cell in delta.cells:
+            previous = self._cells[cell.cell_id]
+            self._attempts.difference_update(previous.attempt_ids)
+            self._attempts.update(cell.attempt_ids)
+            self._cells[cell.cell_id] = cell
+        for row in delta.child_token_states:
+            self._tokens[row.child_id] = row
+        if delta.roster_decisions is not None:
+            self.roster_decisions = delta.roster_decisions
+        self.events.append(delta.event)
+        self._event_index[delta.event.event_id] = delta.event
+        self._snapshot = None
+
+    def materialize(self):
+        if self._snapshot is None:
+            self._snapshot = RunExecutionResourceEnvelope(self.envelope_id, self.spec,
+                self.execution_plan, tuple(self._cells.values()), self.roster_decisions,
+                tuple(self._tokens.values()), tuple(self.events))
+        return self._snapshot
+
+
+def _child_reservations(specs, child_ids, cells):
+    totals = {child_id: (0, 0) for child_id in child_ids}
+    for cell in cells:
+        child_id = specs[cell.cell_id].child_id
+        physical, retries = totals[child_id]
+        totals[child_id] = (physical + cell.physical_tokens_reserved,
+            retries + cell.retry_tokens_reserved)
+    return totals
 
 
 class RunExecutionResourceEnvelopeMachine:
     "Pure resource-envelope transitions; no transition reads a total elapsed-time target."
+
+    @classmethod
+    def repair_pure_task(cls, envelope, *, event_id, occurred_at_utc, cell_id, repair):
+        """Start one separate repair generation, retaining the entire old prefix.
+
+        The owning API authenticates the repair, terminal, failed PURE task and
+        complete receipt/non-entry census before calling this transition. Native
+        reservations, unknown work and any positive effect cost always refuse.
+        Frozen resource limits are never increased.
+        """
+        cell, spec = envelope.cell(cell_id), envelope.spec.cell(cell_id)
+        progress_repair = (type(repair) is ObjectIdentity
+            and repair.object_schema == 'empirical-lawhood/runtime/retained-e3-repair-continuation'
+            and repair.object_version == '2.0.0')
+        if (type(repair) is not ObjectIdentity or repair.object_schema not in {
+                'empirical-lawhood/runtime/retained-e3-control-repair',
+                'empirical-lawhood/runtime/retained-e3-repair-continuation'}
+                or spec.native_simulator_launch or spec.physical_execution_cost != 0
+                or cell.physical_tokens_reserved != 0 or cell.retry_tokens_reserved != 0
+                or spec.maximum_attempts != 1 or len(cell.attempt_ids) != 1
+                or cell.state is not ExecutionResourceEnvelopeState.RECEIPT_OBSERVED
+                or cell.last_operational_reason_code not in (
+                    ('RETRY_EXHAUSTION', 'PROVIDER_RUNNER_DEFECT') if progress_repair else ('RETRY_EXHAUSTION',))
+                or any(value is not None for value in (cell.first_valid_receipt,
+                    cell.published_artifact, cell.recovery_candidate_artifact, cell.recovery_proof))
+                or any(event.kind is ExecutionResourceEnvelopeEventKind.PURE_TASK_REPAIR
+                    and (event.cell_id != cell_id and not progress_repair or event.recovery_proof == repair
+                        or repair.object_schema == 'empirical-lawhood/runtime/retained-e3-control-repair')
+                    for event in envelope.events)):
+            raise ValueError('pure repair refuses completed, native, uncertain or repeated work')
+        updated = replace(cell, state=ExecutionResourceEnvelopeState.ISSUED,
+            attempt_ids=(), current_attempt_id=None, last_operational_reason_code=None,
+            last_progress_counter=None, last_progress_at_utc=None)
+        return cls._append(envelope, event=cls._event(envelope, event_id=event_id,
+            occurred_at_utc=occurred_at_utc, kind=ExecutionResourceEnvelopeEventKind.PURE_TASK_REPAIR,
+            cell_id=cell_id, from_state=cell.state, to_state=updated.state,
+            attempt_id=cell.current_attempt_id, recovery_proof=repair),
+            cells=cls._replace_cell(envelope, updated))
 
     @staticmethod
     def initial(
@@ -1821,19 +1975,13 @@ class RunExecutionResourceEnvelopeMachine:
         cells: tuple[ExecutionResourceCellState, ...],
     ) -> tuple[ChildResourceTokenState, ...]:
         specs = {value.cell_id: value for value in envelope.spec.task_cells}
+        totals = _child_reservations(specs,
+            (value.child_id for value in envelope.spec.child_token_limits), cells)
         return tuple(
             ChildResourceTokenState(
                 child_id=limit.child_id,
-                physical_tokens_reserved=sum(
-                    value.physical_tokens_reserved
-                    for value in cells
-                    if specs[value.cell_id].child_id == limit.child_id
-                ),
-                retry_tokens_reserved=sum(
-                    value.retry_tokens_reserved
-                    for value in cells
-                    if specs[value.cell_id].child_id == limit.child_id
-                ),
+                physical_tokens_reserved=totals[limit.child_id][0],
+                retry_tokens_reserved=totals[limit.child_id][1],
             )
             for limit in envelope.spec.child_token_limits
         )
@@ -1847,6 +1995,8 @@ class RunExecutionResourceEnvelopeMachine:
         cells: tuple[ExecutionResourceCellState, ...],
         roster_decisions: tuple[RosterCapacityDecision, ...] | None = None,
     ) -> RunExecutionResourceEnvelope:
+        if isinstance(envelope, _IndexedResourceEnvelope):
+            return envelope.propose(event=event, cells=cells, roster_decisions=roster_decisions)
         if event.sequence_number != len(envelope.events) + 1:
             raise ValueError("resource-envelope append sequence differs")
         return replace(
@@ -1865,6 +2015,8 @@ class RunExecutionResourceEnvelopeMachine:
         envelope: RunExecutionResourceEnvelope,
         updated: ExecutionResourceCellState,
     ) -> tuple[ExecutionResourceCellState, ...]:
+        if isinstance(envelope, _IndexedResourceEnvelope):
+            return (updated,)
         return tuple(
             updated if value.cell_id == updated.cell_id else value for value in envelope.cells
         )
@@ -1990,7 +2142,7 @@ class RunExecutionResourceEnvelopeMachine:
         cell = envelope.cell(cell_id)
         spec = envelope.spec.cell(cell_id)
         retry = bool(cell.attempt_ids)
-        if any(attempt_id in value.attempt_ids for value in envelope.cells):
+        if envelope.has_reserved_attempt(attempt_id):
             raise ValueError("resource-envelope attempt identity is already reserved")
         if retry:
             if (
@@ -2161,8 +2313,8 @@ class RunExecutionResourceEnvelopeMachine:
         if Decimal(str(elapsed.total_seconds())) < contract.maximum_no_progress_gap_seconds:
             raise ValueError("worker is still inside its no-progress qualification gap")
         reason = "WORKER_PROGRESS_STALLED"
-        if reason not in envelope.spec.allowlisted_retry_reason_codes:
-            raise ValueError("stalled-progress retry reason is not allowlisted")
+        # Record the observed failure even when another attempt is forbidden.
+        # Reservation independently enforces the retry allowlist and tokens.
         updated = replace(
             cell,
             state=ExecutionResourceEnvelopeState.RECEIPT_OBSERVED,
@@ -2810,6 +2962,8 @@ def replay_execution_resource_event(
                 **base,
                 **cell,
             )
+        elif event.kind is ExecutionResourceEnvelopeEventKind.PURE_TASK_REPAIR:
+            envelope = machine.repair_pure_task(envelope, repair=event.recovery_proof, **base, **cell)
         elif event.kind is ExecutionResourceEnvelopeEventKind.TERMINAL:
             envelope = machine.terminal(envelope, **base, **cell)
         elif event.kind is ExecutionResourceEnvelopeEventKind.RESOURCE_STOP:
@@ -2828,7 +2982,8 @@ def replay_execution_resource_event(
                 **base,
                 **cell,
             )
-    if envelope.events[-1] != event:
+    produced = envelope.event if isinstance(envelope, _ResourceEnvelopeDelta) else envelope.events[-1]
+    if produced != event:
         raise ValueError("reconstructed resource-envelope event bytes differ")
     return envelope
 

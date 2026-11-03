@@ -1,0 +1,177 @@
+{
+  "schema": "empirical-lawhood/documentation/ai-usage-summary",
+  "schema_version": "1.1",
+  "prepared_on": "2026-11-03",
+  "account": "Documented retained Codex usage for EL-related sessions",
+  "period": {
+    "since_utc": "2026-06-27T14:00:00Z",
+    "until_utc": "2026-11-02T10:43:02.663983+00:00",
+    "timezone": "Australia/Sydney",
+    "since_local": "2026-06-28T00:00:00+10:00",
+    "until_local": "2026-11-02T21:43:02.663983+11:00",
+    "interval": "[since, until)"
+  },
+  "period_total_tokens": 69861356978,
+  "period_models": [
+    {
+      "model_or_service": "gpt-5.6-sol",
+      "total_tokens": 29936326054
+    },
+    {
+      "model_or_service": "gpt-6.1-sol",
+      "total_tokens": 27254472413
+    },
+    {
+      "model_or_service": "gpt-6-astra",
+      "total_tokens": 9862431536
+    },
+    {
+      "model_or_service": "gpt-6-sol",
+      "total_tokens": 1549969285
+    },
+    {
+      "model_or_service": "codex-auto-review",
+      "total_tokens": 1247750710
+    },
+    {
+      "model_or_service": "gpt-5.3-codex-spark",
+      "total_tokens": 5480605
+    },
+    {
+      "model_or_service": "gpt-5.6-luna",
+      "total_tokens": 4926375
+    }
+  ],
+  "accounting": {
+    "total_definition": "input_tokens + output_tokens",
+    "cached_input": "Already included in input_tokens; do not add again",
+    "reasoning_output": "Already included in output_tokens; do not add again",
+    "model_allocation": "Recorded labels plus allocations under the 52 existing approved inference rules",
+    "approved_inference_rules": 52,
+    "derived_unknown_model_tokens": 0,
+    "complete_billable_coverage": false,
+    "coverage_note": "EL-session scope is recorded separately from receipt completeness. Historical missing request receipts remain unresolved.",
+    "recorded_unknown_model_tokens": 1925242371,
+    "matched_inference_rules": 52
+  },
+  "intervention_review": {
+    "since_date": "2026-10-10",
+    "until_utc": "2026-11-02T10:43:02.663983+00:00",
+    "selected_instructions": 34,
+    "threads": 17,
+    "selection_groups": {
+      "goal_and_priority": 12,
+      "concrete_method": 12,
+      "bounded_control": 10
+    },
+    "model_contexts": {
+      "gpt-6.1-sol": 19,
+      "gpt-6-astra": 15
+    },
+    "selected_stop_or_pause_requests": 6,
+    "consistent_stop_or_pause_outcomes": 6,
+    "returned_paused_goal_states": 4,
+    "finding": "Instructions often changed local actions; acknowledgement, active goals, work orders, executable prerequisites and delivered artifacts could diverge. Local change did not ensure completion of the larger task.",
+    "scope": "EL-related subset of the purposive observational contrast sample, with linked cases and different tasks. Earlier prompt analysis exposed some follow-up. No population success rate or causal model ranking is established.",
+    "selected_case_ids": [
+      "I010",
+      "I011",
+      "I015",
+      "I032",
+      "I045",
+      "I079",
+      "I090",
+      "I091",
+      "I099",
+      "I105",
+      "I110",
+      "I115",
+      "I122",
+      "I123",
+      "I151",
+      "I153",
+      "I159",
+      "I171",
+      "I173",
+      "I186",
+      "I190",
+      "I201",
+      "I247",
+      "I249",
+      "I255",
+      "I286",
+      "I293",
+      "I300",
+      "I338",
+      "I348",
+      "I365",
+      "I378",
+      "I379",
+      "I380"
+    ]
+  },
+  "sources": [
+    {
+      "filename": "EL_USAGE_2026-11-02.json",
+      "retained_packet": "ai-usage-el-scope-20261103-01",
+      "role": "Explicit EL session selection and independently reconciled usage",
+      "bytes": 202401,
+      "sha256": "c6eccdc9e9938d3dc1446e2ea30017525064e5345340c3ecf8a26d593457ad52"
+    },
+    {
+      "filename": "EL_INTERVENTIONS_2026-11-02.json",
+      "retained_packet": "ai-usage-el-scope-20261103-01",
+      "role": "EL-related intervention cases",
+      "bytes": 1063,
+      "sha256": "eaf03bdfd143862441bac669fc1e5487a1888d2e24f982ce4850faf99d6c1b90"
+    }
+  ],
+  "source_availability": "Selected EL records and their original source bindings are retained in the local acceptance packet; original session logs are not included in this repository.",
+  "historical_snapshot": {
+    "path": "ai-usage.json",
+    "cutoff_utc": "2026-10-02T09:00:00.000Z",
+    "scope": "Earlier EL-project unique-response-ID subtotal with different coverage",
+    "sha256": "9dc20d18eff398ff8cf30522616ce66857614d3de57233e5189752bbe276de0b"
+  },
+  "period_usage": {
+    "input_tokens": 69610959896,
+    "cached_input_tokens": 68060050944,
+    "output_tokens": 250397082,
+    "reasoning_output_tokens": 90648936,
+    "total_tokens": 69861356978,
+    "cache_write_input_tokens": 0
+  },
+  "el_scope": {
+    "selection": "Original initial directories for the two main EL repositories, named Rubisco directories and blog, plus the verified EL E4 chat and their recorded descendants.",
+    "included_session_groups": [
+      {
+        "group": "icf-yolo",
+        "total_tokens": 34969121880
+      },
+      {
+        "group": "empirical_lawhood",
+        "total_tokens": 33736775577
+      },
+      {
+        "group": "Reviewed EL E4 chat and descendants",
+        "total_tokens": 332421192
+      },
+      {
+        "group": "Rubisco working directory",
+        "total_tokens": 738743815
+      },
+      {
+        "group": "Rubisco worktree",
+        "total_tokens": 80192279
+      },
+      {
+        "group": "EL blog",
+        "total_tokens": 4102235
+      }
+    ],
+    "owners_with_usage": 2147,
+    "ledger_atoms": 455163,
+    "selected_ledger_lines_sha256": "f0fd2a91d8077dca795d1d751b3b5f64789b709494222450d19808bb0d113eb1",
+    "coverage": "Subtotal for the explicitly identified EL sessions. Other directories are outside this selection."
+  }
+}

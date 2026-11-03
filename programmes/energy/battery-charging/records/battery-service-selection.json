@@ -1,0 +1,277 @@
+{
+  "OEM_values": {
+    "OEM_deadline_seconds": null,
+    "chosen_voltage_control_cap_V": "4.20;do not spend positive tolerance as extra overvoltage allowance",
+    "deadline_source": "OEM refers to separate charger manual; no numeric deadline found. Selected900s is researcher service opportunity,not OEM standard full-charge time.",
+    "exact_model": "INR21700 M50 18.20Wh; M50LT/M50T are not aliases.",
+    "max_voltage_spec_V": "4.20 +/-0.05",
+    "nominal_shipping_SOC": "0.30",
+    "rated_capacity_implied_Ah": "4.85 (1.455/0.3), not substituted for Chen2020 nominal 5.0.",
+    "standard_current_A": "1.455",
+    "standard_mode": "CC to 4.2 V, then CV to 0.050 A cutoff.",
+    "standard_test_temperature_C": [
+      "23",
+      "27"
+    ],
+    "temperature_ambiguity": "The table higher-current row extends to 50 C; handling limits charge to 0\u201345 C. Select their intersection and lower current at 25 C. OEM temperature measurement location is unresolved; modeled volume mean supplies no physical safety certificate.",
+    "temperature_current_tiers": [
+      {
+        "max_magnitude_A": "1.455",
+        "range_C": "0<=T<=25"
+      },
+      {
+        "max_magnitude_A": "3.395",
+        "range_C": "25<T<=45"
+      }
+    ]
+  },
+  "actual_cost": {
+    "CPU_seconds": null,
+    "downloaded_primary_PDF_in_memory_bytes": 576273,
+    "environment_syncs": 0,
+    "native_contacts": 0,
+    "note": "Inspection and researcher expense unmetered: unknown, not zero. No historical cost reset. Existing read-only cap remains 300 CPU s / 600 wall s / 1 GiB / 5 MiB.",
+    "peak_memory_bytes": null,
+    "scientific_CSV_values_read": 0,
+    "setup_repairs": 0,
+    "wall_seconds": null
+  },
+  "additional_source_manifest": [
+    {
+      "bytes": 7097,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm/parameters/geometric_parameters.py",
+      "sha256": "4609bf6e420494d76e58102fbc43222778ceaa10bc167a2b054c642df436aff9"
+    },
+    {
+      "bytes": 3215,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm/models/full_battery_models/lithium_ion/spme.py",
+      "sha256": "3a5a1b870be8f88cdd510f3dc131731029d89b304c68b5d2f4b7084781304543"
+    },
+    {
+      "bytes": 5536,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm/models/full_battery_models/lithium_ion/dfn.py",
+      "sha256": "84711c3ac78beac3c4de102f043549d8ffb11f6a1411c47ce47d0e4488c8a00c"
+    },
+    {
+      "bytes": 15261,
+      "path": "/home/chevre/gs-ml/empirical_lawhood/.venv/lib/python3.11/site-packages/pybamm/experiment/step/steps.py",
+      "sha256": "646840589957343587ab23916718dc5d3a5d645116d238c4fdfb23606e849d08"
+    }
+  ],
+  "authority": "Selection proposal for coordinator freeze; no issued scientific protocol, native launch or source/model qualification.",
+  "comparison": {
+    "adaptive_whole_inquiry": "Temperature-aware direct-model CC/CV with equal ordinary telemetry, supported current tiers, geometry reconfiguration and qualification opportunities; implement only if the premise opens an inquiry.",
+    "competence": "Permit every ordinary history and nominal model. If CC reaches 4.2 V, retain competent CV continuation through supported native Experiment/voltage-control interfaces; early CC stopping alone does not establish conventional failure.",
+    "failure_choice": "Retain numerical, source, deadline, voltage and thermal reasons. A missing CV tail or adaptive allowed current leaves competent control unevaluated. Only a surviving consequential distinction can justify freezing a minimal supported supplier and independent assessment.",
+    "first_eligible_common_policy": "Manufacturer-standard CC/CV: 1.455 A charging, live voltage/temperature/current protections, 4.2 V regulation, 50 mA termination.",
+    "meaningful_alternative": "Ordinary standard CC/CV without an additional supplier, using corrected geometry. One implementation may supply distinct cost/attribution estimands.",
+    "no_retuning": "If a competent common policy meets service for both preparations, close solved/non-discriminating. Do not add a harder deadline, higher charge target, extra receiver or new thermal condition to force a gap.",
+    "supplier_status": "No supplier selected before consequential inadequacy. Correct geometry is initial knowledge available to all arms."
+  },
+  "date": "2026-10-11",
+  "disposition": "CONCRETE_PREMISE_SELECTED_NATIVE_ENTRY_PENDING_TYPED_ROUTE",
+  "geometry_gate": {
+    "historical_effective_area_m2": "0.2060606320",
+    "historical_effective_volume_m3": "0.000020622160",
+    "historical_owner": "BatteryElectrothermalDenominator.__post_init__ and _source_options in pybamm_electrothermal_hierarchy.py require pouch geometry.",
+    "historical_results": "V8B/V8C/V8D retain original pouch scope; no automatic transfer of thermal or restart qualification.",
+    "inference": "The large source cooling-geometry difference requires qualification of the arbitrary denominator. Its ratio alone proves no charging failure or decision advantage.",
+    "meaning": "Historical pouch computes cooling A/V from single-layer unrolled dimensions. The actual Chen2020 A/V fields listed previously are not active in those runs.",
+    "pouch_to_actual_A_over_V_ratio": "45.53881447640545554831342384",
+    "selected_actual_area_m2": "0.00531",
+    "selected_actual_volume_m3": "0.0000242"
+  },
+  "next_action": "Coordinatorreview/freezepre-outputselectionthenimplementonlymissingboundedtypedsource/modelinterfaceandresource/authority/custodygatesbeforeD1premisecontact. NoELadvantageorchargingfailureclaimedhere.",
+  "premise_execution_proposal": {
+    "launch_gates": [
+      "Coordinator freezes service, resources, producing source and selected output root.",
+      "A narrow strict selected input and actual model options are supported before contact.",
+      "Actual authority, storage/custody and resource preflight pass.",
+      "Independent service assessment and complete failure terminals are bound.",
+      "Competent CC/CV or permitted current adaptation remains available when required."
+    ],
+    "native_budget_proposed": {
+      "attempts": 1,
+      "cpu_seconds": 300,
+      "maximum_native_solves": 3,
+      "memory_bytes": 1073741824,
+      "output_bytes": 67108864,
+      "setup_repairs": 0,
+      "wall_seconds": 600,
+      "workers": 1
+    },
+    "nested_temperature_preparations": 2,
+    "not_authorized_here": true,
+    "numerical_decision": "Compare the independent realized-current integral with capacity. A tighter same-model/same-mesh view checks forward integration only. Do not borrow V8D 5 mK materiality. Whole-time bounds require supported events/enclosures; otherwise retain UNEVALUABLE. The allowance cannot expand after failure.",
+    "physical_independent_units": 0,
+    "primary_view": {
+      "atol": "0.000001",
+      "mesh_points_each_x_n_x_s_x_p_r_n_r_p": 20,
+      "output_interval_seconds": "10",
+      "rtol": "0.00001",
+      "solver": "Casadi-safe"
+    },
+    "simulated_parameter_families": 1,
+    "solves": [
+      "23 C standard-CC900 primary",
+      "27 C standard-CC900 primary",
+      "One nested tighter 23 C view, only if required for numerical assessment; no new independent unit."
+    ],
+    "tighter_view": {
+      "atol": "0.00000001",
+      "mesh_points_each_x_n_x_s_x_p_r_n_r_p": 20,
+      "output_interval_seconds": "1",
+      "rtol": "0.0000001",
+      "solver": "Casadi-safe"
+    }
+  },
+  "primary_sources": [
+    {
+      "authorship": "LG Chem product specification, document LRB-PS-CY18.2Wh-M50, 2016-08-23, Tentative; third-party mirror.",
+      "bytes": 576273,
+      "limit": "Historical tentative manufacturer-authored specification, not authenticated current OEM approval or charger manual.",
+      "pages": [
+        4,
+        6,
+        10,
+        11
+      ],
+      "raw_retained": false,
+      "sha256": "a8d895143a55e0beae273f2c94eb4f3038857f19cc190ea2048f825e77a76f6a",
+      "url": "https://www.lithiumelements.com/wp-content/uploads/2023/07/m50.pdf"
+    },
+    {
+      "identity": "Chen et al. 2020 validation data, v1, 15 May 2020.",
+      "limits": "CSV request429; DOI publisher fetch denied. No observed values used to choose service.",
+      "members": [
+        {
+          "md5": "0bbf959cbfc367296ec69d7a74d2f5c1",
+          "name": "LGM50_cell02.csv"
+        },
+        {
+          "md5": "a09cbd8eff0af55dfe9bc8728fa89908",
+          "name": "LGM50_cell03.csv"
+        },
+        {
+          "md5": "f17615476283d2e15087165697ff9d7c",
+          "name": "LGM50_cell04.csv"
+        }
+      ],
+      "payloads_acquired": false,
+      "scope": "Three LG M50 cells: CC/CV charge, discharge rates, current/voltage, physical cell-surface and chamber temperature; no native latent thermal state.",
+      "url": "https://zenodo.org/records/4032561"
+    },
+    {
+      "scope": "Official pinned lumped model and arbitrary-versus-pouch thermal geometry definitions; not qualification of LG M50 scientific control.",
+      "url": "https://docs.pybamm.org/en/v26.6.2.0/source/examples/notebooks/models/thermal-models.html"
+    }
+  ],
+  "prior_audit": {
+    "note": "Prior 41 digests preserved exactly; new geometry interpretation below qualifies the former list of parameter-set fields. No historical identities rewritten.",
+    "path": "/home/chevre/gs-ml/empirical_lawhood/docs/applied-el/battery-entry-audit.json",
+    "preserved_manifest_members": 41,
+    "sha256": "db45d8e407eefb3bbdd564dcd2111d867a28823955518f5d09bda35114e79ceb"
+  },
+  "public_route_gate": {
+    "current_public_command": "campaign battery-native-check --config experiments/battery-response-and-restart/config.json",
+    "current_schema": "empirical-lawhood/simulators/py-ba-mm-development-input,version1.0.0",
+    "public_input_supports_selection": false,
+    "reason": "PyBaMMDevelopmentInput allows only SPMe/isothermal/CasADi; its 297.15 K upper limit excludes 300.15 K. BatterySourceContract fixes isothermal 293.15 K and old future words.",
+    "required_narrow_extension": "Add a separately identified bounded thermal-service input/model binding in existing battery adapter/provider owners. Preserve legacy fixed contracts. Authenticate arbitrary geometry, exact finite words/receivers, independent service falsification and existing resource/authority/custody guards. Do not bypass validation with an ad hoc script.",
+    "retained_factory": "pybamm_electrothermal_hierarchy._runtime_objects(unit, denominator) supports SPMe/DFN and lumped thermal dynamics with initial/ambient input, but _source_options and the strict denominator require pouch.",
+    "scientific_disposition": "Native premise entry remains pending. This is not a conclusive scientific stop or an RA5-C waiver; an opened controlled route still requires ACT/HOLD/NONATTEMPT and actual delivery closure through the existing compiler/runtime.",
+    "source_native_support": "Pinned official PyBaMM supports lumped arbitrary SPMe/DFN and Simulation/Experiment; this is source availability, not an accepted strict public EL route."
+  },
+  "record_kind": "pre-output-battery-service-selection-proposal",
+  "selected_service": {
+    "available_ordinary_inputs": "Same exact modeledV/current/volume-mean thermometer history,known source/options/parameters,initial preparation metadata and elapsed times for all policies. No privileged concentration fields/checkpoints.",
+    "baseline_initial_and_ambient_temperature_K": "296.15",
+    "changed_initial_and_ambient_temperature_K": "300.15",
+    "charge_origin": "Exactly 1.455 \u00d7 900 / 3600 A.h: a standard-charge-equivalent 15-minute top-up chosen before outputs; 7.275% of modeled 5 Ah. No full-charge or physical efficiency claim.",
+    "current_convention": "Positive discharges;negative charges. On0<=t<900 request-1.455A. Receiver at900 observes preceding charge; end of service is not an unobservedzero-current delivery.",
+    "engineering_choices": "900s partial-charge requirement is an explicitly chosen service.23/27C are source test bounds.Model initialSOC0.30 is idealizedOEMshipping anchor,not measured cellSOC population.",
+    "horizon_seconds": "900",
+    "initial_soc": "0.30",
+    "limits": {
+      "current_A": "Conservative OEM tier and native sign convention. Standard 1.455 A magnitude is permitted across the entire selected temperature range.",
+      "risk": "Deterministic simulated envelope: zero certified violations throughout 0\u2013900 s; retain termination/refusal as failure. No population risk-confidence claim.",
+      "voltage_V": [
+        "2.5",
+        "4.2"
+      ],
+      "volume_mean_temperature_K": [
+        "273.15",
+        "318.15"
+      ]
+    },
+    "model": "PyBaMM 26.6.2.0 SPMe, Chen2020",
+    "nominal_capacity_Ah": "5.0",
+    "options": {
+      "cell geometry": "arbitrary",
+      "contact resistance": "false",
+      "dimensionality": 0,
+      "operating mode": "current",
+      "surface temperature": "ambient",
+      "thermal": "lumped",
+      "use lumped thermal capacity": "false"
+    },
+    "prepared_state": "Initialize each preparation independently at initial SOC 0.30. No prefix, supplied latent checkpoint, conditioning or outcome selection.",
+    "question": "Does ordinary standard-rate charging already supply a useful 15-minute top-up on both supported standard-test temperature preparations after geometry correction, or is a consequential charging inadequacy exposed?",
+    "receivers": [
+      "Terminal voltage[V]",
+      "Current[A]",
+      "Volume-averaged cell temperature[K]",
+      "Discharge capacity[A.h] checkpoint-relative negative increment",
+      "actual realization clocks and native termination"
+    ],
+    "single_contrast": "23 C versus 27 C equilibrium initial/ambient preparation, both within OEM standard 25 +/- 2 C, in one exact parameter family.",
+    "source_parameter_policy": "All installed Chen2020 values unchanged except Current function [A], Ambient temperature [K], Initial temperature [K]. Initial SOC is model-generation metadata, not a later latent observation.",
+    "useful_realized_net_charge_Ah": "0.36375",
+    "word_menu": [
+      {
+        "ambient_delta_K": [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        "current_A": [
+          "-1.455",
+          "-1.455",
+          "-1.455",
+          "-1.455",
+          "-1.455"
+        ],
+        "id": "standard-cc900",
+        "interval_boundaries_seconds": [
+          "0",
+          "150",
+          "300",
+          "450",
+          "600",
+          "900"
+        ]
+      },
+      {
+        "ambient_delta_K": [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        "current_A": [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        "id": "native-hold900",
+        "role": "Native HOLD requires independent delivery assessment for RA5-C; zero charge fails service. No HOLD simulation is allocated in this premise allowance."
+      }
+    ]
+  },
+  "version": "1.0.0"
+}

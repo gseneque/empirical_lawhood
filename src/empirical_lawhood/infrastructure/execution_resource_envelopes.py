@@ -13,10 +13,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import ClassVar, Final
 
-from empirical_lawhood.infrastructure.artifacts import GuardedExternalRoot
+from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
 from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
 from empirical_lawhood.infrastructure.file_locks import exclusive_file_lock
 from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.kernel.provenance import ObjectIdentity
 from empirical_lawhood.kernel.serialization import (
     CanonicalRecord,
     canonical_json_bytes,
@@ -24,12 +26,107 @@ from empirical_lawhood.kernel.serialization import (
     validate_sha256,
     validate_stable_id,
 )
-from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeEvent, JitGraphSignatureManifest, reconstruct_execution_resource_envelope, replay_execution_resource_event, RunExecutionResourceEnvelope
+from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult, lineage_parent_sort_key
+from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeEvent, ExecutionResourceEnvelopeEventKind, ExecutionResourceEnvelopeSpec, ExecutionResourceEnvelopeState, JitGraphSignatureManifest, reconstruct_execution_resource_envelope, replay_execution_resource_event, RunExecutionResourceEnvelope
+from empirical_lawhood.runtime.execution_envelope import _IndexedResourceEnvelope, _ResourceEnvelopeDelta
+from empirical_lawhood.runtime.plans import ExecutionPlan
 
 from empirical_lawhood.runtime.recovery import RESOURCE_ENVELOPE_JOURNAL_ROOT
 
 MAX_EXECUTION_RESOURCE_ENVELOPE_STATE_BYTES: Final[int] = 256 * 1024 * 1024
 DEFAULT_EXECUTION_RESOURCE_ENVELOPE_STATE_ROOT: Final[str] = RESOURCE_ENVELOPE_JOURNAL_ROOT
+
+
+def _materialize(envelope):
+    return envelope.materialize() if isinstance(envelope, _IndexedResourceEnvelope) else envelope
+
+
+def execution_launch_relative_path(*, run_id: str, task_id: str, attempt_id: str) -> str:
+    """Exact lookup of one retained task launch, without a journal scan."""
+    for value in (run_id, task_id, attempt_id):
+        validate_stable_id(value)
+    return f"runs/{run_id}/execution-facts/{task_id}/{attempt_id}/launch.json"
+
+
+def _launch_parents(execution_plan: ObjectIdentity, spec: ExecutionResourceEnvelopeSpec):
+    if (execution_plan.object_schema != ExecutionPlan.SCHEMA
+            or execution_plan.object_version != ExecutionPlan.VERSION):
+        raise PermissionError("execution launch requires the current execution-plan contract")
+    return tuple(sorted((ArtifactLineageParent(identity, VisibilityCeiling.PROSPECTIVE,
+        OutcomeAccess.OUTCOME_BLIND) for identity in (
+            execution_plan, ObjectIdentity.from_record(spec.envelope_spec_id, spec))), key=lineage_parent_sort_key))
+
+
+def _require_launch_event(event, *, spec, task_id, attempt_id):
+    if type(event) is not ExecutionResourceEnvelopeEvent or type(spec) is not ExecutionResourceEnvelopeSpec:
+        raise PermissionError("execution launch requires exact current event/resource contracts")
+    try:
+        cell = spec.cell(event.cell_id) if event.cell_id is not None else None
+    except KeyError:
+        cell = None
+    if (cell is None or cell.task_id != task_id or event.event_id != f"resource-envelope-event.{attempt_id}.launch"
+            or event.kind is not ExecutionResourceEnvelopeEventKind.LAUNCH
+            or event.attempt_id != attempt_id or event.from_state is not ExecutionResourceEnvelopeState.RESERVED
+            or event.to_state is not ExecutionResourceEnvelopeState.LAUNCHED or event.affected_cell_ids
+            or any(getattr(event, name) is not None for name in ("reason_code", "receipt", "artifact",
+                "recovery_proof", "heartbeat", "roster_decision", "valid_receipt", "scientific_terminal"))):
+        raise PermissionError("execution launch changes its exact task/attempt transition")
+    projection = event.jit_projection
+    if ((projection is None) != (cell.jit_cell_id is None)
+            or projection is not None and (projection.cell_id != cell.jit_cell_id
+                or projection.signature_sha256 != cell.jit_signature_sha256)):
+        raise PermissionError("execution launch changes its frozen JIT resource binding")
+
+
+def read_execution_launch_event(*, artifact_plane: ExternalArtifactPlane, execution_plan: ExecutionPlan,
+        resource_spec: ExecutionResourceEnvelopeSpec, run_id: str, task_id: str,
+        attempt_id: str) -> ExecutionResourceEnvelopeEvent:
+    """Authenticate one immutable derivative of the actual primary LAUNCH event.
+
+    The existing journal remains the operational history. Its writer publishes
+    these exact event bytes after committing the journal head. Reading this
+    publication requires neither a current execution grant nor a journal replay.
+    No timestamp is inferred from issue, preparation, receipt or file metadata.
+    LAUNCH is the task dispatch boundary, before worker BEGIN/native contact.
+    """
+    if (not isinstance(artifact_plane, ExternalArtifactPlane) or type(execution_plan) is not ExecutionPlan
+            or type(resource_spec) is not ExecutionResourceEnvelopeSpec
+            or execution_plan.source_plan.object_id != run_id
+            or execution_plan.execution_plan_id != f"execution.{run_id}"
+            or execution_plan.execution_resource_envelope_spec != ObjectIdentity.from_record(resource_spec.envelope_spec_id, resource_spec)
+            or resource_spec.issued_study_extensions != execution_plan.issued_extension_set):
+        raise PermissionError("execution launch substitutes its current run/plan/resource contract")
+    try:
+        execution_plan.task(task_id)
+    except KeyError as error:
+        raise PermissionError("execution launch substitutes its current run/plan/resource contract") from error
+    relative = execution_launch_relative_path(run_id=run_id, task_id=task_id, attempt_id=attempt_id)
+    manifest = artifact_plane.read_manifest(relative)
+    logical, physical, publication = manifest.logical, manifest.materialization, manifest.publication
+    parents = _launch_parents(ObjectIdentity.from_record(execution_plan.execution_plan_id, execution_plan), resource_spec)
+    if (publication is None or len(publication.members) != 1
+            or logical.logical_artifact_id != f"execution-launch.{attempt_id}"
+            or logical.payload_schema != ExecutionResourceEnvelopeEvent.SCHEMA
+            or logical.profile is not ArtifactProfile.CANONICAL_JSON or logical.media_type != "application/json"
+            or logical.visibility_ceiling is not VisibilityCeiling.PROSPECTIVE
+            or logical.outcome_access is not OutcomeAccess.OUTCOME_BLIND or logical.lineage_parents != parents
+            or physical.relative_path != relative or physical.storage_root_id != artifact_plane.root.contract.storage_root_id
+            or physical.compression != "none" or physical.partition_selector is not None
+            or publication.publication_scope.publication_scope_id != f"execution-launch.{attempt_id}"
+            or publication.publication_scope.relative_root != relative.rsplit("/", 1)[0]
+            or publication.publication_scope.storage_root_id != physical.storage_root_id
+            or any(artifact_plane.custody_limits.exceeds(name, physical.size_bytes)
+                for name in ("control_record_bytes", "in_memory_payload_bytes"))):
+        raise PermissionError("execution launch differs from its exact immutable publication")
+    artifact_plane.verify_manifest(manifest)
+    raw = read_bounded_bytes(artifact_plane.root.resolve(relative, for_write=False), maximum_bytes=physical.size_bytes)
+    event = decode_canonical_bytes(raw, ExecutionResourceEnvelopeEvent, maximum_bytes=physical.size_bytes)
+    if (event.canonical_bytes() != raw or len(raw) != physical.size_bytes
+            or event.fingerprint() != logical.content_sha256
+            or hashlib.sha256(raw).hexdigest() != physical.physical_sha256):
+        raise PermissionError("execution launch changes its committed event bytes")
+    _require_launch_event(event, spec=resource_spec, task_id=task_id, attempt_id=attempt_id)
+    return event
 
 
 @dataclass(frozen=True, slots=True)
@@ -107,20 +204,24 @@ class ExternalExecutionResourceEnvelopeStore:
         self,
         root: GuardedExternalRoot,
         *,
+        artifact_plane: ExternalArtifactPlane | None = None,
         state_root_relative_path: str = DEFAULT_EXECUTION_RESOURCE_ENVELOPE_STATE_ROOT,
         maximum_state_bytes: int = MAX_EXECUTION_RESOURCE_ENVELOPE_STATE_BYTES,
     ) -> None:
         validate_relative_locator(state_root_relative_path)
         if not 0 < maximum_state_bytes <= MAX_EXECUTION_RESOURCE_ENVELOPE_STATE_BYTES:
             raise ValueError("resource-envelope state byte limit is invalid")
+        if artifact_plane is not None and artifact_plane.root is not root:
+            raise ValueError("resource-envelope publication must use its exact guarded root")
         self.root = root
+        self.artifact_plane = artifact_plane
         self.state_root_relative_path = state_root_relative_path
         self.maximum_state_bytes = maximum_state_bytes
         self.maximum_journal_bytes = maximum_state_bytes
         self._cached: (
             tuple[
                 _JournalHead,
-                RunExecutionResourceEnvelope,
+                RunExecutionResourceEnvelope | _IndexedResourceEnvelope,
                 _JournalOrigin,
                 tuple[tuple[int, ...], ...],
             ]
@@ -262,6 +363,16 @@ class ExternalExecutionResourceEnvelopeStore:
         hasher = hashlib.sha256(journal)
         if hasher.hexdigest() != head.journal_sha256:
             raise ValueError("resource-envelope journal digest differs")
+        cached = self._cached
+        if cached is not None and cached[0] == head and cached[1].envelope_id == envelope_id:
+            # Both full byte digests above were freshly checked. Reuse the
+            # deterministic replay of these exact bytes, never a stat-only
+            # observation or an authority verdict. Keep the final change guard.
+            if before != self._stamps(paths) or self._head(paths) != head:
+                raise ValueError("resource-envelope journal changed during authentication")
+            self._journal_hasher = hasher
+            self._cached = (head, cached[1], cached[2], before)
+            return _materialize(cached[1]), base_sha, journal
         origin = decode_canonical_bytes(
             base,
             _JournalCheckpoint
@@ -294,7 +405,7 @@ class ExternalExecutionResourceEnvelopeStore:
                 )
         if envelope.envelope_id != envelope_id or len(envelope.events) != head.event_count:
             raise ValueError("resource-envelope committed state identity differs")
-        if len(envelope.canonical_bytes()) != head.materialized_bytes:
+        if envelope.canonical_size_bytes() != head.materialized_bytes:
             raise ValueError("resource-envelope materialized byte bound differs")
         if before != self._stamps(paths) or self._head(paths) != head:
             raise ValueError("resource-envelope journal changed during authentication")
@@ -318,14 +429,14 @@ class ExternalExecutionResourceEnvelopeStore:
         origin = (_JournalCheckpoint if envelope.events else _JournalOrigin)(
             envelope=envelope, jit_manifest=jit_graph_signature_manifest
         )
-        if len(origin.canonical_bytes()) > self.maximum_state_bytes:
+        if origin.canonical_size_bytes() > self.maximum_state_bytes:
             raise ValueError("resource-envelope origin exceeds its byte limit")
         head = _JournalHead(
             base_sha256=origin.fingerprint(),
             journal_sha256=hashlib.sha256(b"").hexdigest(),
             journal_bytes=0,
             event_count=len(envelope.events),
-            materialized_bytes=len(envelope.canonical_bytes()),
+            materialized_bytes=envelope.canonical_size_bytes(),
         )
         with self._locked(envelope.envelope_id) as paths:
             if paths.origin.exists():
@@ -360,7 +471,73 @@ class ExternalExecutionResourceEnvelopeStore:
         with self._locked(envelope_id) as paths:
             if not paths.origin.is_file():
                 raise KeyError(envelope_id)
-            return self._current(paths, envelope_id)
+            return _materialize(self._current(paths, envelope_id))
+
+    def _operational_current(self, envelope_id):
+        """Private mutable projection; only the scheduler's locked owner uses it."""
+        with self._locked(envelope_id) as paths:
+            current = self._current(paths, envelope_id)
+            if not isinstance(current, _IndexedResourceEnvelope):
+                current = _IndexedResourceEnvelope(current)
+                head, _, origin, stamps = self._cached
+                self._cached = (head, current, origin, stamps)
+            return current
+
+    def _supports_incremental(self):
+        # Custom persistence/read hooks retain their existing full-record path.
+        return type(self) is ExternalExecutionResourceEnvelopeStore and all(
+            getattr(getattr(self, name), '__func__', None) is method
+            for name, method in _INCREMENTAL_STORE_METHODS.items()) and not any(
+                name in vars(self) for name in _INCREMENTAL_STORE_METHODS)
+
+    def _publish_launch_event(self, envelope, event) -> ArtifactWriteResult:
+        """Copy the primary event verbatim, only after its durable commit."""
+        if self.artifact_plane is None:
+            raise PermissionError("execution launch publication requires its guarded artifact plane")
+        retained = ((envelope._event_index.get(event.event_id),) if isinstance(envelope, _IndexedResourceEnvelope)
+            else tuple(value for value in envelope.events if value.event_id == event.event_id))
+        if retained != (event,):
+            raise PermissionError("execution launch publication differs from its committed primary event")
+        plan = envelope.execution_plan
+        run_id = plan.object_id.removeprefix("execution.")
+        if (plan.object_id != f"execution.{run_id}"
+                or envelope.envelope_id != f"run-resource-envelope.{run_id}"):
+            raise PermissionError("execution launch requires the current run/envelope naming contract")
+        try:
+            cell = envelope.spec.cell(event.cell_id) if event.cell_id is not None else None
+        except KeyError:
+            cell = None
+        if cell is None or event.attempt_id is None:
+            raise PermissionError("execution launch lacks its exact task/attempt binding")
+        task_id = cell.task_id
+        _require_launch_event(event, spec=envelope.spec, task_id=task_id, attempt_id=event.attempt_id)
+        relative = execution_launch_relative_path(run_id=run_id, task_id=task_id, attempt_id=event.attempt_id)
+        parents = _launch_parents(plan, envelope.spec)
+        return self.artifact_plane.write(ArtifactWriteRequest(
+            logical_artifact_id=f"execution-launch.{event.attempt_id}", relative_path=relative,
+            payload_schema=event.SCHEMA, profile=ArtifactProfile.CANONICAL_JSON,
+            media_type="application/json", publication_scope_id=f"execution-launch.{event.attempt_id}",
+            publication_scope_relative_root=relative.rsplit("/", 1)[0], payload=event.canonical_bytes(),
+            visibility_ceiling=VisibilityCeiling.PROSPECTIVE,
+            parent_visibility_ceilings=tuple(parent.visibility_ceiling for parent in parents),
+            outcome_access=OutcomeAccess.OUTCOME_BLIND, lineage_parents=parents))
+
+    def ensure_launch_publication(self, *, envelope_id: str, task_id: str,
+            attempt_id: str) -> ArtifactWriteResult:
+        """Resume only derivative publication of one already committed launch.
+
+        This does not reserve or launch an attempt, alter event time, or infer
+        whether any native effect occurred after the original launch boundary.
+        """
+        with self._locked(envelope_id) as paths:
+            envelope = self._current(paths, envelope_id)
+            matches = tuple(event for event in envelope.events
+                if event.kind is ExecutionResourceEnvelopeEventKind.LAUNCH and event.attempt_id == attempt_id)
+            if len(matches) != 1:
+                raise PermissionError("execution launch requires one exact committed primary event")
+            event = matches[0]
+            _require_launch_event(event, spec=envelope.spec, task_id=task_id, attempt_id=attempt_id)
+            return self._publish_launch_event(envelope, event)
 
     @staticmethod
     def _state_byte_delta(
@@ -369,7 +546,7 @@ class ExternalExecutionResourceEnvelopeStore:
         # Cell/token rosters are fixed. Only changed records contribute bytes;
         # historical events and unchanged siblings are never serialized.
         delta = sum(
-            len(new.canonical_bytes()) - len(old.canonical_bytes())
+            new.canonical_size_bytes() - old.canonical_size_bytes()
             for old, new in (
                 *zip(current.cells, updated.cells, strict=True),
                 *zip(current.child_token_states, updated.child_token_states, strict=True),
@@ -386,7 +563,7 @@ class ExternalExecutionResourceEnvelopeStore:
         self, *, expected: RunExecutionResourceEnvelope, updated: RunExecutionResourceEnvelope
     ) -> None:
         with self._locked(updated.envelope_id) as paths:
-            current = self._current(paths, updated.envelope_id)
+            current = _materialize(self._current(paths, updated.envelope_id))
             if len(current.events) != len(expected.events) or current != expected:
                 raise ValueError("resource-envelope compare-and-append conflict")
             if (
@@ -395,74 +572,115 @@ class ExternalExecutionResourceEnvelopeStore:
             ):
                 raise ValueError("resource-envelope update is not one event append")
             assert self._cached is not None
-            head, _, origin, stamps = self._cached
+            _, _, origin, _ = self._cached
             event = updated.events[-1]
             replayed = replay_execution_resource_event(
                 current, event, jit_graph_signature_manifest=origin.jit_manifest
             )
             if replayed != updated:
                 raise ValueError("resource-envelope update differs from its replayed event")
-            payload = event.canonical_bytes()
-            materialized_bytes = (
-                head.materialized_bytes
-                + len(payload)
-                - 1
-                + bool(current.events)
-                + self._state_byte_delta(current, updated)
-            )
-            delta = payload
-            if (
-                materialized_bytes > self.maximum_state_bytes
-                or head.journal_bytes + len(delta) > self.maximum_journal_bytes
+            committed, stamps = self._append_event(paths, current, event, self._state_byte_delta(current, updated))
+            self._cached = (committed, updated, origin, stamps)
+            if self.artifact_plane is not None and event.kind is ExecutionResourceEnvelopeEventKind.LAUNCH:
+                self._publish_launch_event(updated, event)
+
+    def _compare_and_append_transition(self, *, expected, updated):
+        if type(expected) is not _IndexedResourceEnvelope or type(updated) is not _ResourceEnvelopeDelta:
+            raise TypeError('resource-envelope operational append requires its indexed projection')
+        with self._locked(expected.envelope_id) as paths:
+            current = self._current(paths, expected.envelope_id)
+            if (current is not expected or updated.owner is not current
+                    or updated.event.sequence_number != len(current.events) + 1):
+                raise ValueError('resource-envelope compare-and-append conflict')
+            _, _, origin, _ = self._cached
+            # Reapply the original transition rules to this one delta. Never
+            # trust a caller's proposed cells or substitute an aggregate check.
+            replayed = replay_execution_resource_event(current, updated.event,
+                jit_graph_signature_manifest=origin.jit_manifest)
+            if replayed != updated:
+                raise ValueError('resource-envelope update differs from its replayed event')
+            byte_delta = sum(row.canonical_size_bytes() - current.cell(row.cell_id).canonical_size_bytes()
+                for row in updated.cells)
+            byte_delta += sum(row.canonical_size_bytes() - current._tokens[row.child_id].canonical_size_bytes()
+                for row in updated.child_token_states)
+            if updated.roster_decisions is not None:
+                byte_delta += len(canonical_json_bytes(updated.roster_decisions)) - len(canonical_json_bytes(current.roster_decisions))
+            committed, stamps = self._append_event(paths, current, updated.event, byte_delta)
+            current.commit(updated)
+            self._cached = (committed, current, origin, stamps)
+            if self.artifact_plane is not None and updated.event.kind is ExecutionResourceEnvelopeEventKind.LAUNCH:
+                self._publish_launch_event(current, updated.event)
+
+    def _append_event(self, paths, current, event, state_byte_delta):
+        head, _, _, stamps = self._cached
+        payload = event.canonical_bytes()
+        materialized_bytes = (
+            head.materialized_bytes
+            + len(payload)
+            - 1
+            + bool(current.events)
+            + state_byte_delta
+        )
+        delta = payload
+        if (
+            materialized_bytes > self.maximum_state_bytes
+            or head.journal_bytes + len(delta) > self.maximum_journal_bytes
+        ):
+            raise ValueError("resource-envelope journal or state exceeds its byte limit")
+        hasher = self._journal_hasher.copy()
+        hasher.update(delta)
+        journal_path = self._path(current.envelope_id, "journal")
+        descriptor = os.open(
+            journal_path,
+            os.O_RDWR
+            | os.O_CREAT
+            | (os.O_EXCL if not stamps[1] else 0)
+            | getattr(os, "O_CLOEXEC", 0)
+            | getattr(os, "O_NOFOLLOW", 0),
+            stat.S_IRUSR | stat.S_IWUSR,
+        )
+        try:
+            value = os.fstat(descriptor)
+            if not stat.S_ISREG(value.st_mode) or (
+                stamps[1]
+                and (
+                    value.st_dev,
+                    value.st_ino,
+                    value.st_size,
+                    value.st_mtime_ns,
+                    value.st_ctime_ns,
+                )
+                != stamps[1]
             ):
-                raise ValueError("resource-envelope journal or state exceeds its byte limit")
-            hasher = self._journal_hasher.copy()
-            hasher.update(delta)
-            journal_path = self._path(updated.envelope_id, "journal")
-            descriptor = os.open(
-                journal_path,
-                os.O_RDWR
-                | os.O_CREAT
-                | (os.O_EXCL if not stamps[1] else 0)
-                | getattr(os, "O_CLOEXEC", 0)
-                | getattr(os, "O_NOFOLLOW", 0),
-                stat.S_IRUSR | stat.S_IWUSR,
-            )
-            try:
-                value = os.fstat(descriptor)
-                if not stat.S_ISREG(value.st_mode) or (
-                    stamps[1]
-                    and (
-                        value.st_dev,
-                        value.st_ino,
-                        value.st_size,
-                        value.st_mtime_ns,
-                        value.st_ctime_ns,
-                    )
-                    != stamps[1]
-                ):
-                    raise ValueError("resource-envelope journal changed before append")
-                os.ftruncate(descriptor, head.journal_bytes)
-                os.lseek(descriptor, head.journal_bytes, os.SEEK_SET)
-                self._write_all(descriptor, delta)
-                os.fsync(descriptor)
-            finally:
-                os.close(descriptor)
-            self._fsync_directory(journal_path.parent)
-            committed = _JournalHead(
-                base_sha256=head.base_sha256,
-                journal_sha256=hasher.hexdigest(),
-                journal_bytes=head.journal_bytes + len(delta),
-                event_count=len(updated.events),
-                materialized_bytes=materialized_bytes,
-            )
-            self._write_atomic(self._path(updated.envelope_id, "head"), committed)
-            self._journal_hasher = hasher
-            self._cached = (committed, updated, origin, self._stamps(paths))
+                raise ValueError("resource-envelope journal changed before append")
+            os.ftruncate(descriptor, head.journal_bytes)
+            os.lseek(descriptor, head.journal_bytes, os.SEEK_SET)
+            self._write_all(descriptor, delta)
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+        self._fsync_directory(journal_path.parent)
+        committed = _JournalHead(
+            base_sha256=head.base_sha256,
+            journal_sha256=hasher.hexdigest(),
+            journal_bytes=head.journal_bytes + len(delta),
+            event_count=len(current.events) + 1,
+            materialized_bytes=materialized_bytes,
+        )
+        self._write_atomic(self._path(current.envelope_id, "head"), committed)
+        self._journal_hasher = hasher
+        return committed, self._stamps(paths)
+
+
+_INCREMENTAL_STORE_METHODS = {name: getattr(ExternalExecutionResourceEnvelopeStore, name)
+    for name in ('current', 'load', 'compare_and_append', '_current', '_read', '_operational_current',
+        '_compare_and_append_transition', '_append_event')}
 
 
 __all__ = [
     "DEFAULT_EXECUTION_RESOURCE_ENVELOPE_STATE_ROOT",
     'ExternalExecutionResourceEnvelopeStore',
     "MAX_EXECUTION_RESOURCE_ENVELOPE_STATE_BYTES",
+    "execution_launch_relative_path",
+    "read_execution_launch_event",
 ]

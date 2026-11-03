@@ -9,11 +9,11 @@ from hashlib import sha256
 from pathlib import Path
 
 from empirical_lawhood.adapters.methods.matrix_history_analysis.records import (
-    EXPOSED, HISTORY_FAMILIES, HISTORY_PURPOSES, HISTORY_TRANSPORT_SCHEMA,
+    EXPOSED, HISTORY_FAMILIES, HISTORY_TRANSPORT_SCHEMA,
     PUBLIC_HISTORY_MASTER_SEED, MatrixHistoryAllocation, MatrixHistoryAnalysisConfig,
     MatrixHistoryAnalysisReceipt, MatrixHistoryAnalysisRoot, MatrixHistoryArrayInput,
-    MatrixHistoryEnvironment, MatrixHistoryProtocol, MatrixHistoryRootAllocation,
-    MatrixHistorySeed, MatrixHistorySourceConfig, MatrixHistorySourceReceipt,
+    MatrixHistoryEnvironment, MatrixHistoryProtocol, MatrixHistorySourceConfig, MatrixHistorySourceReceipt,
+    matrix_history_numeric_roots, matrix_known_exposed_effective_seeds,
 )
 from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
 from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
@@ -23,7 +23,7 @@ from empirical_lawhood.kernel.decoding import decode_canonical_bytes
 from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
 from empirical_lawhood.kernel.provenance import ObjectIdentity
 from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, validate_relative_locator, validate_stable_id
+from empirical_lawhood.kernel.serialization import canonical_json_bytes, validate_relative_locator
 from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
 from empirical_lawhood.runtime.execution import VerifiedArtifactInput
 
@@ -34,12 +34,7 @@ def matrix_history_code_sources_sha256():
 
 
 def _numeric_roots(namespace, master_seed):
-    if type(master_seed) is not int or not 0 <= master_seed < 2**256:
-        raise ValueError("History master input must be an explicit unsigned256-bit integer")
-    validate_stable_id(namespace)
-    return tuple(MatrixHistoryRootAllocation(f"{namespace}.h{index:03d}", index,
-        tuple(MatrixHistorySeed(purpose, sha256(b"empirical-lawhood/history/numeric/v1\0" + master_seed.to_bytes(32, "big") + index.to_bytes(2, "big") + bytes([ordinal])).hexdigest()) for ordinal, purpose in enumerate(HISTORY_PURPOSES)))
-        for index in range(256))
+    return matrix_history_numeric_roots(namespace, master_seed)
 
 
 def prepare_matrix_history_allocation(*, allocation_id, namespace, master_seed,
@@ -58,10 +53,7 @@ def prepare_matrix_history_allocation(*, allocation_id, namespace, master_seed,
 def _check_exposure(allocation):
     if allocation.exposure != "PROPOSED_UNRUN":
         return
-    from empirical_lawhood.adapters.simulators.six_matrix_response.observation_order_scientific_inputs import observation_order_scientific_stream_inputs
-    known = {int(s.scientific_seed_sha256[:32], 16) for qualification in (False, True) for s in observation_order_scientific_stream_inputs(qualification=qualification)}
-    known.update(s.effective_seed for r in _numeric_roots("public.history", PUBLIC_HISTORY_MASTER_SEED) for s in r.seeds)
-    known.update(allocation.prior_effective_seeds)
+    known = matrix_known_exposed_effective_seeds(allocation.prior_effective_seeds)
     if any(s.effective_seed in known for root in allocation.roots for s in root.seeds):
         raise ValueError("History proposed streams overlap original, public or declared exposed consumed bits")
 
