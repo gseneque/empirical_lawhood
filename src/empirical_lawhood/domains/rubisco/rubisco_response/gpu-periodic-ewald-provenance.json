@@ -1,0 +1,27 @@
+{
+  "project": "GPU4PySCF",
+  "upstream_version": "1.8.1",
+  "license": "Apache-2.0",
+  "modified_by": "Empirical Lawhood project",
+  "modification_date": "2026-11-05",
+  "files": [
+    {
+      "upstream_url": "https://github.com/pyscf/gpu4pyscf/blob/v1.8.1/gpu4pyscf/qmmm/pbc/mm_mole.py",
+      "upstream_path": "gpu4pyscf/qmmm/pbc/mm_mole.py",
+      "original_sha256": "9d2d7764b63294915404fb49b48b6e1f5f8b2a6b42e78fd4bc6cac9b6b24254e",
+      "original_bytes": 18265,
+      "selected_method": "get_ewald_pot"
+    },
+    {
+      "upstream_url": "https://github.com/pyscf/gpu4pyscf/blob/v1.8.1/gpu4pyscf/qmmm/pbc/itrf.py",
+      "upstream_path": "gpu4pyscf/qmmm/pbc/itrf.py",
+      "original_sha256": "140aef15b0318b9e6e1da4ca443e8d4eecdb69852761adb076929613195fb266",
+      "original_bytes": 53338,
+      "selected_method": "grad_ewald"
+    }
+  ],
+  "local_path": "gpu_periodic_ewald.py",
+  "local_sha256": "31d44f6d657fbf8cb09a795e4fafecf6f2dc4a63f9d938e91611376c15e68c60",
+  "modifications": "Instance-local complete reciprocal-vector blocks for potential and gradient. Workspace selection uses current device headroom and the original allocation. Real-space, multipole, self, Gaussian-charge, grid and precision operands are unchanged. Live real-space temporaries are released before reciprocal evaluation.",
+  "qualification": "Software controls and complete enzyme derivative assessment remain separate requirements."
+}

@@ -9,9 +9,9 @@ from typer.testing import CliRunner
 
 from empirical_lawhood.api import matrix_programme_allocations as admission
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.infrastructure import process_memory
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.runtime.metadata_memory import metadata_rss_operation
+from empirical_lawhood.execution.resources import process_memory
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.execution.metadata_memory import metadata_rss_operation
 
 
 def test_explicit_rss_allowance_preserves_budget_and_resets_on_failure(monkeypatch):

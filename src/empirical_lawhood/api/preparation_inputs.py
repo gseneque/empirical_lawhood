@@ -1,20 +1,22 @@
 """Current input import publications and exact retained result bindings."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
-from empirical_lawhood.adapters.methods.preparation_applicability.issued_inputs import PreparationApplicabilityImportReceipt, PreparationApplicabilityPublishedInput
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.records import ConstructedPreparationReport
-from empirical_lawhood.adapters.methods.preparation_applicability.panel_inputs import PreparationApplicabilityPanelPublication
-from empirical_lawhood.adapters.simulators.preparation_applicability.records import PreparationApplicabilityPrefix, PreparationApplicabilityPanel
-from empirical_lawhood.adapters.methods.preparation_applicability.records import PreparationApplicabilityMeasuredRoot
-from empirical_lawhood.adapters.methods.preparation_applicability.seals import PreparationApplicabilityLowerSeal
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes, MAX_ARTIFACT_MANIFEST_BYTES
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import validate_relative_locator, validate_stable_id
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest, ArtifactProfile
+from empirical_lawhood.domains.matrix.preparation_applicability.issued_inputs import PreparationApplicabilityImportReceipt, PreparationApplicabilityPublishedInput
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.records import ConstructedPreparationReport
+from empirical_lawhood.domains.matrix.preparation_applicability.panel_inputs import PreparationApplicabilityPanelPublication
+from empirical_lawhood.domains.matrix.preparation_applicability.phase_records import PreparationApplicabilityPrefix, PreparationApplicabilityPanel
+from empirical_lawhood.domains.matrix.preparation_applicability.records import PreparationApplicabilityMeasuredRoot
+from empirical_lawhood.domains.matrix.preparation_applicability.seals import PreparationApplicabilityLowerSeal
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import validate_relative_locator, validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactProfile
 from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access
-from empirical_lawhood.adapters.methods.preparation_applicability.result_access import PREPARATION_PROTECTED_OUTCOMES
+from empirical_lawhood.domains.matrix.preparation_applicability.result_access import PREPARATION_PROTECTED_OUTCOMES
 
 
 def publish_preparation_input(*, record, key: str, logical_artifact_id: str, relative_root: str,
@@ -26,9 +28,9 @@ def publish_preparation_input(*, record, key: str, logical_artifact_id: str, rel
     validate_relative_locator(relative_root)
     if key not in ("lower", "exposure", "conformance"):
         raise ValueError("Q transfer cannot use an import publication")
-    from empirical_lawhood.adapters.methods.finite_response_law.original_f import OriginalFiniteResponseLaw
-    from empirical_lawhood.adapters.methods.preparation_applicability.issued_inputs import PreparationApplicabilityExposureInspection
-    from empirical_lawhood.adapters.methods.preparation_applicability.conformance import PreparationApplicabilityNativeConformance
+    from empirical_lawhood.domains.matrix.finite_response_law.original_f import OriginalFiniteResponseLaw
+    from empirical_lawhood.domains.matrix.preparation_applicability.issued_inputs import PreparationApplicabilityExposureInspection
+    from empirical_lawhood.domains.matrix.preparation_applicability.conformance import PreparationApplicabilityNativeConformance
     if not isinstance(record, {"lower": OriginalFiniteResponseLaw,"exposure": PreparationApplicabilityExposureInspection,"conformance": PreparationApplicabilityNativeConformance}[key]):
         raise TypeError("input import changed its code-owned record type")
     def publish(value, name, logical_id):
@@ -39,7 +41,7 @@ def publish_preparation_input(*, record, key: str, logical_artifact_id: str, rel
             visibility_ceiling=VisibilityCeiling.PROSPECTIVE,parent_visibility_ceilings=(),
             outcome_access=OutcomeAccess.OUTCOME_BLIND))
         path=artifact_writer.root.resolve(result.manifest_materialization.relative_path,for_write=False)
-        manifest=decode_artifact_manifest(read_bounded_bytes(path,maximum_bytes=MAX_ARTIFACT_MANIFEST_BYTES))
+        manifest=resolve_artifact_sidecar_bytes(artifact_writer, read_bounded_bytes(path, maximum_bytes=artifact_writer.custody_limits.manifest_bytes))
         artifact_writer.verify_manifest(manifest)
         return manifest
     manifest=publish(record,"input.canonical.json",logical_artifact_id)
@@ -59,7 +61,7 @@ def _retained_output(*, plane, receipt, kind, result_access,
     manifests=[]
     for materialization in receipt.output_materializations:
         path=plane.root.resolve(f"{materialization.relative_path}.manifest.json",for_write=False)
-        manifest=decode_artifact_manifest(read_bounded_bytes(path,maximum_bytes=MAX_ARTIFACT_MANIFEST_BYTES))
+        manifest=read_artifact_sidecar(plane, (path).relative_to(plane.root.contract.canonical_path).as_posix(), maximum_bytes=None)
         if manifest.logical.payload_schema==kind.SCHEMA:
             manifests.append(manifest)
     if len(manifests)!=1:
@@ -106,8 +108,8 @@ def bind_ordinary_preparation_panel(*, run_id: str, root_id: str,
 def bind_preparation_report(*,run_id: str,receipt_id: str,constructed: bool,
     artifact_writer: ExternalArtifactPlane,result_access):
     """Read the selected ordinary or constructed terminal scientific report."""
-    from empirical_lawhood.adapters.methods.preparation_applicability.readout import PreparationApplicabilityScreenReport
-    from empirical_lawhood.adapters.methods.preparation_applicability.result_access import PreparationApplicabilityRetainedResult
+    from empirical_lawhood.domains.matrix.preparation_applicability.readout import PreparationApplicabilityScreenReport
+    from empirical_lawhood.domains.matrix.preparation_applicability.result_access import PreparationApplicabilityRetainedResult
     receipt=ExternalTaskReceiptStore(artifact_writer).read_by_receipt_id(run_id,"ap.report",receipt_id)
     if receipt is None:
         raise ValueError("selected preparation terminal report receipt is absent")
@@ -118,7 +120,7 @@ def bind_preparation_report(*,run_id: str,receipt_id: str,constructed: bool,
 
 def read_preparation_report(retained,*,artifact_writer):
     """Recheck current grants/custody before presenting full denominators/stops."""
-    from empirical_lawhood.adapters.methods.preparation_applicability.readout import PreparationApplicabilityScreenReport
+    from empirical_lawhood.domains.matrix.preparation_applicability.readout import PreparationApplicabilityScreenReport
     kind={ConstructedPreparationReport.SCHEMA:ConstructedPreparationReport,
           PreparationApplicabilityScreenReport.SCHEMA:PreparationApplicabilityScreenReport}.get(retained.manifest.logical.payload_schema)
     if kind is None:
@@ -147,20 +149,20 @@ def create_preparation_selection(*, root, config_id: str, phase: str, allocation
     conformance result, exposure inspection, Q result or execution authority.
     """
     from hashlib import sha256
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.task_records import artifact_identity
-    from empirical_lawhood.adapters.methods.preparation_applicability.config import PreparationApplicabilityUpstream
-    from empirical_lawhood.adapters.methods.preparation_applicability.exposure import PreparationApplicabilityExposure
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.task_records import artifact_identity
+    from empirical_lawhood.domains.matrix.preparation_applicability.config import PreparationApplicabilityUpstream
+    from empirical_lawhood.domains.matrix.preparation_applicability.exposure import PreparationApplicabilityExposure
     if constructed:
-        from empirical_lawhood.adapters.methods.constructed_preparation_applicability.config import ConstructedPreparationStage as Stage,ConstructedPreparationSource as Source
-        from empirical_lawhood.adapters.methods.constructed_preparation_applicability.records import ConstructedPreparationDesign as Design
-        from empirical_lawhood.adapters.composition.constructed_preparation_applicability.selection import ConstructedPreparationApplicabilitySelection as Selection
-        from empirical_lawhood.adapters.composition.constructed_preparation_applicability.authoring import SPECIFICATION_PATH
+        from empirical_lawhood.domains.matrix.constructed_preparation_applicability.config import ConstructedPreparationStage as Stage, ConstructedPreparationSource as Source
+        from empirical_lawhood.domains.matrix.constructed_preparation_applicability.records import ConstructedPreparationDesign as Design
+        from empirical_lawhood.domains.matrix.constructed_preparation_applicability.authoring.selection import ConstructedPreparationApplicabilitySelection as Selection
+        from empirical_lawhood.domains.matrix.constructed_preparation_applicability.authoring.authoring import SPECIFICATION_PATH
     else:
-        from empirical_lawhood.adapters.methods.preparation_applicability.config import PreparationApplicabilityStage as Stage,PreparationApplicabilitySource as Source
-        from empirical_lawhood.adapters.methods.preparation_applicability.records import PreparationApplicabilityDesign as Design
-        from empirical_lawhood.adapters.composition.preparation_applicability.selection import PreparationApplicabilitySelection as Selection
-        from empirical_lawhood.adapters.composition.preparation_applicability.authoring import SPECIFICATION_PATH
+        from empirical_lawhood.domains.matrix.preparation_applicability.config import PreparationApplicabilityStage as Stage, PreparationApplicabilitySource as Source
+        from empirical_lawhood.domains.matrix.preparation_applicability.records import PreparationApplicabilityDesign as Design
+        from empirical_lawhood.domains.matrix.preparation_applicability.authoring.selection import PreparationApplicabilitySelection as Selection
+        from empirical_lawhood.domains.matrix.preparation_applicability.authoring.authoring import SPECIFICATION_PATH
     if (lower.key!="lower" or exposure.key!="exposure" or conformance.key!="conformance"
         or bool(qualification is not None)!=(constructed and phase=="E")):
         raise ValueError("selection requires its actual closed phase input publications")
@@ -188,8 +190,8 @@ def inspect_preparation_exposure(*, prior_inputs, inspection_id: str, original_f
     inspection. An unavailable declared bank must be supplied, not relabelled.
     """
     from empirical_lawhood.api.finite_operands import saved_matrix_arrays_import
-    from empirical_lawhood.adapters.methods.preparation_applicability.issued_inputs import PreparationApplicabilityExposureInspection
-    from empirical_lawhood.adapters.methods.preparation_applicability.exposure import public_historical_exposure,effective_seed_ids
+    from empirical_lawhood.domains.matrix.preparation_applicability.issued_inputs import PreparationApplicabilityExposureInspection
+    from empirical_lawhood.domains.matrix.preparation_applicability.exposure import public_historical_exposure, effective_seed_ids
     known_units,known_seeds=public_historical_exposure()
     units=set(known_units); seeds=set(known_seeds); allocations=[]
     sources=[original_f.original_payload]
@@ -209,9 +211,9 @@ def prepare_preparation_allocation(*, allocation_id: str, cohort_namespace: str,
     bits. Constructed probes are fixed conditioning, never independent draws.
     """
     from hashlib import sha256
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_NATIVE_PURPOSES,MatrixAllocation,MatrixRootAllocation,MatrixPurposeSeed
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
-    from empirical_lawhood.adapters.methods.constructed_preparation_applicability.config import FIXED_PROBE_SEED
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_NATIVE_PURPOSES, MatrixAllocation, MatrixRootAllocation, MatrixPurposeSeed
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
+    from empirical_lawhood.domains.matrix.constructed_preparation_applicability.config import FIXED_PROBE_SEED
     validate_stable_id(allocation_id);validate_stable_id(cohort_namespace)
     if (type(master_seed) is not int or not 0<=master_seed<2**128
         or type(constructed) is not bool or type(proposed_unrun) is not bool

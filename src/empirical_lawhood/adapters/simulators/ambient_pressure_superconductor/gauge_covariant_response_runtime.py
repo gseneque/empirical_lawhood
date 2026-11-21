@@ -1,65 +1,41 @@
-'Receipt-first runtime and frozen protocols for ambient pressure superconductor amendment gauge covariant response.'
+"""Native acquisition and external-format binding for the domain science."""
 
 from __future__ import annotations
-
 from dataclasses import fields
 from hashlib import sha256
 from typing import Any, TypeVar, cast
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.design.study_issue import StudyOperationAuthority
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord, encode_scientific_adjudication
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, CampaignRuntimeProvider, ExternalInputPayload
+from empirical_lawhood.domains.materials.superconductivity.gauge_covariant_response_contracts import GAUGE_COVARIANT_RESPONSE_ADJUDICATION_SCHEMA, GAUGE_COVARIANT_RESPONSE_CONTROL_SCIENCE_FREEZE_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_MATCHED_WAVE_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_TRANSPORT_NOMINATION_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_ADMISSION_COMPILER_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_CONDITIONAL_PROSPECTIVE_CONTROL_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_INDEPENDENT_RECURRENCE_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_CAPABILITY_VERSION, GAUGE_COVARIANT_RESPONSE_CLOSEOUT_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_CONFIG_SCHEMA, GAUGE_COVARIANT_RESPONSE_CONFIG_VERSION, GAUGE_COVARIANT_RESPONSE_DEVELOPMENT_BASIS_FREEZE_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_MATERIAL_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_CONFORMANCE_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_EXTENSION_QUALIFICATION_CAPABILITY_KEY, GaugeCovariantResponseCloseout, GaugeCovariantResponseConfig, GaugeCovariantResponseDevelopmentBasisFreeze, GaugeCovariantResponseSourceQualification, GaugeCovariantResponseStage, GaugeCovariantResponseStageResult, GaugeCovariantResponseConformanceResult, GaugeCovariantResponseMaterialInput, GaugeCovariantResponseMaterialResult, GaugeCovariantResponseResponseObservation, decode_gauge_covariant_response_config_bytes, SyntheticMaterialMethodPrerequisites
+from empirical_lawhood.domains.materials.superconductivity.gauge_covariant_response_design import build_material_control_control_result, build_closeout, build_development_basis_freeze, build_nonattempt
+from empirical_lawhood.domains.materials.superconductivity.synthetic_gauge_covariant_response import produce_material_gauge_covariant_response, run_gauge_covariant_response_conformance
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.gauge_covariant_response_source import expected_gauge_covariant_response_source_qualification, inspect_gauge_covariant_response_external_sources
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_system import task_budget
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.planning.study_issue import StudyOperationAuthority
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-    encode_scientific_adjudication,
+from empirical_lawhood.domains.materials.superconductivity.gauge_covariant_response_stages import (
+    CLOSEOUT_STEP as _science_CLOSEOUT_STEP,
+    COMPUTATIONAL_ADMISSION_STEP as _science_COMPUTATIONAL_ADMISSION_STEP,
+    CONFIG_ARTIFACT_ID as _science_CONFIG_ARTIFACT_ID,
+    DESIGN_STEP as _science_DESIGN_STEP,
+    DIVERSE_SEED_ACTIONS_STEP as _science_DIVERSE_SEED_ACTIONS_STEP,
+    GAUGE_COVARIANT_RESPONSE_STEP as _science_GAUGE_COVARIANT_RESPONSE_STEP,
+    MATERIAL_CONTROL_GATE_STEP as _science_MATERIAL_CONTROL_GATE_STEP,
+    RESPONSE_GUIDED_WAVE_1_STEP as _science_RESPONSE_GUIDED_WAVE_1_STEP,
+    RESPONSE_GUIDED_WAVE_2_STEP as _science_RESPONSE_GUIDED_WAVE_2_STEP,
+    SOURCE_CONTRACT_ARTIFACT_ID as _science_SOURCE_CONTRACT_ARTIFACT_ID,
+    SOURCE_STEP as _science_SOURCE_STEP,
+    TRANSPORT_NOMINATION_STEP as _science_TRANSPORT_NOMINATION_STEP,
 )
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityManifest,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-)
-
-from .gauge_covariant_response_contracts import GAUGE_COVARIANT_RESPONSE_ADJUDICATION_SCHEMA, GAUGE_COVARIANT_RESPONSE_CONTROL_SCIENCE_FREEZE_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_MATCHED_WAVE_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_TRANSPORT_NOMINATION_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_ADMISSION_COMPILER_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_CONDITIONAL_PROSPECTIVE_CONTROL_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_INDEPENDENT_RECURRENCE_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_CAPABILITY_VERSION, GAUGE_COVARIANT_RESPONSE_CLOSEOUT_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_CONFIG_SCHEMA, GAUGE_COVARIANT_RESPONSE_CONFIG_VERSION, GAUGE_COVARIANT_RESPONSE_DEVELOPMENT_BASIS_FREEZE_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_MATERIAL_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_CONFORMANCE_CAPABILITY_KEY, GAUGE_COVARIANT_RESPONSE_EXTENSION_QUALIFICATION_CAPABILITY_KEY, GaugeCovariantResponseCloseout, GaugeCovariantResponseConfig, GaugeCovariantResponseDevelopmentBasisFreeze, GaugeCovariantResponseSourceQualification, GaugeCovariantResponseStage, GaugeCovariantResponseStageResult, GaugeCovariantResponseConformanceResult, GaugeCovariantResponseMaterialInput, GaugeCovariantResponseMaterialResult, GaugeCovariantResponseResponseObservation, decode_gauge_covariant_response_config_bytes, SyntheticMaterialMethodPrerequisites
-from .gauge_covariant_response_design import build_material_control_control_result, build_closeout, build_development_basis_freeze, build_nonattempt
-from .synthetic_gauge_covariant_response import produce_material_gauge_covariant_response, run_gauge_covariant_response_conformance
-from .gauge_covariant_response_source import expected_gauge_covariant_response_source_qualification, inspect_gauge_covariant_response_external_sources
-from .material_source_design_system import task_budget
-
-
-CONFIG_ARTIFACT_ID = 'config-artifact.ambient-pressure-superconductor-gauge-covariant-response'
-SOURCE_CONTRACT_ARTIFACT_ID = 'source-contract.ambient-pressure-superconductor-gauge-covariant-response-gauge-covariant-response-extension'
-SOURCE_STEP = 'gauge-covariant-response-source-qualification'
-GAUGE_COVARIANT_RESPONSE_STEP = 'gauge-covariant-response-gauge-covariant-response-conformance'
-DESIGN_STEP = 'gauge-covariant-response-design-freeze'
-MATERIAL_CONTROL_GATE_STEP = 'gauge-covariant-response-material-control-control-gate'
-DIVERSE_SEED_ACTIONS_STEP = 'gauge-covariant-response-diverse-seed-actions-seed-slot'
-RESPONSE_GUIDED_WAVE_1_STEP = 'gauge-covariant-response-response-guided-exploration-wave-1-slot'
-RESPONSE_GUIDED_WAVE_2_STEP = 'gauge-covariant-response-response-guided-exploration-wave-2-slot'
-TRANSPORT_NOMINATION_STEP = 'gauge-covariant-response-transport-nomination-transport-slot'
-COMPUTATIONAL_ADMISSION_STEP = 'gauge-covariant-response-computational-admission-admission-slot'
-CLOSEOUT_STEP = 'gauge-covariant-response-development-closeout-closeout'
 
 _GAUGE_COVARIANT_RESPONSE_FIXTURE_NAMES = (
     "finite-q-drift",
@@ -80,7 +56,7 @@ def gauge_covariant_response_config_ref(config: GaugeCovariantResponseConfig) ->
         config_schema=GAUGE_COVARIANT_RESPONSE_CONFIG_SCHEMA,
         config_schema_sha256=sha256(GAUGE_COVARIANT_RESPONSE_CONFIG_SCHEMA.encode()).hexdigest(),
         content_sha256=config.payload_sha256,
-        artifact_id=CONFIG_ARTIFACT_ID,
+        artifact_id=_science_CONFIG_ARTIFACT_ID,
     )
 
 
@@ -140,7 +116,7 @@ def gauge_covariant_response_development_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=SOURCE_STEP,
+            step_id=_science_SOURCE_STEP,
             stage=ScientificStage.QUALIFY,
             capability_key=GAUGE_COVARIANT_RESPONSE_EXTENSION_QUALIFICATION_CAPABILITY_KEY,
             dependencies=(),
@@ -154,7 +130,7 @@ def gauge_covariant_response_development_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=GAUGE_COVARIANT_RESPONSE_STEP,
+            step_id=_science_GAUGE_COVARIANT_RESPONSE_STEP,
             stage=ScientificStage.FALSIFY,
             capability_key=GAUGE_COVARIANT_RESPONSE_CONFORMANCE_CAPABILITY_KEY,
             dependencies=(),
@@ -168,10 +144,10 @@ def gauge_covariant_response_development_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=DESIGN_STEP,
+            step_id=_science_DESIGN_STEP,
             stage=ScientificStage.FREEZE,
             capability_key=GAUGE_COVARIANT_RESPONSE_DEVELOPMENT_BASIS_FREEZE_CAPABILITY_KEY,
-            dependencies=(SOURCE_STEP, GAUGE_COVARIANT_RESPONSE_STEP),
+            dependencies=(_science_SOURCE_STEP, _science_GAUGE_COVARIANT_RESPONSE_STEP),
             outputs=(
                 _output("development-basis-freeze", GaugeCovariantResponseDevelopmentBasisFreeze.SCHEMA),
             ),
@@ -186,10 +162,10 @@ def gauge_covariant_response_development_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=MATERIAL_CONTROL_GATE_STEP,
+            step_id=_science_MATERIAL_CONTROL_GATE_STEP,
             stage=ScientificStage.QUALIFY,
             capability_key=GAUGE_COVARIANT_RESPONSE_CONTROL_SCIENCE_FREEZE_CAPABILITY_KEY,
-            dependencies=(SOURCE_STEP, GAUGE_COVARIANT_RESPONSE_STEP, DESIGN_STEP),
+            dependencies=(_science_SOURCE_STEP, _science_GAUGE_COVARIANT_RESPONSE_STEP, _science_DESIGN_STEP),
             outputs=(_output('material-control-stage-result', GaugeCovariantResponseStageResult.SCHEMA),),
             access=OutcomeAccess.DEVELOPMENT_VISIBLE,
             visibility=VisibilityCeiling.DEVELOPMENT_ONLY,
@@ -199,10 +175,10 @@ def gauge_covariant_response_development_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=DIVERSE_SEED_ACTIONS_STEP,
+            step_id=_science_DIVERSE_SEED_ACTIONS_STEP,
             stage=ScientificStage.EXPLORE,
             capability_key=GAUGE_COVARIANT_RESPONSE_MATCHED_WAVE_CAPABILITY_KEY,
-            dependencies=(MATERIAL_CONTROL_GATE_STEP,),
+            dependencies=(_science_MATERIAL_CONTROL_GATE_STEP,),
             outputs=(_output('diverse-seed-actions-stage-result', GaugeCovariantResponseStageResult.SCHEMA),),
             access=OutcomeAccess.DEVELOPMENT_VISIBLE,
             visibility=VisibilityCeiling.DEVELOPMENT_ONLY,
@@ -212,10 +188,10 @@ def gauge_covariant_response_development_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=RESPONSE_GUIDED_WAVE_1_STEP,
+            step_id=_science_RESPONSE_GUIDED_WAVE_1_STEP,
             stage=ScientificStage.EXPLORE,
             capability_key=GAUGE_COVARIANT_RESPONSE_MATCHED_WAVE_CAPABILITY_KEY,
-            dependencies=(DIVERSE_SEED_ACTIONS_STEP,),
+            dependencies=(_science_DIVERSE_SEED_ACTIONS_STEP,),
             outputs=(_output('response-guided-exploration-wave-1-stage-result', GaugeCovariantResponseStageResult.SCHEMA),),
             access=OutcomeAccess.DEVELOPMENT_VISIBLE,
             visibility=VisibilityCeiling.DEVELOPMENT_ONLY,
@@ -225,10 +201,10 @@ def gauge_covariant_response_development_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=RESPONSE_GUIDED_WAVE_2_STEP,
+            step_id=_science_RESPONSE_GUIDED_WAVE_2_STEP,
             stage=ScientificStage.EXPLORE,
             capability_key=GAUGE_COVARIANT_RESPONSE_MATCHED_WAVE_CAPABILITY_KEY,
-            dependencies=(RESPONSE_GUIDED_WAVE_1_STEP,),
+            dependencies=(_science_RESPONSE_GUIDED_WAVE_1_STEP,),
             outputs=(_output('response-guided-exploration-wave-2-stage-result', GaugeCovariantResponseStageResult.SCHEMA),),
             access=OutcomeAccess.DEVELOPMENT_VISIBLE,
             visibility=VisibilityCeiling.DEVELOPMENT_ONLY,
@@ -238,10 +214,10 @@ def gauge_covariant_response_development_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=TRANSPORT_NOMINATION_STEP,
+            step_id=_science_TRANSPORT_NOMINATION_STEP,
             stage=ScientificStage.FALSIFY,
             capability_key=GAUGE_COVARIANT_RESPONSE_TRANSPORT_NOMINATION_CAPABILITY_KEY,
-            dependencies=(RESPONSE_GUIDED_WAVE_2_STEP,),
+            dependencies=(_science_RESPONSE_GUIDED_WAVE_2_STEP,),
             outputs=(_output('transport-nomination-stage-result', GaugeCovariantResponseStageResult.SCHEMA),),
             access=OutcomeAccess.DEVELOPMENT_VISIBLE,
             visibility=VisibilityCeiling.DEVELOPMENT_ONLY,
@@ -253,10 +229,10 @@ def gauge_covariant_response_development_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=COMPUTATIONAL_ADMISSION_STEP,
+            step_id=_science_COMPUTATIONAL_ADMISSION_STEP,
             stage=ScientificStage.ADMISSION,
             capability_key=GAUGE_COVARIANT_RESPONSE_ADMISSION_COMPILER_CAPABILITY_KEY,
-            dependencies=(TRANSPORT_NOMINATION_STEP, DESIGN_STEP),
+            dependencies=(_science_TRANSPORT_NOMINATION_STEP, _science_DESIGN_STEP),
             outputs=(_output('computational-admission-stage-result', GaugeCovariantResponseStageResult.SCHEMA),),
             access=OutcomeAccess.EVALUATION_SEALED,
             visibility=VisibilityCeiling.OUTCOME_VISIBLE,
@@ -268,10 +244,10 @@ def gauge_covariant_response_development_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=CLOSEOUT_STEP,
+            step_id=_science_CLOSEOUT_STEP,
             stage=ScientificStage.EVALUATE,
             capability_key=GAUGE_COVARIANT_RESPONSE_CLOSEOUT_CAPABILITY_KEY,
-            dependencies=(COMPUTATIONAL_ADMISSION_STEP, DESIGN_STEP),
+            dependencies=(_science_COMPUTATIONAL_ADMISSION_STEP, _science_DESIGN_STEP),
             outputs=(
                 _output("closeout", GaugeCovariantResponseCloseout.SCHEMA),
                 _output("scientific-adjudication", GAUGE_COVARIANT_RESPONSE_ADJUDICATION_SCHEMA),
@@ -500,7 +476,7 @@ class GaugeCovariantResponseRunner:
         self.execution_count += 1
         records = self._read(context)
         outputs: dict[str, CanonicalRecord | bytes]
-        if context.task_id == SOURCE_STEP:
+        if context.task_id == _science_SOURCE_STEP:
             contract = _one(records, GaugeCovariantResponseSourceQualification)
             if contract != self.source_contract:
                 raise ValueError('gauge covariant response source contract differs')
@@ -510,7 +486,7 @@ class GaugeCovariantResponseRunner:
             if observed != contract:
                 raise ValueError('gauge covariant response physical source extension differs')
             outputs = {"source-qualification": observed}
-        elif context.task_id == GAUGE_COVARIANT_RESPONSE_STEP:
+        elif context.task_id == _science_GAUGE_COVARIANT_RESPONSE_STEP:
             conformance, observations = run_gauge_covariant_response_conformance()
             if conformance.formalism_sha256 != self.config.gauge_covariant_formalism_sha256:
                 raise ValueError('gauge covariant response executed gauge covariant response formalism differs from config')
@@ -529,7 +505,7 @@ class GaugeCovariantResponseRunner:
                     _one(records, GaugeCovariantResponseMaterialInput)
                 )
             }
-        elif context.task_id == DESIGN_STEP:
+        elif context.task_id == _science_DESIGN_STEP:
             outputs = {
                 "development-basis-freeze": build_development_basis_freeze(
                     config=self.config,
@@ -541,7 +517,7 @@ class GaugeCovariantResponseRunner:
                     conditional_registry=self.conditional_registry,
                 )
             }
-        elif context.task_id == MATERIAL_CONTROL_GATE_STEP:
+        elif context.task_id == _science_MATERIAL_CONTROL_GATE_STEP:
             source = _one(records, GaugeCovariantResponseSourceQualification)
             if source.fingerprint() != self.config.source_extension_sha256:
                 raise ValueError('material control source binding differs')
@@ -551,32 +527,32 @@ class GaugeCovariantResponseRunner:
                     conformance=_one(records, GaugeCovariantResponseConformanceResult),
                 )
             }
-        elif context.task_id == DIVERSE_SEED_ACTIONS_STEP:
+        elif context.task_id == _science_DIVERSE_SEED_ACTIONS_STEP:
             outputs = {
                 'diverse-seed-actions-stage-result': build_nonattempt(
                     stage=GaugeCovariantResponseStage.DIVERSE_SEED_ACTIONS, upstream=_stage(records, GaugeCovariantResponseStage.MATERIAL_CONTROL)
                 )
             }
-        elif context.task_id == RESPONSE_GUIDED_WAVE_1_STEP:
+        elif context.task_id == _science_RESPONSE_GUIDED_WAVE_1_STEP:
             outputs = {
                 'response-guided-exploration-wave-1-stage-result': build_nonattempt(
                     stage=GaugeCovariantResponseStage.RESPONSE_GUIDED_WAVE_1, upstream=_stage(records, GaugeCovariantResponseStage.DIVERSE_SEED_ACTIONS)
                 )
             }
-        elif context.task_id == RESPONSE_GUIDED_WAVE_2_STEP:
+        elif context.task_id == _science_RESPONSE_GUIDED_WAVE_2_STEP:
             outputs = {
                 'response-guided-exploration-wave-2-stage-result': build_nonattempt(
                     stage=GaugeCovariantResponseStage.RESPONSE_GUIDED_WAVE_2,
                     upstream=_stage(records, GaugeCovariantResponseStage.RESPONSE_GUIDED_WAVE_1),
                 )
             }
-        elif context.task_id == TRANSPORT_NOMINATION_STEP:
+        elif context.task_id == _science_TRANSPORT_NOMINATION_STEP:
             outputs = {
                 'transport-nomination-stage-result': build_nonattempt(
                     stage=GaugeCovariantResponseStage.TRANSPORT_NOMINATION, upstream=_stage(records, GaugeCovariantResponseStage.RESPONSE_GUIDED_WAVE_2)
                 )
             }
-        elif context.task_id == COMPUTATIONAL_ADMISSION_STEP:
+        elif context.task_id == _science_COMPUTATIONAL_ADMISSION_STEP:
             design = _one(records, GaugeCovariantResponseDevelopmentBasisFreeze)
             if not design.computational_admission_slots_frozen:
                 raise ValueError('computational admission received an unfrozen conditional slot')
@@ -585,7 +561,7 @@ class GaugeCovariantResponseRunner:
                     stage=GaugeCovariantResponseStage.COMPUTATIONAL_ADMISSION, upstream=_stage(records, GaugeCovariantResponseStage.TRANSPORT_NOMINATION)
                 )
             }
-        elif context.task_id == CLOSEOUT_STEP:
+        elif context.task_id == _science_CLOSEOUT_STEP:
             closeout = build_closeout(
                 config=self.config,
                 design=_one(records, GaugeCovariantResponseDevelopmentBasisFreeze),
@@ -717,7 +693,7 @@ class GaugeCovariantResponseRuntimeProvider(CampaignRuntimeProvider):
             for task in plan.tasks
             for value in task.external_inputs
         }
-        expected = {CONFIG_ARTIFACT_ID, SOURCE_CONTRACT_ARTIFACT_ID}
+        expected = {_science_CONFIG_ARTIFACT_ID, _science_SOURCE_CONTRACT_ARTIFACT_ID}
         if set(specs) != expected:
             raise ValueError('gauge covariant response plan external input set differs')
 
@@ -756,13 +732,13 @@ class GaugeCovariantResponseRuntimeProvider(CampaignRuntimeProvider):
 
         return (
             payload(
-                CONFIG_ARTIFACT_ID,
+                _science_CONFIG_ARTIFACT_ID,
                 payload_schema=GAUGE_COVARIANT_RESPONSE_CONFIG_SCHEMA,
                 content=self.config_payload,
                 object_version=GAUGE_COVARIANT_RESPONSE_CONFIG_VERSION,
             ),
             payload(
-                SOURCE_CONTRACT_ARTIFACT_ID,
+                _science_SOURCE_CONTRACT_ARTIFACT_ID,
                 payload_schema=GaugeCovariantResponseSourceQualification.SCHEMA,
                 content=self.source_contract.canonical_bytes(),
                 object_version=GaugeCovariantResponseSourceQualification.VERSION,
@@ -811,29 +787,9 @@ class GaugeCovariantResponseRuntimeProvider(CampaignRuntimeProvider):
         return ScientificAdjudicationOutputContract(
             capability_key=GAUGE_COVARIANT_RESPONSE_CLOSEOUT_CAPABILITY_KEY,
             capability_version=GAUGE_COVARIANT_RESPONSE_CAPABILITY_VERSION,
-            output_id=f'{CLOSEOUT_STEP}.scientific-adjudication',
+            output_id=f'{_science_CLOSEOUT_STEP}.scientific-adjudication',
             payload_schema=GAUGE_COVARIANT_RESPONSE_ADJUDICATION_SCHEMA,
             maximum_bytes=128 * 1024,
             fixture_scope_id=None,
             plumbing_only=False,
         )
-
-
-__all__ = [
-    'GaugeCovariantResponseRuntimeProvider',
-    "MATERIAL_CONTROL_GATE_STEP",
-    'DIVERSE_SEED_ACTIONS_STEP',
-    'RESPONSE_GUIDED_WAVE_1_STEP',
-    'RESPONSE_GUIDED_WAVE_2_STEP',
-    'TRANSPORT_NOMINATION_STEP',
-    'COMPUTATIONAL_ADMISSION_STEP',
-    "CLOSEOUT_STEP",
-    "CONFIG_ARTIFACT_ID",
-    "DESIGN_STEP",
-    'GAUGE_COVARIANT_RESPONSE_STEP',
-    "SOURCE_CONTRACT_ARTIFACT_ID",
-    "SOURCE_STEP",
-    'gauge_covariant_response_conditional_protocols',
-    'gauge_covariant_response_config_ref',
-    'gauge_covariant_response_development_protocol',
-]

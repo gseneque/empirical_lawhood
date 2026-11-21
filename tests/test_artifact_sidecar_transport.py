@@ -8,20 +8,14 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifact_sidecars as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.artifact_sidecars import (
-    decode_artifact_sidecar, encode_artifact_manifest_reference, read_artifact_sidecar,
-    resolve_artifact_manifest_reference,
-)
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import VisibilityCeiling
-from empirical_lawhood.runtime.artifact_sidecar import ArtifactManifestReference
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactCustodyLimits, ArtifactManifest, ArtifactPublicationCommit, ExternalRootContract,
-    artifact_publication_commit_relative_path,
-)
+from empirical_lawhood.storage import artifact_sidecars as owner
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.artifact_sidecars import decode_artifact_sidecar, encode_artifact_manifest_reference, read_artifact_sidecar, resolve_artifact_manifest_reference
+from empirical_lawhood.storage.task_receipts import decode_artifact_manifest
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifact_sidecar import ArtifactManifestReference
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits, ArtifactManifest, ArtifactPublicationCommit, ExternalRootContract, artifact_publication_commit_relative_path
 from tests.test_artifact_manifest_known_publication import _manifests
 
 

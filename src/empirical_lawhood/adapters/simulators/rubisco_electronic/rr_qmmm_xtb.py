@@ -16,12 +16,8 @@ from numbers import Real
 from pathlib import PurePosixPath
 import re
 
-from empirical_lawhood.adapters.simulators.rubisco_electronic.rr_xtb_repair import (
-    ANGSTROM_PER_BOHR, ELEMENT_VALENCE, ELEMENT_Z, MAXIMUM_FIELD_ATOMS,
-    MAXIMUM_NATIVE_FILE_BYTES, MAXIMUM_QM_ATOMS, PARAMETER_SHA256, RELEASE_TAG,
-    RUNTIME_BUILD, NativeAtomV1, NativeFieldRowV1, angstrom_to_bohr, encode_coord,
-    encode_pcem, parse_gradient,
-)
+from empirical_lawhood.domains.rubisco.electronic.xtb_numerics import ANGSTROM_PER_BOHR, angstrom_to_bohr
+from empirical_lawhood.adapters.simulators.rubisco_electronic.rr_xtb_repair import ELEMENT_VALENCE, ELEMENT_Z, MAXIMUM_FIELD_ATOMS, MAXIMUM_NATIVE_FILE_BYTES, MAXIMUM_QM_ATOMS, PARAMETER_SHA256, RELEASE_TAG, RUNTIME_BUILD, NativeAtomV1, NativeFieldRowV1, encode_coord, encode_pcem, parse_gradient
 
 BINARY_SHA256 = 'debf27a9e0fa4bfb5ca75aafe4b90d8211f08ec2f4a482f375a4987212eaa12a'
 ASH_ANGSTROM_PER_BOHR = Decimal('0.5291772109303')

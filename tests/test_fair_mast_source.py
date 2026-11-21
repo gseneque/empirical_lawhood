@@ -5,27 +5,77 @@ SPDX-License-Identifier: MPL-2.0
 
 from dataclasses import replace
 from decimal import Decimal
+from io import BytesIO
 from pathlib import Path
+import json
 
+import numpy as np
+import pyarrow
 import pytest
 
-from empirical_lawhood.adapters.physical.mast_archive.fresh_source import (
-    FairMastPublicSourceService,
-    load_fair_mast_selection,
-)
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.planning.study_issue import AccountableHumanIdentity, StudyAuthorityKind, StudyOperationAuthority
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.adapters.physical.mast_archive.fresh_source import FairMastPublicSourceService, load_fair_mast_selection
+from empirical_lawhood.adapters.physical.mast_archive.level2_array import Level2Array
+from empirical_lawhood.adapters.physical.mast_archive import fresh_source
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.design.study_issue import AccountableHumanIdentity, StudyAuthorityKind, StudyOperationAuthority
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
+
+
+def test_level2_profile_interval_reads_only_intersecting_chunks_and_preserves_original_indices():
+    metadata = {"zarr_format": 3, "node_type": "array", "data_type": "float64",
+                "dimension_names": ["major_radius", "time"], "attributes": {"units": "eV"},
+                "shape": [4, 5], "chunk_grid": {"name": "regular", "configuration": {"chunk_shape": [3, 3]}},
+                "chunk_key_encoding": {"name": "default", "configuration": {"separator": "/"}},
+                "codecs": [{"name": "bytes", "configuration": {"endian": "little"}}, {"name": "zstd"}]}
+    raw = json.dumps(metadata).encode()
+    selected = Level2Array.from_metadata(raw, dimensions=("major_radius", "time"), units="eV")
+    original = np.arange(36, dtype="<f8").reshape(6, 6)
+    calls = []
+
+    def fetch(index):
+        row, column = (3 * i for i in index)
+        calls.append(index)
+        return pyarrow.Codec("zstd").compress(original[row:row+3, column:column+3].tobytes(), asbytes=True)
+
+    np.testing.assert_array_equal(selected.read_interval(3, 5, fetch), original[:4, 3:5])
+    assert calls == [(0, 1), (1, 1)]
+    np.testing.assert_array_equal(selected.read_interval(2, 4, fetch), original[:4, 2:4])
+    for start, stop in ((-1, 2), (2, 2), (3, 6)):
+        with pytest.raises(ValueError, match="interval"):
+            selected.read_interval(start, stop, fetch)
+    with pytest.raises(OSError):
+        selected.read_interval(1, 2, lambda index: pyarrow.Codec("zstd").compress(b"short", asbytes=True))
+    with pytest.raises(ValueError, match="units"):
+        Level2Array.from_metadata(raw, dimensions=("time", "major_radius"), units="eV")
+    with pytest.raises(ValueError, match="units"):
+        Level2Array.from_metadata(raw, dimensions=("major_radius", "time"), units="keV")
+
 
 CONFIG = Path(__file__).resolve().parents[1] / "programmes/energy/fusion/workflows/fair-mast-source/fair-mast-level2.json"
+
+
+def test_short_original_http_transfer_is_refused_before_source_publication(monkeypatch):
+    url = fresh_source.ZARR_BASE + "/30421.zarr/summary/time/c/0"
+
+    class ShortResponse(BytesIO):
+        status = 200
+        headers = {"Content-Length": "100"}
+
+        def geturl(self):
+            return url
+
+    class Opener:
+        def open(self, request, timeout):
+            return ShortResponse(b"partial")
+
+    monkeypatch.setattr(fresh_source, "build_opener", lambda *handlers: Opener())
+    with pytest.raises(ValueError, match="declared length"):
+        fresh_source.BoundedFairMastHttpGateway().fetch(url, maximum_bytes=200, timeout_seconds=1)
 
 
 class Gateway:

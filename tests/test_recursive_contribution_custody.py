@@ -8,40 +8,33 @@ actual public two-wave numerical execution.
 
 from dataclasses import dataclass, replace
 from decimal import Decimal
-from hashlib import sha256
 import json
 from pathlib import Path
 import shutil
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_recursive_construction import science
-from empirical_lawhood.adapters.methods.battery_recursive_construction.contracts import (
-    BatteryOperation, BatteryOperationConfig, BatteryProcedureContribution,
-)
-from empirical_lawhood.adapters.methods.battery_recursive_construction.examples import (
-    QUESTION_A, QUESTION_B, battery_wave_a_draft, battery_wave_b_draft, describe_contributions, next_wave_builder,
-)
+import empirical_lawhood.domains.battery.battery_recursive_construction.assessment as science
+import empirical_lawhood.adapters.battery.battery_recursive_construction.science as native_science
+from empirical_lawhood.domains.battery.battery_recursive_construction.contracts import BatteryOperation, BatteryOperationConfig, BatteryProcedureContribution
+from empirical_lawhood.domains.battery.battery_recursive_construction.examples import QUESTION_A, QUESTION_B, battery_wave_a_draft, battery_wave_b_draft, describe_contributions, next_wave_builder
 from empirical_lawhood.api import numerical_provenance as provenance_owner
 from empirical_lawhood.api import recursive_authoring as author
 from empirical_lawhood.api import recursive_execution as execution
-from empirical_lawhood.api.recursive_contributions import (
-    authenticate_recursive_contribution, contribution_input_bindings, export_recursive_contribution,
-    inspect_recursive_contribution,
-)
+from empirical_lawhood.api.recursive_contributions import authenticate_recursive_contribution, contribution_input_bindings, export_recursive_contribution, inspect_recursive_contribution
 from empirical_lawhood.api.recursive_operations import operation_catalog
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.infrastructure import execution as execution_infrastructure
-from empirical_lawhood.infrastructure import development_native_custody as native_custody
-from empirical_lawhood.infrastructure import recursive_custody, task_receipts
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.scientific_contributions import ContributionManifest
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.execution import RunnerRegistry, RunnerResult, TaskOutputPayload
-from empirical_lawhood.runtime.recursive_handoff import PortableRecursiveContribution, RecursiveImplementationBinding
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.execution.local import execution as execution_infrastructure
+from empirical_lawhood.storage import development_native_custody as native_custody
+from empirical_lawhood.storage import recursive_custody
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.execution import RunnerRegistry, RunnerResult, TaskOutputPayload
+from empirical_lawhood.execution.recursive_handoff import PortableRecursiveContribution, RecursiveImplementationBinding
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
 from tests.test_battery_recursive_construction import _checkpoint, _trace
 from tests.test_recursive_public_service import _plane
 
@@ -69,7 +62,7 @@ class SyntheticProductExecutor(execution_infrastructure.DirectTaskExecutor):
     def execute(self, runner, context, *, timeout_seconds, native_subwork=None,
                 prepared_contract=None, provenance_requirements=(), native_entry=None,
                 native_work_preparer=None):
-        from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract
+        from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract
 
         if (native_subwork is not None or provenance_requirements or native_entry is not None
                 or native_work_preparer is not None):
@@ -193,8 +186,8 @@ def test_relocated_exact_closure_authenticates_without_native_or_producer_root(p
     expected = _raw_snapshot(imported)
     def no_contact(*args, **kwargs):
         pytest.fail("portable reader attempted native acquisition or producing checkout inspection")
-    monkeypatch.setattr(science, "capture_checkpoint", no_contact)
-    monkeypatch.setattr(science, "continue_checkpoint", no_contact)
+    monkeypatch.setattr(native_science, "capture_checkpoint", no_contact)
+    monkeypatch.setattr(native_science, "continue_checkpoint", no_contact)
     monkeypatch.setattr(execution, "implementation_binding", no_contact)
     # Remove the original producer entirely: the consumer has a complete copy.
     shutil.rmtree(Path(producer.root.contract.canonical_path))
@@ -322,10 +315,9 @@ def test_retained_input_contract_checks_exact_lineage_role_profile_and_size_befo
     producer, directory, _, _, _, _, _ = portable_a
     _, draft, _, payloads = author.load_authored_wave(directory=directory, artifact_writer=producer)
     _, plan, _ = execution._retained_plans(payloads, draft)
-    relative = f"runs/{plan.source_plan.object_id}/inputs/input-0000.json.manifest.json"
-    raw = producer.root.resolve(relative, for_write=False).read_bytes()
-    original_decoder = task_receipts.decode_artifact_manifest
-    original = original_decoder(raw)
+    relative = f"runs/{plan.source_plan.object_id}/inputs/input-0000.json"
+    original_reader = producer.read_manifest
+    original = original_reader(relative)
     logical = original.logical
     profile = ArtifactProfile.RAW_SOURCE_BYTES
     mutations = (
@@ -343,12 +335,16 @@ def test_retained_input_contract_checks_exact_lineage_role_profile_and_size_befo
         pytest.fail("invalid retained metadata reached payload acquisition")
     monkeypatch.setattr(native_custody, "read_development_native_payload", forbidden)
     for candidate in changed:
-        monkeypatch.setattr(task_receipts, "decode_artifact_manifest",
-            lambda payload, *, maximum_bytes=None, candidate=candidate, **kwargs: candidate
-            if sha256(payload).digest() == sha256(raw).digest()
-            else original_decoder(payload, maximum_bytes=maximum_bytes, **kwargs))
+        injected = []
+        def read_selected_manifest(selected_path, *, maximum_bytes=None, candidate=candidate, **kwargs):
+            if selected_path == relative:
+                injected.append(candidate)
+                return candidate
+            return original_reader(selected_path, maximum_bytes=maximum_bytes, **kwargs)
+        monkeypatch.setattr(producer, "read_manifest", read_selected_manifest)
         with pytest.raises(ValueError, match="frozen scientific identity"):
             execution._external_inputs(plane=producer, plan=plan, draft=draft, payloads=payloads, read_only=True)
+        assert injected == [candidate]
 
 
 def test_inner_reader_refuses_consistent_terminal_hash_with_changed_schema_input_census_or_lineage(portable_a, monkeypatch):
@@ -409,7 +405,7 @@ def test_changed_parent_bytes_or_access_are_refused_before_any_new_effect(portab
     external = next(value for value in draft.external_inputs if value.input_id == "battery.parent.procedure")
     blind = replace(external, visibility_ceiling=VisibilityCeiling.PROSPECTIVE, outcome_access=OutcomeAccess.OUTCOME_BLIND)
     with pytest.raises(ValueError, match="role, bytes or access"):
-        from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+        from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
         registrations, registry, codecs = operation_catalog()
         compile_recursive_wave(draft=replace(draft, external_inputs=tuple(blind if i.input_id == blind.input_id else i for i in draft.external_inputs)),
             registrations=registrations, registry=registry, implementation_commit="a"*40, output_codecs=codecs)

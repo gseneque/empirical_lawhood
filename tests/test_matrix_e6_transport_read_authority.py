@@ -11,7 +11,7 @@ import pytest
 
 from empirical_lawhood.api import matrix_selected_scientific_read as reader
 from empirical_lawhood.api import recursive_operations
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
 from tests.test_current_result_custody import actual_issued_current_task_controls  # noqa: F401
 from tests.test_matrix_selected_scientific_read import _selected_reference
 from tests.test_matrix_e6_transport_assessment import fixture_case
@@ -66,7 +66,7 @@ def test_partial_e6_replays_current_grants_before_any_scientific_payload(
 def test_parent_entry_reopens_original_cal_before_accepting_every_projection(monkeypatch):
     from empirical_lawhood.api import matrix_selected_runtime as runtime
     from empirical_lawhood.api import matrix_prepared_original_commitments as commitments
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_publications as publications
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_publications as publications
     case = fixture_case()
     request, future, access, calls = object(), object(), object(), []
     def original_commitments(**kwargs):

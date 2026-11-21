@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from empirical_lawhood.kernel.retrospective_prediction_experiments import RetrospectiveExperimentSpec
-from empirical_lawhood.planning.study_authoring import RetrospectiveStudyDraft
-from empirical_lawhood.planning.experiment_entry import RetrospectiveAuthoringBase, RetrospectiveAuthoringPackage, RetrospectiveEntryPackage
-from empirical_lawhood.planning.approval import RetrospectiveApprovalProposal, FrozenRetrospectiveApproval
-from empirical_lawhood.runtime.candidate_compiler import RetrospectiveStudyCandidate, RetrospectiveStandardCandidate, RetrospectiveExtensionCandidate, RetrospectiveCandidateReport, RetrospectiveStandardReport, RetrospectiveExtensionReport
-from empirical_lawhood.runtime.study_issue import RetrospectiveIssuedBase, RetrospectiveIssuedStudy, RetrospectivePublicationReceipt
-from empirical_lawhood.runtime.plans import ResourceBoundRetrospectiveStudyRunPlan
+from empirical_lawhood.science.experiments.retrospective_prediction_experiments import RetrospectiveExperimentSpec
+from empirical_lawhood.design.study_authoring import RetrospectiveStudyDraft
+from empirical_lawhood.design.experiment_entry import RetrospectiveAuthoringBase, RetrospectiveAuthoringPackage, RetrospectiveEntryPackage
+from empirical_lawhood.design.approval import RetrospectiveApprovalProposal, FrozenRetrospectiveApproval
+from empirical_lawhood.execution.candidate_compiler import RetrospectiveStudyCandidate, RetrospectiveStandardCandidate, RetrospectiveExtensionCandidate, RetrospectiveCandidateReport, RetrospectiveStandardReport, RetrospectiveExtensionReport
+from empirical_lawhood.execution.study_issue import RetrospectiveIssuedBase, RetrospectiveIssuedStudy, RetrospectivePublicationReceipt
+from empirical_lawhood.execution.plans import ResourceBoundRetrospectiveStudyRunPlan
 from empirical_lawhood.api.models import RetrospectiveCampaignBase, RetrospectiveCampaignPackage
 
 import json
@@ -27,38 +27,29 @@ from typing import Any, TypeVar, Union, cast, get_args, get_origin
 import yaml  # type: ignore[import-untyped]
 from yaml.tokens import AliasToken, AnchorToken, TagToken  # type: ignore[import-untyped]
 
-from empirical_lawhood.infrastructure.bounded_io import MAX_RUNTIME_PLAN_JSON_BYTES
-from empirical_lawhood.kernel.experiments import ExperimentSpec
-from empirical_lawhood.kernel.decoding import record_annotations
-from empirical_lawhood.kernel.parsed_nodes import ParsedNodeInterner
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    CanonicalizationError,
-    validate_document_shape,
-)
-from empirical_lawhood.kernel.systems import SystemSpec
-from empirical_lawhood.planning.campaigns import CampaignSpec
-from empirical_lawhood.planning.evidence_profiles import EvidenceProfileSelection
-from empirical_lawhood.planning.experiment_entry import ExperimentEntryPackage, StudyDefinition, ExecutableStudyDefinition
-from empirical_lawhood.planning.linked_campaign import LinkedCampaignProfile
-from empirical_lawhood.planning.study_authoring import StudyDraft
-from empirical_lawhood.planning.study_bundles import StudyBundleSpec
-from empirical_lawhood.planning.multi_world_study import ArchiveOutcomeProtectionPlan, ArchiveOverlapQualification, ArchiveToSimulatorPartialMorphismSpec, MultiWorldJointAdjudicationPlan, MorphismNegativeControlPlan, MultiWorldOutcomeBarrierPlan, MultiWorldStudyChildScientificBinding, PropertyTransportExpectation
-from empirical_lawhood.planning.response_algebra import (
-    ResponseAlgebraHypothesisFreeze,
-    ResponseAlgebraConformanceSpec,
-    ResponseAlgebraProtocolSpec,
-)
-from empirical_lawhood.planning.source_pipelines import SourcePipelineProfile
-from empirical_lawhood.planning.approval import ApprovalGateAttestation, DurableAuthorizationRecord, FrozenApprovalProposal, FrozenIssuedStudyApprovalProposal, IssuedStudyApprovalProposal
-from empirical_lawhood.planning.study_issue import AccountableHumanIdentity, HumanProposerAttestation, RetrospectiveProposerAttestation, ImplementationSourceClosure, StudyOperationAuthority
-from empirical_lawhood.runtime.plans import EnvelopeExecutionPlan, ExecutionPlan, ProtocolTemplate, EnvelopeRunPlan, RunPlan, ProtocolExecutionPlan, ProtocolRunPlan
-from empirical_lawhood.runtime.profile_compilation import LinkedCampaignExecutableCompilation
-from empirical_lawhood.runtime.source_pipelines import SourcePipelineCompilation
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
-from empirical_lawhood.runtime.candidate_compiler import CandidateCompilationReport, DraftStudyCandidate, StudyCompilationReport, ExecutableStudyCompilationReport, StudyCandidate, ExecutableStudyCandidate
-from empirical_lawhood.runtime.study_issue import MAX_COMPOSED_PROGRAMME_CONTROL_BYTES, IssuedDraftManifest, StudyPublicationReceipt, ExtensionPublicationReceipt, StudyExtensionDecoderRegistration, IssuedStudyManifest, IssuedExecutableStudyManifest
-from empirical_lawhood.runtime.study_bundle_compiler import StudyBundleCandidate, StudyBundleCompilationInput, StudyBundleCompilationReport
+from empirical_lawhood.science.experiments.experiments import ExperimentSpec
+from empirical_lawhood.science.records.decoding import record_annotations
+from empirical_lawhood.science.records.parsed_nodes import ParsedNodeInterner
+from empirical_lawhood.science.records.serialization import CanonicalRecord, CanonicalizationError, validate_document_shape
+from empirical_lawhood.science.models.systems import SystemSpec
+from empirical_lawhood.design.campaigns import CampaignSpec
+from empirical_lawhood.design.evidence_profiles import EvidenceProfileSelection
+from empirical_lawhood.design.experiment_entry import ExperimentEntryPackage, StudyDefinition, ExecutableStudyDefinition
+from empirical_lawhood.design.linked_campaign import LinkedCampaignProfile
+from empirical_lawhood.design.study_authoring import StudyDraft
+from empirical_lawhood.design.study_bundles import StudyBundleSpec
+from empirical_lawhood.design.multi_world_study import ArchiveOutcomeProtectionPlan, ArchiveOverlapQualification, ArchiveToSimulatorPartialMorphismSpec, MultiWorldJointAdjudicationPlan, MorphismNegativeControlPlan, MultiWorldOutcomeBarrierPlan, MultiWorldStudyChildScientificBinding, PropertyTransportExpectation
+from empirical_lawhood.design.response_algebra import ResponseAlgebraHypothesisFreeze, ResponseAlgebraConformanceSpec, ResponseAlgebraProtocolSpec
+from empirical_lawhood.design.source_pipelines import SourcePipelineProfile
+from empirical_lawhood.design.approval import ApprovalGateAttestation, DurableAuthorizationRecord, FrozenApprovalProposal, FrozenIssuedStudyApprovalProposal, IssuedStudyApprovalProposal
+from empirical_lawhood.design.study_issue import AccountableHumanIdentity, HumanProposerAttestation, RetrospectiveProposerAttestation, ImplementationSourceClosure, StudyOperationAuthority
+from empirical_lawhood.execution.plans import EnvelopeExecutionPlan, ExecutionPlan, ProtocolTemplate, EnvelopeRunPlan, RunPlan
+from empirical_lawhood.execution.profile_compilation import LinkedCampaignExecutableCompilation
+from empirical_lawhood.execution.source_pipelines import SourcePipelineCompilation
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
+from empirical_lawhood.execution.candidate_compiler import CandidateCompilationReport, DraftStudyCandidate, StudyCompilationReport, ExecutableStudyCompilationReport, StudyCandidate, ExecutableStudyCandidate
+from empirical_lawhood.execution.study_issue import IssuedDraftManifest, StudyPublicationReceipt, ExtensionPublicationReceipt, StudyExtensionDecoderRegistration, IssuedStudyManifest, IssuedExecutableStudyManifest
+from empirical_lawhood.execution.study_bundle_compiler import StudyBundleCandidate, StudyBundleCompilationInput, StudyBundleCompilationReport
 
 from empirical_lawhood.api.models import CampaignPackage, DualLoopPackage, ExplorationExecutionPackage, IssuedCampaignPackage, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage, ElapsedExperimentPackage
 
@@ -145,15 +136,7 @@ RootRecord = (
     | LinkedCampaignProfile
 )
 RecordT = TypeVar("RecordT", bound=CanonicalRecord)
-MAX_AUTHORING_BYTES = 128 * 1024**2
-# Closed executable definitions use the existing composed-control capacity.
-# Generic editable authoring and its complexity limits remain unchanged.
-MAX_EXECUTABLE_STUDY_AUTHORING_BYTES = MAX_COMPOSED_PROGRAMME_CONTROL_BYTES
-MAX_CAMPAIGN_PACKAGE_BYTES = MAX_COMPOSED_PROGRAMME_CONTROL_BYTES
-MAX_AUTHORING_ROOT_SCHEMAS = 128
 MAX_AUTHORING_NESTING = 128
-MAX_AUTHORING_NODES = 4_000_000
-MAX_COMPOSED_CONTROL_NODES = 8_000_000
 
 
 ROOT_SCHEMAS: Mapping[str, type[RootRecord]] = types.MappingProxyType(
@@ -286,10 +269,8 @@ def _snapshot_root_schemas(
 
     if not isinstance(root_schemas, Mapping):
         raise ValueError("authoring root registry must be a mapping")
-    if not root_schemas or len(root_schemas) > MAX_AUTHORING_ROOT_SCHEMAS:
-        raise ValueError(
-            f"authoring root registry size must be in [1, {MAX_AUTHORING_ROOT_SCHEMAS}]"
-        )
+    if not root_schemas:
+        raise ValueError("authoring root registry must be nonempty")
     snapshot: dict[str | tuple[str, str], type[RecordT]] = {}
     for schema, record_type in tuple(root_schemas.items()):
         if (
@@ -310,18 +291,9 @@ def _snapshot_root_schemas(
     return types.MappingProxyType(snapshot)
 
 
-def _validate_authoring_byte_limit(
-    maximum_bytes: int,
-    *,
-    maximum_allowed_bytes: int = MAX_AUTHORING_BYTES,
-) -> int:
-    if (
-        not isinstance(maximum_bytes, int)
-        or isinstance(maximum_bytes, bool)
-        or maximum_bytes <= 0
-        or maximum_bytes > maximum_allowed_bytes
-    ):
-        raise ValueError(f"authoring byte limit must be in [1, {maximum_allowed_bytes}]")
+def _validate_authoring_byte_limit(maximum_bytes: int | None) -> int | None:
+    if maximum_bytes is not None and (type(maximum_bytes) is not int or maximum_bytes <= 0):
+        raise ValueError("authoring byte limit must be a positive selected allowance or None")
     return maximum_bytes
 
 
@@ -559,13 +531,13 @@ def _parse_yaml(text: str, *, maximum_nodes: int | None = None) -> object:
 def _validate_parsed_structure(value: object, *, maximum_nodes: int | None = None) -> None:
     """Bound parsed syntax trees before recursive canonical-record decoding."""
 
-    node_limit = MAX_AUTHORING_NODES if maximum_nodes is None else maximum_nodes
+    node_limit = maximum_nodes
     stack: list[tuple[object, int]] = [(value, 1)]
     observed_nodes = 0
     while stack:
         current, depth = stack.pop()
         observed_nodes += 1
-        if observed_nodes > node_limit:
+        if node_limit is not None and observed_nodes > node_limit:
             raise AuthoringCodecError("authoring document exceeds its node limit")
         if depth > MAX_AUTHORING_NESTING:
             raise AuthoringCodecError("authoring document exceeds its nesting limit")
@@ -580,7 +552,7 @@ def loads_registered_authoring(
     *,
     media_type: str,
     root_schemas: Mapping[str | tuple[str, str], type[RecordT]],
-    maximum_bytes: int = MAX_AUTHORING_BYTES,
+    maximum_bytes: int | None = None,
 ) -> RecordT:
     """Decode one root from an explicit closed schema registry.
 
@@ -594,7 +566,6 @@ def loads_registered_authoring(
         media_type=media_type,
         root_schemas=root_schemas,
         maximum_bytes=maximum_bytes,
-        maximum_allowed_bytes=MAX_AUTHORING_BYTES,
     )
 
 
@@ -603,8 +574,7 @@ def _loads_registered_authoring(
     *,
     media_type: str,
     root_schemas: Mapping[str | tuple[str, str], type[RecordT]],
-    maximum_bytes: int,
-    maximum_allowed_bytes: int,
+    maximum_bytes: int | None,
     maximum_nodes: int | None = None,
 ) -> RecordT:
     token = _authoring_parse.set(_AuthoringParse())
@@ -612,13 +582,12 @@ def _loads_registered_authoring(
         schema_registry = _snapshot_root_schemas(root_schemas)
         byte_limit = _validate_authoring_byte_limit(
             maximum_bytes,
-            maximum_allowed_bytes=maximum_allowed_bytes,
         )
         try:
             encoded_size = len(text.encode("utf-8"))
         except UnicodeEncodeError as error:
             raise AuthoringCodecError("authoring document must be valid UTF-8 text") from error
-        if encoded_size > byte_limit:
+        if byte_limit is not None and encoded_size > byte_limit:
             raise AuthoringCodecError("authoring document exceeds its byte limit")
         if media_type == "application/json":
             raw = _parse_json(text, maximum_nodes=maximum_nodes)
@@ -638,11 +607,6 @@ def _loads_registered_authoring(
             record_type = schema_registry[schema]
         else:
             raise AuthoringCodecError("unsupported authoring root schema or revision")
-        if (
-            issubclass(record_type, (ProtocolRunPlan, ProtocolExecutionPlan))
-            and encoded_size > MAX_RUNTIME_PLAN_JSON_BYTES
-        ):
-            raise AuthoringCodecError("runtime plan exceeds its byte limit")
         return decode_record(document, record_type)
     finally:
         _authoring_parse.reset(token)
@@ -660,7 +624,7 @@ def load_registered_authoring(
     path: Path,
     *,
     root_schemas: Mapping[str | tuple[str, str], type[RecordT]],
-    maximum_bytes: int = MAX_AUTHORING_BYTES,
+    maximum_bytes: int | None = None,
 ) -> RecordT:
     materialization = load_registered_authoring_materialization(
         path,
@@ -674,13 +638,12 @@ def load_registered_authoring_materialization(
     path: Path,
     *,
     root_schemas: Mapping[str | tuple[str, str], type[RecordT]],
-    maximum_bytes: int = MAX_AUTHORING_BYTES,
+    maximum_bytes: int | None = None,
 ) -> LoadedAuthoringMaterialization:
     return _load_registered_authoring_materialization(
         path,
         root_schemas=root_schemas,
         maximum_bytes=maximum_bytes,
-        maximum_allowed_bytes=MAX_AUTHORING_BYTES,
     )
 
 
@@ -688,20 +651,13 @@ def _load_registered_authoring_materialization(
     path: Path,
     *,
     root_schemas: Mapping[str | tuple[str, str], type[RecordT]],
-    maximum_bytes: int,
-    maximum_allowed_bytes: int,
+    maximum_bytes: int | None,
     maximum_nodes: int | None = None,
 ) -> LoadedAuthoringMaterialization:
     schema_registry = _snapshot_root_schemas(root_schemas)
     byte_limit = _validate_authoring_byte_limit(
         maximum_bytes,
-        maximum_allowed_bytes=maximum_allowed_bytes,
     )
-    if all(
-        issubclass(record_type, (ProtocolRunPlan, ProtocolExecutionPlan))
-        for record_type in schema_registry.values()
-    ):
-        byte_limit = min(byte_limit, MAX_RUNTIME_PLAN_JSON_BYTES)
     suffix = path.suffix.casefold()
     if suffix == ".json":
         media_type = "application/json"
@@ -712,7 +668,6 @@ def _load_registered_authoring_materialization(
     payload = _read_bounded_authoring_bytes(
         path,
         maximum_bytes=byte_limit,
-        maximum_allowed_bytes=maximum_allowed_bytes,
     )
     try:
         text = payload.decode("utf-8")
@@ -723,7 +678,6 @@ def _load_registered_authoring_materialization(
         media_type=media_type,
         root_schemas=schema_registry,
         maximum_bytes=byte_limit,
-        maximum_allowed_bytes=maximum_allowed_bytes,
         maximum_nodes=maximum_nodes,
     )
     digest = hashlib.sha256(media_type.encode("ascii") + b"\x00" + payload).hexdigest()
@@ -746,9 +700,7 @@ def load_campaign_package_authoring(path: Path) -> CampaignPackageAuthoring:
     materialization = _load_registered_authoring_materialization(
         path,
         root_schemas=_CAMPAIGN_PACKAGE_ROOT_SCHEMAS,
-        maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
-        maximum_allowed_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
-        maximum_nodes=MAX_COMPOSED_CONTROL_NODES,
+        maximum_bytes=None,
     )
     return cast(CampaignPackageAuthoring, materialization.record)
 
@@ -764,9 +716,7 @@ def loads_campaign_package_authoring(
         text,
         media_type=media_type,
         root_schemas=_CAMPAIGN_PACKAGE_ROOT_SCHEMAS,
-        maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
-        maximum_allowed_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
-        maximum_nodes=MAX_COMPOSED_CONTROL_NODES,
+        maximum_bytes=None,
     )
 
 
@@ -782,8 +732,7 @@ def load_executable_study_authoring_materialization(path: Path) -> LoadedAuthori
             ExecutableStudyDefinition.SCHEMA: ExecutableStudyDefinition,
             RetrospectiveAuthoringPackage.SCHEMA: RetrospectiveAuthoringPackage,
         },
-        maximum_bytes=MAX_EXECUTABLE_STUDY_AUTHORING_BYTES,
-        maximum_allowed_bytes=MAX_EXECUTABLE_STUDY_AUTHORING_BYTES,
+        maximum_bytes=None,
     )
 
 
@@ -800,9 +749,7 @@ def load_standard_study_candidate(path: Path) -> ExecutableStudyCandidate:
             ExecutableStudyCandidate.SCHEMA: ExecutableStudyCandidate,
             RetrospectiveExtensionCandidate.SCHEMA: RetrospectiveExtensionCandidate,
         },
-        maximum_bytes=MAX_COMPOSED_PROGRAMME_CONTROL_BYTES,
-        maximum_allowed_bytes=MAX_COMPOSED_PROGRAMME_CONTROL_BYTES,
-        maximum_nodes=MAX_COMPOSED_CONTROL_NODES,
+        maximum_bytes=None,
     )
     return cast(ExecutableStudyCandidate, materialization.record)
 
@@ -815,9 +762,7 @@ def load_standard_issued_study(path: Path) -> IssuedExecutableStudyManifest:
             IssuedExecutableStudyManifest.SCHEMA: IssuedExecutableStudyManifest,
             RetrospectiveIssuedStudy.SCHEMA: RetrospectiveIssuedStudy,
         },
-        maximum_bytes=MAX_COMPOSED_PROGRAMME_CONTROL_BYTES,
-        maximum_allowed_bytes=MAX_COMPOSED_PROGRAMME_CONTROL_BYTES,
-        maximum_nodes=MAX_COMPOSED_CONTROL_NODES,
+        maximum_bytes=None,
     )
     return cast(IssuedExecutableStudyManifest, materialization.record)
 
@@ -825,19 +770,17 @@ def load_standard_issued_study(path: Path) -> IssuedExecutableStudyManifest:
 def _read_bounded_authoring_bytes(
     path: Path,
     *,
-    maximum_bytes: int = MAX_AUTHORING_BYTES,
-    maximum_allowed_bytes: int = MAX_AUTHORING_BYTES,
+    maximum_bytes: int | None = None,
 ) -> bytes:
     byte_limit = _validate_authoring_byte_limit(
         maximum_bytes,
-        maximum_allowed_bytes=maximum_allowed_bytes,
     )
     if path.is_symlink():
         raise AuthoringCodecError("authoring document cannot be a symlink")
     before = path.stat()
     if not stat.S_ISREG(before.st_mode):
         raise AuthoringCodecError("authoring document must be a regular file")
-    if before.st_size > byte_limit:
+    if byte_limit is not None and before.st_size > byte_limit:
         raise AuthoringCodecError("authoring document exceeds its byte limit")
     descriptor = os.open(
         path,
@@ -853,7 +796,7 @@ def _read_bounded_authoring_bytes(
         if _file_identity(before) != _file_identity(opened_before):
             raise AuthoringCodecError("authoring document identity changed before read")
         chunks: list[bytes] = []
-        remaining = byte_limit + 1
+        remaining = opened_before.st_size + 1
         while remaining:
             chunk = os.read(descriptor, min(64 * 1024, remaining))
             if not chunk:
@@ -865,7 +808,7 @@ def _read_bounded_authoring_bytes(
     finally:
         os.close(descriptor)
     after = path.stat()
-    if len(payload) > byte_limit:
+    if byte_limit is not None and len(payload) > byte_limit:
         raise AuthoringCodecError("authoring document exceeds its byte limit")
     if (
         _file_identity(opened_before) != _file_identity(opened_after)

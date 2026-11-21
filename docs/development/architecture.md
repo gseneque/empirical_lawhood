@@ -13,31 +13,67 @@ Substrate adapters provide native preparation, delivery and observation.
 
 ## Source layers
 
-```text
-kernel <- planning <- runtime <- adapters and infrastructure <- API <- CLI
-```
-
-Imports point toward the scientific core.
-Adapters and infrastructure can compose at their shared layer.
-Neither layer imports the API or CLI.
-The CLI example entry can import its example implementation.
-Other production modules use the native resource owner directly.
-The [import-boundary check](../../tests/test_import_boundaries.py) includes local and relative imports.
+The [v1.0 architecture guide](../v1.0/architecture.md) is the contributor-facing ownership contract.
+This document is the detailed framework implementation map.
+The [migration record](../v1.0/migration.md) identifies every retired module's current owner.
 
 | Owner | Responsibility |
-|---|---|
-| [Kernel](../../src/empirical_lawhood/kernel/) | Scientific records, native units, support, visibility, validation and canonical identities |
-| [Planning](../../src/empirical_lawhood/planning/) | Design lineage, independent units, prospective cutoffs, authority obligations and source profiles |
-| [Runtime](../../src/empirical_lawhood/runtime/) | Registries, candidate/plan compilation, provider protocols, scientific services and recovery contracts |
-| [Adapters](../../src/empirical_lawhood/adapters/) | Native sources, scientific methods, controller bridges and family composition |
-| [Infrastructure](../../src/empirical_lawhood/infrastructure/) | Bounded I/O, guarded custody, signatures, receipts, local scheduling, source verification and SQLite projection |
-| [API](../../src/empirical_lawhood/api/) and [CLI](../../src/empirical_lawhood/cli/) | Application composition, strict document handoffs and the single installed command |
+| --- | --- |
+| [Science](../../src/empirical_lawhood/science/) | Scientific records, native units, support, visibility, validation, provenance and canonical identities |
+| [Design](../../src/empirical_lawhood/design/) | Editable scientific definitions, lineage, independent units, prospective cutoffs and authoring validation |
+| [Methods](../../src/empirical_lawhood/methods/) | Reusable scientific calculations, estimators and assessments with explicit applicability |
+| [Domains](../../src/empirical_lawhood/domains/) | Domain representations, scientific meaning and composition of methods |
+| [Adapters](../../src/empirical_lawhood/adapters/) | External engines, sources, instruments, formats and native conversion |
+| [Execution](../../src/empirical_lawhood/execution/) | Compilation, scheduling, workers, local/remote deployment and usable compute resources |
+| [Storage](../../src/empirical_lawhood/storage/) | Typed I/O ports, bounded reads, guarded custody, receipts, verification and recovery persistence |
+| [API](../../src/empirical_lawhood/api/) | Shared application operations and concrete service composition |
+| [CLI](../../src/empirical_lawhood/cli/) and [workbench](../../src/empirical_lawhood/workbench/) | Presentation and controls over the same application operations |
+| [Package data](../../src/empirical_lawhood/package_data/) | Shipped read-only assets |
+
+Scientific contracts remain independent of execution, storage and applications.
+Shared methods do not import particular programmes.
+Execution and storage expose explicit ports for native capabilities.
+Application composition binds concrete implementations.
+The [import-boundary check](../../tests/test_import_boundaries.py) enforces these rules, including local and relative imports.
+
+## Remote deployment services
+
+The [accelerated-compute procedure](../using/accelerated-compute.md) owns the standard remote GPU workflow.
+Scientific authoring, execution, recovery and independent assessment remain with their existing domain services.
+Stage-specific code selects those services and their original inputs.
+It must not own another scheduler, budget monitor, installer or transport verifier.
+
+| Responsibility | Reusable owner |
+| --- | --- |
+| Exact monetary policy and allocation records | [Runtime budget](../../src/empirical_lawhood/execution/deployment_budget.py): per-resource billing/elapsed maxima, storage buckets, prior attempts and financial thresholds |
+| Monitoring lifetime and typed ports | [Execution supervision](../../src/empirical_lawhood/execution/remote/deployment_supervision.py): monetary transitions, event custody and explicit observation/action ports. The [thin selection owner](../../src/empirical_lawhood/execution/remote/deployment_supervision_selection.py) shares authorization binding with the controller. |
+| Provider observations | [Runpod observation adapter](../../src/empirical_lawhood/adapters/cloud/runpod_budget.py): bounded resource-filtered GETs and retained original responses, bound by the application API. |
+| Cancellation and compute retirement | [Controller action adapter](../../src/empirical_lawhood/adapters/cloud/skypilot_controller_action.py): pinned upstream SkyPilot with original cluster generation and Pod identity checks |
+| Task preparation and complete transfer manifests | [Deployment infrastructure](../../src/empirical_lawhood/execution/remote/accelerated_deployment.py): offline preparation, exact payload census and original-byte verification |
+| New or retained offline dependency bundles | [Worker bundle owner](../../src/empirical_lawhood/execution/remote/accelerated_worker_bundle.py): original specification, complete retained subtree and installer rendering |
+| Distinct environment restoration | [Environment restore owner](../../src/empirical_lawhood/execution/local/worker_environment_restore.py): fresh prefixes, exact replacements, offline engine installation and unchanged originals |
+| Original trees with links | [Archive owner](../../src/empirical_lawhood/storage/deployment_archive.py): complete type/byte census, bounded archive and independent member comparison without extraction |
+| Application and presentation | [Deployment API](../../src/empirical_lawhood/api/accelerated_deployment.py) composes services. [CLI](../../src/empirical_lawhood/cli/accelerated_deployment.py) supplies commands and reports. |
+| Read-only operational observation | [Observation API](../../src/empirical_lawhood/api/operational_observation.py) composes original execution/native metadata, supervision reads and sealed snapshots. [Observer](../../src/empirical_lawhood/workbench/observer.py) runs independently of browser and supervisor; [return handoff](../../src/empirical_lawhood/api/observation_return.py) separates file verification, original reading and contribution inspection. |
+
+Runtime accounting contains no provider, filesystem, domain or CLI dependency.
+The [research explorer](workbench-architecture.md) composes operational collection,
+current original-result reads, exact evidence and bounded relationship views.
+Its editable registration and navigation state never change scientific records.
+Infrastructure receives explicit resource identities, paths, bounds and original authorization.
+The application binds [SkyPilot actions](../../src/empirical_lawhood/adapters/cloud/skypilot_budget.py)
+and Runpod observations to the execution ports. Execution imports no concrete provider adapters.
+Observation and action ports permit offline failure controls without cloud mutation.
+Discovery imports no provider and performs no installation, device inspection or scientific work.
+Budget supervision never launches compute, dispatches science, repeats uncertain work or deletes persistent volumes.
+Its monetary stops do not become native task deadlines.
+Transport verification and installation acceptance do not supply scientific qualification.
 
 ## Records, lineage and three graphs
 
-Frozen records declare their schema and format revision. Their constructor checks own scientific operands and support limits. [Canonical serialization](../../src/empirical_lawhood/kernel/serialization.py) binds exact bytes to identity. [Strict decoding](../../src/empirical_lawhood/kernel/decoding.py) rejects invalid shapes, unknown fields and identity substitutions at its declared boundary.
+Frozen records declare their schema and format revision. Their constructor checks own scientific operands and support limits. [Canonical serialization](../../src/empirical_lawhood/science/records/serialization.py) binds exact bytes to identity. [Strict decoding](../../src/empirical_lawhood/science/records/decoding.py) rejects invalid shapes, unknown fields and identity substitutions at its declared boundary.
 
-Shared record validation belongs in the kernel. Bounded descriptor reads belong in [infrastructure](../../src/empirical_lawhood/infrastructure/bounded_io.py). Family-specific scientific helpers remain with their adapter owner.
+Shared record validation belongs in the science layer. Bounded descriptor reads belong in [storage](../../src/empirical_lawhood/storage/bounded_io.py). Domain-specific scientific helpers remain with their domain owner.
 
 Large immutable canonical records share encoded child fragments instead of
 retaining a complete byte copy at every ancestor. Materialization and hashing
@@ -50,18 +86,26 @@ Task configuration validation uses the C JSON decoder and compares the complete
 canonical re-encoding. This still rejects duplicate keys, binary floats and
 noncanonical spellings. A requested response implementation constructs its
 own current declaration without rebuilding unrelated response phases.
+`release_canonical_encodings` explicitly forgets derived record encodings across
+one graph while retaining its scientific fields and references. Later encoding
+reconstructs the same canonical bytes. Existing fragment readers can keep their
+own references, so callers measure actual memory after any allocator reclamation.
+The kernel helper performs no I/O, serialization or scientific admission.
 Runtime registries index their closed factory census, and sorted task rosters
 use indexed selection without adding fields to scientific records.
 Dependency indices preserve ready-task ordering and release scheduler work
 only after the controller acknowledges a durable outcome.
 The coordinator admits each prepared task before preparing another ready task.
-It checks owned leases and dispatch refusal between preparations. Bounded verification
+It checks dispatch refusal between preparations. Bounded verification
 queues refill when any check completes. Per-item access checks retain current
 grants; publication and read completion retain complete byte verification.
 Pure continuation projections refresh access within their owning read scope.
 They do not repeat whole-history verification. Composite checkpoints verify each
 shared live byte census once; separate and custom custody scopes remain separate.
 The stock read context owns one complete final check, including consumer refusal.
+The main read keeps its canonical validation pool open through all retained parent checks.
+Copied contexts obtain fresh capacity after closure or on another thread.
+Schedulers can explicitly share a live pool with joined task threads.
 Programme predecessor readers propagate that scoped service through the complete
 continuation chain. Shared publications retain one byte proof within the read.
 Each predecessor still checks its selected records and current access.
@@ -119,7 +163,7 @@ Results retain their original order and the caller's Decimal context.
 The controller retains all path, custody, current-access and final byte checks.
 This estimate bounds additional queued work, not the complete process RSS.
 
-Each numerical replay uses a finite [decoded-array scope](../../src/empirical_lawhood/infrastructure/matrix_array_io.py).
+Each numerical replay uses a finite [decoded-array scope](../../src/empirical_lawhood/adapters/matrix_storage/matrix_array_io.py).
 The scope reuses exact immutable archive/manifest operands and read-only values within one root or case.
 Its 256 MiB retention limit includes compressed and expanded bytes, with at most sixteen entries.
 Scope closure clears the retained values, including on refusal.
@@ -208,7 +252,7 @@ Resume verifies complete files, restarts only owned unpublished copies, and refu
 The final COMPLETE receipt follows source, destination, publication and current-access checks.
 
 Scheduled Matrix sources retain one local root and exact shared-parent identities.
-An operation constructs a pure [source index](../../src/empirical_lawhood/adapters/methods/matrix_scheduled_history/source_index.py)
+An operation constructs a pure [source index](../../src/empirical_lawhood/domains/matrix/matrix_scheduled_history/source_index.py)
 from the authenticated reservation, specification and producing provenance.
 The index checks complete membership, exclusions and matched policies before
 resolving local scientific views. Those views have the bounded source's identity
@@ -222,16 +266,16 @@ The engine keeps three graphs distinct:
 
 | Graph | Object and owner | Meaning |
 |---|---|---|
-| Scientific lineage | `CampaignSpec` in [campaigns.py](../../src/empirical_lawhood/planning/campaigns.py) | Campaign nodes, roots, worlds, active nodes, decision rights and evidence state |
-| Scientific operations | `ProtocolRunPlan` in [plans.py](../../src/empirical_lawhood/runtime/plans.py) | Authorized scientific steps, source/resource identities and cutoffs |
-| Executable tasks | `ProtocolExecutionPlan` in [plans.py](../../src/empirical_lawhood/runtime/plans.py) | Concrete capability requirements, inputs, outputs, dependencies, resource locks and barriers |
+| Scientific lineage | `CampaignSpec` in [campaigns.py](../../src/empirical_lawhood/design/campaigns.py) | Campaign nodes, roots, worlds, active nodes, decision rights and evidence state |
+| Scientific operations | `ProtocolRunPlan` in [plans.py](../../src/empirical_lawhood/execution/plans.py) | Authorized scientific steps, source/resource identities and cutoffs |
+| Executable tasks | `ProtocolExecutionPlan` in [plans.py](../../src/empirical_lawhood/execution/plans.py) | Concrete capability requirements, inputs, outputs, dependencies, resource locks and barriers |
 
-[Compilation](../../src/empirical_lawhood/runtime/compiler.py) constructs the run plan and its executable graph.
-[Scientific graph preservation](../../src/empirical_lawhood/runtime/scientific_graph_preservation.py) validates their agreement.
+[Compilation](../../src/empirical_lawhood/execution/compiler.py) constructs the run plan and its executable graph.
+[Scientific graph preservation](../../src/empirical_lawhood/execution/scientific_graph_preservation.py) validates their agreement.
 A campaign lineage is not a task scheduler.
 
 Modern `ExecutionTask.scientific_inputs` select exact producer outputs by logical identity, schema, media type and byte limit.
-The shared [dependency selector](../../src/empirical_lawhood/runtime/execution.py) supplies those same operands to scheduling and native-contact custody.
+The shared [dependency selector](../../src/empirical_lawhood/execution/execution.py) supplies those same operands to scheduling and native-contact custody.
 Scheduling predecessors can include tasks whose outputs are not scientific inputs.
 Historical `ProtocolExecutionTask` records retain their original complete dependency-output behavior.
 The selector does not rewrite either record format or its historical bytes.
@@ -295,6 +339,13 @@ The [recursive workflow](../using/recursive-inquiry.md) records requirements and
 An unavailable condition can remain an explicit scientific question.
 The selected supplier investigation consumes its own premises, rather than its intended future result.
 
+This is existing shared architecture, exercised by retained RC, battery, Matrix and Rubisco workflows.
+The [Rubisco preparation-response route](../../programmes/biology/photosynthesis/workflows/rubisco-response/preparation-response-v1.md)
+adds bounded domain selections, checkpoint/response operations and independent destination assessments through these owners.
+Its configuration consumer and original-input preparer feed the existing inquiry and successor lifecycle.
+A maintained operator recipe composes those services.
+Pending integrated acceptance concerns the selected extension and source; it does not imply that the shared architecture is missing.
+
 The scientific records distinguish procedure evidence, actual instance supply, consumer admission and joined-use assessment.
 Contributions retain exact products, producing receipts, scientific scope and permitted evidence roles.
 A developed procedure can become a candidate for later qualification.
@@ -302,18 +353,18 @@ Its exposed development outcomes cannot substitute for eligible qualification ev
 
 | Owner | Recursive responsibility |
 |---|---|
-| [Requirements](../../src/empirical_lawhood/kernel/recursive_requirements.py) | Scientific meanings, condition scope, separate assessment phases and authority-free development study |
-| [Contributions](../../src/empirical_lawhood/kernel/scientific_contributions.py) | Immutable assessed content and exact product/receipt references |
-| [Authoring](../../src/empirical_lawhood/planning/recursive_authoring.py) | Partial questions, alternatives, selected operations and input links |
-| [Compiler](../../src/empirical_lawhood/runtime/recursive_compiler.py) | One bounded configuration-driven composition through existing scientific/task owners |
+| [Requirements](../../src/empirical_lawhood/science/inquiry/recursive_requirements.py) | Scientific meanings, condition scope, separate assessment phases and authority-free development study |
+| [Contributions](../../src/empirical_lawhood/science/inquiry/scientific_contributions.py) | Immutable assessed content and exact product/receipt references |
+| [Authoring](../../src/empirical_lawhood/design/recursive_authoring.py) | Partial questions, alternatives, selected operations and input links |
+| [Compiler](../../src/empirical_lawhood/execution/recursive_compiler.py) | One bounded configuration-driven composition through existing scientific/task owners |
 | [Development authoring](../../src/empirical_lawhood/api/recursive_authoring.py) and [execution](../../src/empirical_lawhood/api/recursive_execution.py) | Source-bound selected waves, existing scheduler composition and complete result projection |
 | [Prospective handoff](../../src/empirical_lawhood/api/recursive_prospective_authoring.py) | Standard candidate/source composition and ordinary issue/execution/reveal integration |
 | [Qualified parent replay](../../src/empirical_lawhood/api/recursive_qualified_parents.py) | Exact issued controls, complete receipts, current grants and supported adjudication before registered domain admissibility |
 | [Contribution transport](../../src/empirical_lawhood/api/recursive_contributions.py) | Registered scientific descriptions and portable immutable receipt closure |
-| [Custody reader](../../src/empirical_lawhood/infrastructure/recursive_custody.py) | Receipt and complete product authentication without acquisition |
-| [RC scientific binding](../../src/empirical_lawhood/adapters/methods/rc_prerequisite_chain/scientific_binding.py) | Exact frozen protocol, source/root scope and scientific supplier joins before effects |
-| [Battery scientific binding](../../src/empirical_lawhood/adapters/methods/battery_recursive_construction/scientific_binding.py) | Fixed quantities, units, receiver, time, criteria and complete claim joins before effects |
-| [Native contact](../../src/empirical_lawhood/infrastructure/native_effect_custody.py) | Durable plan-bound contact markers and conservative recovery |
+| [Custody reader](../../src/empirical_lawhood/storage/recursive_custody.py) | Receipt and complete product authentication without acquisition |
+| [RC scientific binding](../../src/empirical_lawhood/domains/circuits/rc_prerequisite_chain/scientific_binding.py) | Exact frozen protocol, source/root scope and scientific supplier joins before effects |
+| [Battery scientific binding](../../src/empirical_lawhood/domains/battery/battery_recursive_construction/scientific_binding.py) | Fixed quantities, units, receiver, time, criteria and complete claim joins before effects |
+| [Native contact](../../src/empirical_lawhood/storage/native_effect_custody.py) | Durable plan-bound contact markers and conservative recovery |
 
 The custody reader authenticates the complete frozen task, attempt and product
 census. Authored inputs and portable members stream with exact sizes and digests;
@@ -390,12 +441,12 @@ effect boundary. These shared owners apply to every Matrix phase and other
 registered scientific families without a phase-specific bypass.
 
 Prospective experiment authoring passes generated records through operational
-[`InputBytes`](../../src/empirical_lawhood/runtime/input_payloads.py) bindings.
+[`InputBytes`](../../src/empirical_lawhood/execution/input_payloads.py) bindings.
 The consuming owner checks their exact size, digest and declared schema just as
 it checks original file bindings. Original files are read again at each authoring
 boundary. The public candidate compiler retains its three required control
 files; generated source bindings need no intermediate files.
-The [candidate publisher](../../src/empirical_lawhood/infrastructure/candidate_sources.py)
+The [candidate publisher](../../src/empirical_lawhood/storage/candidate_sources.py)
 syncs each staged file and installs it without replacing an existing destination.
 Its bounded bulk path shares directory syncs and makes completed entries durable
 before returning or propagating an input failure. Each content address remains
@@ -551,8 +602,8 @@ The authored requirement view is derived scientific design, not a fourth executi
 
 See the [scientific inquiry readiness map](../using/designing-recursive-inquiry.md) for initial capabilities, further products and remaining source/adapter work.
 
-The shared [native subwork records](../../src/empirical_lawhood/runtime/native_subwork.py)
-and [custody seam](../../src/empirical_lawhood/infrastructure/native_subwork.py) refine
+The shared [native subwork records](../../src/empirical_lawhood/execution/native_subwork.py)
+and [custody seam](../../src/empirical_lawhood/storage/native_subwork.py) refine
 an already authorized native task. An immutable initial roster retains the full
 selected unit denominator. Conditional child rosters freeze operands available
 only during execution and require the live entered parent subwork's creator
@@ -563,11 +614,14 @@ Completed outputs remain readable after process or catalog loss; uncertain
 contact refuses automatic replay, and persisted parent contact grants no new
 entry. The existing process executor carries a runtime progress port over its
 request/ack pipe, keeping stores and paths out of `TaskContext`. This adds no
-scheduler or database. The [installed exposed fixture](../../src/empirical_lawhood/adapters/methods/native_subwork_conformance.py)
+scheduler or database. The [installed exposed fixture](../../src/empirical_lawhood/methods/native_subwork_conformance.py)
 and [crash/recovery checks](../../tests/runtime_platform/test_native_subwork.py)
-establish software conformance. Battery/Rubisco scientific wrappers, producing
-source joins, full-state numerical checks and independent scientific assessments
-remain separate implementation and qualification work.
+establish software conformance.
+Domain wrappers retain their own source joins, numerical checks and independent assessments.
+Rubisco's [preparation prefix](../../src/empirical_lawhood/domains/rubisco/rubisco_response/active_preparation_operation.py)
+and [response point](../../src/empirical_lawhood/domains/rubisco/rubisco_response/preparation_response_operation.py) already use this seam.
+Their [component evidence and remaining acceptance](../../programmes/biology/photosynthesis/workflows/rubisco-response/preparation-response-v1.md#implementation-and-retained-acceptance)
+do not establish molecular qualification.
 The [native subwork guide](native-subwork.md) gives full roster selection,
 live derived operands, received-prefix custody and exact recovery semantics.
 
@@ -576,11 +630,19 @@ live derived operands, received-prefix custody and exact recovery semantics.
 Static discovery lists declared capabilities, permissions, configurations and maximum evidence ceilings.
 It can report an installed binding without constructing its native provider.
 The [route register](../reference/capabilities.md) states each family's input, execution and refusal ceiling.
-The [generated descriptors](../../src/empirical_lawhood/adapters/composition/generated_extension_bundles.py) do not establish scientific readiness.
+The [generated descriptors](../../src/empirical_lawhood/execution/generated_extension_bundles.py) do not establish scientific readiness.
 
 Executable reconstruction also needs the exact typed records and complete platform-port contract.
-[Executable bindings](../../src/empirical_lawhood/runtime/executable_bindings.py) join the registered implementation to its factory and input codecs.
-[Provider protocols](../../src/empirical_lawhood/runtime/providers.py) declare runners, external inputs and output semantics.
+[Executable bindings](../../src/empirical_lawhood/execution/executable_bindings.py) join the registered implementation to its factory and input codecs.
+Their generator owns a closed recursive operation/schema index.
+Selected composition imports the requested factories and record types.
+It checks their live bindings against the generated declarations.
+It retains the complete capability registry's exact canonical identity.
+
+The full catalogue checks all installed registrations and codec collisions.
+Custom compositions retain their eager contract.
+Input documents cannot name modules or factories.
+[Provider protocols](../../src/empirical_lawhood/execution/providers.py) declare runners, external inputs and output semantics.
 Registration alone does not supply the family-specific authoring and custody route.
 
 ## Workflow, configuration and operational presentation
@@ -597,7 +659,7 @@ Issued records and receipts retain their existing authority and recovery owners.
 The [worked RC trace](extending-the-engine.md#worked-rc-extension) demonstrates the local boundary and its distinct later provider work.
 
 The [development output repair owner](../../src/empirical_lawhood/api/development_output_repair.py) derives an additive PURE recovery wave from complete original custody.
-Its [runtime record](../../src/empirical_lawhood/runtime/development_output_repair.py) binds the failed terminal, retained receipts, exact sources and selected output allowance.
+Its [runtime record](../../src/empirical_lawhood/execution/development_output_repair.py) binds the failed terminal, retained receipts, exact sources and selected output allowance.
 The scheduler applies that allowance only to resource-refused PURE tasks.
 Original scientific input edges, task configurations and other resource fields remain unchanged.
 The original worker executes the calculation, while the repaired controller authenticates custody and current access.
@@ -605,15 +667,15 @@ Completed native work remains immutable, and the repair refuses new native entry
 
 The separate [development controller repair](../../src/empirical_lawhood/api/development_controller_repair.py)
 supports a drained interruption while original native work remains unentered.
-Its [record](../../src/empirical_lawhood/runtime/development_controller_repair.py) binds the complete original
+Its [record](../../src/empirical_lawhood/execution/development_controller_repair.py) binds the complete original
 control census, successful native contacts, pending tasks and the original worker environment.
 The scheduler admits only the recorded original uncontacted native tasks; it retains the ordinary
-current-access, source, lease and worker admission checks.
+current-access, source, original-attempt and worker admission checks.
 Original receipt and event namespaces remain immutable after initial reconciliation.
 
 The [native continuation preparation owner](../../src/empirical_lawhood/api/native_continuation_preparation.py)
 authenticates original incomplete contacts without invoking recovery or scheduling.
-Its [proposal contract](../../src/empirical_lawhood/runtime/native_continuation_proposal.py)
+Its [proposal contract](../../src/empirical_lawhood/execution/native_continuation_proposal.py)
 retains exact prepared invocations, full task and receipt censuses, source bindings and observed control absences.
 Current access, the exclusive original run lock and complete closing byte guards remain required.
 The separate publication grants no execution authority and adds no independent observations.
@@ -632,13 +694,13 @@ The artifact plane skips its shared callback lock only for explicitly independen
 custom readers and ordinary callbacks retain their serialization policy.
 The scheduler's worker slots bound concurrency, without a nested verification pool per task.
 
-The [RC prerequisite chain](../../programmes/foundations/measurement-and-response/workflows/rc-prerequisite-chain/guide.md) adds family-local scientific records in [contracts.py](../../src/empirical_lawhood/adapters/methods/rc_prerequisite_chain/contracts.py).
-[science.py](../../src/empirical_lawhood/adapters/methods/rc_prerequisite_chain/science.py) owns numerical evaluation.
+The [RC prerequisite chain](../../programmes/foundations/measurement-and-response/workflows/rc-prerequisite-chain/guide.md) adds family-local scientific records in [contracts.py](../../src/empirical_lawhood/domains/circuits/rc_prerequisite_chain/contracts.py).
+[science.py](../../src/empirical_lawhood/domains/circuits/rc_prerequisite_chain/science.py) owns numerical evaluation.
 The frozen preparation rule requires exact observation identities, uncertainty and availability.
 The evaluator assesses the committed action against the unchanged response support and task.
 These scientific connections differ from execution order and nested controls within each model preparation.
 
-[The API](../../src/empirical_lawhood/api/rc_prerequisite_chain.py) composes the bounded development calculation with existing source/runtime provenance and [development custody](../../src/empirical_lawhood/infrastructure/development_native_custody.py).
+[The API](../../src/empirical_lawhood/api/rc_prerequisite_chain.py) composes the bounded development calculation with existing source/runtime provenance and [development custody](../../src/empirical_lawhood/storage/development_native_custody.py).
 The artifact plane and task-receipt store own atomic publication and exact completed-unit recovery.
 This route adds no scheduler or issued provider.
 The existing RC provider requires its exact frozen issued-study bytes.
@@ -656,10 +718,10 @@ authoring service or its dispatcher. The neutral
 preserves the base profiles plus the exact flat float64 array validator.
 Family authors and the dispatcher use these same owners.
 Family adapters own science and fixed operands.
-[Matrix input contracts](../../src/empirical_lawhood/kernel/matrix_inputs.py) and [bounded array transport](../../src/empirical_lawhood/infrastructure/matrix_array_io.py) serve current source, bridge and readiness consumers.
+[Matrix input contracts](../../src/empirical_lawhood/domains/matrix/input_contracts.py) and [bounded array transport](../../src/empirical_lawhood/adapters/matrix_storage/matrix_array_io.py) serve current source, bridge and readiness consumers.
 
 Selected raw array outputs use the closed `MATRIX_ARRAY_NPZ` artifact profile.
-The [native decoder](../../src/empirical_lawhood/infrastructure/matrix_array_io.py) checks the complete member census, declared shapes and dtypes.
+The [native decoder](../../src/empirical_lawhood/adapters/matrix_storage/matrix_array_io.py) checks the complete member census, declared shapes and dtypes.
 It checks every header before reading complete member payloads.
 Each member retains one immutable payload buffer.
 The caller still checks finite values, clocks and scientific interpretation.
@@ -674,7 +736,7 @@ missingness. A causal predictor can receive only the exact allocation identity;
 it need not receive the allocation's future driver seeds. Root and native owners
 retain full allocation validation.
 
-The [TRAIN/E2 native-contract owner](../../src/empirical_lawhood/adapters/methods/matrix_factor_response/native_acquisition_contracts.py) binds the actual configuration, acquisition seal and parent input identities.
+The [TRAIN/E2 native-contract owner](../../src/empirical_lawhood/domains/matrix/matrix_factor_response/native_acquisition_contracts.py) binds the actual configuration, acquisition seal and parent input identities.
 Response work also binds its checkpoint, causal prefix, physical acquisition and exact independent-future panels.
 PURE projections describe those operands without decoding another copy of the native arrays.
 The actual worker validates and materializes its required arrays before Ready.
@@ -713,26 +775,26 @@ They create no study grants or scientific qualification.
 
 The shared [numerical provenance boundary](../../src/empirical_lawhood/api/matrix_numerical_provenance.py)
 checks the selected checkout, dependency lock and actual numerical runtime before
-native work. Its [immutable record](../../src/empirical_lawhood/kernel/numerical_provenance.py)
+native work. Its [immutable record](../../src/empirical_lawhood/science/identity/numerical_provenance.py)
 binds the complete producing package inventory and observed Git state.
 An observed HEAD alongside changed source is recorded as such.
 Retained readers validate that producing record without rerunning native work or
 requiring the reader to reproduce the producing environment.
 
-[Retained analysis completion](../../src/empirical_lawhood/runtime/retained_analysis.py)
-declares an exact member census. Its [infrastructure owner](../../src/empirical_lawhood/infrastructure/retained_analysis.py)
+[Retained analysis completion](../../src/empirical_lawhood/execution/retained_analysis.py)
+declares an exact member census. Its [infrastructure owner](../../src/empirical_lawhood/storage/retained_analysis.py)
 commits that census through the existing guarded artifact plane and checks each
 member before returning a report. Family APIs own metric roles, complete inputs
 and outcome consistency. Changing only a terminal report cannot change a retained
 scalar or remove an unevaluable outcome.
 
-The shared [native admission helper](../../src/empirical_lawhood/adapters/simulators/_native_admission.py)
+The shared [native admission helper](../../src/empirical_lawhood/execution/native_time_grid.py)
 bounds update counts and estimated retained histories before simulator contact.
 TORAX and Brian2 keep their own units, clock rules and scientific reductions.
 Operational limits do not establish numerical accuracy or scientific eligibility.
 
 [Authoring codecs](../../src/empirical_lawhood/api/codecs.py) reuse equal immutable
-typed records within one parse through the shared [parsed-node owner](../../src/empirical_lawhood/kernel/parsed_nodes.py).
+typed records within one parse through the shared [parsed-node owner](../../src/empirical_lawhood/science/records/parsed_nodes.py).
 Every serialized occurrence retains its syntax, node and depth checks.
 The parse scope ends before another input or authority read.
 When a handoff independently reconstructs a validated record, it checks the
@@ -740,19 +802,31 @@ retained file's complete canonical bytes through the bounded I/O owner.
 This avoids decoding that same expectation again while preserving fresh source,
 publication and authority checks at each public boundary.
 
-The [decoded record store](../../src/empirical_lawhood/kernel/decoded_record_store.py)
+The [decoded record store](../../src/empirical_lawhood/science/records/decoded_record_store.py)
 shares live immutable values across readers within one finite operation.
 Its weak index binds exact content, record types, validator implementations and Decimal settings.
 Each reader retains its own size, publication and current access checks.
 The store does not extend record lifetimes or retain permission decisions.
 
-[Publication validation](../../src/empirical_lawhood/infrastructure/publication_validation.py)
+Authored controls use the same typed publication reader for ordinary records.
+Normalised views and custom payload readers keep their existing byte interfaces.
+Contribution export reads its report and parent locators inside one effect-free scope.
+It completes the final byte guard before use of the ordinary writer.
+
+The [shared roster indexes](../../src/empirical_lawhood/api/recursive_read_indexes.py)
+join exact producing receipts and products without rescanning their complete
+rosters per input. Grouped lookups retain duplicates for ambiguity refusal.
+The ancestry index validates the complete predecessor graph and computes depths
+iteratively. Every physical ancestor copy still authenticates independently.
+A graph node or cached immutable record supplies no access authority.
+
+[Publication validation](../../src/empirical_lawhood/storage/publication_validation.py)
 can reuse the ordinary in-memory canonical format proof during the same staging call.
 Reuse requires unchanged validation policy and the exact staged size and digest.
 Streams and custom policies retain their ordinary file validation.
 Durable publication, recovery and complete byte verification remain separate requirements.
 
-New recursive plans can include [normalised control views](../../src/empirical_lawhood/kernel/normalized_control.py).
+New recursive plans can include [normalised control views](../../src/empirical_lawhood/science/response/normalized_control.py).
 These versioned views store substantial repeated operands once by content identity.
 The author selects views only for substantial shared content and at least 25 percent smaller encoded size.
 The original plans remain complete packet members with unchanged bytes and custody requirements.
@@ -771,9 +845,9 @@ carriers directly to this loader, which authenticates the small packet and
 decoder before reading the carrier. This changes no scientific record or
 authority requirement.
 
-[Exact receipt lookup](../../src/empirical_lawhood/infrastructure/task_receipts.py) addresses the selected stored run/task/receipt, including an authorized later attempt, without changing retry policy. Current result and parent APIs authenticate full sibling publications and replay persisted issue/execution/reveal grants before protected reads. The shared [current result custody](../../src/empirical_lawhood/api/current_result_custody.py) owner also reconstructs the stored issued plans and checks their complete output contracts against the exact receipt; missing controls do not establish an unissued result. Explicit exposed imports retain their own bounded custody contract. Pure authoring proof reconstructs providers, graphs, outputs and resources but creates no authority and executes no scientific tasks. The [researcher integration guide](../using/paper-study-workflows.md) joins these owners to public commands.
+[Exact receipt lookup](../../src/empirical_lawhood/storage/task_receipts.py) addresses the selected stored run/task/receipt, including an authorized later attempt, without changing retry policy. Current result and parent APIs authenticate full sibling publications and replay persisted issue/execution/reveal grants before protected reads. The shared [current result custody](../../src/empirical_lawhood/api/current_result_custody.py) owner also reconstructs the stored issued plans and checks their complete output contracts against the exact receipt; missing controls do not establish an unissued result. Explicit exposed imports retain their own bounded custody contract. Pure authoring proof reconstructs providers, graphs, outputs and resources but creates no authority and executes no scientific tasks. The [researcher integration guide](../using/paper-study-workflows.md) joins these owners to public commands.
 
-Within an effect-free read context, [retained input reads](../../src/empirical_lawhood/infrastructure/retained_input_read.py)
+Within an effect-free read context, [retained input reads](../../src/empirical_lawhood/storage/retained_input_read.py)
 can reuse shared sealed inputs through independent bounded cursors. The complete
 per-task binding and scan budget still apply; each reuse refreshes member access,
 and the owning context checks original files before returning. Encoded retention
@@ -787,6 +861,33 @@ leaf input. Every sealed member retains its own exact-byte and format checks.
 The result reader reuses immutable decoded controls in that same lifetime.
 Custom input delivery and ordinary worker dispatch retain fresh opens. These
 bounds do not claim a bound on the full decoded object graph or process RSS.
+
+Within one live sealed worker input, `WorkerInputPort.decode_canonical_record`
+can share one immutable decoded record across independent cursors. Each cursor
+still reads every byte; the operation checks the actual artifact identity,
+schema, complete size and scientific operands on every invocation. Reuse binds
+the complete byte digest, record type, validation implementation, Decimal
+context and numerical thread settings. A different process or thread gets a
+fresh lifetime. Closing the input owner releases the record, including after
+consumer failure. Custom encodings, mutable records and unsealed inputs use
+the ordinary strict decoder. This removes repeated parsing within a worker
+invocation; it supplies no permission, source admission or cross-task cache.
+
+The [inquiry authoring reader](../../src/empirical_lawhood/api/recursive_inquiry_read.py)
+shares unchanged authored metadata across projection, commitment and successor
+authoring within one invocation. Each projection independently reads current
+execution products and reconstructs the complete decision and cost census.
+Source metadata reuse retains exact physical paths, complete byte guards,
+current access, parent custody and registered publication requirements. Changed
+record validators, codecs, Decimal or numerical settings invalidate reuse;
+custom read policies and explicit traversal limits use fresh reads. The shared
+index has finite record and canonical-byte limits and releases its roots when
+the invocation ends. Separate threads and copied closed contexts start fresh.
+The ordinary writer publishes new disjoint decision and successor packages;
+the source reader checks the complete observed byte union before returning,
+including on failure. Execution must begin after that reader closes. This is
+incremental verification within an invocation, not a persistent trust token
+for an earlier decision or a replacement for original-result authentication.
 
 Domain preparation uses [current task custody](../../src/empirical_lawhood/api/current_task_custody.py) for the actual issued task, current grants, complete receipt/input bindings and exact canonical controls. It rechecks authority on each call and reuses the existing issued-plan authenticator. Matrix's programme supplier delegates these checks and retains its scientific scope and companion-record validation. This extraction does not establish bounded population assessment or eliminate repeated evidence traversal.
 
@@ -809,8 +910,8 @@ Their size alone is not a reason to split them.
 |---|---|---|
 | [api/facade.py](../../src/empirical_lawhood/api/facade.py) | `EmpiricalLawhoodApi` validates requests, delegates compilation/issue/execution and joins catalog/discovery results. Injected services provide effectful operations. | [Catalog facade](../../tests/api/test_catalog_facade.py), [campaign API](../../tests/api/test_campaign_execution.py), [candidate compilation](../../tests/runtime_platform/test_candidate_compiler.py) |
 | [api/execution.py](../../src/empirical_lawhood/api/execution.py) | `CampaignExecutionService` validates source/plan/provider identity, replays authority, persists plans, composes scheduling and reconstructs status from receipts. | [Campaign execution](../../tests/api/test_campaign_execution.py), [recovery](../../tests/runtime_platform/test_run_recovery.py), [issued package](../../tests/runtime_platform/test_standard_issued_package.py) |
-| [infrastructure/execution.py](../../src/empirical_lawhood/infrastructure/execution.py) | `LocalScheduler` owns durable task transitions. `LocalProcessExecutor` isolates workers. Resource admission, locks, ports and receipt stores are injected boundaries. | [Execution scheduler](../../tests/runtime_platform/test_execution_scheduler.py) and [elapsed-resource package](../../tests/runtime_platform/test_deadline_free_execution_package.py) |
-| [runtime/controller_evaluation_nested.py](../../src/empirical_lawhood/runtime/controller_evaluation_nested.py) | Outcome-visible nested controller evaluation, registered reducers, whole-root cohort accounting and prepared event/custody contracts. It cannot select or deliver native actions. | [Structural import check](../../tests/test_import_boundaries.py). No dedicated direct numerical test for this module is shipped. Retained code is not a qualified execution claim. |
+| [infrastructure/execution.py](../../src/empirical_lawhood/execution/local/execution.py) | `LocalScheduler` owns durable task transitions. `LocalProcessExecutor` isolates workers. Resource admission, locks, ports and receipt stores are injected boundaries. | [Execution scheduler](../../tests/runtime_platform/test_execution_scheduler.py) and [elapsed-resource package](../../tests/runtime_platform/test_deadline_free_execution_package.py) |
+| [runtime/controller_evaluation_nested.py](../../src/empirical_lawhood/execution/controller_evaluation_nested.py) | Outcome-visible nested controller evaluation, registered reducers, whole-root cohort accounting and prepared event/custody contracts. It cannot select or deliver native actions. | [Structural import check](../../tests/test_import_boundaries.py). No dedicated direct numerical test for this module is shipped. Retained code is not a qualified execution claim. |
 | [cli/platform.py](../../src/empirical_lawhood/cli/platform.py) | CLI input selection, strict document loading, source/storage preflight, API calls and output/refusal presentation. It delegates scientific work to the owning services. | [CLI contracts](../../tests/test_cli_contracts.py), [discovery display](../../tests/test_capability_output.py), [operator launcher](../../tests/test_operator_launcher.py) |
 
 The [composition root](../../src/empirical_lawhood/api/composition.py) injects those services and external ports.
@@ -857,12 +958,12 @@ Completed-result reads keep the separate [source-independent read boundary](../u
 
 ## Scientific finalization and external custody
 
-[Adjudication](../../src/empirical_lawhood/runtime/adjudication.py) records evaluability and scientific outcomes under exact lineage and cutoff context.
+[Adjudication](../../src/empirical_lawhood/execution/adjudication.py) records evaluability and scientific outcomes under exact lineage and cutoff context.
 Execution reads the adjudication through its completed receipt and verified artifact identity.
 Operational completion, evaluability, support, admission and permitted use remain separate decisions.
 A completed operation can have a valid negative scientific result.
 
-[Source identity](../../src/empirical_lawhood/infrastructure/source_origin.py) and [study issue](../../src/empirical_lawhood/infrastructure/study_issue.py) bind selected source to the executing implementation.
+[Source identity](../../src/empirical_lawhood/storage/source_origin.py) and [study issue](../../src/empirical_lawhood/storage/study_issue.py) bind selected source to the executing implementation.
 Current admission verifies committed selected bytes and records actual checkout status separately.
 Historical clean-source closures retain their original interpretation.
 Freeze tracked source and bound documentary bytes while their selected processes remain active.
@@ -877,9 +978,11 @@ foreign-key maps within the existing single-writer transaction. Identity
 conflicts roll back the complete append; Decimal strings, absent values,
 denominators, reasons and adverse statuses retain their original representation.
 An in-memory scheduler catalog retains one SQLite connection and serializes
-connection checkouts. Worker lease reads and coordinator transactions cannot
+connection checkouts. Worker attempt reads and coordinator transactions cannot
 share an active transaction or replace each other's query progress handlers.
-[Catalog recovery](../../src/empirical_lawhood/infrastructure/catalog_rebuild.py) verifies an authenticated projection and its controls before replacement.
+Native execution uses the exclusive run lock and current attempt identity,
+without a lease-expiration deadline or lease-renewal loop.
+[Catalog recovery](../../src/empirical_lawhood/storage/catalog_rebuild.py) verifies an authenticated projection and its controls before replacement.
 The [compatibility policy](compatibility.md) gives the public catalog baseline and stopping conditions.
 
 ## The portable worked example

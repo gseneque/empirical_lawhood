@@ -8,24 +8,19 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.composition.finite_response_law.assignment import proposed_scientific_seeds
-from empirical_lawhood.adapters.composition.finite_response_law.rerun_input import (
-    PUBLIC_CALIBRATION_MASTER_SEED, PUBLIC_EVALUATION_MASTER_SEED,
-    FiniteResponseLawCurrentAllocation, FiniteResponseLawCurrentExposure,
-    FiniteResponseLawCurrentPublication, FiniteResponseLawRerunInput,
-    original_development_exposure,
-)
-from empirical_lawhood.adapters.methods.finite_response_law.science import FiniteResponseLawScienceSpec
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment import proposed_scientific_seeds
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.rerun_input import PUBLIC_CALIBRATION_MASTER_SEED, PUBLIC_EVALUATION_MASTER_SEED, FiniteResponseLawCurrentAllocation, FiniteResponseLawCurrentExposure, FiniteResponseLawCurrentPublication, FiniteResponseLawRerunInput, original_development_exposure
+from empirical_lawhood.domains.matrix.finite_response_law.science import FiniteResponseLawScienceSpec
 from empirical_lawhood.api import finite_rerun_authoring as application
 from empirical_lawhood.api.finite_operands import current_nomination_operand_export
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.study_issue import StudyOperationAuthority
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ExternalRootContract, ReceiptCheck
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.study_issue import StudyOperationAuthority
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ExternalRootContract, ReceiptCheck
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 
 ROOT = Path(__file__).resolve().parents[1]
 

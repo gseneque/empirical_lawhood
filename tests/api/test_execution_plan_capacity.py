@@ -6,10 +6,10 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.api import execution as owner
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits, ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.plans import CandidateExecutionPlan
 from tests.runtime_plan_capacity_fixture import expanded_plan_metadata
 from tests.runtime_platform.test_execution_scheduler import _plane
 

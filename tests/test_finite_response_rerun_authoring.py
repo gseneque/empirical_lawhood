@@ -8,28 +8,25 @@ import json
 
 import pytest
 
-from empirical_lawhood.adapters.composition.finite_response_law.assignment import proposed_scientific_seeds
-from empirical_lawhood.adapters.composition.finite_response_law.rerun_input import (
-    FiniteResponseLawCurrentAllocation, FiniteResponseLawCurrentExposure,
-    original_development_exposure,
-)
-from empirical_lawhood.adapters.methods.finite_response_law.science import FiniteResponseLawScienceSpec
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment import proposed_scientific_seeds
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.rerun_input import FiniteResponseLawCurrentAllocation, FiniteResponseLawCurrentExposure, original_development_exposure
+from empirical_lawhood.domains.matrix.finite_response_law.science import FiniteResponseLawScienceSpec
 from empirical_lawhood.adapters.composition.finite_response_law.consumer_ports import FiniteResponseLawRuntimeContext
 from empirical_lawhood.api import finite_rerun_authoring as application
 from empirical_lawhood.api import integration_handoffs, composition as public_composition
 from empirical_lawhood.api.finite_operands import current_nomination_operand_export
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile, OperatorStorageAccessMode
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, OperatorStorageAccessMode
 from empirical_lawhood.api.results import CompileCampaignRequest
 from tests.finite_response_rerun_fixtures import (
     publish_current_issue, publish_native_parent, publish_current_step_output,
     nominated_synthetic_native, qualify_nominated_fixture,
 )
-from empirical_lawhood.adapters.composition.finite_response_law.exposure import native_seed_ids
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.exposure import native_seed_ids
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
 from dataclasses import replace
 
 
@@ -62,6 +59,48 @@ def _allocation(stage, master_seed):
         f"empirical-lawhood.finite-response-law.{stage}.application-test-{master_seed}",
         FiniteResponseLawScienceSpec().plan_sha256, 32 if stage == "calibration" else 64,
         "PROPOSED_UNRUN", proposed_scientific_seeds(stage, master_seed))
+
+
+def test_published_control_authenticates_exact_bytes_and_enforces_selected_limits(finite_plane, monkeypatch):
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+
+    record = _allocation("calibration", 202610080032)
+    payload = record.canonical_bytes()
+    for run_id, visibility in (("software-control", VisibilityCeiling.PROSPECTIVE),
+                              ("software-development", VisibilityCeiling.DEVELOPMENT_ONLY)):
+        directory = f"runs/{run_id}/plans"
+        finite_plane.write(ArtifactWriteRequest(f"allocation.{run_id}", f"{directory}/allocation.json", record.SCHEMA,
+            ArtifactProfile.CANONICAL_JSON, "application/json", f"campaign-plans.{run_id}",
+            directory, payload, visibility, (), OutcomeAccess.OUTCOME_BLIND, minimum_free_bytes=1))
+
+    def read(limit, run_id="software-control", plane=finite_plane):
+        return application._published_current_control(plane, run_id, "allocation", type(record), limit)
+
+    relative = "runs/software-control/plans/allocation.json"
+    assert read(None) == read(len(payload)) == record
+    with monkeypatch.context() as guarded:
+        guarded.setattr(application, "read_verified_canonical_record",
+            lambda *_args, **_kwargs: pytest.fail("a rejected control reached payload verification"))
+        with pytest.raises(ValueError, match="EXACT_PUBLISHED_CONTROL_REQUIRED"):
+            read(len(payload) - 1)
+        with pytest.raises(ValueError, match="EXACT_PUBLISHED_CONTROL_REQUIRED"):
+            read(None, "software-development")
+        with pytest.raises(ValueError, match="EXACT_PUBLISHED_CONTROL_REQUIRED"):
+            read(None, "software-foreign")
+        bounded = ExternalArtifactPlane(finite_plane.root, custody_limits=replace(
+            finite_plane.custody_limits, in_memory_payload_bytes=len(payload) - 1))
+        with pytest.raises(ValueError, match="EXACT_PUBLISHED_CONTROL_REQUIRED"):
+            read(None, plane=bounded)
+        standalone = replace(finite_plane.read_manifest(relative), publication=None)
+        guarded.setattr(finite_plane, "read_manifest", lambda *_args, **_kwargs: standalone)
+        with pytest.raises(ValueError, match="EXACT_PUBLISHED_CONTROL_REQUIRED"):
+            read(None)
+    path = finite_plane.root.resolve(relative, for_write=False)
+    path.write_bytes(payload.replace(b"202610080032", b"202610080033", 1))
+    assert path.read_bytes() != payload
+    with pytest.raises((ValueError, RuntimeError)):
+        read(None)
 
 
 def _software_application_seams(monkeypatch, plane):
@@ -372,8 +411,8 @@ def verify_retained_runtime_control_recovery(cli_api, issue):
 
 def persist_authenticated_provider_reconstruction(service, package):
     """Retain the real no-execution factory receipt after adjacent grant replay."""
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest, ArtifactProfile, ArtifactLineageParent, lineage_parent_sort_key
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactProfile, ArtifactLineageParent, lineage_parent_sort_key
 
     service._validate_campaign_authorization(package)
     service._validate_issued_execution_authority(package, at_utc=None)
@@ -404,7 +443,7 @@ def persist_authenticated_provider_reconstruction(service, package):
 def test_cancellation_only_prediction_declines_both_consumers_with_narrow_finite_uncertainty():
     """Accurate cancelling primitive forecasts cannot meet a nonzero consumer target."""
     import numpy as np
-    from empirical_lawhood.adapters.methods.finite_response_law.intervals import choose
+    from empirical_lawhood.domains.matrix.finite_response_law.intervals import choose
 
     positive = np.full((1, 5, 4, 8), 0.04)
     negative = np.full_like(positive, -0.04)
@@ -421,8 +460,8 @@ def test_cancellation_only_prediction_declines_both_consumers_with_narrow_finite
 
 @pytest.mark.parametrize("phase", ("parent", "future"))
 def test_forecast_refuses_post_prefix_native_products_before_native_or_law_contact(phase, monkeypatch):
-    from empirical_lawhood.adapters.methods.finite_response_law import control_forecast
-    from empirical_lawhood.adapters.simulators.finite_response_law.contracts import native_invocations
+    from empirical_lawhood.domains.matrix.finite_response_law import control_forecast
+    from empirical_lawhood.domains.matrix.finite_response_law.contracts import native_invocations
     from empirical_lawhood.adapters.simulators.finite_response_law.source_outputs import FiniteResponseLawAssignedEvaluationTaskResult
     from tests.test_finite_response_assigned_evaluation_binding import _assigned_prospective_evaluation
 
@@ -446,7 +485,7 @@ def test_forecast_refuses_post_prefix_native_products_before_native_or_law_conta
 @pytest.mark.parametrize("features", (23, 25, 48))
 def test_preparent_prediction_refuses_missing_or_appended_future_features_before_law_contact(features):
     from decimal import Decimal
-    from empirical_lawhood.adapters.methods.finite_response_law.control_prediction import predict_control_table
+    from empirical_lawhood.domains.matrix.finite_response_law.control_prediction import predict_control_table
 
     # 48 coordinates model an attempted concatenation of the causal prefix and
     # an equally sized later observation. No context or payload may be touched.
@@ -463,18 +502,18 @@ def _failed_prefix_forecast(plane):
     import numpy as np
     from tests.finite_response_custody_fixtures import qualified_parent, artifact
     from tests.test_finite_response_assigned_evaluation_binding import _assigned_prospective_evaluation
-    from empirical_lawhood.adapters.composition.finite_response_law.design import qualification_system
-    from empirical_lawhood.adapters.methods.finite_response_law.control_forecast import forecast_root
-    from empirical_lawhood.adapters.methods.finite_response_law.control_plan import control_law_context
-    from empirical_lawhood.adapters.methods.finite_response_law.control_records import FiniteResponseLawRootForecast, FiniteResponseLawRootControlLock
-    from empirical_lawhood.adapters.methods.finite_response_law.extension_bundle import METHOD_CAPABILITY
-    from empirical_lawhood.adapters.simulators.finite_response_law.contracts import native_invocations
-    from empirical_lawhood.adapters.simulators.finite_response_law.source import FiniteResponseLawAssignedEvaluationDelivery, FiniteResponseLawNativePhaseData, streams_for
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.design import qualification_system
+    from empirical_lawhood.domains.matrix.finite_response_law.control_forecast import forecast_root
+    from empirical_lawhood.domains.matrix.finite_response_law.control_plan import control_law_context
+    from empirical_lawhood.domains.matrix.finite_response_law.control_records import FiniteResponseLawRootForecast, FiniteResponseLawRootControlLock
+    from empirical_lawhood.domains.matrix.finite_response_law.extension import METHOD_CAPABILITY
+    from empirical_lawhood.domains.matrix.finite_response_law.contracts import native_invocations
+    from empirical_lawhood.domains.matrix.finite_response_law.source import FiniteResponseLawAssignedEvaluationDelivery, FiniteResponseLawNativePhaseData, streams_for
     from empirical_lawhood.adapters.simulators.finite_response_law.native_artifact import encode_native_pair
     from empirical_lawhood.adapters.simulators.finite_response_law.source_outputs import FiniteResponseLawAssignedEvaluationTaskResult
-    from empirical_lawhood.infrastructure.candidate_payloads import ExternalCandidatePayloadPlane
-    from empirical_lawhood.kernel.references import ExecutableReference, SafePayloadFormat
-    from empirical_lawhood.kernel.evidence import VisibilityCeiling, OutcomeAccess
+    from empirical_lawhood.storage.candidate_payloads import ExternalCandidatePayloadPlane
+    from empirical_lawhood.science.identity.references import ExecutableReference, SafePayloadFormat
+    from empirical_lawhood.science.evidence.evidence import VisibilityCeiling, OutcomeAccess
 
     report, native, _, _, _ = qualified_parent(plane)
     _, source, control = _assigned_prospective_evaluation()
@@ -513,8 +552,8 @@ def _failed_prefix_forecast(plane):
 
 def test_partial_freeze_cannot_publish_all_consumer_guard(finite_plane):
     from tests.finite_response_custody_fixtures import artifact
-    from empirical_lawhood.adapters.methods.finite_response_law.consumer import evaluation_requests
-    from empirical_lawhood.adapters.methods.finite_response_law.control_records import FiniteResponseLawRootControlLock, FiniteResponseLawRootRequestReveal
+    from empirical_lawhood.domains.matrix.finite_response_law.consumer import evaluation_requests
+    from empirical_lawhood.domains.matrix.finite_response_law.control_records import FiniteResponseLawRootControlLock, FiniteResponseLawRootRequestReveal
 
     forecast = _failed_prefix_forecast(finite_plane)
     reveal = FiniteResponseLawRootRequestReveal(forecast.root,
@@ -529,15 +568,15 @@ def test_partial_freeze_cannot_publish_all_consumer_guard(finite_plane):
 
 @pytest.mark.parametrize("refinement", (1, 2))
 def test_unavailable_observed_handoff_terminates_frozen_action_and_refuses_replacement(refinement, monkeypatch):
-    from empirical_lawhood.adapters.methods.finite_response_law import control_prediction, intervals
-    from empirical_lawhood.adapters.methods.finite_response_law.control_delivery import FiniteResponseLawNativeReceiptDelivery, observation_words, observe_native_word
-    from empirical_lawhood.adapters.methods.finite_response_law.control_services import implementation_payloads
-    from empirical_lawhood.adapters.methods.finite_response_law.law_binding import NATIVE_WORDS
-    from empirical_lawhood.adapters.simulators.finite_response_law import source as native_source
-    from empirical_lawhood.adapters.simulators.finite_response_law.contracts import native_invocations
+    from empirical_lawhood.domains.matrix.finite_response_law import control_prediction, intervals
+    from empirical_lawhood.domains.matrix.finite_response_law.control_delivery import FiniteResponseLawNativeReceiptDelivery, observation_words, observe_native_word
+    from empirical_lawhood.domains.matrix.finite_response_law.control_services import implementation_payloads
+    from empirical_lawhood.domains.matrix.finite_response_law.law_binding import NATIVE_WORDS
+    from empirical_lawhood.domains.matrix.finite_response_law import source as native_source
+    from empirical_lawhood.domains.matrix.finite_response_law.contracts import native_invocations
     from empirical_lawhood.adapters.simulators.finite_response_law.source_outputs import FiniteResponseLawAssignedEvaluationTaskResult, unentered_native_bytes
-    from empirical_lawhood.kernel.control import OperationalDeliveryState, ScientificCommitmentKind
-    from empirical_lawhood.planning.controller_study import ImplementationRole
+    from empirical_lawhood.science.response.control import OperationalDeliveryState, ScientificCommitmentKind
+    from empirical_lawhood.design.controller_study import ImplementationRole
     from tests.test_finite_response_assigned_evaluation_binding import _assigned_prospective_evaluation
 
     _, source, _ = _assigned_prospective_evaluation()

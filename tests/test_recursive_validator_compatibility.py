@@ -13,15 +13,15 @@ import shutil
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_NPZ_CODEC
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_NPZ_CODEC
+from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
 from tests.numerical_provenance_fixtures import numerical_plane
 
 

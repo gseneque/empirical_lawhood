@@ -9,13 +9,13 @@ import pytest
 from typer.testing import CliRunner
 
 from empirical_lawhood.api import matrix_history_analysis as api
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import MatrixHistoryAnalysisConfig, MatrixHistoryAllocation, MatrixHistoryProtocol, MatrixHistorySeed
-from empirical_lawhood.adapters.simulators.six_matrix_response import history_source as native
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import four_family_preparation_couplings
-from empirical_lawhood.adapters.simulators.six_matrix_response.simulation import BAOABGradientCache
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import MatrixHistoryAnalysisConfig, MatrixHistoryAllocation, MatrixHistoryProtocol, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.six_matrix_response import history_source as native
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import four_family_preparation_couplings
+from empirical_lawhood.domains.matrix.six_matrix_response.simulation import BAOABGradientCache
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -90,7 +90,7 @@ def test_public_actual_calculation_retention_recovery_and_missing_roots(plane, m
         assert summary["requested_nested_samples"] == 36224
     if mode == "PASSIVE":
         assert all(v is None for _, values in result.family_medians for _, v in values)
-    from empirical_lawhood.adapters.methods.matrix_history_analysis import analysis
+    from empirical_lawhood.domains.matrix.matrix_history_analysis import analysis
     def forbidden(*args, **kwargs):
         raise AssertionError("receipt recovery repeated scientific work")
     monkeypatch.setattr(analysis, "algebra_history", forbidden)
@@ -218,7 +218,7 @@ def test_real_bounded_prefix_cancellation_has_no_completed_native_receipt(plane)
 
 
 def test_saved_result_census_refuses_missing_directions_and_reordered_cells():
-    from empirical_lawhood.adapters.methods.matrix_history_analysis.analysis import passive_history, validate_analysis_arrays
+    from empirical_lawhood.domains.matrix.matrix_history_analysis.analysis import passive_history, validate_analysis_arrays
     root = allocation().roots[0]
     arrays, _, _, _ = passive_history(arrays_for(root), root)
     validate_analysis_arrays(arrays, root, mode="PASSIVE", compare_commutant_altered=True)
@@ -235,7 +235,7 @@ def test_saved_result_census_refuses_missing_directions_and_reordered_cells():
 @pytest.mark.parametrize("mode", ("ALGEBRA", "PASSIVE"))
 def test_cli_saved_import_actual_analysis_and_retained_read(plane, tmp_path, monkeypatch, mode):
     """Real CLI parsers/science/custody with only the explicit storage selection injected."""
-    from empirical_lawhood.adapters.methods.matrix_history_analysis import analysis
+    from empirical_lawhood.domains.matrix.matrix_history_analysis import analysis
     from empirical_lawhood.cli.app import app
 
     inputs = allocation()

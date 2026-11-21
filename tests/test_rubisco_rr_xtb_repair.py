@@ -13,6 +13,7 @@ import sys
 import pytest
 
 from empirical_lawhood.adapters.simulators.rubisco_electronic import rr_xtb_repair as r
+import empirical_lawhood.domains.rubisco.electronic.xtb_numerics as r_science
 
 D = Decimal
 
@@ -92,9 +93,9 @@ def grad_result(p=None, energy='-1.000000000000', raw=None):
 def test_legacy_bohr_conversion_is_context_independent_and_fd_chain_rule():
     with localcontext() as ctx:
         ctx.prec = 6
-        assert r.angstrom_to_bohr(D('.52917726')) == 1
-        assert r.bohr_to_angstrom(D(3)) == D('1.58753178')
-        observed = r.gradient_hartree_per_angstrom(D('2'))
+        assert r_science.angstrom_to_bohr(D('.52917726')) == 1
+        assert r_science.bohr_to_angstrom(D(3)) == D('1.58753178')
+        observed = r_science.gradient_hartree_per_angstrom(D('2'))
     with localcontext() as ctx:
         ctx.prec = 50
         assert observed == D(2) / D('.52917726')
@@ -104,16 +105,16 @@ def test_legacy_bohr_conversion_is_context_independent_and_fd_chain_rule():
         fd = (((x+step)/D('.52917726'))**2 - ((x-step)/D('.52917726'))**2) / (4*step)
         assert abs(fd-observed) < D('1e-40')
     with pytest.raises(ValueError):
-        r.angstrom_to_bohr(D('NaN'))
+        r_science.angstrom_to_bohr(D('NaN'))
 
 
 def test_selected_gfn2_kernel_uses_arithmetic_hardness_not_singular_point_charge():
-    assert r.gfn2_damped_coulomb_kernel(0, 1) == 50
-    assert r.gfn2_damped_coulomb_kernel(2, 1) == pytest.approx(1/math.sqrt(4+1/2500))
-    assert r.gfn2_damped_coulomb_kernel(2, 1) != .5
+    assert r_science.gfn2_damped_coulomb_kernel(0, 1) == 50
+    assert r_science.gfn2_damped_coulomb_kernel(2, 1) == pytest.approx(1/math.sqrt(4+1/2500))
+    assert r_science.gfn2_damped_coulomb_kernel(2, 1) != .5
     for operands in ((-1, 1), (1, 0), (1, float('nan')), (1, 1, 98)):
         with pytest.raises(ValueError):
-            r.gfn2_damped_coulomb_kernel(*operands)
+            r_science.gfn2_damped_coulomb_kernel(*operands)
 
 
 def test_complete_field_is_retained_and_only_exact_zero_rows_omitted():
@@ -128,7 +129,7 @@ def test_complete_field_is_retained_and_only_exact_zero_rows_omitted():
     assert p.native_serialized_field_charge_sum == serialized
     assert p.native_field_rounding_delta == serialized - Fraction(4, 21)
     assert p.native_field_rounding_delta != 0
-    assert D(rows[1].split()[1]) == D(format(r.angstrom_to_bohr(D(10)), '.17E'))
+    assert D(rows[1].split()[1]) == D(format(r_science.angstrom_to_bohr(D(10)), '.17E'))
 
 
 def test_immutable_contract_identity_and_source_boundary():
@@ -369,7 +370,7 @@ assert module.XtbRepairSettingsV1().native_effects == 0
 
 def test_closed_projection_uses_context_source_api_and_exact_native_token_bytes():
     """Independent synthetic layout, with no authentic context construction."""
-    from empirical_lawhood.adapters.physical.rubisco_kinetics import rr_coupled_preparation as p
+    import empirical_lawhood.domains.rubisco.kinetics.rr_coupled_preparation as p
     atom = p.PreparedAtomV1('synthetic-H', 'A', 1, 'RUB', 'H', 'H',
                             (D('1.0000'), D('-0E-7'), D('2.50')), 1, 'synthetic-coordinate')
     cap = p.PreparedAtomV1('synthetic-cap', 'A', 1, 'CAP', 'HL', 'H',

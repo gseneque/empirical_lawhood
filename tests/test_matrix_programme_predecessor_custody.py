@@ -9,7 +9,7 @@ import pytest
 
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService
-from empirical_lawhood.infrastructure import artifacts
+from empirical_lawhood.storage import artifacts
 from tests.test_matrix_programme_binding_batch import _case
 
 

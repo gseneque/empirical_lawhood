@@ -10,41 +10,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
-from empirical_lawhood.adapters.physical.virtual_cell.config import (
-    EVALUATOR_CAPABILITY_KEY,
-    MODEL_CAPABILITY_KEY,
-    PREDICTION_CAPABILITY_KEY,
-    SUMMARY_CAPABILITY_KEY,
-    build_virtual_cell_2025_pipeline_config,
-)
-from empirical_lawhood.adapters.physical.virtual_cell.config_v2 import (
-    VirtualCellPipelineSelectionV2,
-    derive_pipeline_selection_v2,
-)
-from empirical_lawhood.adapters.physical.virtual_cell.contracts import (
-    PredictionCommitment,
-    VirtualCellContractError,
-)
-from empirical_lawhood.adapters.physical.virtual_cell.correction_records_v2 import (
-    MetricSourceSemantics,
-    OfficialMetricGaugeV2,
-    OfficialMetricSetV2,
-    SharedTemplateShiftV2BuildReceipt,
-    SharedTemplateShiftV2Selection,
-)
-from empirical_lawhood.adapters.physical.virtual_cell import (
-    receiver_readiness_v2 as readiness,
-)
-from empirical_lawhood.adapters.physical.virtual_cell.records_v2 import (
-    CandidateValidationRecordV2,
-    ModelDevelopmentRecordV2,
-    OfficialEvaluationRecordV2,
-    PredictionFreezeRecordV2,
-)
+from empirical_lawhood.domains.biology.virtual_cell.config import build_virtual_cell_2025_pipeline_config
+from empirical_lawhood.domains.biology.virtual_cell.config_v2 import VirtualCellPipelineSelectionV2, derive_pipeline_selection_v2
+from empirical_lawhood.domains.biology.virtual_cell.contracts import PredictionCommitment, VirtualCellContractError
+from empirical_lawhood.domains.biology.virtual_cell.correction_records_v2 import MetricSourceSemantics, OfficialMetricGaugeV2, OfficialMetricSetV2, SharedTemplateShiftV2BuildReceipt, SharedTemplateShiftV2Selection
+from empirical_lawhood.adapters.physical.virtual_cell import receiver_readiness_v2 as readiness
+from empirical_lawhood.domains.biology.virtual_cell.records_v2 import CandidateValidationRecordV2, ModelDevelopmentRecordV2, OfficialEvaluationRecordV2, PredictionFreezeRecordV2
 
 
 def _original_config():
@@ -97,11 +72,8 @@ def _reference(schema, object_id, version="1.0.0", digest="1" * 64):
     return ObjectIdentity(object_id, schema, version, digest)
 
 
-def test_extraction_preserves_exact_original_class_objects_and_canonical_goldens():
-    from empirical_lawhood.adapters.physical.virtual_cell import (
-        metric_correction_v2,
-        prediction_v2,
-    )
+def test_extraction_preserves_canonical_goldens_without_retired_adapter_facades():
+    from empirical_lawhood.adapters.physical.virtual_cell import metric_correction_v2, prediction_v2
 
     values = (
         (
@@ -142,9 +114,9 @@ def test_extraction_preserves_exact_original_class_objects_and_canonical_goldens
         "OfficialMetricSetV2",
         "MetricSourceSemantics",
     ):
-        assert getattr(metric_correction_v2, name) is globals()[name]
+        assert not hasattr(metric_correction_v2, name)
     for name in ("SharedTemplateShiftV2Selection", "SharedTemplateShiftV2BuildReceipt"):
-        assert getattr(prediction_v2, name) is globals()[name]
+        assert not hasattr(prediction_v2, name)
 
 
 def test_pure_selection_and_custody_imports_cannot_load_numerical_owners():
@@ -158,10 +130,10 @@ class ForbidScientific(importlib.abc.MetaPathFinder):
                 ('.analysis', '.runtime', '.dataset', '.prediction_v2', '.metric_correction_v2')):
             raise AssertionError('forbidden scientific import: ' + fullname)
 sys.meta_path.insert(0, ForbidScientific())
-from empirical_lawhood.adapters.physical.virtual_cell.correction_records_v2 import (
+from empirical_lawhood.domains.biology.virtual_cell.correction_records_v2 import (
     OfficialMetricGaugeV2, SharedTemplateShiftV2Selection)
-from empirical_lawhood.adapters.physical.virtual_cell.config_v2 import VirtualCellPipelineSelectionV2
-from empirical_lawhood.adapters.physical.virtual_cell.records_v2 import PredictionFreezeRecordV2
+from empirical_lawhood.domains.biology.virtual_cell.config_v2 import VirtualCellPipelineSelectionV2
+from empirical_lawhood.domains.biology.virtual_cell.records_v2 import PredictionFreezeRecordV2
 from empirical_lawhood.adapters.physical.virtual_cell.receiver_readiness_v2 import ReceiverReadinessV2
 from empirical_lawhood.adapters.physical.virtual_cell.runtime_v2 import VirtualCellSelectedMethodsV2
 assert OfficialMetricGaugeV2().des_source_column == 'overlap_at_N'
@@ -170,44 +142,25 @@ assert SharedTemplateShiftV2Selection().VERSION == '2.0.0'
     subprocess.run([sys.executable, "-c", script], check=True)
 
 
-def test_original_package_exports_retain_exact_names_and_owner_objects():
+def test_v1_package_exports_retain_only_adapter_effect_owners():
     import empirical_lawhood.adapters.physical.virtual_cell as adapter
-    from empirical_lawhood.adapters.physical.virtual_cell.analysis import (
-        CompiledPrediction,
-    )
-    from empirical_lawhood.adapters.physical.virtual_cell.contracts import (
-        MetricContract,
-    )
+    from empirical_lawhood.domains.biology.virtual_cell.analysis import CompiledPrediction
+    from empirical_lawhood.domains.biology.virtual_cell.contracts import MetricContract
 
-    # Original public __all__, captured before the lazy export change.
+    # v1 removes scientific compatibility exports from the adapter package.
+    # Canonical scientific records and calculations have their own domain owner.
     assert adapter.__all__ == [
-        "CompiledPrediction",
-        "EmpiricalReplaySpec",
         "H5ADStructuralInspection",
-        "LinearResponseModel",
-        "MetricContract",
-        "ModelFamily",
-        "PredictionCommitment",
-        "ResponseSummaryArrays",
         "SegmentedBinaryReader",
-        "TargetFeatureMatrix",
-        "TargetResponseMatrix",
-        "TaskTranslation2026",
-        "VirtualCellDenominator",
-        "ProvenanceBoundVirtualCellPipelineConfig",
-        "VirtualCellSourceManifest",
-        "adjudicate_placement",
-        "adjudicate_official_final_top100",
-        "compile_prediction_cells",
         "decode_official_final_top100",
-        "fit_tier_l0_model",
         "inspect_h5ad",
-        "official_aggregate_score",
-        "predict_response",
         "summarize_h5ad",
     ]
-    assert adapter.CompiledPrediction is CompiledPrediction
-    assert adapter.MetricContract is MetricContract
+    assert CompiledPrediction.__module__ == "empirical_lawhood.domains.biology.virtual_cell.analysis"
+    assert MetricContract.__module__ == "empirical_lawhood.domains.biology.virtual_cell.contracts"
+    for scientific_name in ("CompiledPrediction", "MetricContract", "ResponseSummaryArrays", "adjudicate_official_final_top100"):
+        with pytest.raises(AttributeError):
+            getattr(adapter, scientific_name)
     with pytest.raises(AttributeError):
         _ = adapter.user_selected_module
 
@@ -336,7 +289,7 @@ def test_readiness_refuses_each_wrong_selected_version_before_receiver_import(
 
 def test_fake_complete_receiver_requires_all_actual_entry_points(monkeypatch):
     # Software-only doubles; this cannot demonstrate official evaluator conformance.
-    from empirical_lawhood.adapters.physical.virtual_cell import analysis
+    from empirical_lawhood.domains.biology.virtual_cell import analysis
 
     expected = dict(readiness.LOCKED_RECEIVER_DISTRIBUTIONS_V2)
     monkeypatch.setattr(readiness, "version", expected.__getitem__)
@@ -371,53 +324,21 @@ def test_fake_complete_receiver_requires_all_actual_entry_points(monkeypatch):
     assert not result.ready and len(result.entry_point_errors) == 4
 
 
-@pytest.mark.parametrize(
-    "capability",
-    [
-        SUMMARY_CAPABILITY_KEY,
-        MODEL_CAPABILITY_KEY,
-        PREDICTION_CAPABILITY_KEY,
-        EVALUATOR_CAPABILITY_KEY,
-    ],
-)
-def test_historical_runtime_refuses_before_any_stage_source_or_scratch(
-    monkeypatch, capability
-):
-    from empirical_lawhood.adapters.physical.virtual_cell.runtime import (
-        VirtualCellTaskRunner,
-    )
-
-    runner = object.__new__(VirtualCellTaskRunner)
-    runner.manifest = SimpleNamespace(capability_key=capability)
-    checked = []
-    monkeypatch.setattr(
-        runner, "_validate_context", lambda context: checked.append(context)
-    )
-    for name in ("_summarize", "_develop", "_freeze_prediction", "_evaluate"):
-        monkeypatch.setattr(
-            runner,
-            name,
-            lambda context: pytest.fail("historical stage reached source or scratch"),
-        )
-    context = object()
-    with pytest.raises(VirtualCellContractError, match="SOFTWARE"):
-        runner.execute(context)
-    assert checked == [context]
+def test_retired_runtime_has_no_executable_compatibility_entry_point():
+    import inspect
+    from empirical_lawhood.adapters.physical.virtual_cell import runtime, provider
+    assert not hasattr(runtime, "VirtualCellTaskRunner")
+    assert not hasattr(provider, "VirtualCellCampaignRuntimeProvider")
+    assert not hasattr(provider, "VirtualCellConfigDecoder")
+    assert inspect.isabstract(runtime.VirtualCellTaskExecutionBase)
+    assert inspect.isabstract(provider.VirtualCellRuntimePortsBase)
 
 
 def test_corrected_custody_uses_successor_metrics_and_original_fit_references():
     # Complete typed metadata only; actual evidence bytes are required by views.
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.adapters.physical.virtual_cell.contracts import (
-        MetricContract,
-        VirtualCellSourceManifest,
-        VirtualCellSourceObject,
-    )
-    from empirical_lawhood.adapters.physical.virtual_cell.records_v2 import (
-        ModelSelectionRecordV2,
-        RAW_PREDICTION_DELTAS_SCHEMA,
-        registry_sha256,
-    )
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.domains.biology.virtual_cell.contracts import MetricContract, VirtualCellSourceManifest, VirtualCellSourceObject
+    from empirical_lawhood.domains.biology.virtual_cell.records_v2 import ModelSelectionRecordV2, RAW_PREDICTION_DELTAS_SCHEMA, registry_sha256
 
     selected = _selection()
     genes, targets = ("gene.a", "gene.b"), ("target.exposed",)
@@ -571,9 +492,7 @@ def test_corrected_custody_uses_successor_metrics_and_original_fit_references():
 def test_selected_methods_refuse_missing_stack_before_writer_evaluator_or_destination(
     monkeypatch, tmp_path
 ):
-    from empirical_lawhood.adapters.physical.virtual_cell.runtime_v2 import (
-        VirtualCellSelectedMethodsV2,
-    )
+    from empirical_lawhood.adapters.physical.virtual_cell.runtime_v2 import VirtualCellSelectedMethodsV2
 
     monkeypatch.setattr(
         readiness,
@@ -603,13 +522,8 @@ def test_selected_methods_refuse_missing_stack_before_writer_evaluator_or_destin
 
 def _tiny_selected_prediction_inputs():
     import numpy as np
-    from empirical_lawhood.adapters.physical.virtual_cell.dataset import (
-        ControlReservoirArrays,
-    )
-    from empirical_lawhood.adapters.physical.virtual_cell.prediction import (
-        PredictionRoster,
-        PredictionTargetAllocation,
-    )
+    from empirical_lawhood.domains.biology.virtual_cell.response_summary import ControlReservoirArrays
+    from empirical_lawhood.domains.biology.virtual_cell.prediction import PredictionRoster, PredictionTargetAllocation
 
     original = _original_config()
     original = replace(
@@ -646,10 +560,7 @@ def test_selected_prediction_delegates_raw_unequal_actions_and_exact_original_se
     monkeypatch, tmp_path
 ):
     import numpy as np
-    from empirical_lawhood.adapters.physical.virtual_cell import (
-        prediction_v2,
-        runtime_v2,
-    )
+    from empirical_lawhood.adapters.physical.virtual_cell import prediction_v2, runtime_v2
 
     original, roster, reservoir = _tiny_selected_prediction_inputs()
     methods = runtime_v2.VirtualCellSelectedMethodsV2(original, _selection(original))
@@ -694,10 +605,7 @@ def test_selected_prediction_delegates_raw_unequal_actions_and_exact_original_se
 def test_selected_prediction_refuses_substituted_budget_before_writer(
     monkeypatch, tmp_path, changed
 ):
-    from empirical_lawhood.adapters.physical.virtual_cell import (
-        prediction_v2,
-        runtime_v2,
-    )
+    from empirical_lawhood.adapters.physical.virtual_cell import prediction_v2, runtime_v2
 
     original, roster, reservoir = _tiny_selected_prediction_inputs()
     methods = runtime_v2.VirtualCellSelectedMethodsV2(original, _selection(original))

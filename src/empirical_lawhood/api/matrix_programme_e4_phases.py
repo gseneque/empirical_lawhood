@@ -8,12 +8,12 @@ from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.e4_operations import MatrixProgrammeE4Access
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.e4_operations import MatrixProgrammeE4Access
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
 
-from .matrix_programme_projection import MatrixProgrammePrerequisite
+from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammePrerequisite
 
 
 def _namespace(context, phase):
@@ -29,9 +29,8 @@ def _operations(context):
 
 
 def _source_request(context, phase, original):
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_assembly import (
-        MatrixFiniteDtSourceAssemblyRequest, MatrixFiniteDtRetainedE3AssemblyRequest)
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection, ConfiguredE3UnfinishedPreparationSelection, ConfiguredE3ClosedPreparationSelection
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_assembly import MatrixFiniteDtSourceAssemblyRequest, MatrixFiniteDtRetainedE3AssemblyRequest
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection, ConfiguredE3UnfinishedPreparationSelection, ConfiguredE3ClosedPreparationSelection
     source = context.plan.specification.operations.source_metadata
     if source.operational_resources.controls.maximum_parallel_tasks != context.execution.workers:
         raise ValueError('programme source controls differ from the actual worker selection')
@@ -48,7 +47,7 @@ def _source_request(context, phase, original):
 
 
 def _banks(context, phase, original):
-    from .matrix_programme_e4_inputs import published_programme_e4_inputs
+    from empirical_lawhood.api.matrix_programme_e4_inputs import published_programme_e4_inputs
     return published_programme_e4_inputs(request=_source_request(context, phase, original),
         project_root=context.service.project_root, artifact_writer=context.writer,
         metadata_directory=context.metadata_directory(phase) / 'original-banks', execution=context.execution)
@@ -56,9 +55,9 @@ def _banks(context, phase, original):
 
 def _template_files(context, phase, bank, original):
     """Copy only C's exact pre-outcome template bytes, never a future result."""
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest
     artifacts = {protocol.templates.array_artifact.artifact_id: protocol.templates.array_artifact
         for protocol in bank.response_selection.protocols}
     publications = {value.logical.logical_artifact_id: value
@@ -93,10 +92,10 @@ def _template_files(context, phase, bank, original):
 
 
 def _development(context, phase, original):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4ExperimentSpecification
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence
-    from .matrix_programme_e4_inputs import original_e3_lineage
-    from .domain_composition.matrix_selected_declarative.derivation import selected_produced_input_parents
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4ExperimentSpecification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence
+    from empirical_lawhood.api.matrix_programme_e4_inputs import original_e3_lineage
+    from empirical_lawhood.api.domain_composition.matrix_selected_declarative.derivation import selected_produced_input_parents
     operations = _operations(context)
     with _banks(context, phase, original) as current:
         bank, programme = dict(current.banks)['DEVELOPMENT'], dict(current.programmes)['DEVELOPMENT']
@@ -115,12 +114,11 @@ def _development(context, phase, original):
 
 
 def _revision(context, phase, original):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import allocation
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4RevisionExperimentSpecification
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_revision_transition import (
-        SelectedE4RevisionAcquisitionSource, SelectedE4RevisionAcquisitionSpecification)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import bind_group_fold_slots
-    from .matrix_programme_e4_inputs import original_e3_lineage
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import allocation
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4RevisionExperimentSpecification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_revision_transition import SelectedE4RevisionAcquisitionSource, SelectedE4RevisionAcquisitionSpecification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import bind_group_fold_slots
+    from empirical_lawhood.api.matrix_programme_e4_inputs import original_e3_lineage
     operations = _operations(context)
     actual = context.method_inputs('e4.development')
     programme, bank = actual.programme, actual.bank
@@ -144,13 +142,13 @@ def _revision(context, phase, original):
 
 
 def _source_qualification(context, phase):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4SourceQualification
-    from empirical_lawhood.adapters.methods.matrix_source_evidence import MatrixSourcePipelineEvidence
-    from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceQualificationSpec, ScientificSourceQualificationResult
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
-    from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4SourceQualification
+    from empirical_lawhood.domains.matrix.matrix_source_evidence import MatrixSourcePipelineEvidence
+    from empirical_lawhood.design.scientific_source_qualification import ScientificSourceQualificationSpec, ScientificSourceQualificationResult
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
+    from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
     source_phase = 'e4.source-cal' if phase == 'e4.calibration' else 'e4.source-conf'
-    from .matrix_programme_decisions import source_assessment
+    from empirical_lawhood.api.matrix_programme_decisions import source_assessment
     report = source_assessment(context, source_phase)
     def decode(value, kind):
         return decode_canonical_bytes(canonical_json_document_bytes(value), kind,
@@ -169,11 +167,11 @@ def _source_qualification(context, phase):
 
 def _calibration_product(context):
     """Construct a locator only inside the actual CAL assessment reader."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as science
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_preparation import ASSESSMENT_COMPONENT_ID
-    from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
-    from .selected_e4_native_read import _read_selected_e4_component
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_preparation import ASSESSMENT_COMPONENT_ID
+    from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
+    from empirical_lawhood.api.selected_e4_native_read import _read_selected_e4_component
     selected, _, authority, _, run, _ = context.authority('e4.calibration', ASSESSMENT_COMPONENT_ID)
     def consume(*, writer, package, plan, entry, receipts, products, reveal):
         rows = tuple((value, receipt, logical) for value, receipt, logical in products
@@ -194,11 +192,11 @@ def _calibration_product(context):
 
 
 def _protected(context, phase, original):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_declarative as domain
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_method_bindings import operations_for_programme
-    from .matrix_programme_e4_inputs import original_e3_lineage
-    from .matrix_researcher_programme_e4_lineage import programme_revision_products
-    from .domain_composition.matrix_selected_declarative.derivation import selected_produced_input_parents
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_declarative as domain
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_method_bindings import operations_for_programme
+    from empirical_lawhood.api.matrix_programme_e4_inputs import original_e3_lineage
+    from empirical_lawhood.api.matrix_researcher_programme_e4_lineage import programme_revision_products
+    from empirical_lawhood.api.domain_composition.matrix_selected_declarative.derivation import selected_produced_input_parents
     access = None if context.operation is None else context.operation.access_for(phase)
     if type(access) is not MatrixProgrammeE4Access:
         raise MatrixProgrammePrerequisite(phase, 'ACTUAL_E4_ENTRY_SELECTION_REQUIRED',
@@ -217,7 +215,7 @@ def _protected(context, phase, original):
             record_id='resources.' + _namespace(context, phase) + '.methods',
             phase_budgets=tuple(row for row in operations.method_resources.phase_budgets
                 if row[0] in operations_for_programme(programme)))
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_bindings import PHASES
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_bindings import PHASES
         required = {*PHASES, 'phase-collect', *operations_for_programme(programme)}
         protected_resources = replace(operations.protected_resources,
             record_id='resources.' + _namespace(context, phase) + '.protected',
@@ -261,10 +259,8 @@ def project_e4_phase(context, phase):
         if phase == 'e4.revision':
             return _revision(context, phase, original)
         if phase in ('e4.source-cal', 'e4.source-conf'):
-            from empirical_lawhood.adapters.methods.matrix_finite_dt_source_assembly import (
-                MatrixFiniteDtSourceAssemblySpecification, MatrixFiniteDtRetainedE3AssemblySpecification,
-                MatrixFiniteDtRetainedE3AssemblyRequest)
-            from .matrix_programme_e4_inputs import original_e3_lineage
+            from empirical_lawhood.domains.matrix.matrix_finite_dt_source_assembly import MatrixFiniteDtSourceAssemblySpecification, MatrixFiniteDtRetainedE3AssemblySpecification, MatrixFiniteDtRetainedE3AssemblyRequest
+            from empirical_lawhood.api.matrix_programme_e4_inputs import original_e3_lineage
             request = _source_request(context, phase, original)
             kind = (MatrixFiniteDtRetainedE3AssemblySpecification if type(request) is MatrixFiniteDtRetainedE3AssemblyRequest
                 else MatrixFiniteDtSourceAssemblySpecification)
@@ -278,11 +274,10 @@ def project_e4_phase(context, phase):
 
 def programme_e4_request(context, phase, *, include_collection=True):
     """Select real issued components; derive collection from actual wave reads."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as domain
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as records
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from .selected_e4_programme_service import (
-        SelectedE4ComponentRequest, SelectedE4ProgrammeRequest, SelectedE4ProgrammeService, _locator)
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as domain
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as records
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.api.selected_e4_programme_service import SelectedE4ComponentRequest, SelectedE4ProgrammeRequest, SelectedE4ProgrammeService, _locator
     plan = context.method_inputs(phase).plan
     if type(plan) is not domain.SelectedE4ProtectedProgrammePlan:
         raise MatrixProgrammePrerequisite(phase, 'ACTUAL_E4_PLAN_REQUIRED', 'Derive the actual ordinary E4 plan before selecting its issued components.')
@@ -306,7 +301,7 @@ def programme_e4_request(context, phase, *, include_collection=True):
             and (context.child_directory(phase) / 'structure' / 'analysis').exists()):
         # Read-only structure replays every current wave reveal and actual
         # complete terminal; absent results remain a prerequisite, never guessed.
-        from empirical_lawhood.runtime.experiment_programme import ExperimentProgrammeDescriptor
+        from empirical_lawhood.execution.experiment_programme import ExperimentProgrammeDescriptor
         descriptor = ExperimentProgrammeDescriptor('programme.' + plan.fingerprint(),
             domain.PROGRAMME_PROTOCOL_ID, plan.specification.identity, plan.identity)
         service = SelectedE4ProgrammeService(service=context.service, descriptor=descriptor)

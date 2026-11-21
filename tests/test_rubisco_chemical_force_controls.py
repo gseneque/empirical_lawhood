@@ -16,24 +16,24 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as p
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_contracts import DurableUnitReturn
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.physical_preparation_geometry import PhysicalPreparationGeometry
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.preparation_integrity import PreparationIntegrity
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import control_contracts as c
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_instrumentation import TerminalReporterCapture
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_science import assess_control, constraints_from_system_xml, reduce_same_geometry_force_control, reduce_terminal_minimizer, terminal_objective_reduction
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_native_ledger import ChemicalForceLedger, request_values
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import control_roster
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_runner import ChemicalForceRunner
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_native_entry import validate_plugin_environment
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.science import hardware_from_stdout
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerOutputPort
-from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion, NativeSubworkDefinition, NativeSubworkRoster, NativeSubworkState
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as p
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_contracts import DurableUnitReturn
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.physical_preparation_geometry import PhysicalPreparationGeometry
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.preparation_integrity import PreparationIntegrity
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import control_contracts as c
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_instrumentation import TerminalReporterCapture
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_science import assess_control, constraints_from_system_xml, reduce_same_geometry_force_control, reduce_terminal_minimizer, terminal_objective_reduction
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_native_ledger import ChemicalForceLedger, request_values
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import control_roster
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_runner import ChemicalForceRunner
+from empirical_lawhood.adapters.rubisco.rubisco_insilico_sampling.control_native_entry import validate_plugin_environment
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.science import hardware_from_stdout
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerOutputPort
+from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion, NativeSubworkDefinition, NativeSubworkRoster, NativeSubworkState
 from tests.test_rubisco_durable_preparation import selected as selected, unit
 
 
@@ -306,7 +306,8 @@ class RefuseEffects(importlib.abc.MetaPathFinder):
     def find_spec(self,fullname,path=None,target=None):
         if fullname.split(".")[0] in blocked:raise AssertionError(fullname)
 sys.meta_path.insert(0,RefuseEffects())
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import control_native_entry,control_runner,control_invocation,control_native_ledger
+from empirical_lawhood.adapters.rubisco.rubisco_insilico_sampling import control_native_entry
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import control_runner,control_invocation,control_native_ledger
 print("EXPOSED_COLD_IMPORT_PASSED")
 '''
     result=subprocess.run([sys.executable,"-c",script],env=dict(os.environ,PYTHONPATH=str(Path(__file__).resolve().parents[1]/"src"),
@@ -330,7 +331,7 @@ def test_selected_existing_cuda_stock_and_explicit_loader_are_checked_without_co
 
 @pytest.mark.parametrize("changed",["none","missing-callback","unsupported-xml"])
 def test_complete_exposed_raw_assessment_keeps_numerical_and_native_physical_claims_distinct(plan,tmp_path,changed):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_preparation import directory_census
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_preparation import directory_census
     directory=tmp_path/"shared-model.exposed"
     directory.mkdir()
     system=b'<System type="System" version="1"><Particles><Particle mass="1"/><Particle mass="1"/></Particles><Constraints><Constraint p1="0" p2="1" d="1"/></Constraints></System>'

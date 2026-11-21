@@ -6,11 +6,11 @@ import sys
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.infrastructure.matrix_recorded_inputs import recorded_programme_inputs
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.adapters.matrix_storage.matrix_recorded_inputs import recorded_programme_inputs
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 from tests.test_matrix_programme_source_continuation import metadata_case  # noqa: F401
 
 

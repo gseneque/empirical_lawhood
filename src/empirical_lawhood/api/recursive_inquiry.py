@@ -1,45 +1,27 @@
 # SPDX-License-Identifier: MPL-2.0
 """Receipt-bound inquiry projection and decisions, independent of optional export."""
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 from hashlib import sha256
 from pathlib import Path
 
 from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
 from empirical_lawhood.api.recursive_authoring import author_recursive_wave, implementation_binding, load_authored_wave
-from empirical_lawhood.api.recursive_execution import (
-    validate_recursive_worker_controls, _validate_terminal_product_format, read_recursive_wave, run_recursive_wave,
-)
-from empirical_lawhood.runtime.artifacts import artifact_custody_limits
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.development_native_custody import read_development_native_payload
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.recursive_inquiry import (
-    AcquisitionEvent, InquiryAttempt, InquiryAttemptStatus, InquiryCost, InquiryDecision,
-    InquiryEvidence, InquirySpecification, InquiryState, InquirySuccessorIntent, identity,
-)
-from empirical_lawhood.kernel.recursive_inquiry_policy import (
-    InquiryAttemptWorkBinding, RobustInquirySpecification, ScientificInquiryWork, WorkBoundInquiryState,
-    WorkBoundInquiryDecision,
-)
-from empirical_lawhood.planning.campaigns import CampaignSpec, DecisionRight
-from empirical_lawhood.planning.recursive_inquiry import (
-    InquiryAction, InquiryMenu, InquiryPolicy, choose_inquiry, make_successor_intent,
-    validate_inquiry_join, validate_inquiry_revision,
-)
-from empirical_lawhood.planning.recursive_inquiry_policy import (
-    RobustInquiryDecision, RobustInquiryMenu, RobustInquiryPolicy,
-    choose_robust_inquiry, make_robust_successor_intent, validate_robust_inquiry_join,
-    validate_robust_inquiry_revision,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding, RecursiveWaveMember
-from empirical_lawhood.runtime.recursive_inquiry import (
-    InquiryDecisionPacket, InquiryDecisionRequest, InquiryStateSources, InquirySuccessorAdmission,
-    RobustInquiryDecisionPacket, RobustInquiryDecisionRequest,
-    WorkBoundInquiryDecisionPacket, WorkBoundInquiryDecisionRequest,
-)
+from empirical_lawhood.api.recursive_execution import validate_recursive_worker_controls, _validate_terminal_product_format, read_recursive_wave, run_recursive_wave
+from empirical_lawhood.storage.contracts.artifacts import artifact_custody_limits
+
+from empirical_lawhood.storage.development_native_custody import read_development_native_payload
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.inquiry.recursive_inquiry import AcquisitionEvent, InquiryAttempt, InquiryAttemptStatus, InquiryCost, InquiryDecision, InquiryEvidence, InquirySpecification, InquiryState, InquirySuccessorIntent, identity
+from empirical_lawhood.science.inquiry.recursive_inquiry_policy import InquiryAttemptWorkBinding, RobustInquirySpecification, ScientificInquiryWork, WorkBoundInquiryState, WorkBoundInquiryDecision
+from empirical_lawhood.design.campaigns import CampaignSpec, DecisionRight
+from empirical_lawhood.design.recursive_inquiry import InquiryAction, InquiryMenu, InquiryPolicy, choose_inquiry, make_successor_intent, validate_inquiry_join, validate_inquiry_revision
+from empirical_lawhood.design.recursive_inquiry_policy import RobustInquiryDecision, RobustInquiryMenu, RobustInquiryPolicy, choose_robust_inquiry, make_robust_successor_intent, validate_robust_inquiry_join, validate_robust_inquiry_revision
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding, RecursiveWaveMember
+from empirical_lawhood.execution.recursive_inquiry import InquiryDecisionPacket, InquiryDecisionRequest, InquiryStateSources, InquirySuccessorAdmission, RobustInquiryDecisionPacket, RobustInquiryDecisionRequest, WorkBoundInquiryDecisionPacket, WorkBoundInquiryDecisionRequest
 
 _CODECS = {"specification.json": InquirySpecification, "state.json": InquiryState,
            "sources.json": InquiryStateSources, "menu.json": InquiryMenu, "policy.json": InquiryPolicy,
@@ -62,7 +44,8 @@ def _decode_versioned(payload, codecs, *, maximum_bytes):
                if (codec.SCHEMA, codec.VERSION) == (document.get("schema"), document.get("version"))]
     if len(matches) != 1:
         raise ValueError("unsupported inquiry schema/version")
-    return decode_canonical_bytes(payload, matches[0], maximum_bytes=maximum_bytes)
+    from empirical_lawhood.science.records.decoded_record_store import decode_scoped_canonical_bytes
+    return decode_scoped_canonical_bytes(payload, matches[0], maximum_bytes=maximum_bytes)
 
 
 def decode_inquiry_decision_request(payload):
@@ -95,7 +78,7 @@ def _publish(writer, directory, name, record, packet_id):
 def _read(writer, relative, codec):
     codecs = codec if isinstance(codec, tuple) else (codec,)
     path = writer.root.resolve(relative, for_write=False)
-    manifest = decode_artifact_manifest(read_bounded_bytes(Path(str(path) + ".manifest.json"), maximum_bytes=artifact_custody_limits(writer).manifest_bytes), maximum_bytes=artifact_custody_limits(writer).manifest_bytes)
+    manifest = read_artifact_sidecar(writer, (Path(str(path) + '.manifest.json')).relative_to(writer.root.contract.canonical_path).as_posix(), maximum_bytes=artifact_custody_limits(writer).manifest_bytes)
     if (manifest.materialization.relative_path != relative
             or any(manifest.logical.payload_schema != item.SCHEMA for item in codecs)
             or manifest.logical.outcome_access is not OutcomeAccess.DEVELOPMENT_VISIBLE
@@ -149,37 +132,39 @@ def _inquiry_parent_depth(*, payloads, draft, artifact_writer):
     if not draft.contribution_parents:
         return 1
     from empirical_lawhood.api.recursive_contributions import authenticate_recursive_contribution
-    from empirical_lawhood.runtime.recursive_handoff import recursive_parent_closure_bindings
+    from empirical_lawhood.api.recursive_read_indexes import AncestryIndex
+    from empirical_lawhood.execution.recursive_handoff import recursive_parent_closure_bindings
     bindings = recursive_parent_closure_bindings(payloads)
 
-    def depth(directory, writer, ancestors):
-        _, transport, manifest, _, _, view = authenticate_recursive_contribution(
-            directory=directory, artifact_writer=writer)
+    roots = tuple(authenticate_recursive_contribution(
+        directory=artifact_writer.root.resolve(binding.relative_path, for_write=False),
+        artifact_writer=artifact_writer) for binding in bindings)
+    keys = tuple(identity(row[2], row[2].contribution_id) for row in roots)
+    if keys != tuple(binding.contribution for binding in bindings):
+        raise ValueError("inquiry wave changes authenticated predecessor")
+    expected = tuple(identity(parent, parent.contribution_id) for parent in draft.contribution_parents)
+    if keys != expected:
+        raise ValueError("inquiry wave changes its exact complete contribution parents")
+
+    rows = []
+    pending = [(row, frozenset()) for row in reversed(roots)]
+    while pending:
+        (_, transport, manifest, _, _, view), ancestors = pending.pop()
         key = identity(manifest, manifest.contribution_id)
         if key in ancestors:
             raise ValueError("inquiry contribution ancestry cycles")
-        parent_depths = []
-        parent_keys = []
-        for path in transport.parent_closure_relative_paths:
-            parent_depth, parent_key = depth(view.root.resolve(path, for_write=False), view, (*ancestors, key))
-            parent_depths.append(parent_depth)
-            parent_keys.append(parent_key)
-        if set(parent_keys) != set(manifest.predecessors):
+        # Authenticate every physical copy, including shared ancestors. Only
+        # the subsequent immutable graph calculation deduplicates identities.
+        parents = tuple(authenticate_recursive_contribution(
+            directory=view.root.resolve(path, for_write=False), artifact_writer=view)
+            for path in transport.parent_closure_relative_paths)
+        parent_keys = tuple(identity(row[2], row[2].contribution_id) for row in parents)
+        if len(set(parent_keys)) != len(parent_keys) or set(parent_keys) != set(manifest.predecessors):
             raise ValueError("inquiry ancestry does not join exact contribution predecessors")
-        return 1 + max(parent_depths, default=0), key
-
-    depths, keys = [], []
-    for binding in bindings:
-        parent_depth, parent_key = depth(artifact_writer.root.resolve(binding.relative_path, for_write=False),
-                                        artifact_writer, ())
-        if parent_key != binding.contribution:
-            raise ValueError("inquiry wave changes authenticated predecessor")
-        depths.append(parent_depth)
-        keys.append(parent_key)
-    expected = tuple(identity(parent, parent.contribution_id) for parent in draft.contribution_parents)
-    if tuple(keys) != expected:
-        raise ValueError("inquiry wave changes its exact complete contribution parents")
-    return 1 + max(depths)
+        rows.append((key, manifest.predecessors))
+        pending.extend((parent, ancestors | {key}) for parent in reversed(parents))
+    indexed = AncestryIndex(rows)
+    return 1 + max(indexed.depth(key) for key in keys)
 
 
 def _inquiry_successor_depth(*, histories, completed_waves, native_depths):
@@ -220,7 +205,7 @@ def _refine_inquiry_cost(previous, measured):
 
 
 def _inquiry_attempt_status(census, operational):
-    from empirical_lawhood.runtime.execution import TaskBlockReason
+    from empirical_lawhood.execution.execution import TaskBlockReason
     reason = str(census["reason_code"])
     if reason.startswith(TaskBlockReason.UNKNOWN_COMPLETION.value) or reason.startswith("UNKNOWN_COMPLETION"):
         return InquiryAttemptStatus.UNCERTAIN_CONTACT
@@ -238,7 +223,7 @@ def _inquiry_current_attempt_status(census, operational, native_observations):
     native = native_observations.get(census["attempt_id"])
     if native is None:
         return recorded
-    from empirical_lawhood.infrastructure.native_parent_finalization import NativeParentReturn
+    from empirical_lawhood.storage.native_parent_finalization import NativeParentReturn
     if type(native) is not NativeParentReturn:
         raise TypeError("inquiry current native facts require the authenticated parent census")
     if (native.work.expected_parent.attempt_id, native.work.expected_parent.task_id) != (
@@ -261,8 +246,8 @@ def _inquiry_operational_witness(products, census):
     event = products["recovery_events"].get(attempt_id)
     if event is not None:
         return event, identity(event, event.event_id)
-    from empirical_lawhood.runtime.execution import TaskBlockKind, TaskBlockReason
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryTerminalEvent
+    from empirical_lawhood.execution.execution import TaskBlockKind, TaskBlockReason
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryTerminalEvent
 
     terminal = products.get("terminal")
     if (type(terminal) is not DevelopmentRunRecoveryTerminalEvent
@@ -283,30 +268,48 @@ def _inquiry_operational_witness(products, census):
 
 
 def _inquiry_outcome_callbacks(draft):
-    from empirical_lawhood.api.recursive_operations import operation_factories
+    from empirical_lawhood.api.recursive_operations import selected_operation_factories
     selected = {op.selection.selection_id for op in draft.operations if op.node_id in draft.selected_operation_ids}
-    return tuple(dict.fromkeys(factory.inquiry_outcome_projector for factory in operation_factories()
+    return tuple(dict.fromkeys(factory.inquiry_outcome_projector for factory in selected_operation_factories(selected)
         if factory.registration.selection.selection_id in selected and factory.inquiry_outcome_projector is not None))
 
 
 def _validate_wave_endpoint(draft, specification, products):
     """Join the registered immutable design to the inquiry without relabelling stock."""
-    from empirical_lawhood.api.recursive_operations import operation_factories
+    from empirical_lawhood.api.recursive_operations import selected_operation_factories
     selected = {op.selection.selection_id for op in draft.operations if op.node_id in draft.selected_operation_ids}
-    callbacks = tuple(dict.fromkeys(factory.inquiry_endpoint_validator for factory in operation_factories()
-        if factory.registration.selection.selection_id in selected and factory.inquiry_endpoint_validator is not None))
+    factories = tuple(factory for factory in selected_operation_factories(selected)
+        if factory.registration.selection.selection_id in selected)
+    callbacks = tuple(dict.fromkeys(factory.inquiry_endpoint_validator for factory in factories
+        if factory.inquiry_endpoint_validator is not None))
     if len(callbacks) != 1:
         raise ValueError("inquiry endpoint needs its unique registered domain assessment")
+    projectors = tuple(getattr(factory, 'inquiry_endpoint_projector', None) for factory in factories
+        if factory.inquiry_endpoint_validator is not None)
+    if projectors and all(projector is projectors[0] and projector is not None for projector in projectors):
+        from empirical_lawhood.science.inquiry.recursive_requirements import ScientificConditionScope
+        actual = projectors[0](draft)
+        if type(actual) is not ScientificConditionScope:
+            raise TypeError('inquiry endpoint projector must return its exact typed original scope')
+        actual.__post_init__()
+        endpoints = (tuple(requirement.scope for requirement in specification.requirements)
+            if type(specification) is RobustInquirySpecification else (specification.endpoint,))
+        if actual not in endpoints:
+            raise ValueError('inquiry wave is outside every declared target/prerequisite scope')
+        return
     # Source-only validation supplies no result: initial choice is separate from
     # an attempted assessment, and raw source meanings retain their own scopes.
     if type(specification) is not RobustInquirySpecification:
-        callbacks[0](draft, specification.endpoint)
+        if callbacks[0](draft, specification.endpoint) is not None:
+            raise TypeError("inquiry endpoint validator must return None or raise")
         return
     # Source meanings are original domain scopes. A supplier investigation may
     # support another question of the same target through an assessed connection.
     for requirement in specification.requirements:
         try:
-            callbacks[0](draft, requirement.scope)
+            result = callbacks[0](draft, requirement.scope)
+            if result is not None:
+                raise TypeError("inquiry endpoint validator must return None or raise")
             return
         except ValueError:
             pass
@@ -315,10 +318,10 @@ def _validate_wave_endpoint(draft, specification, products):
 
 def _scientific_product_identity(draft, task_id, record):
     """Use the selected adapter's identity grammar; never guess scientific IDs."""
-    from empirical_lawhood.api.recursive_operations import operation_factories
+    from empirical_lawhood.api.recursive_operations import selected_operation_factories
     selected = next(operation.selection.selection_id for operation in draft.operations
                     if operation.node_id == task_id and task_id in draft.selected_operation_ids)
-    callbacks = tuple(factory.inquiry_record_identity for factory in operation_factories()
+    callbacks = tuple(factory.inquiry_record_identity for factory in selected_operation_factories((selected,))
                       if factory.registration.selection.selection_id == selected)
     if len(callbacks) != 1 or callbacks[0] is None:
         raise ValueError("robust inquiry requires its registered scientific product identity")
@@ -334,7 +337,7 @@ def _project_supply_findings(*, specification, products, stock, source):
     These are projections of authenticated products through the registered
     assessment owner, not new experiments or new qualification receipts.
     """
-    from empirical_lawhood.kernel.recursive_requirements import ContributionRole
+    from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
     requirements = {identity(row, row.requirement_id): row for row in specification.requirements}
     for assessment in products["connection_assessments"]:
         requirement = requirements.get(assessment.requirement)
@@ -378,18 +381,22 @@ def _validate_revised_inputs(specification, state, sources, policy, artifact_wri
             specification=specification, state=state, policy=policy)
 
 
-def _project_scientific_work(draft, task_id):
-    """Use the selected installed domain owner; missing semantics stay unknown."""
-    from empirical_lawhood.api.recursive_operations import operation_factories
+def _scientific_work_factory(draft, task_id):
+    from empirical_lawhood.api.recursive_operations import selected_operation_factories
     operations = tuple(op for op in draft.operations if op.node_id == task_id
                        and op.node_id in draft.selected_operation_ids)
     if len(operations) != 1:
         raise ValueError("inquiry work changes its actual selected operation")
-    factories = tuple(factory for factory in operation_factories()
+    factories = tuple(factory for factory in selected_operation_factories((operations[0].selection.selection_id,))
                       if factory.registration.selection == operations[0].selection)
     if len(factories) != 1:
         raise ValueError("inquiry work lacks its unique installed operation owner")
-    callback = factories[0].inquiry_work_projector
+    return factories[0]
+
+
+def _project_scientific_work(draft, task_id):
+    """Use the selected installed domain owner; missing semantics stay unknown."""
+    callback = _scientific_work_factory(draft, task_id).inquiry_work_projector
     if callback is None:
         return None
     work = callback(draft, task_id)
@@ -399,9 +406,43 @@ def _project_scientific_work(draft, task_id):
     return work
 
 
+def _project_wave_scientific_work(draft, task_ids):
+    """Share complete domain validation within this projection, without a cache."""
+    selected = tuple(sorted(set(task_ids)))
+    work, batches = {}, {}
+    for task_id in selected:
+        factory = _scientific_work_factory(draft, task_id)
+        batch = getattr(factory, 'inquiry_work_batch_projector', None)
+        if batch is None:
+            work[task_id] = _project_scientific_work(draft, task_id)
+        else:
+            batches.setdefault(id(batch), (batch, []))[1].append(task_id)
+    for batch, names in batches.values():
+        names = tuple(names)
+        rows = batch(draft, names)
+        if (type(rows) is not tuple or len(rows) != len(names)
+                or any(type(row) is not tuple or len(row) != 2 for row in rows)
+                or tuple(row[0] for row in rows) != names):
+            raise ValueError('inquiry work batch changes its exact selected task census')
+        for task_id, value in rows:
+            if type(value) is not ScientificInquiryWork:
+                raise ValueError('inquiry work batch returned no exact typed scientific identity')
+            value.__post_init__()
+            work[task_id] = value
+    return work
+
+
 def project_inquiry_state(*, specification, state_id, information_cutoff, sources, artifact_writer,
                           state_version=None):
     """Project declared eligible custody; missing attempt expenditure stays unknown."""
+    from empirical_lawhood.api.recursive_inquiry_read import inquiry_projection_read
+    with inquiry_projection_read(artifact_writer) as reading:
+        return reading.project_state(specification=specification, state_id=state_id,
+            information_cutoff=information_cutoff, sources=sources, state_version=state_version)
+
+
+def _project_inquiry_state(*, specification, state_id, information_cutoff, sources, artifact_writer,
+                          reading, state_version=None):
     root = Path(artifact_writer.root.contract.canonical_path)
     robust = type(specification) is RobustInquirySpecification
     version = state_version or (WorkBoundInquiryState.VERSION if robust else InquiryState.VERSION)
@@ -437,14 +478,11 @@ def project_inquiry_state(*, specification, state_id, information_cutoff, source
     completed, completed_waves, native_depths = {}, {}, {}
     for source in waves:
         directory = root / source.relative_path
-        packet, draft, _, payloads = load_authored_wave(directory=directory, artifact_writer=artifact_writer)
-        if source.packet != identity(packet, packet.packet_id):
-            raise ValueError("inquiry source changes its exact authored packet")
-        from empirical_lawhood.api.recursive_inquiry_evidence import project_wave_evidence_bindings
-        from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigins, RecursiveInputOriginKind
-        products = report = plan = None
-        if source.include_products:
-            report, products, _, plan = read_recursive_wave(directory=directory, artifact_writer=artifact_writer, include_products=True)
+        original = reading.wave(directory=directory, include_products=source.include_products, expected=source.packet)
+        packet, draft, payloads = original.packet, original.draft, original.payloads
+        from empirical_lawhood.api.recursive_inquiry_evidence import binary_product_identity, project_wave_evidence_bindings
+        from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigins, RecursiveInputOriginKind
+        products, report, plan = original.products, original.report, original.plan
         bindings = project_wave_evidence_bindings(draft=draft, payloads=payloads, products=products)
         _validate_wave_endpoint(draft, specification, products)
         origins = {}
@@ -459,7 +497,9 @@ def project_inquiry_state(*, specification, state_id, information_cutoff, source
         for external in draft.external_inputs:
             if external.input_id not in selected_ids:
                 continue
-            filename = "external-" + sha256(external.input_id.encode()).hexdigest()[:24] + ".json"
+            from empirical_lawhood.api.recursive_authoring import _external_storage_contract
+            _, suffix = _external_storage_contract(payload_schema=external.payload_schema, media_type=external.media_type)
+            filename = "external-" + sha256(external.input_id.encode()).hexdigest()[:24] + suffix
             member = members[filename]
             binding = bindings[external.input_id]
             product_identity, producing_receipt, source_contract = member.identity, None, source.packet
@@ -483,6 +523,9 @@ def project_inquiry_state(*, specification, state_id, information_cutoff, source
         operation_ids = {op.node_id: op.config_identity for op in draft.operations}
         completed_waves[source.packet] = packet.draft
         native_depths[source.packet] = _inquiry_parent_depth(payloads=payloads, draft=draft, artifact_writer=artifact_writer)
+        projected_work = (_project_wave_scientific_work(draft,
+            tuple(row['task_id'] for row in products['operational_census']))
+            if version == WorkBoundInquiryState.VERSION else {})
         for census in products["operational_census"]:
             attempt_id, task_id = census["attempt_id"], census["task_id"]
             receipt = products["attempt_receipts"].get(attempt_id)
@@ -493,15 +536,16 @@ def project_inquiry_state(*, specification, state_id, information_cutoff, source
                 for logical in receipt.output_logical_artifacts:
                     output_id = next(spec.output_id for task in plan.tasks if task.task_id == task_id
                                      for spec in task.outputs if spec.logical_artifact_id == logical.logical_artifact_id)
-                    record = products["records"][task_id][output_id]
-                    product_identity = identity(record, logical.logical_artifact_id)
+                    record = products["records"][task_id].get(output_id)
+                    product_identity = (identity(record, logical.logical_artifact_id) if record is not None else
+                        binary_product_identity(draft=draft, products=products, task_id=task_id, output_id=output_id))
                     output_ids.append(product_identity)
                     binding = bindings[output_id]
                     row = InquiryEvidence("stock." + sha256((receipt.fingerprint() + logical.logical_artifact_id).encode()).hexdigest()[:24],
                         product_identity, receipt_identity, binding.scope, binding.role,
                         binding.independent_unit_ids, binding.nested_view_ids)
                     _merge(stock, row, row.evidence_id)
-                    if type(specification) is RobustInquirySpecification:
+                    if type(specification) is RobustInquirySpecification and record is not None:
                         scientific = _scientific_product_identity(draft, task_id, record)
                         if scientific != product_identity:
                             alias = InquiryEvidence("stock." + sha256((receipt.fingerprint() + scientific.object_id).encode()).hexdigest()[:24],
@@ -515,7 +559,7 @@ def project_inquiry_state(*, specification, state_id, information_cutoff, source
             if version == WorkBoundInquiryState.VERSION:
                 task = next(task for task in plan.tasks if task.task_id == task_id)
                 binding = InquiryAttemptWorkBinding(attempt_id, operation_ids[task_id],
-                    _project_scientific_work(draft, task_id), source.packet,
+                    projected_work[task_id], source.packet,
                     identity(plan, plan.execution_plan_id), identity(task, task.task_id), receipt_identity)
                 _merge(work_bindings, binding, attempt_id)
             event = AcquisitionEvent("event." + attempt_id, attempt_id, receipt_identity, InquiryCost(None, None, None))
@@ -547,19 +591,23 @@ def project_inquiry_state(*, specification, state_id, information_cutoff, source
         attempt_work_bindings=tuple(work_bindings[key] for key in sorted(work_bindings)))
 
 
-def _outcome(specification, sources, artifact_writer):
+def _outcome(specification, sources, artifact_writer, *, reading=None):
     outcomes = []
     root = Path(artifact_writer.root.contract.canonical_path)
     for source in sources.waves:
         if not source.include_products:
             continue
-        _, products, draft, _ = read_recursive_wave(directory=root / source.relative_path,
-            artifact_writer=artifact_writer, include_products=True)
+        if reading is None:
+            _, products, draft, _ = read_recursive_wave(directory=root / source.relative_path,
+                artifact_writer=artifact_writer, include_products=True)
+        else:
+            original = reading.wave(directory=root / source.relative_path, include_products=True, expected=source.packet)
+            products, draft = original.products, original.draft
         if not any(op.config_identity == specification.distinguishing_assessment for op in draft.operations
                    if op.node_id in draft.selected_operation_ids):
             continue
         if type(specification) is RobustInquirySpecification:
-            from empirical_lawhood.kernel.recursive_inquiry_policy import ScientificOutcomeKind
+            from empirical_lawhood.science.inquiry.recursive_inquiry_policy import ScientificOutcomeKind
             census = products["operational_census"]
             statuses = {_inquiry_current_attempt_status(row, _inquiry_operational_witness(products, row)[0],
                             products.get("native_observations", {}))
@@ -582,7 +630,7 @@ def _outcome(specification, sources, artifact_writer):
     return outcomes[0]
 
 
-def _validate_current_menu_work(*, state, sources, menu, artifact_writer):
+def _validate_current_menu_work(*, state, sources, menu, artifact_writer, reading=None):
     """Recompute each current ACT from actual prospective or registered draft science."""
     if not isinstance(state, WorkBoundInquiryState):
         return
@@ -590,7 +638,11 @@ def _validate_current_menu_work(*, state, sources, menu, artifact_writer):
     _, waves = _inquiry_history_sources(sources=sources, root=root, artifact_writer=artifact_writer)
     candidates, suppliers = {}, []
     for source in waves:
-        _, draft, _, _ = load_authored_wave(directory=root / source.relative_path, artifact_writer=artifact_writer)
+        if reading is None:
+            _, draft, _, _ = load_authored_wave(directory=root / source.relative_path, artifact_writer=artifact_writer)
+        else:
+            draft = reading.wave(directory=root / source.relative_path,
+                include_products=source.include_products, expected=source.packet).draft
         candidates[identity(draft, draft.draft_id)] = draft
         if source.include_products:
             suppliers.append(root / source.relative_path)
@@ -618,9 +670,21 @@ def _validate_current_menu_work(*, state, sources, menu, artifact_writer):
             _read_inquiry_completion(state=state, sources=sources, selected=alternative, artifact_writer=artifact_writer)
 
 
-def commit_inquiry_decision(*, specification, state, sources, menu, policy, campaign, right,
-                            actor_id, project_root, artifact_writer, output_dir, human_choice=None,
-                            human_reason=None):
+def preview_inquiry_decision(*, specification, state, sources, menu, policy, campaign, right,
+                             actor_id, project_root, artifact_writer, output_dir, human_choice=None,
+                             human_reason=None):
+    """Perform the original commitment checks without publishing any record."""
+    from empirical_lawhood.api.recursive_inquiry_read import inquiry_projection_read
+    with inquiry_projection_read(artifact_writer) as reading:
+        return _preview_inquiry_decision(specification=specification, state=state, sources=sources,
+            menu=menu, policy=policy, campaign=campaign, right=right, actor_id=actor_id,
+            project_root=project_root, artifact_writer=reading.writer, output_dir=output_dir,
+            human_choice=human_choice, human_reason=human_reason, reading=reading)
+
+
+def _preview_inquiry_decision(*, specification, state, sources, menu, policy, campaign, right,
+                             actor_id, project_root, artifact_writer, output_dir, human_choice,
+                             human_reason, reading):
     choose, successor_intent, packet_type, _ = _policy_owners(specification, menu, policy, state)
     if type(specification) is RobustInquirySpecification and type(state) is not WorkBoundInquiryState:
         raise ValueError("legacy robust inquiry state is archival; reproject a work-bound version-three request before commitment")
@@ -629,15 +693,19 @@ def commit_inquiry_decision(*, specification, state, sources, menu, policy, camp
         extra["human_reason"] = human_reason
     elif human_reason is not None:
         raise ValueError("version-one inquiry does not contain a human reason")
-    destination = preflight_authoring_output_directory(directory=Path(output_dir), repo_root=Path(project_root), artifact_writer=artifact_writer)
-    actual = project_inquiry_state(specification=specification, state_id=state.state_id,
-        information_cutoff=state.information_cutoff, sources=sources, artifact_writer=artifact_writer,
+    preflight_authoring_output_directory(directory=Path(output_dir), repo_root=Path(project_root), artifact_writer=artifact_writer)
+    actual = reading.project_state(specification=specification, state_id=state.state_id,
+        information_cutoff=state.information_cutoff, sources=sources,
         state_version=state.VERSION)
     if actual != state:
         raise ValueError("inquiry state differs from current authenticated inputs")
-    _validate_current_menu_work(state=state, sources=sources, menu=menu, artifact_writer=artifact_writer)
+    _validate_current_menu_work(state=state, sources=sources, menu=menu, artifact_writer=artifact_writer, reading=reading)
     _validate_revised_inputs(specification, state, sources, policy, artifact_writer)
-    outcome_id = _outcome(specification, sources, artifact_writer)
+    outcome_id = _outcome(specification, sources, artifact_writer, reading=reading)
+    if type(specification) is RobustInquirySpecification:
+        from empirical_lawhood.api.recursive_inquiry_claims import project_target_claim_assessments
+        extra["claim_assessments"] = project_target_claim_assessments(
+            specification=specification, sources=sources, menu=menu, artifact_writer=artifact_writer, _reading=reading)
     decision = choose(decision_id="decision." + sha256((state.fingerprint() + menu.fingerprint() + policy.fingerprint()).encode()).hexdigest()[:24],
         specification=specification, state=state, menu=menu, policy=policy, campaign=campaign,
         right=right, actor_id=actor_id, outcome_id=outcome_id, human_choice=human_choice, **extra)
@@ -653,6 +721,19 @@ def commit_inquiry_decision(*, specification, state, sources, menu, policy, camp
     packet = packet_type("inquiry-packet." + decision.fingerprint()[:24], members)
     if implementation_binding(project_root) != records["implementation.json"]:
         raise ValueError("inquiry implementation changed during decision persistence")
+    return packet, records
+
+
+def commit_inquiry_decision(*, specification, state, sources, menu, policy, campaign, right,
+                            actor_id, project_root, artifact_writer, output_dir, human_choice=None,
+                            human_reason=None, expected_packet_sha256=None):
+    packet, records = preview_inquiry_decision(specification=specification, state=state, sources=sources,
+        menu=menu, policy=policy, campaign=campaign, right=right, actor_id=actor_id,
+        project_root=project_root, artifact_writer=artifact_writer, output_dir=output_dir,
+        human_choice=human_choice, human_reason=human_reason)
+    if expected_packet_sha256 is not None and packet.fingerprint() != expected_packet_sha256:
+        raise ValueError("inquiry decision differs from its reviewed packet")
+    destination = preflight_authoring_output_directory(directory=Path(output_dir), repo_root=Path(project_root), artifact_writer=artifact_writer)
     destination.mkdir(parents=True)
     for name, record in (*sorted(records.items()), ("inquiry-packet.json", packet)):
         _publish(artifact_writer, destination, name, record, packet.packet_id)
@@ -660,6 +741,15 @@ def commit_inquiry_decision(*, specification, state, sources, menu, policy, camp
 
 
 def read_inquiry_decision(*, directory, artifact_writer, revalidate_sources=True):
+    if not revalidate_sources:
+        return _read_inquiry_decision(directory=directory, artifact_writer=artifact_writer, revalidate_sources=False)
+    from empirical_lawhood.api.recursive_inquiry_read import inquiry_projection_read
+    with inquiry_projection_read(artifact_writer) as reading:
+        return _read_inquiry_decision(directory=directory, artifact_writer=reading.writer,
+            revalidate_sources=True, reading=reading)
+
+
+def _read_inquiry_decision(*, directory, artifact_writer, revalidate_sources, reading=None):
     root = Path(artifact_writer.root.contract.canonical_path)
     directory = Path(directory)
     relative = directory.relative_to(root).as_posix()
@@ -680,6 +770,11 @@ def read_inquiry_decision(*, directory, artifact_writer, revalidate_sources=True
         raise ValueError("legacy robust inquiry decision is archival; use explicit historical reading or a work-bound version-three decision")
     extra = ({"historical": not revalidate_sources} if type(packet) is InquiryDecisionPacket
              else {"validate_authority": revalidate_sources, "historical": not revalidate_sources})
+    if revalidate_sources and type(packet) is not InquiryDecisionPacket:
+        from empirical_lawhood.api.recursive_inquiry_claims import project_target_claim_assessments
+        extra["claim_assessments"] = project_target_claim_assessments(
+            specification=records["specification.json"], sources=records["sources.json"],
+            menu=records["menu.json"], artifact_writer=artifact_writer, _reading=reading)
     validate_join(decision=records["decision.json"], specification=records["specification.json"],
         state=records["state.json"], menu=records["menu.json"], policy=records["policy.json"],
         campaign=records["campaign.json"], right=records["right.json"], intent=records.get("intent.json"),
@@ -690,12 +785,14 @@ def read_inquiry_decision(*, directory, artifact_writer, revalidate_sources=True
         raise ValueError("inquiry decision changes its required successor intent census")
     if revalidate_sources:
         state = records["state.json"]
-        actual = project_inquiry_state(specification=records["specification.json"], state_id=state.state_id,
-            information_cutoff=state.information_cutoff, sources=records["sources.json"], artifact_writer=artifact_writer,
+        actual = reading.project_state(specification=records["specification.json"], state_id=state.state_id,
+            information_cutoff=state.information_cutoff, sources=records["sources.json"],
             state_version=state.VERSION)
-        if actual != state or _outcome(records["specification.json"], records["sources.json"], artifact_writer) != records["decision.json"].outcome_id:
+        if actual != state or _outcome(records["specification.json"], records["sources.json"], artifact_writer,
+                reading=reading) != records["decision.json"].outcome_id:
             raise ValueError("inquiry decision has stale or substituted scientific inputs")
-        _validate_current_menu_work(state=state, sources=records["sources.json"], menu=records["menu.json"], artifact_writer=artifact_writer)
+        _validate_current_menu_work(state=state, sources=records["sources.json"], menu=records["menu.json"],
+            artifact_writer=artifact_writer, reading=reading)
         _validate_revised_inputs(records["specification.json"], state, records["sources.json"],
                                  records["policy.json"], artifact_writer)
     return packet, records
@@ -758,8 +855,15 @@ def _refuse_reuse_entry(records):
 
 def preview_inquiry_successor(*, supplier_directory, artifact_writer):
     """Invoke the existing registered builder without exporting or deciding."""
+    from empirical_lawhood.api.recursive_inquiry_read import inquiry_projection_read
+    with inquiry_projection_read(artifact_writer) as reading:
+        return _preview_inquiry_successor(supplier_directory=supplier_directory, reading=reading)
+
+
+def _preview_inquiry_successor(*, supplier_directory, reading):
     from empirical_lawhood.api.recursive_contributions import _callbacks, _described
-    _, products, draft, _ = read_recursive_wave(directory=supplier_directory, artifact_writer=artifact_writer, include_products=True)
+    source = reading.wave(directory=supplier_directory, include_products=True)
+    products, draft = source.products, source.draft
     manifest = _described(draft, products)
     successors = tuple(value for callback in _callbacks(draft, products, "next_wave_builder")
                        if (value := callback(draft, manifest, products)) is not None)
@@ -823,7 +927,8 @@ def _validate_successor_allowances(records, draft):
         raise ValueError("inquiry successor exceeds its explicit finite operation allowance")
 
 
-def _validate_human_fork(*, draft, records, supplier_directory, contribution_dir=None, contribution_dirs=None, origins, artifact_writer):
+def _validate_human_fork(*, draft, records, supplier_directory, contribution_dir=None,
+        contribution_dirs=None, origins, reading):
     """Bind an explicitly chosen new inquiry to actual supplier custody.
 
     A new human-directed menu can change the scientific question/consumer while
@@ -835,20 +940,23 @@ def _validate_human_fork(*, draft, records, supplier_directory, contribution_dir
     if (contribution_dir is None and contribution_dirs is None) or not draft.contribution_parents:
         raise ValueError("human inquiry fork requires authenticated actual contribution parents")
     origins.validate_draft(draft)
+    artifact_writer = reading.writer
     root = Path(artifact_writer.root.contract.canonical_path)
     selected = Path(supplier_directory).resolve(strict=True)
     if not selected.is_relative_to(root) or any(p.is_symlink() for p in (Path(supplier_directory), *Path(supplier_directory).parents)):
         raise ValueError("human inquiry fork supplier is outside its exact guarded custody")
-    packet, old_draft, _, _ = load_authored_wave(directory=selected, artifact_writer=artifact_writer)
-    if identity(draft, draft.draft_id) == identity(old_draft, old_draft.draft_id):
-        raise ValueError("human inquiry fork must declare a distinct new inquiry draft")
     sources = tuple(source for source in records["sources.json"].waves if source.include_products
-                    and source.packet == identity(packet, packet.packet_id)
                     and source.relative_path == selected.relative_to(root).as_posix())
     if len(sources) != 1:
         raise ValueError("human inquiry fork supplier is absent from its exact retained decision sources")
+    original = reading.wave(directory=selected, include_products=True, expected=sources[0].packet)
+    packet, old_draft = original.packet, original.draft
+    if identity(draft, draft.draft_id) == identity(old_draft, old_draft.draft_id):
+        raise ValueError("human inquiry fork must declare a distinct new inquiry draft")
+    if sources[0].packet != identity(packet, packet.packet_id):
+        raise ValueError("human inquiry fork supplier is absent from its exact retained decision sources")
     from empirical_lawhood.api.recursive_contributions import _described, authenticate_recursive_parents
-    report, products, retained_draft, _ = read_recursive_wave(directory=selected, artifact_writer=artifact_writer, include_products=True)
+    report, products, retained_draft = original.report, original.products, original.draft
     if report["status"] != "SUCCEEDED":
         raise ValueError("human inquiry fork needs its actual completed supplier outcome")
     actual_parent = _described(retained_draft, products)
@@ -859,10 +967,22 @@ def _validate_human_fork(*, draft, records, supplier_directory, contribution_dir
     return draft
 
 
-def author_inquiry_successor(*, decision_directory, origins,
-                             project_root, artifact_writer, output_dir, supplier_directory=None,
-                             initial_draft=None, human_fork_draft=None, input_bindings=(), contribution_dir=None, contribution_dirs=None):
-    packet, records = read_inquiry_decision(directory=decision_directory, artifact_writer=artifact_writer)
+def preview_inquiry_authoring(*, decision_directory, origins, artifact_writer,
+                              supplier_directory=None, initial_draft=None, human_fork_draft=None,
+                              contribution_dir=None, contribution_dirs=None):
+    """Use the existing registered builder and exact intent/work admission checks."""
+    from empirical_lawhood.api.recursive_inquiry_read import inquiry_projection_read
+    with inquiry_projection_read(artifact_writer) as reading:
+        return _preview_inquiry_authoring(decision_directory=decision_directory, origins=origins,
+            artifact_writer=reading.writer, supplier_directory=supplier_directory,
+            initial_draft=initial_draft, human_fork_draft=human_fork_draft,
+            contribution_dir=contribution_dir, contribution_dirs=contribution_dirs, reading=reading)
+
+
+def _preview_inquiry_authoring(*, decision_directory, origins, artifact_writer, supplier_directory,
+        initial_draft, human_fork_draft, contribution_dir, contribution_dirs, reading):
+    packet, records = _read_inquiry_decision(directory=decision_directory, artifact_writer=artifact_writer,
+        revalidate_sources=True, reading=reading)
     intent = records.get("intent.json")
     if intent is None:
         raise ValueError("HOLD/STOP decision has no executable successor")
@@ -878,31 +998,57 @@ def author_inquiry_successor(*, decision_directory, origins,
         draft = initial_draft
     elif human_fork_draft is not None:
         draft = _validate_human_fork(draft=human_fork_draft, records=records, supplier_directory=supplier_directory,
-            contribution_dir=contribution_dir, contribution_dirs=contribution_dirs, origins=origins, artifact_writer=artifact_writer)
+            contribution_dir=contribution_dir, contribution_dirs=contribution_dirs, origins=origins,
+            reading=reading)
     else:
-        draft = preview_inquiry_successor(supplier_directory=supplier_directory, artifact_writer=artifact_writer)
-    _validate_intent_draft(intent, draft, origins)
-    _validate_successor_allowances(records, draft)
+        draft = _preview_inquiry_successor(supplier_directory=supplier_directory, reading=reading)
+    from empirical_lawhood.api.recursive_operations import inquiry_selection_scope
+    with inquiry_selection_scope(draft):
+        _validate_intent_draft(intent, draft, origins)
+        _validate_successor_allowances(records, draft)
+    return packet, records, draft
+
+
+def author_inquiry_successor(*, decision_directory, origins,
+                             project_root, artifact_writer, output_dir, supplier_directory=None,
+                             initial_draft=None, human_fork_draft=None, input_bindings=(), contribution_dir=None,
+                             contribution_dirs=None, expected_decision_packet_sha256=None):
+    packet, records, draft = preview_inquiry_authoring(decision_directory=decision_directory,
+        origins=origins, artifact_writer=artifact_writer, supplier_directory=supplier_directory,
+        initial_draft=initial_draft, human_fork_draft=human_fork_draft,
+        contribution_dir=contribution_dir, contribution_dirs=contribution_dirs)
+    if expected_decision_packet_sha256 is not None and packet.fingerprint() != expected_decision_packet_sha256:
+        raise ValueError("inquiry authoring changes its reviewed decision packet")
+    intent = records["intent.json"]
     report = author_recursive_wave(draft=draft, project_root=project_root, artifact_writer=artifact_writer,
         output_dir=output_dir, input_bindings=input_bindings, contribution_dir=contribution_dir,
         contribution_dirs=contribution_dirs, origins=origins)
-    authored, _, _, _ = load_authored_wave(directory=output_dir, artifact_writer=artifact_writer)
+    # Readback needs the exact packet, not every external scientific body in
+    # memory. The lazy member owner still verifies the complete publication.
+    authored, _, _, _ = load_authored_wave(directory=output_dir, artifact_writer=artifact_writer,
+        lazy_payloads=True)
     relative = Path(decision_directory).relative_to(Path(artifact_writer.root.contract.canonical_path)).as_posix()
     admission = InquirySuccessorAdmission(relative, identity(packet, packet.packet_id), identity(intent, intent.intent_id), identity(authored, authored.packet_id))
     _publish(artifact_writer, output_dir, "inquiry-admission.json", admission, packet.packet_id)
     return report
 
 
-def run_inquiry_successor(*, directory, project_root, artifact_writer, terminal_product_format="documents",
-                          maximum_parallel_tasks=1, parallel_resource_capacity=None):
-    _validate_terminal_product_format(terminal_product_format)
-    validate_recursive_worker_controls(maximum_parallel_tasks, parallel_resource_capacity)
+def read_inquiry_successor(*, directory, artifact_writer):
+    """Authenticate the original successor admission without entering execution."""
+    from empirical_lawhood.api.recursive_inquiry_read import inquiry_projection_read
+    with inquiry_projection_read(artifact_writer) as reading:
+        return _read_inquiry_successor(directory=directory, artifact_writer=reading.writer, reading=reading)
+
+
+def _read_inquiry_successor(*, directory, artifact_writer, reading):
     root = Path(artifact_writer.root.contract.canonical_path)
     relative = Path(directory).relative_to(root).as_posix()
     admission = _read(artifact_writer, relative + "/inquiry-admission.json", InquirySuccessorAdmission)
-    packet, records = read_inquiry_decision(directory=root / admission.decision_relative_path, artifact_writer=artifact_writer)
+    packet, records = _read_inquiry_decision(directory=root / admission.decision_relative_path,
+        artifact_writer=artifact_writer, revalidate_sources=True, reading=reading)
     _refuse_reuse_entry(records)
-    authored, draft, source, payloads = load_authored_wave(directory=directory, artifact_writer=artifact_writer)
+    original = reading.wave(directory=directory, include_products=False, expected=admission.authored_wave)
+    authored, draft, source, payloads = original.packet, original.draft, original.implementation, original.payloads
     intent = records.get("intent.json")
     if (intent is None or admission.decision_packet != identity(packet, packet.packet_id)
             or admission.intent != identity(intent, intent.intent_id)
@@ -910,13 +1056,23 @@ def run_inquiry_successor(*, directory, project_root, artifact_writer, terminal_
             or identity(draft, draft.draft_id) != intent.draft
             or source != records["implementation.json"]):
         raise ValueError("inquiry execution changes the exact persisted decision/intent/draft/source join")
-    from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigins
+    from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigins
     if "origins.json" not in payloads:
         raise ValueError("inquiry execution lacks its committed explicit input origins")
-    origins = decode_canonical_bytes(payloads["origins.json"], RecursiveInputOrigins,
-        maximum_bytes=max(1, len(payloads["origins.json"])))
+    from empirical_lawhood.storage.recursive_control_read import decode_authored_control
+    origins = decode_authored_control(payloads, "origins.json", RecursiveInputOrigins)
     _validate_intent_draft(intent, draft, origins)
     _validate_successor_allowances(records, draft)
+    return admission, packet, records, authored, draft, source
+
+
+def run_inquiry_successor(*, directory, project_root, artifact_writer, terminal_product_format="documents",
+                          maximum_parallel_tasks=1, parallel_resource_capacity=None):
+    from empirical_lawhood.api.recursive_inquiry_read import require_inquiry_execution_boundary
+    require_inquiry_execution_boundary(artifact_writer)
+    _validate_terminal_product_format(terminal_product_format)
+    validate_recursive_worker_controls(maximum_parallel_tasks, parallel_resource_capacity)
+    read_inquiry_successor(directory=directory, artifact_writer=artifact_writer)
     return run_recursive_wave(directory=directory, project_root=project_root, artifact_writer=artifact_writer,
                               terminal_product_format=terminal_product_format,
                               maximum_parallel_tasks=maximum_parallel_tasks,

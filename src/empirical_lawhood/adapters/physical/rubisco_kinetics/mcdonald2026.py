@@ -16,13 +16,11 @@ from hashlib import sha256
 import re
 from typing import ClassVar
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
-from .direct_panels import NativeRawEndpointValueV1, _diagnostics, _number
-from .genbank import _translate_complete_cds
-from .workbook import (
-    MAX_SELECTED_XML_BYTES, NativeWorkbookCellV1, NativeWorkbookV1, NativeWorksheetV1, _xml, decode_native_workbook,
-)
+from empirical_lawhood.adapters.physical.rubisco_kinetics.direct_panels import NativeRawEndpointValueV1, _diagnostics, _number
+from empirical_lawhood.adapters.physical.rubisco_kinetics.genbank import _translate_complete_cds
+from empirical_lawhood.adapters.physical.rubisco_kinetics.workbook import MAX_SELECTED_XML_BYTES, NativeWorkbookCellV1, NativeWorkbookV1, NativeWorksheetV1, _xml, decode_native_workbook
 
 ARTICLE_SHA256 = "6c37fa27a8a0e1a98442544ecc7fd5113edaa5adebbe7fc96fbe893cfbe2b621"
 S4_SHA256 = "dde3da450f7747952dc67f2c8562d28fa27ba183f39bb608f5acfaaa2d237451"

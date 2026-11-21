@@ -5,24 +5,22 @@ SPDX-License-Identifier: MPL-2.0
 
 from decimal import Decimal
 from pathlib import Path
-from empirical_lawhood.adapters.composition.task_resources import (
-    progress_resource_envelope,
-)
-from empirical_lawhood.adapters.simulators.rc_ladder_response.campaign import VIEWS
-from empirical_lawhood.adapters.simulators.rc_ladder_response.contracts import ResistorCapacitorLadderStudyConfig
+from empirical_lawhood.execution.task_resources import progress_resource_envelope
+from empirical_lawhood.domains.circuits.rc_ladder.campaign import VIEWS
+from empirical_lawhood.domains.circuits.rc_ladder.contracts import ResistorCapacitorLadderStudyConfig
 from empirical_lawhood.adapters.simulators.rc_ladder_response.runtime_provider import native_task_id
 from empirical_lawhood.api.authoring_handoff import create_authoring_api, preflight_authoring_output_directory, write_exclusive_record as _save_new
 from empirical_lawhood.api.authoring_output import report_incomplete_output
 from empirical_lawhood.api.results import CompileCandidateRequest
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import validate_stable_id
-from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_run_plan
-from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
-from empirical_lawhood.adapters.composition.rc_ladder_response.authoring import ResistorCapacitorCandidateContextProvider, build_rc_authoring
-from empirical_lawhood.adapters.composition.rc_ladder_response.design import BUDGET
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import validate_stable_id
+from empirical_lawhood.execution.compiler import compile_preissue_run_plan, lower_run_plan
+from empirical_lawhood.execution.study_issue import project_standard_study_extensions
+from empirical_lawhood.domains.circuits.rc_ladder.authoring.authoring import ResistorCapacitorCandidateContextProvider, build_rc_authoring
+from empirical_lawhood.domains.circuits.rc_ladder.authoring.design import BUDGET
 from empirical_lawhood.adapters.composition.rc_ladder_response.fresh_authoring import FreshRCProfile
 from empirical_lawhood.api.recursive_prospective_authoring import _capture_prospective_source, _publish_source_provenance
-from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
+from empirical_lawhood.storage.study_issue import GitStudySourceClosureInspector
 
 
 # Historical source-project identity remains an exposed development input.
@@ -96,7 +94,7 @@ def author_fresh_rc(
             issued_extensions=ObjectIdentity.from_record(
                 issued_extensions.issued_extension_set_id, issued_extensions
             ),
-            cpu_seconds=BUDGET.wall_time_seconds,
+            summed_wall_time_ceiling_seconds=BUDGET.wall_time_seconds,
             native_preparations=tuple(
                 (
                     native_task_id(study, view),

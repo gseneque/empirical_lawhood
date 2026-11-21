@@ -10,19 +10,19 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as owner, selected_e3_e4_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_workers import SelectedE3E4Worker
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility, inherited_visibility
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity, derived_outcome_access
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as owner, selected_e3_e4_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_workers import SelectedE3E4Worker
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility, inherited_visibility
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity, derived_outcome_access
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.worker_configuration_support import freeze_worker_configuration
 from tests.test_matrix_selected_protected_worker import MemoryReader
 from tests.test_matrix_selected_e3_e4_bridge import selected_bridge, transfer  # noqa: F401 - pure shared fixture
@@ -153,21 +153,19 @@ def e4_dense_case(selected_bridge):  # noqa: F811
     from decimal import Decimal
     from types import SimpleNamespace
 
-    from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as common
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast, response_science
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_native as native
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_science as method
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import FAMILY_MAP
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import (
-        branch_census, response_consumed_streams,
-    )
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import bind_selected_native_source, selected_stream_operands
-    from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-    from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.artifacts import ArtifactMaterialization, CanonicalTaskReceipt
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkBegin, NativeSubworkCompletion, NativeSubworkContact
+    from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as common
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast, response_science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_native as native
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_science as method
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import FAMILY_MAP
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census, response_consumed_streams
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import bind_selected_native_source, selected_stream_operands
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+    from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactMaterialization, CanonicalTaskReceipt
+    from empirical_lawhood.execution.native_subwork import NativeSubworkBegin, NativeSubworkCompletion, NativeSubworkContact
     from tests.matrix_e4_structure_support import dense_array_operands, dense_response_arrays
     from tests.native_completion_fixtures import literal_completion, receipt_with_completion
     from tests.test_matrix_e4_response_nonentry import implementation, literal_prefix
@@ -290,8 +288,8 @@ def e4_dense_case(selected_bridge):  # noqa: F811
 
 
 def _dense_worker_invocation(case, phase, *, damage=None):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast
-    from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
 
     root = case.source.root_id
     if phase == "mechanical":
@@ -300,7 +298,7 @@ def _dense_worker_invocation(case, phase, *, damage=None):
         values = {"entry": case.entry, "causal": case.causal, "causal-arrays": case.causal_raw,
             "templates": case.template_raw, "secondary-target": case.f.secondary_target}
     else:
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_native import phase_config
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_native import phase_config
         config = phase_config(case.prefix_config, phase)
         values = {"entry": case.entry, "source": case.local, "provenance": case.source.provenance,
             "prefix": case.prefix, "prefix-arrays": case.prefix_raw, "causal": case.causal,
@@ -348,11 +346,11 @@ def _forbid_dense_effects(monkeypatch, *, cold):
     import numpy as np
     import scipy.linalg
 
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments, parameter_source
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments, parameter_source
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
 
     def forbidden(*_args, **_kwargs):
         pytest.fail("dense pure worker entered an acquisition, RNG or new cold eigensolve")

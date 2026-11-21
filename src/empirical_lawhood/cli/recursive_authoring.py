@@ -13,8 +13,8 @@ from empirical_lawhood.cli.attempts import ATTEMPT_DIRECTORY_OPTION, attempt_sta
 def _authoring_input(path, helpers):
     """Select a closed known root schema; input cannot choose imports or code."""
     from empirical_lawhood.adapters._strict_json import loads_external_json
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec
     selected = helpers._selected_input(path, maximum_bytes=16 * 1024**2, copy=False)
     document = loads_external_json(read_bounded_bytes(selected, maximum_bytes=16 * 1024**2))
     schema = document.get("schema") if isinstance(document, dict) else None
@@ -33,7 +33,7 @@ def register_recursive_commands(app):
         """Persist an authenticated inquiry decision before optional contribution export."""
         from dataclasses import fields
         from empirical_lawhood.api.recursive_inquiry import commit_inquiry_decision, decode_inquiry_decision_request
-        from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
+        from empirical_lawhood.storage.bounded_io import read_bounded_bytes
         try:
             root, _, plane = h._storage()
             size = max(1, input.stat().st_size)
@@ -85,9 +85,9 @@ def register_recursive_commands(app):
                        attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None):
         """Bind the selected initial draft or registered successor of a persisted ACT decision."""
         from empirical_lawhood.api.recursive_inquiry import author_inquiry_successor
-        from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-        from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-        from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigins
+        from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+        from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigins
         try:
             root, _, plane = h._storage()
             size = max(1, origins.stat().st_size)
@@ -132,7 +132,7 @@ def register_recursive_commands(app):
         try:
             draft = _authoring_input(input, h)
             attempt_stage("recursive_design_explanation", native_contact="none")
-            from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec
+            from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec
             report = explain_recursive_draft(draft.draft if isinstance(draft, RecursiveProspectiveAuthoringSpec) else draft)
         except (OSError, RuntimeError, TypeError, ValueError) as error:
             h._error(error)
@@ -157,7 +157,7 @@ def register_recursive_commands(app):
                     raise ValueError("input binding requires INPUT_ID=PATH")
                 bindings.append((key, Path(path)))
             attempt_stage("recursive_authoring_preflight", native_contact="none")
-            from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec
+            from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec
             if isinstance(draft, RecursiveProspectiveAuthoringSpec):
                 if contribution_dir is not None:
                     raise ValueError("prospective parents bind through their declared qualified receipt operands")
@@ -165,8 +165,22 @@ def register_recursive_commands(app):
                 report = author_recursive_prospective(spec=draft, project_root=root, artifact_writer=plane,
                                                      output_dir=output_dir, input_bindings=tuple(bindings))
             else:
-                report = author_recursive_wave(draft=draft, project_root=root, artifact_writer=plane,
-                                              output_dir=output_dir, input_bindings=tuple(bindings), contribution_dir=contribution_dir)
+                from empirical_lawhood.api.rc_workbench import is_bounded_rc_draft
+                from empirical_lawhood.api.application_contracts import MAX_EDIT_BYTES
+                if (is_bounded_rc_draft(draft) and not bindings and contribution_dir is None
+                        and not draft.contribution_parents and input.stat().st_size <= MAX_EDIT_BYTES):
+                    from hashlib import sha256
+                    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+                    from empirical_lawhood.api.recursive_authoring import implementation_binding
+                    from empirical_lawhood.cli.application import invoke_selected_application
+                    report = invoke_selected_application("recursive.author", {
+                        "input": str(input.absolute()), "output_dir": str(output_dir.absolute()),
+                        "expected_input_sha256": sha256(read_bounded_bytes(input, maximum_bytes=MAX_EDIT_BYTES)).hexdigest(),
+                        "expected_implementation_sha256": implementation_binding(root).fingerprint(),
+                    }, root=root, input_root=input.absolute().parent)
+                else:
+                    report = author_recursive_wave(draft=draft, project_root=root, artifact_writer=plane,
+                                                  output_dir=output_dir, input_bindings=tuple(bindings), contribution_dir=contribution_dir)
         except (OSError, RuntimeError, TypeError, ValueError) as error:
             h._error(error)
         h._report(report)
@@ -182,9 +196,48 @@ def register_recursive_commands(app):
         try:
             root, _, plane = h._storage()
             attempt_stage("recursive_execution_preflight", native_contact="possible")
-            report = run_recursive_wave(directory=authoring_dir, project_root=root, artifact_writer=plane,
-                terminal_product_format=terminal_product_format, maximum_parallel_tasks=workers)
+            from empirical_lawhood.api.rc_workbench import load_bounded_rc
+            from empirical_lawhood.api.application_contracts import ApplicationError
+            try:
+                packet, _draft, _source, _payloads = load_bounded_rc(directory=authoring_dir.absolute(), plane=plane)
+            except ApplicationError as error:
+                if error.code != "UNSUPPORTED_BOUNDED_RC_SELECTION":
+                    raise
+                packet = None
+            if packet is None:
+                report = run_recursive_wave(directory=authoring_dir, project_root=root, artifact_writer=plane,
+                    terminal_product_format=terminal_product_format, maximum_parallel_tasks=workers)
+            else:
+                from empirical_lawhood.cli.application import invoke_selected_application
+                report = invoke_selected_application("recursive.run", {
+                    "directory": str(authoring_dir.absolute()), "terminal_product_format": terminal_product_format,
+                    "expected_packet_sha256": packet.fingerprint(),
+                }, root=root, workers=workers)
             attempt_stage("recursive_execution_completed", native_contact=report["native_contact"])
+        except (OSError, RuntimeError, TypeError, ValueError) as error:
+            h._error(error)
+        h._report(report)
+
+    @app.command("recursive-execution")
+    @retained_command("campaign recursive-execution", closed_output=True, native=False)
+    def execution_records(authoring_dir: Annotated[Path, typer.Option("--authoring-dir", exists=True, file_okay=False)],
+                          limit: Annotated[int, typer.Option("--limit", min=1, max=200)] = 50,
+                          cursor: Annotated[str | None, typer.Option("--cursor")] = None,
+                          filter: Annotated[str, typer.Option("--filter")] = "",
+                          attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None):
+        """Inspect original tasks, attempts and failure origins without scientific reconstruction."""
+        from empirical_lawhood.api.application import execute_application
+        from empirical_lawhood.api.application_contracts import ApplicationRequest
+        from empirical_lawhood.cli.application import application_context_from_cli, require_application_success
+        try:
+            attempt_stage("recursive_execution_records", native_contact="none")
+            context = application_context_from_cli()
+            parameters = {"directory": str(authoring_dir.absolute()), "limit": limit, "filter": filter}
+            if cursor is not None:
+                parameters["cursor"] = cursor
+            selected = ApplicationRequest("cli.recursive-execution", context.context_id,
+                "recursive.execution", tuple(sorted(parameters.items())))
+            report = require_application_success(execute_application(context, selected))
         except (OSError, RuntimeError, TypeError, ValueError) as error:
             h._error(error)
         h._report(report)
@@ -196,12 +249,18 @@ def register_recursive_commands(app):
                allow_partial: Annotated[bool, typer.Option("--allow-partial", help="Read complete task census and retained receipts before terminal publication; does not resume work.")] = False,
                attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None):
         """Authenticate every completed product and terminal disposition without acquisition."""
-        from empirical_lawhood.api.recursive_execution import read_recursive_wave
+        from empirical_lawhood.api.application import execute_application
+        from empirical_lawhood.api.application_contracts import ApplicationRequest
+        from empirical_lawhood.cli.application import application_context_from_cli
         try:
-            _, _, plane = h._storage(read_only=True)
             attempt_stage("recursive_retained_result", native_contact="none")
-            report = read_recursive_wave(directory=authoring_dir, artifact_writer=plane,
-                terminal_product_format=terminal_product_format, allow_partial=allow_partial)
+            context = application_context_from_cli()
+            selected = ApplicationRequest("cli.recursive-result", context.context_id, "recursive.result",
+                (("allow_partial", allow_partial), ("directory", str(authoring_dir.absolute())),
+                 ("terminal_product_format", terminal_product_format)))
+            result = execute_application(context, selected)
+            from empirical_lawhood.cli.application import require_application_success
+            report = require_application_success(result)
         except (OSError, RuntimeError, TypeError, ValueError) as error:
             h._error(error)
         h._report(report)

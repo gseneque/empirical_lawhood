@@ -14,8 +14,8 @@ import pytest
 from empirical_lawhood.api import matrix_programme_completed_continuation as continuation
 from empirical_lawhood.api import matrix_programme_e4_inputs, matrix_programme_e4_phases
 from empirical_lawhood.api.matrix_programme_retained_bank_metadata import retained_e4_bank_metadata
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 from tests.test_recursive_public_service import _plane
 
 

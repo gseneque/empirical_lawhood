@@ -5,12 +5,9 @@ from decimal import Decimal as D
 from dataclasses import replace
 from types import SimpleNamespace as N
 import pytest
-from empirical_lawhood.adapters.methods.rubisco_insilico_free_energy import (
-    science,
-    contracts as c,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.rubisco.rubisco_insilico_free_energy import science, contracts as c
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 
 
 def test_complete_mbar_counts_and_analytic_constant_offset():

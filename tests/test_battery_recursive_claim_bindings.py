@@ -8,16 +8,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_recursive_construction import science
-from empirical_lawhood.adapters.methods.battery_recursive_construction.contracts import BatteryOperationConfig
-from empirical_lawhood.adapters.methods.battery_recursive_construction.executable_binding import (
-    operation_manifests, operation_registrations, output_codecs,
-)
+from empirical_lawhood.adapters.battery.battery_recursive_construction import science
+from empirical_lawhood.domains.battery.battery_recursive_construction.contracts import BatteryOperationConfig
+from empirical_lawhood.domains.battery.battery_recursive_construction.extension import operation_manifests, operation_registrations, output_codecs
 from empirical_lawhood.api.recursive_authoring import author_recursive_wave
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave, project_recursive_assessments
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave, project_recursive_assessments
 from tests.test_battery_recursive_scope_bindings import _compile, _draft, _edit
 from tests.test_recursive_public_service import _plane
 
@@ -167,7 +165,7 @@ def test_public_coherent_nonexistent_claim_refuses_before_authoring_publication(
 def test_legacy_structural_proof_cannot_execute_a_coherent_nonexistent_claim(monkeypatch, tmp_path):
     from empirical_lawhood.api import recursive_execution as execution
     from empirical_lawhood.api.recursive_authoring import implementation_binding
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, LocalScheduler
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor, LocalScheduler
 
     draft = _draft("A")
     changed = _claims(draft, {draft.connections[0].connection_id: "claim.nonexistent"})

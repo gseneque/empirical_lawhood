@@ -1,13 +1,13 @@
 # SPDX-License-Identifier: MPL-2.0
 """Exact original C/phase/package joins for the current result-derived runner."""
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding, MatrixProgrammeRunBinding
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding, MatrixProgrammeRunBinding
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def read_published_record(writer, relative, kind, maximum_bytes):
-    from .retained_e3_evidence import current_e3_evidence, retained_e3_reader
+    from empirical_lawhood.api.retained_e3_evidence import current_e3_evidence, retained_e3_reader
     writer = retained_e3_reader(writer)
     manifest = writer.read_manifest(relative)
     if manifest.logical.payload_schema != kind.SCHEMA or manifest.materialization.compression != 'none':
@@ -17,14 +17,14 @@ def read_published_record(writer, relative, kind, maximum_bytes):
         # The original owner verifies this manifest and its complete current
         # closure on every read; only immutable typed construction is shared.
         return retained.reader.read_control(manifest, kind, maximum_bytes)
-    from empirical_lawhood.infrastructure.canonical_record_read import read_verified_canonical_record
+    from empirical_lawhood.storage.canonical_record_read import read_verified_canonical_record
     return read_verified_canonical_record(writer, manifest, kind, maximum_bytes=maximum_bytes)
 
 
 def authenticate_phase_binding(context, binding):
     from empirical_lawhood.api.experiment_preparation import load_experiment_specification, _protocol
-    from empirical_lawhood.infrastructure.publication_metadata import consume_published_materializations
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection
+    from empirical_lawhood.storage.publication_metadata import consume_published_materializations
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection
     if (type(binding) is not MatrixProgrammePhaseBinding or binding.programme != context.plan.identity):
         raise PermissionError('Matrix phase substitutes its actual original programme')
     binding.__post_init__()
@@ -113,8 +113,8 @@ def programme_original_product(context, phase, schema):
     """Use the ordinary source reader's actual authenticated prior locators."""
     if phase in ('e4.calibration', 'e4.confirmation'):
         return _issued_e4_product(context, phase, schema)
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
-    from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
+    from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
     report = context.report(phase)
     science = report.get('scientific_result', report)
     rows = tuple(decode_canonical_bytes(canonical_json_document_bytes(row), RecursivePriorExecutionBinding,
@@ -138,11 +138,11 @@ def _issued_e4_product(context, phase, schema):
 
 def _issued_e4_record(context, phase, schema):
     """Read the actual typed product and its original locator in one live scope."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as methods
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_preparation import ASSESSMENT_COMPONENT_ID
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as methods
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_preparation import ASSESSMENT_COMPONENT_ID
     from empirical_lawhood.api.selected_e4_native_read import _read_selected_e4_component
-    from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+    from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
     allowed = {'e4.calibration': methods.SelectedE4Calibration,
         'e4.confirmation': methods.SelectedE4DownstreamNomination}
     kind = allowed[phase]

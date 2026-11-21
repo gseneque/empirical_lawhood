@@ -4,24 +4,23 @@ from dataclasses import replace
 from hashlib import sha256
 from types import SimpleNamespace
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_preparation as domain,full_factor_bindings as owner,full_factor_records as r,full_factor_science as science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_preparation as domain, full_factor_bindings as owner, full_factor_records as r, full_factor_science as science
 from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
-from .matrix_retained_replay import map_reconstructions, replay_full_factor, replay_weight
+from empirical_lawhood.api.matrix_retained_replay import map_reconstructions, replay_full_factor, replay_weight
 from empirical_lawhood.api.matrix_full_factor_custody import authenticate_original_full_factor_reference
 from empirical_lawhood.api.recursive_qualified_parents import _output_payload
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling,OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan,ScientificStage
-from empirical_lawhood.runtime.plans import ScientificInputRole
-from empirical_lawhood.runtime.recursive_compiler import (decode_recursive_config_input,
-    project_recursive_config_inputs,configuration_graph_bindings)
-from empirical_lawhood.runtime.prospective_experiment import source_filename
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, ScientificStage
+from empirical_lawhood.execution.plans import ScientificInputRole
+from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input, project_recursive_config_inputs, configuration_graph_bindings
+from empirical_lawhood.execution.prospective_experiment import source_filename
 
 
 def _pin(value,field):return ObjectIdentity.from_record(getattr(value,field),value)
@@ -199,7 +198,7 @@ def _payload(writer,receipts,tasks,node,output,*,original_input_access=None,publ
 
 
 def _scope_input(writer,plan,reference,*,current_inputs=None,original_input_access=None):
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
     if type(reference) is not domain.ScheduledFullFactorScopeReference:
         raise TypeError('full factor consumed scope requires its exact immutable FILE reference')
     reference.__post_init__()
@@ -334,12 +333,12 @@ def _replay_values(*,writer,specification,inputs,draft,plan,receipts,codecs,curr
         'original_wave_observations':tuple(row.to_document() for row in original[0]['observations'])}
     if not reconstruct:
         return base
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_secondary_readout import structural_functional_projection
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_secondary_readout import structural_functional_projection
     secondary=structural_functional_projection(scope,products,assessments,functional_rows,
         target=target,secondary=inputs.request.secondary_readout)
     if any(row.prediction is None for row in functional_rows):
         raise PermissionError('full factor read omits original causal features for the structural comparison')
-    from empirical_lawhood.kernel.serialization import canonical_value
+    from empirical_lawhood.science.records.serialization import canonical_value
     return {**base,
         **({'same_bank_mechanism':canonical_value(tuple(mechanism_rows))} if mechanism_rows else {}),
         'prediction_cases':tuple(row.prediction.to_document() for row in functional_rows),
@@ -352,7 +351,7 @@ def _deferred():return {'scientific_completion':'NOT_ESTABLISHED','scientific_qu
 
 def read_development_result(*,directory,artifact_writer,specification,instance,payloads,report,products,draft,plan,allow_partial=False,
         _consume_programme_result=None,read_access=None):
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
     if type(specification) not in (domain.ScheduledFullFactorDevelopmentSpecification,domain.ScheduledFullFactorProtectedSpecification):raise TypeError('full factor exposed read requires its exact lifecycle leaf')
     if allow_partial or report.get('status')!='SUCCEEDED' or report.get('typed_product_validation')=='DEFERRED':return _deferred()
     inputs=_inputs(specification,instance,payloads)

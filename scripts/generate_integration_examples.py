@@ -6,16 +6,16 @@ from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.composition.finite_response_law.assignment import proposed_scientific_seeds
-from empirical_lawhood.adapters.composition.finite_response_law.rerun_input import FiniteResponseLawCurrentAllocation, FiniteResponseLawCurrentExposure, FiniteResponseLawRerunInput, PUBLIC_CALIBRATION_MASTER_SEED, PUBLIC_EVALUATION_MASTER_SEED, original_development_exposure, public_rerun_sample_exposure
-from empirical_lawhood.adapters.methods.finite_response_law.nominated_package import current_nomination_from_sources
-from empirical_lawhood.adapters.methods.finite_response_law.original_f import original_f_source_identities, authenticate_original_f_sources, original_f_from_bytes
-from empirical_lawhood.adapters.methods.finite_response_law.science import FiniteResponseLawScienceSpec
-from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source_records import CurrentPreparationSourceConfig, MatrixPreparationSourceConfig, MatrixPreparationSourceProtocol
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.config import FIXED_PROBE_SEED
-from empirical_lawhood.adapters.simulator_morphism_challenges.numeric_inputs import exposed_source_export_example, exposed_phase_config_examples
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment import proposed_scientific_seeds
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.rerun_input import FiniteResponseLawCurrentAllocation, FiniteResponseLawCurrentExposure, FiniteResponseLawRerunInput, PUBLIC_CALIBRATION_MASTER_SEED, PUBLIC_EVALUATION_MASTER_SEED, original_development_exposure, public_rerun_sample_exposure
+from empirical_lawhood.domains.matrix.finite_response_law.nominated_package import current_nomination_from_sources
+from empirical_lawhood.domains.matrix.finite_response_law.original_f import original_f_source_identities, authenticate_original_f_sources, original_f_from_bytes
+from empirical_lawhood.domains.matrix.finite_response_law.science import FiniteResponseLawScienceSpec
+from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source_records import CurrentPreparationSourceConfig, MatrixPreparationSourceConfig, MatrixPreparationSourceProtocol
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.config import FIXED_PROBE_SEED
+from empirical_lawhood.domains.history.simulator_morphism_challenges.numeric_inputs import exposed_source_export_example, exposed_phase_config_examples
 from empirical_lawhood.api.finite_operands import ORIGINAL_F_FILENAMES, _public_bytes, current_preparation_code_sources_sha256, current_preparation_protocol_identity
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_NATIVE_PURPOSES, MatrixAllocation, MatrixRootAllocation, MatrixPurposeSeed
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_NATIVE_PURPOSES, MatrixAllocation, MatrixRootAllocation, MatrixPurposeSeed
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -77,11 +77,9 @@ def examples() -> dict[str, bytes]:
     records["programmes/foundations/emergent-structure/workflows/matrix-history-analysis/source-current.json"] = history_source
     for mode in ("algebra", "passive"):
         records[f"programmes/foundations/emergent-structure/workflows/matrix-history-analysis/{mode}-current.json"] = replace(history[f"{mode}.json"], config_id=f"public.matrix-history.{mode}.current", source=history_source)
-    from empirical_lawhood.adapters.methods.matrix_history_analysis.experiment_preparation import (
-        MatrixHistoryProgrammeSpecification, PROTOCOL_ID as history_protocol,
-    )
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+    from empirical_lawhood.domains.matrix.matrix_history_analysis.experiment_preparation import MatrixHistoryProgrammeSpecification, PROTOCOL_ID as history_protocol
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
     history_allocation = history['allocation.json']
     history_analysis = records['programmes/foundations/emergent-structure/workflows/matrix-history-analysis/algebra-current.json']
     analysis_identity = ObjectIdentity.from_record(history_analysis.config_id, history_analysis)
@@ -96,11 +94,11 @@ def examples() -> dict[str, bytes]:
                 len(history_analysis.canonical_bytes())),
         ))
     from empirical_lawhood.api.matrix_preparation_analysis import tangent_preparation_configuration
-    from empirical_lawhood.adapters.methods.matrix_preparation_analysis.records import TransientAnalysisConfig, BaselineSupportConfig
+    from empirical_lawhood.domains.matrix.matrix_preparation_analysis.records import TransientAnalysisConfig, BaselineSupportConfig
     records["programmes/foundations/emergent-structure/workflows/matrix-tangent/input-current.json"] = tangent_preparation_configuration(config_id="example.matrix-tangent.exposed.current", namespace="example.matrix-tangent.exposed", master_seed=70409, project_root=ROOT)
     records["programmes/foundations/emergent-structure/workflows/matrix-transient/input.json"] = TransientAnalysisConfig("example.matrix-transient.exposed")
     records["programmes/foundations/emergent-structure/workflows/matrix-transient/baseline.json"] = BaselineSupportConfig("example.matrix-baseline.exposed")
-    from empirical_lawhood.adapters.methods.rc_prerequisite_chain.science import default_chain_config
+    from empirical_lawhood.domains.circuits.rc_prerequisite_chain.science import default_chain_config
     records["programmes/foundations/measurement-and-response/workflows/rc-prerequisite-chain/input.json"] = default_chain_config()
     payloads = {name: record.canonical_bytes() for name, record in records.items()}
     return payloads

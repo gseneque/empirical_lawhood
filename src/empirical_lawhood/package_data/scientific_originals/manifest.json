@@ -1,0 +1,8 @@
+{
+  "meaning": "Immutable original normalization source bytes; evidence only, never imported or executed.",
+  "original_revision": "d6bb1d85353ef7168729565f2477ab1718b5beb0",
+  "original_path": "src/empirical_lawhood/adapters/simulators/six_matrix_response/response_observer.py",
+  "retained_file": "matrix_scalar_response_observer.py.txt",
+  "sha256": "701d7c5a1157d5d4f29c2a4cc82630e7fff70dc5ade042339009d92934fc31c9",
+  "size_bytes": 20101
+}

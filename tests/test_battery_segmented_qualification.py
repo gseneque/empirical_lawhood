@@ -6,12 +6,12 @@ from decimal import Decimal as D
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, durable_roster as dr
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_contracts as sc, segmented_evidence as se
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_qualification as sq, segmented_roster as sr, segmented_science as ss
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import source_derived_preparation as derived
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, durable_roster as dr
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_contracts as sc, segmented_evidence as se
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_qualification as sq, segmented_roster as sr, segmented_science as ss
+from empirical_lawhood.domains.battery.battery_refined_inquiry import source_derived_preparation as derived
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_battery_durable_roster import selected54, uncertain  # noqa: F401
 from tests.test_battery_refined_inquiry import exposed
 from tests.test_battery_segmented_science import _receipt, prepared as exposed_prepared

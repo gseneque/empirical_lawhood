@@ -6,12 +6,12 @@ from decimal import Decimal
 import pytest
 from tests.rubisco_inquiry_source_fixtures import portfolio_source_operands
 
-from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry import science, operation_bindings as owner, recursive_translation as drafts
-from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.source_manifest import INITIAL_CANDIDATE_IDS
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry import science, operation_bindings as owner, recursive_translation as drafts
+from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry.source_manifest import INITIAL_CANDIDATE_IDS
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
 
 @pytest.fixture(scope='module')
@@ -93,11 +93,11 @@ def _compile(draft):
 
 
 def test_actual_supply_and_portable_mixed_successor_compile(source, supplier):
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-    from empirical_lawhood.kernel.scientific_contributions import ContributionManifest, ContributionProduct
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+    from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
     # Software metadata fixture, never actual scientific custody or qualification.
     product = ContributionProduct('product.exposed-portfolio-compile.design-operand',
         ObjectIdentity.from_record(supplier.product_id, supplier),
@@ -122,8 +122,8 @@ def test_actual_supply_and_portable_mixed_successor_compile(source, supplier):
 
 def test_authenticated_looking_forged_consumer_outputs_refuse(supplier):
     from types import SimpleNamespace
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.status import OperationalStatus
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.records.status import OperationalStatus
     draft = drafts.use_draft(supplier)
     assessment = science.assess(supplier, science.authentic_candidate(supplier))
     selected = draft.operations[0]

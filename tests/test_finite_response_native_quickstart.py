@@ -8,8 +8,8 @@ import numpy as np
 import pytest
 
 from empirical_lawhood.adapters.simulators.finite_response_law.native_quickstart import FiniteResponseLawCanary, run_finite_canary
-from empirical_lawhood.adapters.simulators.prepared_response.contracts import PreparedForceWord
-from empirical_lawhood.adapters.simulators.prepared_response.instruments import prepared_force_components
+from empirical_lawhood.domains.matrix.prepared_response.contracts import PreparedForceWord
+from empirical_lawhood.domains.matrix.prepared_response.instruments import prepared_force_components
 from empirical_lawhood.api.codecs import load_registered_authoring
 
 CONFIG = Path(__file__).parents[1] / "programmes/foundations/emergent-structure/workflows/finite-response-law/finite-canary.json"

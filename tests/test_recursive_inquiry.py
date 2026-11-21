@@ -5,23 +5,14 @@ from decimal import Decimal as D
 
 import pytest
 
-from empirical_lawhood.kernel.authority import AuthorityAction, ResourceBudget
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import (
-    AcquisitionEvent, InquiryAttempt, InquiryAttemptStatus, InquiryCharge, InquiryCost,
-    InquiryCostAccount, InquiryCostCategory, InquiryEvidence, InquiryOutcomeChoice, InquirySpecification,
-    InquiryState, identity, summarize_cost,
-)
-from empirical_lawhood.kernel.recursive_requirements import ContributionRole, ScientificConditionScope
-from empirical_lawhood.kernel.status import LifecycleStatus
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.planning.campaigns import (
-    CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight,
-)
-from empirical_lawhood.planning.recursive_inquiry import (
-    InquiryAction, InquiryAlternative, InquiryMenu, InquiryPolicy, choose_inquiry,
-    make_successor_intent, validate_inquiry_join, validate_inquiry_revision,
-)
+from empirical_lawhood.science.identity.authority import AuthorityAction, ResourceBudget
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import AcquisitionEvent, InquiryAttempt, InquiryAttemptStatus, InquiryCharge, InquiryCost, InquiryCostAccount, InquiryCostCategory, InquiryEvidence, InquiryOutcomeChoice, InquirySpecification, InquiryState, identity, summarize_cost
+from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole, ScientificConditionScope
+from empirical_lawhood.science.records.status import LifecycleStatus
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
+from empirical_lawhood.design.recursive_inquiry import InquiryAction, InquiryAlternative, InquiryMenu, InquiryPolicy, choose_inquiry, make_successor_intent, validate_inquiry_join, validate_inquiry_revision
 
 
 def obj(name):
@@ -186,7 +177,7 @@ def test_partially_unrestricted_policy_checks_only_selected_allowances(episode):
 
 
 def test_policy_roundtrips_finite_and_unrestricted_records(episode):
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     finite = episode["policy"]
     for policy in (finite, replace(finite, max_cost=cost(None, None, None),
                                   max_operations=None, max_waves=None, max_depth=None)):

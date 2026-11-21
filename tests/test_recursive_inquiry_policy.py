@@ -14,40 +14,19 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.kernel.authority import AuthorityAction, ResourceBudget
-from empirical_lawhood.kernel.evidence import ClaimSpec
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import (
-    AcquisitionEvent, InquiryAttempt, InquiryAttemptStatus, InquiryCost,
-    InquiryEvidence, InquiryState, identity,
-)
-from empirical_lawhood.kernel.recursive_inquiry_policy import (
-    CompletedInquiryWork, InquiryClaimFinding, InquiryCriterionAssessment,
-    InquiryEvidenceNeed, InquiryObservation, InquiryOutcomeMap, InquiryPolicyAssumption,
-    InquiryQuestionKind, InquiryRequirementFinding, InquiryStopScope, InquiryTarget,
-    InquiryTargetFrontier, RobustChoiceStatus, RobustInquirySpecification,
-    ScientificInquiryWork, ScientificOutcomeKind,
-    InquiryAttemptWorkBinding, WorkBoundInquiryState,
-)
-from empirical_lawhood.kernel.recursive_requirements import (
-    AssessmentDisposition as A, AssessmentPhase, ConditionRole, ContributionRole,
-    RequirementSupplyAssessment, ScientificConditionScope, ScientificConnectionSpec,
-    ScientificRequirementSpec,
-)
-from empirical_lawhood.kernel.status import LifecycleStatus
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.planning.campaigns import (
-    CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight,
-)
-from empirical_lawhood.planning.recursive_authoring import SupplierProposal
-from empirical_lawhood.planning.recursive_inquiry import InquiryAction
-from empirical_lawhood.planning.recursive_inquiry_policy import (
-    IncomparableResolution, InquiryAlternativeKind, InquiryCriterionRole,
-    InquiryCriterionRule, InquiryOrdering, RobustInquiryMenu, RobustInquiryPolicy,
-    TargetDirectedAlternative, choose_robust_inquiry, evaluate_robust_inquiry,
-    make_robust_successor_intent, validate_robust_inquiry_join,
-    uncertain_contact_requires_recovery,
-)
+from empirical_lawhood.science.identity.authority import AuthorityAction, ResourceBudget
+from empirical_lawhood.science.evidence.evidence import ClaimSpec, EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.inquiry.recursive_claim_assessment import InquiryClaimAssessment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import AcquisitionEvent, InquiryAttempt, InquiryAttemptStatus, InquiryCost, InquiryEvidence, InquiryState, identity
+from empirical_lawhood.science.inquiry.recursive_inquiry_policy import CompletedInquiryWork, InquiryClaimFinding, InquiryCriterionAssessment, InquiryEvidenceNeed, InquiryObservation, InquiryOutcomeMap, InquiryPolicyAssumption, InquiryQuestionKind, InquiryRequirementFinding, InquiryStopScope, InquiryTarget, InquiryTargetFrontier, RobustChoiceStatus, RobustInquirySpecification, ScientificInquiryWork, ScientificOutcomeKind, InquiryAttemptWorkBinding, WorkBoundInquiryState
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A, AssessmentPhase, ConditionRole, ContributionRole, RequirementSupplyAssessment, ScientificConditionScope, ScientificConnectionSpec, ScientificRequirementSpec
+from empirical_lawhood.science.records.status import LifecycleStatus
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
+from empirical_lawhood.design.recursive_authoring import SupplierProposal
+from empirical_lawhood.design.recursive_inquiry import InquiryAction
+from empirical_lawhood.design.recursive_inquiry_policy import IncomparableResolution, InquiryAlternativeKind, InquiryCriterionRole, InquiryCriterionRule, InquiryOrdering, RobustInquiryMenu, RobustInquiryPolicy, TargetDirectedAlternative, choose_robust_inquiry, evaluate_robust_inquiry, make_robust_successor_intent, validate_robust_inquiry_join, uncertain_contact_requires_recovery
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -104,6 +83,13 @@ def rebound(case, **changes):
     return N(**dict(values, state=state, menu=menu, policy=policy))
 
 
+def target_claim(scope):
+    return ClaimSpec("claim.target", scope.world_id, "relation.exposed-target", "Both declared target endpoints",
+        "Exposed exact target conjunction", "unit.exposed-target", None, EvidenceCeiling.NON_PROMOTABLE,
+        OutcomeAccess.DEVELOPMENT_VISIBLE, VisibilityCeiling.DEVELOPMENT_ONLY,
+        "Synthetic policy conformance only; no qualification", ("assumption.exposed",))
+
+
 def policy_case(domain="battery", *, outcome=ScientificOutcomeKind.UNEVALUABLE):
     original = (ROOT / SOURCE_PATHS[domain]).read_bytes()
     source = ObjectIdentity("source." + domain, "empirical-lawhood/testing/exposed-source", "1.0.0", sha256(original).hexdigest())
@@ -140,7 +126,8 @@ def policy_case(domain="battery", *, outcome=ScientificOutcomeKind.UNEVALUABLE):
         "instrument-input", "assess.instrument", "claim.instrument",
         ContributionRole.RETAINED_ANALYSIS_INPUT, instrument.falsifier,
     )
-    claim = obj("claim.target", ClaimSpec.SCHEMA, domain + ": both declared target endpoints")
+    declared_claim = target_claim(scope)
+    claim = identity(declared_claim, declared_claim.claim_id)
     target = InquiryTarget("target." + domain, target_purpose,
                            scope, ("condition",), (claim,), "Complete required claims in this same instance and receiver scope")
     outcomes = tuple(sorted((InquiryOutcomeMap(
@@ -257,7 +244,29 @@ def policy_case(domain="battery", *, outcome=ScientificOutcomeKind.UNEVALUABLE):
 
 
 def choose(case, **kwargs):
-    return choose_robust_inquiry(decision_id="decision", **vars(case), **kwargs)
+    return choose_robust_inquiry(decision_id="decision", **(vars(case) | kwargs))
+
+
+def assessed_target(case, disposition=A.SATISFIED):
+    """Explicit semantic witness for pure policy controls; no public authority."""
+    claim = target_claim(case.specification.target.scope)
+    result = obj("assessment.exposed-target", content=disposition.value)
+    receipt = obj("receipt.exposed-target")
+    contract = obj("contract.exposed-target")
+    evidence = InquiryEvidence("evidence.target", result, receipt, case.specification.target.scope,
+        ContributionRole.INSTANCE_PRODUCT, ("unit.exposed-target",), ("view.target",))
+    assessment = InquiryClaimAssessment(claim, contract, result, receipt, evidence.scope, disposition,
+        (result,), evidence.independent_unit_ids, evidence.nested_view_ids,
+        evidence.evidence_ceiling, evidence.outcome_access, evidence.visibility_ceiling)
+    finding = InquiryClaimFinding(assessment.claim_identity, evidence.scope, disposition, result,
+        (evidence.evidence_id,), "Explicit independently assessed target witness for policy conformance")
+    attempt = InquiryAttempt("attempt.target", contract, InquiryAttemptStatus.COMPLETED, receipt, (result,), "assessed")
+    state = replace(case.state, stock=tuple(sorted((*case.state.stock, evidence), key=lambda row: row.evidence_id)),
+        operational_census=tuple(sorted((*case.state.operational_census, attempt), key=lambda row: row.attempt_id)),
+        cost_events=tuple(sorted((*case.state.cost_events, AcquisitionEvent("event.target", attempt.attempt_id, receipt, cost())),
+                                key=lambda row: row.event_id)))
+    return rebound(case, state=state, claim_assessments=(assessment,), menu=replace(case.menu,
+        frontier=replace(case.menu.frontier, claim_findings=(finding,))))
 
 
 @pytest.mark.parametrize("domain,scientific_reason", [
@@ -283,7 +292,7 @@ def test_independent_domain_expected_prerequisite_decisions(domain, scientific_r
 def complete_requirement(case, requirement_id):
     requirement = next(row for row in case.specification.requirements if row.requirement_id == requirement_id)
     connection = next(row for row in case.specification.connections if row.requirement_id == requirement_id)
-    witness = case.state.stock[-1]
+    witness = next(row for row in case.state.stock if row.evidence_id == "evidence.source")
     assessments = tuple(sorted((RequirementSupplyAssessment(
         "assessment." + requirement_id + "." + phase.value.lower(), identity(requirement, requirement_id),
         identity(connection, connection.connection_id), phase, A.SATISFIED,
@@ -383,10 +392,8 @@ def test_target_completion_requires_all_claims_and_all_four_scientific_supply_ph
                    menu=replace(case.menu, alternatives=(closed,)))
     with pytest.raises(ValueError, match="no eligible decision"):
         choose(case)
+    case = assessed_target(case)
     finding = case.menu.frontier.claim_findings[0]
-    finding = replace(finding, disposition=A.SATISFIED, assessment=case.state.stock[0].product,
-                      evidence_ids=(case.state.stock[0].evidence_id,), reason="Both required endpoints independently assessed at this exact scope")
-    case = rebound(case, menu=replace(case.menu, frontier=replace(case.menu.frontier, claim_findings=(finding,))))
     # The target condition also requires the instrument. Assessing the parent
     # and its claim cannot silently credit that further prerequisite.
     with pytest.raises(ValueError, match="no eligible decision"):
@@ -409,13 +416,63 @@ def target_closure_case():
         (), (), (), cost(), "Next assessed application", "The complete outcome denominator",
         "Any missing, adverse or independently unassessed prerequisite changes closure",
         stop_scope=InquiryStopScope.TARGET, local_question_answered=True)
-    finding = replace(case.menu.frontier.claim_findings[0], disposition=A.SATISFIED,
-        assessment=case.state.stock[0].product, evidence_ids=(case.state.stock[0].evidence_id,),
-        reason="Exposed independent target claim witness at the original exact scope")
-    return rebound(case, specification=replace(case.specification,
+    return assessed_target(rebound(case, specification=replace(case.specification,
         outcomes=tuple(replace(row, alternative_ids=("close-target", "hold")) for row in case.specification.outcomes)),
-        menu=replace(case.menu, alternatives=(close, hold),
-            frontier=replace(case.menu.frontier, claim_findings=(finding,))))
+        menu=replace(case.menu, alternatives=(close, hold))))
+
+
+@pytest.mark.parametrize("evidence_id", ("evidence.source", "evidence.assessment"))
+def test_target_satisfaction_cannot_be_declared_from_arbitrary_scoped_stock(evidence_id):
+    case = target_closure_case()
+    source = next(row for row in case.state.stock if row.evidence_id == evidence_id)
+    finding = replace(case.menu.frontier.claim_findings[0], assessment=source.product,
+                      evidence_ids=(source.evidence_id,))
+    forged = rebound(case, claim_assessments=(), menu=replace(case.menu,
+        frontier=replace(case.menu.frontier, claim_findings=(finding,))))
+    with pytest.raises(ValueError, match="independently assessed claim"):
+        choose(forged)
+
+
+@pytest.mark.parametrize("defect", ("claim-revision", "scope", "contract", "receipt", "disposition",
+                                  "independent-units", "nested-views", "evidence", "ceiling"))
+def test_target_assessment_requires_exact_semantics_and_complete_census(defect):
+    case = target_closure_case()
+    assessment = case.claim_assessments[0]
+    if defect == "claim-revision":
+        altered = replace(assessment, claim=replace(assessment.claim, proposition="A different target proposition"))
+    elif defect == "scope":
+        altered = replace(assessment, scope=replace(assessment.scope, instance_id="different-instance"))
+    elif defect == "contract":
+        altered = replace(assessment, assessment_contract=obj("contract.different"))
+    elif defect == "receipt":
+        altered = replace(assessment, producing_receipt=obj("receipt.different"))
+    elif defect == "disposition":
+        altered = replace(assessment, disposition=A.FALSIFIED)
+    elif defect == "independent-units":
+        altered = replace(assessment, independent_unit_ids=())
+    elif defect == "nested-views":
+        altered = replace(assessment, nested_view_ids=())
+    elif defect == "evidence":
+        altered = replace(assessment, evidence=tuple(sorted((*assessment.evidence, case.state.stock[-2].product),
+                                                           key=lambda row: row.object_id)))
+    else:
+        with pytest.raises(ValueError, match="evidence ceiling"):
+            replace(assessment, evidence_ceiling=EvidenceCeiling.LOCAL_LAW)
+        return
+    with pytest.raises(ValueError, match="target"):
+        choose(rebound(case, claim_assessments=(altered,)))
+
+
+@pytest.mark.parametrize("disposition", (A.FALSIFIED, A.REFUSED, A.UNSUPPORTED, A.UNEVALUABLE))
+def test_actual_adverse_claim_assessment_keeps_target_unresolved(disposition):
+    case = target_closure_case()
+    assessment = replace(case.claim_assessments[0], disposition=disposition)
+    finding = replace(case.menu.frontier.claim_findings[0], disposition=disposition)
+    case = rebound(case, claim_assessments=(assessment,), menu=replace(case.menu,
+        frontier=replace(case.menu.frontier, claim_findings=(finding,))))
+    decision = choose(case)
+    assert decision.selected_alternative_id == "hold"
+    assert decision.unresolved_target_claim_ids == ("claim.target",)
 
 
 @pytest.mark.parametrize("phase", tuple(AssessmentPhase))
@@ -515,7 +572,7 @@ def test_frozen_outcome_census_routine_adoption_and_canonical_revision():
         replace(case.specification, explanations=("known method", "invented substitute"))
     with pytest.raises(ValueError, match="distinct explanations"):
         replace(case.specification, question_kind=InquiryQuestionKind.DISCRIMINATE)
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
     assert decode_canonical_bytes(case.specification.canonical_bytes(), RobustInquirySpecification, maximum_bytes=None) == case.specification
 
@@ -596,7 +653,7 @@ def test_matrix_assessed_factor_negative_closes_only_its_branch_and_keeps_depend
 def test_matrix_boundaries_retain_assessed_outcome_and_freeze_an_unentered_successor(
         case_id, kind, reason, successor_question, expected):
     """Explicit exposed policy operands; no matrix study is acquired or qualified."""
-    from empirical_lawhood.planning.recursive_inquiry_policy import validate_robust_inquiry_revision
+    from empirical_lawhood.design.recursive_inquiry_policy import validate_robust_inquiry_revision
 
     original = policy_case("matrix", outcome=kind)
     scope = original.specification.endpoint
@@ -785,7 +842,7 @@ def test_supplier_unavailable_disposition_is_retained_before_policy_ranking():
 
 
 def test_scientific_redirection_preserves_target_exact_exposed_stock_and_terminal_history():
-    from empirical_lawhood.planning.recursive_inquiry_policy import validate_robust_inquiry_revision
+    from empirical_lawhood.design.recursive_inquiry_policy import validate_robust_inquiry_revision
 
     old = policy_case("matrix")
     previous_decision = choose(old)
@@ -815,7 +872,7 @@ def test_matrix_redirection_freezes_new_native_question_and_refuses_silent_facto
     These exposed immutable operands test redirection/admission, not completion
     of a matrix experiment or acquisition of another independent native root.
     """
-    from empirical_lawhood.planning.recursive_inquiry_policy import validate_robust_inquiry_revision
+    from empirical_lawhood.design.recursive_inquiry_policy import validate_robust_inquiry_revision
 
     old = complete_requirement(policy_case("matrix", outcome=ScientificOutcomeKind.NEGATIVE), "instrument")
     terminal = choose(old, human_choice="hold", human_reason="Retain the scoped scalar negative and formulate an actual factor-response admission question")
@@ -956,8 +1013,8 @@ def test_work_binding_preserves_exact_attempt_denominator_and_custody_joins(part
 
 def test_original_closed_state_and_request_versions_remain_exactly_readable():
     from empirical_lawhood.api.recursive_inquiry import decode_inquiry_decision_request
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.runtime.recursive_inquiry import InquiryStateSources, RobustInquiryDecisionRequest, WorkBoundInquiryDecisionRequest
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.execution.recursive_inquiry import InquiryStateSources, RobustInquiryDecisionRequest, WorkBoundInquiryDecisionRequest
 
     old = policy_case("rubisco")
     request = RobustInquiryDecisionRequest(old.specification, old.state, InquiryStateSources(()), old.menu, old.policy,

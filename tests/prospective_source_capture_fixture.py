@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: MPL-2.0
 """In-memory selected-source contracts for disclosed prospective test fixtures."""
 
-from empirical_lawhood.infrastructure.source_closure import AdmittedTargetSource, CapturedTargetClosure, TrackedSourceMember
-from empirical_lawhood.infrastructure.source_policy import CheckoutSourceAdmission
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SelectedSourceManifest, SelectedSourceManifestMember, SourceClosureKind
+from empirical_lawhood.storage.source_closure import AdmittedTargetSource, CapturedTargetClosure, TrackedSourceMember
+from empirical_lawhood.storage.source_policy import CheckoutSourceAdmission
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SelectedSourceManifest, SelectedSourceManifestMember, SourceClosureKind
 
 
 def synthetic_capture(closure_id, implementation_sha256, *, clean=True):

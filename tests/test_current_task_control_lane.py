@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import current_task_custody as owner
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
 from tests.runtime_platform.test_recursive_compiler import Config
 
 
@@ -65,11 +65,11 @@ def test_unspecified_or_substituted_lane_refuses_before_any_read(access, visibil
 
 def test_scoped_immutable_control_parse_reuse_keeps_real_custody_and_decimal_policy(tmp_path, monkeypatch):
     from decimal import localcontext
-    from empirical_lawhood.infrastructure import canonical_record_read
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-    from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
-    from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+    from empirical_lawhood.storage import canonical_record_read
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+    from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
+    from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 
     plane=ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
         'synthetic.static-control-store','disclosed static parse reuse',str(tmp_path),
@@ -122,7 +122,7 @@ def test_current_issued_control_scope_ignores_routes_without_custody_ports():
 
 @pytest.mark.parametrize('custom',('subclass','write-hook'))
 def test_current_task_scope_preserves_custom_writer_hooks(custom):
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
     if custom=='subclass':
         class CustomPlane(ExternalArtifactPlane):
             def verification_scope(self):

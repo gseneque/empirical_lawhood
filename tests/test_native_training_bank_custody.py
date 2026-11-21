@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Cheap original publication/receipt controls; no native work or qualification."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from types import SimpleNamespace
@@ -8,12 +9,12 @@ import os
 import pytest
 
 from empirical_lawhood.api.native_training_banks import _receipt_product
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.infrastructure.artifacts import ArtifactPlaneError, ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ExternalRootContract
+
+from empirical_lawhood.storage.artifacts import ArtifactPlaneError, ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ExternalRootContract
 
 
 @pytest.fixture
@@ -29,8 +30,7 @@ def receipted_product(tmp_path):
     publication = plane.write(ArtifactWriteRequest("product.native-training", "outputs/product.json", value.SCHEMA,
         ArtifactProfile.CANONICAL_JSON, "application/json", "test.native-training", "outputs", value.canonical_bytes(),
         VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
-    manifest = decode_artifact_manifest(plane.root.resolve(publication.manifest_materialization.relative_path,
-        for_write=False).read_bytes())
+    manifest = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(publication.manifest_materialization.relative_path, for_write=False).read_bytes())
     task_id, run_id = "task.native-training", "run.native-training"
     task = SimpleNamespace(task_id=task_id, outputs=(SimpleNamespace(output_id=task_id + ".product",
         logical_artifact_id=manifest.logical.logical_artifact_id, payload_schema=value.SCHEMA),))
@@ -69,8 +69,8 @@ def test_export_refuses_substituted_receipt_source_or_missing_unit(receipted_pro
 
 def _fresh_publications(tmp_path):
     from tests.test_matrix_native_training_acquisition import fresh_training_metadata_case
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_acquisition import entry_task_id
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_bindings import NativeTrainingEntryConfig
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_acquisition import entry_task_id
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_bindings import NativeTrainingEntryConfig
 
     case = fresh_training_metadata_case(tmp_path)
     entry = NativeTrainingEntryConfig("config." + entry_task_id(case.specification), case.specification, case.request)
@@ -80,9 +80,7 @@ def _fresh_publications(tmp_path):
 
 
 def test_registered_training_callback_reads_actual_complete_prior_publications(tmp_path):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import (
-        authenticate_request, authenticate_training_publications,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_request, authenticate_training_publications
     case, rows = _fresh_publications(tmp_path)
     assert authenticate_request(case.plane, case.request) == tuple((role, case.programme_inputs.phase(slot).responses)
         for role, slot in (("CALIBRATION", "e3.calibration"), ("EVALUATION", "e3.confirmation"),
@@ -97,14 +95,12 @@ def test_registered_training_callback_reads_actual_complete_prior_publications(t
 @pytest.mark.parametrize("changed", ("missing-commit", "missing-corpus", "changed-reservation",
     "missing-support", "changed-support"))
 def test_actual_missing_or_changed_prior_facts_refuse_before_training_effects(tmp_path, changed):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import (
-        authenticate_training_publications,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_training_publications
     case, rows = _fresh_publications(tmp_path)
     assert authenticate_training_publications(case.plane, rows) is None
     manifest = case.request.future_manifest
     if changed in ("missing-support", "changed-support"):
-        from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
+        from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
         _, custody = case.request.exposure_support[0]
         relative = custody.materialization.relative_path if type(custody) is ArtifactWriteResult else custody.relative_path
         member = case.plane.root.resolve(relative, for_write=False)
@@ -117,8 +113,7 @@ def test_actual_missing_or_changed_prior_facts_refuse_before_training_effects(tm
         case.plane.root.resolve(publication.materialization.relative_path, for_write=False).unlink()
     elif changed == "missing-commit":
         publication = manifest.reservation_publication
-        sidecar = decode_artifact_manifest(case.plane.root.resolve(
-            publication.manifest_materialization.relative_path, for_write=False).read_bytes())
+        sidecar = resolve_artifact_sidecar_bytes(case.plane, case.plane.root.resolve(publication.manifest_materialization.relative_path, for_write=False).read_bytes())
         assert sidecar.publication is not None
         case.plane.root.resolve(sidecar.publication.commit_marker_relative_path, for_write=False).unlink()
     else:

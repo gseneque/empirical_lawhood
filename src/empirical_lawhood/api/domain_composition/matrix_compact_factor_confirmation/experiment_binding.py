@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Compact E1 uses the ordinary protected lifecycle and a lazy retained reader."""
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.compact_preparation import PROTOCOL_ID,E1CompactExperimentSpecification,selection_types
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.compact_preparation import PROTOCOL_ID, E1CompactExperimentSpecification, selection_types
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 
 
 def bind_handoff(handoff,*,specification,allocation,source_records,artifact_writer,reveal_authority_id=None):
@@ -25,7 +25,7 @@ def prepare_authoring(*args,**kwargs):
 
 
 def derive_prospective_design_inputs(preparation):
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation.compact_preparation import derive_design_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation.compact_preparation import derive_design_inputs
     return derive_design_inputs(preparation)
 
 

@@ -25,20 +25,20 @@ _before_imports = set(sys.modules)
 _guard = _NoApiImports()
 sys.meta_path.insert(0, _guard)
 try:
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_assembly as assembly
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_assembly as assembly
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native
 finally:
     sys.meta_path.remove(_guard)
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammeInputCommitments, MatrixProgrammePublishedInput
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.campaigns import CampaignSpec
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteResult, LogicalArtifactIdentity
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammeInputCommitments, MatrixProgrammePublishedInput
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.campaigns import CampaignSpec
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteResult, LogicalArtifactIdentity
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
 _contract_imports = set(sys.modules)
 
@@ -194,7 +194,7 @@ def current_committed_train(tmp_path_factory):
     This fixture is deliberately separate from the UNWRITTEN pure descriptors
     above and must run only in the coordinator's committed-source check lane.
     """
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_bindings as workers
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_bindings as workers
     from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs, load_experiment_inputs
     from tests.test_matrix_native_training_assembly import ROOT, assembly_case
 
@@ -225,7 +225,7 @@ def _actual_committed_references(case):
 
 
 def test_actual_train_request_v3_keeps_all_seven_original_commitments_and_exact_custody(current_committed_train):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import authenticate_programme_commitment
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_programme_commitment
     case = current_committed_train
     request = case.request
     native.validate_request(case.specification,request)
@@ -280,7 +280,7 @@ def test_actual_train_request_refuses_missing_or_substituted_original_support(cu
 
 @pytest.mark.parametrize('damage',('different-c','different-math','different-source'))
 def test_actual_train_request_independently_joins_the_original_c_body(current_committed_train,damage):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import validate_request_programme_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import validate_request_programme_inputs
     case = current_committed_train
     request = case.request
     if damage=='different-c':

@@ -7,9 +7,9 @@ from decimal import Decimal as D
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_native as response
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_derivatives, parameter_source
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import SixMatrixState
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_native as response
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_derivatives, parameter_source
+from empirical_lawhood.domains.matrix.six_matrix_response.model import SixMatrixState
 from tests.test_matrix_factor_confirmation_eligibility import provenance as provenance
 from tests.test_matrix_factor_confirmation_eligibility import stock as stock
 from tests.test_matrix_scheduled_history import scheduled as scheduled

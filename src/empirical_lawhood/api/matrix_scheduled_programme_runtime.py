@@ -5,34 +5,21 @@ No current or prior authority is inferred from the handoff, a digest or a
 proposed plan. Preparation runs only in the parent executor against actual
 stored grants, original issued sources, actual plans and successful receipts.
 """
+from empirical_lawhood.storage.contracts.record_codecs import snapshot_record_codecs
 from dataclasses import replace
 
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody, CurrentIssuedTaskCustodySupplier
 from empirical_lawhood.api.current_result_custody import require_current_result_receipt_outputs
-from empirical_lawhood.api.recursive_qualified_parents import (
-    _authenticate, _authenticate_prior_execution,
-    _output_payload, _semantic_writer,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import validate_stable_id
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+from empirical_lawhood.api.recursive_qualified_parents import _authenticate, _authenticate_prior_execution, _output_payload, _semantic_writer
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import validate_stable_id
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_calibration import (
-    CALIBRATE_TASK_ID, MAXIMUM_CALIBRATION_BYTES, QUALIFY_TASK_ID,
-    ScheduledProgrammeCalibrationConfig, ScheduledProgrammeCalibrationEvidence,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_confirmation import (
-    ScheduledProgrammeAuthenticatedParent, ScheduledProgrammeConfirmationGlobalConfig,
-    ScheduledProgrammeConfirmationGlobalCommitter,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_qualified_parent import (
-    _validate_prior_products, prior_execution_bindings, prior_execution_scope_validator,
-    validate_qualified_parent_declaration_evidence,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_runtime_views import (
-    ScheduledProgrammeCurrentCalibration, ScheduledProgrammeVerifiedCalibrationCustody,
-)
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_calibration import CALIBRATE_TASK_ID, MAXIMUM_CALIBRATION_BYTES, QUALIFY_TASK_ID, ScheduledProgrammeCalibrationConfig, ScheduledProgrammeCalibrationEvidence
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_confirmation import ScheduledProgrammeAuthenticatedParent, ScheduledProgrammeConfirmationGlobalConfig, ScheduledProgrammeConfirmationGlobalCommitter
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_qualified_parent import _validate_prior_products, prior_execution_bindings, prior_execution_scope_validator, validate_qualified_parent_declaration_evidence
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_runtime_views import ScheduledProgrammeCurrentCalibration, ScheduledProgrammeVerifiedCalibrationCustody
 
 
 def authenticate_programme_qualified_parent(writer, bank, declaration, output_codecs, *, read_scope=None):
@@ -59,7 +46,7 @@ class ProgrammeRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
             validate_stable_id(reveal_authority_id)
         self.supplier = supplier
         self.writer = writer
-        self.output_codecs = dict(output_codecs)
+        self.output_codecs = snapshot_record_codecs(output_codecs)
         self.reveal_authority_id = reveal_authority_id
         if custody is not None and (type(custody) is not CurrentIssuedTaskCustody
                 or custody.writer is not writer or custody.reveal_authority_id != reveal_authority_id):
@@ -118,13 +105,13 @@ class ProgrammeRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
         by_task, controls = self._inputs(context, task)
         if type(runner) is ScheduledProgrammeConfirmationGlobalCommitter:
             config = self._control(controls[context.config.artifact_id], ScheduledProgrammeConfirmationGlobalConfig, 4*1024**2)
-            from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import ScheduledCompactBank
+            from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import ScheduledCompactBank
             bank = self._control(controls[config.bank.object_id], ScheduledCompactBank, 16*1024**2)
             parent = authenticate_programme_qualified_parent(original_writer, bank, config.qualified_parent, self.output_codecs, read_scope=read_scope)
             return current_result(ScheduledProgrammeConfirmationGlobalCommitter(runner.manifest, parent))
         if context.task_id != QUALIFY_TASK_ID:
             raise PermissionError('programme preparation refuses an undeclared runtime role')
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_calibration_bindings import ScheduledProgrammeCalibrator
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_calibration_bindings import ScheduledProgrammeCalibrator
         if type(runner) is not ScheduledProgrammeCalibrator or runner.role != 'calibration-qualify':
             raise PermissionError('programme preparation refuses a foreign qualifier implementation')
         config = self._control(controls[context.config.artifact_id], ScheduledProgrammeCalibrationConfig, 4*1024**2)
@@ -154,7 +141,7 @@ class ProgrammeRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
 
 
 def bind_programme_runtime_handoff(handoff, *, writer, reveal_authority_id=None):
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
     ports = []
     custody = CurrentIssuedTaskCustody(writer=writer, reveal_authority_id=reveal_authority_id)
     for platform in handoff.platform_ports:

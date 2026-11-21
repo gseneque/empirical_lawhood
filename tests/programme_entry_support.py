@@ -8,16 +8,13 @@ execution/reveal or turn the programme into a scientifically qualified parent.
 
 from dataclasses import replace
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import compact_identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.operation_bindings import source_operands
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.study_authoring import (
-    DesignInputRecord, DesignInputRole, SourceAccessDisposition,
-    SourceMaterializationRef, SourceMaterializationRole,
-)
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import compact_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.operation_bindings import source_operands
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
 from tests.test_matrix_scheduled_calibration import prospective_bank
 
 

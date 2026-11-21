@@ -8,10 +8,10 @@ from typing import ClassVar
 import pytest
 
 from empirical_lawhood.api import recursive_inquiry as service
-from empirical_lawhood.kernel.recursive_inquiry import AcquisitionEvent, identity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.recursive_inquiry import InquiryStateSources, InquiryWaveSource
-from empirical_lawhood.runtime.execution import TaskBlockReason
+from empirical_lawhood.science.inquiry.recursive_inquiry import AcquisitionEvent, identity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.execution.recursive_inquiry import InquiryStateSources, InquiryWaveSource
+from empirical_lawhood.execution.execution import TaskBlockReason
 from tests.test_recursive_inquiry import cost, episode as episode, obj
 from tests.test_recursive_public_service import _plane
 from tests.runtime_platform.test_native_effect_facts import selected as selected
@@ -54,6 +54,17 @@ def custody(tmp_path, monkeypatch, episode):
         return None, decisions[Path(directory).relative_to(root).as_posix()]
 
     from empirical_lawhood.api import recursive_inquiry_evidence
+    from empirical_lawhood.api.recursive_inquiry_read import _InquiryRead
+    def read_source(_self, *, directory, include_products, expected=None, **kwargs):
+        packet, draft, _, payloads = service.load_authored_wave(directory=directory)
+        if expected is not None and expected != identity(packet, packet.packet_id):
+            raise ValueError('inquiry source changes its exact authored packet')
+        report = products = plan = None
+        if include_products:
+            report, products, _, plan = service.read_recursive_wave(directory=directory)
+        return SimpleNamespace(packet=packet, draft=draft, payloads=payloads,
+            report=report, products=products, plan=plan)
+    monkeypatch.setattr(_InquiryRead, 'wave', read_source)
     monkeypatch.setattr(recursive_inquiry_evidence, "project_wave_evidence_bindings", lambda **kwargs: {})
     monkeypatch.setattr(service, "_validate_wave_endpoint", lambda *args: None)
     monkeypatch.setattr(service, "load_authored_wave", load)
@@ -131,7 +142,7 @@ def test_source_and_predecessor_census_has_no_twenty_four_entry_ceiling(custody)
 
 @pytest.mark.parametrize("changed", [cost("0", "20", "30"), cost(None, "20", "30"), cost("10", "0", "30")])
 def test_prior_known_expense_cannot_be_replaced(custody, episode, changed):
-    from empirical_lawhood.kernel.recursive_inquiry import InquiryAttempt, InquiryAttemptStatus
+    from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryAttempt, InquiryAttemptStatus
     witness = obj("actual-recovery-event")
     attempt = InquiryAttempt("attempt", obj("operation"), InquiryAttemptStatus.FAILED, witness, (), "failed")
     original = AcquisitionEvent("event", "attempt", witness, cost("10", "20", "30"))
@@ -144,7 +155,7 @@ def test_prior_known_expense_cannot_be_replaced(custody, episode, changed):
 
 
 def test_explicit_unknown_refinement_retains_prior_unknown_bytes(custody, episode):
-    from empirical_lawhood.kernel.recursive_inquiry import InquiryAttempt, InquiryAttemptStatus
+    from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryAttempt, InquiryAttemptStatus
     witness = obj("actual-recovery-event")
     attempt = InquiryAttempt("attempt", obj("operation"), InquiryAttemptStatus.FAILED, witness, (), "failed")
     original = AcquisitionEvent("event", "attempt", witness, cost(None, None, None))
@@ -159,7 +170,7 @@ def test_explicit_unknown_refinement_retains_prior_unknown_bytes(custody, episod
 
 
 def test_carried_refinement_requires_immutable_explicit_measurement_provenance(custody, episode):
-    from empirical_lawhood.kernel.recursive_inquiry import InquiryAttempt, InquiryAttemptStatus
+    from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryAttempt, InquiryAttemptStatus
     witness = obj("actual-recovery-event")
     attempt = InquiryAttempt("attempt", obj("operation"), InquiryAttemptStatus.FAILED, witness, (), "failed")
     original = AcquisitionEvent("event", "attempt", witness, cost(None, None, None))
@@ -188,8 +199,8 @@ def test_projection_retains_nonattempt_and_uncertain_contacts(operational_status
 
 @pytest.mark.parametrize("unknown_sibling", (False, True))
 def test_current_native_facts_do_not_rewrite_recorded_inquiry_uncertainty(selected, unknown_sibling):
-    from empirical_lawhood.infrastructure.native_parent_finalization import inspect_native_parent_return
-    from empirical_lawhood.runtime.native_subwork import invoke_native_subwork
+    from empirical_lawhood.storage.native_parent_finalization import inspect_native_parent_return
+    from empirical_lawhood.execution.native_subwork import invoke_native_subwork
     from tests.runtime_platform.test_native_effect_facts import _snapshot
 
     store, definitions, _bundle, _context, contract = selected
@@ -218,14 +229,10 @@ def test_current_native_facts_do_not_rewrite_recorded_inquiry_uncertainty(select
 
 def _terminal_nonattempt_wave(custody, episode, monkeypatch, *, block_count=2, failed=False):
     """Project the real custody reader's census, with no fabricated block events."""
-    from empirical_lawhood.infrastructure.recursive_custody import _operational_census
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.execution import OperationalFailureClass
-    from empirical_lawhood.runtime.recovery import (
-        DevelopmentRunRecoveryIndex, DevelopmentRunRecoveryTerminalEvent,
-        OperationalFailureDiagnostic, RecoveryTerminalAttempt, RecoveryTerminalDisposition,
-        TaskRecoveryDisposition, TaskRecoveryEvent,
-    )
+    from empirical_lawhood.storage.recursive_custody import _operational_census
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.execution import OperationalFailureClass
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex, DevelopmentRunRecoveryTerminalEvent, OperationalFailureDiagnostic, RecoveryTerminalAttempt, RecoveryTerminalDisposition, TaskRecoveryDisposition, TaskRecoveryEvent
 
     source = custody.add_wave("first")
     _, draft, _ = custody.packets["first"]
@@ -261,7 +268,7 @@ def _terminal_nonattempt_wave(custody, episode, monkeypatch, *, block_count=2, f
 
 
 def test_terminal_nonattempts_retain_original_witness_unknown_cost_and_replay_counts(custody, episode, monkeypatch):
-    from empirical_lawhood.kernel.recursive_inquiry import InquiryAttemptStatus, summarize_cost
+    from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryAttemptStatus, summarize_cost
 
     source, products, _ = _terminal_nonattempt_wave(custody, episode, monkeypatch, failed=True)
     terminal = products["terminal"]
@@ -331,7 +338,7 @@ def test_missing_recovery_event_cannot_be_relabelled_as_terminal_nonattempt(cust
 
 def test_portable_contribution_ancestry_depth_exceeds_boolean_parent_bound(tmp_path, monkeypatch):
     from empirical_lawhood.api import recursive_contributions
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveParentClosureBinding
+    from empirical_lawhood.execution.recursive_handoff import RecursiveParentClosureBinding
     plane = _plane(tmp_path / "selected")
     @dataclass(frozen=True, slots=True)
     class Manifest(CanonicalRecord):
@@ -355,7 +362,7 @@ def test_portable_contribution_ancestry_depth_exceeds_boolean_parent_bound(tmp_p
 
 def test_portable_contribution_ancestry_has_no_twenty_four_level_ceiling(tmp_path, monkeypatch):
     from empirical_lawhood.api import recursive_contributions
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveParentClosureBinding
+    from empirical_lawhood.execution.recursive_handoff import RecursiveParentClosureBinding
     plane = _plane(tmp_path / "selected")
     @dataclass(frozen=True, slots=True)
     class Manifest(CanonicalRecord):
@@ -383,9 +390,9 @@ def test_portable_contribution_ancestry_has_no_twenty_four_level_ceiling(tmp_pat
 def test_original_source_scope_roles_and_nested_units_are_retained(custody, episode, monkeypatch):
     from hashlib import sha256
     from empirical_lawhood.api import recursive_inquiry_evidence
-    from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveWaveMember
-    from empirical_lawhood.runtime.recursive_inquiry import InquiryEvidenceBinding
+    from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+    from empirical_lawhood.execution.recursive_handoff import RecursiveWaveMember
+    from empirical_lawhood.execution.recursive_inquiry import InquiryEvidenceBinding
     source = custody.add_wave("first")
     packet, draft, run = custody.packets["first"]
     filename = "external-" + sha256(b"operand").hexdigest()[:24] + ".json"
@@ -393,7 +400,7 @@ def test_original_source_scope_roles_and_nested_units_are_retained(custody, epis
     packet = replace(packet, members=(member,))
     draft.links = (SimpleNamespace(consumer_node_id="operation", external_input_id="operand"),)
     draft.selected_operation_ids = ("operation",)
-    draft.external_inputs = (SimpleNamespace(input_id="operand"),)
+    draft.external_inputs = (SimpleNamespace(input_id="operand", payload_schema="empirical-lawhood/tests/operand", media_type="application/json"),)
     custody.packets["first"] = packet, draft, run
     source = replace(source, packet=identity(packet, packet.packet_id))
     binding = InquiryEvidenceBinding("operand", "a" * 64, episode["specification"].endpoint,
@@ -410,3 +417,88 @@ def test_original_source_scope_roles_and_nested_units_are_retained(custody, epis
     other = custody.project(InquiryStateSources((source,)))
     assert other.stock[0].scope == binding.scope
     assert other.stock[0].scope != episode["specification"].endpoint
+
+
+@pytest.fixture
+def work_projection(episode, monkeypatch):
+    from empirical_lawhood.api import recursive_operations
+    from empirical_lawhood.science.inquiry.recursive_inquiry_policy import ScientificInquiryWork
+    calls = []
+    def value(task):
+        return ScientificInquiryWork(obj('method.' + task), (obj('operand.' + task),),
+            episode['specification'].endpoint, obj('observation.' + task))
+    def single(draft, task):
+        calls.append(('single', task))
+        return value(task)
+    def batch(draft, tasks):
+        calls.append(('batch', tasks))
+        return tuple((task, value(task)) for task in tasks)
+    factories = {}
+    for name, ordinary, grouped in (('batch', single, batch), ('legacy', single, None), ('unknown', None, None)):
+        selection = SimpleNamespace(selection_id=name)
+        factories[name] = SimpleNamespace(registration=SimpleNamespace(selection=selection),
+            inquiry_work_projector=ordinary, inquiry_work_batch_projector=grouped)
+    draft = SimpleNamespace(operations=tuple(SimpleNamespace(node_id=task,
+        selection=factories[kind].registration.selection)
+        for task, kind in (('a', 'batch'), ('b', 'batch'), ('c', 'legacy'), ('d', 'unknown'))),
+        selected_operation_ids=('a', 'b', 'c', 'd'))
+    monkeypatch.setattr(recursive_operations, 'selected_operation_factories',
+        lambda names: tuple(factories[name] for name in names))
+    return SimpleNamespace(draft=draft, factories=factories, calls=calls, value=value)
+
+
+def test_work_projection_batches_original_task_census_and_preserves_unknown(work_projection):
+    selected = work_projection
+    actual = service._project_wave_scientific_work(selected.draft, ('d', 'b', 'a', 'c', 'a'))
+    assert actual == dict(a=selected.value('a'), b=selected.value('b'), c=selected.value('c'), d=None)
+    assert selected.calls == [('single', 'c'), ('batch', ('a', 'b'))]
+    selected.calls.clear()
+    assert service._project_wave_scientific_work(selected.draft, ('a',)) == {'a': selected.value('a')}
+    assert selected.calls == [('batch', ('a',))]  # Every projection validates afresh.
+    with pytest.raises(ValueError, match='actual selected operation'):
+        service._project_wave_scientific_work(selected.draft, ('outside',))
+
+
+@pytest.mark.parametrize('damage', ('omit', 'duplicate', 'substitute', 'untyped', 'mutable'))
+def test_work_batch_refuses_changed_or_untyped_census(work_projection, damage):
+    selected = work_projection
+    def invalid(draft, names):
+        rows = tuple((name, selected.value(name)) for name in names)
+        return {'omit': rows[:-1], 'duplicate': (rows[0], rows[0]),
+            'substitute': (rows[0], ('outside', rows[1][1])),
+            'untyped': (rows[0], (rows[1][0], None)), 'mutable': list(rows)}[damage]
+    selected.factories['batch'].inquiry_work_batch_projector = invalid
+    with pytest.raises(ValueError, match='exact selected task census|exact typed scientific identity'):
+        service._project_wave_scientific_work(selected.draft, ('a', 'b'))
+
+
+def test_exact_endpoint_projects_once_and_preserves_original_scope_and_fallback(work_projection):
+    from tests.test_recursive_inquiry_policy import policy_case
+    selected = work_projection
+    specification = policy_case('rubisco').specification
+    endpoint = specification.requirements[-1].scope
+    calls = []
+    def project(draft):
+        calls.append('project')
+        return endpoint
+    def validate(draft, candidate):
+        calls.append('validate')
+        if candidate != endpoint:
+            raise ValueError('different original scope')
+    for factory in selected.factories.values():
+        factory.inquiry_endpoint_validator = validate
+        factory.inquiry_endpoint_projector = project
+    service._validate_wave_endpoint(selected.draft, specification, None)
+    assert calls == ['project']
+    endpoint = replace(endpoint, receiver_id='receiver.substituted')
+    with pytest.raises(ValueError, match='outside every declared'):
+        service._validate_wave_endpoint(selected.draft, specification, None)
+    endpoint = None
+    with pytest.raises(TypeError, match='exact typed original scope'):
+        service._validate_wave_endpoint(selected.draft, specification, None)
+    endpoint = specification.requirements[-1].scope
+    for factory in selected.factories.values():
+        factory.inquiry_endpoint_projector = None
+    calls.clear()
+    service._validate_wave_endpoint(selected.draft, specification, None)
+    assert calls and set(calls) == {'validate'}

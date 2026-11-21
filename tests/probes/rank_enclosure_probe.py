@@ -14,10 +14,10 @@ from flint import arb, ctx, fmpq
 import mpmath as mp
 import numpy as np
 
-from empirical_lawhood.adapters.methods._arb import endpoint_decimal
-from empirical_lawhood.adapters.methods.receiver_history_closure import discrete_rank as receiver
-from empirical_lawhood.adapters.methods.split_cohort_history_budget import discrete_rank as split_cohort
-from empirical_lawhood.adapters.methods.history_budget_phase_diagram import discrete_rank as phase_diagram
+from empirical_lawhood.methods._arb import endpoint_decimal
+from empirical_lawhood.domains.history.receiver_history_closure import discrete_rank as receiver
+from empirical_lawhood.domains.history.split_cohort_history_budget import discrete_rank as split_cohort
+from empirical_lawhood.domains.history.history_budget_phase_diagram import discrete_rank as phase_diagram
 
 
 FAMILIES = {"receiver-history": receiver, "split-cohort": split_cohort, "phase-diagram": phase_diagram}

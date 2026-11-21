@@ -1,5 +1,11 @@
 # Scientific route register
 
+The [question-to-investigation guide](../v1.0/from-question-to-investigation.md)
+selects the scientific protocol before these component routes. This register
+describes existing operations and retained contracts; it is not a declaration
+that every preprint study has a current recursive lifecycle. See the
+[22-family migration census](../release/preprint-recursive-migration.md).
+
 SPDX-License-Identifier: CC-BY-4.0
 
 This register gives information about retained scientific routes, attached methods and removed custody wrappers.
@@ -114,7 +120,7 @@ profile establishes a current verification claim. These states confer no qualifi
 | Fine-steering mirror: physical archive | ⚪ Deferred integration | Retained code. Integration deferred. | Six exposed training blocks with nested amplitudes and a negative probe slope. Public acquisition/operator code exists. Researcher selector and candidate remain absent. | Retained contract only. No checked public consuming path. |
 | Thermodynamic episodes: external-owner import | ⚪ Deferred integration | Retained code. Integration deferred. | Typed import and post-hoc contracts require authentic owner authority, action journals, immutable receipts and separate analysis authorization. | Retained contract only. No checked public consuming path. |
 
-## Parent-dependent methods and historical wrappers
+## Parent-dependent methods and retained scientific contracts
 
 Each row needs its declared consuming input.
 These rows add no substrate, independent native unit or standing authority.
@@ -143,7 +149,7 @@ These rows add no substrate, independent native unit or standing authority.
 | Effective-law post-hoc response analysis | ⚪ Deferred integration | Qualified outcome-visible source roster and parent partitions. | Retained post-hoc analysis, integration deferred. | Existing port/science tests supply no authentic source or typed reveal authority. |
 
 The retained receiver-history untouched phase has an implementation restriction.
-Its [design validator](../../src/empirical_lawhood/adapters/receiver_history/runtime_provider.py) requires the targeted phase, including calls from untouched branches.
+Its [design validator](../../src/empirical_lawhood/domains/circuits/receiver_history/runtime_provider.py) requires the targeted phase, including calls from untouched branches.
 The untouched execution therefore remains a prerequisite stop. Additional external grants do not resolve this validator restriction.
 No usable or qualified untouched execution is advertised here.
 

@@ -7,8 +7,8 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods import certified_rank as rank
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.methods import certified_rank as rank
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.probes.rank_enclosure_probe import FAMILIES
 
 

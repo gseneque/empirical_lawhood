@@ -1,64 +1,25 @@
 """Static candidate/runtime bindings for the frozen 2025 Virtual Cell route."""
 
 from __future__ import annotations
+from abc import ABC, abstractmethod
 
 from hashlib import sha256
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.adjudication import (
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityManifest,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.execution import TaskRunner
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .config import (
-    CAPABILITY_VERSION,
-    EVALUATOR_CAPABILITY_KEY,
-    REPORTER_CAPABILITY_KEY,
-    decode_pipeline_config,
-)
-from .contracts import LeaderboardSnapshot, PlacementAdjudication, ProvenanceBoundVirtualCellPipelineConfig, VirtualCellSourceManifest, VirtualCellSourceObject
-from .ports import VirtualCellScratchPort, VirtualCellSourcePort
-from .protocol import (
-    CONFIG_ARTIFACT_ID,
-    DEVELOPMENT_REPORT_STEP,
-    LEADERBOARD_SNAPSHOT_INPUT_ID,
-    SEALED_TEST_BINDING_INPUT_ID,
-    TEST_ROSTER_INPUT_ID,
-)
-from .records import (
-    CONTROL_RESERVOIR_TABLE_SCHEMA,
-    FalsifierPanel,
-    MODEL_SAFETENSORS_SCHEMA,
-    ModelDevelopmentRecord,
-    ModelSelectionRecord,
-    OFFICIAL_METRICS_TABLE_SCHEMA,
-    OfficialEvaluationRecord,
-    PREDICTED_MEAN_TABLE_SCHEMA,
-    PREDICTION_H5AD_ENVELOPE_SCHEMA,
-    PreparedSourceRecord,
-    PredictionFreezeRecord,
-    RESPONSE_SUMMARY_TABLE_SCHEMA,
-    ResponseSummaryRecord,
-    TARGET_FEATURE_TABLE_SCHEMA,
-    TEST_ROSTER_TEXT_SCHEMA,
-    VirtualCellDevelopmentCloseout,
-    VirtualCellRunCloseout,
-)
-from .runtime import VirtualCellTaskRunner, canonical_json_record_value_keys
+from empirical_lawhood.domains.biology.virtual_cell.config import CAPABILITY_VERSION, EVALUATOR_CAPABILITY_KEY, REPORTER_CAPABILITY_KEY
+from empirical_lawhood.domains.biology.virtual_cell.contracts import LeaderboardSnapshot, PlacementAdjudication, ProvenanceBoundVirtualCellPipelineConfig, VirtualCellSourceManifest, VirtualCellSourceObject
+from empirical_lawhood.adapters.physical.virtual_cell.ports import VirtualCellScratchPort, VirtualCellSourcePort
+from empirical_lawhood.domains.biology.virtual_cell.protocol import CONFIG_ARTIFACT_ID, DEVELOPMENT_REPORT_STEP, LEADERBOARD_SNAPSHOT_INPUT_ID, SEALED_TEST_BINDING_INPUT_ID, TEST_ROSTER_INPUT_ID
+from empirical_lawhood.domains.biology.virtual_cell.records import CONTROL_RESERVOIR_TABLE_SCHEMA, FalsifierPanel, MODEL_SAFETENSORS_SCHEMA, ModelDevelopmentRecord, ModelSelectionRecord, OFFICIAL_METRICS_TABLE_SCHEMA, OfficialEvaluationRecord, PREDICTED_MEAN_TABLE_SCHEMA, PREDICTION_H5AD_ENVELOPE_SCHEMA, PreparedSourceRecord, PredictionFreezeRecord, RESPONSE_SUMMARY_TABLE_SCHEMA, ResponseSummaryRecord, TARGET_FEATURE_TABLE_SCHEMA, TEST_ROSTER_TEXT_SCHEMA, VirtualCellDevelopmentCloseout, VirtualCellRunCloseout
+from empirical_lawhood.adapters.physical.virtual_cell.runtime import canonical_json_record_value_keys
 
 
 _JSON_TYPES: tuple[type[CanonicalRecord], ...] = (
@@ -86,46 +47,16 @@ _PROFILE_BY_SCHEMA = {
 }
 
 
-class VirtualCellConfigDecoder:
-    """Exact candidate config decoder; provider selection remains static."""
-
-    def __init__(
-        self,
-        manifest: CapabilityManifest,
-        config: ProvenanceBoundVirtualCellPipelineConfig,
-    ) -> None:
-        self.manifest = manifest
-        self.config = config
-
-    @property
-    def provider_key(self) -> str:
-        return self.manifest.capability_key
-
-    @property
-    def provider_version(self) -> str:
-        return self.manifest.capability_version
-
-    def validate_config(self, payload: bytes, *, expected_schema: str) -> None:
-        if expected_schema != ProvenanceBoundVirtualCellPipelineConfig.SCHEMA:
-            raise ValueError("Virtual Cell config schema differs")
-        if decode_pipeline_config(payload) != self.config:
-            raise ValueError(
-                "Virtual Cell config bytes differ from the registered config"
-            )
 
 
-def virtual_cell_config_decoders(
-    *,
-    registry: CapabilityRegistry,
-    config: ProvenanceBoundVirtualCellPipelineConfig,
-) -> tuple[VirtualCellConfigDecoder, ...]:
-    return tuple(
-        VirtualCellConfigDecoder(value, config) for value in registry.capabilities
-    )
 
 
-class VirtualCellCampaignRuntimeProvider(CampaignRuntimeProvider):
+class VirtualCellRuntimePortsBase(CampaignRuntimeProvider, ABC):
     """Bind compact external inputs and injected held bytes to the exact registry."""
+
+    @abstractmethod
+    def runners(self, registry, source_records=()):
+        """Bind the selected executable revision to its concrete native task runners."""
 
     def __init__(
         self,
@@ -184,26 +115,6 @@ class VirtualCellCampaignRuntimeProvider(CampaignRuntimeProvider):
         if registry != self.registry or registry.fingerprint() != self.registry_sha256:
             raise ValueError("Virtual Cell provider registry differs")
 
-    def runners(
-        self,
-        registry: CapabilityRegistry,
-        source_records: tuple[CanonicalRecord, ...] = (),
-    ) -> tuple[TaskRunner, ...]:
-        self._validate_registry(registry)
-        if source_records:
-            raise ValueError(
-                "Virtual Cell runtime accepts no unbound issued source records"
-            )
-        return tuple(
-            VirtualCellTaskRunner(
-                manifest=manifest,
-                config=self.config,
-                source_manifest=self.source_manifest,
-                source_port=self.source_port,
-                scratch_port=self.scratch_port,
-            )
-            for manifest in registry.capabilities
-        )
 
     @staticmethod
     def _parent(
@@ -454,8 +365,4 @@ class VirtualCellCampaignRuntimeProvider(CampaignRuntimeProvider):
         )
 
 
-__all__ = [
-    "VirtualCellCampaignRuntimeProvider",
-    "VirtualCellConfigDecoder",
-    "virtual_cell_config_decoders",
-]
+__all__ = ["VirtualCellRuntimePortsBase"]

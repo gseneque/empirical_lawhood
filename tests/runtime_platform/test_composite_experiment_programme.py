@@ -11,14 +11,12 @@ import pytest
 from empirical_lawhood.api import composite_experiment_programme as owner
 from empirical_lawhood.api import experiment_preparation as preparation_owner
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
-from empirical_lawhood.infrastructure.artifact_stream_primitives import ExternalRootUnavailable
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.experiment_preparation import ExperimentProtocolDeclaration, ExperimentRuntimeBinding
-from empirical_lawhood.runtime.experiment_programme import (
-    PROGRAMME_DESCRIPTOR_FILENAME, ExperimentProgrammeDescriptor,
-)
+from empirical_lawhood.storage.artifact_stream_primitives import ExternalRootUnavailable
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.execution.experiment_preparation import ExperimentProtocolDeclaration, ExperimentRuntimeBinding
+from empirical_lawhood.execution.experiment_programme import PROGRAMME_DESCRIPTOR_FILENAME, ExperimentProgrammeDescriptor
 from tests.test_recursive_public_service import _plane
 
 

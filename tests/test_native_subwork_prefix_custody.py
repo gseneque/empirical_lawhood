@@ -7,9 +7,9 @@ import shutil
 
 import pytest
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactStreamWriteRequest, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactStreamWriteRequest, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
 from tests.test_recursive_public_service import _plane
 
 SCHEMA = "empirical-lawhood/runtime/native-subwork-received-prefix"

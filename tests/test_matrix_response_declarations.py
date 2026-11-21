@@ -3,12 +3,9 @@
 
 
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.extension_bundle import (
-    OPERATION_DECLARATIONS,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.executable_binding import (
-    EXECUTABLE_BINDING_FACTORIES,
-)
+from empirical_lawhood.domains.matrix.matrix_factor_response.extension import OPERATION_DECLARATIONS
+from empirical_lawhood.domains.matrix.matrix_factor_response.extension import EXTENSION as _extension_owner_1
+EXECUTABLE_BINDING_FACTORIES = _extension_owner_1.factories
 
 # Exact pre-migration implementation digests from the explicitly preserved
 # handwritten metadata; these labels pin operations, not scientific authority.

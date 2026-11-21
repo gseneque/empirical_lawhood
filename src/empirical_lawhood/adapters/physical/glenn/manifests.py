@@ -16,60 +16,18 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import ClassVar, Final
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.planning.dataset_authority import (
-    DATASET_EXTERNAL_ROOT_CONTRACT_SCHEMA,
-    DatasetControlLimits,
-    DatasetFileLimits,
-    DatasetStorageScope,
-    DatasetWorkEnvelope,
-)
-from empirical_lawhood.planning.dataset_manifests import (
-    DatasetAuthoringExceptionCode,
-    DatasetCapabilityBinding,
-    DatasetCapabilityKind,
-    DatasetCausalContract,
-    DatasetComparisonTarget,
-    DatasetExpectedInvariant,
-    DatasetFamilyInput,
-    DatasetFieldContract,
-    DatasetFieldDataType,
-    DatasetFieldRole,
-    DatasetInvariantKind,
-    DatasetOutputContract,
-    DatasetOutputRole,
-    DatasetRegistrationManifest,
-    DatasetReleaseInput,
-    DatasetSelectorMemberContract,
-    DatasetSplitContract,
-    DatasetTransformInput,
-    DatasetTransformationManifest,
-    DatasetTypeNullNormalization,
-)
-from empirical_lawhood.planning.datasets import (
-    AccessState,
-    DatasetEvidenceClass,
-    DatasetMaterialization,
-    DatasetMaterializationClass,
-    DatasetSelectorKind,
-    DatasetSelectorRef,
-    ExternalIdentifier,
-    ExternalIdentifierKind,
-    ReleaseResolutionClass,
-)
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.design.dataset_authority import DATASET_EXTERNAL_ROOT_CONTRACT_SCHEMA, DatasetControlLimits, DatasetFileLimits, DatasetStorageScope, DatasetWorkEnvelope
+from empirical_lawhood.design.dataset_manifests import DatasetAuthoringExceptionCode, DatasetCapabilityBinding, DatasetCapabilityKind, DatasetCausalContract, DatasetComparisonTarget, DatasetExpectedInvariant, DatasetFamilyInput, DatasetFieldContract, DatasetFieldDataType, DatasetFieldRole, DatasetInvariantKind, DatasetOutputContract, DatasetOutputRole, DatasetRegistrationManifest, DatasetReleaseInput, DatasetSelectorMemberContract, DatasetSplitContract, DatasetTransformInput, DatasetTransformationManifest, DatasetTypeNullNormalization
+from empirical_lawhood.design.datasets import AccessState, DatasetEvidenceClass, DatasetMaterialization, DatasetMaterializationClass, DatasetSelectorKind, DatasetSelectorRef, ExternalIdentifier, ExternalIdentifierKind, ReleaseResolutionClass
 
-from .contracts import (
-    ACTION_COLUMNS,
-    CANONICAL_COLUMNS,
-    GLENN_2026_PROFILE,
-    NUISANCE_COLUMNS,
-)
-from .transform import GLENN_OUTPUT_SCHEMA_ID, GLENN_PARQUET_PROFILE_ID
+from empirical_lawhood.adapters.physical.glenn.contracts import ACTION_COLUMNS, CANONICAL_COLUMNS, GLENN_2026_PROFILE, NUISANCE_COLUMNS
+from empirical_lawhood.adapters.physical.glenn.transform import GLENN_OUTPUT_SCHEMA_ID, GLENN_PARQUET_PROFILE_ID
 
 
 GLENN_ARCHIVE_RELATIVE_LOCATOR: Final = (

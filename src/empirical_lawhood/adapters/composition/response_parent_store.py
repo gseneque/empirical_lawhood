@@ -6,19 +6,20 @@ The operator selects this trust root separately from the held source tree.
 Merely naming a JSON file (or a historical source grant) never imports authority.
 Only owner tooling may populate this store; input checks are read-only.
 """
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 from pathlib import Path
 
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import validate_stable_id
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
 
-from .response_parent_custody import ResponseParentTargetGrant
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+
+from empirical_lawhood.adapters.composition.response_parent_custody import ResponseParentTargetGrant
 
 _NAMESPACE = "authority/prepared-response-parent-grants"
 _MAX_BYTES = 8 * 1024**2
@@ -44,9 +45,7 @@ class ResponseExternalParentAuthorityStore:
         sidecar = self.plane.root.resolve(relative + ".manifest.json", for_write=False)
         if not expected.is_file() or not sidecar.is_file():
             return None
-        manifest = decode_artifact_manifest(
-            read_bounded_bytes(sidecar, maximum_bytes=_MAX_BYTES)
-        )
+        manifest = read_artifact_sidecar(self.plane, (sidecar).relative_to(self.plane.root.contract.canonical_path).as_posix(), maximum_bytes=_MAX_BYTES)
         if (
             manifest.logical.logical_artifact_id != locator.stem
             or manifest.logical.payload_schema != ResponseParentTargetGrant.SCHEMA

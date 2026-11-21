@@ -9,12 +9,9 @@ from dataclasses import dataclass
 from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version
 
-from .config_v2 import VirtualCellPipelineSelectionV2
-from .contracts import VirtualCellContractError
-from .scorer_source_v2 import (
-    authenticate_installed_scorer_source_v2,
-    require_selected_scorer_contract_v2,
-)
+from empirical_lawhood.domains.biology.virtual_cell.config_v2 import VirtualCellPipelineSelectionV2
+from empirical_lawhood.domains.biology.virtual_cell.contracts import VirtualCellContractError
+from empirical_lawhood.adapters.physical.virtual_cell.scorer_source_v2 import authenticate_installed_scorer_source_v2, require_selected_scorer_contract_v2
 
 
 # Exact selected optional group in the existing uv.lock; no environment sync.
@@ -94,7 +91,7 @@ def observe_receiver_readiness_v2(*, selection, original_config):
         return ReceiverReadinessV2(tuple(dependencies), tuple(errors))
 
     # Reuse the original version owner after the complete availability census.
-    from .analysis import verify_official_evaluator_versions
+    from empirical_lawhood.domains.biology.virtual_cell.analysis import verify_official_evaluator_versions
 
     try:
         for contract in (

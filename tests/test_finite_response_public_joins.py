@@ -14,15 +14,12 @@ from tests.finite_response_custody_fixtures import artifact, publish_runtime, qu
 from tests.test_finite_response_assigned_evaluation_binding import _assigned_prospective_evaluation
 from tests.test_response_joined_custody import ROOT, _finite_cli_args, _finite_inputs, _snapshot
 from tests.test_doctor_profile import _profile
-from empirical_lawhood.adapters.composition.finite_response_law.consumer_input import FiniteResponseLawAuthoringInput
-from empirical_lawhood.adapters.methods.finite_response_law import law_payloads
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.consumer_input import FiniteResponseLawAuthoringInput
+from empirical_lawhood.domains.matrix.finite_response_law import law_payloads
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.operator_profile import resolve_external_root_contract
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.operator_profile import resolve_external_root_contract
 
 
 @pytest.fixture
@@ -154,7 +151,7 @@ def test_assigned_qualification_accepts_exact_calibration_contract(prospective_e
     lower = prospective_evaluation_join["plane"].root.resolve(
         parent.publications[0].authoritative_relative_locator, for_write=False
     )
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
     payload = decode_canonical_bytes(
         lower.read_bytes(), law_payloads.FiniteResponseLawLowerPayload, maximum_bytes=1024**2
@@ -225,7 +222,7 @@ def test_assigned_join_first_refusal(
     from empirical_lawhood.adapters.composition.finite_response_law import consumer_ports
 
     if fault == "assignment-stage":
-        from empirical_lawhood.adapters.composition.finite_response_law.assignment import proposed_scientific_seeds
+        from empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment import proposed_scientific_seeds
         value = replace(
             prospective_evaluation_join["assignment"],
             stage="calibration",
@@ -303,8 +300,8 @@ def test_assigned_negative_eligibility_refuses_before_ports(prospective_evaluati
 
 def continuation_join(data):
     from tests.finite_response_custody_fixtures import retained_continuation
-    from empirical_lawhood.adapters.composition.finite_response_law.consumer_input import FiniteResponseLawAdditionalParent
-    from empirical_lawhood.adapters.composition.finite_response_law.exposure import native_seed_ids
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.consumer_input import FiniteResponseLawAdditionalParent
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.exposure import native_seed_ids
 
     source = data["packet"].source
     closeout, retention, members = retained_continuation(source)
@@ -421,9 +418,9 @@ def test_continuation_incomplete_original_stream_census_refuses_before_parent(
 def preparation_screen_join(data):
     from tests.finite_response_custody_fixtures import SyntheticSourceInventory
     from tests.test_finite_response_consumer_binding import stage_packet
-    from empirical_lawhood.adapters.composition.finite_response_law.consumer_input import FiniteResponseLawAdditionalParent
-    from empirical_lawhood.adapters.methods.finite_response_law.preparation_screen_results import FiniteResponseLawRetainedProspectiveCloseoutReference
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.consumer_input import FiniteResponseLawAdditionalParent
+    from empirical_lawhood.domains.matrix.finite_response_law.preparation_screen_results import FiniteResponseLawRetainedProspectiveCloseoutReference
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
 
     baseline, _ = stage_packet("preparation-screening")
     rows = []

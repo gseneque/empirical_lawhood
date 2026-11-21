@@ -47,7 +47,7 @@ def test_lifecycle_labels_cannot_select_or_promote_programme_execution(selection
         ExperimentProgrammeService(Path("/unused"), None).run(directory=Path("/unused"), inquiry_successor=selection)
 
 
-@pytest.mark.parametrize("workers", (None, 0, -1, True, 1.5, "2"))
+@pytest.mark.parametrize("workers", (0, -1, True, 1.5, "2"))
 def test_invalid_workers_refuse_before_programme_custody(workers):
     with pytest.raises(ValueError, match="positive integer"):
         ExperimentProgrammeService(Path("/unused"), None).run(directory=Path("/unused"), maximum_parallel_tasks=workers)

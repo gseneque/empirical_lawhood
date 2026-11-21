@@ -14,10 +14,10 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from empirical_lawhood.adapters.simulators.brian2_neuron_current_response.contracts import Brian2LIFNativeConfig
+from empirical_lawhood.domains.biology.neuron_current_response.contracts import Brian2LIFNativeConfig
 from empirical_lawhood.adapters.simulators.brian2_neuron_current_response.native_quickstart import run_native_development_check
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "programmes/biology/cell-responses/workflows/neuron-current-response/config.json"

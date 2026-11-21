@@ -4,13 +4,13 @@
 This verifies retained results independently of the production statistic worker.
 Historical and configured facades retain their original arithmetic/identity owners.
 """
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_value
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.adjudication import AdjudicationEvaluability
-from empirical_lawhood.runtime.experimental_statistics import split_upper_calibration
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_value
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability
+from empirical_lawhood.methods.statistics.experimental_statistics import split_upper_calibration
 
 
 def _identity(record):

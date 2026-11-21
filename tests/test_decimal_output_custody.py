@@ -7,13 +7,13 @@ import importlib
 
 import pytest
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.runtime.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
 
 
 FAMILIES = (
@@ -32,9 +32,13 @@ class DecimalOperandRecord(CanonicalRecord):
 
 def history_fixture(family, residual):
     name, prefix = family
-    contracts = importlib.import_module(f"empirical_lawhood.adapters.{name}.contracts")
-    runtime = importlib.import_module(f"empirical_lawhood.adapters.{name}.runtime_contracts")
-    provider = importlib.import_module(f"empirical_lawhood.adapters.{name}.runtime_provider")
+    scientific_owner = ("empirical_lawhood.domains.circuits.receiver_history" if name == "receiver_history"
+                        else f"empirical_lawhood.domains.history.{name}")
+    integration_owner = (scientific_owner if name == "receiver_history"
+                         else f"empirical_lawhood.adapters.{name}")
+    contracts = importlib.import_module(scientific_owner + ".contracts")
+    runtime = importlib.import_module(scientific_owner + ".runtime_contracts")
+    provider = importlib.import_module(integration_owner + ".runtime_provider")
     rank_type = getattr(contracts, prefix + "RankStep")
     forecast_type = getattr(contracts, prefix + "HistoryRankForecast")
     forecast_steps = tuple(rank_type(
@@ -177,7 +181,7 @@ def test_nested_rank_residual_round_trip_is_exact_at_default_precision(family):
 def test_long_operands_survive_archive_and_native_authoring_writers(tmp_path):
     from types import SimpleNamespace
     from empirical_lawhood.api.native_authoring import _write_records
-    from empirical_lawhood.runtime.canonical_record_archive import CanonicalRecordArchive
+    from empirical_lawhood.storage.contracts.canonical_record_archive import CanonicalRecordArchive
 
     record = DecimalOperandRecord(LONG)
     with localcontext() as context:

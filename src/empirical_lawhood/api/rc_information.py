@@ -6,19 +6,11 @@ SPDX-License-Identifier: MPL-2.0
 from dataclasses import dataclass
 from typing import ClassVar
 
-from empirical_lawhood.adapters.methods.rc_information.analytic import (
-    evaluate_rc_information,
-)
-from empirical_lawhood.adapters.methods.rc_information.checker import (
-    check_rc_information_bound,
-)
-from empirical_lawhood.adapters.methods.rc_information.contracts import (
-    RCInformationBoundCheck,
-    RCInformationConfig,
-    RCInformationResult,
-)
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.circuits.rc_information.analytic import evaluate_rc_information
+from empirical_lawhood.domains.circuits.rc_information.checker import check_rc_information_bound
+from empirical_lawhood.domains.circuits.rc_information.contracts import RCInformationBoundCheck, RCInformationConfig, RCInformationResult
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 @dataclass(frozen=True, slots=True)

@@ -4,7 +4,7 @@
 
 def source_assessment(context, phase):
     """Authenticate the original source decision at its consuming boundary."""
-    from .results import CampaignStatusRequest
+    from empirical_lawhood.api.results import CampaignStatusRequest
     result = context.report(phase).get('scientific_result')
     if not isinstance(result, dict):
         _, _, authority, _, run, _ = context.authority(phase)
@@ -18,10 +18,10 @@ def source_assessment(context, phase):
 
 def development_assessment(context):
     """Join complete E5 nomination inputs and receipts without array replay."""
-    from .experiment_scientific_read import _development_runtime_context
-    from .matrix_selected_development_scientific_read import read_development_result
-    from .recursive_execution import _read_recursive_wave_with_retained_roots
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+    from empirical_lawhood.api.experiment_scientific_read import _development_runtime_context
+    from empirical_lawhood.api.matrix_selected_development_scientific_read import read_development_result
+    from empirical_lawhood.api.recursive_execution import _read_recursive_wave_with_retained_roots
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
     result = context.report('e5.development').get('scientific_result')
     if not isinstance(result, dict):
         def consume(**values):

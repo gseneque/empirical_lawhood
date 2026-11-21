@@ -7,7 +7,7 @@ belongs to the completed new plan. No combined plan or receipt is manufactured.
 from contextlib import contextmanager
 from dataclasses import dataclass
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,15 +27,12 @@ class ImportedE3ProductCustody:
 @contextmanager
 def imported_e3_product_custody(writer, originals, codecs):
     """Keep all actual producers inside their complete continuation proof."""
-    from .configured_e3_retained_read import continued_plan_read
-    from .matrix_sampling_runtime import _original_product_metadata
-    from .protected_e3_read_custody import configured_receipt_read
-    from .recursive_qualified_parents import (
-        _ParentReadScope, _semantic_writer,
-        _require_parent_authorities_current,
-    )
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_unfinished_execution import ConfiguredE3UnfinishedExecution
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
+    from empirical_lawhood.api.configured_e3_retained_read import continued_plan_read
+    from empirical_lawhood.api.matrix_sampling_runtime import _original_product_metadata
+    from empirical_lawhood.api.protected_e3_read_custody import configured_receipt_read
+    from empirical_lawhood.api.recursive_qualified_parents import _ParentReadScope, _semantic_writer, _require_parent_authorities_current
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_unfinished_execution import ConfiguredE3UnfinishedExecution
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
 
     if len(originals) != 4:
         raise PermissionError('imported E3 products require their four original products')
@@ -111,7 +108,7 @@ def imported_e3_product_custody(writer, originals, codecs):
 
 
 def read_imported_e3_products(writer, originals, codecs, *, scope_validator):
-    from .recursive_qualified_parents import MAX_PARENT_BYTES, _output_payload
+    from empirical_lawhood.api.recursive_qualified_parents import MAX_PARENT_BYTES, _output_payload
 
     if not callable(scope_validator):
         raise PermissionError('imported E3 products require their scientific scope validator')

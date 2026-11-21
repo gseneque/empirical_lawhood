@@ -19,7 +19,7 @@ Some helpers are available in the [partial preservation archive](redirection-pre
 Its [member index](preservation/redirection-v1/member-index.json) identifies `historical-helper/native_coupling/native_coupling.py` and its exact original bytes.
 Check the member's original locator and hash before comparing it with a helper cited below.
 The archive is not a complete donor checkout or native environment.
-The current [heavy-scaffold owner](../../../../src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_preparation.py) supplies a narrower migrated implementation, not the original donor code.
+The current [heavy-scaffold owner](../../../../src/empirical_lawhood/domains/rubisco/kinetics/rr_preparation.py) supplies a narrower migrated implementation, not the original donor code.
 
 The prior repository is `/home/chevre/gs-ml/icf-yolo`, whose inspected primary
 head is `70ad6708799f0e8070526ef15c1da4870e080238`. The main molecular source is

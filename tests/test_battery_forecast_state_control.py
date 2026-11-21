@@ -9,10 +9,10 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_state_control as state
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_step_control as step
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_state_control as state
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_step_control as step
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_battery_forecast_step_control import selected as selected_fixture
 from tests.test_battery_forecast_step_control import failed_assignment_evidence, config as config_fixture
 

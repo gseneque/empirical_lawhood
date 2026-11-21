@@ -4,7 +4,7 @@
 
 def authenticate_draft_publications(*, draft, registrations, artifact_writer) -> None:
     """Recheck registered premises from the exact retained selected configs."""
-    from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input, project_recursive_config_inputs
+    from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input, project_recursive_config_inputs
 
     by_selection = {value.selection.selection_id: value for value in registrations}
     if len(by_selection) != len(registrations):
@@ -32,7 +32,7 @@ def authenticate_registered_publications(*, draft, config_inputs, registrations,
     The next authoring/read/transport boundary authenticates again. This scope
     creates no issue, outcome access, qualification or retry authority.
     """
-    from empirical_lawhood.runtime.recursive_compiler import validate_recursive_config_input
+    from empirical_lawhood.execution.recursive_compiler import validate_recursive_config_input
     by_selection = {value.selection.selection_id: value for value in registrations}
     if len(by_selection) != len(registrations):
         raise ValueError("publication validation has duplicate operation registrations")

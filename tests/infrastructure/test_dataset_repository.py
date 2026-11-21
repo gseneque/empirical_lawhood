@@ -45,78 +45,43 @@ from sqlalchemy import Engine
 
 
 
-import empirical_lawhood.infrastructure.sql.dataset_repository as dataset_repository_module
+import empirical_lawhood.storage.sql.dataset_repository as dataset_repository_module
 
 
-from empirical_lawhood.infrastructure import (
-    decode_dataset_catalog_snapshot,
-    decode_unified_catalog_snapshot,
-    encode_dataset_catalog_snapshot,
-    encode_unified_catalog_snapshot,
-)
+from empirical_lawhood.storage.dataset_projection import decode_dataset_catalog_snapshot, decode_unified_catalog_snapshot, encode_dataset_catalog_snapshot, encode_unified_catalog_snapshot
 
 
 
 
 
 
-from empirical_lawhood.infrastructure.dataset_projection import (
-    decode_dataset_record_json as strict_decode_dataset_record_json,
-)
+from empirical_lawhood.storage.dataset_projection import decode_dataset_record_json as strict_decode_dataset_record_json
 
 
-from empirical_lawhood.infrastructure.sql import (
-    DatasetCatalogCorruption,
-    DatasetCatalogQueryWorkLimitExceeded,
-    DatasetCatalogWriteConflict,
-    SQLiteDatasetRepository,
-    create_catalog_engine,
-    create_read_only_catalog_engine,
-    dataset_catalog_query_preflight_connection as strict_dataset_query_preflight,
-    upgrade_catalog,
-)
+from empirical_lawhood.storage.sql import DatasetCatalogCorruption, DatasetCatalogQueryWorkLimitExceeded, DatasetCatalogWriteConflict, SQLiteDatasetRepository, create_catalog_engine, create_read_only_catalog_engine, dataset_catalog_query_preflight_connection as strict_dataset_query_preflight, upgrade_catalog
 
 
-from empirical_lawhood.infrastructure.sql.schema import (
-    dataset_external_identifier,
-    dataset_family,
-    dataset_projection_state,
-)
+from empirical_lawhood.storage.sql.schema import dataset_external_identifier, dataset_family, dataset_projection_state
 
 
 
 
 
 
-from empirical_lawhood.kernel.serialization import CanonicalizationError
+from empirical_lawhood.science.records.serialization import CanonicalizationError
 
 
-from empirical_lawhood.planning.datasets import (
-    DatasetFamily,
-    ExternalIdentifier,
-    ExternalIdentifierKind,
-    IdentityState,
-)
+from empirical_lawhood.design.datasets import DatasetFamily, ExternalIdentifier, ExternalIdentifierKind, IdentityState
 
 
-from empirical_lawhood.runtime.catalog import (
-    CatalogSnapshot,
-)
+from empirical_lawhood.storage.contracts.catalog import CatalogSnapshot
 
 
 
 
 
 
-from empirical_lawhood.runtime.datasets import (
-    DatasetCatalogProjectionAnchor,
-    DatasetCatalogProjectionState,
-    DatasetCatalogQuery,
-    DatasetCatalogQueryBoundary,
-    DatasetCatalogSnapshot,
-    DatasetCatalogWorkLimit,
-    UnifiedCatalogSnapshot,
-)
+from empirical_lawhood.execution.datasets import DatasetCatalogProjectionAnchor, DatasetCatalogProjectionState, DatasetCatalogQuery, DatasetCatalogQueryBoundary, DatasetCatalogSnapshot, DatasetCatalogWorkLimit, UnifiedCatalogSnapshot
 
 
 @pytest.fixture

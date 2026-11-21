@@ -1,0 +1,42 @@
+{
+  "schema": "empirical-lawhood/documentary/scientific-source-provenance",
+  "version": "1.0.0",
+  "source_repository": "icf-yolo",
+  "source_commit": "aa9346547560abcb6500f2e97b53b96f456d9be3",
+  "source_path": "src/icf_yolo/adapters/simulators/rubisco_m1_v5/allocation.py",
+  "source_sha256": "8476d83a42e8d072d52ae8ae6ca2d53299951a163c1462f8e957473d20bb257d",
+  "source_symbol": "allocate_sampling",
+  "source_symbol_lines": [
+    34,
+    101
+  ],
+  "source_symbol_sha256": "ef11e6809234bdfab4ddfb50ed8f4c35b08fd27873ce6c728fc45ef78c71f104",
+  "adaptation": "Owner-directed local reimplementation of the recovered-cost, outcome-independent common candidate selection pattern. No sibling repository is imported at runtime.",
+  "preserved": [
+    "complete original calibration custody",
+    "failed and unavailable costs",
+    "prospective common candidate priority",
+    "selection without mutation-effect values"
+  ],
+  "excluded": [
+    "fixed eighteen-case roster",
+    "retired remaining-time constant",
+    "eighteen-hour native ceiling",
+    "one-hour reserve",
+    "automatic factor of two",
+    "SCF or evaluation caps",
+    "legacy evidence or authority"
+  ],
+  "additions": [
+    "all four material and eleven consequential-role cells",
+    "explicit cost classes and operator scopes",
+    "exact rational arithmetic from Decimal inputs",
+    "separate quoted charge and selected projected-charge envelope",
+    "host/device/storage estimates",
+    "closed export and full original reconstruction"
+  ],
+  "local_path": "pilot_allocation.py",
+  "local_sha256": "a145d73b7b499e31d52c077719b4d67c8b8bddacdd02a0edbeacdc456bde064f",
+  "license_note": "The donor license is not inferred. This records source attribution for the explicitly requested local adaptation under this repository's source declaration.",
+  "qualification": "No physical supplier, biological prediction, spending or execution qualification."
+}

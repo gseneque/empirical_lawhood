@@ -8,14 +8,12 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import response_scoring as score
-from empirical_lawhood.adapters.methods.matrix_factor_response.origin_mechanics import (
-    MatrixIO48Construction, MatrixOriginResponseModel, ORIGIN_RESPONSE_PREDICTORS,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import ACTION_ROLES, MatrixFactorAction
-from empirical_lawhood.adapters.simulators.six_matrix_response.shooting import hermitian_basis
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_response import response_scoring as score
+from empirical_lawhood.domains.matrix.matrix_factor_response.origin_mechanics import MatrixIO48Construction, MatrixOriginResponseModel, ORIGIN_RESPONSE_PREDICTORS
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import ACTION_ROLES, MatrixFactorAction
+from empirical_lawhood.domains.matrix.six_matrix_response.shooting import hermitian_basis
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 @pytest.fixture

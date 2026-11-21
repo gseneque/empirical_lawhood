@@ -6,12 +6,12 @@ from math import exp, log
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_combinations.source_binding import GENBANK_SOURCE_SHA256, WILSON_SOURCE_SHA256, TeParentGenbankInputV1, WilsonArticleInputV1
-from empirical_lawhood.adapters.methods.rubisco_inquiry import science
-from empirical_lawhood.adapters.methods.rubisco_inquiry.operation_bindings import operation_registrations
-from empirical_lawhood.adapters.methods.rubisco_inquiry.recursive_translation import supply_draft, use_draft
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as Verdict
+from empirical_lawhood.domains.rubisco.rubisco_combinations.source_binding import GENBANK_SOURCE_SHA256, WILSON_SOURCE_SHA256, TeParentGenbankInputV1, WilsonArticleInputV1
+from empirical_lawhood.domains.rubisco.rubisco_inquiry import science
+from empirical_lawhood.domains.rubisco.rubisco_inquiry.operation_bindings import operation_registrations
+from empirical_lawhood.domains.rubisco.rubisco_inquiry.recursive_translation import supply_draft, use_draft
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as Verdict
 
 D = Decimal
 
@@ -82,8 +82,8 @@ def test_source_substitution_and_separate_drafts(operands, supplier):
 
 def test_registered_outcome_projection_refuses_endpoint_and_config_substitution(operands, supplier):
     from types import SimpleNamespace as N
-    from empirical_lawhood.adapters.methods.rubisco_inquiry.recursive_translation import inquiry_outcome_projector
-    from empirical_lawhood.kernel.status import OperationalStatus
+    from empirical_lawhood.domains.rubisco.rubisco_inquiry.recursive_translation import inquiry_outcome_projector
+    from empirical_lawhood.science.records.status import OperationalStatus
     draft = supply_draft(*operands)
     node = draft.operations[0].node_id
     specification = N(distinguishing_assessment=draft.operations[0].config_identity, endpoint=supplier.scope)
@@ -115,8 +115,8 @@ def _evidence_payloads(draft, records):
 
 
 def test_original_article_sequence_scope_role_not_requested_endpoint(operands, supplier):
-    from empirical_lawhood.adapters.methods.rubisco_inquiry.recursive_translation import inquiry_evidence_projector
-    from empirical_lawhood.kernel.recursive_requirements import ContributionRole
+    from empirical_lawhood.domains.rubisco.rubisco_inquiry.recursive_translation import inquiry_evidence_projector
+    from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
     draft = supply_draft(*operands)
     records = {row.binding_id: row for row in inquiry_evidence_projector(draft, _evidence_payloads(draft, operands))}
     article = records['external.rubisco-inquiry.supply.article']
@@ -129,8 +129,8 @@ def test_original_article_sequence_scope_role_not_requested_endpoint(operands, s
 
 
 def test_evidence_projector_retains_product_scope_and_refuses_missing_metadata(operands, supplier):
-    from empirical_lawhood.adapters.methods.rubisco_inquiry.recursive_translation import inquiry_evidence_projector
-    from empirical_lawhood.kernel.recursive_requirements import ContributionRole
+    from empirical_lawhood.domains.rubisco.rubisco_inquiry.recursive_translation import inquiry_evidence_projector
+    from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
     draft = supply_draft(*operands)
     payloads = _evidence_payloads(draft, operands)
     rows = inquiry_evidence_projector(draft, payloads, {'records': {'rubisco-inquiry.supply': {'rubisco-inquiry.supply.product': supplier}}})
@@ -149,14 +149,15 @@ def test_evidence_projector_retains_product_scope_and_refuses_missing_metadata(o
 
 def test_api_evidence_helper_refuses_parent_scope_relabel(supplier, monkeypatch):
     from empirical_lawhood.api.recursive_inquiry_evidence import project_wave_evidence_bindings
-    from empirical_lawhood.adapters.methods.rubisco_inquiry.executable_binding import EXECUTABLE_BINDING_FACTORIES
+    from empirical_lawhood.domains.rubisco.rubisco_inquiry.extension import EXTENSION as _extension_owner_1
+    EXECUTABLE_BINDING_FACTORIES = _extension_owner_1.factories
     # Isolate this API meaning test from the coordinator-owned generated aggregate.
-    monkeypatch.setattr('empirical_lawhood.api.recursive_inquiry_evidence.operation_factories', lambda: EXECUTABLE_BINDING_FACTORIES)
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.kernel.scientific_contributions import ContributionManifest, ContributionProduct
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+    monkeypatch.setattr('empirical_lawhood.api.recursive_inquiry_evidence.selected_operation_factories', lambda _selections: EXECUTABLE_BINDING_FACTORIES)
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
     # Pure metadata conformance: this manifest is never admitted to real custody.
     product = ContributionProduct('product.software-test.supplier', ObjectIdentity.from_record(supplier.product_id, supplier),
         ArtifactIdentity('artifact.software-test.supplier', 'scientific-product', supplier.SCHEMA, supplier.fingerprint(), 'application/json', len(supplier.canonical_bytes())),
@@ -177,9 +178,9 @@ def test_api_evidence_helper_refuses_parent_scope_relabel(supplier, monkeypatch)
 
 def test_use_outcome_refuses_instance_as_supplier_identity(supplier):
     from types import SimpleNamespace as N
-    from empirical_lawhood.adapters.methods.rubisco_inquiry.recursive_translation import inquiry_outcome_projector
-    from empirical_lawhood.adapters.methods.rubisco_inquiry.operation_bindings import record_identity
-    from empirical_lawhood.kernel.status import OperationalStatus
+    from empirical_lawhood.domains.rubisco.rubisco_inquiry.recursive_translation import inquiry_outcome_projector
+    from empirical_lawhood.domains.rubisco.rubisco_inquiry.operation_bindings import record_identity
+    from empirical_lawhood.science.records.status import OperationalStatus
     candidate = science.authentic_candidate(supplier)
     draft = use_draft(supplier, candidate)
     result = replace(science.assess(supplier, candidate), supplier=record_identity(candidate))
@@ -194,9 +195,10 @@ def test_use_outcome_refuses_instance_as_supplier_identity(supplier):
 
 def test_api_meaning_helper_source_scope_and_complete_census(operands, supplier, monkeypatch):
     from empirical_lawhood.api import recursive_inquiry_evidence as api
-    from empirical_lawhood.adapters.methods.rubisco_inquiry.executable_binding import EXECUTABLE_BINDING_FACTORIES
-    from empirical_lawhood.adapters.methods.rubisco_inquiry.recursive_translation import inquiry_evidence_projector
-    monkeypatch.setattr(api, 'operation_factories', lambda: EXECUTABLE_BINDING_FACTORIES)
+    from empirical_lawhood.domains.rubisco.rubisco_inquiry.extension import EXTENSION as _extension_owner_2
+    EXECUTABLE_BINDING_FACTORIES = _extension_owner_2.factories
+    from empirical_lawhood.domains.rubisco.rubisco_inquiry.recursive_translation import inquiry_evidence_projector
+    monkeypatch.setattr(api, 'selected_operation_factories', lambda _selections: EXECUTABLE_BINDING_FACTORIES)
     draft = supply_draft(*operands)
     payloads = _evidence_payloads(draft, operands)
     bindings = api.project_wave_evidence_bindings(draft=draft, payloads=payloads)
@@ -207,20 +209,20 @@ def test_api_meaning_helper_source_scope_and_complete_census(operands, supplier,
     factory = EXECUTABLE_BINDING_FACTORIES[0]
     def omitted(*args):
         return inquiry_evidence_projector(*args)[:1]
-    monkeypatch.setattr(api, 'operation_factories', lambda: (N(registration=factory.registration, inquiry_evidence_projector=omitted),))
+    monkeypatch.setattr(api, 'selected_operation_factories', lambda _selections: (N(registration=factory.registration, inquiry_evidence_projector=omitted),))
     with pytest.raises(ValueError, match='exact selected source bytes'):
         api.project_wave_evidence_bindings(draft=draft, payloads=payloads)
     def extra(*args):
         rows = inquiry_evidence_projector(*args)
         return tuple(sorted((*rows, replace(rows[0], binding_id='extra.unselected-input')), key=lambda row: row.binding_id))
-    monkeypatch.setattr(api, 'operation_factories', lambda: (N(registration=factory.registration, inquiry_evidence_projector=extra),))
+    monkeypatch.setattr(api, 'selected_operation_factories', lambda _selections: (N(registration=factory.registration, inquiry_evidence_projector=extra),))
     with pytest.raises(ValueError, match='complete original'):
         api.project_wave_evidence_bindings(draft=draft, payloads=payloads)
 
 
 def test_source_only_design_endpoint_validation_precedes_missing_product(operands, supplier):
     from types import SimpleNamespace as N
-    from empirical_lawhood.adapters.methods.rubisco_inquiry.recursive_translation import inquiry_outcome_projector
+    from empirical_lawhood.domains.rubisco.rubisco_inquiry.recursive_translation import inquiry_outcome_projector
     draft = supply_draft(*operands)
     original = N(distinguishing_assessment=draft.operations[0].config_identity, endpoint=supplier.scope)
     assert inquiry_outcome_projector(draft, original, {'records': {}}) == 'unresolved'
@@ -231,7 +233,7 @@ def test_source_only_design_endpoint_validation_precedes_missing_product(operand
 
 
 def test_static_history_endpoint_validates_supply_and_use_without_current_assessment(operands, supplier):
-    from empirical_lawhood.adapters.methods.rubisco_inquiry.recursive_translation import inquiry_endpoint_validator
+    from empirical_lawhood.domains.rubisco.rubisco_inquiry.recursive_translation import inquiry_endpoint_validator
     first, later = supply_draft(*operands), use_draft(supplier)
     assert first.operations[0].config_identity != later.operations[0].config_identity
     assert inquiry_endpoint_validator(first, supplier.scope) is None

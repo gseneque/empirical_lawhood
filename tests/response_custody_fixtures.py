@@ -5,6 +5,7 @@ Canonical scientific records are fabricated conformance data. The source receipt
 envelopes model the historical import format, not a qualified native execution.
 Only disposable stores may consume these grants; they confer no real authority.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from pathlib import Path
@@ -12,11 +13,8 @@ from pathlib import Path
 from tests.test_response_parent_custody import _canonical, _put, _wrapped
 from empirical_lawhood.adapters.composition.response_parent_custody import ResponseParentTargetGrant, ResponseSourceParentIdentity
 from empirical_lawhood.adapters.composition.response_parent_store import ResponseExternalParentAuthorityStore
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.runtime.operator_profile import resolve_external_root_contract
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.execution.operator_profile import resolve_external_root_contract
 
 
 def publish_parent(
@@ -118,14 +116,9 @@ def publish_parent(
     outputs = []
     if artifact_members or parent_artifact is not None:
         from hashlib import sha256
-        from empirical_lawhood.infrastructure.task_receipts import (
-            decode_artifact_manifest,
-        )
-        from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-        from empirical_lawhood.runtime.artifacts import (
-            ArtifactProfile,
-            ArtifactWriteRequest,
-        )
+
+        from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+        from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 
         project.mkdir(parents=True, exist_ok=True)
         contract = resolve_external_root_contract(
@@ -163,7 +156,7 @@ def publish_parent(
                 )
             )
             sidecar = Path(str(project / relative) + ".manifest.json")
-            manifest = decode_artifact_manifest(sidecar.read_bytes())
+            manifest = resolve_artifact_sidecar_bytes(source_plane, sidecar.read_bytes())
             marker = project / manifest.publication.commit_marker_relative_path
             for path in (project / relative, sidecar, marker):
                 data = path.read_bytes()

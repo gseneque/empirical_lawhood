@@ -5,21 +5,16 @@ SPDX-License-Identifier: MPL-2.0
 
 from dataclasses import dataclass
 
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.candidate_payloads import ExternalCandidatePayloadPlane
-from empirical_lawhood.infrastructure.dependency_manifests import DependencyManifestReader
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ExecutableReference
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactManifest,
-    CanonicalTaskReceipt,
-    ArtifactSemanticValidationRegistry,
-)
-from empirical_lawhood.runtime.candidate_payloads import CandidatePayloadPublicationReceipt
-from empirical_lawhood.runtime.execution import TaskContext, WorkerInputBinding
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.candidate_payloads import ExternalCandidatePayloadPlane
+from empirical_lawhood.storage.dependency_manifests import DependencyManifestReader
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ExecutableReference
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactManifest, CanonicalTaskReceipt, ArtifactSemanticValidationRegistry
+from empirical_lawhood.execution.candidate_payloads import CandidatePayloadPublicationReceipt
+from empirical_lawhood.execution.execution import TaskContext, WorkerInputBinding
+from empirical_lawhood.execution.plans import ArtifactOutputSpec
 
 
 @dataclass(frozen=True)

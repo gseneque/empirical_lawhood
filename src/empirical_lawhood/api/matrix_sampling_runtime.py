@@ -10,25 +10,17 @@ executes, retries or manufactures scientific evidence.
 from dataclasses import replace
 from hashlib import sha256
 
-from empirical_lawhood.adapters.methods.matrix_sampling_assessment import MatrixSamplingScope
-from empirical_lawhood.adapters.methods.matrix_sampling_bindings import (
-    MatrixE3SamplingInputs, MatrixE4SamplingInputs, MatrixSamplingConfig, MatrixSamplingInvocationCustody,
-    MatrixSamplingWorker, _reference, sampling_task_id,
-)
+from empirical_lawhood.domains.matrix.matrix_sampling_assessment import MatrixSamplingScope
+from empirical_lawhood.domains.matrix.matrix_sampling_bindings import MatrixE3SamplingInputs, MatrixE4SamplingInputs, MatrixSamplingConfig, MatrixSamplingInvocationCustody, MatrixSamplingWorker, _reference, sampling_task_id
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody, CurrentIssuedTaskCustodySupplier
-from .recursive_qualified_parents import (
-    MAX_PARENT_BYTES, _ParentReadScope, _actual_package, _output_payload,
-    _replay_parent_authority, _semantic_writer, _verify_receipt_closure,
-)
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.scientific_source_qualification import (
-    ScientificSourceGateEvidence, ScientificSourceQualificationResult, ScientificSourceQualificationSpec,
-)
+from empirical_lawhood.api.recursive_qualified_parents import MAX_PARENT_BYTES, _ParentReadScope, _actual_package, _output_payload, _replay_parent_authority, _semantic_writer, _verify_receipt_closure
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.scientific_source_qualification import ScientificSourceGateEvidence, ScientificSourceQualificationResult, ScientificSourceQualificationSpec
 
 
 def _read_input(writer, manifest, kind):
@@ -51,7 +43,7 @@ def _original_product(writer, original, expected, codecs, read_scope=None, *, sc
     if read_scope is None:
         # Only immutable plan/control reuse needs a finite snapshot. Full
         # receipt and payload verification below uses the original writer.
-        from .current_result_custody import CurrentResultPlanReader
+        from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
         with writer.verification_scope() as plan_writer:
             plan = CurrentResultPlanReader(plan_writer).authenticate(package=package, issued=issued, receipt=receipt,
                 logical=logical, capability_prefixes=prefixes)
@@ -62,11 +54,11 @@ def _original_product(writer, original, expected, codecs, read_scope=None, *, sc
         raise PermissionError("sampling original result changes its actual original plan")
     semantic = _semantic_writer(package, plan, writer, codecs)
     if read_scope is None:
-        from .recursive_qualified_parents import _collect_receipt_closure
+        from empirical_lawhood.api.recursive_qualified_parents import _collect_receipt_closure
         closure = _collect_receipt_closure(package, plan, semantic, reveal, prefixes)
     else:
         closure = read_scope.receipt_closure(package, plan, semantic, reveal, prefixes)
-    from .configured_e3_retained_read import continued_plan_read
+    from empirical_lawhood.api.configured_e3_retained_read import continued_plan_read
     with continued_plan_read(writer=semantic, plan=plan, receipts=closure.by_task):
         by_task = _verify_receipt_closure(semantic, closure)
         if by_task.get(binding.task_id) != receipt:
@@ -84,8 +76,8 @@ def _original_product(writer, original, expected, codecs, read_scope=None, *, sc
 def _original_product_metadata(writer, original, expected, *, _control_reader=None, _issued_reader=None):
     """Replay each exact package, live grant and producing receipt afresh."""
 
-    from .retained_e3_evidence import current_e3_evidence, recorded_product_kinds
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+    from empirical_lawhood.api.retained_e3_evidence import current_e3_evidence, recorded_product_kinds
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
     active = current_e3_evidence(writer)
     if (active is not None and not scientific_reconstruction_enabled()
             and (expected.object_schema, expected.object_version) in {
@@ -120,10 +112,7 @@ def _original_products(writer, originals, codecs, *, scope_validator=None):
     replayed after all products, while the bulk byte snapshot is still active.
     No custody or authorization survives this call.
     """
-    from .recursive_qualified_parents import (
-        MAX_PRIOR_EXECUTIONS, _collect_receipt_closure, _consume_receipt_closure,
-        _require_parent_authorities_current,
-    )
+    from empirical_lawhood.api.recursive_qualified_parents import MAX_PRIOR_EXECUTIONS, _collect_receipt_closure, _consume_receipt_closure, _require_parent_authorities_current
 
 
     if (type(originals) is not tuple or not originals or len(originals) > MAX_PRIOR_EXECUTIONS
@@ -136,17 +125,17 @@ def _original_products(writer, originals, codecs, *, scope_validator=None):
         expected.__post_init__()
     if len({expected for _, expected in originals}) != len(originals):
         raise PermissionError("original product batch aliases records or combines different actual runs or grants")
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
-    from .retained_e3_evidence import recorded_product_kinds
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
+    from empirical_lawhood.api.retained_e3_evidence import recorded_product_kinds
     if (not scientific_reconstruction_enabled() and len(originals) == 4
             and all((pin.object_schema, pin.object_version) in {
                 (kind.SCHEMA, kind.VERSION) for kind in recorded_product_kinds()} for _, pin in originals)):
-        from .recorded_e3_products import read_recorded_original_products
+        from empirical_lawhood.api.recorded_e3_products import read_recorded_original_products
         return read_recorded_original_products(writer, originals, codecs, scope_validator=scope_validator)
     keys = {(row.prior_execution.run_id, row.prior_execution.package, row.prior_execution.execution_plan,
         row.issued_study, row.execution_authority, row.reveal_authority) for row, _ in originals}
     if len(keys) != 1:
-        from .configured_e3_imported_products import read_imported_e3_products
+        from empirical_lawhood.api.configured_e3_imported_products import read_imported_e3_products
         return read_imported_e3_products(writer, originals, codecs, scope_validator=scope_validator)
     with writer.read_context() as plan_writer:
         read_scope = _ParentReadScope(plan_writer)
@@ -192,7 +181,7 @@ def _original_products(writer, originals, codecs, *, scope_validator=None):
                     raise PermissionError("original product batch actual plan changed during the read")
             return tuple(raw_products)
 
-        from .configured_e3_retained_read import continued_plan_read
+        from empirical_lawhood.api.configured_e3_retained_read import continued_plan_read
         with continued_plan_read(writer=semantic, plan=plan, receipts=closure.by_task):
             result = _consume_receipt_closure(semantic, closure, consume)
 
@@ -216,7 +205,7 @@ def _selected_control(owner, task, manifest, kind):
 
 
 def _sampling_evidence(writer, request, evidence, custody, codecs, read_scope):
-    from .matrix_source_runtime import authenticate_matrix_source_qualification
+    from empirical_lawhood.api.matrix_source_runtime import authenticate_matrix_source_qualification
 
     custody.__post_init__()
     if custody.evidence != evidence.identity:
@@ -318,10 +307,10 @@ def bind_matrix_sampling_handoff(handoff, *, writer, reveal_authority_id=None):
     prospective application service, then bind this exact returned handoff.
     Actual current and original grants are checked again at worker admission.
     """
-    from .recursive_prospective_authoring import RecursiveProspectiveApplicationHandoff
-    from empirical_lawhood.kernel.serialization import validate_stable_id
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.api.recursive_prospective_authoring import RecursiveProspectiveApplicationHandoff
+    from empirical_lawhood.science.records.serialization import validate_stable_id
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 
     if type(handoff) is not RecursiveProspectiveApplicationHandoff:
         raise TypeError("sampling follow-on requires the exact public prospective application handoff")

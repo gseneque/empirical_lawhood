@@ -9,15 +9,15 @@ The ordinary exporter retains its complete independent mathematical replay.
 from contextlib import ExitStack, contextmanager
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, artifact_publication_member
-from empirical_lawhood.runtime.native_training_export import NativeTrainingExportAdoptionSelection
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, artifact_publication_member
+from empirical_lawhood.execution.native_training_export import NativeTrainingExportAdoptionSelection
 
 def _require_stock_export_plane(plane):
     from empirical_lawhood.api.recursive_execution import _read_only_custody_policy
-    from empirical_lawhood.infrastructure.publication_metadata import supports_closed_publication_access
+    from empirical_lawhood.storage.publication_metadata import supports_closed_publication_access
     if (_read_only_custody_policy(plane) is None or not supports_closed_publication_access(plane)):
         raise TypeError('export adoption requires the actual stock read-only custody composition')
 
@@ -37,7 +37,7 @@ def _export_scope(plane):
 def _adoption_lock(plane, selection):
     """Keep existing native nonentry observations stable through final scope exit."""
     _require_stock_export_plane(plane)
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
     path = plane.root.resolve('runs/'+selection.run_id+'/.native-execution.lock', for_write=False)
     if not path.is_file() or path.stat().st_size != 0:
         raise PermissionError('export adoption requires the original existing native execution lock')
@@ -48,7 +48,7 @@ def _adoption_lock(plane, selection):
 
 
 def _source_now(project_root):
-    from empirical_lawhood.infrastructure.source_origin import require_selected_implementation
+    from empirical_lawhood.storage.source_origin import require_selected_implementation
     from empirical_lawhood.api.recursive_authoring import implementation_binding
     project = Path(project_root).resolve(strict=True)
     require_selected_implementation(project)
@@ -61,8 +61,8 @@ def _receipt_pins(receipts):
 
 
 def _receipt_product_contracts(specification):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as owner
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as r
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as owner
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as r
     contracts = [('entry', owner.entry_task_id(specification), r.NativeTrainingAcquisitionSeal, 'product')]
     kinds = (('prefix', r.NativeTrainingPrefixHistory, 'product'), ('prefix', r.ScheduledCheckpoint, 'checkpoint'),
         ('numerical', r.NativeTrainingNumericalAssessment, 'product'), ('measure', r.NativeTrainingPrefixWitness, 'product'),
@@ -80,10 +80,10 @@ def _consume_receipt_products(*, writer, products, plan, specification, consume)
     """Decode one exact closed JSON roster under the existing plural owner."""
     from hashlib import sha256
     from empirical_lawhood.api.native_training_banks import _receipt_product_binding
-    from empirical_lawhood.infrastructure.publication_metadata import consume_published_materializations
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
+    from empirical_lawhood.storage.publication_metadata import consume_published_materializations
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
     contracts = _receipt_product_contracts(specification)
     selected = {}
     writer.require_verification_snapshot()
@@ -126,8 +126,8 @@ def _authenticate_receipt_reconstruction(*, writer, specification, request, draf
     from empirical_lawhood.api.matrix_native_read_custody import _graph
     from empirical_lawhood.api.matrix_native_training_read import _authenticate_root_records, _validate_complete_root_results
     from empirical_lawhood.api.matrix_native_acquisition_replay import authenticate_native_custody
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as owner
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as r
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as owner
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as r
     configs, tasks = _graph(specification, request, draft, plan)
     run_id = plan.source_plan.object_id
     if acquisition != r.acquisition_seal(specification, request):
@@ -162,8 +162,8 @@ def _authenticate_receipt_reconstruction(*, writer, specification, request, draf
 
 def _authenticate_reconstructed_banks(writer, publications, values, parents):
     """Require the complete original atomic edition, exact bytes and producer lineage."""
-    from empirical_lawhood.infrastructure.publication_metadata import authenticate_published_materialization
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
+    from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
     manifests = []
     for value, publication in zip(values, publications, strict=True):
         actual = authenticate_published_materialization(writer, publication)
@@ -197,12 +197,10 @@ def adopt_native_training_bank_export(*, directory, artifact_writer, output_dire
     marker, saved report, filename, or former full-read assertion is accepted.
     Current-source migration and subsequent scientific qualification stay separate.
     """
-    from empirical_lawhood.api.native_training_banks import (
-        NativeTrainingBankExport, _collect_export_records, _export_authored_preflight,
-    )
+    from empirical_lawhood.api.native_training_banks import NativeTrainingBankExport, _collect_export_records, _export_authored_preflight
     from empirical_lawhood.api.recursive_execution import _read_recursive_wave_with_roots
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_acquisition import export_training_banks
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, lineage_parent_sort_key
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_acquisition import export_training_banks
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, lineage_parent_sort_key
     if type(selection) is not NativeTrainingExportAdoptionSelection:
         raise TypeError('export adoption requires its explicit typed receipt-bound reconstruction selection')
     selection.__post_init__()
@@ -238,7 +236,7 @@ def adopt_native_training_bank_export(*, directory, artifact_writer, output_dire
                 raise PermissionError('export adoption changes original source, complete graph or actual winning receipt census')
             with ExitStack() as custody_scopes:
                 def consume(get_product, publications):
-                    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_acquisition import entry_task_id
+                    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_acquisition import entry_task_id
                     acquisition, acquisition_pub, acquisition_receipt, receipts, features, outcomes = _collect_export_records(
                         writer=writer, products=products, plan=plan, specification=specification,
                             get_product=get_product, acquisition_publication=publications[(entry_task_id(specification), 'product')])

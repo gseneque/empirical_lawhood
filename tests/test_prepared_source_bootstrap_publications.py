@@ -12,14 +12,14 @@ import pytest
 
 from empirical_lawhood.api.matrix_prepared_source_experiment import prepared_source_bootstrap_publications
 from empirical_lawhood.api.prospective_experiment import RetainedProspectiveExperiment
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCandidate
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-from empirical_lawhood.runtime.prospective_experiment import ProspectiveExperimentAssociation, instance_identity, source_filename
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCandidate
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+from empirical_lawhood.execution.prospective_experiment import ProspectiveExperimentAssociation, instance_identity, source_filename
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
 from tests.test_prepared_source_access import source_literals, _selected_case  # noqa: F401
 from tests.test_matrix_finite_dt_source_assembly import c_backed_source_case  # noqa: F401
 from tests.test_matrix_selected_opportunity import opportunity  # noqa: F401
@@ -29,7 +29,7 @@ from tests.test_matrix_selected_protected import confirmation, transfer  # noqa:
 def _case(tmp_path, source_literals, confirmation, monkeypatch):  # noqa: F811
     from tests.test_matrix_prepared_source import prepared_bank
     from tests.test_recursive_public_service import _draft
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
     c = _selected_case(tmp_path, source_literals, monkeypatch)
     directory = c.plane.root.resolve("retained-source", for_write=True)
     (directory / "experiment").mkdir(parents=True)
@@ -100,7 +100,7 @@ def test_emitter_retains_exact_seven_original_handles_without_any_payload_open(t
             return actual
         monkeypatch.setattr(c.plane, "read_manifest", foreign)
     elif damage == "expired":
-        from empirical_lawhood.infrastructure import publication_metadata
+        from empirical_lawhood.storage import publication_metadata
         original = publication_metadata.read_publication_metadata
         def expires(*args, **kwargs):
             result = original(*args, **kwargs)

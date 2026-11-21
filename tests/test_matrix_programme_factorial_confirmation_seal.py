@@ -12,24 +12,24 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial_confirmation as method
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial_confirmation_composition as composition
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial_confirmation_custody as custody
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial_confirmation as method
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial_confirmation_composition as composition
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial_confirmation_custody as custody
 from empirical_lawhood.api import matrix_scheduled_factorial_runtime as api
 from empirical_lawhood.api import matrix_scheduled_programme as public
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.study_authoring import DesignInputRole, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult, CanonicalTaskReceipt, LogicalArtifactIdentity, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRegistry, CapabilityRequirement
-from empirical_lawhood.runtime.compiler import _config_input, compile_run_plan, lower_run_plan
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, ExecutionPlan, ExecutionTask, PlanLane
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.study_authoring import DesignInputRole, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult, CanonicalTaskReceipt, LogicalArtifactIdentity, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRegistry, CapabilityRequirement
+from empirical_lawhood.execution.compiler import _config_input, compile_run_plan, lower_run_plan
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, ExecutionPlan, ExecutionTask, PlanLane
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
 from tests.runtime_platform.test_candidate_compiler import _fixture
 from tests.runtime_platform.test_native_subwork import _plane
 from tests.test_matrix_programme_factorial_confirmation import criteria as criteria, _pin

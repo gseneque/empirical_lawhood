@@ -8,10 +8,10 @@ from tempfile import TemporaryFile
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_arrays as codec
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_records as r
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_native as native
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_arrays as codec
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_records as r
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as native
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_battery_segmented_fidelity import _operand, prepared as prepared_fixture
 
 prepared = prepared_fixture

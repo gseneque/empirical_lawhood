@@ -22,7 +22,7 @@ contact. Plan/design paths are separately selected absolute files.
 | Prepared `--design-packet` | A separately retained design input, nonempty, at most 2 MiB. Its digest is bound into the authoring package. Select the reviewed packet, not a placeholder tutorial. The format at this seam is an opaque byte document. |
 | Prepared `--prior-exposure` | At most 64 MiB. Exact schema `empirical-lawhood/composition/prepared-response/prepared-exposure-inspection`. Four nonempty arrays under `value`, described below. Foreign historical schemas require a separately reviewed current export. |
 | information-response/causal-response `--model-bank` | At most 16 MiB. Strict canonical `InformationResponseModelBank` or `CausalResponseModelBank`, respectively. `plan_sha256` must equal the selected plan-byte digest. Prepared response forbids a bank. |
-| Finite `--plan` | At most 2 MiB. Must equal the exact digest selected by `FiniteResponseLawScienceSpec`. The packaged [protocol](../../../../src/empirical_lawhood/adapters/methods/finite_response_law/specification.md) supplies those bytes. Reformatting it changes the input identity. |
+| Finite `--plan` | At most 2 MiB. Must equal the exact digest selected by `FiniteResponseLawScienceSpec`. The packaged [protocol](../../../../src/empirical_lawhood/domains/matrix/finite_response_law/specification.md) supplies those bytes. Reformatting it changes the input identity. |
 | Finite `--prior-exposure` | At most 128 MiB. Schema suffix `methods/finite-response-law/native-exposure-metadata`. The four arrays are at the top level. |
 | Finite assignment | Strict `FiniteResponseLawCohortAssignment`. Stage, scientific seed table and science-plan digest must match the selector. Actual native unit and stream identities are checked against the full census. Passing this reservation check does not issue a campaign. |
 
@@ -69,8 +69,8 @@ This prepared/information/causal authoring entry provides no foreign-record conv
 Stop historical-bank or foreign-census authoring until the reviewed current export and required custody are available.
 
 For a model bank, retain the development manifest and results that actually
-produced it. The [information-response model definitions](../../../../src/empirical_lawhood/adapters/methods/information_response/models.py)
-and [causal-response definitions](../../../../src/empirical_lawhood/adapters/methods/causal_response/models.py)
+produced it. The [information-response model definitions](../../../../src/empirical_lawhood/domains/matrix/information_response/models.py)
+and [causal-response definitions](../../../../src/empirical_lawhood/domains/matrix/causal_response/models.py)
 are the executable formats: the bank carries `plan_sha256`,
 `development_manifest_sha256`, `development_results_sha256`, and ordered
 `contexts`. Each context contains its exact `PreparedBilinearModelSpec`, sixteen
@@ -187,7 +187,7 @@ The shipped authoring inputs use retained fixed allocations. Their empty `root_s
 A different source digest requires a complete explicit census before authoring.
 Changing `seed_label` or `target_prefix` does not allocate scientific randomness.
 
-Each row is a `PreparedRootRandomness` record from the [prepared contracts](../../../../src/empirical_lawhood/adapters/simulators/prepared_response/contracts.py).
+Each row is a `PreparedRootRandomness` record from the [prepared contracts](../../../../src/empirical_lawhood/domains/matrix/prepared_response/contracts.py).
 It contains `stage`, `context`, `index`, `source_seed_sha256`, 17 ordered `stream_seed_sha256s`, and one `passive_probe_seed_sha256`.
 All 18 commitments are lowercase 64-digit hexadecimal strings representing unsigned 256-bit numbers.
 These are explicit numeric allocations. They need not be hashes of names or labels.
@@ -249,11 +249,11 @@ from empirical_lawhood.cli.entry import enforce_single_thread_environment
 
 enforce_single_thread_environment()
 
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.adapters.simulators.prepared_response.contracts import (
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.domains.matrix.prepared_response.contracts import (
     CONTEXTS, PREPARED_STREAM_ROLES, PreparedRootRandomness,
 )
-from empirical_lawhood.adapters.composition.prepared_response.native_authoring import (
+from empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring import (
     PreparedResponseNativeAuthoringInput,
 )
 

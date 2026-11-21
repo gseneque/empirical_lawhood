@@ -9,14 +9,14 @@ is not an authority token or reader.
 
 from functools import partial
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_statistical_bindings import ProtectedE3FitConfig
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_statistical_bindings import ProtectedE3FitConfig
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme
 from empirical_lawhood.api.matrix_selected_e3_family import selected_e3_product_family
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling, inherited_visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.study_authoring import StudyDraft
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, derived_outcome_access
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling, inherited_visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.study_authoring import StudyDraft
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, derived_outcome_access
 
 
 UNAVAILABLE_OPPORTUNITY = "SELECTED_OPPORTUNITY_PRODUCER_UNAVAILABLE"
@@ -28,9 +28,7 @@ def _reference(value, field="record_id"):
 
 def selected_original_producer_scope(programme):
     """Select a consumer predicate; actual original custody remains external."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_opportunity import (
-        MatrixSelectedOpportunityProgramme, MatrixSelectedOpportunityPublicProgramme,
-    )
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_opportunity import MatrixSelectedOpportunityProgramme, MatrixSelectedOpportunityPublicProgramme
 
     if type(programme) not in (MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme,
             MatrixSelectedOpportunityProgramme, MatrixSelectedOpportunityPublicProgramme):
@@ -50,9 +48,9 @@ def _read_config(writer, binding, task, kind):
     if (identifier, config.SCHEMA, config.fingerprint()) != (task.capability.config.config_id,
             task.capability.config.config_schema, task.capability.config.content_sha256):
         raise PermissionError("selected original producer substitutes actual canonical configured science")
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import ConfiguredE3RetainedTaskConfig
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import ConfiguredE3RetainedTaskConfig
     if type(config) is ConfiguredE3RetainedTaskConfig:
-        from .configured_e3_retained_read import authenticated_original_config
+        from empirical_lawhood.api.configured_e3_retained_read import authenticated_original_config
         return authenticated_original_config(writer=writer, run_id=binding.run_id, task=task, config=config)
     return config
 
@@ -132,7 +130,7 @@ def validate_selected_e3_original_product(*, frozen, binding, package, execution
     family = selected_e3_product_family(frozen.specification)
     keys = (family.namespace + "." + phase,)
     if family.configured and phase == "fit":
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_statistical_bindings import fit_capability_key
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_statistical_bindings import fit_capability_key
         keys = (fit_capability_key(frozen.models.training_features.object_schema,
             frozen.models.training_outcomes.object_schema),)
     if family.configured and phase in ('fit', 'model-freeze'):

@@ -12,6 +12,7 @@ Historical source paths identify original custody, not new executable selections
 
 | Record | Role |
 |---|---|
+| [Gas-free Galdieria precursor release](gp-precursor-release.md) | Matched WT/I95M and Met1/Val1 results, per-path measurements and native costs |
 | [Implemented Rubisco extension state](architecture-state.md) | Finding, assessment or retained checkpoint |
 | [Exposed Rubisco source and combination assessments](assessment-protocol.md) | Study design / selected contract |
 | [Conditional paired-branch sensitivity protocol v1](branch-sensitivity-protocol-v1.md) | Study design / selected contract |

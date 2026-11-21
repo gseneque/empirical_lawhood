@@ -1,0 +1,253 @@
+{
+  "empirical_closure_claimed": false,
+  "gaps": [
+    {
+      "completion_evidence_still_required": "TRAIN loss headroom and nomination feasibility recorded; no retrospective relabeling of current NOT_ENTERED.",
+      "id": "G01",
+      "implementation_paths": [
+        "src/empirical_lawhood/domains/matrix/classical_series/science.py",
+        "src/empirical_lawhood/domains/matrix/model_free/science.py"
+      ],
+      "modules": [
+        "M0",
+        "M1"
+      ],
+      "original_title": "Correct E5 estimand and units",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Every entered confirmation has a nonempty theoretically attainable admission set and a feasible development positive control.",
+      "id": "G02",
+      "implementation_paths": [
+        "src/empirical_lawhood/domains/matrix/classical_series/capstones.py",
+        "src/empirical_lawhood/domains/matrix/model_free/confirmation.py",
+        "src/empirical_lawhood/methods/model_free/memory.py"
+      ],
+      "modules": [
+        "M0",
+        "M4"
+      ],
+      "original_title": "Reject empty capstone admission regions",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Cause hypotheses narrowed using development data; successor fitted/calibrated before genuinely fresh confirmation.",
+      "id": "G03",
+      "implementation_paths": [
+        "src/empirical_lawhood/domains/matrix/classical_series/capstones.py"
+      ],
+      "modules": [
+        "M0",
+        "M3",
+        "M4"
+      ],
+      "original_title": "Investigate fixed-F undercoverage",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Nomination compares the intended service objective, risk and actual preparation work against baseline.",
+      "id": "G04",
+      "implementation_paths": [
+        "src/empirical_lawhood/domains/matrix/classical_series/capstones.py",
+        "src/empirical_lawhood/domains/matrix/model_free/science.py",
+        "src/empirical_lawhood/methods/protocol_work.py"
+      ],
+      "modules": [
+        "M1"
+      ],
+      "original_title": "Make preparation nomination useful",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Distinguish input containment from later closure; new receiver data acquired if projected histories are insufficient.",
+      "id": "G05",
+      "implementation_paths": [
+        "src/empirical_lawhood/domains/matrix/model_free/native.py",
+        "src/empirical_lawhood/methods/model_free_response.py"
+      ],
+      "modules": [
+        "M3"
+      ],
+      "original_title": "Align physical ports and representations",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Admission at handoff and survival over assay measured, with censoring/waiting costs/assignment denominators retained.",
+      "id": "G06",
+      "implementation_paths": [
+        "src/empirical_lawhood/domains/matrix/model_free/science.py",
+        "src/empirical_lawhood/methods/model_free/events.py"
+      ],
+      "modules": [
+        "M1"
+      ],
+      "original_title": "Connect formation with service",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Finite-step, nonlinear-chord, temporal-model and representation errors separated; margins fixed in correct units.",
+      "id": "G07",
+      "implementation_paths": [
+        "src/empirical_lawhood/domains/matrix/model_free/native.py",
+        "src/empirical_lawhood/methods/model_free_response.py"
+      ],
+      "modules": [
+        "M3"
+      ],
+      "original_title": "Preserve meaningful precision",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "A concrete receiver tolerance/cost decision identifies which additional observation or direction is worth purchasing.",
+      "id": "G08",
+      "implementation_paths": [
+        "src/empirical_lawhood/domains/matrix/model_free/native.py"
+      ],
+      "modules": [
+        "M3"
+      ],
+      "original_title": "Compare rank depth ports and history fairly",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Individual reversals explainable without treating norms as signed or variance decompositions.",
+      "id": "G09",
+      "implementation_paths": [
+        "src/empirical_lawhood/methods/model_free_response.py",
+        "src/empirical_lawhood/domains/matrix/model_free/science.py"
+      ],
+      "modules": [
+        "M3"
+      ],
+      "original_title": "Export signed error decomposition",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Actual relation supplier produced or typed unavailable; present nominal error-forecast E6 remains a different result.",
+      "id": "G10",
+      "implementation_paths": [
+        "src/empirical_lawhood/methods/parameter_relations.py",
+        "src/empirical_lawhood/domains/matrix/classical_series/aggregate.py"
+      ],
+      "modules": [
+        "M4"
+      ],
+      "original_title": "Restore E4 relation and its E6 transport",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Selector advantage separated from best fixed recipe; spatial representation failure separated from temporal/model error.",
+      "id": "G11",
+      "implementation_paths": [
+        "src/empirical_lawhood/domains/matrix/model_free/native.py",
+        "src/empirical_lawhood/methods/model_free_response.py"
+      ],
+      "modules": [
+        "M3"
+      ],
+      "original_title": "Restore SCI02-A and B",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Actual avoided native calls and complete costs measured; variance reduction and realized mean error reported separately.",
+      "id": "G12",
+      "implementation_paths": [
+        "src/empirical_lawhood/methods/model_free/finite_population.py",
+        "src/empirical_lawhood/domains/matrix/model_free/science.py",
+        "src/empirical_lawhood/api/model_free_matrix.py"
+      ],
+      "modules": [
+        "M5"
+      ],
+      "original_title": "Restore SCI02-C consumer and finite mean",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Canonical/measure/reference premises tested; complete estimator precision and costs assessed rather than instantaneous variance.",
+      "id": "G13",
+      "implementation_paths": [
+        "src/empirical_lawhood/domains/matrix/model_free/native.py",
+        "src/empirical_lawhood/methods/retained_gaussian_response.py",
+        "src/empirical_lawhood/methods/model_free_response.py"
+      ],
+      "modules": [
+        "M6"
+      ],
+      "original_title": "Restore SCI02-D using derivations",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "No empirical rank or low-rank economy claim inferred from construction width.",
+      "id": "G14",
+      "implementation_paths": [
+        "src/empirical_lawhood/domains/matrix/classical_series/science.py",
+        "src/empirical_lawhood/domains/matrix/model_free/native.py"
+      ],
+      "modules": [
+        "M0",
+        "M3"
+      ],
+      "original_title": "Measure update rank",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Useful tolerance met or informative refusal; all oracle/gap/reference acquisition costs charged.",
+      "id": "G15",
+      "implementation_paths": [
+        "src/empirical_lawhood/methods/model_free_response.py",
+        "src/empirical_lawhood/methods/joint_response/__init__.py",
+        "src/empirical_lawhood/methods/retained_gaussian_response.py"
+      ],
+      "modules": [
+        "M3",
+        "M6"
+      ],
+      "original_title": "Make derivation certificates operational",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Horizon>128 has documented supported behavior or typed nonuse rather than uncaught ValueError; stage-only work actually narrows.",
+      "id": "G16",
+      "implementation_paths": [
+        "src/empirical_lawhood/domains/matrix/classical_series/science.py",
+        "src/empirical_lawhood/api/model_free_matrix.py"
+      ],
+      "modules": [
+        "PLATFORM"
+      ],
+      "original_title": "Support longer horizon and narrow reanalysis",
+      "status": "IMPLEMENTED_EMPIRICAL_ASSESSMENT_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Full-population read/reanalysis benchmark at deployment scale with bounded resource budget and exact scientific parity.",
+      "id": "G17",
+      "implementation_paths": [
+        "src/empirical_lawhood/api/model_free_matrix.py",
+        "src/empirical_lawhood/domains/matrix/model_free/bindings.py",
+        "src/empirical_lawhood/execution/development_output_repair.py",
+        "src/empirical_lawhood/execution/development_controller_repair.py",
+        "src/empirical_lawhood/execution/retained_e3_repair.py",
+        "src/empirical_lawhood/storage/recovery.py"
+      ],
+      "modules": [
+        "PLATFORM"
+      ],
+      "original_title": "Reduce population read and reanalysis burden",
+      "status": "IMPLEMENTED_POPULATION_RESOURCE_BENCHMARK_PENDING"
+    },
+    {
+      "completion_evidence_still_required": "Exact historical endpoint/score comparisons and causal operand authenticity checked; unavailable evidence not filled with old thresholds or checkpoint results.",
+      "id": "G18",
+      "implementation_paths": [
+        "programmes/foundations/emergent-structure/workflows/model-free/historical-operands.json"
+      ],
+      "modules": [
+        "M0"
+      ],
+      "original_title": "Recover historical final reports and omitted current operands",
+      "status": "PARTIAL_DOCUMENTARY_INVENTORY_EXTERNAL_NATIVE_OPERANDS_UNAVAILABLE"
+    }
+  ],
+  "schema": "matrix-model-free-gap-coverage.v1",
+  "source_audit": "G01-G18, 17 November 2026 design handoff"
+}

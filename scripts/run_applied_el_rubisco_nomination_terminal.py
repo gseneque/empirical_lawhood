@@ -18,19 +18,17 @@ from run_applied_el_broad_programme import SelectedProgramme, add_custody_locati
 
 
 def run(programme, args):
-    from empirical_lawhood.adapters.methods.rubisco_cycle_constraints.contracts import CycleUseProduct
-    from empirical_lawhood.adapters.methods.rubisco_nomination_preparation.contracts import NominationDossier
-    from empirical_lawhood.adapters.methods.rubisco_nomination_preparation import science
-    from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.science import SourceAudit
+    from empirical_lawhood.domains.rubisco.rubisco_cycle_constraints.contracts import CycleUseProduct
+    from empirical_lawhood.domains.rubisco.rubisco_nomination_preparation.contracts import NominationDossier
+    from empirical_lawhood.domains.rubisco.rubisco_nomination_preparation import science
+    from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry.science import SourceAudit
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_execution import read_recursive_wave
-    from empirical_lawhood.api.recursive_inquiry import (
-        _read, _validate_human_fork, _validate_intent_draft, read_inquiry_decision,
-    )
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.recursive_inquiry import identity
-    from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigins
-    from empirical_lawhood.runtime.recursive_inquiry import InquirySuccessorAdmission
+    from empirical_lawhood.api.recursive_inquiry import _read, _validate_human_fork, _validate_intent_draft, read_inquiry_decision
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.inquiry.recursive_inquiry import identity
+    from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigins
+    from empirical_lawhood.execution.recursive_inquiry import InquirySuccessorAdmission
 
     this_name = 'scripts/run_applied_el_rubisco_nomination_terminal.py'
     archived = {row['path']: row for row in programme.preflight['members']}

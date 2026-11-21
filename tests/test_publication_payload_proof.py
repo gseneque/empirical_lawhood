@@ -8,9 +8,9 @@ import sys
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
-from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits, ArtifactStreamWriteRequest
+from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits, ArtifactStreamWriteRequest
 from tests.test_artifact_publication_admission import _plane, _requests
 
 

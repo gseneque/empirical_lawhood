@@ -1,0 +1,732 @@
+{
+  "label": "Frozen targeted formation/response confirmation; inspect and freeze after pilot",
+  "roots": [
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710101
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710102
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710103
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710104
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710105
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710106
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710107
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710108
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710109
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710110
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710111
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710112
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710113
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710114
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710115
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710116
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710117
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710118
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710119
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710120
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710121
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710122
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710123
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710124
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710125
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710126
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710127
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710128
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710129
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710130
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710131
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710132
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710133
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710134
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710135
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710136
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710137
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710138
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710139
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710140
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710141
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710142
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710143
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710144
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710145
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710146
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710147
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710148
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710149
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710150
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710151
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710152
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710153
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710154
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710155
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710156
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710157
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710158
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710159
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710160
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710161
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710162
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710163
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710164
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710165
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710166
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710167
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710168
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710169
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710170
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710171
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710172
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710173
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710174
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710175
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710176
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710177
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710178
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710179
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation",
+      "seed": 1710180
+    }
+  ],
+  "schema": "model-free-matrix-definition.v1",
+  "settings": {
+    "evidence_scope": "FRESH_CONFIRMATION",
+    "response": {
+      "selection_tick": 32
+    }
+  }
+}

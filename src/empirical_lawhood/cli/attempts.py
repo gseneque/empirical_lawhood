@@ -6,7 +6,6 @@ SPDX-License-Identifier: MPL-2.0
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
-from contextvars import ContextVar
 from functools import wraps
 import inspect
 import json
@@ -18,24 +17,15 @@ from typing import Any, TypeVar, get_type_hints
 import typer
 from typer.core import TyperGroup
 
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.infrastructure.development_attempts import DevelopmentAttempt, MAX_INPUT_COPY_BYTES
+from empirical_lawhood.storage.development_attempts import DevelopmentAttempt
+from empirical_lawhood.api.invocation_retention import _current, _operational_configuration, start_attempt, attempt_input, attempt_stage, retain_output_reservations as retain_output_reservations, retain_development_report, retain_operational_configuration as retain_operational_configuration
 
 
 ATTEMPT_OUTPUT_OPTION = typer.Option("--output-dir", help="Optional fresh directory for this development invocation, report and bounded failure diagnostics.")
 ATTEMPT_DIRECTORY_OPTION = typer.Option("--attempt-dir", help="Optional fresh operational attempt directory, separate from the existing scientific output location.")
-_current: ContextVar[DevelopmentAttempt | None] = ContextVar("development_attempt", default=None)
-_operational_configuration = ContextVar('invocation_operational_configuration', default=None)
 _participants: dict[str, dict[str, object]] = {}
 _PATH_ROLES = {"config", "profile", "study", "archive", "source_root", "source_checkout", "native_python", "plan", "design_packet", "prior_exposure", "model_bank", "assignment", "parent_manifest", "custody", "reveal_record", "analysis_record", "authoring_input", "discovery_file", "upstream_binding"}
 _F = TypeVar("_F", bound=Callable[..., Any])
-
-
-def retain_output_reservations(record: dict) -> None:
-    """Keep the live operational selection and bounded plan arithmetic."""
-    attempt = _current.get()
-    if attempt is not None:
-        attempt.record["output_reservations"] = record
 
 
 def retain_metadata_rss(record: dict) -> None:
@@ -57,18 +47,9 @@ def _matches(attempt: DevelopmentAttempt | None, operation: str, destination: Pa
     return attempt is not None and destination is not None and attempt.record["operation"] == operation and attempt.path == Path(os.path.abspath(destination))
 
 
-def _disjoint(destination: Path, scientific: Path | None) -> None:
-    if scientific is None:
-        return
-    attempt, product = destination.resolve(), scientific.resolve()
-    if attempt.is_relative_to(product) or product.is_relative_to(attempt):
-        raise ValueError("operational attempt and scientific output locations must be disjoint")
-
-
 def _start(destination: Path, operation: str, *, native: bool, scientific: Path | None = None) -> DevelopmentAttempt:
     try:
-        _disjoint(destination, scientific)
-        return DevelopmentAttempt(destination, operation, native=native)
+        return start_attempt(destination, operation, native=native, scientific=scientific)
     except (OSError, RuntimeError, ValueError) as error:
         typer.echo(f"No durable development attempt could be created ({type(error).__name__}); destination must be a fresh directory with an existing real parent. No fallback location was used.", err=True)
         raise typer.BadParameter("unusable development attempt destination", param_hint="--attempt-dir" if scientific is not None else "--output-dir") from error
@@ -136,7 +117,7 @@ def retained_command(operation: str, *, closed_output: bool = False, native: boo
             assert attempt is not None
             configuration = _operational_configuration.get()
             if configuration is None:
-                from empirical_lawhood.runtime.operational_configuration import OperationalConfiguration
+                from empirical_lawhood.execution.operational_configuration import OperationalConfiguration
                 configuration = OperationalConfiguration()
             attempt.record['operational_configuration'] = configuration.to_document()
             attempt.record["handler_entered"] = True
@@ -166,66 +147,6 @@ def retained_command(operation: str, *, closed_output: bool = False, native: boo
         return invoke  # type: ignore[return-value]
 
     return decorate
-
-
-def attempt_input(path: Path, *, maximum_bytes: int, copy: bool = True, role: str = "config", consumer: str | None = None) -> Path:
-    """Keep one owned small snapshot and pass its exact bytes to the real owner."""
-    attempt = _current.get()
-    if attempt is None:
-        return path
-    try:
-        attempt.record["native_contact"] = "none"
-        attempt.event("input_validation")
-        attempt.capture_input(role, path, maximum_bytes=maximum_bytes, copy=False)
-        attempt.record["last_completed_stage"] = "input_identity_recorded"
-        if not copy:
-            return path
-        expected = None
-        if copy and path.suffix.casefold() in {".json", ".yaml", ".yml"}:
-            from empirical_lawhood.api.configuration import validate_configuration
-            from empirical_lawhood.api.configuration_registry import CONSUMERS
-
-            consumers = [item.consumer for item in CONSUMERS if item.command == attempt.record["operation"]]
-            selected = consumer if consumer is not None else (consumers[0] if len(consumers) == 1 else None)
-            # Invalid arbitrary payloads are never persisted as input.json.
-            # Value-valid pretty JSON still reaches the real exact-byte reader.
-            validation = validate_configuration(path, consumer=selected)
-            attempt.record["input_validation"] = validation
-            # Larger closed scientific inputs keep their bounded observed
-            # identity; operational retention never expands its snapshot ceiling.
-            copy = validation["disposition"] == "editable" and validation["input_bytes"] <= MAX_INPUT_COPY_BYTES
-            expected = str(validation["input_sha256"])
-        elif copy:
-            copy = False
-        snapshot = attempt.capture_input(role, path, maximum_bytes=maximum_bytes, copy=copy, expected_sha256=expected)
-        attempt.record["last_completed_stage"] = "input_snapshot_validated" if copy else "input_identity_recorded"
-        return snapshot
-    except BoundedFileIOError as error:
-        raise ValueError("development input snapshot refused its bounded regular-file contract") from error
-
-
-def attempt_stage(stage: str, *, native_contact: str = "unknown") -> None:
-    attempt = _current.get()
-    if attempt is not None:
-        attempt.record["native_contact"] = native_contact
-        attempt.event(stage)
-
-
-def retain_development_report(report: object, *, allow_nan: bool = True) -> None:
-    attempt = _current.get()
-    if attempt is not None:
-        attempt.operation_completed()
-        attempt.event("result_serialization")
-        attempt.report(json.dumps(report, sort_keys=True, indent=2, allow_nan=allow_nan))
-
-
-def retain_operational_configuration(configuration):
-    """Record selected check policy separately from scientific result bytes."""
-    token = _operational_configuration.set(configuration)
-    attempt = _current.get()
-    if attempt is not None:
-        attempt.record['operational_configuration'] = configuration.to_document()
-    return lambda: _operational_configuration.reset(token)
 
 
 def emit_development_report(report: object, *, allow_nan: bool = True) -> None:
@@ -301,6 +222,13 @@ def _selection(command: Any, args: Sequence[str]) -> tuple[str, Path, bool, Path
 
 class AttemptGroup(TyperGroup):
     """Retain usable opt-in destinations before Click parses any preconditions."""
+
+    def invoke(self, context):
+        if context.parent is not None:
+            return super().invoke(context)
+        from empirical_lawhood.cli.progress import command_progress
+        with command_progress(self, context):
+            return super().invoke(context)
 
     def main(self, args: Sequence[str] | None = None, **kwargs: Any) -> Any:
         arguments = list(sys.argv[1:] if args is None else args)

@@ -117,8 +117,8 @@ class SelectedProgramme:
                 if len(raw) != row['bytes'] or sha256(raw).hexdigest() != row['sha256']:
                     raise ValueError('producing archive member differs: ' + row['path'])
         from empirical_lawhood.api.recursive_authoring import implementation_binding
-        from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-        from empirical_lawhood.runtime.artifacts import ExternalRootContract
+        from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+        from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
         self.source = implementation_binding(self.project)
         if self.source.to_document() != self.preflight['implementation']:
             raise ValueError('selected project differs from archived actual producing implementation')
@@ -176,8 +176,8 @@ class SelectedProgramme:
                 'nonadditive_nested_window': True}
 
     def origins(self, draft, parent=None, *, parents=None):
-        from empirical_lawhood.kernel.provenance import ObjectIdentity
-        from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
+        from empirical_lawhood.science.identity.provenance import ObjectIdentity
+        from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
         if parent is not None and parents is not None:
             raise ValueError('select singular or multiple contribution parents')
         selected = tuple(parents) if parents is not None else (() if parent is None else (parent,))
@@ -200,8 +200,8 @@ class SelectedProgramme:
         return RecursiveInputOrigins(tuple(sorted(rows, key=lambda v: v.input_id)))
 
     def bindings(self, draft, records):
-        from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-        from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+        from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+        from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
         by_hash = {r.fingerprint(): r for r in records}
         bindings = []
         for external in draft.external_inputs:
@@ -220,7 +220,7 @@ class SelectedProgramme:
         from empirical_lawhood.api.recursive_authoring import author_recursive_wave
         from empirical_lawhood.api.recursive_execution import read_recursive_wave, run_recursive_wave
         from empirical_lawhood.api.recursive_inquiry import author_inquiry_successor, run_inquiry_successor
-        from empirical_lawhood.kernel.provenance import ObjectIdentity
+        from empirical_lawhood.science.identity.provenance import ObjectIdentity
         directory = self.root / name
         start, start_cpu = time.monotonic(), cpu()
         retained_before = sum(v['bytes'] for v in census(self.root).values())
@@ -313,13 +313,11 @@ class SelectedProgramme:
                  act_outcomes=('useful-supply',), next_manifests=None, existing_measured_event_paths=None):
         """Commit a receipt-backed domain outcome before authoring its successor."""
         from empirical_lawhood.api.recursive_authoring import load_authored_wave
-        from empirical_lawhood.api.recursive_inquiry import (
-            commit_inquiry_decision, project_inquiry_state, read_inquiry_decision,
-        )
-        from empirical_lawhood.kernel.recursive_inquiry import InquiryCost, InquiryOutcomeChoice, InquirySpecification, identity
-        from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-        from empirical_lawhood.planning.recursive_inquiry import InquiryAction, InquiryAlternative, InquiryMenu, InquiryPolicy
-        from empirical_lawhood.runtime.recursive_inquiry import InquiryStateSources, InquiryWaveSource
+        from empirical_lawhood.api.recursive_inquiry import commit_inquiry_decision, project_inquiry_state, read_inquiry_decision
+        from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost, InquiryOutcomeChoice, InquirySpecification, identity
+        from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+        from empirical_lawhood.design.recursive_inquiry import InquiryAction, InquiryAlternative, InquiryMenu, InquiryPolicy
+        from empirical_lawhood.execution.recursive_inquiry import InquiryStateSources, InquiryWaveSource
         packet, draft, _, _ = load_authored_wave(directory=directory, artifact_writer=self.plane)
         # State projection authenticates existing events against the actual
         # attempt/receipt. A whole-wave measurement stays separate in its report.
@@ -429,11 +427,9 @@ def main():
 
 
 def run_rubisco(programme):
-    from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry import science as portfolio
-    from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry import recursive_translation as portfolio_drafts
-    from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.source_manifest import (
-        INITIAL_CANDIDATE_IDS, SOURCE_MANIFEST, SOURCE_PATHS,
-    )
+    from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry import science as portfolio
+    from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry import recursive_translation as portfolio_drafts
+    from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry.source_manifest import INITIAL_CANDIDATE_IDS, SOURCE_MANIFEST, SOURCE_PATHS
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_inquiry import preview_inquiry_successor
 
@@ -454,7 +450,7 @@ def run_rubisco(programme):
             sources[source_id] = raw
         return portfolio.source_audit_from_bytes(sources, candidate_ids=INITIAL_CANDIDATE_IDS)
 
-    from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.challenge import YAMORI_BYTES, YAMORI_SHA256
+    from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry.challenge import YAMORI_BYTES, YAMORI_SHA256
 
     def new_primary_intake():
         path = Path('/tmp/empirical-lawhood-applied-el-20261011-reopen01/rubisco-portfolio-source-audit/yamori2026-primary.xml')
@@ -488,7 +484,7 @@ def run_rubisco(programme):
         question='What exact candidate frontier and supported model-use scope follow from the independently checked portfolio?',
         previous=decision)
     kinetic_products = run_rubisco_cycle(programme, source)
-    from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.challenge import challenge_finalists
+    from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry.challenge import challenge_finalists
     challenge = programme.measured('five-finalists.source-and-mechanism-challenge', lambda: challenge_finalists(
         supplier, assessment, kinetic_products, yamori))
     with (programme.root / 'finalist-challenge.json').open('xb') as stream:
@@ -507,8 +503,8 @@ def unique_product(products, product_type):
 
 
 def run_rubisco_cycle(programme, macro_source):
-    from empirical_lawhood.adapters.methods.rubisco_cycle_constraints import contracts as cycle
-    from empirical_lawhood.adapters.methods.rubisco_cycle_constraints import recursive_translation as drafts
+    from empirical_lawhood.domains.rubisco.rubisco_cycle_constraints import contracts as cycle
+    from empirical_lawhood.domains.rubisco.rubisco_cycle_constraints import recursive_translation as drafts
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_inquiry import preview_inquiry_successor
 
@@ -566,15 +562,13 @@ def run_rubisco_cycle(programme, macro_source):
 
 
 def run_battery(programme):
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry import science
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry import recursive_translation as drafts
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import BatteryInquirySupply, QUESTION
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry.operation_bindings import (
-        BatteryInquiryAssessedInstance, BatteryInquiryNativeCensus, native_census,
-    )
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry import science
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry import recursive_translation as drafts
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquirySupply, QUESTION
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry.operation_bindings import BatteryInquiryAssessedInstance, BatteryInquiryNativeCensus, native_census
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_inquiry import preview_inquiry_successor
-    from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition
+    from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition
 
     source = programme.measured('battery.source-intake', lambda: _battery_source_intake(programme))
     draft = drafts.supply_draft(source)
@@ -664,9 +658,7 @@ def run_battery(programme):
 def _battery_source_intake(programme, *, manufacturer_source_path=None):
     """Retain original/native/protocol bytes using metadata, without native import."""
     from importlib.metadata import distribution
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import (
-        BatteryInquirySource, PROTOCOL_SHA256, SOURCE_MEMBERS, SOURCE_VERSION,
-    )
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquirySource, PROTOCOL_SHA256, SOURCE_MEMBERS, SOURCE_VERSION
     source = BatteryInquirySource()
     target = programme.root / 'battery-source-originals'
     target.mkdir()

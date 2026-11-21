@@ -10,19 +10,19 @@ from math import comb
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import experiment_methods as old
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as protected
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_records as prefix
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import MatrixFactorAction, MatrixFactorResponseModel
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import forecast as sf, records as sr, response_records as rr, response_selection as rs
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.domains.matrix.matrix_factor_response import experiment_methods as old
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as protected
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_records as prefix
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import MatrixFactorAction, MatrixFactorResponseModel
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import forecast as sf, records as sr, response_records as rr, response_selection as rs
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 from tests.test_matrix_e3_protected_inputs import (
     build_source_inputs, join, source_inputs as source_inputs, scheduled as scheduled, stock as stock, provenance as provenance,
 )
@@ -264,7 +264,7 @@ def projection_fixture(case):
         "receiver_coefficients": np.zeros((48, 2, 2, 3, 4), dtype="<f8")})
     pub = case.plane.write(ArtifactWriteRequest("literal.e3.templates", "literal/templates.npz", sr.MATRIX_ARRAY_SCHEMA,
         ArtifactProfile.MATRIX_ARRAY_NPZ, "application/x-npz", "literal-e3", "literal", raw, Visibility.PROSPECTIVE, (), Access.OUTCOME_BLIND))
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import corpus_artifact
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import corpus_artifact
     arrays = rr.ScheduledResponseArrays("arrays.literal.templates", "TEMPLATES", sr.identity(source), corpus_artifact(pub), members,
         (sr.identity(source),), Access.OUTCOME_BLIND, Visibility.PROSPECTIVE)
     protocol = rr.ScheduledResponseProtocol("protocol.literal.cells", feature.public_source, case.inputs.specification.identity,
@@ -321,7 +321,7 @@ def test_complete240_original_cells_project_both_views_without_primary_only_summ
 
 
 def test_configured_native_training_reuses_original_complete_paired_target_body(source_inputs):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_methods import paired_response_view_values
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_methods import paired_response_view_values
     from tests.test_matrix_configured_e3_v2 import configured_case
 
     source, selection, forecast, score = projection_fixture(source_inputs)

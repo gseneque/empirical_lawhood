@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 
 from empirical_lawhood.api.workflows import list_workflows
+from empirical_lawhood.adapters.composition.generated_workflows import WORKFLOW_DECLARATIONS
 from empirical_lawhood.cli.workflows import workflow_details
 
 START = "<!-- BEGIN GENERATED WORKFLOWS -->"
@@ -17,56 +18,12 @@ END = "<!-- END GENERATED WORKFLOWS -->"
 ROOT = Path(__file__).resolve().parents[1]
 DESTINATION = ROOT / "docs/reference/workflows.md"
 
-# Presentation only: scientific limits remain in the workflow facts.
-DISPLAY_STATES = {
-    'matrix-programme': '🔵 Finite installed composition; 🟠 Full scientific acceptance pending',
-    'matrix-selected-e4-revision': '🔵 Declared researcher route; 🟠 Current workflow acceptance required',
-    'matrix-selected-e4-protected': '🔵 Declared researcher route; 🟠 Current workflow acceptance required',
-    'matrix-selected-opportunity': '🔵 Declared researcher route; 🟠 Current workflow acceptance required',
-    'matrix-selected-revision': '🔵 Declared researcher route; 🟠 Current workflow acceptance required',
-    'battery-obstruction-reassessment': '🔵 Declared researcher route; 🟠 Current workflow acceptance required',
-    'battery-initial-window-observation': '🟠 Concise programme software remains unavailable',
-    'matrix-response-experiment': '🔵 Declarative preparation; 🟠 Scientific entry unresolved',
-    'matrix-native-utility': '🔵 Declared native E2 route; 🟠 Scientific selections and workflow acceptance required',
-    'rubisco-kinetic-join': '🟡 Exposed conditional software; 🟠 Biological prediction unresolved',
-    'recursive-inquiry': '🟡 Exposed development; 🟠 Unresolved physical premises',
-    'rc-prerequisite-chain': '🟡 Exposed numerical development experiment',
-    'matrix-geometry': '🟢 Current operation',
-    'selected-events': '🟢 Current operation',
-    'matrix-history-analysis': '🟢 Current acquisition / analysis; 🟠 Exposed-array import',
-    'matrix-tangent': '🟢 Current acquisition / analysis',
-    'matrix-transient': '🟢 Current retained analysis',
-    'preparation-diagnostics': '🟢 Current retained analysis',
-    'rc-challenges': '🟢 Current issued phases',
-    'matrix-inputs': '🟢 Current source export; 🟠 Operand checks / transforms',
-    'preparation-applicability': '🟢 Current phases; 🟡 Development screens',
-    'rc-information': '🟢 Analytical operation',
-    'reactor-response': '🟢 Assigned prefix lifecycle; 🔵 Development authoring; 🟠 Other input checks',
-    'prepared-response': '🔵 Development authoring; 🟡 Native check; 🟠 Parent preflight',
-    'information-response': '🔵 Development authoring',
-    'causal-response': '🔵 Development authoring',
-    'finite-response-law': '🟢 Current C32/E64 phases; 🟡 Development diagnostics; 🟠 Input checks',
-    'causal-transfer-audit': '🟠 Authenticated parent preflight',
-    'rc-ladder-response': '🔵 Development authoring; 🟡 Native check',
-    'electron-gas-response': '🔵 Development authoring; 🟡 Reference check',
-    'lattice-pairing-method': '🔵 Development authoring',
-    'battery-response-and-restart': '🟡 Development check',
-    'tokamak-heat-response': '🟡 Development check',
-    'tokamak-control-response': '🟡 Development check',
-    'neuron-current-response': '🟡 Development check',
-    'reactor-flow-response': '🟡 Development check',
-    'reaction-diffusion-response': '🟡 Development check',
-    'grid-response-inputs': '🟡 Development check',
-    'material-control-inputs': '🟠 Input check',
-    'laser-archive-inspection': '🟠 Retrospective import / inspection',
-    'response-method-reference': '🟡 Development check',
-    'propulsion-reliability-reference': '🟡 Development check',
-}
 
 
 def render_table() -> str:
     workflows = list_workflows()
-    if set(DISPLAY_STATES) != {workflow.workflow_id for workflow in workflows}:
+    states = {row.workflow.workflow_id: row.display_state for row in WORKFLOW_DECLARATIONS}
+    if set(states) != {workflow.workflow_id for workflow in workflows}:
         raise ValueError("Workflow presentation states must cover the exact closed inventory")
     lines = [
         "| Workflow / boundary | Current state | Commands and input roles | Environment / first stop / evidence ceiling |",
@@ -84,7 +41,7 @@ def render_table() -> str:
         guide = Path(os.path.relpath(ROOT / workflow.guide, DESTINATION.parent)).as_posix()
         lines.append(
             f"| [{workflow.title}]({guide})<br>{workflow.kind} | "
-            f"{DISPLAY_STATES[workflow.workflow_id]} | {commands}<br>{inputs} | {workflow.environment}<br>"
+            f"{states[workflow.workflow_id]} | {commands}<br>{inputs} | {workflow.environment}<br>"
             f"{workflow.first_missing_prerequisite}<br>{workflow.scientific_ceiling} |"
         )
     return "\n".join(lines) + "\n"

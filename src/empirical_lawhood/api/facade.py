@@ -2,20 +2,23 @@
 
 from __future__ import annotations
 
-from empirical_lawhood.planning.approval import FrozenRetrospectiveApproval
+from empirical_lawhood.execution.operational_limits import minimum_byte_limit, byte_limit_within
+
+from empirical_lawhood.design.approval import FrozenRetrospectiveApproval
 from empirical_lawhood.adapters.physical.mast_archive.fresh_source import FairMastPublicSelection, FairMastPublicSourceService, FairMastSourceReceipt
-from empirical_lawhood.kernel.time import InformationCutoff
-from empirical_lawhood.planning.study_authoring import DesignInputRecord
+from empirical_lawhood.science.models.time import InformationCutoff
+from empirical_lawhood.design.study_authoring import DesignInputRecord
 
-from empirical_lawhood.kernel.retrospective_prediction_experiments import RetrospectiveExperimentSpec
+from empirical_lawhood.science.experiments.retrospective_prediction_experiments import RetrospectiveExperimentSpec
 
-from empirical_lawhood.planning.experiment_entry import RetrospectiveAuthoringBase
-from empirical_lawhood.runtime.candidate_compiler import RetrospectiveStandardCandidate, RetrospectiveStandardReport, RetrospectiveExtensionReport
-from empirical_lawhood.runtime.study_issue import RetrospectiveIssuedBase, RetrospectiveIssuedStudy, RetrospectivePublicationReceipt
+from empirical_lawhood.design.experiment_entry import RetrospectiveAuthoringBase
+from empirical_lawhood.execution.candidate_compiler import RetrospectiveStandardCandidate, RetrospectiveStandardReport, RetrospectiveExtensionReport
+from empirical_lawhood.execution.study_issue import RetrospectiveIssuedBase, RetrospectiveIssuedStudy, RetrospectivePublicationReceipt
 from empirical_lawhood.api.models import RetrospectiveCompilationSummary, RetrospectiveIssueSummary, RetrospectiveBaseCompilationSummary, RetrospectiveBaseIssueSummary, RetrospectiveCampaignBase
 
 from dataclasses import replace
 from contextlib import nullcontext
+from functools import cached_property
 import base64
 import binascii
 import hashlib
@@ -30,174 +33,74 @@ import types
 from pathlib import Path
 from typing import Callable, Mapping, TypeVar, cast
 
-from empirical_lawhood.infrastructure.artifacts import (
-    ArtifactPlaneError,
-    ExternalStorageDiagnostic,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError, read_bounded_bytes
-from empirical_lawhood.infrastructure.bounded_process import (
-    BoundedProcessError,
-    run_bounded_command,
-)
-from empirical_lawhood.infrastructure.catalog_projection import MAX_CATALOG_PROJECTION_BYTES
-from empirical_lawhood.infrastructure.dataset_projection import decode_unified_catalog_snapshot
-from ..infrastructure.execution import ExecutionErrorKind
-from empirical_lawhood.infrastructure.sql import DatasetCatalogQueryWorkLimitExceeded
-from empirical_lawhood.infrastructure.sql.database import (
-    ALEMBIC_HEAD,
-    APPLICATION_ID,
-    PRODUCTION_RELATIVE_PATH,
-    SCHEMA_VERSION,
-    CatalogSchemaAuditLimitExceeded,
-    catalog_query_preflight,
-    create_catalog_engine,
-    create_read_only_catalog_engine,
-    initialize_production_catalog,
-    production_catalog_path,
-    schema_audit,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.infrastructure.catalog_rebuild import (
-    CatalogRebuildError,
-    rebuild_production_catalog,
-)
-from empirical_lawhood.infrastructure.sql.repository import (
-    DEFAULT_CATALOG_QUERY_WORK_LIMIT,
-    MAX_CATALOG_MATCH_COUNT_LIMIT,
-    CatalogObjectQuery,
-    CatalogQueryWorkLimitExceeded,
-    SQLiteCatalogRepository,
-)
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    CanonicalizationError,
-    canonical_json_bytes,
-    validate_semantic_version,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.systems import SystemSpec
-from empirical_lawhood.kernel.models import ViewModelSetSpec, ModelSetSpec
-from empirical_lawhood.planning.authority import AuthorizationDecision
-from empirical_lawhood.planning.approval import CompleteApprovalService, DecisionClock, DurableAuthorizationRecord, FrozenIssuedStudyApprovalProposal, SystemDecisionClock
-from empirical_lawhood.planning.design import ExperimentProposal
-from empirical_lawhood.planning.dataset_limits import MAX_DATASET_RECORD_CANONICAL_BYTES
-from empirical_lawhood.planning.dataset_manifests import (
-    DATASET_MANIFEST_SCHEMAS,
-    EXPERIMENT_DATASET_BINDINGS_EXTENSION_NAMESPACE,
-    DatasetRegistrationManifest,
-    DatasetTransformationManifest,
-    ProposedExperimentDatasetBindingManifest,
-)
-from empirical_lawhood.planning.dataset_authority import (
-    DatasetOperationAuthorization,
-    DatasetOperationPolicy,
-    DatasetOperationRequest,
-)
-from empirical_lawhood.planning.dataset_rebuild import (
-    DatasetProjectionRebuildAuthorization,
-    DatasetProjectionRebuildManifest,
-    DatasetProjectionRebuildPolicy,
-    DatasetProjectionRebuildRequest as AuthoredDatasetProjectionRebuildRequest,
-)
-from empirical_lawhood.planning.exploration import ExploratoryFinding, HypothesisSet
-from empirical_lawhood.planning.experiment_entry import StudyDefinition, ExecutableStudyDefinition
-from empirical_lawhood.planning.evidence_profiles import EvidenceProfileSelection
-from empirical_lawhood.planning.linked_campaign import LinkedCampaignProfile
-from empirical_lawhood.planning.source_pipelines import SourcePipelineProfile
-from empirical_lawhood.planning.prospective import (
-    NominationObligations,
-    ProspectiveNominationDecision,
-)
-from empirical_lawhood.planning.study_authoring import StudyDraft
-from empirical_lawhood.planning.study_bundles import StudyBundleSpec
-from empirical_lawhood.planning.multi_world_study import ArchiveOutcomeProtectionPlan, ArchiveToSimulatorPartialMorphismSpec, MultiWorldJointAdjudicationPlan, MultiWorldOutcomeBarrierPlan, MultiWorldStudyChildScientificBinding
-from empirical_lawhood.planning.study_issue import HumanProposerAttestation, RetrospectiveProposerAttestation, ImplementationSourceClosure, StudyAuthorityKind, StudyOperationAuthority
-from empirical_lawhood.runtime.candidate_compiler import AuthoringMaterializationIdentity, CandidateCompilationContext, CandidateCompilationDisposition, CandidateDiagnostic, CandidateDiagnosticClass, CandidateDiagnosticCode, CandidateScientificGraph, ContentIdentityPolicy, DraftStudyCandidate, StudyCompilationReport, ExecutableStudyCompilationReport, StandardCandidateCompilationContext, StudyCandidate, ExecutableStudyCandidate, bind_standard_candidate_compilation_report, compile_study_candidate
-from empirical_lawhood.runtime.candidate_composition import (
-    CandidateCapabilityCatalog,
-    CandidateContextProvider,
-)
-from empirical_lawhood.runtime.extension_bundles import GeneratedExtensionBundleAggregate
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityRegistry
-from empirical_lawhood.runtime.study_bundle_compiler import StudyBundleCandidate, StudyBundleCompilationDisposition, StudyBundleCompilationInput, StudyBundleCompilationReport, compile_study_bundle
-from empirical_lawhood.runtime.multi_world_study_issue import IssuedMultiWorldStudyChild, MultiWorldAuthorityRequired, MultiWorldOutcomeBarrierPrefix, MultiWorldStudyBarrierStatus, bind_multi_world_child_result, inspect_study_bundle_barrier_status, prepare_study_bundle_issue, request_multi_world_reveal
-from empirical_lawhood.runtime.multi_world_study import ArchiveOverlapQualificationResult, MultiWorldJointAdjudicationResult, MorphismControlContrastReceipt, PropertyMorphismVerdict, WorldLocalStudyResult, adjudicate_joint_multi_world_study
-from empirical_lawhood.runtime.compiler import ProtocolCompilationError, compile_preissue_run_plan, compile_exploration_execution_plan, compile_exploration_wave_execution_plan, compile_run_plan, execution_topology_sha256, lower_run_plan
-from empirical_lawhood.runtime.catalog import ScientificObjectKind
-from empirical_lawhood.runtime.dataset_catalog_service import (
-    DatasetCatalogLookup,
-    DatasetCatalogReadAuthenticationError,
-    DatasetCatalogReadService,
-    DatasetCatalogTrustedQueryWorkLimitExceeded,
-)
-from empirical_lawhood.runtime.dataset_binding import (
-    DatasetBindingCompilationError,
-    DatasetCampaignBindingResolver,
-)
-from empirical_lawhood.runtime.datasets import (
-    MAX_DATASET_PAGE_RECORDS,
-    DatasetCatalogCursor,
-    DatasetCatalogQueryBoundary,
-    DatasetCatalogRecord,
-    DatasetCatalogRecordKind,
-    DatasetCatalogWorkLimit,
-    dataset_catalog_record_key,
-)
-from empirical_lawhood.runtime.public_source_acquisition import CaptureAssuredSourceAcquisitionInvocation, PublicSourceAcquisitionService, ChecksummedSourceAcquisitionInvocation
-from empirical_lawhood.runtime.dataset_operations import (
-    DatasetOperationAuthorityBundle,
-    DatasetOperationPreview,
-    DatasetOperationPreviewService,
-    DatasetOperationPreviewState,
-    DatasetStorageScopePreflight,
-)
-from empirical_lawhood.runtime.dataset_registration import (
-    DatasetRegistrationInstallation,
-    DatasetRegistrationInstallerPort,
-)
-from empirical_lawhood.runtime.conditional_children import ConditionalChildInstantiation, ConditionalChildResolution, ConditionalChildResolver, FrozenParentInputBinding, bind_frozen_parent_input
-from empirical_lawhood.runtime.dataset_rebuild import (
-    DatasetProjectionRebuildAuthorityBundle,
-    DatasetProjectionRebuildInstallation,
-    DatasetProjectionRebuildInstallerPort,
-)
-from empirical_lawhood.runtime.exploration import ExplorationWaveResult
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, ProtocolRunPlan, ScientificInputRole
-from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeSpec, JitGraphSignatureManifest, PredevelopmentJitSignatureCensus
-from empirical_lawhood.runtime.campaign_elapsed_budget import CampaignElapsedBudgetSpec, CampaignElapsedReservationPlan
-from empirical_lawhood.runtime.executable_bindings import GeneratedExecutableBindingAggregate
-from empirical_lawhood.runtime.executable_bindings import (
-    ExecutableCapabilityProviderFactoryRegistry,
-)
-from empirical_lawhood.runtime.parameterised_candidate_context import compose_parameterised_candidate_context
-from empirical_lawhood.runtime.profile_compilation import ExecutableBindingRequiredError, LinkedCampaignExecutableCompilation, LinkedCampaignExecutableDisposition, LinkedCampaignProfileCompiler, SourceProfileCompilerRegistry
-from empirical_lawhood.runtime.source_pipelines import SourcePipelineCompilationDisposition, SourcePipelineCompilation
-from empirical_lawhood.runtime.study_issue import MAX_COMPOSED_PROGRAMME_CONTROL_BYTES, StudyPublicationReceipt, ExtensionPublicationReceipt, StudyExtensionDecoderRegistration, StudySourceClosureInspector, IssuedExecutableStudyManifest, prepare_study_issue, prepare_executable_study_issue, project_standard_study_extensions
-from empirical_lawhood.runtime.study_extensions import StudyExtensionMaterializationReceipt
-from empirical_lawhood.runtime.static_codecs import CanonicalRecordCodecRegistry
-from empirical_lawhood.runtime.scientific_graph_preservation import prove_scientific_graph_parity
-from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher, StudyOperationAuthorityStore
+from empirical_lawhood.storage.artifacts import ArtifactPlaneError, ExternalStorageDiagnostic, GuardedExternalRoot
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError, read_bounded_bytes
+from empirical_lawhood.execution.local.bounded_process import BoundedProcessError, run_bounded_command
+from empirical_lawhood.storage.dataset_projection import decode_unified_catalog_snapshot
+from empirical_lawhood.execution.local.execution import ExecutionErrorKind
+from empirical_lawhood.storage.sql import DatasetCatalogQueryWorkLimitExceeded
+from empirical_lawhood.storage.sql.database import ALEMBIC_HEAD, APPLICATION_ID, PRODUCTION_RELATIVE_PATH, SCHEMA_VERSION, CatalogSchemaAuditLimitExceeded, catalog_query_preflight, create_catalog_engine, create_read_only_catalog_engine, initialize_production_catalog, production_catalog_path, schema_audit
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.catalog_rebuild import CatalogRebuildError, rebuild_production_catalog
+from empirical_lawhood.storage.sql.repository import DEFAULT_CATALOG_QUERY_WORK_LIMIT, MAX_CATALOG_MATCH_COUNT_LIMIT, CatalogObjectQuery, CatalogQueryWorkLimitExceeded, SQLiteCatalogRepository
+from empirical_lawhood.science.records.serialization import CanonicalRecord, CanonicalizationError, canonical_json_bytes, validate_semantic_version, validate_sha256, validate_stable_id
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.models.systems import SystemSpec
+from empirical_lawhood.science.models.models import ViewModelSetSpec, ModelSetSpec
+from empirical_lawhood.design.authority import AuthorizationDecision
+from empirical_lawhood.design.approval import CompleteApprovalService, DecisionClock, DurableAuthorizationRecord, FrozenIssuedStudyApprovalProposal, SystemDecisionClock
+from empirical_lawhood.design.design import ExperimentProposal
+from empirical_lawhood.design.dataset_limits import MAX_DATASET_RECORD_CANONICAL_BYTES
+from empirical_lawhood.design.dataset_manifests import DATASET_MANIFEST_SCHEMAS, EXPERIMENT_DATASET_BINDINGS_EXTENSION_NAMESPACE, DatasetRegistrationManifest, DatasetTransformationManifest, ProposedExperimentDatasetBindingManifest
+from empirical_lawhood.design.dataset_authority import DatasetOperationAuthorization, DatasetOperationPolicy, DatasetOperationRequest
+from empirical_lawhood.design.dataset_rebuild import DatasetProjectionRebuildAuthorization, DatasetProjectionRebuildManifest, DatasetProjectionRebuildPolicy, DatasetProjectionRebuildRequest as AuthoredDatasetProjectionRebuildRequest
+from empirical_lawhood.design.exploration import ExploratoryFinding, HypothesisSet
+from empirical_lawhood.design.experiment_entry import StudyDefinition, ExecutableStudyDefinition
+from empirical_lawhood.design.evidence_profiles import EvidenceProfileSelection
+from empirical_lawhood.design.linked_campaign import LinkedCampaignProfile
+from empirical_lawhood.design.source_pipelines import SourcePipelineProfile
+from empirical_lawhood.design.prospective import NominationObligations, ProspectiveNominationDecision
+from empirical_lawhood.design.study_authoring import StudyDraft
+from empirical_lawhood.design.study_bundles import StudyBundleSpec
+from empirical_lawhood.design.multi_world_study import ArchiveOutcomeProtectionPlan, ArchiveToSimulatorPartialMorphismSpec, MultiWorldJointAdjudicationPlan, MultiWorldOutcomeBarrierPlan, MultiWorldStudyChildScientificBinding
+from empirical_lawhood.design.study_issue import HumanProposerAttestation, RetrospectiveProposerAttestation, ImplementationSourceClosure, StudyAuthorityKind, StudyOperationAuthority
+from empirical_lawhood.execution.candidate_compiler import AuthoringMaterializationIdentity, CandidateCompilationContext, CandidateCompilationDisposition, CandidateDiagnostic, CandidateDiagnosticClass, CandidateDiagnosticCode, CandidateScientificGraph, ContentIdentityPolicy, DraftStudyCandidate, StudyCompilationReport, ExecutableStudyCompilationReport, StandardCandidateCompilationContext, StudyCandidate, ExecutableStudyCandidate, bind_standard_candidate_compilation_report, compile_study_candidate
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog, CandidateContextProvider
+from empirical_lawhood.execution.extension_bundles import GeneratedExtensionBundleAggregate
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityRegistry
+from empirical_lawhood.execution.study_bundle_compiler import StudyBundleCandidate, StudyBundleCompilationDisposition, StudyBundleCompilationInput, StudyBundleCompilationReport, compile_study_bundle
+from empirical_lawhood.execution.multi_world_study_issue import IssuedMultiWorldStudyChild, MultiWorldAuthorityRequired, MultiWorldOutcomeBarrierPrefix, MultiWorldStudyBarrierStatus, bind_multi_world_child_result, inspect_study_bundle_barrier_status, prepare_study_bundle_issue, request_multi_world_reveal
+from empirical_lawhood.execution.multi_world_study import ArchiveOverlapQualificationResult, MultiWorldJointAdjudicationResult, MorphismControlContrastReceipt, PropertyMorphismVerdict, WorldLocalStudyResult, adjudicate_joint_multi_world_study
+from empirical_lawhood.execution.compiler import ProtocolCompilationError, compile_preissue_run_plan, compile_exploration_execution_plan, compile_exploration_wave_execution_plan, compile_run_plan, execution_topology_sha256, lower_run_plan
+from empirical_lawhood.storage.contracts.catalog import ScientificObjectKind
+from empirical_lawhood.execution.dataset_catalog_service import DatasetCatalogLookup, DatasetCatalogReadAuthenticationError, DatasetCatalogReadService, DatasetCatalogTrustedQueryWorkLimitExceeded
+from empirical_lawhood.execution.dataset_binding import DatasetBindingCompilationError, DatasetCampaignBindingResolver
+from empirical_lawhood.execution.datasets import MAX_DATASET_PAGE_RECORDS, DatasetCatalogCursor, DatasetCatalogQueryBoundary, DatasetCatalogRecord, DatasetCatalogRecordKind, DatasetCatalogWorkLimit, dataset_catalog_record_key
+from empirical_lawhood.execution.public_source_acquisition import CaptureAssuredSourceAcquisitionInvocation, PublicSourceAcquisitionService, ChecksummedSourceAcquisitionInvocation
+from empirical_lawhood.execution.dataset_operations import DatasetOperationAuthorityBundle, DatasetOperationPreview, DatasetOperationPreviewService, DatasetOperationPreviewState, DatasetStorageScopePreflight
+from empirical_lawhood.execution.dataset_registration import DatasetRegistrationInstallation, DatasetRegistrationInstallerPort
+from empirical_lawhood.execution.conditional_children import ConditionalChildInstantiation, ConditionalChildResolution, ConditionalChildResolver, FrozenParentInputBinding, bind_frozen_parent_input
+from empirical_lawhood.execution.dataset_rebuild import DatasetProjectionRebuildAuthorityBundle, DatasetProjectionRebuildInstallation, DatasetProjectionRebuildInstallerPort
+from empirical_lawhood.execution.exploration import ExplorationWaveResult
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, ProtocolRunPlan, ScientificInputRole
+from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeSpec, JitGraphSignatureManifest, PredevelopmentJitSignatureCensus
+from empirical_lawhood.execution.campaign_elapsed_budget import CampaignElapsedBudgetSpec, CampaignElapsedReservationPlan
+from empirical_lawhood.execution.executable_bindings import GeneratedExecutableBindingAggregate
+from empirical_lawhood.execution.executable_bindings import ExecutableCapabilityProviderFactoryRegistry
+from empirical_lawhood.execution.parameterised_candidate_context import compose_parameterised_candidate_context
+from empirical_lawhood.execution.profile_compilation import ExecutableBindingRequiredError, LinkedCampaignExecutableCompilation, LinkedCampaignExecutableDisposition, LinkedCampaignProfileCompiler, SourceProfileCompilerRegistry
+from empirical_lawhood.execution.source_pipelines import SourcePipelineCompilationDisposition, SourcePipelineCompilation
+from empirical_lawhood.execution.study_issue import StudyPublicationReceipt, ExtensionPublicationReceipt, StudyExtensionDecoderRegistration, StudySourceClosureInspector, IssuedExecutableStudyManifest, prepare_study_issue, prepare_executable_study_issue, project_standard_study_extensions
+from empirical_lawhood.execution.study_extensions import StudyExtensionMaterializationReceipt
+from empirical_lawhood.execution.static_codecs import CanonicalRecordCodecRegistry
+from empirical_lawhood.execution.scientific_graph_preservation import prove_scientific_graph_parity
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, StudyOperationAuthorityStore
 
-from .codecs import load_executable_study_authoring, load_executable_study_authoring_materialization, load_standard_issued_study, load_standard_study_candidate, MAX_AUTHORING_BYTES, MAX_CAMPAIGN_PACKAGE_BYTES, AuthoringCodecError, load_authoring, load_campaign_package_authoring, load_registered_authoring, load_registered_authoring_materialization, loads_registered_authoring
-from .execution import (
-    CampaignExecutionError,
-    CampaignExecutionService,
-    CampaignIdentityError,
-    CampaignInternalError,
-    CampaignValidationError,
-    RunExecutionSummary,
-    RunHistoryReconciliationSummary,
-    RunStatusSummary,
-)
+from empirical_lawhood.api.codecs import load_executable_study_authoring, load_executable_study_authoring_materialization, load_standard_issued_study, load_standard_study_candidate, AuthoringCodecError, load_authoring, load_campaign_package_authoring, load_registered_authoring, load_registered_authoring_materialization, loads_registered_authoring
+from empirical_lawhood.api.execution import CampaignExecutionError, CampaignExecutionService, CampaignIdentityError, CampaignInternalError, CampaignValidationError, RunExecutionSummary, RunHistoryReconciliationSummary, RunStatusSummary
 from empirical_lawhood.api.models import CampaignAuthorityRequired, ExperimentPackageAssemblySummary, CampaignPackage, AuthorizationSummary, CapabilityListSummary, CapabilityShowSummary, CatalogObjectSummary, CatalogQuerySummary, CatalogRebuildSummary, CatalogSummary, StudyCompilationSummary, ExecutableStudyCompilationSummary, CompilationSummary, PreissueReadinessSummary, LinkedCampaignCompilationSummary, DatabaseMutationSummary, DatasetCatalogRecordSummary, DatasetListSummary, DatasetManifestSummary, DatasetOperationPreviewSummary, PublicSourceAcquisitionSummary, PublicSourceCustodySummary, DatasetProjectionRebuildSummary, DatasetRegistrationSummary, DatasetShowSummary, DatasetStoragePreflightSummary, DoctorActionReadiness, DoctorAuthorityBoundary, DoctorBackendSummary, DoctorSummary, DocumentSummary, DualLoopPackage, ExplorationExecutionPackage, IssuedCampaignPackage, IssuedCampaignPackageRoot, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage, SourceProfileCompilationSummary, assemble_experiment_package, bind_issued_execution_package_elapsed_budget, issued_base_candidate, issued_standard_candidate, ExplorationCompilationSummary, ExplorationPortfolioSummary, HypothesisSummary, NominationSummary, StudyIssueSummary, ExecutableStudyIssueSummary, MultiWorldStudyIssueSummary, StudyBundleCompilationSummary, ProposalSummary, ScientificInspectionSummary, SystemSummary, WriteEffectSummary
-from empirical_lawhood.api.ports import (
-    DatasetCatalogSessionProvider,
-    ProspectiveWorkflow,
-)
+from empirical_lawhood.api.ports import DatasetCatalogSessionProvider, ProspectiveWorkflow
 from empirical_lawhood.api.results import AdvanceStudyBundleRequest, AssembleExperimentPackageRequest, BindElapsedBudgetRequest, ApiError, ApiResult, CapabilityListRequest, CapabilityShowRequest, CampaignStatusRequest, CampaignMaintenanceStopRequest, CampaignMaintenanceInterruptionRequest, CatalogQueryRequest, CatalogRebuildRequest, CompileCampaignRequest, CompileStudyRequest, CompileCandidateRequest, CompileLinkedCampaignProfileRequest, CompileStudyBundleRequest, CompileSourceProfileRequest, CloseStudyBundleRequest, DatabaseMutationRequest, DatasetListRequest, DatasetManifestRequest, DatasetOperationPreviewRequest, PublicSourceAcquisitionRequest, DatasetProjectionRebuildRequest, DatasetRegistrationRequest, DatasetShowRequest, DocumentRequest, ErrorCategory, IssueStudyRequest, IssueExtensionsRequest, IssueStudyBundleRequest, OperationStatus, CheckReadinessRequest, StudyBundleStatusRequest, ResumeCampaignRequest, RunCampaignRequest
 
 
@@ -816,6 +719,8 @@ class EmpiricalLawhoodApi:
         extension_bundle_aggregate: GeneratedExtensionBundleAggregate | None = None,
         executable_binding_aggregate: GeneratedExecutableBindingAggregate | None = None,
         executable_factory_registry: ExecutableCapabilityProviderFactoryRegistry | None = None,
+        executable_binding_loader: Callable[[], GeneratedExecutableBindingAggregate] | None = None,
+        executable_factory_loader: Callable[[], ExecutableCapabilityProviderFactoryRegistry] | None = None,
         study_bundle_registry: CapabilityRegistry | None = None,
         study_authority_store: StudyOperationAuthorityStore | None = None,
         study_issue_publisher: ExternalIssuedStudyPublisher | None = None,
@@ -850,7 +755,7 @@ class EmpiricalLawhoodApi:
             raise ValueError("facade catalog selection differs from its execution service")
         self._catalog_access = selected_catalog if catalog_access is None else catalog_access
         if self._catalog_access is not None:
-            from empirical_lawhood.infrastructure.guarded_catalog import GuardedCatalogAccess
+            from empirical_lawhood.storage.guarded_catalog import GuardedCatalogAccess
 
             if type(self._catalog_access) is not GuardedCatalogAccess:
                 raise TypeError("facade requires its exact guarded catalog owner")
@@ -872,22 +777,23 @@ class EmpiricalLawhoodApi:
         self._conditional_successor_resolver = conditional_successor_resolver
         self._candidate_capability_catalog = candidate_capability_catalog or provider_catalog
         self._extension_bundle_aggregate = extension_bundle_aggregate
-        if executable_binding_aggregate is not None and (
-            extension_bundle_aggregate is None
-            or executable_binding_aggregate.discovery_aggregate
-            != ObjectIdentity.from_record(
-                extension_bundle_aggregate.aggregate_id,
-                extension_bundle_aggregate,
-            )
+        if executable_binding_loader is not None and (
+            extension_bundle_aggregate is None or executable_binding_aggregate is not None or executable_factory_registry is not None
         ):
-            raise ValueError("executable and discovery aggregates differ")
-        self._executable_binding_aggregate = executable_binding_aggregate
+            raise ValueError("deferred executable bindings require a discovery aggregate and exclusive binding selection")
+        if executable_factory_loader is not None and (extension_bundle_aggregate is None or executable_factory_registry is not None):
+            raise ValueError("deferred executable factories require a discovery aggregate and exclusive selection")
+        if executable_binding_aggregate is not None:
+            self._require_executable_discovery(executable_binding_aggregate)
         if executable_factory_registry is not None and (
             executable_binding_aggregate is None
             or executable_factory_registry.aggregate != executable_binding_aggregate
         ):
             raise ValueError("executable factory registry differs from facade aggregate")
-        self._executable_factory_registry = executable_factory_registry
+        self._configured_executable_aggregate = executable_binding_aggregate
+        self._executable_binding_loader = executable_binding_loader
+        self._configured_executable_factories = executable_factory_registry
+        self._executable_factory_loader = executable_factory_loader
         self._capability_discovery_catalog = _merge_discovery_catalogs(
             self._candidate_capability_catalog,
             (
@@ -911,6 +817,39 @@ class EmpiricalLawhoodApi:
     @property
     def repo_root(self) -> Path:
         return self._repo_root
+
+    def _require_executable_discovery(self, bindings: GeneratedExecutableBindingAggregate) -> None:
+        discovery = self._extension_bundle_aggregate
+        if not isinstance(bindings, GeneratedExecutableBindingAggregate):
+            raise TypeError("executable binding selection returned another aggregate type")
+        if discovery is None or bindings.discovery_aggregate != ObjectIdentity.from_record(discovery.aggregate_id, discovery):
+            raise ValueError("executable and discovery aggregates differ")
+
+    @cached_property
+    def _executable_factory_registry(self) -> ExecutableCapabilityProviderFactoryRegistry | None:
+        if self._executable_factory_loader is None:
+            return self._configured_executable_factories
+        factories = self._executable_factory_loader()
+        if not isinstance(factories, ExecutableCapabilityProviderFactoryRegistry):
+            raise TypeError("deferred executable factory selection returned another registry type")
+        if self._executable_binding_loader is None and self._configured_executable_aggregate is None:
+            self._require_executable_discovery(factories.aggregate)
+        else:
+            selected = self._executable_binding_aggregate
+            if factories.aggregate is not selected and factories.aggregate != selected:
+                raise ValueError("executable factory registry differs from facade aggregate")
+        return factories
+
+    @cached_property
+    def _executable_binding_aggregate(self) -> GeneratedExecutableBindingAggregate | None:
+        if self._executable_binding_loader is not None:
+            bindings = self._executable_binding_loader()
+            self._require_executable_discovery(bindings)
+            return bindings
+        if self._configured_executable_aggregate is not None or self._executable_factory_loader is None:
+            return self._configured_executable_aggregate
+        factories = self._executable_factory_registry
+        return None if factories is None else factories.aggregate
 
     def _catalog_path(self) -> Path:
         if self._catalog_access is not None:
@@ -1587,7 +1526,7 @@ class EmpiricalLawhoodApi:
         self,
         request: DocumentRequest,
     ) -> ApiResult[DocumentSummary]:
-        from empirical_lawhood.planning.campaigns import CampaignSpec
+        from empirical_lawhood.design.campaigns import CampaignSpec
 
         return self._validate_document_kind(
             request,
@@ -2026,7 +1965,7 @@ class EmpiricalLawhoodApi:
                     draft_path=request.base_package_path,
                     requested_path=request.emit_path,
                     payload=payload,
-                    maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
+                    maximum_bytes=None,
                 )
                 payload_sha256 = hashlib.sha256(payload).hexdigest()
                 local_bytes_written = len(payload)
@@ -2128,7 +2067,7 @@ class EmpiricalLawhoodApi:
                     draft_path=request.execution_package_path,
                     requested_path=request.emit_path,
                     payload=payload,
-                    maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
+                    maximum_bytes=None,
                 )
                 payload_sha256 = hashlib.sha256(payload).hexdigest()
                 local_bytes_written = len(payload)
@@ -2599,7 +2538,7 @@ class EmpiricalLawhoodApi:
                 or registration.config_sha256 != proposal.decoder_config_sha256
             ):
                 raise ValueError("extension bytes/decoder differ from their exact proposal")
-            codec = registry.registration(proposal.payload.object_schema)
+            codec = registry.registration(proposal.payload.object_schema, record_version=proposal.payload.object_version)
             # Additional profiles are explicit installed choices. Schema-only
             # decoding must keep its original primary allocation; a larger
             # advertised size cannot select another profile.
@@ -2612,11 +2551,12 @@ class EmpiricalLawhoodApi:
                     proposal.payload.object_schema,
                     decoder_key=registration.decoder_key,
                     decoder_version=registration.decoder_version,
+                    record_version=proposal.payload.object_version,
                 )
                 aggregate = self._executable_binding_aggregate
                 if (
                     codec.record_version != registration.payload_version
-                    or codec.maximum_bytes > registration.maximum_payload_bytes
+                    or not byte_limit_within(codec.maximum_bytes, registration.maximum_payload_bytes)
                     or codec.decoder_implementation_sha256 != registration.implementation_sha256
                     or aggregate is None
                     or not any(
@@ -2625,13 +2565,13 @@ class EmpiricalLawhoodApi:
                     )
                 ):
                     raise ValueError("extension decoder differs from its installed codec owner")
-            maximum_bytes = min(codec.maximum_bytes, registration.maximum_payload_bytes)
+            maximum_bytes = minimum_byte_limit(proposal.payload_size_bytes, codec.maximum_bytes, registration.maximum_payload_bytes)
             if proposal.payload_size_bytes > maximum_bytes:
                 raise ValueError("extension payload exceeds its installed decoder byte bound")
             payload = read_bounded_bytes(payload_path, maximum_bytes=maximum_bytes)
             decoded = decode_canonical_bytes(
                 payload,
-                registry.record_types[proposal.payload.object_schema],
+                registry.record_type(proposal.payload.object_schema, proposal.payload.object_version),
                 maximum_bytes=codec.maximum_bytes,
             )
             payload_identity = ObjectIdentity.from_record(
@@ -2773,7 +2713,7 @@ class EmpiricalLawhoodApi:
                     draft_path=request.path,
                     requested_path=request.emit_path,
                     payload=candidate_payload,
-                    maximum_bytes=MAX_COMPOSED_PROGRAMME_CONTROL_BYTES,
+                    maximum_bytes=None,
                 )
                 candidate_sha256 = hashlib.sha256(candidate_payload).hexdigest()
                 local_bytes_written = len(candidate_payload)
@@ -4155,13 +4095,11 @@ class EmpiricalLawhoodApi:
             raise ValueError("local candidate output must be relative to the draft")
         if requested_path.suffix.casefold() != ".json":
             raise ValueError("local candidate output must use a .json suffix")
-        byte_limit = MAX_AUTHORING_BYTES if maximum_bytes is None else maximum_bytes
-        if type(byte_limit) is not int or not 0 < byte_limit <= MAX_CAMPAIGN_PACKAGE_BYTES:
-            raise ValueError("local emission requires its bounded authoring or package allocation")
-        if len(payload) > byte_limit:
-            if maximum_bytes is None:
-                raise ValueError("local candidate output exceeds the authoring byte limit")
-            raise ValueError("local campaign package output exceeds the package byte limit")
+        if maximum_bytes is not None:
+            if type(maximum_bytes) is not int or maximum_bytes <= 0:
+                raise ValueError("local emission requires a positive selected allowance")
+            if len(payload) > maximum_bytes:
+                raise ValueError("local candidate output exceeds its selected byte allowance")
         draft_root = draft_path.parent.resolve(strict=True)
         unresolved_target = draft_root / requested_path
         resolved_parent = unresolved_target.parent.resolve(strict=True)
@@ -5096,14 +5034,23 @@ class EmpiricalLawhoodApi:
             payload=summary,
         )
 
+    def doctor_workflow(self, workflow_id: str, *, profile: str = "standard", worker_pythons: tuple[str, ...] = (),
+                        external_software: tuple[str, ...] = (), assert_prerequisites: bool = False) -> ApiResult[dict]:
+        """Inspect exact selected workflow software without native or source contact."""
+        from empirical_lawhood.api.workflow_installation import workflow_environment_result
+
+        return workflow_environment_result(workflow_id, profile=profile,
+            project_root=self._repo_root if self._project_configured else None, worker_pythons=worker_pythons,
+            external_software=external_software, assert_prerequisites=assert_prerequisites)
+
     def doctor(self, *, route: str | None = None) -> ApiResult[DoctorSummary]:
         operation = "doctor"
         import platform
-        from empirical_lawhood.api.environment import EnvironmentRoute, inspect_route_dependencies
-        from empirical_lawhood.infrastructure.source_origin import require_executing_target_source
+        from empirical_lawhood.api.environment import environment_by_id, inspect_route_dependencies
+        from empirical_lawhood.storage.source_origin import require_executing_target_source
 
         try:
-            selected_route = None if route is None else EnvironmentRoute(route)
+            selected_route = None if route is None else environment_by_id(route).route_id
         except ValueError as error:
             return _validation_error(operation, error)
         source_bound = False
@@ -5227,7 +5174,7 @@ class EmpiricalLawhoodApi:
                 authority_boundaries=authority_boundaries,
                 action_readiness=action_readiness,
                 warnings=tuple(sorted(set(warnings))),
-                environment_route=None if selected_route is None else selected_route.value,
+                environment_route=selected_route,
                 operating_system=platform.system(),
                 architecture=platform.machine(),
             ),
@@ -6151,7 +6098,7 @@ class EmpiricalLawhoodApi:
         try:
             projection_payload = read_bounded_bytes(
                 projection,
-                maximum_bytes=MAX_CATALOG_PROJECTION_BYTES,
+                maximum_bytes=None,
             )
             try:
                 decode_unified_catalog_snapshot(projection_payload)
@@ -6810,7 +6757,7 @@ class EmpiricalLawhoodApi:
         )
 
     def _database_mutation(self, action: str, audit: object) -> DatabaseMutationSummary:
-        from empirical_lawhood.infrastructure.sql.database import CatalogSchemaAudit
+        from empirical_lawhood.storage.sql.database import CatalogSchemaAudit
 
         if not isinstance(audit, CatalogSchemaAudit):
             raise TypeError("catalog mutation returned an invalid audit")

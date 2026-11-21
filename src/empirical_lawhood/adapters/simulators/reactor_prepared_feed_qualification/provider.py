@@ -6,35 +6,24 @@ from dataclasses import fields
 from decimal import Decimal as D
 from typing import Callable
 
-from empirical_lawhood.adapters.methods.reactor_causal_response.provider import DependencyCustodyReader, validate_dependency
-from empirical_lawhood.adapters.methods.reactor_causal_response.resource_contract import EmpiricalResourceGuard
-from empirical_lawhood.adapters.methods.reactor_causal_response.campaign_records import EmpiricalStudySource
-from empirical_lawhood.adapters.methods.reactor_prepared_feed_qualification.config import ROOTS, SOURCE_TASKS
-from empirical_lawhood.adapters.methods.reactor_prepared_feed_qualification.records import FeedRootEvidence
-from empirical_lawhood.adapters.methods.reactor_prepared_feed_qualification.scoring import FeedCalibration
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-    TaskProgressEmitter,
-    WorkerInputKind,
-)
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
-from .config import FeedNativeConfig
-from .extension_bundle import CAPABILITY
-from .acquisition import acquire_feed_root
+from empirical_lawhood.domains.reactor.reactor_causal_response.provider import DependencyCustodyReader, validate_dependency
+from empirical_lawhood.domains.reactor.reactor_causal_response.resource_contract import EmpiricalResourceGuard
+from empirical_lawhood.domains.reactor.reactor_causal_response.campaign_records import EmpiricalStudySource
+from empirical_lawhood.domains.reactor.reactor_prepared_feed_qualification.config import ROOTS, SOURCE_TASKS
+from empirical_lawhood.domains.reactor.reactor_prepared_feed_qualification.records import FeedRootEvidence
+from empirical_lawhood.domains.reactor.reactor_prepared_feed_qualification.scoring import FeedCalibration
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner, TaskProgressEmitter, WorkerInputKind
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
+from empirical_lawhood.domains.reactor.reactor_prepared_feed_qualification.native_config import FeedNativeConfig
+from empirical_lawhood.adapters.simulators.reactor_prepared_feed_qualification.extension import CAPABILITY
+from empirical_lawhood.adapters.simulators.reactor_prepared_feed_qualification.acquisition import acquire_feed_root
 
 
 class FeedNativeRunner:

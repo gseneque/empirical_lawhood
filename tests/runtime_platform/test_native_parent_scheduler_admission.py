@@ -8,9 +8,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure.execution import LocalScheduler, ResourceAdmissionError
-from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, ParentPreparedTaskRunner
-from empirical_lawhood.runtime.plans import PlanLane
+from empirical_lawhood.execution.local.execution import LocalScheduler, ResourceAdmissionError
+from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, ParentPreparedTaskRunner
+from empirical_lawhood.execution.plans import PlanLane
 from tests.runtime_platform.test_native_parent_preparation_contract import native_context
 
 
@@ -30,6 +30,7 @@ def test_actual_scheduler_refuses_legacy_begin_fallback_for_unprepared_native_pa
     scheduler.runner_registry = SimpleNamespace(resolve=lambda value: wrapper)
     scheduler._worker_inputs = lambda *args: ((), ())
     scheduler.lane = PlanLane.PROSPECTIVE
+    scheduler.accelerated_compute = False
     scheduler.assurance_profile = ExecutionAssuranceProfile.TRUSTED_LOCAL
     scheduler.adjudication_task_id = None
     scheduler.execution_resource_envelope_coordinator = None

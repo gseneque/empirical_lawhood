@@ -6,16 +6,16 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as acquisition
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as utility
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_records import ALL_PHASES, NativeTrainingResources
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import e2_assembly as domain
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as acquisition
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as utility
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_records import ALL_PHASES, NativeTrainingResources
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import e2_assembly as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support
 from empirical_lawhood.api import matrix_programme_e2 as owner
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 from tests.test_matrix_programme_allocations import census as census  # noqa: F401
 
 ROOT = Path(__file__).parents[1]
@@ -86,23 +86,23 @@ def test_current_e2_request_has_no_train_or_manual_source_roster(assembled_case)
 @pytest.mark.parametrize('count', (1, 3))
 def test_actual_c_derives_complete_current_e2_and_exact_replay_without_native(tmp_path, census, monkeypatch, count):  # noqa: F811
     from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 
     kwargs, actual = assembly_case(tmp_path, census, count=count)
     _forbid_acquisition(monkeypatch)
     from empirical_lawhood.api import selected_e4_bank_recipe
-    from empirical_lawhood.infrastructure import numerical_provenance, source_closure
+    from empirical_lawhood.storage import numerical_provenance, source_closure
     observed_captures,observed_archives,observed_runtime=[],[],[]
     actual_capture=source_closure.capture_admitted_target_source
-    actual_git=source_closure._git
+    actual_archive = source_closure._git_archive_stream
     actual_runtime=numerical_provenance.numerical_runtime_observation
     def capture(*args,**kwargs):
         source=actual_capture(*args,**kwargs)
         observed_captures.append(source)
         return source
-    def git(root,*args):
-        if args[0]=="archive":observed_archives.append(args)
-        return actual_git(root,*args)
+    def archive(root, consumer):
+        observed_archives.append(root)
+        return actual_archive(root, consumer)
     def runtime():
         value=actual_runtime()
         observed_runtime.append(value)
@@ -111,7 +111,7 @@ def test_actual_c_derives_complete_current_e2_and_exact_replay_without_native(tm
         pytest.fail("E2 assembly rebuilt an already admitted package/lock inventory")
     monkeypatch.setattr(source_closure,"capture_admitted_target_source",capture)
     monkeypatch.setattr(selected_e4_bank_recipe,"capture_admitted_target_source",capture)
-    monkeypatch.setattr(source_closure,"_git",git)
+    monkeypatch.setattr(source_closure, "_git_archive_stream", archive)
     monkeypatch.setattr(numerical_provenance,"numerical_runtime_observation",runtime)
     monkeypatch.setattr(numerical_provenance,"numerical_package_sources",raw_inventory)
     monkeypatch.setattr(numerical_provenance,"selected_dependency_lock_sha256",raw_inventory)

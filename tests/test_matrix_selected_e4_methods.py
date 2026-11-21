@@ -14,20 +14,20 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_choices as scientific_choices
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_methods import METHODS
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import PREDICTORS
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_selection as original
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as r, selected_e3_e4_science as development
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as p, selected_e4_methods as method
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as owner, selected_e4_revision_preparation as public
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseScore, ScheduledResponseLossCell
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selection_specification import RevisionCandidateSelection
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.experimental_selection import WholeUnitFold
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_choices as scientific_choices
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_methods import METHODS
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import PREDICTORS
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_selection as original
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as r, selected_e3_e4_science as development
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as p, selected_e4_methods as method
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as owner, selected_e4_revision_preparation as public
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseScore, ScheduledResponseLossCell
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selection_specification import RevisionCandidateSelection
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.experiments.experimental_selection import WholeUnitFold
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_selected_e4_fixtures import selected_e4_populations, selected_bridge, transfer  # noqa: F401
 from tests.test_matrix_selected_e3_e4_bridge import campaign_fixture
 
@@ -41,7 +41,7 @@ def fixture_observations(programme, bank, *, revision=None):
     index=bank.source_index()
     protected = type(programme) is p.SelectedE4PhaseProgramme
     if protected:
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as native
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as native
     for case in programme.cases:
         source = bank.source(case.root_id,index=index)
         protocol, panels = bank.response_selection.validate_source(source)
@@ -201,12 +201,12 @@ def test_real_selected_development_compiler_and_cold_budget_join(selected_revisi
     inputs = public.SelectedE4RevisionInputs(campaign_fixture()[0].campaign, f.programme, f.bank, acquisition, f.reduction, f.data, resources)
     draft, records = public.lower_development(f.editable, inputs)
     assert len(draft.operations) == 2
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave, validate_recursive_scientific_roots
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave, validate_recursive_scientific_roots
     declarations = owner.operation_declarations()
     registry = CapabilityRegistry("registry.selected-e4.methods.disclosed", tuple(row.manifest() for row in declarations))
     registrations = tuple(row.registration() for row in declarations)
-    from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+    from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
     registrations_by_node = {operation.node_id: next(row for row in registrations if row.selection == operation.selection)
         for operation in draft.operations}
     configs = tuple(decode_recursive_config_input(operation, registrations_by_node[operation.node_id]) for operation in draft.operations)
@@ -326,10 +326,10 @@ def test_selected_calibration_refuses_changed_original_phase_operands(selected_c
 
 
 def confirmation_products(calibrated, *, required=()):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial as factorial
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_workflow as workflow
-    from empirical_lawhood.runtime.experimental_factorial import PairInteractionScale
-    from empirical_lawhood.runtime.experimental_statistics import PairedMeanTAlternative
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial as factorial
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_workflow as workflow
+    from empirical_lawhood.execution.experimental_factorial import PairInteractionScale
+    from empirical_lawhood.methods.statistics.experimental_statistics import PairedMeanTAlternative
     f = calibrated.revision.populations
     reduction, data = fixture_observations(f.confirmation, f.confirmation_bank, revision=calibrated.export)
     forecasts = p.SelectedE4ForecastBank("forecasts.confirmation", f.confirmation.identity,
@@ -355,7 +355,7 @@ def confirmation_products(calibrated, *, required=()):
 
 
 def test_actual_selected64_confirmation_reduces_all12_slots_without_inventing_e3_scope(selected_calibrated):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial import FAMILY_IDS
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial import FAMILY_IDS
     f = confirmation_products(selected_calibrated)
     assert len(f.result.groups) == 64 and len(f.result.factorial_assessment.groups) == 64
     assert tuple(row.comparison_id for row in f.result.family_slots) == FAMILY_IDS
@@ -381,7 +381,7 @@ def test_declared_unevaluable_required_comparison_prevents_nomination_without_dr
 
 
 def test_bounded_revision_point_preserves_all30_predictions_and_explicit_unsupported_nonuse(selected_calibrated):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels
     models = selected_calibrated.export.models
     payload = SelectedE4PointModels.from_models(models, record_id="point-models.disclosed")
     f = selected_calibrated
@@ -401,9 +401,9 @@ def test_bounded_revision_point_preserves_all30_predictions_and_explicit_unsuppo
 
 
 def test_declared14_primary_family_replays_factorial_and_confirmation_without_changing_calibration(selected_calibrated):
-    from empirical_lawhood.kernel.decoding import decode_canonical_record
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial as factorial
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as bindings
+    from empirical_lawhood.science.records.decoding import decode_canonical_record
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial as factorial
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as bindings
     f = confirmation_products(selected_calibrated)
     old = f.factorial.specification
     original = old.canonical_bytes()

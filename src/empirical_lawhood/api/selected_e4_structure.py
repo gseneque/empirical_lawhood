@@ -8,18 +8,18 @@ it creates no native entry, issue, qualification or outcome-access authority.
 from dataclasses import replace
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_preparation as full
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_bindings as workers
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_experiment as development
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as original_workers
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_method_bindings import SelectedE4DevelopmentAcquisition
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_structure import structural_measurement
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, ExperimentInstanceBinding
-from empirical_lawhood.runtime.prospective_experiment import source_filename
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_preparation as full
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_bindings as workers
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_experiment as development
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as original_workers
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_method_bindings import SelectedE4DevelopmentAcquisition
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_structure import structural_measurement
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, ExperimentInstanceBinding
+from empirical_lawhood.execution.prospective_experiment import source_filename
 
 
 def _pin(value, field):
@@ -36,7 +36,7 @@ def _development_inputs(specification, instance, payloads):
     if (type(specification) is not development.SelectedE3E4ExperimentSpecification
             or type(instance) is not ExperimentInstanceBinding or instance.specification != specification.identity):
         raise PermissionError("ordinary E4 structure changes its actual original DEV companion")
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryReadoutSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryReadoutSelection
     kinds = (*development._scientific_input_types(), MatrixE4SecondaryReadoutSelection)
     records = {}
     for reference in instance.sources:
@@ -127,11 +127,11 @@ def _require_structural_inputs(*,specification,inputs,programme,bank,choices,sec
 def _retained_structure_preparation(*,directory,writer,programme,bank,choices,secondary_readout,resources,campaign,
         original,declaration,current_access,measurement,execution):
     """Reuse exact derived inputs under fresh original access before body hashing."""
-    from empirical_lawhood.api.experiment_preparation import _input_member,load_experiment_inputs,prepare_experiment
-    from empirical_lawhood.api.matrix_full_factor_access import development_original_access,protected_original_access
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.api.experiment_preparation import _input_member, load_experiment_inputs, prepare_experiment
+    from empirical_lawhood.api.matrix_full_factor_access import development_original_access, protected_original_access
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
     protected=declaration is not None
     kind=full.ScheduledFullFactorProtectedSpecification if protected else full.ScheduledFullFactorDevelopmentSpecification
     request_kind=full.ScheduledFullFactorProtectedRequestV4 if protected else full.ScheduledFullFactorDevelopmentRequestV3
@@ -215,9 +215,9 @@ def _complete_structural_result(result):
 
 def read_development_structure_execution(*, directory, artifact_writer, acquisition_report, observe_controls=None):
     """Keep the required PURE child in operational completion without replay."""
-    from .experiment_scientific_read import _development_runtime_context
-    from .recursive_authoring import load_authored_wave
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.api.experiment_scientific_read import _development_runtime_context
+    from empirical_lawhood.api.recursive_authoring import load_authored_wave
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
     child = _directory(artifact_writer, directory) / 'analysis'
     if not child.exists() and not child.is_symlink():
         return {'state':'NOT_ENTERED','execution_complete':False}
@@ -234,7 +234,7 @@ def read_development_structure_execution(*, directory, artifact_writer, acquisit
         receipt = ExternalTaskReceiptStore(writer).read_by_receipt_id(acquisition_report['run_id'], task_id, row['receipt_id'])
         if receipt is None or receipt.fingerprint() != row['receipt_sha256']:
             raise PermissionError('ordinary E4 operational completion changes its original entry receipt')
-        from empirical_lawhood.kernel.decoding import decode_canonical_record
+        from empirical_lawhood.science.records.decoding import decode_canonical_record
         plan_pin = decode_canonical_record(acquisition_report['execution_plan'], ObjectIdentity)
         original = SelectedE4DevelopmentAcquisition('acquisition.' + plan_pin.object_fingerprint,
             Path(directory).relative_to(writer.root.contract.canonical_path).as_posix(), acquisition_report['run_id'],
@@ -248,9 +248,9 @@ def read_development_structure_execution(*, directory, artifact_writer, acquisit
 def read_structural_execution(*, directory, artifact_writer, programme, bank, choices, secondary_readout,
         resources, campaign, original=None, declaration=None, current_access=None, observe_controls=None):
     """Bind operational completion to the exact original structural companion."""
-    from .experiment_execution_read import read_development_execution
-    from .recursive_authoring import load_authored_wave
-    from .development_structure_repair import selected_structure_directory
+    from empirical_lawhood.api.experiment_execution_read import read_development_execution
+    from empirical_lawhood.api.recursive_authoring import load_authored_wave
+    from empirical_lawhood.api.development_structure_repair import selected_structure_directory
     with artifact_writer.read_context() as writer:
         child, repair, require_original = selected_structure_directory(writer=writer, directory=directory)
         if not child.exists() and not child.is_symlink():
@@ -308,15 +308,15 @@ def produce_selected_e4_structure(*, directory, artifact_writer, project_root, m
     from empirical_lawhood.api.recursive_operations import operation_catalog
     from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
     from empirical_lawhood.api.selected_e3_access import original_e3_authority_read_context
-    from empirical_lawhood.infrastructure.numerical_provenance import observe_worker_environment
+    from empirical_lawhood.storage.numerical_provenance import observe_worker_environment
 
-    from .matrix_full_factor_secondary import authenticate_e4_secondary_target
+    from empirical_lawhood.api.matrix_full_factor_secondary import authenticate_e4_secondary_target
     if authenticate_e4_secondary_target(writer=artifact_writer, selection=secondary_readout, bank=bank) != choices.secondary_target:
         raise PermissionError('ordinary E4 structure replaces the actual pre-future target')
     measurement = structural_measurement(programme=programme, bank=bank, choices=choices)
     resources.__post_init__()
     selected_directory = _directory(artifact_writer, directory)
-    from .development_structure_repair import selected_structure_directory
+    from empirical_lawhood.api.development_structure_repair import selected_structure_directory
     with artifact_writer.read_context() as reading:
         child, _, require_original = selected_structure_directory(writer=reading, directory=directory)
         require_original()
@@ -413,10 +413,10 @@ def read_selected_e4_structure(*, directory, artifact_writer, programme, bank, c
     """Authenticate the actual structural child and all original evidence; no writes."""
     from empirical_lawhood.api.matrix_full_factor_read import read_development_result
     from empirical_lawhood.api.recursive_execution import _read_recursive_wave_with_roots
-    from empirical_lawhood.api.selected_e4_access import SelectedE4CurrentAccess,require_current_e4_access
+    from empirical_lawhood.api.selected_e4_access import SelectedE4CurrentAccess, require_current_e4_access
     protected = declaration is not None
     current_access=(SelectedE4CurrentAccess(waves) if read_access is None else read_access) if protected else read_access
-    from .matrix_full_factor_secondary import authenticate_e4_secondary_target
+    from empirical_lawhood.api.matrix_full_factor_secondary import authenticate_e4_secondary_target
     if authenticate_e4_secondary_target(writer=artifact_writer, selection=secondary_readout, bank=bank) != choices.secondary_target:
         raise PermissionError('ordinary E4 read replaces the actual pre-future target')
     expected = structural_measurement(programme=programme, bank=bank, choices=choices)
@@ -436,7 +436,7 @@ def read_selected_e4_structure(*, directory, artifact_writer, programme, bank, c
         specification,instance,_=authored[0]
         return read_development_result(specification=specification, instance=instance,
             read_access=current_access,**context)
-    from .development_structure_repair import selected_structure_directory
+    from empirical_lawhood.api.development_structure_repair import selected_structure_directory
     accesses=[]
     with artifact_writer.read_context() as writer:
         child, repair, require_original = selected_structure_directory(writer=writer, directory=directory)
@@ -456,8 +456,8 @@ def read_selected_e4_structure(*, directory, artifact_writer, programme, bank, c
 
 def complete_development_result(*, directory, artifact_writer, project_root, maximum_parallel_tasks,
         specification, instance, payloads, draft, plan, scheduler_result, read_access=None):
-    from empirical_lawhood.runtime.execution import SchedulerResult
-    from empirical_lawhood.kernel.status import OperationalStatus
+    from empirical_lawhood.execution.execution import SchedulerResult
+    from empirical_lawhood.science.records.status import OperationalStatus
     inputs = _development_inputs(specification, instance, payloads)
     if type(scheduler_result) is not SchedulerResult or scheduler_result.run_id != plan.source_plan.object_id:
         raise PermissionError("ordinary E4 completion changes its actual scheduler run")
@@ -496,7 +496,7 @@ def read_development_result(*, directory, artifact_writer, specification, instan
     if allow_partial or products.get("terminal") is None or entry_receipt is None:
         from empirical_lawhood.api.matrix_selected_e3_e4_read import _development_result
         entries = tuple(row for row in draft.operations if row.selection.capability_key == original_workers.NAMESPACE + ".entry")
-        from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+        from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
         declarations = {row.capability_key: row for row in original_workers.operation_declarations()}
         if len(entries) != 1:
             raise PermissionError("ordinary E4 incomplete read changes its original source entry")

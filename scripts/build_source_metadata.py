@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Build ordinary distribution source metadata, without importing native code."""
 
+from email.parser import BytesParser
 from hashlib import sha1, sha256
 from io import BytesIO
 import json
@@ -11,6 +12,29 @@ import stat
 import tarfile
 
 SOURCE_METADATA_FILENAME = "empirical-lawhood-source.json"
+PROJECT_REPOSITORY = "https://github.com/gseneque/empirical_lawhood"
+
+
+def project_urls(commit):
+    if type(commit) is not str or len(commit) != 40 or any(c not in "0123456789abcdef" for c in commit):
+        raise ValueError("documentation requires the exact implementation commit")
+    return {"Repository": PROJECT_REPOSITORY,
+            "Documentation": f"{PROJECT_REPOSITORY}/blob/{commit}/README.md",
+            "Issues": f"{PROJECT_REPOSITORY}/issues"}
+
+
+def verify_documentation_metadata(raw, *, implementation_commit):
+    """Verify actual METADATA/PKG-INFO, separately from member-byte custody."""
+    if not isinstance(raw, bytes) or len(raw) > 128 * 1024:
+        raise ValueError("distribution metadata must be bounded ordinary bytes")
+    metadata = BytesParser().parsebytes(raw)
+    urls = [value.partition(",")[2].strip()
+            for value in metadata.get_all("Project-URL", ())
+            if value.partition(",")[0].strip().casefold() == "documentation"]
+    expected = project_urls(implementation_commit)["Documentation"]
+    if metadata.defects or urls != [expected]:
+        raise ValueError("distribution documentation does not bind its exact source commit")
+    return expected
 
 
 def encode(value):
@@ -20,7 +44,7 @@ def encode(value):
 def build_source_metadata(root):
     root = Path(root).resolve(strict=True)
     retained = root / SOURCE_METADATA_FILENAME
-    excluded = runpy.run_path(str(root / "src/empirical_lawhood/infrastructure/source_policy.py"))["is_work_plan_path"]
+    excluded = runpy.run_path(str(root / "src/empirical_lawhood/storage/source_policy.py"))["is_work_plan_path"]
     checkout = (root / ".git").exists()
     if retained.exists() and checkout:
         raise ValueError("a checkout cannot replace its current committed identity with retained sdist metadata")
@@ -32,7 +56,7 @@ def build_source_metadata(root):
         if encode(document) != raw:
             raise ValueError("distribution source metadata is not canonical")
     else:
-        command_owner = runpy.run_path(str(root / "src/empirical_lawhood/infrastructure/bounded_process.py"))
+        command_owner = runpy.run_path(str(root / "src/empirical_lawhood/execution/local/bounded_process.py"))
         def git(*args):
             environment = {name: value for name, value in os.environ.items() if not name.startswith("GIT_")}
             environment.update(GIT_CONFIG_NOSYSTEM="1", GIT_CONFIG_GLOBAL=os.devnull,

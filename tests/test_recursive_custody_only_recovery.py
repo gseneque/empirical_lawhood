@@ -6,19 +6,19 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_bindings as bindings
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as records
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_bindings as bindings
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as records
 from empirical_lawhood.api import recursive_execution as api
 from empirical_lawhood.api.experiment_preparation import author_prepared_experiment
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.recursive_authoring import load_authored_wave
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, LocalScheduler, ResourceAdmissionError
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore, RunRecoveryError, settled_recovery_tasks
-from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog, SQLiteOperationalRepository
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.runtime.execution import TaskBlockReason
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, LocalScheduler, ResourceAdmissionError
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore, RunRecoveryError, settled_recovery_tasks
+from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog, SQLiteOperationalRepository
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.execution.execution import TaskBlockReason
 from tests.test_matrix_native_utility import copied_preparation, utility_case
 
 ROOT = Path(__file__).parents[1]
@@ -45,14 +45,13 @@ def unclosed_case(tmp_path, monkeypatch):
         author_prepared_experiment(preparation=prepared, project_root=ROOT, artifact_writer=case.plane, output_dir=directory)
         first, second = case.specification.root_ids
         execute = LocalProcessExecutor.execute
-        from empirical_lawhood.infrastructure import source_closure
-        archives, git = [], source_closure._git
-        def observe_git(root, *arguments):
-            if arguments[0] == "archive":
-                archives.append(arguments)
-            return git(root, *arguments)
+        from empirical_lawhood.storage import source_closure
+        archives, archive_census = [], source_closure._git_archive_census
+        def observe_archive(root, tree):
+            archives.append(root)
+            return archive_census(root, tree)
         with monkeypatch.context() as control:
-            control.setattr(source_closure, "_git", observe_git)
+            control.setattr(source_closure, "_git_archive_census", observe_archive)
             control.setattr(bindings, "execute_parameter_native_work", _forbidden)
             control.setattr(bindings, "execute_paired_response_native_work", _forbidden)
             if unentered:
@@ -129,13 +128,12 @@ def _attempts(value):
 def test_public_custody_only_closes_exhausted_dependency_chain_without_executor_or_new_contact(unclosed_case, monkeypatch):
     value = unclosed_case()
     original = api._custody_control_pins(value.case.plane, value.index)
-    from empirical_lawhood.infrastructure import source_closure
-    archives, git = [], source_closure._git
-    def observe_git(root, *arguments):
-        if arguments[0] == "archive":
-            archives.append(arguments)
-        return git(root, *arguments)
-    monkeypatch.setattr(source_closure, "_git", observe_git)
+    from empirical_lawhood.storage import source_closure
+    archives, archive_census = [], source_closure._git_archive_census
+    def observe_archive(root, tree):
+        archives.append(root)
+        return archive_census(root, tree)
+    monkeypatch.setattr(source_closure, "_git_archive_census", observe_archive)
     monkeypatch.setattr(LocalProcessExecutor, "__init__", _forbidden)
     monkeypatch.setattr(LocalScheduler, "__init__", _forbidden)
     monkeypatch.setattr(api, "operation_runners", _forbidden)
@@ -173,6 +171,35 @@ def test_custody_only_refuses_independent_unentered_task_before_any_publication(
     monkeypatch.setattr(ExternalRunRecoveryStore, "record_terminal", _forbidden)
     with pytest.raises(PermissionError, match="eligible or unsettled"):
         _recover(value)
+    assert api._custody_control_pins(value.case.plane, value.index) == before
+
+
+def test_returned_parent_public_api_does_not_execute_unentered_graph_and_authenticates_frozen_worker(
+        unclosed_case, monkeypatch):
+    from empirical_lawhood.api import retained_e3_control_repair as frozen
+    from empirical_lawhood.storage.numerical_provenance import observe_worker_environment, selected_worker_environment
+    value = unclosed_case(unentered=True)
+    _, _, source, _ = load_authored_wave(directory=value.directory, artifact_writer=value.case.plane,
+        lazy_payloads=True)
+    environment = replace(observe_worker_environment(), selected_environment=selected_worker_environment())
+    monkeypatch.setattr(frozen, "observe_frozen_repair_worker", lambda **kwargs: (source, environment))
+    monkeypatch.setattr(frozen, "observe_frozen_worker_package_root", lambda environment: str(ROOT / "src"))
+    monkeypatch.setattr(LocalProcessExecutor, "execute", _forbidden)
+    monkeypatch.setattr(LocalProcessExecutor, "execute_deadline_free", _forbidden)
+    monkeypatch.setattr(ExternalNativeEffectContactStore, "begin", _forbidden)
+    before = api._custody_control_pins(value.case.plane, value.index)
+    arguments = dict(directory=value.directory, project_root=ROOT, artifact_writer=value.case.plane,
+        worker_interpreter=environment.interpreter_path, worker_source_root=ROOT)
+    report = api.finalize_returned_recursive_tasks(**arguments)
+    assert report["new_native_contact_count"] == 0 and report["receipted_task_ids"] == ()
+    assert set(report["unreceipted_task_ids"]) == {row.task_id for row in value.plan.tasks}
+    assert report["task_count"] == 18 and report["scientific_completion"] == "NOT_ASSESSED"
+    assert api._custody_control_pins(value.case.plane, value.index) == before
+    assert _attempts(value) == ()
+    monkeypatch.setattr(frozen, "observe_frozen_repair_worker", lambda **kwargs:
+        (replace(source, dependency_lock_sha256="f" * 64), environment))
+    with pytest.raises(PermissionError, match="original installed producing source"):
+        api.finalize_returned_recursive_tasks(**arguments)
     assert api._custody_control_pins(value.case.plane, value.index) == before
 
 
@@ -239,7 +266,7 @@ def test_initial_custody_loader_refuses_inquiry_before_array_or_catalog_open(unc
     value = unclosed_case()
     (value.directory / "inquiry-admission.json").write_text("disclosed-invalid-initial-fixture")
     monkeypatch.setattr(api, "_external_inputs", _forbidden)
-    import empirical_lawhood.infrastructure.sql as sql
+    import empirical_lawhood.storage.sql as sql
     monkeypatch.setattr(sql, "create_catalog_engine", _forbidden)
     with pytest.raises(ValueError, match="inquiry"):
         _recover(value)
@@ -270,7 +297,7 @@ def test_pure_closure_rejects_duplicate_attempts_and_foreign_run(unclosed_case):
 
 @pytest.mark.parametrize("defect", ("foreign-success", "foreign-failure", "foreign-block", "ordinal-gap"))
 def test_pure_closure_rejects_foreign_entered_candidates_before_success_classification(unclosed_case, defect):
-    from empirical_lawhood.runtime.execution import TaskAttemptDisposition
+    from empirical_lawhood.execution.execution import TaskAttemptDisposition
     value = unclosed_case()
     rows = _attempts(value)
     row = rows[0]
@@ -289,7 +316,7 @@ def test_pure_closure_rejects_foreign_entered_candidates_before_success_classifi
 
 
 def test_pure_closure_preserves_candidate_ordinal_after_known_operational_nonattempt(unclosed_case):
-    from empirical_lawhood.runtime.execution import OperationalAttempt, TaskAttemptDisposition
+    from empirical_lawhood.execution.execution import OperationalAttempt, TaskAttemptDisposition
     value = unclosed_case()
     rows = _attempts(value)
     task = owner.task_id(value.case.specification.root_ids[0], "prefix")

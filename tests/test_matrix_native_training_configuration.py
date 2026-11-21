@@ -12,18 +12,15 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as acquisition
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as records
-from empirical_lawhood.adapters.methods.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
-from empirical_lawhood.infrastructure import execution as lifecycle
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import (
-    ParentPreparedTaskRunner, TaskContext, VerifiedArtifactInput, WorkerInputBinding,
-    WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort,
-)
-from empirical_lawhood.runtime.plans import ScientificInputRole
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as acquisition
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as records
+from empirical_lawhood.domains.matrix.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
+from empirical_lawhood.execution.local import execution as lifecycle
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import ParentPreparedTaskRunner, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import ScientificInputRole
 from tests.test_matrix_native_training_parent_preflight import prefix_context
 from tests.test_matrix_native_training_public_lifecycle import _actual_case, _copied_preparation
 

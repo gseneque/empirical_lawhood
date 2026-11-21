@@ -8,11 +8,11 @@ import venv
 
 import pytest
 
-from empirical_lawhood.adapters.methods.isolated_native_conformance import ExposedIsolatedNativeRunner
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, TaskProcessError
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.isolated_native_subwork import IsolatedNativeEntrySelection
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+from empirical_lawhood.adapters.conformance.isolated_native import ExposedIsolatedNativeRunner
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, TaskProcessError
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.isolated_native_subwork import IsolatedNativeEntrySelection
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
 from tests.runtime_platform.test_isolated_native_subwork import fixture_case
 
 
@@ -27,7 +27,7 @@ def test_frozen_controller_uses_authenticated_bare_venv_child(tmp_path, phase, c
     store, definitions, context, root, invocation, payload = fixture_case(tmp_path, phase)
     source = root / 'selected_bare_environment.py'
     source.write_text('import json, sys\nfrom pathlib import Path\n'
-        'from empirical_lawhood.adapters.methods.isolated_native_conformance import exposed_child as original\n'
+        'from empirical_lawhood.adapters.conformance.isolated_native import exposed_child as original\n'
         'def exposed_child(progress, invocation):\n'
         '    Path("observed-child-runtime.json").write_text(json.dumps({"executable":sys.executable,"prefix":sys.prefix,"base_prefix":sys.base_prefix}))\n'
         '    original(progress, invocation)\n')

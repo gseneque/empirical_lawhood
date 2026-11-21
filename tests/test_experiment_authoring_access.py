@@ -4,8 +4,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.api import experiment_preparation as owner,recursive_authoring
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.api import experiment_preparation as owner, recursive_authoring
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 
 
 @pytest.mark.parametrize('verdict',(False,True,0,(),{}))

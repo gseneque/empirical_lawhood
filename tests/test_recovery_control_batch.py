@@ -4,10 +4,10 @@
 import pytest
 import sys
 
-from empirical_lawhood.infrastructure import recovery as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.storage import recovery as owner
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.recovery_support import case as case, custody as custody
 
 
@@ -18,14 +18,14 @@ def _replay(value, recovery, receipts):
 
 
 def _census(value, recovery, receipts):
-    from empirical_lawhood.infrastructure.recursive_custody import _execution_operational_census
+    from empirical_lawhood.storage.recursive_custody import _execution_operational_census
     return _execution_operational_census(recovery=recovery, store=receipts,
         plan=value.plan, index=value.index, terminal=value.terminal)
 
 
 @pytest.mark.parametrize("custody", ("success", "blocked"), indirect=True)
 def test_execution_census_batch_matches_the_ordinary_complete_serial_census(custody, monkeypatch):
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
     expected = _census(custody, custody.recovery, custody.receipt_store)
     hashes, batches = [], []
     original_pin, original_batch = ObjectIdentity.from_record, owner._reconcile_recovery_control_batch
@@ -76,6 +76,38 @@ def test_history_batches_actual_controls_and_hashes_full_index_once(custody, mon
         assert len(batches) == len(custody.receipts)
         with pytest.raises(owner.RunRecoveryError, match="escaped"):
             batches[0].require_open(recovery, receipts, custody.index)
+
+
+@pytest.mark.parametrize('custody', ('success',), indirect=True)
+@pytest.mark.parametrize('size', (16, 4096))
+def test_repeated_control_guards_use_fixed_census_and_recheck_live_limit(custody, size):
+    from dataclasses import replace
+    from types import SimpleNamespace
+
+    class NoRepeatedRoster:
+        def __iter__(self):
+            pytest.fail('a per-receipt live guard rescanned the complete task roster')
+
+    # Disclosed projection of the finite decoded census, including absent
+    # candidates. The public lifecycle cases separately prove exact custody.
+    index = SimpleNamespace(tasks=NoRepeatedRoster())
+    values = {('task.' + str(i), 'attempt.' + str(i)): None for i in range(size)}
+    events = {'event.' + str(i): None for i in range(2 * size)}
+    with custody.plane.read_context() as plane:
+        recovery, receipts = owner.ExternalRunRecoveryStore(plane), ExternalTaskReceiptStore(plane)
+        controls = owner._RecoveryControlBatch(recovery, receipts, index, None,
+            values, events, owner._RECOVERY_CONTROL_SEAL)
+        for _ in range(64):
+            controls.require_open(recovery, receipts, index)
+        original = plane.custody_limits
+        plane.custody_limits = replace(original, publication_members=3 * size - 1)
+        with pytest.raises(owner.RunRecoveryError, match='escaped'):
+            controls.require_open(recovery, receipts, index)
+        plane.custody_limits = original
+        controls.require_open(recovery, receipts, index)
+        controls.active = False
+        with pytest.raises(owner.RunRecoveryError, match='escaped'):
+            controls.require_open(recovery, receipts, index)
 
 
 @pytest.mark.parametrize("custody", ("success",), indirect=True)
@@ -141,7 +173,7 @@ def test_history_rejects_new_control_in_previously_absent_candidate(custody, mon
 
 @pytest.mark.parametrize("custody", ("success", "blocked"), indirect=True)
 def test_complete_control_paths_share_one_live_resolution_census(custody):
-    from empirical_lawhood.infrastructure.artifacts import GuardedExternalRoot
+    from empirical_lawhood.storage.artifacts import GuardedExternalRoot
     expected = {name for row in custody.index.tasks
         for relative in (row.nonattempt_event_relative_path,
             *(name for candidate in row.attempts
@@ -178,7 +210,7 @@ def test_complete_control_paths_share_one_live_resolution_census(custody):
 
 @pytest.mark.parametrize("custody", ("success",), indirect=True)
 def test_control_path_batch_refuses_an_ancestor_replaced_during_consumption(custody, monkeypatch):
-    from empirical_lawhood.infrastructure.artifacts import ExternalRootUnavailable
+    from empirical_lawhood.storage.artifacts import ExternalRootUnavailable
     original = owner._RecoveryControlBatch.receipt_event
     changed = []
 

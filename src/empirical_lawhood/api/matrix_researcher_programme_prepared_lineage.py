@@ -1,13 +1,13 @@
 # SPDX-License-Identifier: MPL-2.0
 """Current produced DEV and account joins, with original C kept immutable."""
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
 
 
 def _development_record_identity(record):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_results import MatrixRevisionProgrammeAssessment
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_results import MatrixRevisionProgrammeAssessment
     if type(record) is MatrixRevisionProgrammeAssessment:
         return ObjectIdentity.from_record(record.record_id, record)
     return record.identity
@@ -50,7 +50,7 @@ def retained_development_products(context, phase, kinds, *, locator_type):
 
 def _retained_development_locator(context, writer, directory, kind, locator_type, packet, run, plan, products):
     from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4DevelopmentProduct
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4DevelopmentProduct
     rows = tuple(row for row in products['product_index'] if row['schema'] == kind.SCHEMA)
     if len(rows) != 1:
         raise ValueError('programme DEV needs one exact original ' + kind.SCHEMA)
@@ -87,12 +87,12 @@ def programme_development_product(context, phase):
     if phase != 'e5.development':
         raise ValueError('prepared development locator requires the actual selected E5 DEV phase')
     if context.design.downstream_account == 'ORIGINAL_E3':
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.science import MatrixPreparationNomination
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_development_product import MatrixSelectedDevelopmentProduct
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.science import MatrixPreparationNomination
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_development_product import MatrixSelectedDevelopmentProduct
         return retained_development_product(context, phase, MatrixPreparationNomination,
             locator_type=MatrixSelectedDevelopmentProduct)
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_results import MatrixRevisionProgrammeAssessment
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_development_product import MatrixRevisionDevelopmentProduct
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_results import MatrixRevisionProgrammeAssessment
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_development_product import MatrixRevisionDevelopmentProduct
     return retained_development_product(context, phase, MatrixRevisionProgrammeAssessment,
         locator_type=MatrixRevisionDevelopmentProduct)
 
@@ -104,10 +104,10 @@ def programme_development_nomination(context):
     reduction. Join that typed read to the original receipted publication before
     projecting either a nominee or conditional scientific nonentry.
     """
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.science import MatrixPreparationNomination
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_results import MatrixRevisionProgrammeAssessment
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
-    from .matrix_programme_decisions import development_assessment
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.science import MatrixPreparationNomination
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_results import MatrixRevisionProgrammeAssessment
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
+    from empirical_lawhood.api.matrix_programme_decisions import development_assessment
     science = development_assessment(context)
     account = context.design.downstream_account
     if account not in ('ORIGINAL_E3', 'REVISION'):
@@ -142,7 +142,7 @@ def require_current_account(context, phase, specification, inputs):
         # current contracts, with no scientific account field. Their actual
         # prepared programme and original-C operands carry that join instead.
         if phase in ('e5.source', 'e6.source'):
-            from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import MatrixRevisionPreparedProgramme
+            from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import MatrixRevisionPreparedProgramme
             programme = inputs.prepared_programme
             if (type(programme) is MatrixRevisionPreparedProgramme) != (account == 'REVISION'):
                 raise PermissionError('programme prepared source changes the original D account')

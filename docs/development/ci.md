@@ -8,20 +8,67 @@ Use it to select a job and retain its evidence packet.
 
 [Release checks](../../.github/workflows/release-check.yml) runs `portable-ci-check` on pushes and pull requests.
 It uses Ubuntu 24.04 x86-64, CPython 3.11.14 and uv 0.11.28.
-The `ci` profile verifies bounded contracts, static errors, generators and documentation.
+The `ci` profile verifies bounded contracts, independent numerical references,
+coverage-path configuration, static errors, generators and documentation.
 It builds the wheel through the sdist and runs the existing installed-wheel checks outside the checkout.
 Those checks include the exposed reactor example.
 This profile provides no complete portable coverage claim or scientific qualification.
 
-The [profile selector](../../scripts/test_profiles.py) owns explicit CI and scale module declarations.
-Every other portable module belongs to `integration`, including new modules until review.
-The three profiles partition the complete portable case census without dropping tests.
-Native and held cases retain their separate selectors and prerequisites.
-Review fixture cost and contract coverage before adding a module to CI.
+For a local `ci` or `portable` gate on the supported AVX2/FMA host, select the
+[declared frozen RC numerical profile](../using/environments.md#frozen-rc-numerical-input-profile)
+before running the release command:
+
+```sh
+export OPENBLAS_CORETYPE=HASWELL
+export NPY_DISABLE_CPU_FEATURES=X86_V4,AVX512_ICL,AVX512_SPR
+```
+
+The hosted job already supplies these variables. The locked package versions
+alone do not select the original CPU dispatch. An exact-input mismatch is a
+refusal to reproduce that exposed example; do not regenerate its frozen hashes
+to fit a different host profile.
+
+The [verification-purpose plugin](../../scripts/test_purposes.py) reports
+`conformance` and `numerical` independently of CI/integration/scale cost profiles.
+Numerical cases name their mathematical oracle; required CI references cannot
+silently lose that declaration. The [testing guide](testing.md#verification-purpose-and-execution-profile)
+defines the reviewed subset and its limits. Purpose is retained with each
+selected and executed case, rather than inferred from a filename or a passing build.
+
+The [profile selector](../../scripts/test_profiles.py) assigns bounded CI and scale modules. Other portable modules belong to integration.
+Every push, tag and pull request runs the bounded CI profile and the installed-package checks.
+Branch pushes and pull requests also run eligible cases from changed modules declared `bounded` in the
+[test change decisions](../../scripts/test_change_decisions.json). An edit to a bounded test runs its current bytes.
+For a new branch, CI uses the merge base with the default branch when available. Tags run the bounded profile directly.
+A manual integration, scale, native or held job keeps its run when another commit arrives on the same branch.
+
+To reproduce the automatic branch comparison locally, pass `--bounded-changes-since BASE_COMMIT` with
+`--profile ci`. The selection packet records the compared modules and their profiles. The execution packet records
+which cases actually ran and their outcomes. Portable CI excludes native and held cases.
+
+### Optional exact-source audit
+
+Select an audit when a review needs evidence for the whole change. The audit checks exact module digests,
+declared native and held exclusions, and passing receipts for integration or scale cases. A changed shared fixture
+or `conftest.py` can require complete portable evidence. The audit verifies that a shared fixture contains fixtures
+and preserves the record of any test bodies in the previous revision.
+
+For a local audit, supply the comparison commit and its exact-source partition manifest or complete portable evidence.
+
+```sh
+uv run --no-sync python scripts/release_check.py --profile ci \
+  --changed-tests-base BASE_COMMIT \
+  --changed-test-evidence /absolute/passing-profile/release-manifest.json \
+  --output-dir /absolute/new-ci-packet
+```
+
+Repeat `--changed-test-evidence` for required shards. Evidence reuse authenticates source, bound logs and executed-case coverage.
+For a hosted audit, select `changed_test_audit_base` during manual dispatch. Supply any existing evidence with
+`changed_test_evidence_runs`. Ordinary CI requires only the checked-out repository and its declared dependencies.
 
 The CI job retains the [frozen RC numerical profile](../using/environments.md#frozen-rc-numerical-input-profile).
 It verifies exact original descriptor and fibre hashes before tests.
-Its 45-minute limit is an operational budget, not a measured hosted duration or a passing result.
+The hosted job allows two hours for setup, test execution, both builds and the installed checks.
 
 `workflow_dispatch` always runs bounded CI and can select one additional profile:
 
@@ -47,7 +94,7 @@ Partition passes do not substitute for that coverage receipt.
 Do not repeat a completed full suite for a focused correction.
 Preserve its original outcome and bind affected checks separately.
 
-Hosted artifacts retain manifests, selection censuses, logs and disclosed fixtures for 30 days.
+Hosted artifacts retain manifests, selection and execution censuses, logs and disclosed fixtures for 30 days.
 CI also retains exact build inventories and artifacts.
 Download the selected evidence before retention expires.
 Failed checks upload available diagnostics.

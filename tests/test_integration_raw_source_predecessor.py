@@ -16,17 +16,15 @@ import pytest
 
 from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
 from empirical_lawhood.api.recursive_operations import operation_storage_codecs
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
-from empirical_lawhood.infrastructure.matrix_array_io import decode_native_matrix_arrays, encode_matrix_arrays
-from empirical_lawhood.infrastructure.publication_metadata import authenticate_published_materialization
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactCustodyLimits, ArtifactProfile, ArtifactSemanticValidation, ArtifactWriteRequest, ArtifactWriteResult,
-)
+from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_native_matrix_arrays, encode_matrix_arrays
+from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits, ArtifactProfile, ArtifactSemanticValidation, ArtifactWriteRequest, ArtifactWriteResult
 from tests.numerical_provenance_fixtures import numerical_plane
 
 RAW_SCHEMA = "empirical-lawhood/source/checksummed-uninterpreted-public-bytes"

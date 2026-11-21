@@ -18,19 +18,13 @@ import pytest
 from tests.test_matrix_operand_transport import allocation as allocated
 from tests.test_matrix_history_public_api import plane as plane
 from tests.numerical_provenance_fixtures import numerical_plane
-from empirical_lawhood.api.finite_operands import (
-    current_preparation_code_sources_sha256, current_preparation_source_export,
-    matrix_preparation_source_export, original_f_operand_export,
-    preparation_bridge_fits, preparation_operands_export, saved_matrix_arrays_export,
-    saved_matrix_arrays_import,
-)
-from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge import mechanical_kernel
-from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source import acquire_current_preparation_root
-from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source_records import (
-    MatrixPreparationSourceConfig, MatrixPreparationSourceProtocol,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.finite_response_law.current_preparation import preparation_bridge_fits
+from empirical_lawhood.api.finite_operands import current_preparation_code_sources_sha256, current_preparation_source_export, matrix_preparation_source_export, original_f_operand_export, preparation_operands_export, saved_matrix_arrays_export, saved_matrix_arrays_import
+from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge import mechanical_kernel
+from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source import acquire_current_preparation_root
+from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source_records import MatrixPreparationSourceConfig, MatrixPreparationSourceProtocol
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 
 
 def source_config(allocation):
@@ -40,7 +34,7 @@ def source_config(allocation):
 def test_failed_prefix_retains_two_failures_and_complete_unentered_denominator(monkeypatch):
     current = allocated()
     phases = tuple(SimpleNamespace(refinement=view, disposition="NUMERICAL_FAILURE", reason="NATIVE_NUMERICAL_FAILURE") for view in (1, 2))
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source.acquire_prefix", lambda *args: SimpleNamespace(phases=phases, frame_base64=None, features=()))
+    monkeypatch.setattr("empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source.acquire_prefix", lambda *args: SimpleNamespace(phases=phases, frame_base64=None, features=()))
     retained = []
     def retain(cell_id, record):
         retained.append(cell_id)
@@ -62,7 +56,7 @@ def test_interruption_keeps_native_member_and_has_no_completed_manifest(tmp_path
         record = ObjectIdentity("test.partial", "empirical-lawhood/kernel/matrix-root-allocation", "1.0.0", "a" * 64)
         kwargs["retain"]("test.partial-native-cell", record)
         raise KeyboardInterrupt
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source.acquire_current_preparation_root", interrupt)
+    monkeypatch.setattr("empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source.acquire_current_preparation_root", interrupt)
     with pytest.raises(KeyboardInterrupt):
         matrix_preparation_source_export(tmp_path, config=source_config(current), allocation=current, project_root=ROOT, artifact_writer=plane)
     assert (tmp_path / "test.partial-native-cell.canonical.json").is_file()
@@ -74,7 +68,7 @@ def test_source_code_and_actual_roster_refuse_before_effects(tmp_path, monkeypat
     current = allocated()
     def forbidden(**kwargs):
         raise AssertionError("native acquisition entered")
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source.acquire_current_preparation_root", forbidden)
+    monkeypatch.setattr("empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source.acquire_current_preparation_root", forbidden)
     with pytest.raises(ValueError, match="code"):
         matrix_preparation_source_export(tmp_path, config=replace(source_config(current), code_sources_sha256="0" * 64), allocation=current, project_root=ROOT, artifact_writer=None)
     assert not tuple(tmp_path.iterdir())

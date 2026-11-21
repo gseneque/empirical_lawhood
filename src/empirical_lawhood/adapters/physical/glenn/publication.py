@@ -7,51 +7,22 @@ from decimal import Decimal
 from pathlib import PurePosixPath
 from typing import ClassVar, Final
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256
-from empirical_lawhood.planning.dataset_manifests import (
-    DatasetCapabilityKind,
-    DatasetTransformationManifest,
-)
-from empirical_lawhood.planning.datasets import (
-    DatasetEvidenceClass,
-    DatasetMaterializationClass,
-    DatasetMaterializationVerificationSubject,
-    DatasetSelectorKind,
-    DatasetSelectorRef,
-    EvidenceReferenceKind,
-    LogicalContentIdentity,
-    RegisteredImplementationIdentity,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.dataset_io import DatasetSourceOpener
-from empirical_lawhood.runtime.dataset_transformation import (
-    DatasetTransformationSupportingRecord,
-    PreparedDatasetTransformation,
-)
-from empirical_lawhood.runtime.datasets import DatasetTransformRegistration
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256
+from empirical_lawhood.design.dataset_manifests import DatasetCapabilityKind, DatasetTransformationManifest
+from empirical_lawhood.design.datasets import DatasetEvidenceClass, DatasetMaterializationClass, DatasetMaterializationVerificationSubject, DatasetSelectorKind, DatasetSelectorRef, EvidenceReferenceKind, LogicalContentIdentity, RegisteredImplementationIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.storage.contracts.dataset_io import DatasetSourceOpener
+from empirical_lawhood.execution.dataset_transformation import DatasetTransformationSupportingRecord, PreparedDatasetTransformation
+from empirical_lawhood.execution.datasets import DatasetTransformRegistration
 
-from .comparison import GlennLogicalEquivalence
-from .contracts import (
-    ACTION_COLUMNS,
-    CANONICAL_COLUMNS,
-    GLENN_2026_PROFILE,
-    NUISANCE_COLUMNS,
-)
-from .manifests import GlennRetainedComparisonInputs, GLENN_ARCHIVE_RELATIVE_LOCATOR, GLENN_ARCHIVE_SIZE_BYTES, GLENN_HISTORICAL_OBSERVATIONS_RELATIVE_LOCATOR, GLENN_HISTORICAL_OBSERVATIONS_SIZE_BYTES, GLENN_READ_SET_RELATIVE_LOCATOR, GLENN_READ_SET_SIZE_BYTES
-from .registry import GLENN_CAPABILITY_VERSION, GLENN_TRANSFORM_REGISTRY_KEY
-from .reproduction import (
-    GlennReproductionPreparationRequest,
-    prepare_glenn_reproduction,
-)
-from .source import GlennArchiveAudit
-from .transform import (
-    GLENN_LOGICAL_PROFILE_ID,
-    GLENN_OUTPUT_SCHEMA_ID,
-    GLENN_PARQUET_PROFILE_ID,
-    GlennParquetProfile,
-    GlennTransformResult,
-)
+from empirical_lawhood.adapters.physical.glenn.comparison import GlennLogicalEquivalence
+from empirical_lawhood.adapters.physical.glenn.contracts import ACTION_COLUMNS, CANONICAL_COLUMNS, GLENN_2026_PROFILE, NUISANCE_COLUMNS
+from empirical_lawhood.adapters.physical.glenn.manifests import GlennRetainedComparisonInputs, GLENN_ARCHIVE_RELATIVE_LOCATOR, GLENN_ARCHIVE_SIZE_BYTES, GLENN_HISTORICAL_OBSERVATIONS_RELATIVE_LOCATOR, GLENN_HISTORICAL_OBSERVATIONS_SIZE_BYTES, GLENN_READ_SET_RELATIVE_LOCATOR, GLENN_READ_SET_SIZE_BYTES
+from empirical_lawhood.adapters.physical.glenn.registry import GLENN_CAPABILITY_VERSION, GLENN_TRANSFORM_REGISTRY_KEY
+from empirical_lawhood.adapters.physical.glenn.reproduction import GlennReproductionPreparationRequest, prepare_glenn_reproduction
+from empirical_lawhood.adapters.physical.glenn.source import GlennArchiveAudit
+from empirical_lawhood.adapters.physical.glenn.transform import GLENN_LOGICAL_PROFILE_ID, GLENN_OUTPUT_SCHEMA_ID, GLENN_PARQUET_PROFILE_ID, GlennParquetProfile, GlennTransformResult
 
 
 GLENN_TRANSFORMATION_VERIFICATION_POLICY_ID: Final = (

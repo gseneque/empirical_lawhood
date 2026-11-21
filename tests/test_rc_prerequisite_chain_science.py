@@ -9,11 +9,9 @@ from decimal import Decimal, Inexact, ROUND_UP, localcontext
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain import science
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.contracts import (
-    ARM_IDS, VARIANT_IDS, RCPrerequisiteChainConfig, decay_factor,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain import science
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.contracts import ARM_IDS, VARIANT_IDS, RCPrerequisiteChainConfig, decay_factor
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def test_design_compilation_is_static_bounded_and_canonically_transportable() -> None:
@@ -24,7 +22,7 @@ def test_design_compilation_is_static_bounded_and_canonically_transportable() ->
     assert proof.maximum_native_steps <= config.protocol.maximum_native_steps
     assert proof.maximum_nested_view_count == 154  # Nested views, not unit count.
     script = (
-        "import sys; from empirical_lawhood.adapters.methods.rc_prerequisite_chain.science "
+        "import sys; from empirical_lawhood.domains.circuits.rc_prerequisite_chain.science "
         "import default_chain_config,prove_chain; prove_chain(default_chain_config()); "
         "assert 'numpy' not in sys.modules and 'scipy' not in sys.modules"
     )
@@ -157,9 +155,9 @@ def test_failed_source_conformance_keeps_completed_panels_and_has_a_cold_reader(
     result_path.write_bytes(result.canonical_bytes())
     script = (
         "import sys; from pathlib import Path; "
-        "from empirical_lawhood.kernel.decoding import decode_canonical_bytes; "
-        "from empirical_lawhood.adapters.methods.rc_prerequisite_chain.contracts import RCPrerequisiteChainConfig,RCChainUnitResult; "
-        "from empirical_lawhood.adapters.methods.rc_prerequisite_chain.science import verify_unit_result; "
+        "from empirical_lawhood.science.records.decoding import decode_canonical_bytes; "
+        "from empirical_lawhood.domains.circuits.rc_prerequisite_chain.contracts import RCPrerequisiteChainConfig,RCChainUnitResult; "
+        "from empirical_lawhood.domains.circuits.rc_prerequisite_chain.science import verify_unit_result; "
         "c=decode_canonical_bytes(Path(sys.argv[1]).read_bytes(),RCPrerequisiteChainConfig,maximum_bytes=65536); "
         "r=decode_canonical_bytes(Path(sys.argv[2]).read_bytes(),RCChainUnitResult,maximum_bytes=16777216); "
         "verify_unit_result(c,r); assert 'numpy' not in sys.modules and 'scipy' not in sys.modules"

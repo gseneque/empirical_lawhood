@@ -10,17 +10,12 @@ from dataclasses import replace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import (
-    compact_bindings as b, compact_composition as c,
-    compact_records as r, records as original_records,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.planning.study_authoring import (
-    DesignInputRecord, DesignInputRole, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import compact_bindings as b, compact_composition as c, compact_records as r, records as original_records
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_matrix_scheduled_calibration import (
     bank as bank, prospective_bank, provenance as provenance,
     response_bank as response_bank, scheduled as scheduled, stock as stock,
@@ -135,7 +130,7 @@ def test_compact_graph_rejects_substituted_shared_custody_and_predictor_future_i
     elif mutation == 'forecast-private-bank':
         target = next(operation.node_id for operation in draft.operations if operation.node_id.endswith('.forecast'))
         bank = next(value.input_id for value in draft.external_inputs if value.payload_schema == r.ScheduledCompactBank.SCHEMA)
-        from empirical_lawhood.planning.recursive_authoring import RecursiveInputLink
+        from empirical_lawhood.design.recursive_authoring import RecursiveInputLink
         extra = RecursiveInputLink('edge.software.illegal-private-bank', target, 'bank', external_input_id=bank, scientific_role='SOURCE')
         draft = replace(draft, links=tuple(sorted((*draft.links, extra), key=lambda value: value.edge_id)))
     elif mutation == 'future-stream-substitution':
@@ -168,12 +163,12 @@ def calibration64_bank(response_bank, *, cases_per_group=1, programme_only=False
     from decimal import Decimal
     from itertools import product
     from hashlib import sha256
-    from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-    from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import commitment as commit_records, forecast, response_records, response_selection
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.operation_bindings import source_operands
-    from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+    from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import commitment as commit_records, forecast, response_records, response_selection
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.operation_bindings import source_operands
+    from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
     from tests.test_matrix_factor_confirmation_eligibility import publish
 
     if cases_per_group not in (1, 9):
@@ -277,7 +272,7 @@ def calibration64_bank(response_bank, *, cases_per_group=1, programme_only=False
     system = replace(root.system, numerical_views=tuple(views[key] for key in sorted(views)))
     root = replace(root, system=system)
     qualifications = tuple(replace(value, numerical_view_ids=tuple(view.view_id for view in system.numerical_views)) for value in qualifications)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.qualification import cutoffs
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.qualification import cutoffs
     cutoffs = cutoffs(commitment)
     experiment = replace(root.experiment, information_cutoffs=cutoffs,
         obligations=replace(root.experiment.obligations, support=replace(root.experiment.obligations.support, information_cutoff_id=cutoffs[0].cutoff_id)))
@@ -314,7 +309,7 @@ def calibration64_bank(response_bank, *, cases_per_group=1, programme_only=False
 
 def test_compact_single_coordinate_calibration64_preserves_full_census_below_existing_decoder(response_bank, monkeypatch):
     draft, qualifications, records, commitment = calibration64_bank(response_bank)
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments
 
     def blocked(*args, **kwargs):
         pytest.fail('64-group compact graph entered native science or fitting')
@@ -336,10 +331,10 @@ def test_compact_single_coordinate_calibration64_preserves_full_census_below_exi
 
 
 
-def test_complete_nine_coordinate_calibration64_capacity_is_explicitly_refused(response_bank, monkeypatch):
-    """The full576-case declaration cannot pass the unchanged public decoder."""
-    from empirical_lawhood.planning.recursive_authoring import RecursiveScientificSelection
-    from empirical_lawhood.runtime.recursive_prospective import recursive_selection_decoder_registration, recursive_selection_proposal
+def test_complete_nine_coordinate_calibration64_proposal_retains_exact_payload(response_bank, monkeypatch):
+    """The complete 576-case proposal records its actual selected size and identity."""
+    from empirical_lawhood.design.recursive_authoring import RecursiveScientificSelection
+    from empirical_lawhood.execution.recursive_prospective import recursive_selection_decoder_registration, recursive_selection_proposal
 
     def blocked(*args, **kwargs):
         pytest.fail('576-case capacity declaration entered numerical science')
@@ -356,8 +351,13 @@ def test_complete_nine_coordinate_calibration64_capacity_is_explicitly_refused(r
     assert len(draft.prospective_draft.evaluation_unit_ids) == 64
     assert all(len(scope.coordinates) == 9 and len(scope.independent_group_ids) == 16
         for scope in shared.reservation.allocation.matched_scopes if scope.role.value == 'CALIBRATION')
-    assert len(selection.canonical_bytes()) > 16*1024**2
+    size = len(selection.canonical_bytes())
+    assert size > 16*1024**2
     registration = recursive_selection_decoder_registration(implementation_sha256='a'*64)
-    assert registration.maximum_payload_bytes == 16*1024**2
-    with pytest.raises(ValueError, match='allowlisted decoder'):
-        recursive_selection_proposal(selection=selection, registration=registration)
+    assert registration.maximum_payload_bytes is None
+    proposal = recursive_selection_proposal(selection=selection, registration=registration)
+    assert proposal.payload == ObjectIdentity.from_record(selection.selection_id, selection)
+    assert proposal.payload_size_bytes == size
+    with pytest.raises(ValueError, match='differs from its installed decoder'):
+        recursive_selection_proposal(selection=selection,
+            registration=replace(registration, maximum_payload_bytes=16*1024**2))

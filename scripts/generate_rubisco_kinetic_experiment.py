@@ -4,15 +4,13 @@
 import argparse
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.disclosed_examples import DisclosedAssumption
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.experiment_specification import (
-    PROTOCOL_ID, kinetic_experiment_specification,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_supply import JointKineticSupply, KineticTargetComparison
-from empirical_lawhood.adapters.simulators.rubisco_assay.records import AssayQuery
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.disclosed_examples import DisclosedAssumption
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.experiment_specification import PROTOCOL_ID, kinetic_experiment_specification
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_supply import JointKineticSupply, KineticTargetComparison
+from empirical_lawhood.domains.rubisco.assay.records import AssayQuery
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
 
 
 ROOT = Path(__file__).resolve().parents[1] / "programmes/biology/photosynthesis/workflows/rubisco-kinetic-join"

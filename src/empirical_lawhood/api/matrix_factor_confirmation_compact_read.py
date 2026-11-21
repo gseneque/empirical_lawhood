@@ -7,36 +7,31 @@ This consumer joins exact original compact operands and independently replays th
 native/factor witnesses and complete terminal reduction, once per actual root.
 """
 from types import SimpleNamespace
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_records as r,compact_science as science,compact_bindings as owner,compact_preparation as domain
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.compact_publications import authenticate_prior_publications
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.occurrence import cell_report
-from empirical_lawhood.api.current_result_custody import (
-    CurrentResultPlanReader, retained_output_artifact_plane, authenticate_task_dispatch_authority,
-    require_current_result_reveal_authority,
-)
-from empirical_lawhood.api.recursive_qualified_parents import _actual_package,_replay_parent_authority,_collect_receipt_closure,_verify_receipt_closure,_output_payload
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from .matrix_retained_replay import map_reconstructions, replay_e1, replay_weight
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.recursive_custody import (
-    _execution_operational_census, _require_no_orphaned_native_custody,
-)
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import validate_stable_id
-from empirical_lawhood.kernel.status import AdmissionStatus,OperationalStatus,ScientificStatus
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.adjudication import AdjudicationEvaluability,ScientificAdjudicationRecord
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, artifact_custody_limits
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput, dependency_artifact_inputs
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.recovery import RunRecoveryTerminalEvent
-from empirical_lawhood.runtime.plans import BarrierKind,ScientificStage
-from empirical_lawhood.runtime.prospective_experiment import SPECIFICATION_FILENAME,source_filename
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_records as r, compact_science as science, compact_bindings as owner, compact_preparation as domain
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.compact_publications import authenticate_prior_publications
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.occurrence import cell_report
+from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader, retained_output_artifact_plane, authenticate_task_dispatch_authority, require_current_result_reveal_authority
+from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _replay_parent_authority, _collect_receipt_closure, _verify_receipt_closure, _output_payload
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.api.matrix_retained_replay import map_reconstructions, replay_e1, replay_weight
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.recursive_custody import _execution_operational_census, _require_no_orphaned_native_custody
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import validate_stable_id
+from empirical_lawhood.science.records.status import AdmissionStatus, OperationalStatus, ScientificStatus
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, artifact_custody_limits
+from empirical_lawhood.execution.execution import VerifiedArtifactInput, dependency_artifact_inputs
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.recovery import RunRecoveryTerminalEvent
+from empirical_lawhood.execution.plans import BarrierKind, ScientificStage
+from empirical_lawhood.execution.prospective_experiment import SPECIFICATION_FILENAME, source_filename
 
 
 def _pin(record,field):return ObjectIdentity.from_record(getattr(record,field),record)

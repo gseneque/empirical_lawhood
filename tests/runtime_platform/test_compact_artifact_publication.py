@@ -7,17 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactProfile, ArtifactPublicationIntent, ArtifactWriteRequest, ExternalRootContract,
-    artifact_publication_intent_relative_path,
-)
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.task_receipts import decode_artifact_manifest
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactPublicationIntent, ArtifactWriteRequest, ExternalRootContract, artifact_publication_intent_relative_path
 
 
-def _case(directory, *, compact=True, count=4):
+def _case(directory, *, count=4):
     directory.mkdir()
     mount = next(parent for parent in directory.parents if parent.is_mount())
     plane = ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
@@ -29,7 +26,7 @@ def _case(directory, *, compact=True, count=4):
         ObjectIdentity(f"software.subject.{number}", ObjectIdentity.SCHEMA, "1.0.0", "a" * 64).canonical_bytes(),
         VisibilityCeiling.PROSPECTIVE, (), OutcomeAccess.OUTCOME_BLIND,
     ) for number in range(count))
-    results = (plane.write_compact_batch if compact else plane.write_batch)(requests)
+    results = plane.write_batch(requests)
     manifests = tuple(plane.read_manifest(row.relative_path) for row in requests)
     return plane, requests, results, manifests
 
@@ -45,8 +42,8 @@ def _census(plane):
         for path in root.rglob("*") if path.is_file()}
 
 
-def test_compact_transport_preserves_payloads_logical_identity_commit_and_normalized_canonical_bytes(tmp_path):
-    legacy, requests, original, left = _case(tmp_path / "legacy", compact=False)
+def test_canonical_publication_preserves_payloads_logical_identity_commit_and_normalized_canonical_bytes(tmp_path):
+    legacy, requests, original, left = _case(tmp_path / "first")
     compact, _, current, right = _case(tmp_path / "compact")
     assert left == right
     assert all(a.canonical_bytes() == b.canonical_bytes() for a, b in zip(left, right, strict=True))
@@ -67,12 +64,11 @@ def test_compact_transport_preserves_payloads_logical_identity_commit_and_normal
         scoped.verify_manifests(members)
 
 
-@pytest.mark.parametrize("original_compact", (False, True))
-def test_replay_preserves_existing_sidecar_representation_without_staging(tmp_path, monkeypatch, original_compact):
-    plane, requests, original, _ = _case(tmp_path / "custody", compact=original_compact)
+def test_replay_preserves_existing_sidecar_representation_without_staging(tmp_path, monkeypatch):
+    plane, requests, original, _ = _case(tmp_path / "custody")
     before = _census(plane)
     monkeypatch.setattr(plane, "_stage_publication", lambda *_args, **_kwargs: pytest.fail("committed replay staged bytes"))
-    repeated = (plane.write_batch if original_compact else plane.write_compact_batch)(requests)
+    repeated = plane.write_batch(requests)
     assert all(not row.created for row in repeated)
     assert tuple(row.manifest_materialization for row in repeated) == tuple(row.manifest_materialization for row in original)
     assert _census(plane) == before
@@ -87,17 +83,16 @@ def test_undeclared_stream_replay_keeps_compact_custody_and_compares_actual_chun
         for row in requests}
     streams = tuple(replace(row.as_stream(), expected_size_bytes=None, expected_physical_sha256=None)
         for row in requests)
-    plane.write_compact_batch(streams)
+    plane.write_batch(streams)
     assert all(_path(plane, relative + ".manifest.json").read_bytes() == raw for relative, raw in before.items())
     invalid = replace(requests[0].as_stream(), expected_size_bytes=None,
         expected_physical_sha256=None, chunks=iter((b"changed actual request",)))
     with pytest.raises(ArtifactIdentityConflict):
-        plane.write_compact_batch((invalid, *(row.as_stream() for row in requests[1:])))
+        plane.write_batch((invalid, *(row.as_stream() for row in requests[1:])))
 
 
-@pytest.mark.parametrize("original_compact", (False, True))
-def test_interrupted_owned_partial_keeps_existing_complete_pair_and_restores_exact_prefix(tmp_path, original_compact):
-    plane, requests, results, manifests = _case(tmp_path / "custody", compact=original_compact)
+def test_interrupted_owned_partial_keeps_existing_complete_pair_and_restores_exact_prefix(tmp_path):
+    plane, requests, results, manifests = _case(tmp_path / "custody")
     publication = manifests[0].publication
     commit = _path(plane, publication.commit_marker_relative_path)
     commit.unlink()
@@ -118,7 +113,7 @@ def test_interrupted_owned_partial_keeps_existing_complete_pair_and_restores_exa
     intent_path = plane.root.resolve(artifact_publication_intent_relative_path(
         publication.publication_scope, publication.publication_batch_id), for_write=True)
     plane._write_publication_intent(intent_path, intent)
-    (plane.write_batch if original_compact else plane.write_compact_batch)(requests)
+    plane.write_batch(requests)
     assert not intent_path.exists()
     assert partial_sidecar.read_bytes().startswith(prefix)
     assert partial_payload.read_bytes() == requests[1].payload

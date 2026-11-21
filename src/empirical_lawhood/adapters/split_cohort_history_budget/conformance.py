@@ -1,10 +1,11 @@
 """Outcome-blind source, equation, rank, negative-control, and resource canaries."""
 
 from __future__ import annotations
+from empirical_lawhood.domains.circuits.reference_oracles import _analytic_equilibrium, _brute_matching_rank, _rank_audit
 
-from empirical_lawhood.adapters.history_budget_fixed_scientific_inputs import fixed_history_budget_preparation_input, fixed_history_budget_unit_input
+from empirical_lawhood.domains.history.history_budget_fixed_scientific_inputs import fixed_history_budget_preparation_input, fixed_history_budget_unit_input
 
-from empirical_lawhood.adapters.history_budget_seed_constants import history_budget_fixed_seed
+from empirical_lawhood.domains.history.history_budget_seed_constants import history_budget_fixed_seed
 
 import ast
 from dataclasses import replace
@@ -13,45 +14,44 @@ from hashlib import sha256
 import resource
 from time import perf_counter, process_time
 from typing import Mapping
-from itertools import combinations, permutations
 
 import numpy as np
-from scipy.linalg import expm, svdvals
+from scipy.linalg import expm
 from scipy.sparse.linalg import expm_multiply
 from scipy.sparse.linalg import spsolve
 from threadpoolctl import threadpool_limits  # type: ignore[import-untyped]
 
-from empirical_lawhood.adapters.methods.split_cohort_history_budget.evaluator import _lexical_reference_decision_errors, adjudicate_unit_scale
-from empirical_lawhood.adapters.methods.split_cohort_history_budget.conditioning import dimensionless_history_operator
-from empirical_lawhood.adapters.methods.split_cohort_history_budget.discrete_rank import residual_certified_rank_bracket
-from empirical_lawhood.adapters.methods.split_cohort_history_budget.history import assemble_dense_operator, coordinate_labels, observe_history
-from empirical_lawhood.adapters.methods.split_cohort_history_budget.preparation_sampler import _raw_state_bits, charge_preservation_error, scale_coupled_initial_states
-from empirical_lawhood.adapters.methods.split_cohort_history_budget.inference import _transition_disposition
-from empirical_lawhood.adapters.methods.split_cohort_history_budget.structural_rank import maximum_bipartite_matching_rank
-from empirical_lawhood.adapters.methods.split_cohort_history_budget.targeting import nominate_targeted_challenges
-from empirical_lawhood.adapters.simulators.rc_ladder_split_cohort_history.generator import _affine_action, _factorized_action_components, assemble_sparse_operator, generate_outcomes, receiver_matrix
-from empirical_lawhood.kernel.evidence import OutcomeAccess
+from empirical_lawhood.domains.history.split_cohort_history_budget.evaluator import _lexical_reference_decision_errors, adjudicate_unit_scale
+from empirical_lawhood.domains.history.split_cohort_history_budget.conditioning import dimensionless_history_operator
+from empirical_lawhood.domains.history.split_cohort_history_budget.discrete_rank import residual_certified_rank_bracket
+from empirical_lawhood.domains.history.split_cohort_history_budget.history import assemble_dense_operator, coordinate_labels, observe_history
+from empirical_lawhood.domains.history.split_cohort_history_budget.preparation_sampler import _raw_state_bits, charge_preservation_error, scale_coupled_initial_states
+from empirical_lawhood.domains.history.split_cohort_history_budget.inference import _transition_disposition
+from empirical_lawhood.domains.history.split_cohort_history_budget.structural_rank import maximum_bipartite_matching_rank
+from empirical_lawhood.domains.history.split_cohort_history_budget.targeting import nominate_targeted_challenges
+from empirical_lawhood.domains.circuits.rc_ladder_split_cohort_history.generator import _affine_action, _factorized_action_components, assemble_sparse_operator, generate_outcomes, receiver_matrix
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
 
-from .contracts import SplitCohortHistoryBudgetDenominatorDescriptor, SplitCohortHistoryBudgetDisorderFamily, SplitCohortHistoryBudgetConfig, SplitCohortHistoryBudgetGeneratorActionOutcome, SplitCohortHistoryBudgetPhase, SplitCohortHistoryBudgetScientificState
-from .authoring import SPLIT_COHORT_HISTORY_BUDGET_RESOURCE_PROFILE
-from .descriptors import default_config, generate_descriptor
-from .runtime_contracts import SplitCohortHistoryBudgetCanaryReport, SplitCohortHistoryBudgetDenominatorBundle, SplitCohortHistoryBudgetTaskOutputMeasurement
-from .workflow import adjudication_bundle, generator_bundle, freeze_nominations, history_bundle, targeter_bundle, untouched_bundle
+from empirical_lawhood.domains.history.split_cohort_history_budget.contracts import SplitCohortHistoryBudgetDenominatorDescriptor, SplitCohortHistoryBudgetDisorderFamily, SplitCohortHistoryBudgetConfig, SplitCohortHistoryBudgetGeneratorActionOutcome, SplitCohortHistoryBudgetPhase, SplitCohortHistoryBudgetScientificState
+from empirical_lawhood.domains.history.split_cohort_history_budget.authoring import SPLIT_COHORT_HISTORY_BUDGET_RESOURCE_PROFILE
+from empirical_lawhood.domains.history.split_cohort_history_budget.descriptors import default_config, generate_descriptor
+from empirical_lawhood.domains.history.split_cohort_history_budget.runtime_contracts import SplitCohortHistoryBudgetCanaryReport, SplitCohortHistoryBudgetDenominatorBundle, SplitCohortHistoryBudgetTaskOutputMeasurement
+from empirical_lawhood.domains.history.split_cohort_history_budget.workflow import adjudication_bundle, generator_bundle, freeze_nominations, history_bundle, targeter_bundle, untouched_bundle
 
 
-_GENERATOR_PATH = 'src/empirical_lawhood/adapters/simulators/rc_ladder_split_cohort_history/generator.py'
+_GENERATOR_PATH = 'src/empirical_lawhood/domains/circuits/rc_ladder_split_cohort_history/generator.py'
 _OBSERVER_PATHS = (
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/conditioning.py',
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/discrete_rank.py',
-    "src/empirical_lawhood/adapters/methods/_arb.py",
-    "src/empirical_lawhood/adapters/methods/certified_rank.py",
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/history.py',
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/preparation_sampler.py',
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/structural_rank.py',
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/targeting.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/conditioning.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/discrete_rank.py',
+    "src/empirical_lawhood/methods/_arb.py",
+    "src/empirical_lawhood/methods/certified_rank.py",
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/history.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/preparation_sampler.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/structural_rank.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/targeting.py',
 )
-_EVALUATOR_PATH = 'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/evaluator.py'
-_SHARED_PREFIX = 'src/empirical_lawhood/adapters/split_cohort_history_budget/'
+_EVALUATOR_PATH = 'src/empirical_lawhood/domains/history/split_cohort_history_budget/evaluator.py'
+_SHARED_PREFIX = 'src/empirical_lawhood/domains/history/split_cohort_history_budget/'
 
 
 def _decimal(value: float) -> Decimal:
@@ -83,8 +83,8 @@ def audit_source_firewall(source_files: Mapping[str, bytes]) -> tuple[str, ...]:
     forbidden_generator = {
         value
         for value in generator_imports
-        if value.startswith("empirical_lawhood.adapters.methods")
-        or "rc_ladder_response" in value
+        if value.startswith("empirical_lawhood.methods")
+        or "rc_ladder_response" in value or value.startswith("empirical_lawhood.domains.circuits.rc_ladder")
         or "physical_scale_morphism" in value
         or "physical_scale_morphism.simulator_challenges" in value
         or "simulator_morphism_challenges" in value
@@ -100,15 +100,15 @@ def audit_source_firewall(source_files: Mapping[str, bytes]) -> tuple[str, ...]:
     if forbidden_generator or forbidden_observer:
         raise ValueError("split cohort history budget generator--observer source firewall is violated")
     allowed_local_intersection = {
-        'empirical_lawhood.adapters.split_cohort_history_budget.contracts',
-        "empirical_lawhood.kernel.serialization",
+        'empirical_lawhood.domains.history.split_cohort_history_budget.contracts',
+        "empirical_lawhood.science.records.serialization",
     }
     local_intersection = {
         value for value in generator_imports & observer_imports if value.startswith("empirical_lawhood")
     }
     if local_intersection != allowed_local_intersection:
         raise ValueError("split cohort history budget implementations share an undeclared scientific module")
-    if 'empirical_lawhood.adapters.simulators.rc_ladder_split_cohort_history.generator' in evaluator_imports:
+    if 'empirical_lawhood.domains.circuits.rc_ladder_split_cohort_history.generator' in evaluator_imports:
         raise ValueError("split cohort history budget evaluator imports the generator implementation")
     shared_paths = tuple(sorted(path for path in source_files if path.startswith(_SHARED_PREFIX)))
     if not {
@@ -138,24 +138,6 @@ def _report(report_id: str, checks: set[str], started: float) -> SplitCohortHist
     )
 
 
-def _brute_matching_rank(support: np.ndarray) -> int:
-    rows, columns = support.shape
-    for rank in range(min(rows, columns), -1, -1):
-        for selected_rows in combinations(range(rows), rank):
-            for selected_columns in combinations(range(columns), rank):
-                if any(
-                    all(
-                        support[row, column]
-                        for row, column in zip(
-                            selected_rows,
-                            ordered_columns,
-                            strict=True,
-                        )
-                    )
-                    for ordered_columns in permutations(selected_columns)
-                ):
-                    return rank
-    return 0
 
 
 def run_structural_rank_canary() -> SplitCohortHistoryBudgetCanaryReport:
@@ -509,42 +491,8 @@ def _uniform_descriptor(scale_cells: int) -> SplitCohortHistoryBudgetDenominator
     )
 
 
-def _analytic_equilibrium(descriptor: SplitCohortHistoryBudgetDenominatorDescriptor, amplitude: float) -> np.ndarray:
-    left = float(descriptor.left_source_resistance_ohms)
-    right = float(descriptor.right_termination_resistance_ohms)
-    interior = np.asarray(descriptor.interior_resistances_ohms, dtype=np.float64)
-    current = amplitude / (left + float(np.sum(interior)) + right)
-    preceding = np.concatenate((np.zeros(1), np.cumsum(interior)))
-    return amplitude - current * (left + preceding)
 
 
-def _rank_audit(descriptor: SplitCohortHistoryBudgetDenominatorDescriptor) -> None:
-    config = default_config(SplitCohortHistoryBudgetPhase.CANARY)
-    operator = assemble_dense_operator(descriptor)
-    lag = float(config.history_lag_t_star) * float(descriptor.time_scale_seconds)
-    inverse = expm(-operator.state_matrix * lag)
-    blocks = []
-    current = operator.receiver.copy()
-    for depth in range(config.history_max_depth + 1):
-        if depth:
-            current = current @ inverse
-        blocks.append(current.copy())
-        stack = np.vstack(blocks)
-        numpy_values = np.linalg.svd(stack, compute_uv=False)
-        scipy_values = svdvals(stack)
-        if not np.allclose(numpy_values, scipy_values, atol=1e-10, rtol=1e-11):
-            raise ValueError("SPLIT_COHORT_HISTORY_BUDGET_CANARY_SVD_AUDIT_FAILED")
-        duplicated = np.vstack([operator.receiver] * (depth + 1))
-        if np.linalg.matrix_rank(duplicated, tol=1e-12) > 8:
-            raise ValueError("SPLIT_COHORT_HISTORY_BUDGET_DUPLICATE_PRESENT_CONTROL_FAILED")
-        shuffled = np.vstack(tuple(reversed(blocks)))
-        if not np.allclose(
-            np.linalg.svd(shuffled, compute_uv=False),
-            numpy_values,
-            atol=1e-10,
-            rtol=1e-11,
-        ):
-            raise ValueError("SPLIT_COHORT_HISTORY_BUDGET_SHUFFLED_LAG_CONTROL_FAILED")
 
 
 def _run_generator_canary() -> SplitCohortHistoryBudgetCanaryReport:
@@ -625,7 +573,11 @@ def _run_observer_canary() -> SplitCohortHistoryBudgetCanaryReport:
             raise ValueError("SPLIT_COHORT_HISTORY_BUDGET_OBSERVER_MANUFACTURED_SOLUTION_FAILED")
         if np.max(np.abs(operator.state_matrix @ equilibrium + operator.left_input)) > 1e-12:
             raise ValueError("SPLIT_COHORT_HISTORY_BUDGET_OBSERVER_CURRENT_BALANCE_RESIDUAL_FAILED")
-        _rank_audit(descriptor)
+        _rank_audit(
+            operator.state_matrix, operator.receiver,
+            lag=float(config.history_lag_t_star) * float(descriptor.time_scale_seconds),
+            maximum_depth=config.history_max_depth, error_prefix="SPLIT_COHORT_HISTORY_BUDGET",
+        )
         checks.update(
             {
                 f"n{scale_cells}-observer-manufactured-equilibrium",
@@ -700,7 +652,11 @@ def _run_cross_implementation_conformance(
         sparse_future = np.asarray(expm_multiply(sparse.state_matrix * duration, initial))
         if not np.allclose(dense_future, sparse_future, atol=1e-11, rtol=1e-11):
             raise ValueError("SPLIT_COHORT_HISTORY_BUDGET_CANARY_PROPAGATOR_MISMATCH")
-        _rank_audit(descriptor)
+        _rank_audit(
+            dense.state_matrix, dense.receiver,
+            lag=float(config.history_lag_t_star) * float(descriptor.time_scale_seconds),
+            maximum_depth=config.history_max_depth, error_prefix="SPLIT_COHORT_HISTORY_BUDGET",
+        )
 
         seed = history_budget_fixed_seed(programme_ordinal=2, scientific_role="conformance", numeric_index=scale_cells)
         challenge_descriptor = generate_descriptor(

@@ -6,11 +6,11 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.recursive_authoring import RecursiveOperationSpec
-from empirical_lawhood.planning.study_authoring import CapabilitySelection
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.recursive_authoring import RecursiveOperationSpec
+from empirical_lawhood.design.study_authoring import CapabilitySelection
 
 
 @dataclass(frozen=True)

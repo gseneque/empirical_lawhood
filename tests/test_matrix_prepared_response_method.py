@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Short supplied-innovation equation controls; no scientific/native entry."""
 
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as _preparation_io_effect
 from dataclasses import replace
 from decimal import Decimal as D
 from hashlib import sha256
@@ -8,21 +9,22 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_response_science as method
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import ACTION_ROLES, PREDICTORS, MatrixFactorAction, MatrixFactorResponseModel
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as original
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_forecast import instrument
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseArrays, ScheduledResponseProtocol, physical_forecast_implementation
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import preparation_intervals
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as preparation_science_owner_0
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_response_science as method
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import ACTION_ROLES, PREDICTORS, MatrixFactorAction, MatrixFactorResponseModel
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as original
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_forecast import instrument
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseArrays, ScheduledResponseProtocol, physical_forecast_implementation
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 from tests import test_matrix_coupling_preparation as preparation_fixture
 from tests.test_matrix_factor_confirmation_eligibility import publish
 from tests.test_matrix_later_programme import ref
@@ -53,8 +55,8 @@ def case(tmp_path):
     original_source = source_index.resolve(reference)
     source = replace(source, original=ScheduledPublicSource.from_source(original_source), root=original_source.root)
     source.validate_allocation(allocation)
-    arrays = preparation_science.propagate_preparation(source, initial, coarse_innovations=coarse, bridge_innovations=bridge)
-    preparation_raw, preparation = preparation_science.preparation_array_product(source, initial, arrays, artifact_id="array.prepared-response.literal-prefix")
+    arrays = preparation_science_owner_0.propagate_preparation(source, initial, coarse_innovations=coarse, bridge_innovations=bridge)
+    preparation_raw, preparation = preparation_science_owner_0.preparation_array_product(source, initial, arrays, artifact_id="array.prepared-response.literal-prefix")
     pauli = np.asarray(([[0, 1], [1, 0]], [[0, -1j], [1j, 0]], [[1, 0], [0, -1]]), dtype="<c16")
     frame = np.asarray([np.kron(row, np.eye(2)) / 2 for row in pauli], dtype="<c16")
     templates = {"generic_basis": np.asarray([np.kron(np.eye(2), row) / 2 for row in pauli], dtype="<c16"),
@@ -95,8 +97,8 @@ def test_complete_prepared_response_readout_preserves_original48_controls240_cel
         raise AssertionError("prepared cold assessment entered a native producer, RNG or eigensolve")
 
     monkeypatch.setattr(method, "native_scheduled_branch", forbidden)
-    monkeypatch.setattr(preparation_science, "acquire_preparation", forbidden)
-    monkeypatch.setattr(preparation_science, "baoab_step_with_hermitian_noise", forbidden)
+    monkeypatch.setattr(_preparation_io_effect, "acquire_preparation", forbidden)
+    monkeypatch.setattr(preparation_intervals, "baoab_step_with_hermitian_noise", forbidden)
     monkeypatch.setattr(np.random, "Generator", forbidden)
     monkeypatch.setattr(np.linalg, "eigh", forbidden)
     result = method.assess_prepared_responses(*case[:-1], arrays, record_id="readout.literal-complete-prepared-response")
@@ -118,7 +120,7 @@ def test_complete_prepared_response_readout_preserves_original48_controls240_cel
 def test_prepared_native_decoded_array_seam_preserves_every_supplied_branch_byte(case, monkeypatch):
     source, initial, preparation, raw, protocol, panels, forecast, frozen_raw, innovations = case
     expected = method.propagate_prepared_responses(*case)
-    prefix = preparation_science.consume_preparation_arrays(source, initial, preparation, raw)
+    prefix = preparation_science_owner_0.consume_preparation_arrays(source, initial, preparation, raw)
     frozen = method._context(source, preparation, protocol, panels, forecast, frozen_raw)
     def forbidden(*args, **kwargs):
         raise AssertionError("prepared native branch re-expanded its authenticated preflight arrays")
@@ -168,7 +170,7 @@ def test_unentered_prepared_assay_retains_every_case_without_native_or_finite_lo
 @pytest.mark.parametrize("precision", (28, 80))
 def test_prepared_response_reuse_preserves_exact_decimal_and_negative_assessment(case, precision, monkeypatch):
     from decimal import localcontext
-    from empirical_lawhood.infrastructure.matrix_array_io import DecodedMatrixArrayInput
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import DecodedMatrixArrayInput
     arrays = method.propagate_prepared_responses(*case)
     selected = DecodedMatrixArrayInput(case[7], case[6])
     damaged = {name: value.copy() for name, value in arrays.items()}

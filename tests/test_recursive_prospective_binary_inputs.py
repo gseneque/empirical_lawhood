@@ -11,14 +11,14 @@ from hashlib import sha256
 import pytest
 
 from empirical_lawhood.api.execution import CampaignExecutionService
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-from empirical_lawhood.infrastructure.candidate_sources import ExternalCandidateInputPublisher
-from empirical_lawhood.infrastructure.recursive_prospective_inputs import RecursiveContentInputSupplier
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.plans import ExternalInputSpec
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveOperand
-from empirical_lawhood.runtime.recursive_storage_codecs import storage_codec_census
+from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+from empirical_lawhood.storage.candidate_sources import ExternalCandidateInputPublisher
+from empirical_lawhood.storage.recursive_prospective_inputs import RecursiveContentInputSupplier
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.plans import ExternalInputSpec
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveOperand
+from empirical_lawhood.storage.contracts.recursive_storage_codecs import storage_codec_census
 from tests.runtime_platform.test_recursive_compiler import Config
 from tests.runtime_platform.test_recursive_storage_codec_registration import (
     MAXIMUM_BYTES, MEDIA, SCHEMA, _codec, _declaration, _framed, _validate_raw_json_fixture_stream,

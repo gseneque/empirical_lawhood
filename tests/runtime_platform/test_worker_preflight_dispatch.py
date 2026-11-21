@@ -1,23 +1,20 @@
 # SPDX-License-Identifier: MPL-2.0
 """A refused prerequisite stops dispatch without losing admitted custody."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 from dataclasses import replace
 import hashlib
 import threading
 
 import pytest
 
-from empirical_lawhood.infrastructure.execution import (
-    DirectTaskExecutor, ExecutionResourceCapacity, WorkerPreflightError, operational_failure_diagnostic,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.infrastructure.recovery import RunRecoveryError
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.runtime.execution import TaskAttemptDisposition
-from empirical_lawhood.runtime.prepared_native_invocation import (
-    PreparedInvocationContract, WorkerPreflightMismatch, WorkerPreflightResult,
-)
+from empirical_lawhood.execution.local.execution import DirectTaskExecutor, ExecutionResourceCapacity, WorkerPreflightError, operational_failure_diagnostic
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.recovery import RunRecoveryError
+
+from empirical_lawhood.execution.execution import TaskAttemptDisposition
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, WorkerPreflightMismatch, WorkerPreflightResult
 from tests.runtime_platform.test_execution_scheduler import _runtime
 from tests.runtime_platform.conftest import protocol_fixture as protocol_fixture
 
@@ -91,8 +88,7 @@ def test_preflight_refusal_stops_new_dispatch_and_drains_receipts(
         assert raw == executor.refusal.canonical_bytes()
         assert decode_canonical_bytes(raw, WorkerPreflightResult,
             maximum_bytes=plane.custody_limits.recovery_event_bytes) == executor.refusal
-        manifest = decode_artifact_manifest(plane.root.resolve(relative + ".manifest.json",
-            for_write=False).read_bytes())
+        manifest = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(relative + '.manifest.json', for_write=False).read_bytes())
         assert manifest.logical.content_sha256 == executor.refusal.fingerprint()
         assert manifest.logical.outcome_access == template.capability.requested_outcome_access
         assert manifest.logical.lineage_parents[0].identity == ObjectIdentity.from_record(

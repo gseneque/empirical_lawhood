@@ -19,31 +19,31 @@ import numpy as np
 import pytest
 from threadpoolctl import threadpool_limits
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryReadoutSelection
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_methods import METHODS
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old, science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_science as method
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import FAMILY_MAP, ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_workers import SelectedE3E4Worker
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import bind_selected_native_source
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryReadoutSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_methods import METHODS
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old, science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_science as method
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import FAMILY_MAP, ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_workers import SelectedE3E4Worker
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import bind_selected_native_source
 from empirical_lawhood.api.recursive_authoring import implementation_binding
-from empirical_lawhood.infrastructure import execution as lifecycle
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.infrastructure.numerical_provenance import selected_worker_environment
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
-from empirical_lawhood.adapters.methods.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
+from empirical_lawhood.execution.local import execution as lifecycle
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.storage.numerical_provenance import selected_worker_environment
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.domains.matrix.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
 from tests.runtime_platform.test_native_subwork import _store
 from tests.test_matrix_factor_confirmation_eligibility import stock, provenance, publish  # noqa: F401
 from tests.test_matrix_scheduled_history import scheduled  # noqa: F401
@@ -205,8 +205,8 @@ def native_case(scheduled, provenance, monkeypatch):  # noqa: F811
         protocol, _ = literal_protocol()
         protocol = replace(protocol, public_source=local.public, horizon_steps=(1, 2),
             templates=replace(protocol.templates, source=local.reference.identity, producers=(local.reference.identity,)))
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponsePanel
-        from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponsePanel
+        from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
         group = source.root.root.independent_group_id
         panels = (ScheduledResponsePanel("panel.e4-worker.common", group, "COMMON_NOISE_PANEL", "ORIGINAL_COMPLETED_PREFIX_GENERATOR_STATES", source.root.streams),
             ScheduledResponsePanel("panel.e4-worker.independent", group, "INDEPENDENT_FUTURE", "FRESH_DECLARED_FUTURE_START_AT_CUTOFF",
@@ -228,7 +228,7 @@ def native_case(scheduled, provenance, monkeypatch):  # noqa: F811
         store.parent_contacts.begin(contract.expected_parent_contact)
         result = runner.execute_with_native_subwork(context, store)
         raw_outputs = {row.output_id.rsplit(".", 1)[-1]: row.payload for row in result.outputs}
-        from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
         history = decode_canonical_bytes(raw_outputs["product"], r.SelectedE3E4PrefixHistory, maximum_bytes=None)
         record_exposure(case, "prefix", completion=history.native.completion, raw=raw_outputs["arrays"])
         prefix = science.consume_prefix(bind_selected_native_source(local, provenance), history.arrays, raw_outputs["arrays"])
@@ -313,7 +313,7 @@ def test_actual_e4_worker_stops_missing_operand_and_mutated_invocation(native_ca
 
 @pytest.mark.parametrize("phase", ("continue", "responses"))
 def test_actual_e4_worker_stops_changed_preopened_prefix_bytes(native_case, phase):
-    from empirical_lawhood.runtime.execution import WorkerInputPort
+    from empirical_lawhood.execution.execution import WorkerInputPort
     runner, context, contract, _ = invoke(native_case, phase)
     try:
         ready(runner, context, contract)
@@ -358,7 +358,7 @@ def test_actual_e4_response_worker_stops_bad_frozen_instrument_before_ready(nati
 
 
 def test_continuation_reuses_preflight_prefix_and_matches_original_archive(native_case, monkeypatch):
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments as segments
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments as segments
     case = native_case
     history = case.future["prefix"]
     prefix = science.consume_prefix(case.source, history.arrays, case.future["prefix-arrays"])
@@ -383,8 +383,8 @@ def test_continuation_reuses_preflight_prefix_and_matches_original_archive(nativ
 
 
 def test_actual_e4_continuation_return_and_recovery_preserve_bytes_without_expansion(native_case, monkeypatch):
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments as segments
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments as segments
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     case = native_case
     runner, context, contract, inputs = invoke(case, "continue")
     ready(runner, context, contract)
@@ -414,7 +414,7 @@ def test_actual_e4_continuation_return_and_recovery_preserve_bytes_without_expan
 
 
 def test_actual_e4_prefix_recovery_rebinds_original_bytes_after_one_decode(native_case, monkeypatch):
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments as segments
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments as segments
     case = native_case
     runner, context, contract, _ = invoke(case, "prefix")
     ready(runner, context, contract)
@@ -433,10 +433,10 @@ def test_actual_e4_prefix_recovery_rebinds_original_bytes_after_one_decode(nativ
 
 
 def test_prefix_local_carrier_rebinding_checks_exact_archive_members_source_and_checkpoint(scheduled, monkeypatch):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import parameter_native
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as protected
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_science as protected_method
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments as segments
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import parameter_native
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as protected
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_science as protected_method
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments as segments
     _, sources = scheduled
     source = sources[0]
     segment = segments.acquire_parameter_segment(source.coordinate, source.root.streams, 0, source.policy.cutoff_tick)

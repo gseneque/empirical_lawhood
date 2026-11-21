@@ -1,114 +1,40 @@
-"""Deterministic, outcome-blind VCC core-input materialization."""
+"""Native acquisition and external-format binding for the domain science."""
 
 from __future__ import annotations
-
 import csv
-from dataclasses import dataclass
 from hashlib import sha256
 from io import BytesIO, StringIO
 import math
-from typing import BinaryIO, ClassVar
+from typing import BinaryIO
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.adapters.physical.virtual_cell.codecs import encode_target_features
+from empirical_lawhood.domains.biology.virtual_cell.config import ENSEMBL_113_GTF_SHA256, ENSEMBL_113_PEPTIDE_SHA256
+from empirical_lawhood.domains.biology.virtual_cell.contracts import VirtualCellContractError, VirtualCellSourceManifest, VirtualCellSourceObject, VirtualCellSplit
+from empirical_lawhood.adapters.physical.virtual_cell.features import build_ensembl_target_features
+from empirical_lawhood.adapters.physical.virtual_cell.ports import VirtualCellSourcePort
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_strings,
-    validate_sha256,
-    validate_stable_id,
+from empirical_lawhood.domains.biology.virtual_cell.materialization_records import (
+    TargetFeatureMaterialization as _science_TargetFeatureMaterialization,
+    TargetFeatureMaterializationReceipt as _science_TargetFeatureMaterializationReceipt,
 )
-
-from .codecs import encode_target_features
-from .config import (
-    ENSEMBL_113_GTF_SHA256,
-    ENSEMBL_113_PEPTIDE_SHA256,
-)
-from .contracts import (
-    VirtualCellContractError,
-    VirtualCellSourceManifest,
-    VirtualCellSourceObject,
-    VirtualCellSplit,
-)
-from .features import TargetFeatureBuildReceipt, build_ensembl_target_features
-from .ports import VirtualCellSourcePort
-
 
 _MAXIMUM_ROSTER_BYTES = 1024**2
+
+
 _MAXIMUM_GTF_BYTES = 128 * 1024**2
+
+
 _MAXIMUM_PEPTIDE_BYTES = 64 * 1024**2
+
+
 _ROSTER_HEADER = ("target_gene", "n_cells", "median_umi_per_cell")
+
+
 _EXPECTED_TARGET_COUNTS = {
     VirtualCellSplit.TRAIN: 150,
     VirtualCellSplit.VALIDATION: 50,
     VirtualCellSplit.TEST: 100,
 }
-
-
-@dataclass(frozen=True, slots=True)
-class TargetFeatureMaterializationReceipt(CanonicalRecord):
-    SCHEMA: ClassVar[str] = (
-        'empirical-lawhood/physical/virtual-cell/target-feature-materialization-receipt'
-    )
-
-    receipt_id: str
-    source_manifest_sha256: str
-    roster_source_object_ids: tuple[str, ...]
-    roster_source_sha256s: tuple[str, ...]
-    build_receipt_sha256: str
-    arrow_sha256: str
-    arrow_size_bytes: int
-    target_count: int
-    feature_count: int
-    feature_provenance_sha256: str
-    outcome_access: OutcomeAccess
-    response_derived: bool
-    post_cutoff: bool
-
-    def __post_init__(self) -> None:
-        validate_stable_id(self.receipt_id, field_name="receipt_id")
-        for digest_name, digest_value in (
-            ("source_manifest_sha256", self.source_manifest_sha256),
-            ("build_receipt_sha256", self.build_receipt_sha256),
-            ("arrow_sha256", self.arrow_sha256),
-            ("feature_provenance_sha256", self.feature_provenance_sha256),
-        ):
-            validate_sha256(digest_value, field_name=digest_name)
-        require_sorted_unique_strings(
-            self.roster_source_object_ids,
-            field_name="roster_source_object_ids",
-            allow_empty=False,
-        )
-        require_sorted_unique_strings(
-            self.roster_source_sha256s,
-            field_name="roster_source_sha256s",
-            allow_empty=False,
-        )
-        for value in self.roster_source_sha256s:
-            validate_sha256(value, field_name="roster_source_sha256s")
-        if (
-            len(self.roster_source_object_ids) != 3
-            or len(self.roster_source_sha256s) != 3
-        ):
-            raise ValueError(
-                "target-feature materialization requires all three split rosters"
-            )
-        for count_name, count_value in (
-            ("arrow_size_bytes", self.arrow_size_bytes),
-            ("target_count", self.target_count),
-            ("feature_count", self.feature_count),
-        ):
-            if isinstance(count_value, bool) or count_value <= 0:
-                raise ValueError(f"{count_name} must be positive")
-        if self.outcome_access is not OutcomeAccess.OUTCOME_BLIND:
-            raise ValueError("target features must remain outcome blind")
-        if self.response_derived or self.post_cutoff:
-            raise ValueError("target features must be response-blind and pre-cutoff")
-
-
-@dataclass(frozen=True, slots=True)
-class TargetFeatureMaterialization:
-    arrow_payload: bytes
-    build_receipt: TargetFeatureBuildReceipt
-    materialization_receipt: TargetFeatureMaterializationReceipt
 
 
 def _bounded_payload(stream: BinaryIO, *, maximum_bytes: int, label: str) -> bytes:
@@ -182,12 +108,12 @@ def _roster_source(
 
 def build_target_feature_materialization(
     *,
-    expected: TargetFeatureMaterializationReceipt,
+    expected: _science_TargetFeatureMaterializationReceipt,
     source_manifest: VirtualCellSourceManifest,
     source_port: VirtualCellSourcePort,
     gtf_stream: BinaryIO,
     peptide_fasta_stream: BinaryIO,
-) -> TargetFeatureMaterialization:
+) -> _science_TargetFeatureMaterialization:
     """Build and requalify the exact 300-target Ensembl-113 Arrow artifact."""
 
     if expected.source_manifest_sha256 != source_manifest.fingerprint():
@@ -249,7 +175,7 @@ def build_target_feature_materialization(
         raise VirtualCellContractError(
             "target-feature Arrow bytes differ from the freeze"
         )
-    receipt = TargetFeatureMaterializationReceipt(
+    receipt = _science_TargetFeatureMaterializationReceipt(
         receipt_id="materialization.virtual-cell-2025-ensembl-113-features",
         source_manifest_sha256=source_manifest.fingerprint(),
         roster_source_object_ids=tuple(
@@ -266,16 +192,8 @@ def build_target_feature_materialization(
         response_derived=False,
         post_cutoff=False,
     )
-    return TargetFeatureMaterialization(
+    return _science_TargetFeatureMaterialization(
         arrow_payload=arrow_payload,
         build_receipt=build_receipt,
         materialization_receipt=receipt,
     )
-
-
-__all__ = [
-    "TargetFeatureMaterialization",
-    "TargetFeatureMaterializationReceipt",
-    "build_target_feature_materialization",
-    "decode_perturbation_roster",
-]

@@ -13,12 +13,12 @@ from typing import ClassVar
 import h5py  # type: ignore[import-untyped]
 import numpy as np
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256
 from empirical_lawhood.adapters.simulators.six_matrix_response.response_source import response_hdf5_read_text, response_hdf5_text, response_hdf5_writer
 
-from .source import PreparedNativeCheckpoint, PreparedNativeDelivery, PreparedNativePhaseData
+from empirical_lawhood.domains.matrix.prepared_response.source import PreparedNativeCheckpoint, PreparedNativeDelivery, PreparedNativePhaseData
 
 NATIVE_PHASE_SCHEMA = 'empirical-lawhood/simulators/prepared-response/native-phase-hdf5'
 MAXIMUM_PHASE_BYTES = 8 * 1024 * 1024

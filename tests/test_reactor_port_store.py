@@ -8,21 +8,13 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.adapters.composition.reactor_prefix_response.port_store import ReactorExternalPortStore, ReactorPortContext
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, StudyOperationAuthority
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ArtifactWriteRequest,
-    ExternalRootContract,
-)
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, StudyOperationAuthority
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 
 
 def test_store_requires_publication_exact_context_and_independent_authority(

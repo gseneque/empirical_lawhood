@@ -5,20 +5,12 @@ from dataclasses import replace
 from hashlib import sha256
 from types import SimpleNamespace as N
 import pytest
-from empirical_lawhood.adapters.methods.battery_diagnostic_obstruction import (
-    contracts as c,
-    science as s,
-)
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import (
-    contracts as rc,
-    science as rs,
-    operation_bindings as ro,
-    recursive_translation as rt,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.runtime.execution import WorkerInputKind
+from empirical_lawhood.domains.battery.battery_diagnostic_obstruction import contracts as c, science as s
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as rc, science as rs, operation_bindings as ro, recursive_translation as rt
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.execution.execution import WorkerInputKind
 from tests.battery_obstruction_fixtures import load_retained_obstruction_source
 from tests.test_battery_refined_inquiry_binding import parent
 from tests.test_battery_refined_inquiry import selected as selected
@@ -69,6 +61,42 @@ def test_complete_primary_history_keeps_unknown_executions(source):
     )
     assert len(source.complete_custody) == 475 and len(source.input_manifests) == 3
     assert records["terminal"].completed_task_ids == ()
+
+
+def test_disclosed_reference_transport_keeps_history_joins_and_commit_census(source):
+    """Representation-only fixture derived from closed records; no new native facts."""
+    import json
+    from empirical_lawhood.storage.artifact_sidecars import decode_artifact_sidecar
+    from empirical_lawhood.storage.contracts.artifact_sidecar import ArtifactManifestReference
+
+    custody = {row.relative_path: row for row in source.complete_custody}
+    records = []
+    for row in source.records:
+        original = decode_artifact_sidecar(row.manifest_raw_utf8.encode())
+        reference = ArtifactManifestReference.from_manifest(original)
+        raw = reference.canonical_bytes()
+        relative = row.relative_path + '.manifest.json'
+        custody[relative] = c.CustodyMember(relative, len(raw), sha256(raw).hexdigest())
+        records.append(replace(row, manifest_raw_utf8=raw.decode()))
+    inputs = tuple(ArtifactManifestReference.from_manifest(row) for row in source.input_manifests)
+    for reference in inputs:
+        raw = reference.canonical_bytes()
+        relative = reference.materialization.relative_path + '.manifest.json'
+        custody[relative] = c.CustodyMember(relative, len(raw), sha256(raw).hexdigest())
+    cost = json.loads(source.invocation_cost_raw_utf8)
+    cost['operational_retained_bytes'] = sum(row.size_bytes for row in custody.values())
+    selected = replace(source, records=tuple(records), input_manifests=inputs,
+        complete_custody=tuple(custody[path] for path in sorted(custody)),
+        invocation_cost_raw_utf8=json.dumps(cost))
+    # Only physical metadata encodings differ. Every retained scientific and
+    # operational body, including UNKNOWN completion, has the same exact join.
+    assert s.validate_source(selected) == s.validate_source(source)
+    restored = decode_canonical_bytes(selected.canonical_bytes(), c.ObstructionSource, maximum_bytes=None)
+    assert restored == selected and type(restored.input_manifests[0]) is ArtifactManifestReference
+    marker_path = inputs[0].commit_marker_relative_path
+    with pytest.raises(ValueError, match='commit census'):
+        s.validate_source(replace(selected, complete_custody=tuple(
+            row for row in selected.complete_custody if row.relative_path != marker_path)))
 
 
 @pytest.mark.parametrize(
@@ -204,8 +232,8 @@ def test_explicit_alternative_history_preserves_full_roster_and_gates(selected, 
         "unknown" in draft.requirements[0].condition
         and "No DiagnosticResult" in draft.requirements[0].condition
     )
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
     compiled = compile_recursive_wave(
         draft=draft,
@@ -251,10 +279,10 @@ def test_explicit_alternative_history_preserves_full_roster_and_gates(selected, 
             kind=WorkerInputKind.EXTERNAL,
             media_type="application/json",
             outcome_access=__import__(
-                "empirical_lawhood.kernel.evidence", fromlist=["OutcomeAccess"]
+                "empirical_lawhood.science.evidence.evidence", fromlist=["OutcomeAccess"]
             ).OutcomeAccess.DEVELOPMENT_VISIBLE,
             visibility_ceiling=__import__(
-                "empirical_lawhood.kernel.evidence", fromlist=["VisibilityCeiling"]
+                "empirical_lawhood.science.evidence.evidence", fromlist=["VisibilityCeiling"]
             ).VisibilityCeiling.DEVELOPMENT_ONLY,
             size_bytes=len(r.canonical_bytes()),
             read=r.canonical_bytes,
@@ -267,7 +295,7 @@ def test_explicit_alternative_history_preserves_full_roster_and_gates(selected, 
         )
         for r in rows
     )
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
 
     runner = ro.RefinedRunner("validate-obstruction-policy")
     context = N(
@@ -303,8 +331,8 @@ def test_explicit_alternative_history_preserves_full_roster_and_gates(selected, 
 @pytest.mark.parametrize("damage", ("missing-receipt", "external-gate", "old-result-gate", "changed-history"))
 def test_alternate_native_gate_refuses_before_acquisition(selected, source, monkeypatch, damage):
     from tests.test_battery_refined_inquiry_binding import context, Port
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import native
-    from empirical_lawhood.runtime.execution import DependencyReceiptBinding
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import native
+    from empirical_lawhood.execution.execution import DependencyReceiptBinding
     old_source, old_policy = selected
     history = projected(source)
     selection = replace(old_policy.selection, diagnostic=c.identity(history))

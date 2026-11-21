@@ -5,12 +5,12 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_acquisition as owner, programme_records
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.obligations import ObligationStatus
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.study_authoring import DesignInputRecord, DesignInputRole
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_acquisition as owner, programme_records
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.evidence.obligations import ObligationStatus
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole
 from tests.runtime_platform.test_candidate_compiler import _fixture
 from tests.test_matrix_scheduled_programme_reduction import declared as declared
 
@@ -79,7 +79,7 @@ def test_local_acquisition_root_has_new_data_obligations_and_preserves_global_sc
 
 def test_new_acquisition_factories_select_new_controls_and_literal_v2_native_configs(monkeypatch):
     import numpy as np
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_acquisition_bindings as bindings
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_acquisition_bindings as bindings
 
     def blocked(*args, **kwargs):
         pytest.fail('acquisition static discovery entered numerical science')

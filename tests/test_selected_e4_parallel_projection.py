@@ -12,10 +12,10 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api.selected_e4_case_projection import _project_score, original_score_projections
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
-from empirical_lawhood.infrastructure.parallel_verification import CanonicalValidationPool, canonical_validation_scope
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
+from empirical_lawhood.storage.parallel_verification import CanonicalValidationPool, canonical_validation_scope
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_dense_response_measurements import assay, impulse, measure  # noqa: F401
 
 

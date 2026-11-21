@@ -6,6 +6,7 @@ hypothetical test controls. Only source inspection is replaced; the installed
 catalog, authoring API, content-addressed custody, loader and provider proof are
 the actual application owners. No issue, signer, native producer or fit runs.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from decimal import Decimal
@@ -16,37 +17,31 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import records as records, science
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.commitment import COMMIT_KEY, E1Commitment, E1CommitmentConfig, committed
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.operation_bindings import (
-    KEY, NAMESPACE, E1AdjudicationConfig, E1NativeRunner, E1OperationConfig,
-    _decode,
-)
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import records as records, science
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.commitment import COMMIT_KEY, E1Commitment, E1CommitmentConfig, committed
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.operation_bindings import KEY, NAMESPACE, E1AdjudicationConfig, E1NativeRunner, E1OperationConfig, _decode
 from empirical_lawhood.api import recursive_prospective_authoring as author
 from empirical_lawhood.api.authoring_handoff import create_authoring_api
 from empirical_lawhood.api.execution import CampaignExecutionService
 from empirical_lawhood.api.recursive_operations import operation_catalog, operation_factories
 from empirical_lawhood.api.results import CompileCandidateRequest
-from empirical_lawhood.infrastructure.candidate_sources import ExternalCandidateInputPublisher, ExternalContentAddressedInputResolver
-from empirical_lawhood.infrastructure.artifacts import ArtifactPlaneError
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.execution_envelope import (
-    ChildResourceTokenLimit, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec,
-    NonTimeResourceBudget, ProgressHeartbeat, ProgressLivenessContract,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactWriteRequest, lineage_parent_sort_key
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.executable_bindings import LayeredCampaignRuntimeProviderResolver
-from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
-from empirical_lawhood.runtime.capabilities import CapabilityConformanceError
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec, RecursiveProspectiveOperand
-from empirical_lawhood.runtime.source_resolution import ContentAddressedResolutionError, SourceMaterializationConfig, SourceReadMode
-from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
+from empirical_lawhood.storage.candidate_sources import ExternalCandidateInputPublisher, ExternalContentAddressedInputResolver
+from empirical_lawhood.storage.artifacts import ArtifactPlaneError
+
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.execution_envelope import ChildResourceTokenLimit, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec, NonTimeResourceBudget, ProgressHeartbeat, ProgressLivenessContract
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactWriteRequest, lineage_parent_sort_key
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.executable_bindings import LayeredCampaignRuntimeProviderResolver
+from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
+from empirical_lawhood.execution.capabilities import CapabilityConformanceError
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec, RecursiveProspectiveOperand
+from empirical_lawhood.execution.source_resolution import ContentAddressedResolutionError, SourceMaterializationConfig, SourceReadMode
+from empirical_lawhood.execution.study_issue import project_standard_study_extensions
 from tests.experiment_entry_support import standard_authoring_for_draft
 from tests.prospective_source_capture_fixture import SyntheticSourceInspector, synthetic_capture
 from tests.test_matrix_factor_confirmation_adjudication import prospective
@@ -66,7 +61,7 @@ def _blocked(*args, **kwargs):
 
 
 def _block_science(monkeypatch):
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
     monkeypatch.setattr(E1NativeRunner, 'execute_with_native_subwork', _blocked)
     monkeypatch.setattr(parameter_source, 'acquire_parameter_history', _blocked)
     monkeypatch.setattr(science, 'measure', _blocked)
@@ -250,8 +245,8 @@ def _prove_stock_staging_to_pure_commitment(handoff, plane):
             row.logical_artifact_id) for row in history_task.outputs), history_task.capability.required_permissions,
         history_task.capability.requested_outcome_access, history_task.capability.requested_resources, WorkerIsolationProfile.TRUSTED_LOCAL,
         (DependencyReceiptBinding('receipt.hypothetical-default-commit', COMMIT_KEY, (write.materialization.materialization_id,)),))
-    from empirical_lawhood.infrastructure.execution import prepare_worker_invocation
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+    from empirical_lawhood.execution.local.execution import prepare_worker_invocation
+    from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
     provenance = config.sources[0].provenance
     implementation = RecursiveImplementationBinding(provenance.package_sources, provenance.code_sources_sha256,
         provenance.dependency_lock_sha256, provenance.observed_git_head, provenance.observed_checkout_clean)
@@ -364,7 +359,7 @@ def test_default_author_and_loader_authenticate_original_custody_before_effects(
     publication = config.sources[0].reservation.publication
     original_manifest = plane.root.resolve(publication.manifest_materialization.relative_path, for_write=False)
     if defect == 'missing-commit':
-        manifest = decode_artifact_manifest(original_manifest.read_bytes())
+        manifest = resolve_artifact_sidecar_bytes(plane, original_manifest.read_bytes())
         path = plane.root.resolve(manifest.publication.commit_marker_relative_path, for_write=False)
     elif defect == 'changed-original-bytes':
         path = plane.root.resolve(publication.materialization.relative_path, for_write=False)
@@ -396,7 +391,7 @@ def test_default_author_and_loader_authenticate_original_custody_before_effects(
 def test_default_e1_unselected_memory_limit_cannot_lower_into_finite_envelope(e1, tmp_path, monkeypatch):
     # Evidence for the original mismatch: cells must be finite, while each
     # unchanged default request has no selected memory enforcement limit.
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation.operation_bindings import BUDGET
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation.operation_bindings import BUDGET
     args, _, plane = _application(e1, tmp_path, monkeypatch, selected_budget=BUDGET)
     destination = Path(plane.root.contract.canonical_path)/'default-memory-refusal'
     with pytest.raises(ValueError, match='resource cell|task budget|envelope'):
@@ -406,7 +401,7 @@ def test_default_e1_unselected_memory_limit_cannot_lower_into_finite_envelope(e1
 
 @pytest.mark.parametrize('placement', ('finite-contained', 'cpu2', 'gpu1'))
 def test_e1_worker_budget_guard_accepts_explicit_contained_request_only(e1, placement):
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation.operation_bindings import _worker
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation.operation_bindings import _worker
     _, sources, _ = e1
     config = E1AdjudicationConfig('config.'+KEY, sources)
     p, a = evaluator_products(sources)

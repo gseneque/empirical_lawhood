@@ -3,7 +3,7 @@
 from types import SimpleNamespace
 import pytest
 from empirical_lawhood.api.matrix_native_acquisition_replay import inspect_native
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
 
 
 @pytest.mark.parametrize("state", tuple(NativeSubworkState))

@@ -13,16 +13,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4WaveLocator
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4WaveLocator
 from empirical_lawhood.api import matrix_full_factor_read as full_read
 from empirical_lawhood.api import selected_e4_access as access
 from empirical_lawhood.api import selected_e4_native_read as native_read
 from empirical_lawhood.api import recursive_qualified_parents as authority
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.study_issue import StudyOperationAuthority
-from empirical_lawhood.runtime.plans import ExecutionPlan
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.study_issue import StudyOperationAuthority
+from empirical_lawhood.execution.plans import ExecutionPlan
 from tests.test_current_result_custody import actual_issued_current_task_controls  # noqa: F401
 from tests.test_current_result_historical_access import later_reveal
 from tests.test_matrix_selected_e3_e4_bridge import selected_bridge, transfer  # noqa: F401
@@ -325,13 +325,13 @@ def _component_access_case(monkeypatch, target_fixture, *, interrupted=None, fai
     seam isolates when the component reader must refresh that owner, including
     after a heavy replay or a dependent consumer changes the current fact.
     """
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as preparation
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as records
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as programme
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as original
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledSource
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as preparation
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as records
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as programme
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as original
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledSource
     from empirical_lawhood.api import recursive_operations
-    from empirical_lawhood.runtime.prospective_experiment import SPECIFICATION_FILENAME
+    from empirical_lawhood.execution.prospective_experiment import SPECIFICATION_FILENAME
 
     events=[]
     state=SimpleNamespace(now=0,revoked=False,changed=False)
@@ -498,9 +498,9 @@ def test_component_normal_and_wave_returns_refresh_current_access(monkeypatch,ro
 def _inner_wave_access_case(monkeypatch, target_fixture, *, interrupted=None,failure='expired'):
     """Real inner projection of nine missing cases; custody/clock remain spies."""
     from pathlib import Path
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
     from empirical_lawhood.api import selected_e4_native_runtime
-    from empirical_lawhood.kernel.authority import ResourceBudget
+    from empirical_lawhood.science.identity.authority import ResourceBudget
 
     case=_component_access_case(monkeypatch,target_fixture,interrupted=interrupted,failure=failure,wave=True,replacement=True)
     root=Path(__file__).parents[1]

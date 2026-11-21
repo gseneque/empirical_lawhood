@@ -10,35 +10,31 @@ from hashlib import sha256
 from collections import Counter
 from contextlib import contextmanager
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as methods
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_preparation import (
-    decode_response_inputs, response_native_work,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_records import ConfiguredProtectedE3ResponseConfig
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_continued_response import ConfiguredE3ContinuedResponseConfig
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_source_records import NAMESPACE
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_statistical_bindings import statistical_task_id
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_unknown_response import (
-    ConfiguredProtectedE3UnknownResponseAvailability, score_unknown_response,
-)
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as methods
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_preparation import decode_response_inputs, response_native_work
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_records import ConfiguredProtectedE3ResponseConfig
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_continued_response import ConfiguredE3ContinuedResponseConfig
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_source_records import NAMESPACE
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_statistical_bindings import statistical_task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_unknown_response import ConfiguredProtectedE3UnknownResponseAvailability, score_unknown_response
 from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader, authenticate_task_dispatch_authority
 from empirical_lawhood.api.protected_e3_read_custody import product
 from empirical_lawhood.api.recursive_qualified_parents import _collect_receipt_closure
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.execution import LocalScheduler, validate_resolved_external_inputs
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from empirical_lawhood.infrastructure.retained_input_read import RetainedInputRead
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_value
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, most_restrictive_outcome_access
-from empirical_lawhood.runtime.execution import TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.experimental_statistics import binomial_upper_tail, split_upper_calibration
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.execution.local.execution import LocalScheduler, validate_resolved_external_inputs
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+from empirical_lawhood.storage.retained_input_read import RetainedInputRead
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_value
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, most_restrictive_outcome_access
+from empirical_lawhood.execution.execution import TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.methods.statistics.experimental_statistics import binomial_upper_tail, split_upper_calibration
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
 
 
 def _external_inputs(writer, task, run_id):
@@ -127,7 +123,7 @@ def _operands(writer, package, task, contact, receipts, external, *, input_read=
         if manifest.implementation_sha256 != task.capability_implementation_sha256:
             raise PermissionError('INCOMPLETE_E3_EXACT_ORIGINAL_RESPONSE_METHOD_REQUIRED')
         def read_record(port, prepared, kind):
-            from empirical_lawhood.adapters.methods.matrix_factor_response.protected_input_custody import read_protected_e3_response_input
+            from empirical_lawhood.domains.matrix.matrix_factor_response.protected_input_custody import read_protected_e3_response_input
             retained = input_read.retained_manifest(port)
             if retained is None:
                 return read_protected_e3_response_input(port, prepared, kind)
@@ -269,7 +265,7 @@ def _receipt_sources(*, writer, package, plan, receipts, retained):
     """Keep each accepted receipt with its producing plan and live read owner."""
     sources = [(writer, plan, receipts)]
     if retained is not None:
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import ConfiguredE3RetainedTaskConfig
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import ConfiguredE3RetainedTaskConfig
         adopted = {task.task_id: task for task in plan.tasks
             if task.capability.config.config_schema == ConfiguredE3RetainedTaskConfig.SCHEMA}
         if retained.unfinished is None:
@@ -339,7 +335,7 @@ def read_incomplete_assessment(*, writer, package, plan, specification, allocati
             rows[unit] = row
     del control_reader
     if retained is not None:
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
         if type(retained.unfinished) is ConfiguredE3ClosedExecution:
             previous = retained.predecessor
             previous.require_access()

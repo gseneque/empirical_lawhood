@@ -9,17 +9,17 @@ import pickle
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_future_custody as method
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import MatrixPreparationHistory, MatrixPreparationSource
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_forecast import MatrixPreparedMechanicalForecast
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_point import MatrixPreparedPointSeal
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_prefix import MatrixPreparedCausalPrefix
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_response_science import MatrixPreparedResponsePanel
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseProtocol
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA, MAXIMUM_MATRIX_ARRAY_BYTES
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_future_custody as method
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixPreparationHistory, MatrixPreparationSource
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_forecast import MatrixPreparedMechanicalForecast
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_point import MatrixPreparedPointSeal
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_prefix import MatrixPreparedCausalPrefix
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_response_science import MatrixPreparedResponsePanel
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseProtocol
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA, MAXIMUM_MATRIX_ARRAY_BYTES
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 from tests.test_matrix_prepared_response_method import case  # noqa: F401 - supplied-innovation fixture
 
 
@@ -63,9 +63,9 @@ def test_retained_future_reuses_original_archive_without_recompression_and_refus
 @pytest.mark.parametrize("recovered", (False, True))
 def test_native_future_closes_verified_output_once_and_keeps_raw_parity(case, monkeypatch, recovered):  # noqa: F811
     """Disclosed store and supplied innovations; no acquired RNG or real contact."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_native_body as native
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_response_science
-    from empirical_lawhood.infrastructure import matrix_array_io
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_native_body as native
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_response_science
+    from empirical_lawhood.adapters.matrix_storage import matrix_array_io
     from tests.test_matrix_native_real_progress import DisclosedStore
 
     source, initial, preparation, preparation_raw, protocol, panels, forecast, frozen_raw, _ = case
@@ -105,7 +105,7 @@ def test_native_future_closes_verified_output_once_and_keeps_raw_parity(case, mo
 
 
 def test_member_metadata_retains_noncontiguous_values_and_explicit_missingness_without_archive(monkeypatch):
-    from empirical_lawhood.infrastructure.matrix_array_io import matrix_array_members
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import matrix_array_members
     values = {"slice": np.arange(12, dtype="<f8").reshape(3, 4)[:, ::2],
         "missing": np.asarray([np.nan], dtype="<f8")}
     raw, expected = encode_matrix_arrays(values, nonfinite_members=("missing",))
@@ -146,9 +146,9 @@ def test_prepared_future_cannot_promote_known_nonentry_to_completed_native_custo
 
 
 def test_missing_full_assay_inputs_report_dependencies_without_science_or_authority(monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_assay_experiment as public
-    from empirical_lawhood.planning.campaigns import CampaignSpec
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_assay_experiment as public
+    from empirical_lawhood.design.campaigns import CampaignSpec
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
     specification = public.MatrixPreparedAssaySpecification("experiment.literal-missing-assay",
         reference("programme.literal-missing-assay", public.MatrixPreparedAssayProgramme),
@@ -172,12 +172,12 @@ def test_missing_full_assay_inputs_report_dependencies_without_science_or_author
 def test_revision_future_closes_actual_record_without_shifting_package_into_protocol(monkeypatch):
     """Only post-handoff record closeout: disclosed pins, no issue or native work."""
     from types import SimpleNamespace
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_future as revision
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_native_body
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import MatrixRevisionSelectedPackage
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_point import SelectedE4RevisionPoint
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_future as revision
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_native_body
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import MatrixRevisionSelectedPackage
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_point import SelectedE4RevisionPoint
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
 
     raw, marker_operand = marker()
     # These metadata-only seams isolate the real post-native call and schema;
@@ -229,8 +229,8 @@ def test_revision_future_closes_actual_record_without_shifting_package_into_prot
 def test_prepared_future_cold_science_reuses_exact_frozen_input_and_preserves_adverse_cells(case, monkeypatch, precision):  # noqa: F811
     """Real supplied-innovation equations; only native receipt admission is a seam."""
     from decimal import localcontext
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_response_science as science
-    from empirical_lawhood.infrastructure import matrix_array_io
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_response_science as science
+    from empirical_lawhood.adapters.matrix_storage import matrix_array_io
     source, initial, preparation, preparation_raw, protocol, panels, forecast, frozen_raw, _ = case
     actual = science.propagate_prepared_responses(*case)
     damaged = {name: value.copy() for name, value in actual.items()}
@@ -285,7 +285,7 @@ def test_prepared_future_cold_science_reuses_exact_frozen_input_and_preserves_ad
 
 
 def test_prepared_future_nonentry_keeps_all48_and_validation_precedes_decoding(case, monkeypatch):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_response_science as science
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_response_science as science
     source, initial, preparation, preparation_raw, protocol, panels, forecast, frozen_raw, _ = case
     config = SimpleNamespace(source=source, protocol=protocol, panels=panels)
     history, mechanical = SimpleNamespace(arrays=preparation), SimpleNamespace(arrays=forecast)
@@ -321,11 +321,12 @@ def test_prepared_future_nonentry_keeps_all48_and_validation_precedes_decoding(c
 @pytest.mark.parametrize("nonentry", (False, True))
 def test_installed_prepared_assessor_reuses_one_frozen_decode_and_keeps_actual_cold_reproof(tmp_path, monkeypatch, nonentry):
     """Actual score worker/physical equations; ordinary input/native-custody admission are explicit seams."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_future_bindings as worker
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science, prepared_forecast, prepared_response_science as science
-    from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-    from empirical_lawhood.infrastructure import matrix_array_io
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_future_bindings as worker
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_forecast, prepared_response_science as science
+    import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as preparation_science_owner_0
+    from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+    from empirical_lawhood.adapters.matrix_storage import matrix_array_io
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     from tests import test_matrix_prepared_forecast as physical_fixture
     source, protocol, causal, causal_raw, template_raw = physical_fixture.case.__wrapped__(tmp_path)
     if nonentry:
@@ -338,8 +339,8 @@ def test_installed_prepared_assessor_reuses_one_frozen_decode_and_keeps_actual_c
     initial, _ = encode_matrix_arrays({"positions": positions, "momenta": np.zeros_like(positions)})
     assert sha256(initial).hexdigest() == source.initial.array_artifact.sha256
     zeros = np.zeros((source.total_ticks, 2, 3, 4, 4), dtype="<c16")
-    prepared = preparation_science.propagate_preparation(source, initial, coarse_innovations=zeros, bridge_innovations=zeros)
-    preparation_raw, preparation = preparation_science.preparation_array_product(source, initial, prepared,
+    prepared = preparation_science_owner_0.propagate_preparation(source, initial, coarse_innovations=zeros, bridge_innovations=zeros)
+    preparation_raw, preparation = preparation_science_owner_0.preparation_array_product(source, initial, prepared,
         artifact_id="array.literal-pauli-preparation")
     assert method.preparation_identity(preparation) == mechanical.arrays.preparation
     group = source.root.root.independent_group_id
@@ -395,7 +396,7 @@ def test_installed_prepared_assessor_reuses_one_frozen_decode_and_keeps_actual_c
                 pytest.fail("installed prepared score worker expanded its frozen input twice")
             return original(raw, operand)
         monkeypatch.setattr(owner, "decode_matrix_arrays", no_repeat)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast
     monkeypatch.setattr(response_forecast, "_hessian", lambda *_: pytest.fail("cold reproof entered Hessian producer"))
     monkeypatch.setattr(np.linalg, "eigh", lambda *_: pytest.fail("cold reproof entered eigensolver"))
     monkeypatch.setattr(np.random, "Generator", lambda *_: pytest.fail("cold score created RNG"))

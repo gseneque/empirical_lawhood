@@ -6,7 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.composition.prepared_response.native_authoring import PreparedResponseNativeAuthoringInput, _prior_census
+from empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring import PreparedResponseNativeAuthoringInput
+from empirical_lawhood.adapters.composition.prepared_response.native_authoring import _prior_census
 from empirical_lawhood.api.native_authoring import author_matrix_response
 from empirical_lawhood.api.codecs import load_registered_authoring
 

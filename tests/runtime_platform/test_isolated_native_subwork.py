@@ -18,20 +18,20 @@ import tracemalloc
 
 import pytest
 
-from empirical_lawhood.adapters.methods.isolated_native_conformance import ExposedIsolatedNativeRunner, exposed_metadata_definition
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, TaskProcessError
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.isolated_native_subwork import IsolatedNativeEntryReturn, IsolatedNativeEntrySelection
-from empirical_lawhood.runtime.isolated_native_subwork import IsolatedNativeProcessStart
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.native_subwork import NativeSubworkOutput, NativeSubworkRoster, NativeSubworkState, NativeSubworkUncertainContact
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedNativeWork, PreparedWorkerEnvironment
+from empirical_lawhood.adapters.conformance.isolated_native import ExposedIsolatedNativeRunner, exposed_metadata_definition
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, TaskProcessError
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.isolated_native_subwork import IsolatedNativeEntryReturn, IsolatedNativeEntrySelection
+from empirical_lawhood.execution.isolated_native_subwork import IsolatedNativeProcessStart
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.native_subwork import NativeSubworkOutput, NativeSubworkRoster, NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.execution.prepared_native_invocation import PreparedNativeWork, PreparedWorkerEnvironment
 from tests.runtime_platform.test_native_subwork import _process_context, _selected
 from tests.runtime_platform.test_worker_preflight import _case
 
@@ -56,7 +56,7 @@ def prepared_bridge_case(tmp_path, return_code):
     The selected child only returns a disclosed process code. This exercises
     real source/preflight/IPC custody, without a scientific native engine.
     """
-    from empirical_lawhood.infrastructure import isolated_native_subwork as bridge
+    from empirical_lawhood.execution.local import isolated_native_subwork as bridge
     plane, bundle, _runner, context, contract, parent = _case(tmp_path, actual=True, native=True)
     root = tmp_path / "prepared-selected-child"
     root.mkdir()
@@ -286,9 +286,9 @@ def test_selected_source_executes_authenticated_bytes_despite_valid_stale_byteco
 @pytest.mark.parametrize("fault", ["none-handshake", "boolean-sequence", "bootstrap-exit"])
 @pytest.mark.parametrize("return_publication_fails", [False, True])
 def test_malformed_actual_child_is_refused_and_reaped_even_when_it_ignores_term(tmp_path, monkeypatch, fault, return_publication_fails):
-    from empirical_lawhood.adapters.methods.isolated_native_conformance import _freeze_initial
-    from empirical_lawhood.infrastructure import isolated_native_subwork as bridge
-    from empirical_lawhood.infrastructure.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
+    from empirical_lawhood.adapters.conformance.isolated_native import _freeze_initial
+    from empirical_lawhood.execution.local import isolated_native_subwork as bridge
+    from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
     store, definitions, context, root, invocation, _ = fixture_case(tmp_path, "success")
     service = NativeSubworkPipeService(store, context, tmp_path)
     class Connection:
@@ -333,8 +333,8 @@ def test_malformed_actual_child_is_refused_and_reaped_even_when_it_ignores_term(
     # violates this narrow protocol and waits forever while ignoring SIGTERM.
     script = '''import os, signal, sys
 from multiprocessing.connection import Connection
-from empirical_lawhood.infrastructure.isolated_native_subwork import _Handshake
-from empirical_lawhood.infrastructure.native_subwork_ipc import NativeSubworkRequest
+from empirical_lawhood.execution.local.isolated_native_subwork import _Handshake
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkRequest
 signal.signal(signal.SIGTERM, signal.SIG_IGN)
 connection = Connection(int(sys.argv[1]))
 selection, parent = connection.recv()
@@ -534,8 +534,8 @@ def test_changed_original_invocation_after_handshake_cannot_substitute_selected_
 
 @pytest.mark.parametrize("field", ["entry_source_path", "invocation_path"])
 def test_nonregular_selected_file_refuses_before_launch_or_contact(tmp_path, field):
-    from empirical_lawhood.infrastructure import isolated_native_subwork as bridge
-    from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
+    from empirical_lawhood.execution.local import isolated_native_subwork as bridge
+    from empirical_lawhood.storage.bounded_io import BoundedFileIOError
     from tests.runtime_platform.test_native_subwork_completed_relay import pipe
     store, definitions, _, root, invocation, _ = fixture_case(tmp_path, "success")
     progress, service, context = pipe(store, definitions[0], store.parent_inputs, tmp_path)
@@ -562,9 +562,9 @@ def test_nonregular_selected_file_refuses_before_launch_or_contact(tmp_path, fie
             port.close()
 
 
-def test_complete_invocation_snapshot_is_sealed_with_bounded_copy_memory(tmp_path):
+def test_complete_invocation_snapshot_is_sealed_with_bounded_copy_memory(tmp_path, monkeypatch):
     import fcntl
-    from empirical_lawhood.infrastructure import isolated_native_subwork as bridge
+    from empirical_lawhood.execution.local import isolated_native_subwork as bridge
     source = Path(bridge.__file__).resolve()
     invocation = tmp_path / "all-selected-operands"
     block = b"complete operand denominator\n" * 32768
@@ -577,9 +577,15 @@ def test_complete_invocation_snapshot_is_sealed_with_bounded_copy_memory(tmp_pat
         sha256(Path(sys.executable).read_bytes()).hexdigest(), bridge.__name__, "_main", str(source),
         sha256(source.read_bytes()).hexdigest(), str(invocation), digest.hexdigest(),
         bridge.selected_environment_sha256(dict(os.environ)))
+    reservation = bridge.IsolatedInvocationMemory(invocation.stat().st_size)
+    with monkeypatch.context() as patch:
+        patch.setattr(bridge, "_anonymous_input_descriptor",
+            lambda: pytest.fail("oversized invocation allocated anonymous backing"))
+        with pytest.raises(ValueError, match="complete isolated invocation backing"):
+            bridge._seal_invocation(selected, memory_bytes=reservation.known_bytes - 1)
     tracemalloc.start()
     try:
-        operand = bridge._seal_invocation(selected)
+        operand = bridge._seal_invocation(selected, memory_bytes=reservation.known_bytes)
         _, peak = tracemalloc.get_traced_memory()
     finally:
         tracemalloc.stop()

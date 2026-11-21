@@ -11,32 +11,11 @@ import pytest
 from sqlalchemy import Engine, event
 from sqlalchemy.exc import DatabaseError
 
-from empirical_lawhood.infrastructure.dataset_catalog_access import (
-    DatasetCatalogReadSessionProvider,
-    load_local_dataset_projection_receipt_reference,
-)
-from empirical_lawhood.infrastructure.sql import (
-    create_catalog_engine,
-    create_read_only_catalog_engine,
-    upgrade_catalog,
-)
-from empirical_lawhood.planning.datasets import (
-    DatasetFamily,
-    EvidenceReference,
-    EvidenceReferenceKind,
-    IdentityState,
-)
-from empirical_lawhood.runtime.dataset_catalog_service import (
-    DatasetCatalogLookup,
-    DatasetCatalogReadService,
-)
-from empirical_lawhood.runtime.datasets import (
-    DatasetCatalogProjectionReceipt,
-    DatasetCatalogProjectionAnchor,
-    DatasetCatalogProjectionState,
-    DatasetCatalogSnapshot,
-    DatasetCatalogWorkLimit,
-)
+from empirical_lawhood.storage.dataset_catalog_access import DatasetCatalogReadSessionProvider, load_local_dataset_projection_receipt_reference
+from empirical_lawhood.storage.sql import create_catalog_engine, create_read_only_catalog_engine, upgrade_catalog
+from empirical_lawhood.design.datasets import DatasetFamily, EvidenceReference, EvidenceReferenceKind, IdentityState
+from empirical_lawhood.execution.dataset_catalog_service import DatasetCatalogLookup, DatasetCatalogReadService
+from empirical_lawhood.execution.datasets import DatasetCatalogProjectionReceipt, DatasetCatalogProjectionAnchor, DatasetCatalogProjectionState, DatasetCatalogSnapshot, DatasetCatalogWorkLimit
 
 
 def _projection_anchor(

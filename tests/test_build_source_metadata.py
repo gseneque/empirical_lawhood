@@ -7,13 +7,26 @@ import json
 from pathlib import Path
 import subprocess
 import tarfile
+import tomllib
 from types import SimpleNamespace
+import zipfile
 
 import pytest
+import yaml
 
 from scripts import build_source_metadata as owner
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_deposit_and_software_citation_match_the_selected_distribution_version():
+    distribution = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["version"]
+    citation = yaml.safe_load((ROOT / "CITATION.cff").read_bytes())
+    deposit = json.loads((ROOT / ".zenodo.json").read_bytes())
+    assert citation["version"] == deposit["version"] == distribution
+    for related in deposit["related_identifiers"]:
+        if related["relation"] == "isIdenticalTo" and "/tree/v" in related["identifier"]:
+            assert related["identifier"].rsplit("/tree/v", 1)[1] == distribution
 
 
 def git(root, *arguments):
@@ -30,15 +43,19 @@ def build_case(tmp_path):
     root = tmp_path / "literal-build-source"
     payloads = {"src/empirical_lawhood/__init__.py": b"# literal package fixture\n",
         "src/empirical_lawhood/operation.py": b"VALUE = 42\n",
-        "src/empirical_lawhood/resources/operand.txt": b"literal mathematical operand\n",
+        "src/empirical_lawhood/package_data/operand.txt": b"literal mathematical operand\n",
         "scripts/entry.py": b"# literal entry fixture\n", "uv.lock": b"version = 1\n",
         "pyproject.toml": b"[project]\nname = 'empirical-lawhood'\nversion = '0.0.test'\n",
         "docs/public.md": b"# Public fixture instructions\n"}
     # These are the build owner's explicit executable policy/process inputs,
     # copied as implementation fixtures; no scientific records are borrowed.
-    for name in ("source_policy.py", "bounded_process.py"):
-        relative = "src/empirical_lawhood/infrastructure/" + name
+    for relative in (
+        "src/empirical_lawhood/storage/source_policy.py",
+        "src/empirical_lawhood/execution/local/bounded_process.py",
+    ):
         payloads[relative] = (ROOT / relative).read_bytes()
+    for name in ("build_source_metadata.py", "hatch_metadata.py"):
+        payloads["scripts/" + name] = (ROOT / "scripts" / name).read_bytes()
     for name, raw in payloads.items():
         write(root / name, raw)
     git(root, "init", "--template=")
@@ -85,6 +102,61 @@ def test_source_distribution_rebuild_retains_identical_metadata_without_git(buil
     assert owner.build_source_metadata(source) == expected
 
 
+def test_documentation_hook_retains_the_exact_commit_through_git_free_sdist(build_case, tmp_path, monkeypatch):
+    from scripts.hatch_metadata import CustomMetadataHook
+
+    raw = owner.build_source_metadata(build_case.root)
+    commit = json.loads(raw)["implementation_commit"]
+    metadata = {}
+    CustomMetadataHook(str(build_case.root), {}).update(metadata)
+    assert metadata["urls"]["Documentation"] == f"{owner.PROJECT_REPOSITORY}/blob/{commit}/README.md"
+    source = export_source(build_case, tmp_path / "source-export")
+    write(source / owner.SOURCE_METADATA_FILENAME, raw)
+    def forbidden(*args, **kwargs):
+        pytest.fail("Git-free metadata hook attempted a process")
+    monkeypatch.setattr(subprocess, "Popen", forbidden)
+    rebuilt = {}
+    CustomMetadataHook(str(source), {}).update(rebuilt)
+    assert rebuilt == metadata
+
+
+@pytest.mark.parametrize("artifact", ("wheel", "sdist"))
+@pytest.mark.parametrize("defect", (None, "main", "wrong-commit", "missing", "duplicate", "oversized"))
+def test_artifact_gate_checks_actual_documentation_metadata(tmp_path, artifact, defect):
+    from scripts.release_check import verify_artifact_documentation
+
+    commit = "e" * 40
+    url = f"{owner.PROJECT_REPOSITORY}/blob/{commit}/README.md"
+    header = f"Project-URL: Documentation, {url}\n"
+    good = ("Metadata-Version: 2.4\nName: empirical-lawhood\n" + header + "\n").encode()
+    altered = good
+    if defect == "main":
+        altered = good.replace(commit.encode(), b"main")
+    elif defect == "wrong-commit":
+        altered = good.replace(commit.encode(), b"f" * 40)
+    elif defect == "missing":
+        altered = good.replace(header.encode(), b"")
+    elif defect == "duplicate":
+        altered = good.replace(header.encode(), (header + header).encode())
+    elif defect == "oversized":
+        altered = good + b"x" * (128 * 1024)
+    wheel = tmp_path / "selected.whl"
+    sdist = tmp_path / "selected.tar.gz"
+    with zipfile.ZipFile(wheel, "w") as archive:
+        archive.writestr("empirical_lawhood-0.3.0.dist-info/METADATA", altered if artifact == "wheel" else good)
+    with tarfile.open(sdist, "w:gz") as archive:
+        raw = altered if artifact == "sdist" else good
+        info = tarfile.TarInfo("empirical_lawhood-0.3.0/PKG-INFO")
+        info.size = len(raw)
+        archive.addfile(info, io.BytesIO(raw))
+    if defect:
+        with pytest.raises((ValueError, RuntimeError), match="metadata|documentation"):
+            verify_artifact_documentation(wheel, sdist, implementation_commit=commit)
+    else:
+        assert verify_artifact_documentation(wheel, sdist, implementation_commit=commit) == {
+            "implementation_commit": commit, "wheel": url, "sdist": url}
+
+
 @pytest.mark.parametrize("name", ("src/empirical_lawhood/operation.py", "scripts/entry.py", "uv.lock", "pyproject.toml"))
 @pytest.mark.parametrize("route", ("checkout", "sdist"))
 def test_execution_and_build_inputs_must_match_the_committed_identity(build_case, tmp_path, name, route):
@@ -100,7 +172,7 @@ def test_execution_and_build_inputs_must_match_the_committed_identity(build_case
         owner.build_source_metadata(selected)
 
 
-@pytest.mark.parametrize("name", ("src/empirical_lawhood/untracked.py", "src/empirical_lawhood/resources/new.txt", "scripts/untracked.py"))
+@pytest.mark.parametrize("name", ("src/empirical_lawhood/untracked.py", "src/empirical_lawhood/package_data/new.txt", "scripts/untracked.py"))
 @pytest.mark.parametrize("route", ("checkout", "sdist"))
 def test_complete_source_census_refuses_extra_executable_and_package_resources(build_case, tmp_path, name, route):
     case = build_case

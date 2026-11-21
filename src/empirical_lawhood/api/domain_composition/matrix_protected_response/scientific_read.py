@@ -5,28 +5,27 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_specification import MatrixResponseErrorSpecification
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_adjudication import adjudication_task_id, conditional_reasons
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_experiment_methods import ProtectedE3Assessment, ProtectedE3Calibration, ProtectedE3FrozenProducts, ProtectedE3ModelSet
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_experiment_inputs import ProtectedE3PreFitJoin
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_statistical_bindings import statistical_task_id
-from empirical_lawhood.api.codecs import MAX_CAMPAIGN_PACKAGE_BYTES
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_specification import MatrixResponseErrorSpecification
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_adjudication import adjudication_task_id, conditional_reasons
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_experiment_methods import ProtectedE3Assessment, ProtectedE3Calibration, ProtectedE3FrozenProducts, ProtectedE3ModelSet
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_experiment_inputs import ProtectedE3PreFitJoin
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_statistical_bindings import statistical_task_id
 from empirical_lawhood.api.current_result_custody import _current_control, authenticate_current_execution_plan, retained_output_artifact_plane
 from empirical_lawhood.api.models import ExperimentPackage
 from empirical_lawhood.api.protected_e3_read_custody import authorize as _authorize, completed_receipts, original_design, product as _product
 from empirical_lawhood.api.protected_e3_read_custody import identity as _identity  # noqa: F401 - retained reader helper
 from empirical_lawhood.api.matrix_training_provenance import fitted_training_provenance
-from empirical_lawhood.kernel.experimental_design import UnitAllocation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import validate_stable_id
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.plans import ExecutionPlan
+from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import validate_stable_id
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.plans import ExecutionPlan
 
 
 def _retained_scientific_writer(package, plan, writer):
     """Project typed codecs only; preserve the original stored manifests."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_composition import operation_declarations
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_composition import operation_declarations
 
     codecs = {}
     for declaration in operation_declarations():
@@ -63,7 +62,7 @@ def _read_protected_e3_result(*, selected, artifact_writer, run_id, reveal_autho
     # No mutable global cache survives this read or grants outcome authority.
     writer = artifact_writer
     package = _current_control(writer=writer, run_id=run_id, name='campaign-package',
-        record_type=ExperimentPackage, maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES)
+        record_type=ExperimentPackage, maximum_bytes=None)
     if expected_package is not None and package != expected_package:
         raise PermissionError('PROTECTED_E3_READ_EXACT_EXPECTED_PACKAGE_REQUIRED')
     if (ObjectIdentity.from_record(package.issued_study.candidate.candidate_id, package.issued_study.candidate)

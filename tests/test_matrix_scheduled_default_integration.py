@@ -13,18 +13,18 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import calibration_bindings as cb
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import calibration_bindings as cb
 from empirical_lawhood.api import recursive_prospective_authoring as author
 from empirical_lawhood.api.authoring_handoff import create_authoring_api
 from empirical_lawhood.api.recursive_operations import operation_catalog, operation_factories
 from empirical_lawhood.api.results import CompileCandidateRequest
-from empirical_lawhood.infrastructure.candidate_sources import ExternalCandidateInputPublisher
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec, RecursiveProspectiveOperand
-from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig, SourceReadMode
-from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
+from empirical_lawhood.storage.candidate_sources import ExternalCandidateInputPublisher
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec, RecursiveProspectiveOperand
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
+from empirical_lawhood.execution.study_issue import project_standard_study_extensions
 from tests.experiment_entry_support import standard_authoring_for_draft
 from tests.prospective_source_capture_fixture import SyntheticSourceInspector, synthetic_capture
 from tests.test_matrix_factor_confirmation_default_integration import _resources as e1_resources
@@ -36,9 +36,7 @@ from tests.test_matrix_scheduled_calibration import (
 
 def _resources(compilation):
     """Reuse the stock finite envelope fixture with the scheduled native census."""
-    from empirical_lawhood.runtime.execution_envelope import (
-        ChildResourceTokenLimit, ProgressHeartbeat, ProgressLivenessContract,
-    )
+    from empirical_lawhood.execution.execution_envelope import ChildResourceTokenLimit, ProgressHeartbeat, ProgressLivenessContract
     from decimal import Decimal
 
     native = {operation.node_id for operation in compilation.draft.operations
@@ -68,11 +66,11 @@ def _resources(compilation):
 def _application(response_bank, tmp_path, monkeypatch, *, compact=False, draft_bundle=None, formal_method_capability_key=None):
     plane = response_bank[0]
     if draft_bundle is not None:
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_qualification import QUALIFY_KEY
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_qualification import QUALIFY_KEY
         draft, qualifications, records, _ = draft_bundle
     elif compact:
         from tests.test_matrix_scheduled_compact_graph import compact_bank
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_qualification import QUALIFY_KEY
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_qualification import QUALIFY_KEY
         draft, qualifications, records, _ = compact_bank(response_bank, response=True)
     else:
         draft, qualifications, records, _ = prospective_bank(response_bank, response=True)
@@ -168,8 +166,8 @@ def _load(application, destination, monkeypatch):
 
 
 def test_default_scheduled_public_author_load_and_provider_remain_effect_free(application, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import NAMESPACE
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import NAMESPACE
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments
 
     def blocked(*args, **kwargs):
         pytest.fail('public author/load or provider proof entered numerical science')
@@ -193,7 +191,7 @@ def test_default_scheduled_public_author_load_and_provider_remain_effect_free(ap
 
 def test_original_full_scheduled_projection_preserves_operands_and_decoder_bound(response_bank):
     """The compact encoding preserves the complete original projection."""
-    from empirical_lawhood.kernel.decoding import CanonicalizationError, decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import CanonicalizationError, decode_canonical_bytes
 
     draft, qualifications, _, _ = prospective_bank(response_bank, response=True)
     registrations, registry, codecs = operation_catalog()
@@ -206,15 +204,15 @@ def test_original_full_scheduled_projection_preserves_operands_and_decoder_bound
     assert compilation.candidate_report.candidate is not None, compilation.candidate_report.diagnostics
     projection = compilation.selected_scientific_projection
     raw = projection.canonical_bytes()
-    assert decode_canonical_bytes(raw, type(projection), maximum_bytes=author.MAXIMUM_SPEC_BYTES) == projection
+    assert decode_canonical_bytes(raw, type(projection), maximum_bytes=len(raw)) == projection
     with pytest.raises(CanonicalizationError, match='exceeds its bounded contract'):
         decode_canonical_bytes(raw, type(projection), maximum_bytes=len(raw)-1)
 
 
 @pytest.mark.parametrize('entry', ('author', 'load'))
 def test_compact_public_entry_authenticates_original_shared_publication(application, monkeypatch, entry):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import ScheduledCompactCommitmentConfig
-    from empirical_lawhood.infrastructure.artifacts import ArtifactPlaneError
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import ScheduledCompactCommitmentConfig
+    from empirical_lawhood.storage.artifacts import ArtifactPlaneError
 
     args, compilation, plane = application
     config, = (value.record for value in compilation.config_inputs

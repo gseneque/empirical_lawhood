@@ -7,9 +7,9 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_prefix as method
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_prefix as method
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as preparation_science_owner_0
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
 from tests import test_matrix_coupling_preparation as fixture
 
 
@@ -17,9 +17,9 @@ from tests import test_matrix_coupling_preparation as fixture
 def case(tmp_path):
     metadata = fixture.metadata.__wrapped__(tmp_path)
     source, initial, coarse, bridge, _ = fixture.selected.__wrapped__(metadata)
-    arrays = preparation_science.propagate_preparation(source, initial, coarse_innovations=coarse, bridge_innovations=bridge)
-    raw, operand = preparation_science.preparation_array_product(source, initial, arrays, artifact_id="array.literal-prefix-preparation")
-    numerical = preparation_science.assess_preparation_arrays(source, initial, operand, arrays,
+    arrays = preparation_science_owner_0.propagate_preparation(source, initial, coarse_innovations=coarse, bridge_innovations=bridge)
+    raw, operand = preparation_science_owner_0.preparation_array_product(source, initial, arrays, artifact_id="array.literal-prefix-preparation")
+    numerical = preparation_science_owner_0.assess_preparation_arrays(source, initial, operand, arrays,
         assessment_id="assessment.literal-prefix-preparation")
     diagnostics, witness = method.measure_prepared_prefix(source, initial, operand, numerical, raw,
         artifact_id="array.literal-prepared-factor-witness")
@@ -31,8 +31,8 @@ def test_prepared_prefix_cold_full_denominators_and_seedless_causal_nonuse(case,
         raise AssertionError("prepared prefix cold reader entered measurement, producer, RNG or eigensolve")
 
     monkeypatch.setattr(method, "measure_prepared_prefix", forbidden)
-    monkeypatch.setattr(preparation_science, "acquire_preparation", forbidden)
-    monkeypatch.setattr(preparation_science, "baoab_step_with_hermitian_noise", forbidden)
+    monkeypatch.setattr(preparation_science_owner_0, "acquire_preparation", forbidden)
+    monkeypatch.setattr("empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_intervals.baoab_step_with_hermitian_noise", forbidden)
     monkeypatch.setattr(np.linalg, "eigh", forbidden)
     monkeypatch.setattr(np.random, "Generator", forbidden)
     frames = method.check_prepared_frames(*case)

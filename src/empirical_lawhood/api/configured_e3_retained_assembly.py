@@ -6,26 +6,26 @@ from io import BytesIO
 from pathlib import Path
 from time import monotonic
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_preparation as preparation_owner
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_composition import operation_declarations
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_bindings import retained_input_id
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection, ConfiguredE3UnfinishedPreparationSelection, ConfiguredE3ClosedPreparationSelection
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_NPZ_CODEC
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.matrix_array_io import NPZMemberSelection, decode_matrix_arrays
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from empirical_lawhood.infrastructure.publication_metadata import authenticate_published_materialization
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.planning.formal_gaps import FormalGapEvidenceWorld
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_preparation as preparation_owner
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_composition import operation_declarations
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_bindings import retained_input_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection, ConfiguredE3UnfinishedPreparationSelection, ConfiguredE3ClosedPreparationSelection
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_NPZ_CODEC
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import NPZMemberSelection, decode_matrix_arrays
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.design.formal_gaps import FormalGapEvidenceWorld
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
-from .derived_array_access import derive_matrix_array_access
-from .derived_metadata_access import _semantic_access, derive_canonical_metadata_access
+from empirical_lawhood.api.derived_array_access import derive_matrix_array_access
+from empirical_lawhood.api.derived_metadata_access import _semantic_access, derive_canonical_metadata_access
 
 
 def _original_input(*, original, retained_files, external, original_run_id):
@@ -94,13 +94,13 @@ def _retained_array_access(*, original, producer, writer, publication, external,
 
 def project_retained_e3(context):
     """Use ordinary source access, candidate preparation and public authoring."""
-    from empirical_lawhood.adapters.composition.experiment_authoring import formal_entry
+    from empirical_lawhood.execution.experiment_authoring import formal_entry
     from empirical_lawhood.api.matrix_programme_allocations import _require_memory
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.planning.experiment_entry import validate_experiment_entry
-    from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
-    from .selected_e4_bank_recipe import _current_selection
-    from .matrix_numerical_provenance import capture_matrix_provenance
+    from empirical_lawhood.design.experiment_entry import validate_experiment_entry
+    from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
+    from empirical_lawhood.api.selected_e4_bank_recipe import _current_selection
+    from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
     if len(context.retained_e3) != 1:
         raise PermissionError('retained E3 requires its one active original programme continuation')
     continuation, original, tasks = context.retained_e3[0]
@@ -214,7 +214,7 @@ def project_retained_e3(context):
         qualifications=tuple(sorted(qualifications, key=lambda row: row.receipt_id)))
     draft = preparation_owner._source_projection(lowered.draft, selection, versions)
     registrations, registry, output_codecs = operation_catalog()
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import source_binding
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import source_binding
     implementation = source_binding(retention.response_provenance)
     compiled = compile_recursive_wave(draft=draft, registrations=registrations, registry=registry,
         implementation_commit=implementation.observed_git_head, qualifications=selection.qualifications,
@@ -238,7 +238,7 @@ def project_retained_e3(context):
         draft=ObjectIdentity.from_record(final_draft.prospective_draft.draft_id, final_draft.prospective_draft)))
     validate_experiment_entry(final_draft.prospective_draft, entry, for_issue=False)
     selection = replace(selection, entry_package=entry)
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
     for filename, record, identity in (('specification.json', specification, specification.identity),
             ('protected-selection.json', selection, ObjectIdentity.from_record(selection.selection_id, selection))):
         write(destination / filename, record.canonical_bytes(), logical=identity.object_id, schema=record.SCHEMA,

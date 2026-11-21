@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Static API compositions for declared prospective runtime requirements."""
 
-from empirical_lawhood.runtime.experiment_preparation import ExperimentProtocolDeclaration, ExperimentRuntimeBinding
+from empirical_lawhood.execution.experiment_preparation import ExperimentProtocolDeclaration, ExperimentRuntimeBinding
 from types import MappingProxyType
 
 
@@ -92,8 +92,8 @@ def bootstrap_selected_experiment_inputs(*, declaration, specification, selectio
     The installed domain owns the exact locator joins and current permission.
     A selected path, declared identity or returned guard creates no authority.
     """
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputSelection
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputSelection
 
     if type(specification) is not declaration.specification_type:
         raise TypeError('selected input bootstrap changes its exact installed specification owner')
@@ -168,9 +168,9 @@ def bootstrap_authored_development_inputs(*, directory, artifact_writer, packet,
     a narrower reader limited to its declared locator-only input codecs.
     """
     from empirical_lawhood.api.experiment_preparation import experiment_protocols
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-    from empirical_lawhood.runtime.prospective_experiment import source_filename
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+    from empirical_lawhood.execution.prospective_experiment import source_filename
 
     names = {value.filename for value in packet.members}
     required = {'experiment-instance.json', 'experiment-specification.json'}
@@ -219,8 +219,8 @@ def bootstrap_authored_development_inputs(*, directory, artifact_writer, packet,
 
 def original_input_record_publication(*, record, original_input_access, inherited_parents=()):
     """Exact input ancestry and ordinary inherited labels; no authority inference."""
-    from empirical_lawhood.runtime.artifacts import derived_outcome_access, inherited_visibility
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import derived_outcome_access, inherited_visibility
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
     parents = (() if original_input_access is None else original_input_access.record_parents(record))
     if inherited_parents:
         parents = inherited_parents

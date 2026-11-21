@@ -7,17 +7,17 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, durable_roster as dr
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_step_control as step
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_contracts as sc
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import source_derived_preparation as roots
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, durable_roster as dr
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_step_control as step
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_contracts as sc
+from empirical_lawhood.domains.battery.battery_refined_inquiry import source_derived_preparation as roots
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
 from tests.test_battery_durable_roster import selected54 as original_selection
 from tests.test_battery_internal_step_control import Backend, constructor
 
@@ -159,7 +159,7 @@ def test_cost_preserves_nested_segment_scope_and_counts_extra_bytes_once(selecte
 
 
 def test_every_actual_request_options_and_full_policy_sources_are_checked(selected, config, monkeypatch):
-    from empirical_lawhood.adapters.methods.battery_segmented_inquiry import evidence_stream as stream
+    from empirical_lawhood.domains.battery.battery_segmented_inquiry import evidence_stream as stream
     assignment = witness(selected[2], config)[2]
     frame = object.__new__(stream.SegmentEvidenceFrame)
     object.__setattr__(frame, 'request', N(configuration=assignment.native_configuration,
@@ -179,9 +179,9 @@ def test_every_actual_request_options_and_full_policy_sources_are_checked(select
 @pytest.mark.parametrize('horizon', (D(60), D(30), D(15)))
 def test_actual_definition_typed_roundtrip_full_outputs_sources_and_all_inputs(selected, config, horizon):
     from hashlib import sha256
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry.preparation_contracts import PreparationProtocol
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry.preparation_science import PREPARATION_SOURCE_MEMBERS
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition
+    from empirical_lawhood.domains.battery.battery_refined_inquiry.preparation_contracts import PreparationProtocol
+    from empirical_lawhood.domains.battery.battery_refined_inquiry.preparation_science import PREPARATION_SOURCE_MEMBERS
+    from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition
     original, changed, control = selected
     config = replace(config, method=sc.SegmentedMethodProtocol('method.exposed.' + str(horizon), horizon))
     sources = (('src/exposed-forecast-control.py', '6' * 64),)
@@ -228,16 +228,16 @@ def test_existing_roster_convention_keeps_distinct_content_and_original_exact_id
 
 
 def test_actual_scheduler_identifies_controlled_forecast_native_interface(selected):
-    from empirical_lawhood.infrastructure.execution import LocalScheduler, ResourceAdmissionError
+    from empirical_lawhood.execution.local.execution import LocalScheduler, ResourceAdmissionError
     runner = step.ControlledSegmentedRunner(*selected[2:], selected[0], selected[1], None, None, None, None)
     with pytest.raises(ResourceAdmissionError, match='no selected native-effect parent'):
         object.__new__(LocalScheduler)._native_subwork_progress(runner, None, ())
 
 
 def failed_assignment_evidence(selected, config, tmp_path):
-    from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion, NativeSubworkDefinition, NativeSubworkOutput
+    from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion, NativeSubworkDefinition, NativeSubworkOutput
     from tests.test_battery_segmented_fidelity import _receipt
 
     control = selected[2]
@@ -270,7 +270,7 @@ def test_actual_known_failed_assignment_absence_is_retained_not_a_positive(selec
 
 @pytest.mark.parametrize('kind', ['successful-receipt', 'missing-omission', 'successful-completion', 'wrong-completion', 'unreceipted-policy'])
 def test_assignment_absence_refuses_false_or_unauthed_failure(selected, config, tmp_path, kind):
-    from empirical_lawhood.kernel.status import OperationalStatus
+    from empirical_lawhood.science.records.status import OperationalStatus
     evidence = failed_assignment_evidence(selected, config, tmp_path)
     with pytest.raises(ValueError):
         if kind == 'successful-receipt':
@@ -292,9 +292,9 @@ def context_fixture(selected, monkeypatch):
     """Isolate actual port integrity; retained scientific joins have separate controls."""
     from dataclasses import dataclass
     import io
-    from empirical_lawhood.kernel.serialization import CanonicalRecord
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerOutputPort
+    from empirical_lawhood.science.records.serialization import CanonicalRecord
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerOutputPort
 
     @dataclass(frozen=True)
     class ExposedPrecision(CanonicalRecord):
@@ -355,8 +355,8 @@ def test_actual_extra_inputs_use_real_typed_ports_without_losing_materialization
 @pytest.mark.parametrize('damage', ('missing-input', 'wrong-access', 'wrong-kind', 'wrong-size', 'wrong-bytes', 'unprefixed-output', 'wrong-profile', 'missing-output'))
 def test_actual_additional_port_counterexamples_refuse_before_original_loader(selected, monkeypatch, damage):
     import io
-    from empirical_lawhood.kernel.evidence import OutcomeAccess
-    from empirical_lawhood.runtime.execution import WorkerInputKind
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+    from empirical_lawhood.execution.execution import WorkerInputKind
     context, operands = context_fixture(selected, monkeypatch)
     port = context.input_ports[0]
     if damage == 'missing-input':

@@ -6,7 +6,7 @@ from weakref import ref
 
 import pytest
 
-from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads
+from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads
 from tests.test_selected_e3_current_access import published_packet
 
 

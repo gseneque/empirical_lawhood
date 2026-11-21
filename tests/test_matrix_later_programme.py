@@ -8,35 +8,26 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.experiment_preparation import (
-    bind_later_inputs, prepare_later_experiment, validate_later_instance,
-)
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.operation_bindings import operation_declarations
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.records import (
-    PACKAGE_ROLES, MatrixFrozenConsumerPackage, MatrixFunctionalCriterion, MatrixLaterExperimentSpecification,
-    MatrixProgrammeCase, MatrixProgrammeEvidence, MatrixProgrammeObservation, MatrixProgrammeRoster,
-)
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.science import (
-    assess_later_programme, nominate_preparation, source_allocation, validate_evidence,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as original
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import (
-    CALIBRATED_QUERY, ScheduledForecastFeature, ScheduledForecastSeal, ScheduledPublicSource,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial import FAMILY_IDS
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseLossCell, ScheduledResponseScore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.campaigns import CampaignSpec
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExecutionSelection
-from empirical_lawhood.runtime.execution import RunnerRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.experiment_preparation import bind_later_inputs, prepare_later_experiment, validate_later_instance
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.operation_bindings import operation_declarations
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.records import PACKAGE_ROLES, MatrixFrozenConsumerPackage, MatrixFunctionalCriterion, MatrixLaterExperimentSpecification, MatrixProgrammeCase, MatrixProgrammeEvidence, MatrixProgrammeObservation, MatrixProgrammeRoster
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.science import assess_later_programme, nominate_preparation, source_allocation, validate_evidence
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as original
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import CALIBRATED_QUERY, ScheduledForecastFeature, ScheduledForecastSeal, ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial import FAMILY_IDS
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseLossCell, ScheduledResponseScore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.campaigns import CampaignSpec
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection
+from empirical_lawhood.execution.execution import RunnerRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 from tests.test_matrix_factor_confirmation_eligibility import artifact, publish, stock
 from tests.test_matrix_parameter_history import source as parameter_source
@@ -88,7 +79,7 @@ def allocation(metadata, label, role, *, groups=2, temperatures=(D(3),)):
 def products(package, case, value):
     public = case.public_source
     prefix = ref("prefix." + case.case_id, original.ScheduledCausalPrefix.SCHEMA)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import FAMILY_MAP
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import FAMILY_MAP
     feature = ScheduledForecastFeature("feature." + case.case_id, public.source, prefix, public.root.root_id,
         case.unit_id, FAMILY_MAP[public.coordinate.family_id], public.root.clock_id, public.coordinate.physical_time(public.policy.cutoff_tick),
         None, "AVAILABLE", tuple((name, D(0)) for name in FEATURES))
@@ -399,7 +390,7 @@ def test_confirmation_refuses_every_known_nontraining_upstream_use_before_pair_r
 
 @pytest.mark.parametrize("phase", ("E5_OPPORTUNITY", "E5_CONFIRMATION", "E6_TRANSFER"))
 def test_preparation_and_instance_authentication_never_replay_outcome_worker(metadata, tmp_path, monkeypatch, phase):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import functional_outcome_reduction, science
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import functional_outcome_reduction, science
 
     nomination, inherited = None, None
     if phase == "E5_CONFIRMATION":

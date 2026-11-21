@@ -19,7 +19,7 @@ from typer.testing import CliRunner
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api import prospective_experiment as owner
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
 from tests.test_prospective_experiment import selected as prospective_selection  # noqa: F401
 
 
@@ -144,7 +144,7 @@ def test_optional_catalog_preserves_legacy_default_and_factory_signature(prospec
 
     monkeypatch.setattr(composition, "create_api", compose)
     selection = prospective_selection
-    from empirical_lawhood.runtime.operational_configuration import ArtifactVerificationMode
+    from empirical_lawhood.execution.operational_configuration import ArtifactVerificationMode
     selection.plane.artifact_verification = ArtifactVerificationMode.STRICT
     _, api = _service(selection, operator)._prospective_context(selection.directory, lifecycle="read")
     assert "catalog_relative_path" not in seen[-1]

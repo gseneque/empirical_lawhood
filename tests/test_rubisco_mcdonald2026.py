@@ -16,7 +16,7 @@ import pytest
 
 from empirical_lawhood.adapters.physical.rubisco_kinetics import mcdonald2026 as source
 from empirical_lawhood.adapters.physical.rubisco_kinetics.direct_panels import _diagnostics
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 FIXTURES = Path(__file__).parent / "fixtures" / "rubisco" / "mcdonald2026"
 

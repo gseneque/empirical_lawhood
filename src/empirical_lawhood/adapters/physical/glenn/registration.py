@@ -13,51 +13,19 @@ from datetime import timedelta
 import hashlib
 from typing import ClassVar, Final
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    canonical_json_bytes,
-    require_sorted_unique_ids,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.kernel.time import parse_utc_timestamp
-from empirical_lawhood.planning.dataset_manifests import (
-    DatasetCapabilityKind,
-    DatasetRegistrationManifest,
-    DatasetSelectorMemberContract,
-)
-from empirical_lawhood.planning.datasets import (
-    CurrentMaterializationVerification,
-    CustodyState,
-    DatasetMaterialization,
-    DatasetMaterializationVerificationObservations,
-    DatasetMaterializationVerificationSubject,
-    EvidenceReferenceKind,
-    RegisteredImplementationIdentity,
-)
-from empirical_lawhood.runtime.dataset_io import (
-    DatasetSourceGuardReceipt,
-    DatasetSourceOpener,
-    GuardedDatasetSource,
-)
-from empirical_lawhood.runtime.dataset_registration import (
-    DatasetRegistrationSupportingRecord,
-    PreparedDatasetRegistration,
-)
-from empirical_lawhood.runtime.datasets import (
-    DatasetFormatInspectorRegistration,
-    DatasetInspectorImplementationBinding,
-)
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes, require_sorted_unique_ids, validate_sha256, validate_stable_id
+from empirical_lawhood.science.models.time import parse_utc_timestamp
+from empirical_lawhood.design.dataset_manifests import DatasetCapabilityKind, DatasetRegistrationManifest, DatasetSelectorMemberContract
+from empirical_lawhood.design.datasets import CurrentMaterializationVerification, CustodyState, DatasetMaterialization, DatasetMaterializationVerificationObservations, DatasetMaterializationVerificationSubject, EvidenceReferenceKind, RegisteredImplementationIdentity
+from empirical_lawhood.storage.contracts.dataset_io import DatasetSourceGuardReceipt, DatasetSourceOpener, GuardedDatasetSource
+from empirical_lawhood.execution.dataset_registration import DatasetRegistrationSupportingRecord, PreparedDatasetRegistration
+from empirical_lawhood.execution.datasets import DatasetFormatInspectorRegistration, DatasetInspectorImplementationBinding
 
-from .contracts import (
-    GlennAdapterError,
-    GlennArchiveInput,
-    GlennTransformProfile,
-)
-from .manifests import GLENN_ARCHIVE_FULL_SCAN_PASS_LIMIT
-from .registry import GLENN_INSPECTOR_REGISTRY_KEY
-from .source import GlennArchiveAudit, GlennMemberReceipt, inspect_glenn_archive
+from empirical_lawhood.adapters.physical.glenn.contracts import GlennAdapterError, GlennArchiveInput, GlennTransformProfile
+from empirical_lawhood.adapters.physical.glenn.manifests import GLENN_ARCHIVE_FULL_SCAN_PASS_LIMIT
+from empirical_lawhood.adapters.physical.glenn.registry import GLENN_INSPECTOR_REGISTRY_KEY
+from empirical_lawhood.adapters.physical.glenn.source import GlennArchiveAudit, GlennMemberReceipt, inspect_glenn_archive
 
 
 GLENN_ARCHIVE_VERIFICATION_POLICY_ID: Final = "policy.glenn-archive-verification"

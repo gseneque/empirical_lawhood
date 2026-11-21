@@ -7,13 +7,13 @@ from typing import ClassVar
 
 import numpy as np
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 from empirical_lawhood.adapters.simulators.six_matrix_response.response_source import response_hdf5_text, response_hdf5_writer
 
-from .native_pair import PAIR_METADATA, PreparedNativePairArtifact, decode_prepared_native_pair
-from .native_tasks import PreparedNativeInvocation
-from .source import PreparedCommonStart, PreparedNativePhaseData
+from empirical_lawhood.adapters.simulators.prepared_response.native_pair import PAIR_METADATA, PreparedNativePairArtifact, decode_prepared_native_pair
+from empirical_lawhood.adapters.simulators.prepared_response.native_tasks import PreparedNativeInvocation
+from empirical_lawhood.domains.matrix.prepared_response.source import PreparedCommonStart, PreparedNativePhaseData
 
 
 @dataclass(frozen=True, slots=True)

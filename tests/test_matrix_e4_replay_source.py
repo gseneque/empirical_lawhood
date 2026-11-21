@@ -7,14 +7,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_bank_recipe as recipe
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as dev
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as protected
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import BoundSelectedNativeSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_bank_recipe as recipe
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as dev
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as protected
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import BoundSelectedNativeSource
 from empirical_lawhood.api.matrix_retained_replay import bounded_e4_replay_source, map_reconstructions, replay_weight
-from empirical_lawhood.infrastructure.parallel_verification import CanonicalValidationPool
+from empirical_lawhood.storage.parallel_verification import CanonicalValidationPool
 from tests.test_matrix_selected_e4_bank_recipe import literal_recipe_source_inputs  # noqa: F401
 from tests.test_matrix_selected_protected import unpublished
 

@@ -14,18 +14,32 @@ import stat
 import subprocess
 import sys
 import tarfile
+import tempfile
 import time
 import tomllib
 import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
+RUBISCO_CONSTRUCTION_AND_PREDICTION_TESTS = (
+    "tests/test_rubisco_amber_terminal_fragments.py",
+    "tests/test_rubisco_interface_transfer.py",
+    "tests/test_rubisco_kcx_backbone.py",
+    "tests/test_rubisco_library_construction.py",
+    "tests/test_rubisco_molprobity.py",
+    "tests/test_rubisco_prediction.py",
+    "tests/test_rubisco_prediction_recursive.py",
+    "tests/test_rubisco_repair_progress.py",
+)
 PROFILES = {
     **{name: ((), ["tests", "-m", "not native and not held", "-p", "scripts.test_profiles",
                    "--test-profile", name]) for name in ("ci", "integration", "scale")},
     "portable": ((), ["tests", "-m", "not native and not held"]),
-    "native-open": (("open-simulators", 'reaction-response-simulators'),
-                    ["tests", "-m", "native", "--ignore=tests/test_brian2_native_science.py"]),
+    "native-open": (("open-simulators", "reaction-response-simulators"),
+                    ["tests", "-m", "native", "--ignore=tests/test_brian2_native_science.py",
+                     *(f"--ignore={path}" for path in RUBISCO_CONSTRUCTION_AND_PREDICTION_TESTS)]),
+    "native-rubisco": (("rubisco-construction", "rubisco-prediction"),
+                       [*RUBISCO_CONSTRUCTION_AND_PREDICTION_TESTS, "-m", "native"]),
     "native-brian2": ((), ["tests/test_brian2_native_science.py", "-m", "native"]),
     "held-reactor": ((), ["tests/test_reactor_batch_input.py", "tests/test_reactor_prepared_input.py",
                           "tests/test_reactor_held_native_science.py", "tests/test_reactor_upstream_binding.py", "-m", "held"]),
@@ -33,11 +47,17 @@ PROFILES = {
                       'tests/test_causal_contrasts_held_source.py', 'tests/test_finite_response_assignment.py',
                       'tests/test_finite_response_stage_input.py', "-m", "held"]),
 }
-
-
 def digest(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
 
+
+
+def check_generated_files(run, python: list[str]) -> None:
+    """Run extension projections in the order owned by their generator, then examples."""
+    run("generated-extension_projections", [*python, "scripts/generate_extension_projections.py", "--check", "--json"])
+    for generator in ("test_fixture", "operator_examples", "integration_examples", "recursive_examples",
+                      "matrix_experiment_examples", "rubisco_response_experiment"):
+        run(f"generated-{generator}", [*python, f"scripts/generate_{generator}.py", "--check"])
 
 
 def retained_test_options(packet: Path) -> list[str]:
@@ -80,7 +100,7 @@ def output(command: list[str], *, cwd: Path) -> str:
 
 
 def source_identity(root: Path) -> dict[str, object]:
-    from empirical_lawhood.infrastructure.source_closure import capture_admitted_target_source
+    from empirical_lawhood.storage.source_closure import capture_admitted_target_source
 
     if __package__:
         from .release_portable_evidence import candidate_inventory, release_input_paths
@@ -105,13 +125,10 @@ def source_identity(root: Path) -> dict[str, object]:
 
 def release_source_disclosure(root: Path, selected_paths: tuple[str, ...]):
     """Disclose status while refusing undeclared executable or selected inputs."""
-    from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256
-    from empirical_lawhood.infrastructure.source_closure import _source_path_census
-    from empirical_lawhood.infrastructure.source_origin import require_executing_target_source
-    from empirical_lawhood.infrastructure.source_policy import (
-        DOCUMENT_WORK_PLAN_PATHS, LOCAL_PLAN_NAME, NESTED_WORK_PLAN_PATHS, WORK_PLAN_DIRECTORIES,
-        inspect_checkout_source, is_work_plan_path,
-    )
+    from empirical_lawhood.storage.bounded_io import bounded_file_sha256
+    from empirical_lawhood.storage.source_closure import _source_path_census
+    from empirical_lawhood.storage.source_origin import require_executing_target_source
+    from empirical_lawhood.storage.source_policy import DOCUMENT_WORK_PLAN_PATHS, LOCAL_PLAN_NAME, NESTED_WORK_PLAN_PATHS, WORK_PLAN_DIRECTORIES, inspect_checkout_source, is_work_plan_path
 
     if __package__:
         from .release_portable_evidence import RELEASE_INPUT_FILES, RELEASE_INPUT_ROOTS
@@ -208,50 +225,80 @@ def _source_metadata_payload(stream, size):
 
 
 def preserve_source_archive(root: Path, packet: Path, source: dict[str, object]):
-    """Retain only the selected current tree, with no ancestor Git objects."""
-    from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256
-    from empirical_lawhood.infrastructure.source_closure import _MAX_ARCHIVE_BYTES, _archive_census, _git
-    from empirical_lawhood.infrastructure.source_policy import is_work_plan_path
+    """Stream and retain the selected current tree, with no ancestor Git objects."""
+    from empirical_lawhood.storage.bounded_io import bounded_file_sha256
+    from empirical_lawhood.storage.source_closure import _stream_archive_census, _git_archive_stream, _git
+    from empirical_lawhood.storage.source_policy import is_release_excluded_path
 
     if _git(root, "rev-parse", "HEAD").decode("ascii").strip() != source["commit"]:
         raise RuntimeError("source archive requires the admitted commit at HEAD")
     tree = _git(root, "ls-tree", "-r", "-z", "--full-tree", "HEAD")
-    payload = _git(root, "archive", "HEAD")
-    members = _archive_census(tree, payload)
-    if (digest(tree) != source["tree_inventory_sha256"]
-            or digest(payload) != source["archive_sha256"]
-            or [member.to_mapping() for member in members] != source["tracked_files"]):
+    if digest(tree) != source["tree_inventory_sha256"]:
         raise RuntimeError("retained source archive differs from the admitted release source")
-    if any(is_work_plan_path(member.relative_path) for member in members):
-        raise RuntimeError("source archive includes a local working plan")
-    if any(member.mode not in ("100644", "100755") for member in members):
-        raise RuntimeError("source archive requires regular committed source members")
-    if _git(root, "rev-parse", "HEAD").decode("ascii").strip() != source["commit"]:
-        raise RuntimeError("selected commit changed during source archive capture")
-    path = packet / "source.tar"
-    with path.open("xb") as stream:
-        stream.write(payload)
-        stream.flush()
-        os.fsync(stream.fileno())
-    directory = os.open(packet, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    # Refuse excluded instructions and nonregular members from Git's exact
+    # committed census before any archive bytes enter the release directory.
+    for entry in tree.split(b"\0"):
+        if not entry:
+            continue
+        metadata, encoded_name = entry.split(b"\t", 1)
+        name = encoded_name.decode("utf-8")
+        if is_release_excluded_path(name):
+            raise RuntimeError(f"source archive includes a local working plan or private directory: {name}")
+        if metadata.split(b" ", 1)[0] not in (b"100644", b"100755"):
+            raise RuntimeError("source archive requires regular committed source members")
+    descriptor, temporary_name = tempfile.mkstemp(prefix=".release-source-", suffix=".tar", dir=packet.parent)
+    staging = Path(temporary_name)
     try:
-        os.fsync(directory)
+        with os.fdopen(descriptor, "wb") as target:
+            class RetainedArchive:
+                def __init__(self, source_stream):
+                    self.source = source_stream
+                    self.byte_count = 0
+                def read(self, size):
+                    block = self.source.read(size)
+                    target.write(block)
+                    self.byte_count += len(block)
+                    return block
+            def retain(source_stream):
+                stream = RetainedArchive(source_stream)
+                members, checksum = _stream_archive_census(tree, stream)
+                return members, checksum, stream.byte_count
+            members, checksum, size_bytes = _git_archive_stream(root, retain)
+            target.flush()
+            os.fsync(target.fileno())
+        if (digest(tree) != source["tree_inventory_sha256"]
+                or checksum != source["archive_sha256"]
+                or [member.to_mapping() for member in members] != source["tracked_files"]):
+            raise RuntimeError("retained source archive differs from the admitted release source")
+        if any(is_release_excluded_path(member.relative_path) for member in members):
+            raise RuntimeError("source archive includes a local working plan")
+        if any(member.mode not in ("100644", "100755") for member in members):
+            raise RuntimeError("source archive requires regular committed source members")
+        if _git(root, "rev-parse", "HEAD").decode("ascii").strip() != source["commit"]:
+            raise RuntimeError("selected commit changed during source archive capture")
+        if bounded_file_sha256(staging, maximum_bytes=size_bytes) != (size_bytes, checksum):
+            raise RuntimeError("durable source archive differs from its admitted current bytes")
+        path = packet / "source.tar"
+        os.link(staging, path)
+        directory = os.open(packet, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+        return {"schema": "empirical-lawhood/operational/release-source-archive", "version": "1.0.0",
+                "path": path.name, "commit": source["commit"], "size_bytes": size_bytes,
+                "sha256": checksum, "tree_inventory_sha256": digest(tree),
+                "member_count": len(members), "scientific_authority": "NONE"}
     finally:
-        os.close(directory)
-    if bounded_file_sha256(path, maximum_bytes=_MAX_ARCHIVE_BYTES) != (len(payload), digest(payload)):
-        raise RuntimeError("durable source archive differs from its admitted current bytes")
-    return {"schema": "empirical-lawhood/operational/release-source-archive", "version": "1.0.0",
-            "path": path.name, "commit": source["commit"], "size_bytes": len(payload),
-            "sha256": digest(payload), "tree_inventory_sha256": digest(tree),
-            "member_count": len(members), "scientific_authority": "NONE"}
+        staging.unlink(missing_ok=True)
 
 
 def compare_wheel_source(checkout: Path, wheel: Path) -> list[dict[str, object]]:
     """Bind every package source byte to the shared regular wheel-member owner."""
-    from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256
-    from empirical_lawhood.infrastructure.source_closure import TrackedSourceMember, _MAX_ARCHIVE_BYTES
-    from empirical_lawhood.infrastructure.source_origin import verify_wheel_package_members
-    from empirical_lawhood.infrastructure.source_policy import is_work_plan_path
+    from empirical_lawhood.storage.bounded_io import bounded_file_sha256
+    from empirical_lawhood.storage.source_closure import TrackedSourceMember
+    from empirical_lawhood.storage.source_origin import verify_wheel_package_members
+    from empirical_lawhood.storage.source_policy import is_release_excluded_path
 
     names = output(["git", "ls-files", "--", "src/empirical_lawhood"], cwd=checkout).splitlines()
     expected = []
@@ -260,18 +307,25 @@ def compare_wheel_source(checkout: Path, wheel: Path) -> list[dict[str, object]]
         metadata = path.lstat()
         if not stat.S_ISREG(metadata.st_mode):
             raise RuntimeError("wheel comparison requires a regular selected source member")
-        if is_work_plan_path(name):
+        if is_release_excluded_path(name):
             if metadata.st_mode & 0o111 or any(parent.is_symlink() for parent in path.parents if parent.is_relative_to(checkout)):
                 raise RuntimeError("excluded work plans must be regular non-executable files without symlink parents")
             continue
-        size, checksum = bounded_file_sha256(path, maximum_bytes=_MAX_ARCHIVE_BYTES)
+        size, checksum = bounded_file_sha256(path, maximum_bytes=None)
         mode = "100755" if metadata.st_mode & stat.S_IXUSR else "100644"
         expected.append(TrackedSourceMember(name, mode, size, checksum))
     result = verify_wheel_package_members(wheel, expected=tuple(expected))
     with zipfile.ZipFile(wheel) as archive:
-        if any(is_work_plan_path(name) or is_work_plan_path("src/" + name)
-               for name in archive.namelist()):
-            raise RuntimeError("wheel/source mismatch: includes a local working plan")
+        for member in archive.infolist():
+            name = member.filename.removesuffix("/")
+            root, _, remainder = name.partition("/")
+            if root.endswith(".data"):
+                # Installers relocate the scheme-relative payload at installation.
+                name = remainder.partition("/")[2]
+            elif root.endswith(".dist-info"):
+                name = remainder
+            if is_release_excluded_path(name) or is_release_excluded_path("src/" + name):
+                raise RuntimeError(f"wheel/source mismatch: includes a local working plan or private directory: {member.filename}")
         metadata = [member for member in archive.infolist()
                     if member.filename.endswith(".dist-info/extra_metadata/source.json")]
         if len(metadata) != 1:
@@ -295,11 +349,11 @@ def compare_wheel_source(checkout: Path, wheel: Path) -> list[dict[str, object]]
 
 def compare_sdist_researcher_inputs(checkout: Path, sdist: Path) -> list[dict[str, object]]:
     """Authenticate checkout-owned instructions and copied inputs in the source export."""
-    from empirical_lawhood.infrastructure.source_policy import is_work_plan_path
+    from empirical_lawhood.storage.source_policy import is_release_excluded_path
 
     names = output(["git", "ls-files", "--", "README.md", "CONTRIBUTING.md", "docs", "configs", "programmes",
                     "experiments"], cwd=checkout).splitlines()  # Retained pre-consolidation sources keep their input scope.
-    expected = {name: (checkout / name).read_bytes() for name in names if not is_work_plan_path(name)}
+    expected = {name: (checkout / name).read_bytes() for name in names if not is_release_excluded_path(name)}
     with tarfile.open(sdist, "r:gz") as archive:
         members = archive.getmembers()
         roots = {member.name.split("/", 1)[0] for member in members}
@@ -309,14 +363,14 @@ def compare_sdist_researcher_inputs(checkout: Path, sdist: Path) -> list[dict[st
         observed = {}
         for member in members:
             name = member.name.removeprefix(root)
+            if is_release_excluded_path(name):
+                raise RuntimeError(f"source distribution includes a local working plan or private directory: {name}")
             if name in expected:
                 if not member.isfile() or name in observed:
                     raise RuntimeError("source distribution researcher input is not one regular member")
                 stream = archive.extractfile(member)
                 assert stream is not None
                 observed[name] = stream.read()
-            if is_work_plan_path(name):
-                raise RuntimeError("source distribution includes a local working plan")
     if observed != expected:
         missing = sorted(expected.keys() - observed.keys())
         changed = sorted(name for name in expected.keys() & observed.keys() if expected[name] != observed[name])
@@ -332,8 +386,8 @@ def compare_sdist_committed_source(checkout: Path, sdist: Path) -> list[dict[str
     must equal its complete committed identity. Every other file must be an
     exact regular blob, including inputs outside the portable suite's scope.
     """
-    from empirical_lawhood.infrastructure.source_closure import _matches_regular_git_mode
-    from empirical_lawhood.infrastructure.source_policy import is_work_plan_path
+    from empirical_lawhood.storage.source_closure import _matches_regular_git_mode
+    from empirical_lawhood.storage.source_policy import is_release_excluded_path
 
     if __package__:
         from .release_portable_evidence import _selected_entries
@@ -351,15 +405,16 @@ def compare_sdist_committed_source(checkout: Path, sdist: Path) -> list[dict[str
         prefix = next(iter(roots)) + "/"
         for member in members:
             name = member.name.removeprefix(prefix)
-            if (name in seen or Path(member.name).is_absolute() or ".." in Path(member.name).parts):
+            if (name in seen or Path(member.name).is_absolute() or ".." in Path(member.name).parts
+                    or Path(member.name).as_posix() != member.name):
                 raise RuntimeError("source distribution has duplicate or escaping members")
             seen.add(name)
+            if is_release_excluded_path(name):
+                raise RuntimeError(f"source distribution includes a local working plan or private directory: {name}")
             if member.isdir():
                 continue
             if not member.isfile():
                 raise RuntimeError("source distribution contains a nonregular source member")
-            if is_work_plan_path(name):
-                raise RuntimeError("source distribution includes a local working plan")
             if name == "PKG-INFO":
                 if member.size > 16 * 1024**2 or member.mode & ~0o777 or member.mode & 0o111:
                     raise RuntimeError("source distribution generated metadata is not bounded ordinary data")
@@ -390,6 +445,30 @@ def compare_sdist_committed_source(checkout: Path, sdist: Path) -> list[dict[str
     return sorted(inventory, key=lambda row: row["path"])
 
 
+def verify_artifact_documentation(wheel: Path, sdist: Path, *, implementation_commit: str) -> dict:
+    """Require the built wheel and sdist to point at their admitted instructions."""
+    if __package__:
+        from .build_source_metadata import verify_documentation_metadata
+    else:
+        from build_source_metadata import verify_documentation_metadata
+
+    with zipfile.ZipFile(wheel) as archive:
+        members = [member for member in archive.infolist()
+                   if member.filename.count("/") == 1 and member.filename.endswith(".dist-info/METADATA")]
+        if len(members) != 1 or members[0].file_size > 128 * 1024:
+            raise RuntimeError("wheel requires one bounded distribution metadata member")
+        wheel_url = verify_documentation_metadata(archive.read(members[0]), implementation_commit=implementation_commit)
+    with tarfile.open(sdist, "r:gz") as archive:
+        members = [member for member in archive.getmembers()
+                   if member.name.count("/") == 1 and member.name.endswith("/PKG-INFO")]
+        if len(members) != 1 or not members[0].isfile() or members[0].size > 128 * 1024:
+            raise RuntimeError("sdist requires one bounded distribution metadata member")
+        with archive.extractfile(members[0]) as stream:
+            sdist_url = verify_documentation_metadata(stream.read(128 * 1024 + 1),
+                                                      implementation_commit=implementation_commit)
+    return {"implementation_commit": implementation_commit, "wheel": wheel_url, "sdist": sdist_url}
+
+
 def main() -> None:
     if sys.version_info < (3, 11):
         raise SystemExit("Use the selected Python 3.11 environment: uv run --no-sync python scripts/release_check.py ...")
@@ -399,11 +478,22 @@ def main() -> None:
                         help="New directory for fresh environments and temporary files on a POSIX filesystem.")
     parser.add_argument("--profile", choices=tuple(PROFILES), default="portable")
     parser.add_argument("--offline", action="store_true", help="Require already cached Python/build/dependency downloads.")
+    parser.add_argument("--download-cache", type=Path,
+                        help="Reuse this dependency download cache; installations remain fresh and lock-verified.")
     parser.add_argument("--portable-evidence", type=Path,
                         help="Reuse one authenticated precommit portable suite with the exact final tree; never rerun it.")
     parser.add_argument("--shard-index", type=int, default=0, help="Zero-based integration/scale module shard.")
     parser.add_argument("--shard-count", type=int, default=1, help="Total integration/scale module shards.")
+    comparison = parser.add_mutually_exclusive_group()
+    comparison.add_argument("--bounded-changes-since", help="Include changed modules declared suitable for bounded CI.")
+    comparison.add_argument("--changed-tests-base", help="Audit exact changed-test decisions and separately supplied evidence.")
+    parser.add_argument("--changed-test-evidence", type=Path, action="append", default=[],
+                        help="Passing exact-source profile or complete portable evidence for larger changed checks.")
     args = parser.parse_args()
+    if (args.bounded_changes_since or args.changed_tests_base or args.changed_test_evidence) and args.profile != "ci":
+        parser.error("changed-test supplementation requires --profile ci")
+    if args.changed_test_evidence and not args.changed_tests_base:
+        parser.error("changed-test evidence requires --changed-tests-base")
     if __name__ == "__main__" and not __package__:
         from test_profiles import validate_shard
     else:
@@ -454,6 +544,7 @@ def main() -> None:
             "scale": "Selected portable scale module shard; no distribution build or complete coverage claim.",
         }.get(args.profile, "Selected original verification profile; omitted profiles remain unverified."),
         "test_selection": None,
+        "test_execution": None,
         "distribution_version": distribution_version,
         "host": {"os": platform.system(), "architecture": platform.machine()},
         "checks": [], "artifacts": [],
@@ -476,7 +567,7 @@ def main() -> None:
     environment["COVERAGE_RCFILE"] = str(checkout / ".coveragerc")
     environment.update(UV_PROJECT_ENVIRONMENT=str(project_environment), TMPDIR=str(temporary_files),
                        TMP=str(temporary_files), TEMP=str(temporary_files),
-                       UV_CACHE_DIR=str(environments / "uv-cache"),
+                       UV_CACHE_DIR=str(args.download_cache.expanduser().absolute() if args.download_cache else environments / "uv-cache"),
                        XDG_CACHE_HOME=str(environments / "cache"),
                        RUFF_CACHE_DIR=str(environments / "ruff-cache"))
     environment.update({name: "1" for name in (
@@ -531,6 +622,12 @@ def main() -> None:
                                               "sha256": digest(payload)}
             elif result.returncode == 0:
                 raise RuntimeError("partitioned tests did not retain their selected-case census")
+            execution = packet / "test-execution.json"
+            if execution.exists():
+                payload = execution.read_bytes()
+                manifest["test_execution"] = {"path": execution.name, "size_bytes": len(payload), "sha256": digest(payload)}
+            elif result.returncode == 0:
+                raise RuntimeError("partitioned tests did not retain their actual execution census")
         if result.returncode:
             raise RuntimeError(f"{name} failed (exit {result.returncode}); see {log}")
 
@@ -545,7 +642,14 @@ def main() -> None:
         if args.profile in ("ci", "integration", "scale"):
             tests = [*tests, "--test-shard-index", str(args.shard_index),
                      "--test-shard-count", str(args.shard_count),
-                     "--test-selection-output", str(packet / "test-selection.json")]
+                     "--test-selection-output", str(packet / "test-selection.json"),
+                     "--test-execution-output", str(packet / "test-execution.json")]
+            if args.bounded_changes_since:
+                tests += ["--bounded-changes-since", args.bounded_changes_since]
+            if args.changed_tests_base:
+                tests += ["--changed-tests-base", args.changed_tests_base]
+            for evidence in args.changed_test_evidence:
+                tests += ["--changed-test-evidence", str(evidence.absolute())]
         group_flags = [flag for group in ("reactor-example", "build", *groups) for flag in ("--group", group)]
         run("locked-install", ["uv", "sync", "--locked", "--python", "3.11.14", *offline, *group_flags])
         if args.profile == "native-brian2":
@@ -557,7 +661,7 @@ def main() -> None:
         run("environment", [*uv_python, "-c",
             "import importlib.metadata as m,json,platform,sys; from pathlib import Path; "
             "import empirical_lawhood; "
-            "from empirical_lawhood.infrastructure.source_origin import require_executing_target_source; "
+            "from empirical_lawhood.storage.source_origin import require_executing_target_source; "
             "root=Path.cwd().resolve(); require_executing_target_source(root); "
             f"selected={distribution_version!r}; "
             "assert empirical_lawhood.__version__ == m.version('empirical-lawhood') == selected, "
@@ -567,18 +671,18 @@ def main() -> None:
             "'packages':sorted((d.metadata['Name'],d.version) for d in m.distributions())},indent=2))"])
         if args.profile in ("portable", "ci"):
             run("frozen-rc-numerical-inputs", [*uv_python, "scripts/check_frozen_rc_inputs.py"])
+            run("coverage-configuration", [*uv_python, "scripts/check_coverage_inventory.py",
+                                           "--checkout", str(checkout)])
         if args.profile not in ("integration", "scale"):
             # Refuse inexpensive source drift before the complete portable suite.
             run("static-errors", ["uv", "run", "--no-sync", "ruff", "check", "src", "tests", "scripts"])
-            for generator in ("extension_bundle_aggregate", "executable_binding_aggregate", "cli_reference", "test_fixture", "operator_examples", "workflow_index", "config_schemas", "integration_examples", "recursive_examples", "matrix_experiment_examples"):
-                run(f"generated-{generator}", [*uv_python, f"scripts/generate_{generator}.py", "--check"])
+            check_generated_files(run, uv_python)
             run("documentation-links", [*uv_python, "scripts/check_documentation.py"])
         if args.profile == "portable" and prior_portable is None:
             environment["COVERAGE_FILE"] = str(packet / ".coverage")
-            run("coverage-configuration", [*uv_python, "scripts/check_coverage_inventory.py",
-                                           "--checkout", str(checkout)])
             run("tests", [*uv_python, "-m", "coverage", "run", "-m", "pytest",
-                          "-q", "-ra", "--fail-on-skip", *retained_test_options(packet), *tests])
+                          "-q", "-ra", "--fail-on-skip", "-p", "scripts.test_purposes",
+                          *retained_test_options(packet), *tests])
             run("critical-coverage", [*uv_python, "-m", "coverage", "report"])
             run("critical-coverage-json", [*uv_python, "-m", "coverage", "json",
                                             "-o", str(packet / "coverage.json")])
@@ -590,7 +694,7 @@ def main() -> None:
                                     "scope": ".coveragerc; parent test process only; no repository-wide coverage claim"}
         elif args.profile != "portable":
             run("tests", [*uv_python, "-m", "pytest", "-q", "-ra", "--fail-on-skip",
-                          *retained_test_options(packet), *tests])
+                          "-p", "scripts.test_purposes", *retained_test_options(packet), *tests])
         if prior_portable is not None:
             # Preserve precommit attribution and its original immutable files;
             # this gate only adds a verified exact-tree join to the selected commit.
@@ -631,6 +735,8 @@ def main() -> None:
             (packet / "package-inventory.json").write_text(json.dumps(inventory, indent=2) + "\n")
             researcher_inputs = compare_sdist_researcher_inputs(checkout, sdists[0])
             sdist_inventory = compare_sdist_committed_source(checkout, sdists[0])
+            manifest["documentation"] = verify_artifact_documentation(
+                wheels[0], sdists[0], implementation_commit=source["commit"])
             (packet / "sdist-source-inventory.json").write_text(json.dumps(sdist_inventory, indent=2) + "\n")
             manifest["sdist_source_inventory_sha256"] = digest((packet / "sdist-source-inventory.json").read_bytes())
             manifest["sdist_source_members"] = len(sdist_inventory)

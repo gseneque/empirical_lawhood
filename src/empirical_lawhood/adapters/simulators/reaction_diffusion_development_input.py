@@ -6,12 +6,12 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import ClassVar
 
-from empirical_lawhood.adapters.methods.selective_dependence_response.contracts import SelectiveDependenceResponseCompleteUnitResult, SelectiveDependenceResponsePhase
-from empirical_lawhood.adapters.simulators.cantera_reaction_response.contracts import CanteraReactionResponseCanteraDesign
-from empirical_lawhood.adapters.simulators.fipy_reaction_diffusion_response.contracts import FipyReactionDiffusionResponseFiPyDesign
-from empirical_lawhood.adapters.methods.selective_dependence_response.preparation_inputs import SelectiveDependenceResponsePreparationInput
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.methods.selective_dependence_response.contracts import SelectiveDependenceResponseCompleteUnitResult, SelectiveDependenceResponsePhase
+from empirical_lawhood.domains.chemistry.chemical_reactor.contracts import CanteraReactionResponseCanteraDesign
+from empirical_lawhood.domains.chemistry.reaction_diffusion.contracts import FipyReactionDiffusionResponseFiPyDesign
+from empirical_lawhood.methods.selective_dependence_response.preparation_inputs import SelectiveDependenceResponsePreparationInput
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
 
 
 @dataclass(frozen=True, slots=True)
@@ -103,9 +103,9 @@ class ReactionDiffusionDevelopmentInput(CanonicalRecord):
         if type(self.preparation_input) is not SelectiveDependenceResponsePreparationInput:
             raise ValueError("native development requires explicit full numerical preparation inputs before solver contact")
         if isinstance(self.design, CanteraReactionResponseCanteraDesign):
-            from .cantera_reaction_response.preparation_inputs import DRAW_VARIABLE_IDS
+            from empirical_lawhood.domains.chemistry.chemical_reactor.preparation_inputs import DRAW_VARIABLE_IDS
         elif isinstance(self.design, FipyReactionDiffusionResponseFiPyDesign):
-            from .fipy_reaction_diffusion_response.preparation_inputs import DRAW_VARIABLE_IDS
+            from empirical_lawhood.domains.chemistry.reaction_diffusion.preparation_inputs import DRAW_VARIABLE_IDS
         else:
             raise TypeError("native development requires a supported current design")
         if self.preparation_input.roster_index != 0:

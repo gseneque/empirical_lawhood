@@ -4,15 +4,9 @@
 The same actual source/receipt owners serve derivation, public authoring and
 cold parent entry. No pass flag, exclusion inventory or authority is retained.
 """
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import (
-    require_original_commitments, validate_original_prepared_scope,
-)
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_opportunity import (
-    MatrixSelectedOpportunityProgramme, public_programme,
-)
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import (
-    MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme,
-)
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import require_original_commitments, validate_original_prepared_scope
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_opportunity import MatrixSelectedOpportunityProgramme, public_programme
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme
 
 
 def authenticate_prepared_original_commitments(*, writer, programme, evidence, source_scan_bytes,current_access=None):
@@ -20,7 +14,7 @@ def authenticate_prepared_original_commitments(*, writer, programme, evidence, s
     commitments = require_original_commitments(getattr(evidence, "original_commitments", None))
     # Static protocol discovery must not load runtime owners or generated
     # executable bindings while their aggregates are being regenerated.
-    from .matrix_prepared_source_runtime import _native_training_prerequisite, _committed_e4_selections, _e4_phases, _prepared_phases, _require_original_e4_scope, _future_source_selections
+    from empirical_lawhood.api.matrix_prepared_source_runtime import _native_training_prerequisite, _committed_e4_selections, _e4_phases, _prepared_phases, _require_original_e4_scope, _future_source_selections
     evidence.__post_init__()
     if type(programme) is MatrixSelectedOpportunityProgramme:
         programme = public_programme(programme)
@@ -35,9 +29,7 @@ def authenticate_prepared_original_commitments(*, writer, programme, evidence, s
             maximum_source_bytes=maximum, native_training_locator=commitments.native_training_locator) as inputs:
         _require_original_e4_scope(writer, inputs, programme, evidence,
             training_specification=specification, training_request=request,current_access=current_access)
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import (
-            validate_committed_prepared_sources, validate_committed_prepared_panels,
-        )
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import validate_committed_prepared_sources, validate_committed_prepared_panels
         phases = _prepared_phases(inputs)
         validate_committed_prepared_sources(phase=programme.phase, sources=programme.sources,
             phases=phases, producing_provenance=inputs.producing_provenance)
@@ -51,23 +43,21 @@ def authenticate_prepared_original_commitments(*, writer, programme, evidence, s
 
 def prepare_selected_commitment_authoring(preparation, *, project_root, artifact_writer, output_dir):
     """Existing public lifecycle hook; validate before authoring effects."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import (
-        MatrixSelectedOpportunityEvidenceV2, MatrixSelectedEntryEvidenceV3, MatrixRevisionEntryEvidenceV2,
-    )
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import MatrixRevisionPreparedProgramme
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixSelectedOpportunityEvidenceV2, MatrixSelectedEntryEvidenceV3, MatrixRevisionEntryEvidenceV2
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import MatrixRevisionPreparedProgramme
     records = tuple(value for _, value in preparation.design_records)
     programmes = tuple(value for value in records if type(value) in (
         MatrixSelectedOpportunityProgramme, MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme,
         MatrixRevisionPreparedProgramme))
     if not programmes:
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_opportunity import MatrixSelectedOpportunityPublicProgramme
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_opportunity import MatrixSelectedOpportunityPublicProgramme
         programmes = tuple(value for value in records if type(value) is MatrixSelectedOpportunityPublicProgramme)
     evidence = tuple(value for value in records if type(value) in (
         MatrixSelectedOpportunityEvidenceV2, MatrixSelectedEntryEvidenceV3, MatrixRevisionEntryEvidenceV2))
     if len(programmes) != 1 or len(evidence) != 1:
         require_original_commitments(None)
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_bindings as opportunity
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_protected_bindings as protected, selected_revision_bindings as revision
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_bindings as opportunity
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_protected_bindings as protected, selected_revision_bindings as revision
     keys = {opportunity.COMMITTED_DESIGN_KEY,
         protected.ENTRY_ORIGINAL_COMMITMENTS_KEY, protected.ENTRY_TRANSPORT_KEY,
         revision.capability_key("entry", "DEVELOPMENT", "2.0.0"),

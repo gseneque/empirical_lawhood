@@ -1,0 +1,2635 @@
+{
+  "executable": "bin/sander",
+  "files": [
+    {
+      "executable": true,
+      "path": "bin/sander",
+      "sha256": "0d815d7fbdb1a6e3dafd1a42ebd508d8842916d1a7ecf8666d02ce2dc65db888",
+      "size_bytes": 9411640
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-Br.skf",
+      "sha256": "deb4509735c7702a6fea7af887428d1ef502c1c76d475177ec07aeae210f12ac",
+      "size_bytes": 362389
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-C.skf",
+      "sha256": "8d3b94662abc87fdd3797c8b77477c4e8af3481913b292c6f61001583c38bb02",
+      "size_bytes": 311601
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-Ca.skf",
+      "sha256": "26637b9915c9ec4828aed55294c2cd3e4c49c7b3b9f19f7e4a1a709ef24b51a6",
+      "size_bytes": 373454
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-Cl.skf",
+      "sha256": "281351e4077eca78ee50560da6cf4cb3763a5ae9c0d8504a921e3ad0fc911153",
+      "size_bytes": 336531
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-F.skf",
+      "sha256": "71acee0ad0fd3ae8dbf8fbbc6c70ef01c4a618ad4c7e3cc74aedd2077d708602",
+      "size_bytes": 291518
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-H.skf",
+      "sha256": "c8c78d6a51470df034a2dadc5d89ca2142a9a0978d4187f66931a3d285ac097a",
+      "size_bytes": 231515
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-I.skf",
+      "sha256": "d2185e47a08e5f6e4e06a658c460b8c74ac1fc586cdc06db55147227ddd4c1ef",
+      "size_bytes": 418260
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-K.skf",
+      "sha256": "ba672bb02465bbb8fb7edea210eda30fe92e980fc7e08c3034bff35f315a3010",
+      "size_bytes": 353598
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-Mg.skf",
+      "sha256": "0e4c5f71c3b9dc5058f67d6f02b40b4d0c71bb6514f1dfe56fe5300180afa3ac",
+      "size_bytes": 368492
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-N.skf",
+      "sha256": "1393d066bb5f13f1a2e33e8409d57e60f5b30d2a4f11a21b8e8e486b37c18fb1",
+      "size_bytes": 312044
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-Na.skf",
+      "sha256": "a8d88c42c20f008393fe1d23c9ab0097e71c73a89abb7a545d9981b6bba11a2f",
+      "size_bytes": 453981
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-O.skf",
+      "sha256": "105c8e42004bab6db8f588dd3f39e81c2657d7a038c50b5dad064b58b0da4527",
+      "size_bytes": 292435
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-P.skf",
+      "sha256": "3847edde50e9bd614b09ac5b9a4352d26a519637b63e86fb7163e07520668d96",
+      "size_bytes": 377364
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-S.skf",
+      "sha256": "92402f28e4fa437f51e2c0f8c9b946841d7d96e7ac460029e1190e2ad4ed3103",
+      "size_bytes": 357291
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Br-Zn.skf",
+      "sha256": "c14b0dfc05f46bc2be897694f03747fd91af62504c7a617262d0d8a386000687",
+      "size_bytes": 390845
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-Br.skf",
+      "sha256": "1355c12109ea726447b120df738e6a03d37452af42f3121367f601fb13fffe2a",
+      "size_bytes": 313881
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-C.skf",
+      "sha256": "dfda7b773cb7891e2275ff284c87daac11167a105ba90bafd783b289715cda0f",
+      "size_bytes": 279705
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-Ca.skf",
+      "sha256": "3355062debf68c55a46e464cee65f9ae149a2057b4cf25cabcf8a87cc8fc54cd",
+      "size_bytes": 332748
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-Cl.skf",
+      "sha256": "44b56b5f5388ea6ea993e85105b8e4bcfe554364f07a3d26caa244154d3802c6",
+      "size_bytes": 273681
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-F.skf",
+      "sha256": "1400aec578957a8fc505f0e25f8ee5a73d046aff6a10adbc901f1bd5f10f44e5",
+      "size_bytes": 412808
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-H.skf",
+      "sha256": "8d5c6aabecfc72271e7a3f56a238cb8cc77fb552685c79b9381412d32e5609f1",
+      "size_bytes": 249411
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-I.skf",
+      "sha256": "c7202e44c387fcfc49a5c5b181bbbea16b4b11a04bdb44b029b298d300654eb1",
+      "size_bytes": 375383
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-K.skf",
+      "sha256": "3c701bc6ca3346ad30a1711c5e14016456aae43ea63661312320b0eccfca3cde",
+      "size_bytes": 311755
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-Mg.skf",
+      "sha256": "d44c828453c9225bec94fe003fde8a1585d82d80ad4718f0bdb2bd1c5d5f2c30",
+      "size_bytes": 262248
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-N.skf",
+      "sha256": "3455aea77ce55e836db4165397871726080d52e813a268432f999f4de4ee07cd",
+      "size_bytes": 272906
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-Na.skf",
+      "sha256": "dbe374881e341cb1505a0a9d8954d103cd4508749d61e69af8f24521f43d3509",
+      "size_bytes": 432774
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-O.skf",
+      "sha256": "f95f3af65b0f9b7daff8073df90326e795e746e72c91ee7c88792f8b1b684ccc",
+      "size_bytes": 233505
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-P.skf",
+      "sha256": "665ae82b7c45e58c6f929f227aeb79479b353a595bcd2f17fa17fba7fbe8f539",
+      "size_bytes": 336260
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-S.skf",
+      "sha256": "ed6efac6fb232618c11ad0daec22c11a965ecf8620678368fea62b7199161269",
+      "size_bytes": 315069
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/C-Zn.skf",
+      "sha256": "4294f536a4f6a5f7899a22dc0188a759f7656345ee3465a109b4a7e66b0d006f",
+      "size_bytes": 344581
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-Br.skf",
+      "sha256": "bd0a96d4e2f4fe2b2fcb30bc51b106d0bb8026bda36cf7f06a84b56965e2565e",
+      "size_bytes": 375903
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-C.skf",
+      "sha256": "fa7bdd200b466d6d6ef16c380e814bfda65ec458cb6408eca510c4ca8df233e9",
+      "size_bytes": 332736
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-Ca.skf",
+      "sha256": "abca9cf61be453926ac4a8473ef3afaad50bb01e9569a5ff7ff1ff9c8d3d0fb5",
+      "size_bytes": 436651
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-Cl.skf",
+      "sha256": "fea442228bf8d06f85d2cd9cb57fe3ea89db4a189861805892a1e9f2cd7c8728",
+      "size_bytes": 376929
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-F.skf",
+      "sha256": "69d0611eb5547053598fca19e9b530e808479e7b200ed5a3560493d5f2081242",
+      "size_bytes": 312620
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-H.skf",
+      "sha256": "23da57abc4ab809f2518b3cd16bbb15ecc0dafd60d60eeb60935bec6f861c987",
+      "size_bytes": 309944
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-I.skf",
+      "sha256": "2f742cf2e7cb04be634b61f5f1497418aab1b13fdf2daecb13824c868c532655",
+      "size_bytes": 396644
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-K.skf",
+      "sha256": "a13d662edb6d7edace685c0367fdf0fb2754f09ce0d350d871d8370da8073082",
+      "size_bytes": 412667
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-Mg.skf",
+      "sha256": "3bbe4f0ef8e38ae78edb1b9f025b1110e2b505412b9c5744a5bd9d309d2822b3",
+      "size_bytes": 473265
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-N.skf",
+      "sha256": "8e4e3ea221a5511a20390118bc3b09a1936769eb188f78504e5e9671afe8dbbc",
+      "size_bytes": 337017
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-Na.skf",
+      "sha256": "bc3fbff8a87eed2bcd1b3923673c6a0b5c4ebc8bdb19acd8a9874cefc1b7d1ff",
+      "size_bytes": 553435
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-O.skf",
+      "sha256": "c4ad8337b538df6df58636160526169e563b4630acded015f9eedcbc5a90f8ab",
+      "size_bytes": 315864
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-P.skf",
+      "sha256": "a06078eeab6d6984fec1321ad2f3656cb86b404b2c87c12b59af6ad2da9de471",
+      "size_bytes": 356234
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-S.skf",
+      "sha256": "7168bf53464924eb5e328f21ee3a3b7b23f6f6eb7d26dbc519f6358cb07676d9",
+      "size_bytes": 359789
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Ca-Zn.skf",
+      "sha256": "540b5380727acc0e1eebffdeebc93f16d3bfe63e6467a8c0d7afc9bfb33cc80c",
+      "size_bytes": 578284
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-Br.skf",
+      "sha256": "99da3b0df9257d7617a9444433c5c459a589b37ba82de4ad960a56d630d5403c",
+      "size_bytes": 336548
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-C.skf",
+      "sha256": "93f63640ec9b6473094b0d1554f260f7a45741cd6505678ad325a387a6801a81",
+      "size_bytes": 271805
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-Ca.skf",
+      "sha256": "2210f131279aa3b349d5bc4397f7ecfc9f5e7df8e44caa2dd656acba8299d00d",
+      "size_bytes": 374297
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-Cl.skf",
+      "sha256": "9c148aba7113416fa1d8f31a8b21b1cc0f4fecdfbf08010925c9bff2f8f339a8",
+      "size_bytes": 321187
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-F.skf",
+      "sha256": "a31e83f5954ac0bf403c9dffaa6dc6dd691709398c5f549ea681aa22e68ec0f7",
+      "size_bytes": 250891
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-H.skf",
+      "sha256": "385b2b260a2add7ec501ce4d40bdc352637b89b3b38325df5b486c2a906177dd",
+      "size_bytes": 249671
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-I.skf",
+      "sha256": "75f3b2ebc4bd4907524f7ecd0cf6fc898f37a705e14cd7feedaff992a677f8db",
+      "size_bytes": 378794
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-K.skf",
+      "sha256": "550639c739b3b34f39507af0f0bdb4c5e71748e95d93fe41e3737dc26213eef8",
+      "size_bytes": 333473
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-Mg.skf",
+      "sha256": "3de6df5b32b40de7e77dae289904716f886693088ea66f86ca15063276dcbe04",
+      "size_bytes": 366801
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-N.skf",
+      "sha256": "8257172887255b93fbdc72bac16bedfdd5464904406f80e0c41e305b6ff80208",
+      "size_bytes": 271320
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-Na.skf",
+      "sha256": "6fcf872e772a2f74877e0d2d61b0dd4b7513bf363fc971815ed1e68ba6a0856e",
+      "size_bytes": 453531
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-O.skf",
+      "sha256": "2182dc4f6f67d1d14c310b406e87d9c091e915e67b1e71448c9b18dc1ac96581",
+      "size_bytes": 272449
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-P.skf",
+      "sha256": "48c47c803353ccaa9450388747a1dcd0f8e1f66d3ce4313c75fb65c986bc3e30",
+      "size_bytes": 355599
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-S.skf",
+      "sha256": "e0d4a1a370af14684f5142ec625e927830ffe212e5ede0bcc896b3834e4a779c",
+      "size_bytes": 276150
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Cl-Zn.skf",
+      "sha256": "ae50aec31c74b0e4d48a2396e1deb0e84705bcd2deefb4ffbd856d5db64cc942",
+      "size_bytes": 389071
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-Br.skf",
+      "sha256": "f78406c75ec4b6f5b8689475f5d7a3fc9d3930cdf012bbe95517fcffa625c713",
+      "size_bytes": 293515
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-C.skf",
+      "sha256": "ef91ce63f3db06e2ecc962d3aa87b80344bc8d6bb04c402d813b5e297be716f8",
+      "size_bytes": 412838
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-Ca.skf",
+      "sha256": "ec4782d6eed34f97c3e583621e7a7426f29897e869b3d74e62daedfcfd4a822d",
+      "size_bytes": 312526
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-Cl.skf",
+      "sha256": "686d35f1f278b689df398b21ab7f5fdb6bb654646c2aa73ed771774bc58b2e07",
+      "size_bytes": 252633
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-F.skf",
+      "sha256": "e0e571015733b6d00839393b8a5f2297b92f4f911b72684bff900c0b5a0a37e1",
+      "size_bytes": 195771
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-H.skf",
+      "sha256": "83bd0da37d6e45049bc7ff11a9c98e3faac52893339c4a7a4781a1b5af73993c",
+      "size_bytes": 389532
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-I.skf",
+      "sha256": "3d491f563db2b088a45fd3da3379f6903abd832dce086fdc1c2d8cdf3036db14",
+      "size_bytes": 354836
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-K.skf",
+      "sha256": "a934d5fac86535ed852a94edb3061a1f8635a4e53c39e69be5c7d194fb4a727a",
+      "size_bytes": 272131
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-Mg.skf",
+      "sha256": "b1e5ae0d6ef3578a6e420a5172e913b45a44b7bb26e209730f7e7dcc6310a7a5",
+      "size_bytes": 283331
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-N.skf",
+      "sha256": "6d15c931542a50a2bdeff178d045dbfc7950047f1fa1b0ee4a3c445555858070",
+      "size_bytes": 412310
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-Na.skf",
+      "sha256": "10005ab0f0010756556e4cde0ba3786d60ccf441b571d236caeeaaee0fdd0c21",
+      "size_bytes": 413309
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-O.skf",
+      "sha256": "a914bfb2e001d069be999641b9e51ee5242c3939c0f3f1f878194f7fe0bbded9",
+      "size_bytes": 410895
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-P.skf",
+      "sha256": "8c1f0d37b9fe4d4a75a6f2b4172064478137ef94418333249fe8be69cfdef147",
+      "size_bytes": 517378
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-S.skf",
+      "sha256": "2709f5ae6ce49e64486784a22dbc039e9cbda9765f1265660f7eb5680c34c9bf",
+      "size_bytes": 496849
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/F-Zn.skf",
+      "sha256": "4bf3828d0da6d5fb667617281fa9a45526a6e4d7cea9544ff56c960cf2fc0f4a",
+      "size_bytes": 325319
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-Br.skf",
+      "sha256": "95b219dad13a37863b5bba7d2d0d5a9ddd408270e04167444c6892680fa609f7",
+      "size_bytes": 231457
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-C.skf",
+      "sha256": "950f61115cf701988b752960b9a56929b090ca66fe4bbdcea46b3272d20027e0",
+      "size_bytes": 249983
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-Ca.skf",
+      "sha256": "bd622f1174c55e5879151c41e3a1c3e016248540d6c44cec9593cdc3230f5497",
+      "size_bytes": 310748
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-Cl.skf",
+      "sha256": "441273f535d286042a2dd8dc4575879ab65705be5a8187f152848092c591a7d2",
+      "size_bytes": 250802
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-F.skf",
+      "sha256": "341c267f6984dbfe253228a4edf8995b5359bbd8fbab357da1b986394203a21f",
+      "size_bytes": 390397
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-H.skf",
+      "sha256": "acdc130b5ac73a9d51c5091b61e448f1de0723648dfb66d4b5cf1ab71bea0b66",
+      "size_bytes": 232885
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-I.skf",
+      "sha256": "3dbe11531f583a13e81734ea3fd67eef0120775730bc9cefb0291e1af48f0b7f",
+      "size_bytes": 291170
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-K.skf",
+      "sha256": "176e865e39ee771a84e1cd152df491d75dcffc41d09c09dcc6f9e0d90f506ca0",
+      "size_bytes": 290548
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-Mg.skf",
+      "sha256": "6dbded7717b3f73942d338833aeb27d5f1296cd387688f63764c2fb42423e37a",
+      "size_bytes": 261297
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-N.skf",
+      "sha256": "4782c582e5a39d5f8ef56c3b5bd7b47aee78b43ec421608db8d2cbf930b1d15c",
+      "size_bytes": 252418
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-Na.skf",
+      "sha256": "cb7b080a439322acd6a83c6370d4f1e0984925a8451258d3f17ef3b3017492f9",
+      "size_bytes": 409473
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-O.skf",
+      "sha256": "b77a51b690caccfa00bbbb2c3d83073d04dab59a7853ac96586d13138ebd4891",
+      "size_bytes": 231031
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-P.skf",
+      "sha256": "0a9b24284960c5d3657b83f8681cfa7afe2f200182a4b6b83b50c31464ea46cc",
+      "size_bytes": 291565
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-S.skf",
+      "sha256": "53145baa34897bee27f3cefa497b9a69c806fbde2ed53fcc82bc762fec0d92e1",
+      "size_bytes": 292230
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/H-Zn.skf",
+      "sha256": "5e7b92ab5d6db0ae96c3928dca4eacf5012c30ebb510c73023b5df04af3cd1c8",
+      "size_bytes": 325620
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-Br.skf",
+      "sha256": "1293942b70c904465c02953945cc023307d12a1c42f18a4639677ea64df7b093",
+      "size_bytes": 418324
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-C.skf",
+      "sha256": "73fb67c1263549b4c3e77e5126e0c25da63b27b5f06e857f5571fd8bc9e5c880",
+      "size_bytes": 372753
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-Ca.skf",
+      "sha256": "cc1648bc085847255347f208f8d0217b765e98074208bb0db9b3305c6b61ecc6",
+      "size_bytes": 394000
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-Cl.skf",
+      "sha256": "a4bd9c1f25e5599cca4cccc20a2244cc037628aab390d2338b9d7a2f395e6a44",
+      "size_bytes": 378717
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-F.skf",
+      "sha256": "60d3c52225ef2d25ff4192acb034bcf1d7459361ced6ba67e1ad620651fbcbc0",
+      "size_bytes": 352152
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-H.skf",
+      "sha256": "d25246032313ecd8905266b052b8706f56dda5754e2f90b0f1f4eb47c8610b97",
+      "size_bytes": 289683
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-I.skf",
+      "sha256": "823410161fb683a16544bf4946bbd3747833dd88aeb7c62df210584aede625c9",
+      "size_bytes": 484997
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-K.skf",
+      "sha256": "8bee469676ea0802d74279cbba3748822da77fb29996def9a3b0969924b99444",
+      "size_bytes": 454994
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-Mg.skf",
+      "sha256": "e1ed0dfd60b0aa7cdb9b9e078d2be0db40979c9729b5b793e0e4ac97da6201d7",
+      "size_bytes": 410703
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-N.skf",
+      "sha256": "b71ea375d1047163e541e05a8376cd4bf1f8ffd92bca5cc29ed30cc0b474d91e",
+      "size_bytes": 372758
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-Na.skf",
+      "sha256": "65b7a21173338c517f8838a90e8b17be3b357a70b7c11ed1b9482f7a62fba36a",
+      "size_bytes": 454363
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-O.skf",
+      "sha256": "0a12b4be8f6a87b12f9afa6ec4f02d5555ce9e0c27584225bc2089e94613cd78",
+      "size_bytes": 372561
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-P.skf",
+      "sha256": "191b4196bfc666ca5732a5c8ff023f052565d44e81e01e086f1b74e01be5a0f9",
+      "size_bytes": 377420
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-S.skf",
+      "sha256": "542ff8c0eae152c3b620a5580c568ae67c042a56edb17707e3b9907b8a160c35",
+      "size_bytes": 377605
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/I-Zn.skf",
+      "sha256": "7f2619e13a639d1c2d8f1fdecd835f4ec81e7df5764b5ecd33afe31cfcbe7479",
+      "size_bytes": 389658
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-Br.skf",
+      "sha256": "8271a0a861519b7f742d84f3da6ac882534e85ad28cb29bc8a09e9bd1489656c",
+      "size_bytes": 355742
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-C.skf",
+      "sha256": "4a98a73b45b1496c9b198b09267ecce30c7e2a1d9e113d295534f5c7d9d3a428",
+      "size_bytes": 311750
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-Ca.skf",
+      "sha256": "0403e2fd38ba5d5f88797571a29deb17d3e9ffd91845ae908985c7af54dbe771",
+      "size_bytes": 412758
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-Cl.skf",
+      "sha256": "72a2b4dd8c6ed735d256871179ce12ce38ee2f531f9ca4774c5f940ea0191320",
+      "size_bytes": 335756
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-F.skf",
+      "sha256": "e189f2c7db61fd33a07eec4702c6270af76b98a2808fed48c4d87bc6d7007160",
+      "size_bytes": 272213
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-H.skf",
+      "sha256": "fcbe82699bb0bce5067034535d33fc1de78e361cecdf412141cd00f0dfc356a2",
+      "size_bytes": 289838
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-I.skf",
+      "sha256": "fd8a341f2179332b2f17ee9af38e4eeaf908263437051509393259740e08e4a8",
+      "size_bytes": 458498
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-K.skf",
+      "sha256": "2bdae5e7bd5297d280d7e5095e8e32648bb844404d7faca1a75ad4d8af78b399",
+      "size_bytes": 397897
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-Mg.skf",
+      "sha256": "774fa0327331b25a75d5fb6ac1b391d88686ca064d115af4be9b3fe2dedce953",
+      "size_bytes": 430568
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-N.skf",
+      "sha256": "f896552277f48c22c2d796b395758a289e67a65ff438d71344cb3652b4333360",
+      "size_bytes": 297051
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-Na.skf",
+      "sha256": "99753caae4264f4d4c804a03eb94b65aabfd06d1665f90302d41632e18b53934",
+      "size_bytes": 513195
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-O.skf",
+      "sha256": "50b464c86cc77f5418903dcb8e7fb0e6eaa3ac0d38218a52efda3fd44682f5d1",
+      "size_bytes": 295065
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-P.skf",
+      "sha256": "0cdaf83020f4c61ea9af147541ed3d35cff1ebb25311270b6e6a1a280d840f85",
+      "size_bytes": 353607
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-S.skf",
+      "sha256": "98204c261f4ec6607ad419dc544b4f886b3b49ac2361845867c711f6fd620f22",
+      "size_bytes": 338371
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/K-Zn.skf",
+      "sha256": "79db8396590732118d5fc4507903fbb783dc9cc9eb34afaab2d98b0f8d27063c",
+      "size_bytes": 556519
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-Br.skf",
+      "sha256": "b3889cab9212a48835cfa3f6f362d87d9a42e0f16515a3efcf46e53c94cb4e63",
+      "size_bytes": 368490
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-C.skf",
+      "sha256": "b07c1429a05bca478dc55f946186d631460a401d68f358d4f5c3b99cfdd82ba0",
+      "size_bytes": 262279
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-Ca.skf",
+      "sha256": "dcee1f9e5276084f5bdd0642ab92f94b49238b2701bd53a49236587625e704a4",
+      "size_bytes": 473265
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-Cl.skf",
+      "sha256": "ec34d55d4484f5bcd5f2b3a109365f0aedcd3387f2ef11472b6fc3fce0d62dcb",
+      "size_bytes": 366801
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-F.skf",
+      "sha256": "3e1cb6045dabe897594cdb65263aefee5fc838182106c39e4aa9309dfff4d0da",
+      "size_bytes": 283331
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-H.skf",
+      "sha256": "1ca6e7ba7cf7b9931a5aa49dccb6e620f5c9ead1c8520b5de3cb312eb6503ea8",
+      "size_bytes": 261297
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-I.skf",
+      "sha256": "65755b3a08cb43c3f5392addea4589bdf43a4e3893f5d19ac727a2de108605ae",
+      "size_bytes": 410701
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-K.skf",
+      "sha256": "45cdde0a04937cdd54fa572ba103cb4f67821d4640c7c13282d957625e0f888c",
+      "size_bytes": 430566
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-Mg.skf",
+      "sha256": "2e2c80ffeac61c12dd36b6ce76e92426d66a64cc5ef750198447c3176f3d26ed",
+      "size_bytes": 434790
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-N.skf",
+      "sha256": "76297bb0d1f53fe463c55c2d26d516e89e30712a3b8beebeb848f51dc2f57843",
+      "size_bytes": 264121
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-Na.skf",
+      "sha256": "ab1a8297df36c13f444c8a6ee02cf2325dbe8ad66937fdbbed46975e825c098c",
+      "size_bytes": 517362
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-O.skf",
+      "sha256": "7ddd58e9d00ceced8f7c7ffb1f4807d60c7c363db8055359a1e5f8048feb2582",
+      "size_bytes": 264120
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-P.skf",
+      "sha256": "bfe54c498409ee13d5a4419d6161c358d6c75d5693f85fa7f9b3cd8c5704216e",
+      "size_bytes": 303890
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-S.skf",
+      "sha256": "45a62b769e8efa51b215d1a454609cca5c836094e084877bc2d75e93d28b2b67",
+      "size_bytes": 284477
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Mg-Zn.skf",
+      "sha256": "b2ae5f945b897220bc117fd2c7c9340d3b31a45c3004f2c23561a0f869b1d3be",
+      "size_bytes": 515098
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-Br.skf",
+      "sha256": "6bd1dbe48b730b8a3ad71174398c88738946d6a7bbd34f2d1ea8eba05d27a4e9",
+      "size_bytes": 314272
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-C.skf",
+      "sha256": "f0b04e6bcee02be99d4f1b2068488f5e62157d8cd41c8424813b6ce21a6f1257",
+      "size_bytes": 272915
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-Ca.skf",
+      "sha256": "7c27243f37f2b166300c238a9e362a1f8c9b65f31835a0fa85025302bad1a8a2",
+      "size_bytes": 337024
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-Cl.skf",
+      "sha256": "1b260ed32ef2d05fa198303a4dc201afcbd935b8409239bd00d5671d0065627a",
+      "size_bytes": 273174
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-F.skf",
+      "sha256": "fa724751684e87a6b1864f3900452baaca76ed5f0380754fe3ce6536dbbffd8a",
+      "size_bytes": 412264
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-H.skf",
+      "sha256": "c25aa3eaf8d05f4ee3b97d750b4c37c74b00d44f427750162bee58031f104e03",
+      "size_bytes": 251844
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-I.skf",
+      "sha256": "af42103dc11ba2186d5bb67a6c9a17c3b0c8b0b8915ecbffba6fe364f398b933",
+      "size_bytes": 375504
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-K.skf",
+      "sha256": "4ac6679f7e75eba04e3a2f794282e66aff4a51b4972e2b99e0e52e1ca64cd23a",
+      "size_bytes": 296989
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-Mg.skf",
+      "sha256": "fc5d546fe896d0d8de1994dcafe5624d469a4cc73bbc12079405cdfa5cab4f9f",
+      "size_bytes": 264121
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-N.skf",
+      "sha256": "f96f6a07430f4d472cc21e0614cda8478c82a25d3d7734331cd65149f0d58906",
+      "size_bytes": 219243
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-Na.skf",
+      "sha256": "37e5ea4e4681c5a949721a2ba6cdcd5be10ab93f2f499b6947f5ca599ca013ce",
+      "size_bytes": 436240
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-O.skf",
+      "sha256": "31ab322d2dc25ae28f1e567d1e25c7485c2d38732327c754db33208022b05bec",
+      "size_bytes": 232163
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-P.skf",
+      "sha256": "22580aa14e69ef99617906d0055f4613a16ffbba7d754f8bc7bf4da3d522777e",
+      "size_bytes": 315759
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-S.skf",
+      "sha256": "2c05910f7761b564974fc4549c31f838869bb6efe3f80564d127d48201236b6f",
+      "size_bytes": 316630
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/N-Zn.skf",
+      "sha256": "5a8affb7f76de5bba3db885f64141e7ca852a2bf1f18f8dab4206903fc768078",
+      "size_bytes": 326572
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-Br.skf",
+      "sha256": "df1a32220b08f159b4b7c27924ddea3c4d03b814b362482db4c7330e1a69b3a5",
+      "size_bytes": 457634
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-C.skf",
+      "sha256": "58539fe3b9d304d027e980e62f6894d2de90edae571ce5d35aaa08d5dd45c702",
+      "size_bytes": 432783
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-Ca.skf",
+      "sha256": "6fa21dd8b2b90d1e7c47cd0dbfb1227fd1a51b0ad89a8156634784f875f0ef64",
+      "size_bytes": 553394
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-Cl.skf",
+      "sha256": "ab86c9974fd14ad38ac404c26b6f0c63a0bd8c7c0f36b109b619c3c664b90892",
+      "size_bytes": 457135
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-F.skf",
+      "sha256": "b8177c8dbfee371c13d9f5d10963153e46bcc6685b6b32792d5823f6292eaf5f",
+      "size_bytes": 413320
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-H.skf",
+      "sha256": "e3ab6ed27eeef0a86fb1160055c1b4779ea144e8d2d1ef7fc1657a73fd8efd9f",
+      "size_bytes": 408539
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-I.skf",
+      "sha256": "e4349263b1bbca59130e19c4b8ad26c90b7c225a34e798b3430e1b3b03fad7e4",
+      "size_bytes": 457475
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-K.skf",
+      "sha256": "d229da8c1adc7e37a1fad4c91147502222ba6cb9a1ef75f7a462ac5a08a3a87b",
+      "size_bytes": 513297
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-Mg.skf",
+      "sha256": "a73ad40fb2736c4eddcf3d57178b05c7bcc4e6ecfe73a9b329885587d2866d50",
+      "size_bytes": 517362
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-N.skf",
+      "sha256": "4ab15d269c739bd1c87391499bfea6f4516c6c1f9449f618b7bcffeb6783b552",
+      "size_bytes": 436231
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-Na.skf",
+      "sha256": "20f0c752877c27ea6d649af730e97f5d456427d3b59ea84e00d22c5cf4db42ef",
+      "size_bytes": 520373
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-O.skf",
+      "sha256": "962b32947829a706c982f86cc139df911adee8a562c1e9070c10e2c133ed8b3b",
+      "size_bytes": 415609
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-P.skf",
+      "sha256": "cf9290e47a0aee3b649e96414315dcab9805da52c336c0f1717bf30251b29a44",
+      "size_bytes": 454349
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-S.skf",
+      "sha256": "153fdec5dee14d4f18087f712da9bde8d5d02e9e23112d4cb75bf0bd796d030d",
+      "size_bytes": 457729
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Na-Zn.skf",
+      "sha256": "a605e887e64130f057c64d29129a592ac7f06aab7a652bffb92483bc95070db0",
+      "size_bytes": 535234
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-Br.skf",
+      "sha256": "553b51caffd7068094198beac9fd9d29a72fc873972783ef981b6f5be3e7a900",
+      "size_bytes": 294486
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-C.skf",
+      "sha256": "cbfbf6f0058ca42c9fd8b2ba6db0a3a0e694260abe3f3ea032608d3714212ba0",
+      "size_bytes": 233521
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-Ca.skf",
+      "sha256": "076baa539e09a2edda46bca165607d6d07248156f449acc43e18b2e2d41629a5",
+      "size_bytes": 315836
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-Cl.skf",
+      "sha256": "2d103496ffbbc5a6fc4c3dffe9ab0d95b007882a99f7c947a5fb3e4e42186d63",
+      "size_bytes": 274343
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-F.skf",
+      "sha256": "2e55442f973b54624575a2d1852f7a911d8b7286d448530d1f7aefd602f0ed0f",
+      "size_bytes": 410848
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-H.skf",
+      "sha256": "911b8644b0a0d6bbd193064ffb962a658c2dc77e911a563194476e5dddf96f45",
+      "size_bytes": 230510
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-I.skf",
+      "sha256": "01b35d3c27a20faf51a98b5145d15dcc0a4751bc85e430de81aec1df8b88520f",
+      "size_bytes": 375345
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-K.skf",
+      "sha256": "0ef3b48997b80166a5387ed7c506330c4598799ef4a094f981b5c4124b140e71",
+      "size_bytes": 294991
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-Mg.skf",
+      "sha256": "4d0a941b52c211e11ec3d663d6616bf43fabdd8e828ddcdc566464f8849ba9dd",
+      "size_bytes": 264120
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-N.skf",
+      "sha256": "785a2dcab1575282eb6d5d85eaa65a4157c55edf2e7cd6771340dae4176e72dc",
+      "size_bytes": 232172
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-Na.skf",
+      "sha256": "dcaecd28d15624c9d84da9ad73e45a8b961322c76aec41cefb8dd0045fbca361",
+      "size_bytes": 415606
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-O.skf",
+      "sha256": "3b377938f48ebf8b5a1b79da5befcfe42074ec5b4908cc2e6eb1193f9d748a91",
+      "size_bytes": 198424
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-P.skf",
+      "sha256": "817a9cce9a6956ef68f23c176dfe2f1df74026e54185892947afae8b3705b53d",
+      "size_bytes": 316894
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-S.skf",
+      "sha256": "76679002e88b6dd7a2347c33cb6bdfb8bbb30b544ea66ee727eb5c6bb61bc0f9",
+      "size_bytes": 295673
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/O-Zn.skf",
+      "sha256": "102c1e36e97475ecc0bcce2551ac0306291bcb7d7fc7ae8432ace29dbd118813",
+      "size_bytes": 326807
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-Br.skf",
+      "sha256": "1aebe691dd0dfd6babc637f99ac5b0c042040bbc0c9f64020f421810fbab5f2a",
+      "size_bytes": 377332
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-C.skf",
+      "sha256": "fcd8d3ae97224fbf25aa281dbfc633a5e99a23a4b20dca696c1461624a337b5a",
+      "size_bytes": 333823
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-Ca.skf",
+      "sha256": "e0b323c7256fce355a15f1606a73471c5b4d5b2ed29d0f4a38caa7805af553d0",
+      "size_bytes": 353645
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-Cl.skf",
+      "sha256": "3988b9d1e563167376b0ded02ce6ac36b1a178a8f54a64bda064178079a3889f",
+      "size_bytes": 355755
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-F.skf",
+      "sha256": "97d1c323628b3bea48432be09cace2929902cb92d1a41e2f2fa06534adabf5a9",
+      "size_bytes": 513630
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-H.skf",
+      "sha256": "a675a1c090cc5de2903476a0b979e1766b62bad41bd98260e75911bd8b3c9612",
+      "size_bytes": 290126
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-I.skf",
+      "sha256": "20576c04b4e980b509e1f60018bfa2e3c61790a85b98c9d2fad8cb9b27168b09",
+      "size_bytes": 377563
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-K.skf",
+      "sha256": "fcb60ab3b16f023c1ccdd5dc5e156e4c5feeeea1a025015f251f7c071c9c2165",
+      "size_bytes": 350788
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-Mg.skf",
+      "sha256": "34f73fd9ba68e849addaabb2ef46342692a848bcf59016c9d5e56f121e821200",
+      "size_bytes": 303890
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-N.skf",
+      "sha256": "f6bc8a77cebf3b9ebb86680f457adfea3dff879221305d54522dd6b204829f6a",
+      "size_bytes": 313453
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-Na.skf",
+      "sha256": "0fc74c48a4c707148368919d580fb5e749b292d9fb5e824d7edbc3621cb9482c",
+      "size_bytes": 451434
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-O.skf",
+      "sha256": "142262cb38c238ac4b61de48e13b5db1aebd93feffd35edf38a8cb0780dbd095",
+      "size_bytes": 314576
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-P.skf",
+      "sha256": "40d7fd2c022e09acd618bc74ff8a582c289b28798b524b3e489677a17300fc75",
+      "size_bytes": 383693
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-S.skf",
+      "sha256": "168290ced42a5a7e4998fbc2cca0d1ec0daf21eb70daa1ed3569b92bf7a3f531",
+      "size_bytes": 359992
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/P-Zn.skf",
+      "sha256": "fa3e50e57080a3f755b992a1b4bfc5ef8ce43e4f19fe6d04c2f33a7362dd7538",
+      "size_bytes": 366811
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-Br.skf",
+      "sha256": "e52df39451210fe12b6aef22ec8b0b6dd81a68570e10f78d99984aac14ffd745",
+      "size_bytes": 357249
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-C.skf",
+      "sha256": "17b13b6810c0aeb0beaa01559fc883001fe3a5aa4bcb958759bebda81c942548",
+      "size_bytes": 312798
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-Ca.skf",
+      "sha256": "8d14112272fb0c6572f83a3da24327cae019e17c7b5f9e76b399b0e31dd07cdd",
+      "size_bytes": 357190
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-Cl.skf",
+      "sha256": "4c4c747641e18a7b42eb203a7a634e11a84656ee8a3e520eac23be953fbf1c2e",
+      "size_bytes": 276232
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-F.skf",
+      "sha256": "81e03b4591753709ad4e113f3e1cecfe82dedbd8ca29073d9cff695f37fc4186",
+      "size_bytes": 493227
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-H.skf",
+      "sha256": "6ae7edaf19fd815ac9c864cecefa31cb8b03634c836b05ab075fb51d7103d2e5",
+      "size_bytes": 290786
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-I.skf",
+      "sha256": "eee6900e24cf9cc66ac21e82ac80b4785d4d639324e6fc10f7608f4dcf6381f6",
+      "size_bytes": 377743
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-K.skf",
+      "sha256": "99047bbc1330d1c59a1c6a68db49a198baf88374f7cae56a5bb05c2e23606a5e",
+      "size_bytes": 335886
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-Mg.skf",
+      "sha256": "1d5acb5037f0579f8a61b4672f227df3c05ca2cdec7384b0ec806c07a670ba15",
+      "size_bytes": 284477
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-N.skf",
+      "sha256": "a956ca0022407d879766ccd8b47995d6cd1947f27278b9da8b1cb831f2a6869c",
+      "size_bytes": 314330
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-Na.skf",
+      "sha256": "68427e6c19f25e603119e4a6331e742774ad7ac18a5e467449f11f17e605a652",
+      "size_bytes": 454744
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-O.skf",
+      "sha256": "3cc07ad9a677540304105a4ccab2e2a30788cbe67ed7288e36d49dd2bcf202a4",
+      "size_bytes": 293539
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-P.skf",
+      "sha256": "cd9ae09d3d38e3c9515cd775df1619ff57f8502338342dc9233126c9d6c8af71",
+      "size_bytes": 360001
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-S.skf",
+      "sha256": "4482219df86e3d73cea928add54db837c709869f4ee39cd9facbb51d8bad5424",
+      "size_bytes": 364333
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/S-Zn.skf",
+      "sha256": "d26e71ed3c0e8ce46b0b01fc9d0a9db1a00216fc85c63da2e3c8b13ac1fd7c06",
+      "size_bytes": 348101
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-Br.skf",
+      "sha256": "7d8bee3b627282091ea027225e939d526cf1922f068edcf046e0a132654af052",
+      "size_bytes": 390843
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-C.skf",
+      "sha256": "6ab2983d9fcac68628f1305c7b242bf345d32f09d6a2625de74b5c0fca9a56b3",
+      "size_bytes": 344581
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-Ca.skf",
+      "sha256": "cff4f88cd68ceeccab3f4d8adb89a3aa52a2f4220b4862c9e5472729d1bd3bcc",
+      "size_bytes": 578284
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-Cl.skf",
+      "sha256": "ba6a907db788ce5f3e99bf9e2c7757ba4665d53a3c9e2d4cb7f23ec52f7076d9",
+      "size_bytes": 389071
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-F.skf",
+      "sha256": "3ae15bc98868093a0e2261b9ad71042df9b9916b61b831db3e6c5d13d1a7e49d",
+      "size_bytes": 325319
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-H.skf",
+      "sha256": "66f3e45c52b899424cf05dddfd6e2c8729cb158b1dcd8a02e29ce8ce3ae9b4b7",
+      "size_bytes": 325620
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-I.skf",
+      "sha256": "776bb9c137f799e2d9612b4db13589ef3b4d4c3dd38513e9d9a82b3f7bed067d",
+      "size_bytes": 389656
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-K.skf",
+      "sha256": "46a1f64d92f87364b08bccd62ba568f042ac0c3a2773d414f2b893725062c873",
+      "size_bytes": 556517
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-Mg.skf",
+      "sha256": "3366b69d7d1a08d230f2d385015375cb363e4660ad3fd6cc6131b21b46bf398a",
+      "size_bytes": 515098
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-N.skf",
+      "sha256": "1fbf3cb0a601d80c2225fefb635d7f9ae438c15ebca94167fa67eb4746a4779f",
+      "size_bytes": 326572
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-Na.skf",
+      "sha256": "0e793eaa9dff98d8a58c7fcb507c194b8164f0f1b5a1c3d0eed3245478b2d84a",
+      "size_bytes": 535234
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-O.skf",
+      "sha256": "1af130d74f212c8d03e17187c735c3fb3d4975e89476ea11f63edc54c3930b02",
+      "size_bytes": 326807
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-P.skf",
+      "sha256": "23aeaa9608181b690e3793fe434e987a0bee83834f9b1e8b27dd73d4b389e0bc",
+      "size_bytes": 366811
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-S.skf",
+      "sha256": "037a9a6ce0f5627d1710489aaf5562e1766f1be89c9add46c78ba7aff4af40d2",
+      "size_bytes": 348101
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/3ob-3-1/Zn-Zn.skf",
+      "sha256": "31c62f1881de4318404a0f01ea76d49aef277fffa3cb7219c989357c7f7294cd",
+      "size_bytes": 499123
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/README",
+      "sha256": "4a578480e45d1257134943b0f83d9b8eed9b14ecec859e2bb9514bfefa7d9b12",
+      "size_bytes": 474
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Ag-Ag.skf",
+      "sha256": "44ae4bead26e780588c1a892d318fe3a8c8aee0fa0a499b31c0cc5f51216dd6d",
+      "size_bytes": 219056
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Ag-C.skf",
+      "sha256": "543e5834ec58f661d14668548df3e0c85e5110b5ea9926442bbd0485f16c937c",
+      "size_bytes": 101841
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Ag-H.skf",
+      "sha256": "019b0269b7b9441f7861fc3f9902027dc6cbf402c5babee91096c107b00e98b9",
+      "size_bytes": 76872
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Ag-O.skf",
+      "sha256": "39f159d05a53922e87bdecd37e008a125a797df8bfdd7dd4317118c5cf04a723",
+      "size_bytes": 101919
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Ag-Si.skf",
+      "sha256": "3faa11856e0a8af266b8aad6842ade314d06a66c0f16d3aa9abc3c17d36b5b00",
+      "size_bytes": 101907
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/As-As.skf",
+      "sha256": "76de2407e1548ceb3493564060a6e71e68d830c44207cbb8373f9bfe55de6cdf",
+      "size_bytes": 102747
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/As-Ga.skf",
+      "sha256": "d5420d6a58dd4c2bf0604764655f937a75f0ae2ef5c8b2e0531af2467b9900b7",
+      "size_bytes": 160960
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/As-H.skf",
+      "sha256": "3172a93766bdbbe60f7d5a1043d309e32db5e0c73a2821c81ce93ef1ea022730",
+      "size_bytes": 55450
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/As-S.skf",
+      "sha256": "4896ef0afffa0faf2d17cfe6e3f62c4283ccd9b6810021db6cbad9fd21d14f00",
+      "size_bytes": 191896
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/As-Si.skf",
+      "sha256": "0c0b1d4894cc8cdde51fb28c9b4f7597a334f6bc24df1a14084522ec1d3bf991",
+      "size_bytes": 101893
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/C-Ag.skf",
+      "sha256": "74f7ae766f4f7ea595d4da850d07feaa8eda36a435583fb84296d6b3e00120f8",
+      "size_bytes": 160832
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/C-C.skf",
+      "sha256": "f0aebd8b7d2d4bd3710e9ecdbbe9174c515aab9cc3a739b15205861d222d2fc6",
+      "size_bytes": 103264
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/C-Ga.skf",
+      "sha256": "8200f7f087539b907af60bf53c0acd749f3b7dab85c174c4ed5eb3539a205ea2",
+      "size_bytes": 161025
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/C-H.skf",
+      "sha256": "87eefb7b80ee99344a7985e039c9be42622548d3a2ab557b6d1c224c27a513f7",
+      "size_bytes": 54204
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/C-N.skf",
+      "sha256": "8f48a007d0aced4de63d46122a124a7303b2dde7cbffeabe4be46ad5caf79c68",
+      "size_bytes": 101179
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/C-O.skf",
+      "sha256": "1b990957516c534f41aaf5a3e75cb834dcf1f86d63a0f4d414bb4abd782b02be",
+      "size_bytes": 101129
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/C-S.skf",
+      "sha256": "253fafc4f633e0441b79f77e09a88baacd9fd2829750c309ec0c1482bdf1ab52",
+      "size_bytes": 159526
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/CM3_PARAMETERS.DAT",
+      "sha256": "0568fb6b0a83a17763be3269fee44a4ca72bf478678230cdf8a03c498b4d3bed",
+      "size_bytes": 965
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/DFTB_3RD_ORDER_PA.DAT",
+      "sha256": "9f132b89396d1b1b3561d42119ddf9e93324ef3dbdbf305fa730175cd045cb8b",
+      "size_bytes": 387
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/DFTB_3RD_ORDER_PR.DAT",
+      "sha256": "15ae5c31aef42f85ea94fce95bee8a9e4c6663a901ad3393b66eea2485f59733",
+      "size_bytes": 387
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/DISPERSION.INP_ONCHSP",
+      "sha256": "c3067aaf2edd555d6ccb31a245be9e2866adfd6474ec7c336f12bde25276b772",
+      "size_bytes": 300
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Ga-As.skf",
+      "sha256": "352695501cfa14d444b254224a0f01f767b7d64c7f9e4831ca4b903ccd5187a5",
+      "size_bytes": 101961
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Ga-C.skf",
+      "sha256": "196d4a42f1a89b2af86d68cb7e56af06d74ccc051f49fd8f217641c968a39005",
+      "size_bytes": 102049
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Ga-Ga.skf",
+      "sha256": "11f79aebeda2f6cc75fc587ccca6b4c4c2c86f57f0d6e0e80e6fe0bf3344fa75",
+      "size_bytes": 219889
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Ga-H.skf",
+      "sha256": "3579ad07f2954e1f0c4a3c2ca07b019c43e280d1fc0d3a886d447fd375e2ce3b",
+      "size_bytes": 76941
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Ga-O.skf",
+      "sha256": "f09c42183950f6fd69d90ac5431f4dc137c865cc1d26477fb97f98d346a89f87",
+      "size_bytes": 101792
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Ga-S.skf",
+      "sha256": "b8d43c3306b4252869a03bf6e48cd430ec9ce1a86e2464b086fe498f497ff01a",
+      "size_bytes": 260288
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Ga-Si.skf",
+      "sha256": "6b4e95f279c6bc6f6b724704da0e7316b5d0626d3032257808054d60d49ceddd",
+      "size_bytes": 101882
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/H-Ag.skf",
+      "sha256": "9d78d4d2cd97f694850e59a71144106f29fe2e39bb26b32ccfef90bbddffa3ef",
+      "size_bytes": 76875
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/H-As.skf",
+      "sha256": "cadb1534cc326f5c164bbc2d163258c78b957fa4e7a582148abcf601f8ceeecc",
+      "size_bytes": 55453
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/H-C.skf",
+      "sha256": "02b7936366a337cf3511a4f4d16c4b7670bf4495a074506f8aada3fc56b4e529",
+      "size_bytes": 54207
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/H-Ga.skf",
+      "sha256": "9c6e9010f76dc6715f026d55017fc1cfdb2ce7500a72013f34381098f30a373c",
+      "size_bytes": 76941
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/H-H.skf",
+      "sha256": "a1af8e00eac30f9bda0b883c3db053a611f1de77ce2045ebc32fa6f65391c26a",
+      "size_bytes": 32302
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/H-N.skf",
+      "sha256": "7dcebfc475df1037d474b4a1173654bbad4c8131bbdec838d0486fc3d15b4787",
+      "size_bytes": 56576
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/H-O.skf",
+      "sha256": "b6d5e6fcfc5388599b53560880f15e10aebe3c1e518f63d39593b6e0f94ea6e3",
+      "size_bytes": 53506
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/H-S.skf",
+      "sha256": "2d1278e4d16814c3a64b7e38d90ad294bb8a34e6aa46a86b2d42d438180822b5",
+      "size_bytes": 74639
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/LICENSE",
+      "sha256": "9348ddfd44da5a127c59141981954746a860ec8e03e0412cf3af7134af0f97e2",
+      "size_bytes": 20133
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/N-C.skf",
+      "sha256": "a156f7fc7b5ab7658be3f6a5c3fba6d1154f23e58811ddb7b4d24aedd8841c36",
+      "size_bytes": 101177
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/N-H.skf",
+      "sha256": "a1cb4bd99b5c6e53f6321ff4334546be05f4bb8464ff1f97569b8d58ff65de4a",
+      "size_bytes": 56576
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/N-N.skf",
+      "sha256": "dc362deb2a9c18fc97e4d6820e828ac836a9ed4f1e432ed0c31eb1b436760d35",
+      "size_bytes": 102260
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/N-O.skf",
+      "sha256": "1ac7d9625780fb93de3b5ea860a0717c17b0e2f2f92dd3f313db63c118a94c6d",
+      "size_bytes": 102301
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/N-S.skf",
+      "sha256": "1de759d27fa88d52a0cf0d3f53b0773cc9dee075a00125afb18eb33ae4356786",
+      "size_bytes": 158652
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/O-Ag.skf",
+      "sha256": "b455312f10c581d0a6f5f3905207ffd0b620eb9d04b863eafb0a57935a4d06a3",
+      "size_bytes": 160908
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/O-C.skf",
+      "sha256": "e7d9c56fd32963f44c9a3af5ad1620995f946280cfe8e55c728868e906bb727f",
+      "size_bytes": 101131
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/O-Ga.skf",
+      "sha256": "50ea893e91b1dc54979318181631f9c2c3d266ecfea55510fc9a753439f85307",
+      "size_bytes": 160801
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/O-H.skf",
+      "sha256": "e1a11aece87fdddafbfe0f9f5c52fa48b083e630ab78d314840c38088f8097aa",
+      "size_bytes": 53506
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/O-N.skf",
+      "sha256": "813d9a3ca47c8fb5022687a4cf251457ad1f308b7d9baef681735f1af847fc74",
+      "size_bytes": 102301
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/O-O.skf",
+      "sha256": "eace60d806b8c77325e595495a2a472feacf7157482bfb9a6ef8785f888938cf",
+      "size_bytes": 102784
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/O-S.skf",
+      "sha256": "a3382b9c243fdb11259263bd12feeca6c1d894d7a327054ec08d4761e1615d0e",
+      "size_bytes": 160126
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/README",
+      "sha256": "c5185ea4b698c7d6d56ba6a5751c2921c864ceabf5c7881f80dc9fff2b83217a",
+      "size_bytes": 3402
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/S-As.skf",
+      "sha256": "b81e6701382754ef9ee8168af50c56686f741324afada4bc79d977ab9a5df635",
+      "size_bytes": 121100
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/S-C.skf",
+      "sha256": "940195e68476cba801f2a92a87808c03c3d2b6e436133be4ab8cb408afe12b18",
+      "size_bytes": 100529
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/S-Ga.skf",
+      "sha256": "20bf17d72c26dd9f7ae78d15ac8e7cf80fb19acc0f6a01aca6ec7f59cde38ca8",
+      "size_bytes": 260307
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/S-H.skf",
+      "sha256": "10f63449967bca7a9be04cc3330a7a7f4a4f989c50943355a233f7673d90c70d",
+      "size_bytes": 74639
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/S-N.skf",
+      "sha256": "155a6ff6aa9491fdc53caf5ab5b87e8358f5c8c2876e635211826ba75deff11c",
+      "size_bytes": 99654
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/S-O.skf",
+      "sha256": "786fe4e3eae0b909f1f10e85d34c0dbcb6a72ece3ef2b5f6d8f364bd01f6723b",
+      "size_bytes": 101126
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/S-S.skf",
+      "sha256": "5396e41537393cb09fceb2b406b0d815452e057a2a547b14e5714941bae911d3",
+      "size_bytes": 219679
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/S-Si.skf",
+      "sha256": "50c81f1f09e88c9184b0e69734310ea15c65becaaab4e12ec91d703a85956270",
+      "size_bytes": 101841
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Si-Ag.skf",
+      "sha256": "690c594b00c2081b2f1869d1b3fd79281172671cde7ae962a3c6e747b0f000dc",
+      "size_bytes": 160904
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Si-As.skf",
+      "sha256": "9178b6d303b86bd44305a72b37576d478b171b5ae69232458baf7ca707e93cd7",
+      "size_bytes": 101892
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Si-Ga.skf",
+      "sha256": "7b35d6d23738e59a21e998b8bae01ad59cc065d1348041e15a6ff10d98016a30",
+      "size_bytes": 160887
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Si-S.skf",
+      "sha256": "db2d1a59dc953ee66b2b322496b642eeb18d0b81b62f5f2ccaa586919b649fc0",
+      "size_bytes": 160835
+    },
+    {
+      "executable": false,
+      "path": "dat/slko/mio-1-1/Si-Si.skf",
+      "sha256": "a49c681b3e03bb3c3a45d412b88ec24c1d4d1537fdeb28222d710ac769d9c007",
+      "size_bytes": 102884
+    },
+    {
+      "executable": true,
+      "path": "lib/ld-linux-x86-64.so.2",
+      "sha256": "19c124808772b27ce3956f10f30c56400e90edb0cfb50e282a154445e9bf63bf",
+      "size_bytes": 191504
+    },
+    {
+      "executable": true,
+      "path": "lib/libarpack.so.2",
+      "sha256": "ddca8400c14e45f10757d9ffe02e24e75a7fc63779cbcac316bfa2a50e9d3631",
+      "size_bytes": 353224
+    },
+    {
+      "executable": false,
+      "path": "lib/libblas.so.3",
+      "sha256": "b8fc3b2ed878b275a6f33ace23bac409cea2cce7c99372918a9e67823d79c252",
+      "size_bytes": 27200552
+    },
+    {
+      "executable": true,
+      "path": "lib/libbz2.so.1.0",
+      "sha256": "89167cfb36a81306dcf8f439436f46dda12f0bbf4877b9f87abfd079bf765c46",
+      "size_bytes": 241912
+    },
+    {
+      "executable": true,
+      "path": "lib/libc.so.6",
+      "sha256": "048b0cb76a997fa37cf81a555cca1b0be1deb802f6231b9f1920442ad552778a",
+      "size_bytes": 2029592
+    },
+    {
+      "executable": true,
+      "path": "lib/libcew.so",
+      "sha256": "5e2e88afc40ecefcc5948cd0f3f00bceeb60007f6cb91b4955c41e11854be29d",
+      "size_bytes": 62720
+    },
+    {
+      "executable": true,
+      "path": "lib/libcom_err.so.3",
+      "sha256": "5788f4585d9d8febea117fc3d38fd52012af2e5167995603663dd708c75c57cb",
+      "size_bytes": 21952
+    },
+    {
+      "executable": true,
+      "path": "lib/libcrypto.so.3",
+      "sha256": "65f86cad2036a05a259ddf1a60da64353fb0a36ec5cabf65efce681b45ce4129",
+      "size_bytes": 7252896
+    },
+    {
+      "executable": true,
+      "path": "lib/libcurl.so.4",
+      "sha256": "cf82c85691322b3787ef99a8d03ebca489071a02777fc8825748eec26976f48e",
+      "size_bytes": 1091456
+    },
+    {
+      "executable": true,
+      "path": "lib/libdf.so.0",
+      "sha256": "82e29525ab32346bd64eb3c5a5ee6b9f119ffd95e6547d0a73d58765709a11be",
+      "size_bytes": 609344
+    },
+    {
+      "executable": false,
+      "path": "lib/libdl.so.2",
+      "sha256": "10eca37efdab68bb2f6544ca43ef24ae0f40d11f08abd015398b7b386652ccef",
+      "size_bytes": 18848
+    },
+    {
+      "executable": true,
+      "path": "lib/libemil.so",
+      "sha256": "056381c004cd94ddce82e498a3edb807dfaa254d6f9137e875e413f1afe5b39f",
+      "size_bytes": 187080
+    },
+    {
+      "executable": false,
+      "path": "lib/libfftw3.so.3",
+      "sha256": "b63413c26b5ae054d25df7899e5937a342e3d676254738f2fb891c8260296150",
+      "size_bytes": 2115912
+    },
+    {
+      "executable": false,
+      "path": "lib/libgcc_s.so.1",
+      "sha256": "5444fbe71e8cfe3bd05cdf2b44bd8c2e553e6e7e276977089b5e4e1a1ceed531",
+      "size_bytes": 922624
+    },
+    {
+      "executable": false,
+      "path": "lib/libgfortran.so.5",
+      "sha256": "8555a1ad2c03b06f22ecb72cfb89361869ce92d8ed75034cab77799bca885de0",
+      "size_bytes": 3678136
+    },
+    {
+      "executable": true,
+      "path": "lib/libgssapi_krb5.so.2",
+      "sha256": "a55322cbdd9efde8d82be65caeba8c4feaa26534b2592897ae22750db37d03cf",
+      "size_bytes": 400248
+    },
+    {
+      "executable": true,
+      "path": "lib/libhdf5.so.310",
+      "sha256": "dfbc48856ecc1ea1db5478aa1f67eba606b8e62f798d2b241398e5102d9de231",
+      "size_bytes": 4732432
+    },
+    {
+      "executable": true,
+      "path": "lib/libhdf5_hl.so.310",
+      "sha256": "7888920045eba2577563811914b631130db35d1661d189391b2891da997f1a93",
+      "size_bytes": 159248
+    },
+    {
+      "executable": true,
+      "path": "lib/libiconv.so.2",
+      "sha256": "59b942b8a9dfabcfec7d65ff2be1de2e59902765837768ca37468cef5dca9571",
+      "size_bytes": 1182640
+    },
+    {
+      "executable": true,
+      "path": "lib/libicudata.so.75",
+      "sha256": "e065d9cbce8450291e1e8f9125f9a115a07b0181728217b7bf4e3db65c60a322",
+      "size_bytes": 30741448
+    },
+    {
+      "executable": true,
+      "path": "lib/libicuuc.so.75",
+      "sha256": "c9a25b3248c0b20fe3e2bf10042fba72009eed6d72422dca53c8ac169ca65d1b",
+      "size_bytes": 2585632
+    },
+    {
+      "executable": true,
+      "path": "lib/libjpeg.so.8",
+      "sha256": "27d5bc7b9c9674cc073e71e899e7d5f6dedf86f0ad4d93947f60aaee2c2b25c8",
+      "size_bytes": 913736
+    },
+    {
+      "executable": true,
+      "path": "lib/libk5crypto.so.3",
+      "sha256": "73b90eff29b55af2317c17be164a36adab72db193d9b403974c39b5277999a13",
+      "size_bytes": 112432
+    },
+    {
+      "executable": true,
+      "path": "lib/libkeyutils.so.1",
+      "sha256": "bfe024accca85c9f39b7c0e5bf8f2e551f45989db6ea4de2d4cf5bd5319f8e9d",
+      "size_bytes": 39192
+    },
+    {
+      "executable": true,
+      "path": "lib/libkmmd.so",
+      "sha256": "4cb80c76ccd8833f4c5feceda36f5d4d3b2b4f88ed147fa6388e0e0475fda139",
+      "size_bytes": 56584
+    },
+    {
+      "executable": true,
+      "path": "lib/libkrb5.so.3",
+      "sha256": "a3fb16fa6a7016f205bab0733d10e0a97dad3d1c5e62ecc21c47b89ebfd56237",
+      "size_bytes": 1064752
+    },
+    {
+      "executable": true,
+      "path": "lib/libkrb5support.so.0",
+      "sha256": "ecf1d6c0c918f694cc90d6c2d8497fc16ca82d7e79671590d183dd1a94b1ad76",
+      "size_bytes": 66072
+    },
+    {
+      "executable": false,
+      "path": "lib/liblapack.so.3",
+      "sha256": "72d177d23ba55760f8dcf2e48dadb3f3bca44da45ca9dd2bac6be2dd1dc965c6",
+      "size_bytes": 33562376
+    },
+    {
+      "executable": true,
+      "path": "lib/liblzma.so.5",
+      "sha256": "491c01c02da5a22f5825a7c05a561e175aa70c203d5e462dfe90b5040dbdaf50",
+      "size_bytes": 222712
+    },
+    {
+      "executable": false,
+      "path": "lib/libm.so.6",
+      "sha256": "a8994ab5f5042d79353862e2f758017f9db2284608433cfff7d966113242bb6a",
+      "size_bytes": 1369384
+    },
+    {
+      "executable": true,
+      "path": "lib/libmfhdf.so.0",
+      "sha256": "d1b4e13e69d141cf03aff941ce20ad80949bcf4ffb7e77f60d804d2babef32a0",
+      "size_bytes": 193968
+    },
+    {
+      "executable": true,
+      "path": "lib/libnetcdf.so.19",
+      "sha256": "0a53981620849b0b92876881a92ec2c808f27c92b8e9751b8b9014f56772a917",
+      "size_bytes": 1786824
+    },
+    {
+      "executable": true,
+      "path": "lib/libnetcdff.so.7",
+      "sha256": "0ecb176ee341cb351f2fcdca63f069221ccf69217558161865afe427e77be2d5",
+      "size_bytes": 956320
+    },
+    {
+      "executable": true,
+      "path": "lib/libnghttp2.so.14",
+      "sha256": "90ea9756606017da9b40f5ded6de140b98c3bbaac301a3c12f02ee2b15a204bd",
+      "size_bytes": 200576
+    },
+    {
+      "executable": true,
+      "path": "lib/libpthread.so.0",
+      "sha256": "3a96e97d63e7ffa1422e7a62f1091a3a7a1659e7b2d428d92191e4abde5d2e48",
+      "size_bytes": 157224
+    },
+    {
+      "executable": true,
+      "path": "lib/libquick.so",
+      "sha256": "fcff1ffd0ea6ed5021f6a8c49317e6198d02d5f4c56aafbac78d1706aff49175",
+      "size_bytes": 10698648
+    },
+    {
+      "executable": false,
+      "path": "lib/libresolv.so.2",
+      "sha256": "b154c0e02f05cf93a6ccfa8c0dc665152c2527179c3b67e641ab6d72647a4fc2",
+      "size_bytes": 101352
+    },
+    {
+      "executable": true,
+      "path": "lib/libsff_fortran.so",
+      "sha256": "ba4c9d840882f831ae9da50076f75fe8d4394fe090939426400e2f83bc1b49b1",
+      "size_bytes": 135440
+    },
+    {
+      "executable": true,
+      "path": "lib/libssh2.so.1",
+      "sha256": "3b209bcbd821d33e16776334b02194bc4cba05d1f412f6252aadbd8668c4c78d",
+      "size_bytes": 351048
+    },
+    {
+      "executable": true,
+      "path": "lib/libssl.so.3",
+      "sha256": "9f9fc1f5ab856181716b7dff697daf16aa5b0f47f7add572c491ac31a10ef8f4",
+      "size_bytes": 1228008
+    },
+    {
+      "executable": true,
+      "path": "lib/libstdc++.so.6",
+      "sha256": "10f0d3c46c070acd4abea2ccf2500ff0ec77e9b90154b82ea2720dba05510cb9",
+      "size_bytes": 23874544
+    },
+    {
+      "executable": true,
+      "path": "lib/libsz.so.2",
+      "sha256": "c034db431229f40daed1602f2413c2fbdebe6c2fbd1ca13be44ab747238cd3ce",
+      "size_bytes": 55392
+    },
+    {
+      "executable": true,
+      "path": "lib/libxml2.so.2",
+      "sha256": "505eeee901ccdf3bd8423502b1a021ec783c55d116344ba65a9656a588795e94",
+      "size_bytes": 1598072
+    },
+    {
+      "executable": true,
+      "path": "lib/libz.so.1",
+      "sha256": "3c6fd78e248a60e45081bcc77031204a7cb64a88ff2e27fc786ef12ae7e91fca",
+      "size_bytes": 117168
+    },
+    {
+      "executable": true,
+      "path": "lib/libzip.so.5",
+      "sha256": "08c7d60cc76461c741a220c7cf9d417b724f9b421a51b935a38bb7f8dc207c72",
+      "size_bytes": 161712
+    },
+    {
+      "executable": true,
+      "path": "lib/libzstd.so.1",
+      "sha256": "b0e2bad8c117a3ad7d344d7924272d12b8e363956efb91b5074e43d4e201a08d",
+      "size_bytes": 1198840
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/bzip2-1.0.8-hda65f42_10/about.json",
+      "sha256": "5e1c9701cc445b1a1e1aa01bbf5b9d08048bf4ea78e7bb4133bb7dd260c106a4",
+      "size_bytes": 9637
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/bzip2-1.0.8-hda65f42_10/hash_input.json",
+      "sha256": "3ac941f3e0de07f35c5da1369e7f4f7bf108f8c2db04446c349ad269e4ba1757",
+      "size_bytes": 239
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/bzip2-1.0.8-hda65f42_10/index.json",
+      "sha256": "3c0d58d5daf9c5ecaac01db2fa302e64a9c119206bda550b01b558eaef09050d",
+      "size_bytes": 311
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/bzip2-1.0.8-hda65f42_10/licenses/LICENSE",
+      "sha256": "c6dbbf828498be844a89eaa3b84adbab3199e342eb5cb2ed2f0d4ba7ec0f38a3",
+      "size_bytes": 1896
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/hdf4-4.2.15-h2a13503_7/about.json",
+      "sha256": "88ac3510b62e580f4b78fc35a2690a7ab710001c0c81abd2cef953211ad31c25",
+      "size_bytes": 6941
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/hdf4-4.2.15-h2a13503_7/hash_input.json",
+      "sha256": "0b089b6a9f743e7515f8e9793bae6d3132c79ca0842719507a68470f58691e62",
+      "size_bytes": 227
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/hdf4-4.2.15-h2a13503_7/index.json",
+      "sha256": "7476be76f3150416c84f2d3f3e6b0b2d6d2ea1aaf2298650de998bdb2d7b0499",
+      "size_bytes": 377
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/hdf4-4.2.15-h2a13503_7/licenses/COPYING",
+      "sha256": "85a27f39aa52ad32386a6fc638cae0a0885a88a0478384a2670c166476cb2b56",
+      "size_bytes": 2780
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/hdf5-1.14.3-nompi_h2d575fe_109/about.json",
+      "sha256": "81bf24bdd32a35e9d46b22dfecdcff93b66d34aae1ed1383e8931daa9be45685",
+      "size_bytes": 6613
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/hdf5-1.14.3-nompi_h2d575fe_109/hash_input.json",
+      "sha256": "bcccc881efb2c44c91b973037549566634001c909e34a375529200a3f81f16b7",
+      "size_bytes": 456
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/hdf5-1.14.3-nompi_h2d575fe_109/index.json",
+      "sha256": "efd0e710e7abeb9a5d325f8f8473418c9d44aca0c1515cfaec7559afabe2b4fb",
+      "size_bytes": 510
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/hdf5-1.14.3-nompi_h2d575fe_109/licenses/COPYING",
+      "sha256": "cacfb8c9d891e4b0514396e319f626a55f74e43f9fb539eecd1aa52dacf8b7e7",
+      "size_bytes": 5515
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/icu-75.1-he02047a_0/about.json",
+      "sha256": "01a593bcab7ae6c831f84e5b82141402d997e2934a37d45c95ff17a23dd30b5b",
+      "size_bytes": 6271
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/icu-75.1-he02047a_0/hash_input.json",
+      "sha256": "0faf9ce91aeec90e5fb0af213ded7a6f404f495a204b523801d93b3e4b4cefbd",
+      "size_bytes": 280
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/icu-75.1-he02047a_0/index.json",
+      "sha256": "cf7ec1c632d124a7e19178c8a300fcf6d9a381b35c2678748446b7e7a79cba55",
+      "size_bytes": 299
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/icu-75.1-he02047a_0/licenses/LICENSE",
+      "sha256": "3ae033da0bfd60f4609c5c99fe50c0c840685889d3b705d3f527fd7b52032f5c",
+      "size_bytes": 25223
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/keyutils-1.6.3-h7cc23a3_1/about.json",
+      "sha256": "13a1a9dfe3595ab311287bf4051d079b6bc742259178300a7af06577da906974",
+      "size_bytes": 9571
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/keyutils-1.6.3-h7cc23a3_1/hash_input.json",
+      "sha256": "5b3d4c27d5be6d8548edf6c110eff685d13064115ecd087bb0774b4fd2f7e0dd",
+      "size_bytes": 223
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/keyutils-1.6.3-h7cc23a3_1/index.json",
+      "sha256": "ea4e0ea8b903174fc8e17c455405199558ef48f2897b261d84c1e1b9ac70f97d",
+      "size_bytes": 291
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/keyutils-1.6.3-h7cc23a3_1/licenses/LICENCE.LGPL",
+      "sha256": "0d15593e3a8ad90917f8509b5ac1e4b5e5d196434a68029aa9dc0858a4a4c521",
+      "size_bytes": 26450
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/krb5-1.22.2-hbc21106_2/about.json",
+      "sha256": "c0907accb98773900572c03ae7a6c9eb9b0e27dd5749934029950bbad528b206",
+      "size_bytes": 9371
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/krb5-1.22.2-hbc21106_2/hash_input.json",
+      "sha256": "b7fb992776ab07a3e98a1667cc989613c5f375bd0048d2028908e563c634b7cd",
+      "size_bytes": 318
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/krb5-1.22.2-hbc21106_2/index.json",
+      "sha256": "9ef4723620e94b30bc30ca6663ee27f1bf032f6a1d0c14fb710a5b90f19d9709",
+      "size_bytes": 433
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/krb5-1.22.2-hbc21106_2/licenses/doc/notice.rst",
+      "sha256": "35a540e57bd0c22f1a5c8262dac9f80b1b440ce249db8d2d02604c800149b52e",
+      "size_bytes": 62479
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libaec-1.1.5-h088129d_0/about.json",
+      "sha256": "11e1f7475193201d6d322a84883768a9cddb761478f6899a8c1871f0f251d283",
+      "size_bytes": 8893
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libaec-1.1.5-h088129d_0/hash_input.json",
+      "sha256": "3b37fcd5a5884c634523d1fabc7619ae9dac23a45cec81c3d524574c14398750",
+      "size_bytes": 297
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libaec-1.1.5-h088129d_0/index.json",
+      "sha256": "99075ceb03b0217018dd779fbce187fab365e3b8eb14c250276ffb005b31254f",
+      "size_bytes": 333
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libaec-1.1.5-h088129d_0/licenses/LICENSE.txt",
+      "sha256": "9fdabba96fbc46af0ca018f86329f1e06e873b25801732001128d5afca265e36",
+      "size_bytes": 1346
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libcurl-8.21.0-hcf29cc6_1/about.json",
+      "sha256": "eecd7c55cdc1dd8b1f739f5b5932a8b6462be9b6eb2361f57170f82751e8d5f7",
+      "size_bytes": 9800
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libcurl-8.21.0-hcf29cc6_1/hash_input.json",
+      "sha256": "4b77b6fa953bd8397ffc0bf630100ce33a6e5b3a31809aca448c3c77c51d2f50",
+      "size_bytes": 329
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libcurl-8.21.0-hcf29cc6_1/index.json",
+      "sha256": "778a80d271bcee13254537144c1979a9e4d0312f4f88bd65e0ee24dd7b57bf58",
+      "size_bytes": 490
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libcurl-8.21.0-hcf29cc6_1/licenses/COPYING",
+      "sha256": "82f2f4427d6545ee5aaac4f0b80428da6cc8ba41c2cf5da3a03680ec327b9681",
+      "size_bytes": 1088
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libgcc-16.2.0-ha9f2e26_7/about.json",
+      "sha256": "a157c53d16f728d234048cdf245bd68d2f9f2ae0698aadf5f1b01c04839398b1",
+      "size_bytes": 9297
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libgcc-16.2.0-ha9f2e26_7/hash_input.json",
+      "sha256": "c556fdf4e5b6966dad49253977411c882fc16b2c10b0edda4b7328ee7a7f3459",
+      "size_bytes": 318
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libgcc-16.2.0-ha9f2e26_7/index.json",
+      "sha256": "6ebef09b3593b7f33da0ccabc70c481a122e090d80bb113da4ff9b70df8c85f3",
+      "size_bytes": 401
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libiconv-1.18-h0cb94f2_3/about.json",
+      "sha256": "eeefed6e866d6e22fb4c120cb1b9a1462daaf0ebe1eef04fc3d333fdfcdd9ad8",
+      "size_bytes": 9579
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libiconv-1.18-h0cb94f2_3/hash_input.json",
+      "sha256": "3a7e541e3097e8415b6dcdad68ad31881cacce0654b00963d6f308f33f680411",
+      "size_bytes": 242
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libiconv-1.18-h0cb94f2_3/index.json",
+      "sha256": "00cc8331fc008d3926ac766698296e97bcd6d2723f9d9343fdb0bbc8dccc6124",
+      "size_bytes": 286
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libiconv-1.18-h0cb94f2_3/licenses/COPYING.LIB",
+      "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+      "size_bytes": 26419
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libjpeg-turbo-3.2.0-hb03c661_1/about.json",
+      "sha256": "5e8d0403cc4e2e3aacdbb0fe991be646e8c919de9d28e1b59bc234d79311a391",
+      "size_bytes": 9421
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libjpeg-turbo-3.2.0-hb03c661_1/hash_input.json",
+      "sha256": "870ddba5c6aaf0ae9d3110e6ce8a350804b428b4e51b10cae5ef6b95aa267fa0",
+      "size_bytes": 223
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libjpeg-turbo-3.2.0-hb03c661_1/index.json",
+      "sha256": "bfa40b3cd7390ee65dd89ba27c3311162966a428ad7b707b5a7690035256db4c",
+      "size_bytes": 350
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libjpeg-turbo-3.2.0-hb03c661_1/licenses/LICENSE.md",
+      "sha256": "ba6bceebcba0fdd35488477c2cca8c4632ce82c74dbfbc87d886ce6fc4433579",
+      "size_bytes": 6077
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/liblzma-5.8.3-hb03c661_1/about.json",
+      "sha256": "89de90353d02526feb9a94b06c146652eb2dd51d10220e2ec0be8ef724400281",
+      "size_bytes": 9540
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/liblzma-5.8.3-hb03c661_1/hash_input.json",
+      "sha256": "e4844f4b6a642ff821f7438db591a64efc1a7e31b07e3d0cab57f26225f4045c",
+      "size_bytes": 223
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/liblzma-5.8.3-hb03c661_1/index.json",
+      "sha256": "f550c7f2f070dab40793b3551b890b1a7977a5bfe0586a3249442480b8ba732d",
+      "size_bytes": 317
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/liblzma-5.8.3-hb03c661_1/licenses/COPYING",
+      "sha256": "616a3ad264ce29b8f1cb97e53037b139d406899ca8d1f799651e17bfa09830b8",
+      "size_bytes": 3119
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/liblzma-5.8.3-hb03c661_1/licenses/COPYING.0BSD",
+      "sha256": "0b01625d853911cd0e2e088dcfb743261034a091bb379246cb25a14cc4c74bf1",
+      "size_bytes": 607
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libnetcdf-4.9.2-nompi_h00e09a9_116/about.json",
+      "sha256": "6a4acf8dd028d268482172c0ab23d71048b14b4b48a1a9248ec91ffac11a2a35",
+      "size_bytes": 6177
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libnetcdf-4.9.2-nompi_h00e09a9_116/hash_input.json",
+      "sha256": "dda2fd73b910c7c7f9a37499046218b1832f65181767f3df7cab5b92e699debd",
+      "size_bytes": 498
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libnetcdf-4.9.2-nompi_h00e09a9_116/index.json",
+      "sha256": "89a23f0e3ff720e81767a95c8f57242d0d9c76df88c7bb12f696dc26069b8d97",
+      "size_bytes": 655
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libnetcdf-4.9.2-nompi_h00e09a9_116/licenses/COPYRIGHT",
+      "sha256": "58b3a925e82191209929dbf47891f9d661e09d8f8ee753ca90bd3f6a1262ecb7",
+      "size_bytes": 1452
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libnghttp2-1.68.1-h74cf4be_1/about.json",
+      "sha256": "cb02b1a5ad6867ade2126fb27681235f257c8989ef5bdd4428e9126dffa29f02",
+      "size_bytes": 9890
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libnghttp2-1.68.1-h74cf4be_1/hash_input.json",
+      "sha256": "85c32e2c0ac8f51ad7f2fabd8a9505aaced8fba41f289504721fa1d7d7a9e903",
+      "size_bytes": 351
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libnghttp2-1.68.1-h74cf4be_1/index.json",
+      "sha256": "950211d14b2e9002e6074839abc736ad5dd760aec8122343b83f4f135bcbe5c7",
+      "size_bytes": 476
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libnghttp2-1.68.1-h74cf4be_1/licenses/COPYING",
+      "sha256": "6b94f3abc1aabd0c72a7c7d92a77f79dda7c8a0cb3df839a97890b4116a2de2a",
+      "size_bytes": 1156
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libssh2-1.11.1-h6154650_1/about.json",
+      "sha256": "be65e6699ba8c5584d23244b27e709c3f8c9fe8e732ba867ea9f9bcef38dd54b",
+      "size_bytes": 9648
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libssh2-1.11.1-h6154650_1/hash_input.json",
+      "sha256": "21cd7a8171008d493989326c09ae443229145b39aacb74aa01ac0a880011aff6",
+      "size_bytes": 276
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libssh2-1.11.1-h6154650_1/index.json",
+      "sha256": "143cbdbdc513024d7a07d27c532fa43c8952db71ed04feb4d50f4b47ba609810",
+      "size_bytes": 373
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libssh2-1.11.1-h6154650_1/licenses/COPYING",
+      "sha256": "f7f9633cf9ff2f1333f3d7ce46973a8716a4d2a2815ad56f30d437d5fea7bafe",
+      "size_bytes": 1959
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libstdcxx-16.2.0-h934c35e_7/about.json",
+      "sha256": "99cafd129fdadbaf0264651788677a86125b0c8118901b2666de6aa8b7db1be4",
+      "size_bytes": 9262
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libstdcxx-16.2.0-h934c35e_7/hash_input.json",
+      "sha256": "6a3318bb7a1d068fee3edcf6e14133a05cfdbc2ffedbd304462b15bafe80c339",
+      "size_bytes": 311
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libstdcxx-16.2.0-h934c35e_7/index.json",
+      "sha256": "5c93abd41e47ab49b6020a097f4155a4c6a4e11f68e76af36adffea1d628199e",
+      "size_bytes": 379
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libxml2-2.13.9-h04c0eec_0/about.json",
+      "sha256": "fb77a5563ecbe3ac58624d6e504630a8a9bcdd8d0552f6a6e32676c3d6b30a34",
+      "size_bytes": 7810
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libxml2-2.13.9-h04c0eec_0/hash_input.json",
+      "sha256": "5cbda9aac461330f15816882ec7771b0a51ebe0fdabde1529d389db47617a3be",
+      "size_bytes": 340
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libxml2-2.13.9-h04c0eec_0/index.json",
+      "sha256": "8f44dd9c1d46ec65350f36d7b7978b1333e7874abe2b4934072fa3a2729355b4",
+      "size_bytes": 420
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libxml2-2.13.9-h04c0eec_0/licenses/Copyright",
+      "sha256": "c99aae1afe013e50b8b3701e089222b351258043c3025b64053a233fd25b4be7",
+      "size_bytes": 1273
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libzip-1.11.4-h6008cf6_0/about.json",
+      "sha256": "27617e5424da8019311eb0aaa1e8509788ce53c73fba56f636e766df87dd52fb",
+      "size_bytes": 9471
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libzip-1.11.4-h6008cf6_0/hash_input.json",
+      "sha256": "41726a1466e237dacade87b3f07f370e34d3d56a996332d328f49c9efed5ff4a",
+      "size_bytes": 291
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libzip-1.11.4-h6008cf6_0/index.json",
+      "sha256": "26ab3d9f460e7cbc182aefa9d9d743cf4a39dd78e201eb3e64ce2ed76d71c13b",
+      "size_bytes": 400
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libzip-1.11.4-h6008cf6_0/licenses/LICENSE",
+      "sha256": "01c022eca6d566e2e8792fd0f091a28653b2a608319922bcd4de91c49d1438e1",
+      "size_bytes": 1454
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libzlib-1.3.2-h25fd6f3_3/about.json",
+      "sha256": "5d299ccaeaa325ea2a9a8d98dc6429cc9169ca5b65bcf55de08b059507188511",
+      "size_bytes": 9746
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libzlib-1.3.2-h25fd6f3_3/hash_input.json",
+      "sha256": "2b89c9aac6b7481da9970188606b02831604a92c6289d8dab383cef2430d8620",
+      "size_bytes": 233
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libzlib-1.3.2-h25fd6f3_3/index.json",
+      "sha256": "b8b077eb46ed1d6f292934165665bdf2f0e6fa46ed0b4bf661942efddc35b750",
+      "size_bytes": 331
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/libzlib-1.3.2-h25fd6f3_3/licenses/LICENSE",
+      "sha256": "e32ff4e00d9d94930537635291da39e7e612703334bf6fde8c7f1686fe8a45a2",
+      "size_bytes": 1002
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/openssl-3.6.5-h781a0a9_0/about.json",
+      "sha256": "a0cdb498cc9ab4d5ea2ffddb65bac96d57a9b2203237d744d2d7e79d90f63914",
+      "size_bytes": 9375
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/openssl-3.6.5-h781a0a9_0/hash_input.json",
+      "sha256": "4e77ec9ca1f666a5a53580235b1b7dd26a84c0fe0f2d92872a0053d9979ef180",
+      "size_bytes": 243
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/openssl-3.6.5-h781a0a9_0/index.json",
+      "sha256": "b0d7904c2da4b2138d7228e13d786982bdf6527b1bdb85a4a6dedd55e90be88d",
+      "size_bytes": 336
+    },
+    {
+      "executable": false,
+      "path": "licenses/amber-runtime/openssl-3.6.5-h781a0a9_0/licenses/LICENSE.txt",
+      "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+      "size_bytes": 10175
+    },
+    {
+      "executable": false,
+      "path": "licenses/ambertools-24.8-cuda_None_nompi_py311h9353165_101/info/licenses/AmberTools/LICENSE",
+      "sha256": "912af0215a173b10e44c254b1ee2ed844393298a503bea4596216afcb42ec509",
+      "size_bytes": 38042
+    },
+    {
+      "executable": false,
+      "path": "licenses/ambertools-24.8-cuda_None_nompi_py311h9353165_101/info/licenses/AmberTools/src/packmol_memgen/packmol_memgen/lib/packmol/LICENSE",
+      "sha256": "b7f87d528cc3b9b8d8724ec67ed47754e05fb984a63e2cb6dd3167e62df86af7",
+      "size_bytes": 1118
+    },
+    {
+      "executable": false,
+      "path": "licenses/ambertools-24.8-cuda_None_nompi_py311h9353165_101/licenses/arpack/LICENSE",
+      "sha256": "6fc24ba3a92414e5d3222bf0cb0b19a9367ea7ae416ce9ceccd23e79fb506263",
+      "size_bytes": 1664
+    },
+    {
+      "executable": false,
+      "path": "licenses/ambertools-24.8-cuda_None_nompi_py311h9353165_101/licenses/cifparse/README",
+      "sha256": "19800db34587fd7375d52dd5a74b861d6b76b543dd4d2e8a71ca4b90ac84a26d",
+      "size_bytes": 910
+    },
+    {
+      "executable": false,
+      "path": "licenses/ambertools-24.8-cuda_None_nompi_py311h9353165_101/licenses/cusplibrary-cuda9/LICENSE",
+      "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+      "size_bytes": 10175
+    },
+    {
+      "executable": false,
+      "path": "licenses/ambertools-24.8-cuda_None_nompi_py311h9353165_101/licenses/netcdf-4.3.0/COPYRIGHT",
+      "sha256": "bcdf032e01511bc7eaeb076d446726b66baa63411ecc1ba73c3d15554625309e",
+      "size_bytes": 2043
+    },
+    {
+      "executable": false,
+      "path": "licenses/ambertools-24.8-cuda_None_nompi_py311h9353165_101/licenses/reduce/LICENSE.txt",
+      "sha256": "d7627f8c839a7496f79d7ea50f3ce252317f0510501517c64330e7619b446159",
+      "size_bytes": 1421
+    },
+    {
+      "executable": false,
+      "path": "licenses/ambertools-24.8-cuda_None_nompi_py311h9353165_101/licenses/ucpp-1.3/README",
+      "sha256": "77dae9aa0458afdde6fd25542a41583e92f0dc72c207c658d11e64bbfea3eb05",
+      "size_bytes": 38411
+    },
+    {
+      "executable": false,
+      "path": "licenses/arpack-3.9.1-nompi_h77f6705_101/info/licenses/COPYING",
+      "sha256": "0926566f9f406178d1214f8cc796e166b1213dd7c05e0c5b461a8b8ac9e50bbe",
+      "size_bytes": 1892
+    },
+    {
+      "executable": false,
+      "path": "licenses/host/libblas3.copyright",
+      "sha256": "962c3b9f95cc8755e1a01cdbba6d992f7f1bdeca37db5e4c17499b750a6b47c1",
+      "size_bytes": 4923
+    },
+    {
+      "executable": false,
+      "path": "licenses/host/libc6.copyright",
+      "sha256": "40c7e1f2118531f038ca22999bd976901254e1bc5cd1b0f0211bdd064c599987",
+      "size_bytes": 25467
+    },
+    {
+      "executable": false,
+      "path": "licenses/host/libfftw3-double3.copyright",
+      "sha256": "4be674025ed10bf66caf8587ee642ec2932265473eb72881deb694987cb2d47e",
+      "size_bytes": 644
+    },
+    {
+      "executable": false,
+      "path": "licenses/host/libgcc-s1.copyright",
+      "sha256": "d7815dd2364180835891947d96d808878204dea45b8597602a7952332195fbea",
+      "size_bytes": 73896
+    },
+    {
+      "executable": false,
+      "path": "licenses/host/libgfortran5.copyright",
+      "sha256": "d7815dd2364180835891947d96d808878204dea45b8597602a7952332195fbea",
+      "size_bytes": 73896
+    },
+    {
+      "executable": false,
+      "path": "licenses/host/libgomp1.copyright",
+      "sha256": "d7815dd2364180835891947d96d808878204dea45b8597602a7952332195fbea",
+      "size_bytes": 73896
+    },
+    {
+      "executable": false,
+      "path": "licenses/host/liblapack3.copyright",
+      "sha256": "962c3b9f95cc8755e1a01cdbba6d992f7f1bdeca37db5e4c17499b750a6b47c1",
+      "size_bytes": 4923
+    },
+    {
+      "executable": false,
+      "path": "licenses/host/libopenblas0-pthread.copyright",
+      "sha256": "098797c45b303e05128b5657b9d0ba16d0c203d9c0062b7111470d9aab9010d1",
+      "size_bytes": 19053
+    },
+    {
+      "executable": false,
+      "path": "licenses/host/libquadmath0.copyright",
+      "sha256": "d7815dd2364180835891947d96d808878204dea45b8597602a7952332195fbea",
+      "size_bytes": 73896
+    },
+    {
+      "executable": false,
+      "path": "licenses/host/libstdc++6.copyright",
+      "sha256": "d7815dd2364180835891947d96d808878204dea45b8597602a7952332195fbea",
+      "size_bytes": 73896
+    },
+    {
+      "executable": false,
+      "path": "licenses/netcdf-fortran-4.6.1-nompi_h22f9119_106/info/licenses/COPYRIGHT",
+      "sha256": "71faf94201499cc928ed627f74059d9d4079422ed537671a03c832db67e43707",
+      "size_bytes": 2417
+    },
+    {
+      "executable": false,
+      "path": "manifest.json",
+      "sha256": "8585c20d1f3afee2cae59e9721497fa5f06c24c497d06fd3828e36ac543ae073",
+      "size_bytes": 47666
+    }
+  ],
+  "library_directory": "lib",
+  "origin": "AmberTools 24.8 SANDER, Slater\u2013Koster tables, runtime libraries and license notices. An independent reconstruction from the three selected conda-forge packages and the retained Amber runtime reproduced every member. The 132 original native receipts bind the installation manifest.",
+  "original_engine_sha256": "0d815d7fbdb1a6e3dafd1a42ebd508d8842916d1a7ecf8666d02ce2dc65db888",
+  "original_installation_manifest_sha256": "8585c20d1f3afee2cae59e9721497fa5f06c24c497d06fd3828e36ac543ae073",
+  "packages": {
+    "ambertools-24.8-cuda_None_nompi_py311h9353165_101": "5340479d606ccc1116c52fd902e1be180c9b5046897170bfe69d0b0e35ab466b",
+    "arpack-3.9.1-nompi_h77f6705_101": "8da9f7dbc982e4da7dd2e7c4b93a5858917ef937e6d0f9b45d3b1d052edcd620",
+    "netcdf-fortran-4.6.1-nompi_h22f9119_106": "4b64d3ca275be7a791b0de65459d230a8651813f2834127962da630ed3f11cdd"
+  },
+  "platform": "linux-x86_64",
+  "schema": "empirical-lawhood/native-installation-manifest",
+  "tool": "ambertools24.8-sander-3ob",
+  "upstream": "https://conda.anaconda.org/conda-forge/linux-64/",
+  "version": "1.0.0"
+}

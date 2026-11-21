@@ -79,7 +79,7 @@ by that historical scope.
 The [programme closeout](../../../../programmes/shared-records/applied-el/programme-closeout.md) records the selected studies and their actual limits.
 The [Rubisco programme contract](../../../../programmes/biology/photosynthesis/records/programme-contract.md) states the biological targets.
 Current storage and environment instructions are in
-[environment reuse](../../maintainer-environment.md).
+[environment reuse](../../../using/environments.md#select-storage-and-reuse-an-environment).
 
 Existing portable export limits of 64 MiB/member and 128 MiB aggregate are
 software transport restrictions. The new inquiry implementation additionally

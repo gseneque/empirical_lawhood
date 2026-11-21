@@ -8,13 +8,13 @@ scientific products, access permission or executable operands.
 from hashlib import sha256
 import json
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
 
 
 def _document(writer, relative, *, schema, version, expected=None, maximum_bytes):
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
     manifest = writer.read_manifest(relative)
     if (manifest.logical.payload_schema != schema or manifest.logical.profile is not ArtifactProfile.CANONICAL_JSON
             or manifest.logical.media_type != 'application/json' or manifest.materialization.relative_path != relative
@@ -42,7 +42,7 @@ def _identity(document, field):
 
 
 def _issued_source(document):
-    from empirical_lawhood.runtime.study_issue import IssuedExecutableStudyManifest, IssuedStudyManifest
+    from empirical_lawhood.execution.study_issue import IssuedExecutableStudyManifest, IssuedStudyManifest
     if (document['schema'], document['version']) == (IssuedExecutableStudyManifest.SCHEMA, IssuedExecutableStudyManifest.VERSION):
         document = document['value']['base']
     if (document['schema'], document['version']) != (IssuedStudyManifest.SCHEMA, IssuedStudyManifest.VERSION):
@@ -51,17 +51,16 @@ def _issued_source(document):
 
 
 def completed_issued_execution(*, writer, locator, candidate, terminal, observe_controls=None):
-    from .models import ExperimentPackage
-    from .codecs import MAX_CAMPAIGN_PACKAGE_BYTES
-    from .current_result_custody import _current_control
-    from .experiment_execution_read import read_execution_records
-    from empirical_lawhood.runtime.plans import ExecutionPlan, RunPlan
-    from empirical_lawhood.runtime.recovery import build_run_recovery_index
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, lineage_parent_sort_key
+    from empirical_lawhood.api.models import ExperimentPackage
+    from empirical_lawhood.api.current_result_custody import _current_control
+    from empirical_lawhood.api.experiment_execution_read import read_execution_records
+    from empirical_lawhood.execution.plans import ExecutionPlan, RunPlan
+    from empirical_lawhood.execution.recovery import build_run_recovery_index
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, lineage_parent_sort_key
     run_id = locator.run_id
     package, package_manifest = _document(writer, 'runs/' + run_id + '/plans/campaign-package.json',
         schema=ExperimentPackage.SCHEMA, version=ExperimentPackage.VERSION,
-        expected=locator.package, maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES)
+        expected=locator.package, maximum_bytes=None)
     if (package['package_id'] != locator.package.object_id or package['run_plan_id'] != run_id
             or _identity(package['issued_study']['value']['candidate'], 'candidate_id') != candidate
             or package_manifest.logical.logical_artifact_id != 'campaign-package.' + run_id):

@@ -11,12 +11,12 @@ from zipfile import ZipFile
 import numpy as np
 import numpy.typing as npt
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import validate_relative_locator
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import validate_relative_locator
 
-from .contracts import RcLadderResponseActionDeliveryStatus, RcLadderResponseBundleManifest, RcLadderResponseChannelCalibration, RcLadderResponseEpisodeManifest, RcLadderResponsePreparationRecord
-from .profile import RcLadderResponsePhysicalSemanticProfile, RcLadderResponseStatusMeaning
+from empirical_lawhood.adapters.physical.rc_ladder_response.contracts import RcLadderResponseActionDeliveryStatus, RcLadderResponseBundleManifest, RcLadderResponseChannelCalibration, RcLadderResponseEpisodeManifest, RcLadderResponsePreparationRecord
+from empirical_lawhood.adapters.physical.rc_ladder_response.profile import RcLadderResponsePhysicalSemanticProfile, RcLadderResponseStatusMeaning
 
 
 FloatArray: TypeAlias = npt.NDArray[np.float64]

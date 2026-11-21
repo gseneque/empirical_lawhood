@@ -1,13 +1,14 @@
 # SPDX-License-Identifier: MPL-2.0
 """Ordinary authored/issued task custody for the PURE original-history follow-up."""
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_bindings as owner
-from empirical_lawhood.api.current_task_custody import CurrentDevelopmentTaskCustody,CurrentIssuedTaskCustody,CurrentIssuedTaskCustodySupplier
+from empirical_lawhood.storage.contracts.record_codecs import snapshot_record_codecs
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_bindings as owner
+from empirical_lawhood.api.current_task_custody import CurrentDevelopmentTaskCustody, CurrentIssuedTaskCustody, CurrentIssuedTaskCustodySupplier
 from empirical_lawhood.api.matrix_full_factor_custody import authenticate_original_full_factor_reference
-from empirical_lawhood.api.recursive_qualified_parents import _actual_package,_replay_parent_authority
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _replay_parent_authority
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
 
 
 def _pin(value,field):return ObjectIdentity.from_record(getattr(value,field),value)
@@ -33,7 +34,7 @@ def _original_grants(writer,scope,source=None,*,control_reader=None,current_acce
     if not scope.protected:return
     waves=scope.waves if source is None else tuple(row for row in scope.waves if source.root_id in next(wave.root_ids for wave in scope.programme.waves if wave.wave_id==row.wave_id))
     if not waves:raise PermissionError('full factor case omits its actual original protected wave')
-    from empirical_lawhood.api.selected_e4_access import SelectedE4CurrentAccess,selected_e4_authority_binding
+    from empirical_lawhood.api.selected_e4_access import SelectedE4CurrentAccess, selected_e4_authority_binding
     if current_access is not None:
         if type(current_access) is not SelectedE4CurrentAccess:
             raise TypeError('current E4 access requires its exact operation-local selection')
@@ -53,7 +54,7 @@ def _original_grants(writer,scope,source=None,*,control_reader=None,current_acce
 
 class ScheduledFullFactorRuntimeSupplier(CurrentIssuedTaskCustodySupplier):
     def __init__(self,supplier,*,writer,draft,codecs,directory=None,plan=None,read_access=None,payloads=None):
-        self.supplier,self.writer,self.output_codecs=supplier,writer,dict(codecs)
+        self.supplier,self.writer,self.output_codecs=supplier,writer,snapshot_record_codecs(codecs)
         reference,self.configs=_graph(draft)
         self.current_access=read_access
         self.original_input_access=getattr(payloads,'original_input_access',None)
@@ -128,13 +129,13 @@ def bind_development_runtime(*,supplier,writer,directory,plan,output_codecs,read
     if payloads is None:
         _,draft,_,payloads=load_authored_wave(directory=directory,artifact_writer=writer,lazy_payloads=True,read_access=read_access)
     else:
-        from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-        from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+        from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
         raw=payloads['draft.json'];draft=decode_canonical_bytes(raw,RecursiveStudyDraft,maximum_bytes=len(raw))
     from empirical_lawhood.api.recursive_authoring import _authenticate_experiment_instance
-    from empirical_lawhood.api.matrix_full_factor_read import _inputs,_decode
+    from empirical_lawhood.api.matrix_full_factor_read import _inputs, _decode
     from empirical_lawhood.api.matrix_full_factor_secondary import authenticate_full_factor_target
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_preparation import ScheduledFullFactorDevelopmentSpecification,ScheduledFullFactorProtectedSpecification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_preparation import ScheduledFullFactorDevelopmentSpecification, ScheduledFullFactorProtectedSpecification
     instance=_authenticate_experiment_instance(payloads=payloads,draft=draft,artifact_writer=writer)
     kind=ScheduledFullFactorProtectedSpecification if instance.specification.object_schema==ScheduledFullFactorProtectedSpecification.SCHEMA else ScheduledFullFactorDevelopmentSpecification
     specification=_decode(payloads['experiment-specification.json'],kind)
@@ -147,10 +148,8 @@ def bind_development_runtime(*,supplier,writer,directory,plan,output_codecs,read
 def validate_development_read_access(*,directory,artifact_writer,specification,instance,payloads,draft,plan,read_access):
     """Authorize exact original outcomes before generic input/product reads."""
     from empirical_lawhood.api.matrix_full_factor_read import _inputs
-    from empirical_lawhood.api.selected_e4_access import SelectedE4CurrentAccess,require_current_e4_access
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_preparation import (
-        ScheduledFullFactorProtectedSpecification,
-    )
+    from empirical_lawhood.api.selected_e4_access import SelectedE4CurrentAccess, require_current_e4_access
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_preparation import ScheduledFullFactorProtectedSpecification
     if (read_access is not None and type(read_access) is not SelectedE4CurrentAccess
             or type(specification) is not ScheduledFullFactorProtectedSpecification):
         raise TypeError('full factor read access requires its exact protected original selection')

@@ -8,19 +8,15 @@ from typing import ClassVar
 import pytest
 
 from empirical_lawhood.api import load_authoring
-from empirical_lawhood.api.recursive_publications import (
-    authenticate_draft_publications, authenticate_registered_publications,
-)
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.recursive_authoring import RecursiveOperationSpec, RecursiveStudyDraft
-from empirical_lawhood.planning.study_authoring import CapabilitySelection
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.plans import BarrierKind, ExternalInputSpec, OutputTemplate, ScientificStage
-from empirical_lawhood.runtime.recursive_compiler import (
-    RecursiveConfigInput, RecursiveOperationRegistration, RegisteredPublicationRequirement,
-)
+from empirical_lawhood.api.recursive_publications import authenticate_draft_publications, authenticate_registered_publications
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.recursive_authoring import RecursiveOperationSpec, RecursiveStudyDraft
+from empirical_lawhood.design.study_authoring import CapabilitySelection
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.plans import BarrierKind, ExternalInputSpec, OutputTemplate, ScientificStage
+from empirical_lawhood.execution.recursive_compiler import RecursiveConfigInput, RecursiveOperationRegistration, RegisteredPublicationRequirement
 
 
 @dataclass(frozen=True, slots=True)

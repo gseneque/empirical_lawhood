@@ -6,14 +6,12 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.mechanism_readout import (
-    MECHANISM_READOUT_RULE, hessian_action_batch, hold_tangent_response, input_krylov_basis, signed_cell,
-)
-from empirical_lawhood.adapters.simulators.six_matrix_response.gradients import SixMatrixParameters
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import SixMatrixState, hermitian_part
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_derivatives import hessian_image, tangent_step
-from empirical_lawhood.adapters.simulators.six_matrix_response.preparation_differential import NativeStateDifferential
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_response.mechanism_readout import MECHANISM_READOUT_RULE, hessian_action_batch, hold_tangent_response, input_krylov_basis, signed_cell
+from empirical_lawhood.domains.matrix.six_matrix_response.gradients import SixMatrixParameters
+from empirical_lawhood.domains.matrix.six_matrix_response.model import SixMatrixState, hermitian_part
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_derivatives import hessian_image, tangent_step
+from empirical_lawhood.domains.matrix.six_matrix_response.preparation_differential import NativeStateDifferential
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def test_batched_HOLD_matches_each_source_owned_Hessian_and_both_kick_tangent():
@@ -75,8 +73,8 @@ def test_signed_accounting_keeps_cancellation_actual_magnitude_and_unavailable_c
 
 
 def test_complete_missing_future_read_keeps_all_cells_fine_features_and_instrument_contrasts():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.mechanism_readout import same_bank_mechanism, instrument_change
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.domains.matrix.matrix_factor_response.mechanism_readout import same_bank_mechanism, instrument_change
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
     from tests.test_matrix_causal_hessian import causal_case
 
     protocol, causal, frozen = causal_case()
@@ -96,8 +94,8 @@ def test_complete_missing_future_read_keeps_all_cells_fine_features_and_instrume
 
 
 def test_complete_signed_read_maps_both_physical_clocks_and_original_action_cells():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.mechanism_readout import same_bank_mechanism, instrument_summary
-    from empirical_lawhood.adapters.methods.matrix_factor_response.science import native_position_lift
+    from empirical_lawhood.domains.matrix.matrix_factor_response.mechanism_readout import same_bank_mechanism, instrument_summary
+    from empirical_lawhood.domains.matrix.matrix_factor_response.science import native_position_lift
     from tests.test_matrix_causal_hessian import causal_case, time_varying_map
 
     protocol, causal, frozen = causal_case()
@@ -138,9 +136,9 @@ def test_complete_signed_read_maps_both_physical_clocks_and_original_action_cell
     assert len(costs) == 1 and costs[0]['total_read_seconds'] >= costs[0]['causal_Hessian_read_seconds'] > 0
     replay = same_bank_mechanism(protocol, causal, frozen, received, panel_ids=('panel.a', 'panel.b'),
         numerical_status='SATISFIED', feature_disposition='AVAILABLE')
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
     assert canonical_json_bytes(replay) == canonical_json_bytes(result)
-    from empirical_lawhood.adapters.methods.matrix_factor_response.mechanism_readout import compact_instrument
+    from empirical_lawhood.domains.matrix.matrix_factor_response.mechanism_readout import compact_instrument
     compact = compact_instrument(result['instrument'])
     assert compact['forces_sha256'] == result['instrument']['forces_sha256']
     assert 'force_maps_real_Hermitian' not in compact and 'receiver_maps_real_Hermitian' not in compact

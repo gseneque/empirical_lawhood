@@ -12,13 +12,13 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure import repository_identity as repository
-from empirical_lawhood.infrastructure import source_policy as owner
-from empirical_lawhood.infrastructure import source_closure as capture
-from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.study_issue import SelectedSourceManifest, SelectedSourceManifestMember, SourceClosureKind
+from empirical_lawhood.storage import repository_identity as repository
+from empirical_lawhood.storage import source_policy as owner
+from empirical_lawhood.storage import source_closure as capture
+from empirical_lawhood.storage.study_issue import GitStudySourceClosureInspector
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.study_issue import SelectedSourceManifest, SelectedSourceManifestMember, SourceClosureKind
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -314,7 +314,7 @@ def _archive(files, *, archive_mode=0o644, git_mode="100644"):
 def test_complete_archive_census_authenticates_every_original_blob_without_extraction():
     files = {"src/empirical_lawhood/module.py": b"original code\n", "docs/prose.md": b"original prose\n"}
     tree, archive = _archive(files)
-    members = capture._archive_census(tree, archive)
+    members = capture._stream_archive_census(tree, BytesIO(archive))[0]
     assert tuple(row.relative_path for row in members) == tuple(sorted(files))
     assert all(row.sha256 == sha256(files[row.relative_path]).hexdigest()
         and row.size_bytes == len(files[row.relative_path]) and row.mode == "100644" for row in members)
@@ -325,7 +325,7 @@ def test_complete_archive_census_authenticates_every_original_blob_without_extra
 def test_archive_permission_masks_preserve_original_tree_mode_and_blob(archive_mode, git_mode):
     raw = b"original committed source\n"
     tree, archive = _archive({"source.py": raw}, archive_mode=archive_mode, git_mode=git_mode)
-    member, = capture._archive_census(tree, archive)
+    member, = capture._stream_archive_census(tree, BytesIO(archive))[0]
     assert member.mode == git_mode and member.sha256 == sha256(raw).hexdigest()
 
 
@@ -334,7 +334,7 @@ def test_archive_permission_masks_preserve_original_tree_mode_and_blob(archive_m
 def test_archive_mode_refuses_executable_substitution_and_special_bits(archive_mode, git_mode):
     tree, archive = _archive({"source.py": b"original source"}, archive_mode=archive_mode, git_mode=git_mode)
     with pytest.raises(owner.SourcePolicyError, match="file mode"):
-        capture._archive_census(tree, archive)
+        capture._stream_archive_census(tree, BytesIO(archive))[0]
 
 
 @pytest.mark.parametrize("damage", ("omitted", "changed", "extra", "mode", "gitlink"))
@@ -355,7 +355,7 @@ def test_archive_census_refuses_omissions_substitutions_modes_and_gitlinks(damag
     else:
         tree = tree.replace(b"100644 blob", b"160000 commit", 1)
     with pytest.raises(owner.SourcePolicyError, match="census|blob bytes|mode|unsupported|omits"):
-        capture._archive_census(tree, archive)
+        capture._stream_archive_census(tree, BytesIO(archive))[0]
 
 
 @pytest.mark.parametrize("damage", (None, "bytes", "mode", "changed"))
@@ -425,6 +425,8 @@ def _capture_inputs(monkeypatch):
 
     calls = []
     monkeypatch.setattr(capture, "_git", git)
+    monkeypatch.setattr(capture, "_git_archive_census", lambda root, tree:
+        (capture._stream_archive_census(tree, BytesIO(archive))[0], sha256(archive).hexdigest()))
     monkeypatch.setattr(capture, "require_executing_target_source", lambda root: calls.append("origin"))
     monkeypatch.setattr(capture, "_source_path_census", lambda root: names)
     monkeypatch.setattr(capture, "inspect_checkout_source", lambda root, raw, **kwargs:
@@ -456,10 +458,14 @@ def test_committed_source_capture_rejects_undeclared_executable_members(monkeypa
 @pytest.mark.parametrize("mode",("100755","120000"))
 def test_committed_archival_path_is_not_an_executable_or_symlink_exception(monkeypatch,mode):
     _capture_inputs(monkeypatch)
-    original=capture._archive_census
+    original=capture._git_archive_census
     name=next(iter(owner.NESTED_WORK_PLAN_PATHS))
-    monkeypatch.setattr(capture,"_archive_census",lambda tree,archive:tuple(
-        replace(row,mode=mode) if row.relative_path==name else row for row in original(tree,archive)))
+
+    def altered_census(root, tree):
+        members, digest = original(root, tree)
+        return tuple(replace(row, mode=mode) if row.relative_path == name else row for row in members), digest
+
+    monkeypatch.setattr(capture, "_git_archive_census", altered_census)
     with pytest.raises(owner.SourcePolicyError,match="census differs"):
         capture.capture_admitted_target_source(ROOT)
 

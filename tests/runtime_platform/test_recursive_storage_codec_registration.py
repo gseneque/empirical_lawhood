@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Disclosed binary-codec conformance fixtures, without execution or authority."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from hashlib import sha256
@@ -11,21 +12,17 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-from empirical_lawhood.infrastructure.artifact_validation import validate_jsonl_stream
-from empirical_lawhood.infrastructure.artifact_stream_primitives import ArtifactIdentityConflict
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityRegistry
-from empirical_lawhood.runtime.plans import OutputTemplate, ScientificInputRole, ScientificStage
-from empirical_lawhood.runtime.recursive_compiler import RecursivePortContract, compile_recursive_wave
-from empirical_lawhood.runtime.recursive_provider import (
-    RecursiveOperationDeclaration, RecursiveOperationProviderFactory, recursive_operation_binding,
-)
-from empirical_lawhood.runtime.recursive_storage_codecs import (
-    RecursiveStorageCodec, resolve_storage_codec, storage_codec_census,
-)
+from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+from empirical_lawhood.storage.artifact_validation import validate_jsonl_stream
+from empirical_lawhood.storage.artifact_stream_primitives import ArtifactIdentityConflict
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityRegistry
+from empirical_lawhood.execution.plans import OutputTemplate, ScientificInputRole, ScientificStage
+from empirical_lawhood.execution.recursive_compiler import RecursivePortContract, compile_recursive_wave
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationDeclaration, RecursiveOperationProviderFactory, recursive_operation_binding
+from empirical_lawhood.storage.contracts.recursive_storage_codecs import RecursiveStorageCodec, resolve_storage_codec, storage_codec_census
 from tests.runtime_platform.test_recursive_compiler import (
     BUDGET, PERMISSIONS, Config, SourceConfig, UseConfig, fixture,
 )
@@ -206,6 +203,7 @@ def test_local_domain_declaration_projects_its_codec_without_native_or_validatio
     ("maximum_bytes", 0), ("maximum_bytes", -1), ("maximum_bytes", True),
     ("maximum_bytes", 1.5), ("maximum_bytes", "128"), ("validate_stream", None),
     ("validate_stream", "module:validator"), ("validate_stream", len),
+    ("allow_empty", 0), ("allow_empty", 1), ("allow_empty", None), ("allow_empty", "true"),
 ))
 def test_cold_codec_contract_refuses_untyped_or_unsafe_fields(field, value):
     with pytest.raises((TypeError, ValueError)):
@@ -329,7 +327,7 @@ def test_direct_factory_requires_the_binary_input_descriptor_at_cold_constructio
 
 @pytest.mark.parametrize("json_record_masquerade", (False, True))
 def test_external_binary_input_requires_the_consumer_descriptor(json_record_masquerade):
-    from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
+    from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
 
     codec = _codec(payload_schema=Config.SCHEMA) if json_record_masquerade else _codec()
     declaration = _declaration("use", codec)
@@ -427,6 +425,29 @@ def test_declared_codec_limit_refuses_before_structural_callback():
         registry.validate(_request())
 
 
+@pytest.mark.parametrize('allow_empty', (False, True))
+def test_empty_codec_selection_keeps_memory_file_and_structural_validation(tmp_path, allow_empty):
+    calls = []
+    def empty(source, request, *, size):
+        calls.append(size)
+        assert size == 0 and source.read(1) == b''
+    registry = ArtifactProfileValidatorRegistry(binary_codecs=(
+        _codec(validate_stream=empty, allow_empty=allow_empty),))
+    request = _request(b'')
+    path = tmp_path / 'empty.bin'
+    path.write_bytes(b'')
+    for validate in (lambda: registry.validate(request), lambda: registry.validate_file(path, request)):
+        if allow_empty:
+            validate()
+        else:
+            with pytest.raises(ArtifactIdentityConflict, match='byte contract'):
+                validate()
+    assert calls == ([0, 0] if allow_empty else [])
+    # Selecting an empty transport never skips the domain's own structure check.
+    with pytest.raises(ValueError, match='magic header'):
+        ArtifactProfileValidatorRegistry(binary_codecs=(_codec(allow_empty=True),)).validate(request)
+
+
 @pytest.mark.parametrize("result", (True, False, "VALIDATED", b"validated", object()))
 def test_structural_callback_must_return_none_or_raise_instead_of_a_proof_label(result):
     def labelled(_source, _request, *, size):
@@ -468,8 +489,8 @@ def test_public_operation_census_uses_local_factories_without_invoking_their_run
 
 
 def test_registered_arbitrary_binary_crosses_real_guarded_stream_custody_and_manifest_read(tmp_path):
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-    from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+
     from tests.test_recursive_public_service import _plane
 
     calls = []
@@ -487,14 +508,14 @@ def test_registered_arbitrary_binary_crosses_real_guarded_stream_custody_and_man
     assert result.materialization.size_bytes == len(request.payload)
     assert (tmp_path / "explicit-disclosed-custody" / request.relative_path).read_bytes() == request.payload
     manifest_path = tmp_path / "explicit-disclosed-custody" / (request.relative_path + ".manifest.json")
-    plane.verify_manifest(decode_artifact_manifest(manifest_path.read_bytes()))
+    plane.verify_manifest(resolve_artifact_sidecar_bytes(plane, manifest_path.read_bytes()))
     assert len(calls) >= 2 and set(calls) == {len(request.payload)}
 
 
 @pytest.mark.parametrize("transport", ("npz", "framed"))
 def test_default_registry_has_no_implicit_matrix_binary_allowance(transport):
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_FRAMED_CODEC, MATRIX_NPZ_CODEC
-    from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_FRAMED_CODEC, MATRIX_NPZ_CODEC
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
     import numpy as np
 
     if transport == "npz":
@@ -510,7 +531,7 @@ def test_default_registry_has_no_implicit_matrix_binary_allowance(transport):
 
 @pytest.mark.parametrize("transport", ("npz", "framed"))
 def test_known_matrix_labels_do_not_exempt_an_unregistered_binary_compiler_output(transport):
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_FRAMED_CODEC, MATRIX_NPZ_CODEC
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_FRAMED_CODEC, MATRIX_NPZ_CODEC
 
     codec = MATRIX_NPZ_CODEC if transport == "npz" else MATRIX_FRAMED_CODEC
     with pytest.raises(ValueError):
@@ -519,8 +540,8 @@ def test_known_matrix_labels_do_not_exempt_an_unregistered_binary_compiler_outpu
 
 @pytest.mark.parametrize("output_limit", (None, 4096, 128 * 1024**2))
 def test_registered_matrix_npz_keeps_its_original_exact_closed_byte_limit(output_limit):
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_NPZ_CODEC
-    from empirical_lawhood.kernel.matrix_inputs import MAXIMUM_MATRIX_ARRAY_BYTES
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_NPZ_CODEC
+    from empirical_lawhood.domains.matrix.input_contracts import MAXIMUM_MATRIX_ARRAY_BYTES
 
     assert MATRIX_NPZ_CODEC.maximum_bytes == MAXIMUM_MATRIX_ARRAY_BYTES
     compiled, _ = _compile(codec=MATRIX_NPZ_CODEC, output_limit=output_limit,
@@ -533,8 +554,8 @@ def test_registered_matrix_npz_keeps_its_original_exact_closed_byte_limit(output
 
 
 def test_registered_matrix_npz_cannot_raise_its_closed_limit_by_using_the_callback_directly():
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_NPZ_CODEC
-    from empirical_lawhood.kernel.matrix_inputs import MAXIMUM_MATRIX_ARRAY_BYTES
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_NPZ_CODEC
+    from empirical_lawhood.domains.matrix.input_contracts import MAXIMUM_MATRIX_ARRAY_BYTES
 
     request = _request(b"", payload_schema=MATRIX_NPZ_CODEC.payload_schema,
                        profile=MATRIX_NPZ_CODEC.profile, media_type=MATRIX_NPZ_CODEC.media_type)
@@ -571,6 +592,7 @@ def test_cold_binary_consumer_requires_its_own_exact_declared_codec():
 @pytest.mark.parametrize("fields", (
     {"record_version": "2.0.0"}, {"maximum_bytes": MAXIMUM_BYTES + 1},
     {"media_type": "application/vnd.disclosed.fixture"},
+    {"allow_empty": True},
 ))
 def test_producing_validator_stamp_preserves_current_codec_revision_media_and_limit(fields, tmp_path):
     producing = ArtifactProfileValidatorRegistry(binary_codecs=(_codec(),)).generic_validation(
@@ -677,8 +699,8 @@ def test_same_schema_profile_keeps_current_media_guards_independent_of_producing
 @pytest.mark.parametrize("transport", ("framed", "raw-json"))
 def test_public_author_and_retained_reader_accept_new_domain_binary_using_its_declaration(tmp_path, monkeypatch, transport):
     from empirical_lawhood.api import recursive_authoring, recursive_operations
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-    from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
     from tests.test_recursive_public_service import _plane
 
     codec = (_codec() if transport == "framed" else _codec(media_type="application/json",
@@ -739,7 +761,7 @@ def test_raw_json_input_cannot_bypass_exact_storage_or_canonical_record_contract
 
 
 def test_raw_json_codec_cannot_change_another_registered_operations_canonical_meaning():
-    from empirical_lawhood.runtime.recursive_record_codecs import input_record_type_census
+    from empirical_lawhood.storage.contracts.recursive_record_codecs import input_record_type_census
 
     class CanonicalMeaning(Config):
         SCHEMA = globals()["SCHEMA"]

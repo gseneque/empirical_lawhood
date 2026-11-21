@@ -8,12 +8,12 @@ from pathlib import Path
 import pytest
 from scipy.constants import mu_0
 
-from empirical_lawhood.adapters.methods.analytic_material_inquiry import science
-from empirical_lawhood.adapters.methods.analytic_material_inquiry.operation_bindings import operation_registrations
-from empirical_lawhood.adapters.methods.analytic_material_inquiry.recursive_translation import supply_draft, use_draft
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.native_quickstart import UniformElectronGasAnalyticReferenceConfig
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as Verdict
+from empirical_lawhood.domains.materials.analytic_material_inquiry import science
+from empirical_lawhood.domains.materials.analytic_material_inquiry.operation_bindings import operation_registrations
+from empirical_lawhood.domains.materials.analytic_material_inquiry.recursive_translation import supply_draft, use_draft
+from empirical_lawhood.domains.materials.electron_gas.native_quickstart import UniformElectronGasAnalyticReferenceConfig
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as Verdict
 
 D = Decimal
 
@@ -79,8 +79,8 @@ def test_separate_drafts_have_zero_native_effects(source, supplier):
 
 def test_registered_assessment_projection_retains_clock_failure(supplier):
     from types import SimpleNamespace as N
-    from empirical_lawhood.adapters.methods.analytic_material_inquiry.recursive_translation import inquiry_outcome_projector
-    from empirical_lawhood.kernel.status import OperationalStatus
+    from empirical_lawhood.domains.materials.analytic_material_inquiry.recursive_translation import inquiry_outcome_projector
+    from empirical_lawhood.science.records.status import OperationalStatus
     instance = science.compatible_instance(supplier)
     instance = replace(instance, panel=replace(instance.panel, rows=(replace(instance.panel.rows[0], receiver_clock=4), *instance.panel.rows[1:])))
     draft = use_draft(supplier, instance)
@@ -98,16 +98,17 @@ def test_registered_assessment_projection_retains_clock_failure(supplier):
 
 def test_initial_and_later_material_stock_keep_original_config_scope(source, supplier, monkeypatch):
     from hashlib import sha256
-    from empirical_lawhood.adapters.methods.analytic_material_inquiry.recursive_translation import inquiry_evidence_projector
-    from empirical_lawhood.kernel.recursive_requirements import ContributionRole
+    from empirical_lawhood.domains.materials.analytic_material_inquiry.recursive_translation import inquiry_evidence_projector
+    from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
     instance = science.compatible_instance(supplier)
     draft = use_draft(supplier, instance)
     records = {record.fingerprint(): record for record in (supplier, instance)}
     payloads = {'external-' + sha256(external.input_id.encode()).hexdigest()[:24] + '.json':
                 records[external.expected_content_sha256].canonical_bytes() for external in draft.external_inputs}
     from empirical_lawhood.api import recursive_inquiry_evidence as api
-    from empirical_lawhood.adapters.methods.analytic_material_inquiry.executable_binding import EXECUTABLE_BINDING_FACTORIES
-    monkeypatch.setattr(api, 'operation_factories', lambda: EXECUTABLE_BINDING_FACTORIES)
+    from empirical_lawhood.domains.materials.analytic_material_inquiry.extension import EXTENSION as _extension_owner_1
+    EXECUTABLE_BINDING_FACTORIES = _extension_owner_1.factories
+    monkeypatch.setattr(api, 'selected_operation_factories', lambda _: EXECUTABLE_BINDING_FACTORIES)
     bindings = api.project_wave_evidence_bindings(draft=draft, payloads=payloads)
     retained = bindings['external.analytic-material-inquiry.use.supplier']
     original = bindings['external.analytic-material-inquiry.use.instance']
@@ -125,9 +126,9 @@ def test_initial_and_later_material_stock_keep_original_config_scope(source, sup
 
 def test_material_use_outcome_refuses_instance_alias_for_supplier(supplier):
     from types import SimpleNamespace as N
-    from empirical_lawhood.adapters.methods.analytic_material_inquiry.recursive_translation import inquiry_outcome_projector
-    from empirical_lawhood.adapters.methods.analytic_material_inquiry.operation_bindings import record_identity
-    from empirical_lawhood.kernel.status import OperationalStatus
+    from empirical_lawhood.domains.materials.analytic_material_inquiry.recursive_translation import inquiry_outcome_projector
+    from empirical_lawhood.domains.materials.analytic_material_inquiry.operation_bindings import record_identity
+    from empirical_lawhood.science.records.status import OperationalStatus
     instance = science.compatible_instance(supplier)
     draft = use_draft(supplier, instance)
     record = replace(science.assess(supplier, instance), supplier=record_identity(instance))
@@ -141,8 +142,8 @@ def test_material_use_outcome_refuses_instance_alias_for_supplier(supplier):
 
 def test_material_source_only_endpoint_validation_before_missing_product(source):
     from types import SimpleNamespace as N
-    from empirical_lawhood.adapters.methods.analytic_material_inquiry.recursive_translation import inquiry_outcome_projector
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.domains.materials.analytic_material_inquiry.recursive_translation import inquiry_outcome_projector
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
     draft = supply_draft(source)
     original = N(distinguishing_assessment=draft.operations[0].config_identity, endpoint=science.scope(source))
     assert science.source_scope(ObjectIdentity.from_record(source.config_id, source)) == original.endpoint
@@ -156,7 +157,7 @@ def test_material_source_only_endpoint_validation_before_missing_product(source)
 
 
 def test_material_static_history_endpoint_preserves_supply_use_scope(source, supplier):
-    from empirical_lawhood.adapters.methods.analytic_material_inquiry.recursive_translation import inquiry_endpoint_validator
+    from empirical_lawhood.domains.materials.analytic_material_inquiry.recursive_translation import inquiry_endpoint_validator
     first, later = supply_draft(source), use_draft(supplier)
     assert first.operations[0].config_identity != later.operations[0].config_identity
     assert inquiry_endpoint_validator(first, supplier.scope) is None

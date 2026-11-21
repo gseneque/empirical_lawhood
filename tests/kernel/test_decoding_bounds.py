@@ -12,9 +12,9 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.kernel import decoding, serialization
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.kernel.serialization import CanonicalRecord, CanonicalizationError
+from empirical_lawhood.science.records import decoding, serialization
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.science.records.serialization import CanonicalRecord, CanonicalizationError
 
 
 @dataclass(frozen=True, slots=True)
@@ -152,9 +152,9 @@ def test_existing_semantic_and_json_refusals_remain(malformation: str) -> None:
 
 _SUBPROCESS = '''
 import json, resource, sys, tracemalloc
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.references import NamedDecimal
-from empirical_lawhood.kernel.serialization import CanonicalizationError
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.references import NamedDecimal
+from empirical_lawhood.science.records.serialization import CanonicalizationError
 resource.setrlimit(resource.RLIMIT_AS, (256 * 1024 * 1024, 256 * 1024 * 1024))
 resource.setrlimit(resource.RLIMIT_CPU, (2, 2))
 payload = sys.stdin.buffer.read(8193)

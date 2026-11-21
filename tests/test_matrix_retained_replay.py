@@ -11,10 +11,10 @@ import numpy as np
 import pytest
 
 from empirical_lawhood.api.matrix_retained_replay import replay_e4_functional
-from empirical_lawhood.infrastructure.parallel_verification import CanonicalValidationPool
-from empirical_lawhood.infrastructure import matrix_array_io as arrays
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.storage.parallel_verification import CanonicalValidationPool
+from empirical_lawhood.adapters.matrix_storage import matrix_array_io as arrays
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 
 
 def _weighted(value):
@@ -63,9 +63,7 @@ def _operand(index):
 @pytest.mark.parametrize('damage', (None, 'mechanical', 'dense', 'score'))
 def test_functional_worker_keeps_each_numerical_join_and_reuses_case_arrays(monkeypatch, damage):
     """Disclosed math seams isolate dispatch; physical NPZ decoding is real."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import (
-        response_forecast, response_science, selected_e3_e4_science,
-    )
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast, response_science, selected_e3_e4_science
     from empirical_lawhood.api import matrix_mechanism_read
     operands = [_operand(n) for n in range(6)]
     template, causal, physical, dense, response, witness = [SimpleNamespace(arrays=value[1]) for value in operands]

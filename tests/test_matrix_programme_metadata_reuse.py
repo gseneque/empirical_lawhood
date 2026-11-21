@@ -12,8 +12,8 @@ from empirical_lawhood.api import matrix_programme_source_continuation as owner
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammeProjectionContext
 from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_recursive_report_projection import ROOT, wave  # noqa: F401
 from tests.test_matrix_programme_source_continuation import metadata_case, _plans  # noqa: F401
 
@@ -134,7 +134,7 @@ def test_operational_observation_reuses_only_inherited_execution_reports(monkeyp
 
 
 def test_public_author_keeps_one_preparation_context_through_publication(metadata_case, monkeypatch):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import prepare
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import prepare
     _, _, plan = _plans(metadata_case)
     writer = metadata_case.case.writer
     service = ExperimentProgrammeService(ROOT, writer, SimpleNamespace(maximum_parallel_tasks=4))
@@ -184,7 +184,7 @@ def test_cli_author_defers_current_refinement_to_the_owning_author(monkeypatch, 
 
 
 def test_author_without_selected_storage_keeps_its_prerequisite(metadata_case):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import prepare
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import prepare
     _, _, plan = _plans(metadata_case)
     service = ExperimentProgrammeService(ROOT, metadata_case.case.writer)
     prepared = prepare(plan.specification, execution=metadata_case.case.execution)
@@ -193,7 +193,7 @@ def test_author_without_selected_storage_keeps_its_prerequisite(metadata_case): 
 
 
 def test_nested_input_reads_reuse_pure_joins_but_expire_with_the_outer_scope(metadata_case, monkeypatch):  # noqa: F811
-    from empirical_lawhood.infrastructure import matrix_programme_inputs as inputs
+    from empirical_lawhood.adapters.matrix_storage import matrix_programme_inputs as inputs
     original, calls = inputs.validate_programme_input_records, []
 
     def validate(resolved):
@@ -212,7 +212,7 @@ def test_nested_input_reads_reuse_pure_joins_but_expire_with_the_outer_scope(met
 
 
 def test_nested_input_reuse_still_authenticates_current_bytes(metadata_case):  # noqa: F811
-    from empirical_lawhood.infrastructure import matrix_programme_inputs as inputs
+    from empirical_lawhood.adapters.matrix_storage import matrix_programme_inputs as inputs
     writer = metadata_case.case.writer
     options = dict(writer=writer, commitment=metadata_case.commitment,
         maximum_source_bytes=metadata_case.case.request.metadata_budget.source_scan_bytes)
@@ -230,7 +230,7 @@ def test_nested_input_reuse_still_authenticates_current_bytes(metadata_case):  #
 
 @pytest.fixture(scope='module')
 def just_authored(wave):  # noqa: F811
-    from empirical_lawhood.adapters.methods.analytic_material_inquiry.recursive_translation import supply_draft
+    from empirical_lawhood.domains.materials.analytic_material_inquiry.recursive_translation import supply_draft
     from empirical_lawhood.api.recursive_authoring import author_recursive_wave
     draft = supply_draft(wave.source, draft_id='draft.metadata-authoring.pure')
     directory = wave.directory.parent / 'unentered-authoring-records'
@@ -283,7 +283,7 @@ def test_new_authoring_observation_rejects_foreign_or_changed_custody(just_autho
 
 def test_retained_selection_reuses_typed_operands_but_compares_every_original_byte(wave, monkeypatch):  # noqa: F811
     from empirical_lawhood.api import recursive_execution
-    from empirical_lawhood.planning.recursive_authoring import RecursiveScientificSelection
+    from empirical_lawhood.design.recursive_authoring import RecursiveScientificSelection
     _, draft, _, payloads = recursive_execution.load_authored_wave(directory=wave.directory,
         artifact_writer=wave.plane, lazy_payloads=True)
     decode = recursive_execution.decode_canonical_bytes

@@ -14,15 +14,16 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_evidence as se
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_fidelity as local, segmented_fidelity_stream as paired
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_native as native, segmented_science as ss
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_contracts as sc
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry import evidence_stream as es
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_evidence as se
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_fidelity as local, segmented_fidelity_stream as paired
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as native
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_science as ss
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_contracts as sc
+from empirical_lawhood.domains.battery.battery_segmented_inquiry import evidence_stream as es
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
 from tests.test_battery_segmented_fidelity import _operand, _receipt, prepared as prepared_fixture
 from tests.test_battery_segmented_native import custody as native_custody, selected as selected_fixture, exposed_backend, acquire
 
@@ -307,6 +308,6 @@ def test_actual_hybrid_and_terminal_clocks_are_not_phase_aligned(selected, tmp_p
 
 
 def test_complete_stream_control_import_stays_outside_native_and_numeric_engines():
-    result = subprocess.run((sys.executable, "-c", "import sys; import empirical_lawhood.adapters.methods.battery_refined_inquiry.segmented_fidelity_stream; assert 'pybamm' not in sys.modules; assert 'numpy' not in sys.modules"),
+    result = subprocess.run((sys.executable, "-c", "import sys; import empirical_lawhood.domains.battery.battery_refined_inquiry.segmented_fidelity_stream; assert 'pybamm' not in sys.modules; assert 'numpy' not in sys.modules"),
         capture_output=True, text=True, check=False)
     assert result.returncode == 0, result.stderr

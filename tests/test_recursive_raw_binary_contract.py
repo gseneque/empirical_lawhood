@@ -5,19 +5,17 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_FRAMED_ARRAY_SCHEMA, MATRIX_STORAGE_CODECS
-from empirical_lawhood.runtime.recursive_storage_codecs import resolve_storage_codec
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.plans import OutputTemplate
-from empirical_lawhood.runtime.recursive_compiler import RecursivePortContract, compile_recursive_wave
-from empirical_lawhood.runtime.recursive_provider import (
-    RecursiveOperationProvider, RecursiveOperationProviderFactory, recursive_operation_binding,
-)
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactIdentityConflict
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_FRAMED_ARRAY_SCHEMA, MATRIX_STORAGE_CODECS
+from empirical_lawhood.storage.contracts.recursive_storage_codecs import resolve_storage_codec
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.plans import OutputTemplate
+from empirical_lawhood.execution.recursive_compiler import RecursivePortContract, compile_recursive_wave
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationProvider, RecursiveOperationProviderFactory, recursive_operation_binding
+from empirical_lawhood.storage.artifact_validation import ArtifactIdentityConflict
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
 from tests.runtime_platform.test_native_subwork import _plane as _bare_plane
 from tests.runtime_platform.test_recursive_compiler import fixture
 
@@ -61,7 +59,9 @@ def test_declared_raw_binary_factory_compiler_and_capability_semantics():
 ))
 def test_changed_profile_media_or_old_matrix_schema_cannot_escape_exact_codec(kwargs):
     draft, registrations, registry = selected(**kwargs)
-    with pytest.raises(ValueError, match='exact canonical record codec|registered storage codec'):
+    refusal = ('requires the exact codec binding' if kwargs.get('profile') is ArtifactProfile.CANONICAL_JSON
+        else 'registered storage codec')
+    with pytest.raises(ValueError, match=refusal):
         compile_recursive_wave(draft=draft, registrations=registrations, registry=registry,
             implementation_commit='1'*40, output_codecs={})
     r = registrations[0]
@@ -97,7 +97,7 @@ def test_public_authoring_streams_exact_framed_input_and_portable_readback(tmp_p
     from hashlib import sha256
     from pathlib import Path
     from empirical_lawhood.api import recursive_authoring as author
-    from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
+    from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
     from tests.runtime_platform.test_recursive_compiler import SourceConfig, UseConfig
 
     draft, registrations, registry = selected()

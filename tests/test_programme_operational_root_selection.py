@@ -7,7 +7,7 @@ import pytest
 
 from empirical_lawhood.api.composition import create_api
 from empirical_lawhood.api.integration_handoffs import integration_artifact_profile_validators
-from empirical_lawhood.runtime.operator_profile import resolve_external_root_contract
+from empirical_lawhood.execution.operator_profile import resolve_external_root_contract
 from tests.test_programme_catalog_selection import CATALOG, ROOT, operator  # noqa: F401
 
 
@@ -82,12 +82,13 @@ def test_cli_storage_owner_uses_configured_contract_and_installed_codecs(tmp_pat
 
 
 def test_global_contract_option_is_discoverable_without_storage_contact(monkeypatch):
-    from empirical_lawhood.infrastructure.artifacts import GuardedExternalRoot
+    from empirical_lawhood.storage.artifacts import GuardedExternalRoot
     from empirical_lawhood.cli.app import app
     from typer.testing import CliRunner
 
     def no_probe(*_arguments, **_options):
         pytest.fail("help inspected storage")
     monkeypatch.setattr(GuardedExternalRoot, "verify", no_probe)
-    result = CliRunner().invoke(app, ["--help"])
+    monkeypatch.setenv("COLUMNS", "180")
+    result = CliRunner().invoke(app, ["--help"], terminal_width=180)
     assert result.exit_code == 0 and "--artifact-root-contract" in result.stdout

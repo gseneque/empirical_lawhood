@@ -11,31 +11,25 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import eligibility as p
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import (
-    MatrixHistoryAllocation, PUBLIC_HISTORY_MASTER_SEED, matrix_history_numeric_roots,
-    matrix_known_exposed_effective_seeds,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.exposure import (
-    MANDATORY_EFFECTIVE_SEEDS, MANDATORY_FLOOR_IDENTITY, MANDATORY_FLOOR_SHA256,
-    MatrixConstantPhysicalExclusion,
-)
-from empirical_lawhood.adapters.methods.matrix_prospective.example import example_source
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole as Role
+from empirical_lawhood.domains.matrix.matrix_factor_response import eligibility as p
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import MatrixHistoryAllocation, PUBLIC_HISTORY_MASTER_SEED, matrix_history_numeric_roots, matrix_known_exposed_effective_seeds
+from empirical_lawhood.domains.matrix.matrix_factor_response.exposure import MANDATORY_EFFECTIVE_SEEDS, MANDATORY_FLOOR_IDENTITY, MANDATORY_FLOOR_SHA256, MatrixConstantPhysicalExclusion
+from empirical_lawhood.domains.matrix.matrix_prospective.example import example_source
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole as Role
 from empirical_lawhood.api import matrix_history_analysis as history_api
 from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.authority import AuthorityAction, AuthorityPolicy, SourceAccessClass
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.identity.authority import AuthorityAction, AuthorityPolicy, SourceAccessClass
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
 from tests.test_recursive_public_service import _plane
 
 
@@ -43,7 +37,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def _matrix_plane(path, *, storage_codecs=MATRIX_STORAGE_CODECS):
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
     plane = _plane(path)
     plane.validators = ArtifactProfileValidatorRegistry(binary_codecs=storage_codecs)
     return plane
@@ -248,7 +242,7 @@ def test_confirmation_clock_and_existing_authority_refusals(stock):
 
 @pytest.mark.parametrize("state", ("UNKNOWN_COMPLETION", "COMPLETED", "BEGUN"))
 def test_retained_or_uncertain_native_branch_cannot_be_reacquired(state):
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+    from empirical_lawhood.execution.native_subwork import NativeSubworkState
     selected = NativeSubworkState(state)
     store = SimpleNamespace(inspect=lambda definition: SimpleNamespace(state=selected))
     with pytest.raises(ValueError, match="receipt recovery"):

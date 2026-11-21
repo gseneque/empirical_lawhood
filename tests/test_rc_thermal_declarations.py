@@ -3,22 +3,16 @@
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry import (
-    operation_bindings as thermal, recursive_translation as inquiry,
-)
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import (
-    BatteryInquirySource, BatteryInquirySupply, BatteryInquiryInstance,
-)
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain import (
-    operation_bindings as rc, operation_contracts as records, operations,
-)
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.contracts import RCChainSummary, RCChainUnitResult
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityPermission
-from empirical_lawhood.runtime.plans import BarrierKind, ScientificStage
+from empirical_lawhood.domains.battery.battery_thermal_inquiry import operation_bindings as thermal, recursive_translation as inquiry
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquirySource, BatteryInquirySupply, BatteryInquiryInstance
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain import operation_bindings as rc, operation_contracts as records, operations
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.contracts import RCChainSummary, RCChainUnitResult
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityPermission
+from empirical_lawhood.execution.plans import BarrierKind, ScientificStage
 
 
 # Exact implementation digests from the preserved 4abe82a3 handwritten owners.
@@ -204,14 +198,14 @@ def test_declaration_construction_and_projections_never_construct_or_execute_run
 @pytest.mark.parametrize('family', ('rc', 'thermal'))
 def test_actual_discovery_and_executable_descriptors_share_the_authoritative_roster(family):
     if family == 'rc':
-        from empirical_lawhood.adapters.methods.rc_prerequisite_chain import extension_bundle as cold, executable_binding as live
+        from empirical_lawhood.domains.circuits.rc_prerequisite_chain import extension as cold, extension as live
     else:
-        from empirical_lawhood.adapters.methods.battery_thermal_inquiry import extension_bundle as cold, executable_binding as live
+        from empirical_lawhood.domains.battery.battery_thermal_inquiry import extension as cold, extension as live
     declarations = {row.capability_key: row for row in cold.OPERATION_DECLARATIONS}
-    factories = {row.manifest.capability_key: row for row in live.EXECUTABLE_BINDING_FACTORIES}
+    factories = {row.manifest.capability_key: row for row in live.EXTENSION.factories}
     assert set(declarations) == set(factories)
-    assert tuple(sorted((row.manifest() for row in declarations.values()), key=lambda row: row.registry_id)) == cold.EXTENSION_BUNDLE_CONTRIBUTION.capability_manifests
-    assert tuple(row.binding for row in live.EXECUTABLE_BINDING_FACTORIES) == live.EXECUTABLE_BINDING_CONTRIBUTION.bindings
+    assert tuple(sorted((row.manifest() for row in declarations.values()), key=lambda row: row.registry_id)) == cold.EXTENSION.discovery.capability_manifests
+    assert tuple(row.binding for row in live.EXTENSION.factories) == live.EXTENSION.executable.bindings
     for key, row in declarations.items():
         assert factories[key].manifest == row.manifest()
         assert factories[key].registration == row.registration()

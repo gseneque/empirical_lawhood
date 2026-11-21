@@ -14,10 +14,10 @@ from hashlib import sha256
 import re
 from typing import ClassVar
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
-from .direct_panels import _number
-from .workbook import NativeWorkbookCellV1, NativeWorkbookV1, decode_native_workbook
+from empirical_lawhood.adapters.physical.rubisco_kinetics.direct_panels import _number
+from empirical_lawhood.adapters.physical.rubisco_kinetics.workbook import NativeWorkbookCellV1, NativeWorkbookV1, decode_native_workbook
 
 ARTICLE_SHA256 = "77c7bb857c26132820123d70ad356deb36124b162300f124784df6eddadbdd0f"
 WORKBOOK_SHA256 = "bbd449d86c96297acf6351cf184464ceb23cbc1f42535beff4fce8b0dcd7bbc0"

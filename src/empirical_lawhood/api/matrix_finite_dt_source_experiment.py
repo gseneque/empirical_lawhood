@@ -3,15 +3,14 @@
 from dataclasses import replace
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_experiment as domain
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_records as r
-from empirical_lawhood.adapters.methods.matrix_source_evidence import MatrixSourcePipelineEvidence
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_experiment as domain
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_records as r
+from empirical_lawhood.domains.matrix.matrix_source_evidence import MatrixSourcePipelineEvidence
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
-from empirical_lawhood.api.matrix_finite_dt_source_runtime import (
-    _authenticate_bank_publications, authenticate_instrument_certificate, bind_finite_dt_source_handoff)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.experiment_preparation import ExperimentPreparation
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveDesignInputs
+from empirical_lawhood.api.matrix_finite_dt_source_runtime import _authenticate_bank_publications, authenticate_instrument_certificate, bind_finite_dt_source_handoff
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.experiment_preparation import ExperimentPreparation
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveDesignInputs
 
 
 def _selection(specification, allocation, draft, source_records):
@@ -30,8 +29,7 @@ def pipeline_evidence(selection):
 
 def authenticate_selection(*, writer, selection, control_reader=None):
     from empirical_lawhood.api.matrix_finite_dt_source_pipeline import authenticate_finite_dt_source_materialization
-    from empirical_lawhood.api.matrix_source_runtime import (
-        _authenticate_source_publication, matrix_source_publication_references)
+    from empirical_lawhood.api.matrix_source_runtime import _authenticate_source_publication, matrix_source_publication_references
     selection.__post_init__()
     _authenticate_bank_publications(writer, selection.bank, selection.exposure_support)
     authenticate_instrument_certificate(writer=writer, certificate=selection.certificate,
@@ -89,9 +87,8 @@ def bind_finite_dt_source_experiment(handoff, *, specification, allocation, sour
 
 
 def _retained_selection(selected):
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation
-    from empirical_lawhood.runtime.prospective_experiment import (
-        ALLOCATION_FILENAME, SPECIFICATION_FILENAME, source_filename)
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+    from empirical_lawhood.execution.prospective_experiment import ALLOCATION_FILENAME, SPECIFICATION_FILENAME, source_filename
     if len(selected.instance.sources) != 1:
         raise PermissionError("finite-dt source read requires one exact original selected input")
     source_pin, = selected.instance.sources
@@ -126,10 +123,9 @@ def read_finite_dt_source_result(*, selected, artifact_writer, run_id, reveal_au
     from empirical_lawhood.api.current_result_custody import authenticate_current_execution_plan, retained_output_artifact_plane
     from empirical_lawhood.api.matrix_source_runtime import authenticate_matrix_source_qualification
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.api.recursive_qualified_parents import (
-        _actual_package, _collect_receipt_closure, _ParentReadScope)
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+    from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _collect_receipt_closure, _ParentReadScope
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
     if type(allow_partial) is not bool:
         raise TypeError("finite-dt source read requires an explicit partial selection")
     selection = _retained_selection(selected)
@@ -153,7 +149,7 @@ def read_finite_dt_source_result(*, selected, artifact_writer, run_id, reveal_au
         evidence, result = authenticate_selection(writer=writer, selection=selection, control_reader=scope.plan_reader)
         expected = {domain.node_id(selection.scope, "pipeline"): (evidence.receipt, "receipt_id"),
             domain.node_id(selection.scope, "qualification"): (result, "result_id")}
-        from empirical_lawhood.adapters.methods.matrix_finite_dt_source_bindings import gate_declaration
+        from empirical_lawhood.domains.matrix.matrix_finite_dt_source_bindings import gate_declaration
         for gate in result.gate_evidence:
             kind, = (value for value in r.GATES if gate.method.capability_key ==
                 gate_declaration(value).capability_key)

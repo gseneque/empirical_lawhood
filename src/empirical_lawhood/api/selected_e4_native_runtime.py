@@ -1,26 +1,27 @@
 # SPDX-License-Identifier: MPL-2.0
 """Fresh issued selected E4 custody; children receive bounded exact projections."""
 
+from empirical_lawhood.storage.contracts.record_codecs import snapshot_record_codecs
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustodySupplier
 
 from functools import partial
 from contextlib import contextmanager
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as p
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_protected_workers import SelectedE4ProtectedWorker
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as p
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_protected_workers import SelectedE4ProtectedWorker
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody, CurrentDevelopmentTaskCustody
-from .matrix_sampling_runtime import _original_product, _selected_control
-from .matrix_selected_runtime import _published_input, _current_source_qualifications
+from empirical_lawhood.api.matrix_sampling_runtime import _original_product, _selected_control
+from empirical_lawhood.api.matrix_selected_runtime import _published_input, _current_source_qualifications
 from empirical_lawhood.api.recursive_qualified_parents import MAX_PARENT_BYTES, _ParentReadScope, _output_payload, _semantic_writer
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactManifest
-from empirical_lawhood.kernel.status import OperationalStatus
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
+from empirical_lawhood.science.records.status import OperationalStatus
 
 
 def development_output_plane(writer,plan,codecs):
@@ -42,7 +43,7 @@ def development_product(writer,locator,operation,codecs,*,include_bank=False,rea
 @contextmanager
 def _development_replay(writer):
     """Share one complete acquisition replay inside its live custody context."""
-    from .selected_e4_method_runtime import original_development_products
+    from empirical_lawhood.api.selected_e4_method_runtime import original_development_products
     active, cached, accesses = True, [], []
 
     def current():
@@ -97,10 +98,10 @@ def development_products(writer, requests, codecs, *, include_bank=False, read_a
 
 
 def _development_products(writer, requests, codecs, *, include_bank, read_access, secondary_readout, replay):
-    from .recursive_execution import _read_recursive_wave_with_roots
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
-    from .selected_e4_method_runtime import authenticate_selected_e4_development_operands
-    from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+    from empirical_lawhood.api.recursive_execution import _read_recursive_wave_with_roots
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
+    from empirical_lawhood.api.selected_e4_method_runtime import authenticate_selected_e4_development_operands
+    from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
     directory=writer.root.resolve(requests[0][0].authored_directory,for_write=False)
     retained_payloads = []
     def validate_producer(locator, operation, *, draft, run, plan):
@@ -178,9 +179,9 @@ def _development_products(writer, requests, codecs, *, include_bank, read_access
 
 def validate_original_calibration_phase(*,expected_public,confirmation,**kwargs):
     """Existing CAL producer admission plus complete CAL/CONF source separation."""
-    from .selected_e4_method_runtime import validate_selected_e4_calibration_producer
+    from empirical_lawhood.api.selected_e4_method_runtime import validate_selected_e4_calibration_producer
     from empirical_lawhood.api.matrix_selected_producer_scope import _read_config
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
     validate_selected_e4_calibration_producer(expected_public=expected_public,**kwargs)
     tasks=tuple(v for v in kwargs["execution_plan"].tasks if v.task_id==kwargs["binding"].task_id)
     config=_read_config(kwargs["writer"],kwargs["binding"],tasks[0],methods.SelectedE4MethodConfig)
@@ -204,13 +205,13 @@ def validate_calibration_confirmation_separation(calibration,confirmation):
         raise PermissionError("selected E4 confirmation changes original CAL target/reservation or reuses groups/sources/streams")
 
 def authenticate_entry(writer,entry,evidence,codecs,*,wave_evidence=None):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4Calibration
-    from .matrix_selected_e3_e4_runtime import authenticate_selected_e3_public_package
-    from .matrix_source_runtime import authenticate_matrix_source_qualification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4Calibration
+    from empirical_lawhood.api.matrix_selected_e3_e4_runtime import authenticate_selected_e3_public_package
+    from empirical_lawhood.api.matrix_source_runtime import authenticate_matrix_source_qualification
     r.validate_evidence(evidence,entry.programme,entry.bank,entry.decision,entry.models,entry.calibration)
     authenticate_publication(writer,entry.declaration_publication,entry.declaration)
     authenticate_publication(writer,entry.declaration.bank_publication,entry.bank)
-    from .matrix_full_factor_secondary import authenticate_e4_secondary_target
+    from empirical_lawhood.api.matrix_full_factor_secondary import authenticate_e4_secondary_target
     authenticate_e4_secondary_target(writer=writer, selection=entry.secondary_readout, bank=entry.bank)
     public=entry.bank.forecast_design.package
     summary=authenticate_selected_e3_public_package(writer=writer,public=public,
@@ -381,8 +382,8 @@ def prepare_selected_e4_protected(supplier,context,runner):
         if models!=entry.models:raise PermissionError("selected E4 leaf changes actual entry-authenticated public models")
         owner.bind_selected_e4_models(config,models)
     if owner.native_config(config):
-        from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import bind_selected_native_source
+        from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import bind_selected_native_source
         rows=tuple(v for v in controls.values() if v.logical.payload_schema==NumericalProducingProvenance.SCHEMA)
         if len(rows)!=1:
             raise PermissionError("selected E4 protected leaf loses exact standalone original provenance input")
@@ -397,7 +398,7 @@ def prepare_selected_e4_protected(supplier,context,runner):
 
 class SelectedE4RuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
     def __init__(self,supplier,*,writer,output_codecs,reveal_authority_id=None,custody=None):
-        self.supplier,self.writer,self.output_codecs,self.reveal_authority_id=supplier,writer,dict(output_codecs),reveal_authority_id
+        self.supplier,self.writer,self.output_codecs,self.reveal_authority_id=supplier,writer,snapshot_record_codecs(output_codecs),reveal_authority_id
         if custody is not None and (type(custody) is not CurrentIssuedTaskCustody
                 or custody.writer is not writer or custody.reveal_authority_id!=reveal_authority_id):
             raise TypeError("selected E4 shared custody changes its exact writer or reveal selection")
@@ -407,15 +408,15 @@ class SelectedE4RuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
         with self.custody.preparation_scope():
             return prepare_selected_e4_protected(self,context,runner)
     def prepare_selected_e4_method(self,context,runner):
-        from .selected_e4_method_runtime import prepare_selected_e4_method
+        from empirical_lawhood.api.selected_e4_method_runtime import prepare_selected_e4_method
         with self.custody.preparation_scope():
             return prepare_selected_e4_method(self,context,runner)
 
 
 def bind_selected_e4_handoff(handoff,*,writer,reveal_authority_id=None):
     from dataclasses import replace
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
     from empirical_lawhood.api.recursive_operations import operation_catalog
     codecs=operation_catalog()[2]
     ports=[]

@@ -1,0 +1,143 @@
+{
+  "actions": [
+    -40.0,
+    40.0,
+    80.0
+  ],
+  "calibration_unit_ids": [
+    "unit.r13.calibration.0000",
+    "unit.r13.calibration.0001",
+    "unit.r13.calibration.0002",
+    "unit.r13.calibration.0003",
+    "unit.r13.calibration.0004",
+    "unit.r13.calibration.0005",
+    "unit.r13.calibration.0006",
+    "unit.r13.calibration.0007",
+    "unit.r13.calibration.0008",
+    "unit.r13.calibration.0009",
+    "unit.r13.calibration.0010",
+    "unit.r13.calibration.0011"
+  ],
+  "descriptions": [
+    {
+      "features": [
+        "action",
+        "horizon",
+        "resistance_mohm"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 3 coordinate accesses, 3 coordinate conversions, 0 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 6.0,
+      "id": "minimal",
+      "interface_dimension": 0,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "ridge",
+      "rationale": "Test whether one instantaneous state coordinate supports this action/receiver family.",
+      "state_dimension": 1
+    },
+    {
+      "features": [
+        "action",
+        "horizon",
+        "baseline_hz",
+        "history_hz",
+        "resistance_mohm"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 5 coordinate accesses, 5 coordinate conversions, 0 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 10.0,
+      "id": "additive",
+      "interface_dimension": 0,
+      "memory_dimension": 1,
+      "memory_samples": 1,
+      "model": "ridge",
+      "rationale": "Separate additive preparation and retained-history coordinates; no multiplicative interface.",
+      "state_dimension": 2
+    },
+    {
+      "features": [
+        "action",
+        "horizon",
+        "baseline_hz",
+        "history_hz",
+        "resistance_mohm",
+        "action_x_state",
+        "action_x_context"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 7 coordinate accesses, 7 coordinate conversions, 2 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 16.0,
+      "id": "interface",
+      "interface_dimension": 2,
+      "memory_dimension": 1,
+      "memory_samples": 1,
+      "model": "ridge",
+      "rationale": "Pay for explicit action/state and action/history interface dependence.",
+      "state_dimension": 2
+    },
+    {
+      "features": [
+        "action",
+        "horizon",
+        "baseline_hz",
+        "history_hz",
+        "resistance_mohm",
+        "action_x_state",
+        "action_x_context",
+        "state_x_context"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 8 coordinate accesses, 8 coordinate conversions, 3 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 19.0,
+      "id": "joint",
+      "interface_dimension": 3,
+      "memory_dimension": 1,
+      "memory_samples": 1,
+      "model": "ridge",
+      "rationale": "Joint second-order description is an authored candidate, not an assertion of global minimality.",
+      "state_dimension": 2
+    }
+  ],
+  "economics": {
+    "accounting_unit": "authored-cost-unit",
+    "action_price": "0",
+    "compute_price": "0.0001",
+    "interface_price": "0.001",
+    "maximum_control_regret": "1",
+    "memory_price": "0.001",
+    "minimum_coverage": "0.9",
+    "missing_penalty": "1000000",
+    "reuse_count": 1,
+    "ridge_penalty": "0.001",
+    "safety_penalty": "1000000",
+    "state_price": "0.001"
+  },
+  "evaluation_unit_ids": [
+    "unit.r13.evaluation.0000",
+    "unit.r13.evaluation.0001",
+    "unit.r13.evaluation.0002",
+    "unit.r13.evaluation.0003",
+    "unit.r13.evaluation.0004",
+    "unit.r13.evaluation.0005"
+  ],
+  "family_id": "R13",
+  "horizons": [
+    0.5,
+    1.0
+  ],
+  "parameters": {},
+  "question": "Which preparation, history and current-action coordinates preserve useful firing-rate selection?",
+  "receiver_policies": {
+    "firing_rate_hz": {
+      "max_abs_error": 2,
+      "safety_lower": 0,
+      "safety_upper": 100,
+      "scale": 10,
+      "target": 10,
+      "units": "Hz",
+      "weight": 1.0
+    }
+  },
+  "seed": 20261114
+}

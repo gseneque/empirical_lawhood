@@ -10,8 +10,8 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_prediction import paired_response as p
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.rubisco.rubisco_prediction import paired_response as p
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def query(name, group, *features):
@@ -87,7 +87,7 @@ class Refuse(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in {'numpy', 'scipy', 'rapidfuzz', 'torch', 'transformers', 'esm'}:
             raise AssertionError('numerical import during cold discovery: ' + fullname)
 sys.meta_path.insert(0, Refuse())
-import empirical_lawhood.adapters.methods.rubisco_prediction.paired_response
+import empirical_lawhood.domains.rubisco.rubisco_prediction.paired_response
 """
     result = subprocess.run([sys.executable, "-B", "-c", script],
                             cwd=Path(__file__).parent.parent, capture_output=True, text=True, check=False)

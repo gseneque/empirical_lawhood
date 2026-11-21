@@ -10,8 +10,8 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.api.recursive_qualified_parents import _collect_receipt_closure
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
 from tests.runtime_platform.test_recursive_prospective_workflow import _public_issued_handoff_fixture, _run_public_handoff
 
 
@@ -68,8 +68,8 @@ def test_blocked_parent_keeps_unreached_tasks_and_refuses_hidden_attempts(tmp_pa
     """A real scheduler terminal can stop before reaching the complete graph."""
     from hashlib import sha256
     from empirical_lawhood.api.results import RunCampaignRequest
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.recovery import RecoveryTerminalAttempt, RecoveryTerminalDisposition, RunRecoveryTerminalEvent
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.recovery import RecoveryTerminalAttempt, RecoveryTerminalDisposition, RunRecoveryTerminalEvent
     from tests.test_recursive_refusal_report import _refusal
 
     parts = _public_issued_handoff_fixture(tmp_path, monkeypatch)

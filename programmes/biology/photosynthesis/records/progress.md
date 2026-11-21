@@ -248,10 +248,10 @@ execution through registered task receipts.
 | Owner | Implemented responsibility |
 |---|---|
 | [Physical Rubisco adapters](../../../../src/empirical_lawhood/adapters/physical/rubisco_kinetics) | Bounded original-source decoding, lexical Decimal quantities, full row/construct censuses, source identities, heavy/chemical preparation, embedding, Amber nonbonded and reference-topology interpretation. |
-| [Conditional assay](../../../../src/empirical_lawhood/adapters/simulators/rubisco_assay) and [feedback method](../../../../src/empirical_lawhood/adapters/methods/rubisco_feedback) | Supplied-kinetics numerical model, closed-form comparison, commitment and bounded feedback. |
-| [Historical method](../../../../src/empirical_lawhood/adapters/methods/rubisco_historical) | Source-bound two-fold fitting/prediction, global commitment and exposed assessment. |
-| [Combination method](../../../../src/empirical_lawhood/adapters/methods/rubisco_combinations) | Exact paired-subunit joins, conventional three-corner forecast and target assessment. |
-| [Prediction methods](../../../../src/empirical_lawhood/adapters/methods/rubisco_prediction) | Natural-only fitting, exact query recipes and parent anchoring; maintained direct structural and paired-response numerical owners. |
+| [Conditional assay](../../../../src/empirical_lawhood/adapters/simulators/rubisco_assay) and [feedback method](../../../../src/empirical_lawhood/domains/rubisco/rubisco_feedback) | Supplied-kinetics numerical model, closed-form comparison, commitment and bounded feedback. |
+| [Historical method](../../../../src/empirical_lawhood/domains/rubisco/rubisco_historical) | Source-bound two-fold fitting/prediction, global commitment and exposed assessment. |
+| [Combination method](../../../../src/empirical_lawhood/domains/rubisco/rubisco_combinations) | Exact paired-subunit joins, conventional three-corner forecast and target assessment. |
+| [Prediction methods](../../../../src/empirical_lawhood/domains/rubisco/rubisco_prediction) | Natural-only fitting, exact query recipes and parent anchoring; maintained direct structural and paired-response numerical owners. |
 | [Electronic/simulator adapters](../../../../src/empirical_lawhood/adapters/simulators/rubisco_electronic) | Cold electronic/source interpretation, explicit optional execution, xTB input/gradient contracts, strict coupled callback and pure unverified-return encoding. |
 | Existing infrastructure/API/composition | Bounded I/O, genuine artifact-plane custody, explicit services and generated operation bindings. Kernel scientific records and inward import direction remain respected. |
 

@@ -65,12 +65,12 @@ provide a 64-root information result.
 
 ## Retained information-response diagnostics
 
-Use the installed [information-response statistics](../../../../../src/empirical_lawhood/adapters/methods/information_response/posthoc_statistics.py)
+Use the installed [information-response statistics](../../../../../src/empirical_lawhood/domains/matrix/information_response/posthoc_statistics.py)
 for the retained two-future, two-view, seven-arm chart. The
-[array reduction](../../../../../src/empirical_lawhood/adapters/methods/information_response/posthoc_reduction.py)
+[array reduction](../../../../../src/empirical_lawhood/domains/matrix/information_response/posthoc_reduction.py)
 accepts the original retained arrays, separate development arrays, frozen bank
 and explicit root IDs. It returns the report, derived arrays, root atlas and
-casebook. The [pulse supplement](../../../../../src/empirical_lawhood/adapters/methods/information_response/posthoc_pulse.py)
+casebook. The [pulse supplement](../../../../../src/empirical_lawhood/domains/matrix/information_response/posthoc_pulse.py)
 adds sign/duration, diagonal/off-diagonal and future-sensitivity reductions.
 
 Authenticate each supplied array and bank against its original receipt census.
@@ -85,7 +85,7 @@ private paths or authority wrapper. They perform no native work, publication or
 issue. No CLI analysis executor or authentic input selection is supplied by this
 library entry point.
 
-The [information-response native extractor](../../../../../src/empirical_lawhood/adapters/methods/information_response/posthoc_extraction.py)
+The [information-response native extractor](../../../../../src/empirical_lawhood/domains/matrix/information_response/posthoc_extraction.py)
 reconstructs the original two-context, 64-root post-hoc feature arrays. It keeps
 the pre-parent prefix frame distinct from the later handoff history, reproduces
 every saved-bank forecast and validates the paired endpoint gains. Supply the
@@ -94,7 +94,7 @@ separate analysis authorization. The extractor reuses the bounded native codec
 and performs no acquisition, fitting or publication. Its arrays remain exposed
 post-hoc evidence.
 
-`concordant_win_power` in the [information-response comparison owner](../../../../../src/empirical_lawhood/adapters/methods/information_response/comparison.py)
+`concordant_win_power` in the [information-response comparison owner](../../../../../src/empirical_lawhood/domains/matrix/information_response/comparison.py)
 retains the original 32-root, 24-win probability grid. It assumes independent root events and the declared probability of a win concordant across both views.
 It describes the first Holm threshold.
 It supplies no joint-power calculation for the whole eight-test family. It performs no outcome contact or qualification.

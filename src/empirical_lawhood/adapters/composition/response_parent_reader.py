@@ -5,8 +5,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from .response_parent_custody import ResponseParentTargetAuthorityStore, ResponseParentTargetGrant, replay_response_parent_custody
-from .response_parent_input import ImportedResponseParentCustody, require_target_parent_authority
+from empirical_lawhood.adapters.composition.response_parent_custody import ResponseParentTargetAuthorityStore, ResponseParentTargetGrant, replay_response_parent_custody
+from empirical_lawhood.adapters.composition.response_parent_input import ImportedResponseParentCustody, require_target_parent_authority
 
 
 @dataclass(frozen=True)

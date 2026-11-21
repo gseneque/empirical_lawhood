@@ -3,9 +3,9 @@ from dataclasses import replace
 import pytest
 from empirical_lawhood.api import derived_array_access as owner
 from empirical_lawhood.api.derived_metadata_access import derive_canonical_metadata_access
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
-from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 from tests.runtime_platform.test_candidate_compiler import _fixture
 
@@ -16,7 +16,7 @@ def inputs_for(tmp_path):
     from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
     pub=_publication_from_manifest(writer,manifest)
     raw=writer.root.resolve(pub.materialization.relative_path,for_write=False).read_bytes()
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     record=decode_canonical_bytes(raw,ObjectIdentity,maximum_bytes=len(raw))
     external=RecursiveExternalInput("external.bound-first",pub.logical.logical_artifact_id,record.SCHEMA,
         "application/json",len(raw),pub.logical.outcome_access,pub.logical.visibility_ceiling,record.fingerprint())

@@ -10,32 +10,29 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import FactorEventSpec
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import causal_observations, measure_sector
-from empirical_lawhood.adapters.methods.matrix_factor_response import independent, science
-from empirical_lawhood.adapters.methods.matrix_factor_response.eligibility import BUDGET
-from empirical_lawhood.adapters.methods.matrix_factor_response.operation_bindings import _run_native
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import (
-    PREDICTORS, MatrixFactorAction, MatrixFactorPreparationRecipe, MatrixFactorResponseDesign,
-    MatrixFactorResponseModel, MatrixResponseArrays, identity,
-)
-from empirical_lawhood.adapters.methods.matrix_history_analysis import algebra
-from empirical_lawhood.adapters.methods.matrix_prospective.example import example_source
-from empirical_lawhood.adapters.simulators.six_matrix_response.factor_response import factor_response_force_step
-from empirical_lawhood.adapters.simulators.six_matrix_response import factor_response, simulation
-from empirical_lawhood.adapters.simulators.six_matrix_response.factor_bridge import factor_frame_sha256
-from empirical_lawhood.adapters.simulators.six_matrix_response.gradients import SixMatrixParameters, reference_action_terms
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import SixMatrixState, hermitian_part
-from empirical_lawhood.adapters.simulators.six_matrix_response.simulation import baoab_step_with_hermitian_noise
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import FactorEventSpec
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import causal_observations, measure_sector
+from empirical_lawhood.domains.matrix.matrix_factor_response import independent, science
+from empirical_lawhood.domains.matrix.matrix_factor_response.eligibility import BUDGET
+from empirical_lawhood.domains.matrix.matrix_factor_response.operation_bindings import _run_native
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import PREDICTORS, MatrixFactorAction, MatrixFactorPreparationRecipe, MatrixFactorResponseDesign, MatrixFactorResponseModel, MatrixResponseArrays, identity
+from empirical_lawhood.domains.matrix.matrix_history_analysis import algebra
+from empirical_lawhood.domains.matrix.matrix_prospective.example import example_source
+from empirical_lawhood.domains.matrix.six_matrix_response.factor_response import factor_response_force_step
+from empirical_lawhood.domains.matrix.six_matrix_response import factor_response, simulation
+from empirical_lawhood.domains.matrix.six_matrix_response.factor_bridge import factor_frame_sha256
+from empirical_lawhood.domains.matrix.six_matrix_response.gradients import SixMatrixParameters, reference_action_terms
+from empirical_lawhood.domains.matrix.six_matrix_response.model import SixMatrixState, hermitian_part
+from empirical_lawhood.domains.matrix.six_matrix_response.simulation import baoab_step_with_hermitian_noise
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind
 from tests.test_matrix_parameter_native import REGIMES, coordinate, corpus
 
 
@@ -244,8 +241,8 @@ def test_uncertain_or_begun_native_child_cannot_be_replayed(state):
         _run_native(Unknown(),object(),lambda:pytest.fail('native replay'),{})
 
 def test_completed_child_real_receipt_relocation_and_corruption_refusal(tmp_path,monkeypatch):
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactIdentityConflict, ArtifactProfileValidatorRegistry
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkOutput, NativeSubworkRoster
+    from empirical_lawhood.storage.artifact_validation import ArtifactIdentityConflict, ArtifactProfileValidatorRegistry
+    from empirical_lawhood.execution.native_subwork import NativeSubworkOutput, NativeSubworkRoster
     from tests.runtime_platform.test_native_subwork import _selected, _complete, _plane, _store
 
     values = {'positions':np.arange(96,dtype='<c16').reshape(1,2,3,4,4),
@@ -287,7 +284,7 @@ def test_completed_child_real_receipt_relocation_and_corruption_refusal(tmp_path
 def native_fixture_context(plane, *, runner, config, manifests, run_id, attempt_id,
                            output_ports, access, task_record=None, receipts=()):
     """Expose this fixture's actual ports and explicit original task edges."""
-    from empirical_lawhood.runtime.execution import DependencyReceiptBinding
+    from empirical_lawhood.execution.execution import DependencyReceiptBinding
 
     dependencies = set() if task_record is None else {
         row.operational_logical_artifact_id for row in task_record.scientific_inputs if row.producer_task_id is not None}

@@ -3,10 +3,10 @@
 from dataclasses import replace
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_preparation as domain
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.compact_publications import authenticate_manifest_publications
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind,ExperimentPreparation
-from empirical_lawhood.runtime.experiment_resources import bind_execution_resources
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_preparation as domain
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.compact_publications import authenticate_manifest_publications
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExperimentPreparation
+from empirical_lawhood.execution.experiment_resources import bind_execution_resources
 
 
 def prepare_authoring(preparation,*,project_root,artifact_writer,output_dir):

@@ -8,17 +8,12 @@ from empirical_lawhood.api.codecs import load_authoring
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
 from empirical_lawhood.api.models import IssuedStudyPackage, assemble_issued_study_package
 from empirical_lawhood.api.results import CompileCampaignRequest, OperationStatus
-from empirical_lawhood.kernel.authority import AuthorityAction, SourceAccessClass
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.approval import (
-    ApprovalCheckerRegistry,
-    AttestationResult,
-    CompleteApprovalService,
-    issue_approval_gate_attestation,
-)
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, StudyOperationAuthority
-from empirical_lawhood.runtime.study_issue import build_study_approval_proposal
+from empirical_lawhood.science.identity.authority import AuthorityAction, SourceAccessClass
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.approval import ApprovalCheckerRegistry, AttestationResult, CompleteApprovalService, issue_approval_gate_attestation
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, StudyOperationAuthority
+from empirical_lawhood.execution.study_issue import build_study_approval_proposal
 from tests.approval_support import FixedDecisionClock, deterministic_approval_signer
 from tests.runtime_platform.test_study_approval import _AttestationStore, _AuthorizationStore, _StudyProposalStore, _checker_registrations
 from tests.runtime_platform.test_study_issue import _issue_api_fixture, _issue_request

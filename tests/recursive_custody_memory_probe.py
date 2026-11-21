@@ -7,11 +7,11 @@ from pathlib import Path
 import resource
 import sys
 
-from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactStreamWriteRequest
-from empirical_lawhood.runtime.recursive_handoff import RecursiveWaveMember
+from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactStreamWriteRequest
+from empirical_lawhood.execution.recursive_handoff import RecursiveWaveMember
 from tests.test_recursive_public_service import _plane
 
 

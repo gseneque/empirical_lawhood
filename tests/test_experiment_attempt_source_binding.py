@@ -7,10 +7,10 @@ import pytest
 from typer.testing import CliRunner
 
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, canonical_json_document_bytes
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, canonical_json_document_bytes
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.test_experiment_preparation_public import _copied_input
 
 

@@ -9,30 +9,28 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure.execution import (
-    ExecutionResourceCapacity, LiveLeaseError, LocalProcessExecutor, LocalScheduler, ResourceAdmissionError,
-)
-from empirical_lawhood.infrastructure import execution as execution_owner
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_parent_finalization import NativeParentFinalizationPending
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.recursive_custody import read_recursive_products
-from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, ParentPreparedTaskRunner, RunnerRegistry, TaskAttemptDisposition, TaskBlockReason, VerifiedArtifactInput
-from empirical_lawhood.runtime.native_subwork import NativeSubworkRoster, NativeSubworkState, invoke_native_subwork
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, PlanLane
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedNativeWork
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+from empirical_lawhood.execution.local.execution import ExecutionResourceCapacity, LocalProcessExecutor, LocalScheduler, ResourceAdmissionError
+from empirical_lawhood.execution.local import execution as execution_owner
+from empirical_lawhood.storage.artifact_validation import ArtifactIdentityConflict
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_parent_finalization import NativeParentFinalizationPending
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.recursive_custody import read_recursive_products
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, ParentPreparedTaskRunner, RunnerRegistry, TaskAttemptDisposition, TaskBlockReason, VerifiedArtifactInput
+from empirical_lawhood.execution.native_subwork import NativeSubworkRoster, NativeSubworkState, invoke_native_subwork
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, PlanLane
+from empirical_lawhood.execution.prepared_native_invocation import PreparedNativeWork
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
 from tests.runtime_platform.test_execution_scheduler import FixedClock, StaticExternalInputResolver
 from tests.runtime_platform.test_native_subwork import _plane, _publish
 from tests.runtime_platform.test_native_parent_finalization import _census
@@ -97,16 +95,25 @@ def _prepared_work(*, runner, context, expected_parent):
         (NativeSubworkRoster("selected.native-subwork", expected_parent, (definition.identity,)),))
 
 
-def _runtime(tmp_path, *, mode="complete", parallel=1, parent_prepared=False, recorded_provenance=None):
+def _runtime(tmp_path, *, mode="complete", parallel=1, parent_prepared=False, recorded_provenance=None,
+        unentered_sibling=False, worker_environment_selector=None, numerical_threads=1):
     plane, bundle, template, _, contract, _ = _case(tmp_path, actual=True, native=True,
         recorded_provenance=recorded_provenance)
     task = contract.execution_task_record
+    if numerical_threads != 1:
+        task = replace(task, capability=replace(task.capability,
+            requested_resources=replace(task.capability.requested_resources, cpu_cores=numerical_threads)))
     task = replace(task, outputs=tuple(replace(row, relative_path="runs/exposed.run/outputs/" + row.relative_path)
         for row in task.outputs))
     registry_sha256 = "a" * 64
+    tasks = (task,)
+    if unentered_sibling:
+        tasks += (replace(task, task_id=task.task_id + ".unentered", outputs=tuple(replace(row,
+            output_id=row.output_id + ".unentered", logical_artifact_id=row.logical_artifact_id + ".unentered",
+            relative_path=row.relative_path + ".unentered") for row in task.outputs)),)
     plan = DevelopmentExecutionPlan("exposed.current-parent", PlanLane.DEVELOPMENT,
         ObjectIdentity("exposed.run", "empirical-lawhood/runtime/development-run-plan", "1.0.0", "b" * 64),
-        registry_sha256, contract.implementation.observed_git_head, (task,), True)
+        registry_sha256, contract.implementation.observed_git_head, tasks, True)
     index = DevelopmentRunRecoveryIndex.from_execution_plan(plan, run_id="exposed.run", wave_id="exposed.finalization")
     engine = create_catalog_engine("sqlite+pysqlite:///" + str(tmp_path / "catalog.sqlite3"))
     upgrade_catalog(engine)
@@ -122,6 +129,8 @@ def _runtime(tmp_path, *, mode="complete", parallel=1, parent_prepared=False, re
             visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY,
             outcome_access=OutcomeAccess.DEVELOPMENT_VISIBLE)
         runner = CurrentParentRunner(template.selected_definitions[0], state.mode)
+        if numerical_threads != 1:
+            runner.manifest = replace(runner.manifest, resource_ceiling=task.capability.requested_resources)
         if parent_prepared:
             plain = runner
             def prepare(context):
@@ -141,8 +150,10 @@ def _runtime(tmp_path, *, mode="complete", parallel=1, parent_prepared=False, re
             assurance_profile=ExecutionAssuranceProfile.TRUSTED_LOCAL,
             native_effect_contact_store=contacts, native_effect_capability_keys=(runner.manifest.capability_key,),
             native_work_preparers={runner.manifest.capability_key: _prepared_work},
+            worker_environment_selectors=({runner.manifest.capability_key: worker_environment_selector}
+                if worker_environment_selector is not None else {}),
             maximum_parallel_tasks=parallel,
-            parallel_resource_capacity=ExecutionResourceCapacity(parallel, 8 * 1024**3, 0, True, True, False))
+            parallel_resource_capacity=ExecutionResourceCapacity(max(parallel, numerical_threads), 8 * 1024**3, 0, True, True, False))
         return result, contacts
     state.scheduler = scheduler
     return state
@@ -152,6 +163,131 @@ def _event(state):
     task, = state.index.tasks
     candidate, = task.attempts
     return state.recovery.read_event(state.index, candidate.event_relative_path)
+
+
+def test_returned_only_publication_preserves_unentered_sibling_and_never_closes_whole_graph(tmp_path, monkeypatch):
+    state = _runtime(tmp_path, unentered_sibling=True)
+    scheduler, contacts = state.scheduler()
+    original = state.receipts.commit
+    def interrupted(*args, **kwargs):
+        raise OSError("disclosed original parent publication interruption")
+    monkeypatch.setattr(state.receipts, "commit", interrupted)
+    try:
+        with pytest.raises(NativeParentFinalizationPending):
+            scheduler.execute("exposed.run", state.plan)
+        attempt, = state.repository.attempts("exposed.run")
+        parent = contacts.read("exposed.run", state.task.task_id)
+        native = ExternalNativeSubworkStore(plane=state.plane, parent_contacts=contacts,
+            parent_contact=parent, parent_inputs=state.bundle.manifests)
+        definition = native.read_definition(native.read_roster(parent).subworks[0])
+        retained = native.inspect(definition)
+        assert retained.state is NativeSubworkState.COMPLETED
+        monkeypatch.setattr(state.receipts, "commit", original)
+        resumed, fresh_contacts = state.scheduler()
+        def forbidden(*args, **kwargs):
+            pytest.fail("publication-only finalization attempted new acquisition")
+        monkeypatch.setattr(resumed, "_start_attempt", forbidden)
+        monkeypatch.setattr(resumed, "_begin_native_contact", forbidden)
+        monkeypatch.setattr(ExternalNativeSubworkStore, "begin", forbidden)
+        receipts = resumed.finalize_returned_tasks("exposed.run", state.plan)
+        receipt, = receipts
+        assert receipt.attempt_id == attempt.attempt_id and receipt.task_id == state.task.task_id
+        assert native.inspect(definition) == retained
+        assert state.recovery.read_terminal(state.index) is None
+        sibling = state.plan.tasks[1]
+        assert fresh_contacts.read("exposed.run", sibling.task_id) is None
+        assert len(state.repository.attempts("exposed.run")) == 1
+        binding = state.index.task(sibling.task_id)
+        assert state.recovery.read_event(state.index, binding.nonattempt_event_relative_path) is None
+        assert all(state.recovery.read_event(state.index, row.event_relative_path) is None for row in binding.attempts)
+        assert resumed.finalize_returned_tasks("exposed.run", state.plan) == receipts
+    finally:
+        state.bundle.close()
+        state.repository.engine.dispose()
+
+
+def test_returned_only_publication_refuses_incomplete_call_without_closing_original_attempt(tmp_path):
+    state = _runtime(tmp_path, mode="raw-products-missing")
+    scheduler, _ = state.scheduler()
+    try:
+        with pytest.raises(NativeParentFinalizationPending):
+            scheduler.execute("exposed.run", state.plan)
+        before = state.repository.attempts("exposed.run")
+        resumed, _ = state.scheduler()
+        with pytest.raises(NativeParentFinalizationPending, match="incomplete or unknown"):
+            resumed.finalize_returned_tasks("exposed.run", state.plan)
+        assert state.repository.attempts("exposed.run") == before
+        assert _event(state) is None and state.recovery.read_terminal(state.index) is None
+    finally:
+        state.bundle.close()
+        state.repository.engine.dispose()
+
+
+@pytest.mark.parametrize("defect", (None, "interpreter_path", "interpreter_sha256", "prefix", "gpu-setting"))
+def test_returned_finalizer_preserves_original_gpu_and_thread_settings_and_refuses_substitution(
+        tmp_path, monkeypatch, defect):
+    from empirical_lawhood.domains.rubisco.rubisco_response.periodic_probe_selection import periodic_worker_environment
+    from empirical_lawhood.storage.numerical_provenance import observe_worker_environment, selected_worker_environment
+    from empirical_lawhood.execution.operational_configuration import accelerated_compute_operation
+    state = _runtime(tmp_path, unentered_sibling=True, numerical_threads=2,
+        worker_environment_selector=periodic_worker_environment)
+    monkeypatch.setenv("OPENMM_CPU_THREADS", "2")
+    # These optional settings belong to this worker, not the ambient test process.
+    for name in ("NUMBA_NUM_THREADS", "BLIS_NUM_THREADS"):
+        monkeypatch.setenv(name, "2")
+    monkeypatch.setenv("CUPY_CACHE_DIR", str(tmp_path / "original-gpu-cache"))
+    original_commit = state.receipts.commit
+    def interrupted(*args, **kwargs):
+        raise OSError("disclosed parent publication interruption after literal returned bytes")
+    try:
+        with accelerated_compute_operation(True):
+            scheduler, contacts = state.scheduler()
+            monkeypatch.setattr(state.receipts, "commit", interrupted)
+            with pytest.raises(NativeParentFinalizationPending):
+                scheduler.execute("exposed.run", state.plan)
+            parent = contacts.read("exposed.run", state.task.task_id)
+            native = ExternalNativeSubworkStore(plane=state.plane, parent_contacts=contacts,
+                parent_contact=parent, parent_inputs=state.bundle.manifests)
+            invocation = native.read_prepared_invocation(parent)
+            assert dict(invocation.environment.selected_environment)["OMP_NUM_THREADS"] == "2"
+            assert dict(invocation.environment.selected_environment)["CUPY_CACHE_DIR"] == str(tmp_path / "original-gpu-cache")
+            before = _census(native)
+            monkeypatch.setattr(state.receipts, "commit", original_commit)
+            resumed, fresh_contacts = state.scheduler()
+            observed = replace(observe_worker_environment(), selected_environment=selected_worker_environment())
+            assert observed.selected_environment != invocation.environment.selected_environment
+            if defect in {"interpreter_path", "prefix"}:
+                observed = replace(observed, **{defect: "/disclosed/substituted-worker"})
+            elif defect == "interpreter_sha256":
+                observed = replace(observed, interpreter_sha256="f" * 64)
+            elif defect == "gpu-setting":
+                monkeypatch.setenv("CUPY_CACHE_DIR", str(tmp_path / "changed-gpu-cache"))
+            resumed.repair_worker_environment = observed
+            def forbidden(*args, **kwargs):
+                pytest.fail("returned finalization attempted another native entry")
+            monkeypatch.setattr(resumed, "_begin_native_contact", forbidden)
+            monkeypatch.setattr(ExternalNativeSubworkStore, "begin", forbidden)
+            if defect is None:
+                receipt, = resumed.finalize_returned_tasks("exposed.run", state.plan)
+                assert receipt.task_id == state.task.task_id and receipt.attempt_id == parent.attempt_id
+            else:
+                with pytest.raises(NativeParentFinalizationPending):
+                    resumed.finalize_returned_tasks("exposed.run", state.plan)
+                assert state.receipts.read("exposed.run", state.task.task_id, parent.attempt_id) is None
+            after = _census(native)
+            assert all(after[name] == value for name, value in before.items())
+            if defect is not None:
+                assert after == before
+            else:
+                assert all(name.startswith(('runs/exposed.run/receipts/exposed.task/',
+                    'runs/exposed.run/recovery/')) for name in after.keys() - before.keys())
+            assert native.read_prepared_invocation(parent) == invocation
+            assert fresh_contacts.read("exposed.run", state.plan.tasks[1].task_id) is None
+            assert state.recovery.read_terminal(state.index) is None
+            assert len(state.repository.attempts("exposed.run")) == 1
+    finally:
+        state.bundle.close()
+        state.repository.engine.dispose()
 
 
 def _current_products(state):
@@ -362,9 +498,8 @@ def test_parent_publication_interruption_resumes_same_attempt_without_acquisitio
         before = retained
         monkeypatch.setattr(state.receipts, "commit", original)
         resumed, fresh_contacts = state.scheduler()
-        with pytest.raises(LiveLeaseError):
-            resumed.execute("exposed.run", state.plan)
-        state.clock.value += scheduler.lease_seconds + 1
+        # The previous owner released its real run lock. Pure recovery of its
+        # original completion does not wait for an arbitrary catalog timestamp.
         result = resumed.execute("exposed.run", state.plan)
         assert result.status is OperationalStatus.SUCCEEDED
         complete, = state.repository.attempts("exposed.run")

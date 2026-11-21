@@ -9,23 +9,17 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_bindings import (
-    operation_declarations as matrix_declarations,
-)
-from empirical_lawhood.adapters.methods.matrix_response_study.numerical_runtime import (
-    MATRIX_PROVENANCE_REQUIREMENT,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.operation_bindings import (
-    operation_declarations as kinetic_declarations,
-)
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_bindings import operation_declarations as matrix_declarations
+from empirical_lawhood.domains.matrix.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.operation_bindings import operation_declarations as kinetic_declarations
 from empirical_lawhood.api import numerical_provenance as observation
-from empirical_lawhood.infrastructure import numerical_provenance as producing_observation
+from empirical_lawhood.storage import numerical_provenance as producing_observation
 from empirical_lawhood.api.matrix_native_custody import MatrixNativeRuntimeObservation
 from empirical_lawhood.api.matrix_numerical_provenance import authenticate_recorded_matrix_provenance
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.recursive_compiler import RegisteredProvenanceRequirement
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.execution.recursive_compiler import RegisteredProvenanceRequirement
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -298,7 +292,7 @@ def test_shared_capture_observes_actual_selected_package_lock_git_and_runtime_on
     assert record.dependency_lock_sha256 == sha256((ROOT / "uv.lock").read_bytes()).hexdigest()
     assert record.code_sources_sha256 == sha256(canonical_json_bytes(record.package_sources)).hexdigest()
     rows = dict(record.package_sources)
-    assert rows["kernel/serialization.py"] == sha256((ROOT / "src/empirical_lawhood/kernel/serialization.py").read_bytes()).hexdigest()
+    assert rows["science/records/serialization.py"] == sha256((ROOT / "src/empirical_lawhood/science/records/serialization.py").read_bytes()).hexdigest()
     assert rows["api/numerical_provenance.py"] == sha256((ROOT / "src/empirical_lawhood/api/numerical_provenance.py").read_bytes()).hexdigest()
     assert not any("__pycache__" in Path(name).parts or Path(name).suffix in (".pyc", ".pyo") for name in rows)
     assert observation.authenticate_recorded_numerical_provenance(record) is record
@@ -327,7 +321,7 @@ def test_loaded_foreign_source_module_refuses_before_package_or_environment_obse
 @pytest.fixture(scope="module")
 def actual_admitted_source():
     """Real selected checkout admission; never an exposed source-identity fixture."""
-    from empirical_lawhood.infrastructure.source_closure import capture_admitted_target_source
+    from empirical_lawhood.storage.source_closure import capture_admitted_target_source
 
     return capture_admitted_target_source(ROOT)
 
@@ -335,7 +329,7 @@ def actual_admitted_source():
 def test_admitted_source_projection_preserves_canonical_source_and_observes_runtime_freshly(
         actual_admitted_source, monkeypatch):
     from threadpoolctl import threadpool_limits
-    from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
+    from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
 
     observed = []
     actual_observer = producing_observation.numerical_runtime_observation
@@ -361,7 +355,7 @@ def test_admitted_source_projection_preserves_canonical_source_and_observes_runt
         assert record.runtime_observation_json == canonical_json_bytes(runtime).decode()
         assert replace(ordinary, runtime_observation_json=record.runtime_observation_json).canonical_bytes() == record.canonical_bytes()
     assert projected[0].dependency_lock_sha256 == sha256((ROOT / "uv.lock").read_bytes()).hexdigest()
-    resource = "resources/matrix_factor_response/mandatory-exposure-floor.json"
+    resource = "package_data/matrix_factor_response/mandatory-exposure-floor.json"
     assert dict(projected[0].package_sources)[resource] == sha256(
         (ROOT / "src/empirical_lawhood" / resource).read_bytes()).hexdigest()
 
@@ -373,7 +367,7 @@ def test_admitted_source_projection_preserves_canonical_source_and_observes_runt
 def test_admitted_projection_refuses_malformed_or_partial_census_before_runtime_or_raw_inventory(
         actual_admitted_source, monkeypatch, damage):
     source, selected_root = actual_admitted_source, ROOT
-    package = "src/empirical_lawhood/kernel/serialization.py"
+    package = "src/empirical_lawhood/science/records/serialization.py"
     member = next(row for row in source.tracked_files if row.relative_path == package)
     if damage == "missing-root":
         selected_root = None
@@ -386,7 +380,7 @@ def test_admitted_projection_refuses_malformed_or_partial_census_before_runtime_
     elif damage.startswith("missing-"):
         missing = {
             "missing-package": package,
-            "missing-resource": "src/empirical_lawhood/resources/matrix_factor_response/mandatory-exposure-floor.json",
+            "missing-resource": "src/empirical_lawhood/package_data/matrix_factor_response/mandatory-exposure-floor.json",
             "missing-script": next(row.relative_path for row in source.tracked_files if row.relative_path.startswith("scripts/")),
             "missing-lock": "uv.lock", "missing-build": "pyproject.toml",
         }[damage]
@@ -407,9 +401,9 @@ def test_admitted_projection_refuses_malformed_or_partial_census_before_runtime_
 
 
 def test_actual_source_guard_refuses_consistently_trimmed_census_before_dependent_effects(actual_admitted_source):
-    from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
+    from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
 
-    omitted = "src/empirical_lawhood/resources/matrix_factor_response/mandatory-exposure-floor.json"
+    omitted = "src/empirical_lawhood/package_data/matrix_factor_response/mandatory-exposure-floor.json"
     source = actual_admitted_source
     partial = replace(source,
         tracked_files=tuple(row for row in source.tracked_files if row.relative_path != omitted),

@@ -8,7 +8,7 @@ and join the worker before copying the measured prefix for sealed evaluation.
 from types import FrameType
 import numpy as np
 
-from .batch_bridge import ReactorBatchBridge
+from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_bridge import ReactorBatchBridge
 
 
 class ReactorPrefixBridge(ReactorBatchBridge):

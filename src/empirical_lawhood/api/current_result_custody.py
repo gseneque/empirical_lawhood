@@ -1,26 +1,28 @@
 """Current issued-plan and complete receipt joins before scientific output reads."""
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 from dataclasses import fields
 from datetime import UTC, datetime
 from hashlib import sha256
 from typing import Literal
 
-from .codecs import MAX_CAMPAIGN_PACKAGE_BYTES, loads_campaign_package_authoring
+from empirical_lawhood.api.codecs import loads_campaign_package_authoring
 from empirical_lawhood.api.models import ExperimentPackage
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, _ScopedArtifactPlane, _has_stock_manifest_reads
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError, MAX_ARTIFACT_MANIFEST_BYTES, read_bounded_bytes
-from empirical_lawhood.infrastructure.execution_resource_envelopes import read_execution_launch_event
-from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID, PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decimal_context_key, decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling, inherited_visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, require_study_authority
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, CanonicalTaskReceipt, LogicalArtifactIdentity, derived_outcome_access, lineage_parent_sort_key
-from empirical_lawhood.runtime.plans import ExecutionPlan, PlanLane, RunPlan, ScientificStage
-from empirical_lawhood.runtime.providers import CapabilityOutputSemanticContract, capability_semantic_validation_registry
-from empirical_lawhood.runtime.scientific_graph_preservation import _validate_execution_plan, _validate_run_plan
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, _ScopedArtifactPlane, _has_stock_manifest_reads
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError, read_bounded_bytes
+from empirical_lawhood.execution.resources.execution_resource_envelopes import read_execution_launch_event
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID, PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decimal_context_key, decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling, inherited_visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, require_study_authority
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, CanonicalTaskReceipt, LogicalArtifactIdentity, derived_outcome_access, lineage_parent_sort_key
+from empirical_lawhood.execution.plans import ExecutionPlan, PlanLane, RunPlan, ScientificStage
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, capability_semantic_validation_registry
+from empirical_lawhood.storage.contracts.record_codecs import resolve_operation_output_codec
+from empirical_lawhood.execution.scientific_graph_preservation import _validate_execution_plan, _validate_run_plan
 
 def retained_output_artifact_plane(package, plan, writer, output_codecs):
     """Bind installed record shapes to the original stored output ownership.
@@ -37,9 +39,10 @@ def retained_output_artifact_plane(package, plan, writer, output_codecs):
                 contract = CapabilityOutputSemanticContract.from_manifest(manifest,
                     payload_schema=output.payload_schema, profile=output.profile)
             else:
-                record_type = output_codecs.get(output.payload_schema)
-                if record_type is None or record_type.SCHEMA != output.payload_schema:
-                    raise PermissionError('qualified parent output lacks its installed typed scientific codec')
+                from empirical_lawhood.design.study_authoring import CapabilitySelection
+                record_type = resolve_operation_output_codec(output_codecs,
+                    CapabilitySelection(manifest.capability_key, manifest.capability_version, manifest.implementation_sha256),
+                    output.payload_schema, allow_unbound_unique=True)
                 contract = CapabilityOutputSemanticContract.from_manifest(manifest,
                     payload_schema=output.payload_schema, profile=output.profile,
                     top_level_keys=('schema', 'value', 'version'),
@@ -74,17 +77,15 @@ def _authenticate_protected_current_result(*, issued_study: ObjectIdentity,
     else:
         raise ValueError('Unsupported protected current result family')
     relative = f'runs/{receipt.run_id}/plans/campaign-package.json'
-    manifest = decode_artifact_manifest(read_bounded_bytes(writer.root.resolve(relative + '.manifest.json', for_write=False),
-        maximum_bytes=MAX_ARTIFACT_MANIFEST_BYTES))
+    manifest = read_artifact_sidecar(writer, (writer.root.resolve(relative + '.manifest.json', for_write=False)).relative_to(writer.root.contract.canonical_path).as_posix(), maximum_bytes=writer.custody_limits.manifest_bytes)
     if (manifest.materialization.relative_path != relative
-        or manifest.materialization.size_bytes > MAX_CAMPAIGN_PACKAGE_BYTES
         or manifest.logical.logical_artifact_id != f'campaign-package.{receipt.run_id}'
         or manifest.logical.payload_schema != ExperimentPackage.SCHEMA
         or manifest.logical.profile is not ArtifactProfile.CANONICAL_JSON
         or manifest.logical.media_type != 'application/json'):
         raise PermissionError(codes[0])
     writer.verify_manifest(manifest)
-    raw = read_bounded_bytes(writer.root.resolve(relative, for_write=False), maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES)
+    raw = read_bounded_bytes(writer.root.resolve(relative, for_write=False), maximum_bytes=manifest.materialization.size_bytes)
     package = loads_campaign_package_authoring(raw.decode('utf-8'), media_type='application/json')
     if (type(package) is not ExperimentPackage
         or package.run_plan_id != receipt.run_id or not package.canonical_equals(raw)
@@ -126,7 +127,7 @@ def current_result_package_present(*, writer, run_id):
 def _current_control(*, writer, run_id, name, record_type, maximum_bytes, control_reader=None,
                      expected_lineage=None, include_manifest=False):
     relative = f'runs/{run_id}/plans/{name}.json'
-    manifest = writer.read_manifest(relative, maximum_bytes=MAX_ARTIFACT_MANIFEST_BYTES)
+    manifest = writer.read_manifest(relative, maximum_bytes=writer.custody_limits.manifest_bytes)
     if (manifest.materialization.relative_path != relative
         or manifest.materialization.storage_root_id != writer.root.contract.storage_root_id
         or (maximum_bytes is not None and manifest.materialization.size_bytes > maximum_bytes)
@@ -308,7 +309,7 @@ def authenticate_current_execution_plan(*, package, issued, run_id, writer, cont
     if type(package) is not ExperimentPackage:
         raise PermissionError('CURRENT_RESULT_UNSUPPORTED_PACKAGE')
     stored_package, package_manifest = _current_control(writer=writer, run_id=run_id, name='campaign-package',
-        record_type=type(package), maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES, control_reader=control_reader,
+        record_type=type(package), maximum_bytes=None, control_reader=control_reader,
         include_manifest=True)
     if stored_package != package:
         raise PermissionError('CURRENT_RESULT_EXACT_PREPARED_PACKAGE_REQUIRED')
@@ -389,7 +390,7 @@ def require_current_result_reveal_authority(*, writer, package, reveal_authority
     """Reload genuine access authority and check its clock at this boundary."""
     if reveal_authority_id is None:
         raise PermissionError('CURRENT_RESULT_REVEAL_AUTHORITY_REQUIRED')
-    from .selected_e3_access import _current_authority_reader
+    from empirical_lawhood.api.selected_e3_access import _current_authority_reader
     authority_reader = _current_authority_reader(writer)
     if authority_reader is not None:
         writer = authority_reader
@@ -466,13 +467,13 @@ class CurrentResultPlanReader:
         key=(manifest.materialization.materialization_id,record_type,decimal_context_key())
         retained=self._controls.get(key)
         if retained is None:
-            from empirical_lawhood.runtime.progress import report_progress
+            from empirical_lawhood.execution.progress import report_progress
             report_progress(phase='decode_retained.' + record_type.SCHEMA.rsplit('/', 1)[-1])
         else:
             original,_=retained
             if original != manifest:
                 raise PermissionError('CURRENT_RESULT_PUBLISHED_CONTROL_BYTES_MISMATCH')
-        from empirical_lawhood.infrastructure.canonical_record_read import read_verified_canonical_record
+        from empirical_lawhood.storage.canonical_record_read import read_verified_canonical_record
         record = read_verified_canonical_record(self.writer, manifest, record_type,
             maximum_bytes=manifest.materialization.size_bytes, before_member=self._input_member_guard)
         if record._is_cacheable():
@@ -515,14 +516,16 @@ class CurrentResultPlanReader:
             raise PermissionError('CURRENT_RESULT_AUTHENTICATED_PLAN_REQUIRED')
         if not _has_stock_manifest_reads(self.writer):
             return retained_output_artifact_plane(package, execution_plan, self.writer, output_codecs)
-        key = (package.fingerprint(), id(execution_plan), decimal_context_key(), tuple(sorted(output_codecs.items())))
+        key = (package.fingerprint(), id(execution_plan), decimal_context_key(),
+            tuple(sorted(output_codecs.items(), key=lambda row:(row[1].SCHEMA, row[1].VERSION))),
+            getattr(output_codecs, 'output_selection_keys', ()))
         if key not in self._output_writers:
             self._output_writers[key] = retained_output_artifact_plane(package, execution_plan, self.writer, output_codecs)
         return self._output_writers[key]
 
     def original_recovery_index(self, *, package, execution_plan, authority_identities=None):
         """Reuse the pure frozen census, never continuation records or events."""
-        from empirical_lawhood.runtime.recovery import build_run_recovery_index
+        from empirical_lawhood.execution.recovery import build_run_recovery_index
 
         self.writer.require_verification_context()
         plan_key = (package.fingerprint(), package.issued_study.fingerprint(),
@@ -582,11 +585,11 @@ class CurrentResultPlanReader:
         and their full publications remain subject to the caller's live scope.
         """
         from empirical_lawhood.api.recursive_qualified_parents import _actual_package
-        from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-        from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-        from empirical_lawhood.infrastructure.execution import LocalScheduler
-        from empirical_lawhood.kernel.status import OperationalStatus
-        from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+        from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+        from empirical_lawhood.storage.provider_input_custody import provider_input_location
+        from empirical_lawhood.execution.local.execution import LocalScheduler
+        from empirical_lawhood.science.records.status import OperationalStatus
+        from empirical_lawhood.execution.execution import VerifiedArtifactInput
         if not callable(before_header):
             raise TypeError("issued receipt metadata requires its current header guard")
         task = self.execution_task(execution_plan=execution_plan, task_id=task_id)
@@ -597,7 +600,7 @@ class CurrentResultPlanReader:
         if _actual_package(self.writer, package.run_plan_id, control_reader=self) != package:
             raise PermissionError("issued receipt metadata changes its current package")
         index = self.original_recovery_index(package=package, execution_plan=execution_plan)
-        from .retained_e3_control_repair import selected_repair_index
+        from empirical_lawhood.api.retained_e3_control_repair import selected_repair_index
         index = selected_repair_index(writer=self.writer, plan=execution_plan, predecessor=index)
         index_path = index.index_relative_path
         index_manifest = self.writer.read_manifest(index_path)
@@ -676,7 +679,7 @@ class CurrentResultPlanReader:
             raise PermissionError("issued output changes its exact frozen input ancestry")
         # Genuine historical dispatch is independent of current read permission
         # and of a new effect's Ready-time authority clock.
-        from empirical_lawhood.infrastructure.artifacts import _ScopedArtifactPlane
+        from empirical_lawhood.storage.artifacts import _ScopedArtifactPlane
         history_writer = self.writer
         if type(history_writer) is _ScopedArtifactPlane:
             history_writer = ExternalArtifactPlane(history_writer.root, history_writer.validators,
@@ -688,7 +691,7 @@ class CurrentResultPlanReader:
         receipt_parents = tuple(sorted((ArtifactLineageParent(
             ObjectIdentity.from_record(value.logical.logical_artifact_id, value.logical),
             value.logical.visibility_ceiling, value.logical.outcome_access) for value in outputs), key=lineage_parent_sort_key))
-        from empirical_lawhood.runtime.artifacts import most_restrictive_outcome_access
+        from empirical_lawhood.storage.contracts.artifacts import most_restrictive_outcome_access
         if (manifest.logical.lineage_parents != receipt_parents
                 or manifest.logical.outcome_access is not most_restrictive_outcome_access(
                     *(value.logical.outcome_access for value in outputs))
@@ -736,12 +739,11 @@ def authenticate_unprotected_current_result_if_issued(*, writer, receipt, logica
     # The package is public control metadata. Its closed schema selects only the
     # current package owner; it cannot select executable modules.
     relative = f'runs/{receipt.run_id}/plans/campaign-package.json'
-    manifest = decode_artifact_manifest(read_bounded_bytes(
-        writer.root.resolve(relative + '.manifest.json', for_write=False), maximum_bytes=MAX_ARTIFACT_MANIFEST_BYTES))
+    manifest = read_artifact_sidecar(writer, (writer.root.resolve(relative + '.manifest.json', for_write=False)).relative_to(writer.root.contract.canonical_path).as_posix(), maximum_bytes=writer.custody_limits.manifest_bytes)
     if manifest.logical.payload_schema != ExperimentPackage.SCHEMA:
         raise PermissionError('CURRENT_RESULT_UNSUPPORTED_PACKAGE')
     package = _current_control(writer=writer, run_id=receipt.run_id, name='campaign-package',
-                               record_type=ExperimentPackage, maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES)
+                               record_type=ExperimentPackage, maximum_bytes=None)
     # Keep the shared strict package parser's closed current package validation.
     if loads_campaign_package_authoring(package.canonical_bytes().decode(), media_type='application/json') != package:
         raise PermissionError('CURRENT_RESULT_PACKAGE_BYTES_MISMATCH')

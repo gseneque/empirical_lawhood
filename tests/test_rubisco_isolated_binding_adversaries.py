@@ -8,13 +8,13 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_contracts import DurablePreparationPlan
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_roster import definitions
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_runner import validate_current_source_descriptor
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_contracts import DurablePreparationPlan
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_roster import definitions
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_runner import validate_current_source_descriptor
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.runtime_platform.test_native_subwork import ExposedInput
 
 
@@ -193,7 +193,7 @@ def test_interpreter_caches_do_not_become_declared_scientific_source_members(tmp
 
 @pytest.mark.parametrize("legacy", (False, True))
 def test_child_source_loader_maps_both_exact_representations_to_the_same_actual_bytes(tmp_path, legacy):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_native_entry import _SelectedSourceFinder
+    from empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics.durable_native_entry import _SelectedSourceFinder
 
     case = _source_case(tmp_path, legacy=legacy)
     finder = _SelectedSourceFinder(case.root, case.plan.code_sources)
@@ -208,7 +208,7 @@ def test_child_source_loader_maps_both_exact_representations_to_the_same_actual_
 
 
 def test_child_source_loader_refuses_ambiguous_labels_and_unlisted_modules(tmp_path):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_native_entry import _SelectedSourceFinder
+    from empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics.durable_native_entry import _SelectedSourceFinder
 
     case = _source_case(tmp_path, legacy=True)
     finder = _SelectedSourceFinder(case.root,
@@ -221,8 +221,8 @@ def test_child_source_loader_refuses_ambiguous_labels_and_unlisted_modules(tmp_p
 
 
 def test_registered_durable_operation_selects_the_actual_preparation_callback():
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import durable_operation_bindings as ob
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_runner import prepare_native_work
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import durable_operation_bindings as ob
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_runner import prepare_native_work
 
     registration, = ob.operation_registrations()
     assert registration.native_effect is True
@@ -230,8 +230,8 @@ def test_registered_durable_operation_selects_the_actual_preparation_callback():
 
 
 def test_durable_worker_refuses_missing_preparation_before_attempting_any_child(tmp_path):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import durable_operation_bindings as ob
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_runner import DurablePreparationWorker
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import durable_operation_bindings as ob
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_runner import DurablePreparationWorker
     from tests.runtime_platform.test_worker_preflight import _case
 
     # The complete exposed task/input context is a software guard fixture. It
@@ -257,7 +257,7 @@ def exposed_geometry(tmp_path_factory):
 
 
 def _geometry_transport_case(original):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import geometry_reuse as owner
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import geometry_reuse as owner
     from tests.test_rubisco_geometry_reuse import fresh
     source, plan = fresh(original)
     parent = original.supply.definition.parent_contact
@@ -295,7 +295,7 @@ def test_geometry_strict_public_builder_still_refuses_actual_invalid_stock_befor
 
 def test_geometry_actual_child_still_uses_strict_builder_before_engine_archive_or_native_contact(exposed_geometry, monkeypatch):
     import json
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import durable_native_entry, geometry_reuse_native_entry
+    from empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics import durable_native_entry, geometry_reuse_native_entry
     owner, arguments, parent = _geometry_transport_case(exposed_geometry)
     data = json.loads(owner._invocation_transport(*arguments))
     def forbidden(*args, **kwargs):
@@ -312,7 +312,7 @@ def test_geometry_conditional_admitted_branch_has_exact_transport_bytes_without_
     The exposed original is actually invalid and is refused again after this
     conditional branch. It supplies no worker readiness or scientific admission.
     """
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import science
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import science
     owner, arguments, _ = _geometry_transport_case(exposed_geometry)
     expected = owner._invocation_transport(*arguments)
     called = []

@@ -7,14 +7,14 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_cycle_constraints import assessment, contracts, operation_bindings as owner, recursive_translation as drafts
-from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry import science as portfolio
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition, AssessmentPhase
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.recursive_compiler import project_recursive_assessments
+from empirical_lawhood.domains.rubisco.rubisco_cycle_constraints import assessment, contracts, operation_bindings as owner, recursive_translation as drafts
+from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry import science as portfolio
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition, AssessmentPhase
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.recursive_compiler import project_recursive_assessments
 from tests.test_inquiry_successor_compilation import compile_complete_draft, portable_parent
 from tests.rubisco_nomination_fixture import sources as exposed_sources
 
@@ -104,8 +104,8 @@ def test_independent_finite_release_interval_handles_strict_limits_and_specifici
 
 
 def test_pure_worker_consumes_exact_config_source_and_product_census(sources, model):
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile
-    from empirical_lawhood.runtime.execution import WorkerInputKind
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+    from empirical_lawhood.execution.execution import WorkerInputKind
     draft = drafts.supply_draft(sources[0])
     config = decode_canonical_bytes(draft.operations[0].config_payload.encode(), contracts.CycleOperationConfig, maximum_bytes=None)
     node = draft.operations[0].node_id
@@ -211,7 +211,7 @@ def test_exact_registered_successor_chain_and_receipt_substitution_refusal(sourc
 
 
 def test_code_owned_original_scopes_full_binding_census_and_actual_outcome(sources, model, queries, uses):
-    from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
+    from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
     parent = portable_parent(model)
     use = drafts.use_draft(model, queries[0], parent=parent)
     product = parent.products[0]

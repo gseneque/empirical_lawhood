@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.adapters.physical.rubisco_kinetics import iqbal2023 as source
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 FIXTURES = Path(__file__).parent / "fixtures" / "rubisco" / "iqbal2023"
 

@@ -7,18 +7,13 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_historical.operation_bindings import (
-    operation_declarations, output_codecs,
-)
-from empirical_lawhood.adapters.methods.rubisco_historical.recursive_translation import historical_recursive_draft
-from empirical_lawhood.adapters.methods.rubisco_historical.records import HistoricalFoldV1, HistoricalScienceV1
-from empirical_lawhood.adapters.physical.rubisco_kinetics.records import (
-    HistoricalFeatureSliceV1, HistoricalLabelSliceV1, HistoricalTrainingSliceV1,
-    ReportedEndpointsV1, ReportedSubstitutionV1,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.rubisco.rubisco_historical.operation_bindings import operation_declarations, output_codecs
+from empirical_lawhood.domains.rubisco.rubisco_historical.recursive_translation import historical_recursive_draft
+from empirical_lawhood.domains.rubisco.rubisco_historical.records import HistoricalFoldV1, HistoricalScienceV1
+from empirical_lawhood.domains.rubisco.kinetics.records import HistoricalFeatureSliceV1, HistoricalLabelSliceV1, HistoricalTrainingSliceV1, ReportedEndpointsV1, ReportedSubstitutionV1
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -85,19 +80,16 @@ def test_historical_public_service_retains_negative_census_and_recovers_without_
     from empirical_lawhood.api import matrix_numerical_provenance as provenance_owner
     from empirical_lawhood.api import recursive_authoring as author
     from empirical_lawhood.api import recursive_execution as execute
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, FilesystemState, GuardedExternalRoot
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.runtime.artifacts import ExternalRootContract
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, FilesystemState, GuardedExternalRoot
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
 
     class Inspector:
         def inspect(self, contract):
             return FilesystemState(contract.canonical_path, True, True, 2**40, False)
 
-    # Freeze only this software test's provenance while other developers edit.
-    source = author.implementation_binding(ROOT)
+    # Stabilize numerical metadata while retaining actual committed-source admission.
     observed = provenance_owner.capture_matrix_provenance(project_root=ROOT)
-    monkeypatch.setattr(author, "implementation_binding", lambda root, **kwargs: source)
-    monkeypatch.setattr(execute, "implementation_binding", lambda root, **kwargs: source)
     monkeypatch.setattr(provenance_owner, "capture_matrix_provenance", lambda **kwargs: observed)
     selected = tmp_path / "custody"
     selected.mkdir()

@@ -9,8 +9,8 @@ from typing import Mapping, cast
 
 import numpy as np
 
-from .schemas import stable_json_bytes
-from .types import Action, Denominator, EventRecord, JumpDiagnostic, TrajectoryCheckpoint, TrajectoryResult, View
+from empirical_lawhood.domains.quantum.trajectory_burnin_screen.schemas import stable_json_bytes
+from empirical_lawhood.domains.quantum.trajectory_burnin_screen.types import Action, Denominator, EventRecord, JumpDiagnostic, TrajectoryCheckpoint, TrajectoryResult, View
 
 
 DIAGNOSTIC_COLUMNS = (

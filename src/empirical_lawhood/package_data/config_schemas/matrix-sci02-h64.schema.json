@@ -1,0 +1,108 @@
+{
+  "$defs": {
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "Sci02Specification_57b671621ebe": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-sci02/specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "campaign": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "campaign; constructor checks semantics and units."
+            },
+            "provenance": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "provenance; constructor checks semantics and units."
+            },
+            "selection": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "selection; constructor checks semantics and units."
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "tranche": {
+              "description": "tranche; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "specification_id",
+            "selection",
+            "provenance",
+            "campaign",
+            "tranche"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-sci02-h64",
+  "$ref": "#/$defs/Sci02Specification_57b671621ebe",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Sci02 H64",
+  "x-consumer": "matrix-sci02-h64",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

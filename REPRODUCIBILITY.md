@@ -1,5 +1,7 @@
 # Reproducibility and evidence limits
 
+The [preprint migration census](docs/release/preprint-recursive-migration.md) identifies the 22 reauthored families and their public recipes. The [scientific record](programmes/shared-records/joint-description-results.md) identifies the producing sources, original assessments and unmeasured families. The [release procedure](docs/release/release-artifacts.md) describes how to verify the software from a selected commit.
+
 SPDX-License-Identifier: CC-BY-4.0
 
 This guide gives information about source identities, reproducibility records and evidence limits.
@@ -23,7 +25,7 @@ can become a prospective design input. It does not make an unqualified native
 observation scientifically fit.
 
 Current routes with selected-source admission require the selected committed package and an explicit `OperatorStorageProfile`.
-The [source-admission owner](src/empirical_lawhood/infrastructure/source_policy.py) verifies selected bytes, modes and imported source.
+The [source-admission owner](src/empirical_lawhood/storage/source_policy.py) verifies selected bytes, modes and imported source.
 It records actual checkout status separately.
 Permitted disclosed untracked operational notes do not require an empty Git status.
 Legacy routes with raw-clean checks retain those checks.

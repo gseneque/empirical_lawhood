@@ -1,32 +1,22 @@
 """Native effects only behind an installed campaign runner and scoped input ports."""
 
-from empirical_lawhood.adapters.simulators.reactor_matched_replay_forecast.transport import ReactorTraceEnvelope
+from empirical_lawhood.domains.reactor.reactor_matched_replay_forecast.transport import ReactorTraceEnvelope
 
 from dataclasses import fields
 from decimal import Decimal
 from typing import Callable
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-    TaskProgressEmitter,
-)
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
-from .extension_bundle import CAPABILITY
-from empirical_lawhood.adapters.simulators.reactor_matched_replay_forecast.design import ReactorBatchConfig, ReactorBatchSource, BRANCHES, native_task_id
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner, TaskProgressEmitter
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
+from empirical_lawhood.adapters.simulators.reactor_matched_replay_forecast.extension import CAPABILITY
+from empirical_lawhood.domains.reactor.reactor_matched_replay_forecast.design import ReactorBatchConfig, ReactorBatchSource, BRANCHES, native_task_id
 
 from empirical_lawhood.adapters.simulators.reactor_matched_replay_forecast.trace import acquire_history_unit
 

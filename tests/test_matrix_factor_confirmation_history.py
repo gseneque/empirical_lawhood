@@ -14,27 +14,25 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import records as r, science
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.operation_bindings import (
-    NAMESPACE, E1NativeRunner, E1OperationConfig, operation_factories,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import ScalarClosureSpec
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_parameter_factor.records import MatrixParameterFactorNumericalDesign, MatrixParameterScalarDefinition
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import MatrixParameterNativeHistory, coordinate_identity, expected_members
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import advance_parameter_pair, initial_parameter_state
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion, NativeSubworkContact, NativeSubworkDefinition, NativeSubworkOutput
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import records as r, science
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.operation_bindings import NAMESPACE, E1NativeRunner, E1OperationConfig, operation_factories
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import ScalarClosureSpec
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_parameter_factor.records import MatrixParameterFactorNumericalDesign, MatrixParameterScalarDefinition
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import MatrixParameterNativeHistory, coordinate_identity, expected_members
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import advance_parameter_pair, initial_parameter_state
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion, NativeSubworkContact, NativeSubworkDefinition, NativeSubworkOutput
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
 from tests.test_matrix_factor_confirmation_eligibility import publish
 from tests.test_matrix_factor_confirmation_eligibility import provenance as provenance
 from tests.test_matrix_factor_confirmation_eligibility import stock as stock
@@ -189,7 +187,7 @@ def test_full_numerical_and_factor_cold_reproof_without_producer_rng_or_eigh(e1,
         ordinary_receipt(plane, source, 'measure', product, diagnostic_raw), ordinary_receipt(plane, source, 'check', assessment))
     def blocked(*args, **kwargs):
         raise AssertionError('cold reader entered producer, RNG or eigensolver')
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source as native
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source as native
     monkeypatch.setattr(native, 'acquire_parameter_history', blocked)
     monkeypatch.setattr(science, 'measure', blocked)
     monkeypatch.setattr(science.factor_science, 'measure_sector', blocked)
@@ -202,7 +200,7 @@ def test_full_numerical_and_factor_cold_reproof_without_producer_rng_or_eigh(e1,
         science.read_retained(source, history, numerical, product, assessment, native_raw, diagnostic_raw, receipts=receipts[:-1])
     changed = {name: value.copy() for name, value in arrays.items()}
     changed['fine_positions'][7, 0, 0, 0, 0] += .1
-    from empirical_lawhood.adapters.methods.matrix_parameter_history import independent
+    from empirical_lawhood.domains.matrix.matrix_parameter_history import independent
     controls = independent.assess_arrays(source.coordinate, changed, trajectory_tolerance=D('1e-8'), bridge_tolerance=D('1e-11'))
     assert controls[1]['disposition'] == 'VIOLATED'
 
@@ -222,7 +220,7 @@ def test_mutually_forged_operator_and_spectrum_fail_literal_native_state_join(e1
     source = sources[1]
     history, numerical, arrays, native_raw = complete_history(plane, source)
     raw, product = science.measure(source, history, numerical, arrays, artifact_id='factor.original.'+source.root_id)
-    from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
     values = {n: a.copy() for n, a in decode_matrix_arrays(raw, product.arrays).items()}
     values['primary_x_operator'][4] += np.eye(15)
     values['primary_x_spectrum'][4] += 1
@@ -281,7 +279,7 @@ def test_cold_reader_refuses_changed_original_run_attempt_native_locator_or_scop
     elif defect == 'history-attempt':
         receipts[0] = replace(receipts[0], attempt_id='foreign.attempt')
     else:
-        from empirical_lawhood.kernel.evidence import VisibilityCeiling
+        from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
         original = history.arrays.array_artifact.artifact_id
         new_id = 'native.changed.arrays.'+source.root_id
         receipt = receipts[0]

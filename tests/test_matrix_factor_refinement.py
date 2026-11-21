@@ -4,11 +4,11 @@ from decimal import Decimal as D
 from types import SimpleNamespace
 import numpy as np
 import pytest
-from empirical_lawhood.adapters.methods.matrix_factor_response import refinement
+from empirical_lawhood.domains.matrix.matrix_factor_response import refinement
 
 
 def test_weighted_ou_bridge_exact_coupling_and_orthogonal_normal_transform():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.independent import noise_panel
+    from empirical_lawhood.domains.matrix.matrix_factor_response.independent import noise_panel
     coarse = noise_panel(SimpleNamespace(seed=40),3)
     bridge = noise_panel(SimpleNamespace(seed=41),3)
     fine = refinement.weighted_ou_bridge(coarse,bridge,friction=D(1),coarse_timestep=D('.001'))

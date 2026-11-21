@@ -1,0 +1,125 @@
+{
+  "$defs": {
+    "BridgeSpecification_ee44d2f9fdf6": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-sci02d/specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "campaign": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "campaign; constructor checks semantics and units."
+            },
+            "design": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "design; constructor checks semantics and units."
+            },
+            "frozen": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "frozen; constructor checks semantics and units."
+            },
+            "provenance": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "provenance; constructor checks semantics and units."
+            },
+            "selection": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "selection; constructor checks semantics and units."
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "tranche": {
+              "description": "tranche; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "specification_id",
+            "design",
+            "selection",
+            "provenance",
+            "campaign",
+            "tranche",
+            "frozen"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-sci02d-paired-equilibrium",
+  "$ref": "#/$defs/BridgeSpecification_ee44d2f9fdf6",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Sci02D Paired Equilibrium",
+  "x-consumer": "matrix-sci02d-paired-equilibrium",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

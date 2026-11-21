@@ -10,14 +10,14 @@ from pathlib import Path, PurePosixPath
 from typing import ClassVar
 from zipfile import ZipFile
 
-from empirical_lawhood.adapters.methods.structured_target import IndependentSubstrateTargetPhase
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.methods.structured_target import IndependentSubstrateTargetPhase
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
 
-from .contracts import Grid2OpActionBranchRequest, Grid2OpActionKind, Grid2OpEpisodeRequest, Grid2OpNativeAction
-from .runtime import Grid2OpOfflineEnvironmentAdapter, execute_grid2op_episode
-from .source import build_held_grid2op_source_binding
+from empirical_lawhood.domains.energy.grid2op.contracts import Grid2OpActionBranchRequest, Grid2OpActionKind, Grid2OpEpisodeRequest, Grid2OpNativeAction
+from empirical_lawhood.adapters.simulators.grid2op_response.runtime import Grid2OpOfflineEnvironmentAdapter, execute_grid2op_episode
+from empirical_lawhood.adapters.simulators.grid2op_response.source import build_held_grid2op_source_binding
 
 
 def _relative_source_member(value: str) -> None:

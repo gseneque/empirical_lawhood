@@ -79,6 +79,10 @@ The three packaged reactor inputs retain their upstream Apache-2.0 license,
 unmodified source bytes and exact pins. Their specific account remains beside
 the payload in [PROVENANCE.md](../../src/empirical_lawhood/_vendor/terminal_bench_science/PROVENANCE.md).
 
+The workbench's bundled Inter font retains its SIL Open Font License 1.1.
+The [asset provenance](../../src/empirical_lawhood/workbench/assets/PROVENANCE.md)
+identifies the unchanged font, project logo and retained licence text.
+
 The former template-only evidence directory is not a primary-results deposit.
 The template and plotted-value CC0 notices retain their original scope.
 Private custody records and third-party inputs are

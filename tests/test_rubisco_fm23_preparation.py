@@ -11,8 +11,8 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.physical.rubisco_kinetics import fm23_preparation as fm
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+import empirical_lawhood.domains.rubisco.kinetics.fm23_preparation as fm
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def atom(element, x, y, z, digits=4):
@@ -261,7 +261,7 @@ class RefuseOptional(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in {'numpy','scipy','sympy','mpmath','pyscf','openmm','rdkit','PIL','torch','pypdf'}:
             raise AssertionError('optional import: ' + fullname)
 sys.meta_path.insert(0, RefuseOptional())
-from empirical_lawhood.adapters.physical.rubisco_kinetics.fm23_preparation import Fm23PreparationProtocolV1
+from empirical_lawhood.domains.rubisco.kinetics.fm23_preparation import Fm23PreparationProtocolV1
 assert Fm23PreparationProtocolV1().canonical_bytes()
 """
     result = subprocess.run([sys.executable, "-c", script], env=os.environ.copy(), capture_output=True, text=True)

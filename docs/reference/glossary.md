@@ -37,7 +37,7 @@ puts these terms in one concrete calculation.
 | Canonical record | Strict, versioned JSON emitted by `canonical_bytes()`. Applicable decoders reject unknown fields, duplicate keys and identity substitutions. |
 | Object identity | ID, schema, version and canonical fingerprint together. Matching ID strings alone do not prove matching content. |
 | Candidate | A design and its requirements compiled without evaluation outcomes. Compilation grants no custody, approval, execution or reveal authority. |
-| Source closure | Exact clean Git commit and tree, with proof that the tracked package in that checkout executes |
+| Source closure | Exact selected executable, resource and environment bytes bound to their producing source, with checkout status reported separately. The owning source policy decides which changes invalidate that binding. |
 | Issue | Publication of the reviewed candidate, source closure, proposer attestation and custody inputs as immutable records |
 | Execution contracts | `ExperimentPackage`, `ProtocolRunPlan` and `ProtocolExecutionPlan` describe authorized delivery, scientific operations and executable tasks. Their format revisions are separate from scientific support. |
 | Receipt | An immutable record of actual inputs, outputs, checks and implementation for a completed task. SQLite provides a rebuildable custody projection. |
@@ -66,7 +66,7 @@ puts these terms in one concrete calculation.
 ## Evidence stages
 
 These values match `EvidenceRung` and `EvidenceCeiling` in
-[`kernel/evidence.py`](../../src/empirical_lawhood/kernel/evidence.py).
+[`science/evidence/evidence.py`](../../src/empirical_lawhood/science/evidence/evidence.py).
 Preparation and causal custody remain prerequisites at every applicable stage.
 They do not replace measurement validity or order support.
 
@@ -103,7 +103,7 @@ That ceiling does not establish an achieved result.
 | Transverse response | Signed current response to the declared realized vector potential, with its gauge, finite-wavevector and unit conditions. Pairing alone does not establish it. |
 | Post-hoc response composition | Analysis of authenticated, outcome-visible parent scalars. The analysis cannot relabel those inputs as prospective evidence. |
 
-The [finite response-law specification](../../src/empirical_lawhood/adapters/methods/finite_response_law/specification.md)
+The [finite response-law specification](../../src/empirical_lawhood/domains/matrix/finite_response_law/specification.md)
 and [response input guide](../../programmes/foundations/emergent-structure/reference/input-formats.md) govern the detailed scientific operands.
 Fresh calibration alone does not establish prospective use.
 

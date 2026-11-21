@@ -9,16 +9,16 @@ import struct
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_event_control as event
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_state_orchestration as orchestration
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_step_control as step
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_evidence_stream as stream
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_records as lossless
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_contracts as contracts
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_event_control as event
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_state_orchestration as orchestration
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_step_control as step
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_evidence_stream as stream
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_records as lossless
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_contracts as contracts
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
 from tests.test_battery_forecast_clock_control import lossless_call, multiple_call_observation
 from tests.test_battery_forecast_state_control import selected as selected_fixture
 from tests.test_battery_forecast_step_control import failed_assignment_evidence, witness

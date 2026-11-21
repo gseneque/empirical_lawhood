@@ -5,16 +5,16 @@ from dataclasses import fields, replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_entry_v2 as owner
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_protected_bindings as binding
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_development_product import MatrixSelectedDevelopmentProduct
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedEntryEvidence, validate_selected_entry_evidence
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_entry_v2 as owner
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_protected_bindings as binding
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_development_product import MatrixSelectedDevelopmentProduct
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedEntryEvidence, validate_selected_entry_evidence
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
 from tests.test_matrix_selected_entry_scope import entry_shape, source_case  # noqa: F401
 from tests.test_matrix_selected_package import reference
 from tests.test_matrix_selected_protected import confirmation, transfer  # noqa: F401
@@ -110,7 +110,7 @@ def test_current_entry_consumes_development_evidence_and_refuses_uncommitted_exe
 @pytest.mark.parametrize("route", ("transfer", "legacy-confirmation", "development-confirmation"))
 def test_protected_entry_batches_only_original_e3_and_keeps_nomination_lanes_separate(
         transfer, confirmation, source_case, monkeypatch, route):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import commitment
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import commitment
     from empirical_lawhood.api import matrix_sampling_runtime, matrix_selected_runtime, matrix_selected_producer_scope
     from empirical_lawhood.api import matrix_selected_opportunity_runtime
     full = transfer if route == "transfer" else confirmation

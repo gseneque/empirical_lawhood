@@ -2,8 +2,8 @@
 """Bounded full-read receipt custody on actual exposed PURE workloads."""
 import pytest
 
-from empirical_lawhood.infrastructure import artifacts, recursive_custody as owner
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.storage import artifacts, recursive_custody as owner
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
 from tests.test_recursive_compact_output_bulk import compact_wave as compact_wave  # noqa: F401
 from tests.test_recursive_report_projection import wave as wave  # noqa: F401
 from tests.test_recursive_prebatch_readonly_inputs import (
@@ -25,7 +25,7 @@ def test_full_read_refuses_changed_custody_after_typed_decode_before_scientific_
     original = target.read_bytes()
     changed, escaped = [], []
     assemble_code = owner._assemble_read_products.__code__
-    decode_code = owner.decode_canonical_bytes.__code__
+    decode_code = owner._decode_retained_product.__code__
     def observe(frame, event, arg):
         if (event == "return" and frame.f_code is decode_code and not changed
                 and frame.f_back.f_code is assemble_code):
@@ -46,7 +46,7 @@ def test_full_read_refuses_changed_custody_after_typed_decode_before_scientific_
 def test_full_read_refuses_receipt_policy_change_inside_bounded_window(scale_cases, monkeypatch):
     case = scale_cases[0]
     original = ExternalTaskReceiptStore.read
-    decode_code = owner.decode_canonical_bytes.__code__
+    decode_code = owner._decode_retained_product.__code__
     assemble_code = owner._assemble_read_products.__code__
     changed = []
     def observe(frame, event, arg):

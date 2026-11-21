@@ -1,0 +1,509 @@
+{
+  "$defs": {
+    "ArtifactIdentity_3b360fc69225": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/artifact-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "description": "artifact id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "extensions": {
+              "description": "extensions; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ExtensionBinding_d34345d4218d"
+              },
+              "type": "array"
+            },
+            "media_type": {
+              "description": "media type; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "payload_schema": {
+              "description": "payload schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "role": {
+              "description": "role; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sha256": {
+              "description": "sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "size_bytes": {
+              "description": "size bytes; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "artifact_id",
+            "role",
+            "payload_schema",
+            "sha256",
+            "media_type",
+            "size_bytes",
+            "extensions"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ExtensionBinding_d34345d4218d": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/extension-binding"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "namespace": {
+              "description": "namespace; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "payload_sha256": {
+              "description": "payload sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "schema": {
+              "description": "schema; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "namespace",
+            "schema",
+            "payload_sha256"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ParentLineage_4911036af28f": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-model-free/parent-lineage"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "exposed_seeds": {
+              "description": "exposed seeds; constructor checks semantics and units.",
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "exposed_seeds_sha256": {
+              "description": "exposed seeds sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "frozen_settings_sha256": {
+              "description": "frozen settings sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "parent_assignments": {
+              "description": "parent assignments; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/RootAssignment_284c2528a20e"
+              },
+              "type": "array"
+            },
+            "parent_execution_plan_sha256": {
+              "description": "parent execution plan sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "parent_packet_sha256": {
+              "description": "parent packet sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "parent_producing_code_sha256": {
+              "description": "parent producing code sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "parent_readout_sha256": {
+              "description": "parent readout sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "parent_specification": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "parent specification; constructor checks semantics and units."
+            },
+            "parent_summaries": {
+              "description": "parent summaries; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "purpose": {
+              "description": "purpose; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "purpose",
+            "parent_specification",
+            "parent_summaries",
+            "parent_assignments",
+            "parent_packet_sha256",
+            "parent_execution_plan_sha256",
+            "parent_producing_code_sha256",
+            "parent_readout_sha256",
+            "exposed_seeds",
+            "exposed_seeds_sha256",
+            "frozen_settings_sha256"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RetainedArray_8a37bebf23dc": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-model-free/retained-array"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "identity": {
+              "$ref": "#/$defs/ArtifactIdentity_3b360fc69225",
+              "description": "identity; constructor checks semantics and units."
+            },
+            "key": {
+              "description": "key; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "identity"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RetainedInput_db131eeded24": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-model-free/retained-input"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "identity": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "identity; constructor checks semantics and units."
+            },
+            "key": {
+              "description": "key; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "identity"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RootAssignment_284c2528a20e": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-model-free/root-assignment"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "audit_selected": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "audit selected; constructor checks semantics and units."
+            },
+            "audit_size": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "audit size; constructor checks semantics and units."
+            },
+            "frame_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "frame id; constructor checks semantics and units."
+            },
+            "frame_size": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "frame size; constructor checks semantics and units."
+            },
+            "inclusion_probability": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "inclusion probability; constructor checks semantics and units."
+            },
+            "modules": {
+              "description": "modules; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "role": {
+              "description": "role; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "seed": {
+              "description": "seed; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "seed",
+            "modules",
+            "role",
+            "audit_selected",
+            "inclusion_probability",
+            "frame_id",
+            "frame_size",
+            "audit_size"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "Specification_21415b258126": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-model-free/specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "assignments": {
+              "description": "assignments; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/RootAssignment_284c2528a20e"
+              },
+              "type": "array"
+            },
+            "evidence_scope": {
+              "description": "evidence scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "mode": {
+              "description": "mode; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "parent_lineage": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ParentLineage_4911036af28f"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "parent lineage; constructor checks semantics and units."
+            },
+            "retained_arrays": {
+              "description": "retained arrays; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/RetainedArray_8a37bebf23dc"
+              },
+              "type": "array"
+            },
+            "retained_inputs": {
+              "description": "retained inputs; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/RetainedInput_db131eeded24"
+              },
+              "type": "array"
+            },
+            "settings_json": {
+              "description": "settings json; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "study_label": {
+              "description": "study label; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "specification_id",
+            "settings_json",
+            "assignments",
+            "study_label",
+            "mode",
+            "evidence_scope",
+            "retained_inputs",
+            "retained_arrays",
+            "parent_lineage"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-model-free-experiment",
+  "$ref": "#/$defs/Specification_21415b258126",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Model Free Experiment",
+  "x-consumer": "matrix-model-free-experiment",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

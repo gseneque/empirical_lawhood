@@ -21,7 +21,7 @@ describes the later chemical preparation and scientific assessment.
 ## Native admission and constructed denominator
 
 The maintained
-[source owner](../../../../src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_preparation.py)
+[source owner](../../../../src/empirical_lawhood/domains/rubisco/kinetics/rr_preparation.py)
 consumed exact original [9RUB](https://www.rcsb.org/structure/9RUB) CIF/PDB and
 [P04718](https://www.uniprot.org/uniprotkb/P04718/entry) FASTA witnesses from the
 closed native intake. Their complete nineteen-member source packet has

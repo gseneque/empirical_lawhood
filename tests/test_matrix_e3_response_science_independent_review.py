@@ -13,12 +13,12 @@ import os
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as methods
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_records as records
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_science as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast, science
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as methods
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_records as records
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_science as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast, science
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
 from tests.test_matrix_e3_response_records import case as _producer_case, publication, qualification
 from tests.test_matrix_e3_response_science import (
     LIMITS, blocked, byte_fetch, context, literal_score, no_native, public_context, score_config, store,

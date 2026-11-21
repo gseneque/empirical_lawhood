@@ -4,6 +4,7 @@ SPDX-License-Identifier: MPL-2.0
 """
 
 from pathlib import Path
+from fnmatch import fnmatchcase
 
 
 def module_name(path: Path, *, package_root: Path) -> str:
@@ -40,9 +41,9 @@ def discover_descriptors(
             raise ValueError(f"allowlisted {kind} root is absent or unsafe: {root}")
         require_safe_path(root, root=package_root, description=f"{kind} root")
         for path in root.rglob("*"):
-            if path.is_symlink() and (path.is_dir() or path.name == name):
+            if path.is_symlink() and (path.is_dir() or fnmatchcase(path.name, name)):
                 raise ValueError(f"{kind} discovery traverses a symlink: {path}")
-            if path.name != name:
+            if not fnmatchcase(path.name, name):
                 continue
             require_safe_path(path, root=root, description=f"{kind} descriptor")
             if not path.is_file():

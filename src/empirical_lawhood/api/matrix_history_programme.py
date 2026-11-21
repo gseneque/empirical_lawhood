@@ -2,14 +2,13 @@
 """Thin E2 facade; original source/result receipts remain its durable state."""
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_history_analysis.experiment_preparation import (
-    PROTOCOL_ID,MatrixHistoryProgrammePlan)
+from empirical_lawhood.domains.matrix.matrix_history_analysis.experiment_preparation import PROTOCOL_ID, MatrixHistoryProgrammePlan
 from empirical_lawhood.api.composite_experiment_programme import write_experiment_programme_descriptor
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile,ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_programme import ExperimentProgrammeDescriptor,PROGRAMME_DESCRIPTOR_FILENAME
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_programme import ExperimentProgrammeDescriptor, PROGRAMME_DESCRIPTOR_FILENAME
 
 PLAN_FILENAME='history-programme.json'
 
@@ -47,7 +46,7 @@ class MatrixHistoryProgrammeService:
             raise TypeError('E2 authoring requires its exact prepared descriptive plan')
         if not preparation.executable:raise ValueError('E2 authoring retains its explicit unmet prerequisites')
         from empirical_lawhood.api.recursive_authoring import implementation_binding
-        from empirical_lawhood.kernel.provenance import ObjectIdentity
+        from empirical_lawhood.science.identity.provenance import ObjectIdentity
         actual=implementation_binding(self.service.project_root)
         if plan.source_snapshot!=ObjectIdentity.from_record('recursive-member.implementation',actual):
             raise ValueError('E2 authoring source differs from the actual selected checkout')
@@ -71,7 +70,7 @@ class MatrixHistoryProgrammeService:
             'state':'DESCRIPTIVE_PLAN_RETAINED','scientific_authority':'NONE','native_contact':'NONE'}
 
     def _read_result(self,plan):
-        from empirical_lawhood.api.matrix_history_analysis import read_matrix_history_analysis,matrix_history_result_summary
+        from empirical_lawhood.api.matrix_history_analysis import read_matrix_history_analysis, matrix_history_result_summary
         receipt=read_matrix_history_analysis(writer=self.writer,
             relative_path=plan.specification.result_relative_root+'/receipt.json',config=plan.analysis)
         if receipt.allocation_publication.logical.content_sha256!=plan.allocation.fingerprint():
@@ -94,7 +93,7 @@ class MatrixHistoryProgrammeService:
             raise ValueError('E2 parallel native lowering is absent; existing dedicated imports/retained analyses remain available')
         if plan.specification.mode=='READ_RETAINED':return self._read_result(plan)
         from empirical_lawhood.api.recursive_authoring import implementation_binding
-        from empirical_lawhood.kernel.provenance import ObjectIdentity
+        from empirical_lawhood.science.identity.provenance import ObjectIdentity
         if ObjectIdentity.from_record('recursive-member.implementation',implementation_binding(self.service.project_root))!=plan.source_snapshot:
             raise ValueError('E2 calculation source differs from its original selected implementation')
         from empirical_lawhood.api.matrix_history_analysis import analyze_matrix_histories
@@ -114,7 +113,7 @@ class MatrixHistoryProgrammeService:
         if path.exists():return self._read_result(plan)
         if plan.specification.mode!='ANALYZE_RETAINED':raise FileNotFoundError('E2 selected retained result is absent')
         from empirical_lawhood.api.recursive_authoring import implementation_binding
-        from empirical_lawhood.kernel.provenance import ObjectIdentity
+        from empirical_lawhood.science.identity.provenance import ObjectIdentity
         if ObjectIdentity.from_record('recursive-member.implementation',implementation_binding(self.service.project_root))!=plan.source_snapshot:
             raise ValueError('E2 incomplete recovery source differs from its original selected implementation')
         from empirical_lawhood.api.matrix_history_analysis import analyze_matrix_histories

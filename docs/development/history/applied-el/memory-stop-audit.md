@@ -27,9 +27,9 @@ remains an operational unresolved outcome, not enzyme failure.
 
 The execution plan binds `rubisco-inquiry.supply`, one maximum attempt and
 `memory_bytes: 536870912` (512 MiB). The
-[operation contract](../../../../src/empirical_lawhood/adapters/methods/rubisco_inquiry/operation_bindings.py)
+[operation contract](../../../../src/empirical_lawhood/domains/rubisco/rubisco_inquiry/operation_bindings.py)
 declares the same bound. Existing
-[process execution](../../../../src/empirical_lawhood/infrastructure/execution.py)
+[process execution](../../../../src/empirical_lawhood/execution/local/execution.py)
 defaults to multiprocessing `spawn`. Python reconstructs the main module and
 imports the runner before entering `_execute_in_child`. That target calls
 `_sanitize_worker_process` before `runner.execute`; sanitization limits already
@@ -37,7 +37,7 @@ loaded numerical pools and then calls `_apply_resource_limits`, which applies
 `RLIMIT_AS` to the declared memory bytes. Thus the enforced value constrains
 virtual address space, not solely resident RAM, and pretarget imports already
 occupy part of that space. The
-[spawn environment](../../../../src/empirical_lawhood/infrastructure/worker_bootstrap.py)
+[spawn environment](../../../../src/empirical_lawhood/execution/local/worker_bootstrap.py)
 sets all five numerical thread variables to 1 before the interpreter starts.
 
 The acceptance main module imports both selected scientific adapters and the

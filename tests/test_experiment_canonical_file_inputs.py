@@ -12,22 +12,18 @@ from typing import ClassVar
 import pytest
 
 from empirical_lawhood.api import experiment_preparation as owner, recursive_authoring, recursive_operations
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.experiment_inputs import (
-    ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding, ExperimentInputSelection,
-)
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.experiment_preparation import (
-    ExecutionSelection, ExperimentCensus, ExperimentPreparation, ExperimentProtocolDeclaration, PreparedExperimentInputs,
-)
-from empirical_lawhood.runtime.recursive_compiler import RecursivePortContract
-from empirical_lawhood.runtime.recursive_storage_codecs import RecursiveStorageCodec
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding, ExperimentInputSelection
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, ExperimentCensus, ExperimentPreparation, ExperimentProtocolDeclaration, PreparedExperimentInputs
+from empirical_lawhood.execution.recursive_compiler import RecursivePortContract
+from empirical_lawhood.storage.contracts.recursive_storage_codecs import RecursiveStorageCodec
 from tests.runtime_platform.test_recursive_compiler import Config, fixture
 from tests.runtime_platform.test_native_subwork import _plane
 
@@ -241,7 +237,7 @@ def test_canonical_file_symlinks_refuse_before_domain_contact(selected, location
 
 
 def test_exact_selected_size_refuses_before_hashing_despite_broad_allowance(selected, monkeypatch):
-    from empirical_lawhood.infrastructure import bounded_io
+    from empirical_lawhood.storage import bounded_io
 
     selected.path.write_bytes(replace(selected.choice, files=(replace(selected.binding, maximum_bytes=8192),)).canonical_bytes())
     selected.member.write_bytes(selected.raw + b"oversize")
@@ -283,10 +279,8 @@ def test_existing_owning_decoder_refuses_invalid_toy_contents_after_public_prepa
 @pytest.mark.parametrize("damage", ("undeclared", "symlink"))
 def test_author_rechecks_file_contract_before_prospective_delegation(selected, monkeypatch, damage):
     from empirical_lawhood.api import prospective_experiment
-    from empirical_lawhood.runtime.execution_envelope import (
-        ChildResourceTokenLimit, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec, NonTimeResourceBudget,
-    )
-    from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec
+    from empirical_lawhood.execution.execution_envelope import ChildResourceTokenLimit, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec, NonTimeResourceBudget
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec
     from tests.experiment_entry_support import entry_package_for_draft
     from tests.runtime_platform.test_candidate_compiler import _fixture
     from tests.runtime_platform.test_standard_formal_candidate import _standard_fixture

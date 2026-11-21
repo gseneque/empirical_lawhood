@@ -1,0 +1,147 @@
+{
+  "schema": "model-free-matrix-definition.v1",
+  "label": "Exposed pilot M2 common future on the original native clock",
+  "roots": [
+    {
+      "seed": 1700201,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700202,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700203,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700204,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700205,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700206,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700207,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700208,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700209,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700210,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700211,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700212,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700213,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700214,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700215,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1700216,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    }
+  ],
+  "settings": {
+    "resources": {
+      "memory_bytes": 4294967296,
+      "wall_time_seconds": 14400,
+      "output_bytes": 2147483648
+    },
+    "memory": {
+      "protocol_age_ticks": [
+        16384
+      ]
+    },
+    "response": {
+      "selection_tick": 32
+    },
+    "receiver_study": {
+      "revision": "matrix-receiver-study.v2",
+      "instrument": null,
+      "M2": {
+        "coordinates": [
+          "nominal",
+          "high-temperature"
+        ],
+        "future_lag_ticks": 64,
+        "origin_record_age_ticks": 8192,
+        "history_lag_ticks": 64,
+        "risk_budget": "0.10"
+      }
+    }
+  }
+}

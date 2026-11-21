@@ -7,7 +7,7 @@ import subprocess
 import sys
 from tempfile import TemporaryDirectory
 import pytest
-from empirical_lawhood.infrastructure.source_closure import capture_admitted_target_source
+from empirical_lawhood.storage.source_closure import capture_admitted_target_source
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -44,7 +44,7 @@ def test_public_reactor_issue_execute_reveal_and_recover(tmp_path, mode):
             cwd=storage, env=environment, capture_output=True, text=True, timeout=600)
         assert result.returncode == 0, result.stdout+result.stderr
         expected = {'lifecycle': '21 receipted tasks; same-identity recovery verified',
-            'scale': 'realistic census and production member bounds verified',
+            'scale': 'realistic census and observed member sizes verified',
             'exposed': 'exposed assignment refused base and extension study issue despite contradictory attestations'}[mode]
         assert expected in result.stdout
     assert _source_identity() == original_source

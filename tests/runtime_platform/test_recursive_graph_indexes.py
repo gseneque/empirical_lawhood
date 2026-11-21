@@ -10,15 +10,13 @@ import sys
 
 import pytest
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveInputLink, RecursiveOperationSpec
-from empirical_lawhood.runtime.candidate_compiler import CandidateGraphEdge, StudyTemplate
-from empirical_lawhood.runtime.plans import ScientificInputRole
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.scientific_graph_preservation import (
-    _scientific_graph_indexes, prove_development_graph_parity,
-)
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveInputLink, RecursiveOperationSpec
+from empirical_lawhood.execution.candidate_compiler import CandidateGraphEdge, StudyTemplate
+from empirical_lawhood.execution.plans import ScientificInputRole
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.scientific_graph_preservation import _scientific_graph_indexes, prove_development_graph_parity
 from tests.runtime_platform.test_development_original_input_contracts import Config, _case
 
 

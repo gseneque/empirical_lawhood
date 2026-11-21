@@ -9,23 +9,20 @@ from collections.abc import Iterator
 from dataclasses import dataclass, replace
 from multiprocessing.reduction import ForkingPickler
 
-from empirical_lawhood.adapters.composition.reactor_prefix_response.authoring import ReactorAuthoringBundle
+from empirical_lawhood.domains.reactor.reactor_prefix_response.authoring.authoring import ReactorAuthoringBundle
 from empirical_lawhood.adapters.composition.reactor_prefix_response.custody_ports import ReactorCustodyPorts
-from empirical_lawhood.adapters.methods.reactor_prefix_response.design import ReactorScienceDesign
-from empirical_lawhood.adapters.methods.reactor_prefix_response.provider import FiniteChainProvider
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.panel import ReactorPrefixConfig
+from empirical_lawhood.domains.reactor.reactor_prefix_response.design import ReactorScienceDesign
+from empirical_lawhood.domains.reactor.reactor_prefix_response.provider import FiniteChainProvider
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_panel import ReactorPrefixConfig
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.provider import ReactorPrefixProvider
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.packaged_source import load_packaged_reactor_source
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    ExternalInputPayload,
-    capability_semantic_validation_registry,
-)
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import ExternalInputPayload, capability_semantic_validation_registry
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,9 +90,9 @@ def fresh_reactor_platform_ports(
         p for p in bundle.payloads if isinstance(p, ReactorPrefixConfig)
     )
     design = next(p for p in bundle.payloads if isinstance(p, ReactorScienceDesign))
-    from empirical_lawhood.adapters.methods.reactor_prefix_response.assigned.executable_binding import AssignedFiniteChainProvider
-    from empirical_lawhood.adapters.simulators.reactor_prefix_response.assigned import ReactorAssignedPrefixConfig
-    from empirical_lawhood.adapters.simulators.reactor_prefix_response.assigned_binding.executable_binding import ReactorAssignedPrefixProvider
+    from empirical_lawhood.domains.reactor.reactor_prefix_response.assigned.extension import AssignedFiniteChainProvider
+    from empirical_lawhood.domains.reactor.reactor_prefix_response.native_assigned import ReactorAssignedPrefixConfig
+    from empirical_lawhood.adapters.simulators.reactor_prefix_response.assigned_binding.extension import ReactorAssignedPrefixProvider
 
     assigned = type(native_config) is ReactorAssignedPrefixConfig
     source_type = (

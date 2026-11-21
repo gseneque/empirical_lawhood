@@ -1,0 +1,340 @@
+{
+  "$defs": {
+    "ArtifactIdentity_3b360fc69225": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/artifact-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "description": "artifact id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "extensions": {
+              "description": "extensions; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ExtensionBinding_d34345d4218d"
+              },
+              "type": "array"
+            },
+            "media_type": {
+              "description": "media type; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "payload_schema": {
+              "description": "payload schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "role": {
+              "description": "role; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sha256": {
+              "description": "sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "size_bytes": {
+              "description": "size bytes; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "artifact_id",
+            "role",
+            "payload_schema",
+            "sha256",
+            "media_type",
+            "size_bytes",
+            "extensions"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ExtensionBinding_d34345d4218d": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/extension-binding"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "namespace": {
+              "description": "namespace; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "payload_sha256": {
+              "description": "payload sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "schema": {
+              "description": "schema; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "namespace",
+            "schema",
+            "payload_sha256"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RetainedArray_c9bf6054e846": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-classical-series/retained-array"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "identity": {
+              "$ref": "#/$defs/ArtifactIdentity_3b360fc69225",
+              "description": "identity; constructor checks semantics and units."
+            },
+            "key": {
+              "description": "key; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "identity"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RetainedInput_059778c8db86": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-classical-series/retained-input"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "identity": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "identity; constructor checks semantics and units."
+            },
+            "key": {
+              "description": "key; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "identity"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RootAssignment_284baa6ca89d": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-classical-series/root-assignment"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "role": {
+              "description": "role; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "seed": {
+              "description": "seed; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "seed",
+            "role"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "SeriesSpecification_0a8f575900a2": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-classical-series/specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "assignments": {
+              "description": "assignments; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/RootAssignment_284baa6ca89d"
+              },
+              "type": "array"
+            },
+            "evidence_scope": {
+              "description": "evidence scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "mode": {
+              "description": "mode; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "retained_arrays": {
+              "description": "retained arrays; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/RetainedArray_c9bf6054e846"
+              },
+              "type": "array"
+            },
+            "retained_inputs": {
+              "description": "retained inputs; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/RetainedInput_059778c8db86"
+              },
+              "type": "array"
+            },
+            "settings_json": {
+              "description": "settings json; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "study_label": {
+              "description": "study label; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "specification_id",
+            "settings_json",
+            "assignments",
+            "study_label",
+            "mode",
+            "retained_inputs",
+            "evidence_scope",
+            "retained_arrays"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-classical-series-experiment",
+  "$ref": "#/$defs/SeriesSpecification_0a8f575900a2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Classical Series Experiment",
+  "x-consumer": "matrix-classical-series-experiment",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

@@ -1,15 +1,5 @@
-"""Shared history budget phase diagram interchange contracts and denominator descriptors."""
+"""External execution and serialization integration for history budget phase diagram.
 
-from .contracts import HistoryBudgetPhaseDiagramChallengeNomination, HistoryBudgetPhaseDiagramConfig, HistoryBudgetPhaseDiagramDenominatorDescriptor, HistoryBudgetPhaseDiagramHistoryRankForecast, HistoryBudgetPhaseDiagramMethodFreeze, HistoryBudgetPhaseDiagramRecurrenceResult, HistoryBudgetPhaseDiagramSeedRosterCommitment, HistoryBudgetPhaseDiagramTerminalCloseout, HistoryBudgetPhaseDiagramUnitAdjudication
-
-__all__ = [
-    'HistoryBudgetPhaseDiagramChallengeNomination',
-    'HistoryBudgetPhaseDiagramConfig',
-    'HistoryBudgetPhaseDiagramDenominatorDescriptor',
-    'HistoryBudgetPhaseDiagramHistoryRankForecast',
-    'HistoryBudgetPhaseDiagramMethodFreeze',
-    'HistoryBudgetPhaseDiagramRecurrenceResult',
-    'HistoryBudgetPhaseDiagramSeedRosterCommitment',
-    'HistoryBudgetPhaseDiagramTerminalCloseout',
-    'HistoryBudgetPhaseDiagramUnitAdjudication',
-]
+Scientific records and calculations are owned by domains.history.
+SPDX-License-Identifier: MPL-2.0
+"""

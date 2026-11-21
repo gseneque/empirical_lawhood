@@ -9,22 +9,16 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import (
-    programme_bindings as wave_bindings, programme_calibration as owner,
-    programme_calibration_bindings as bindings, programme_reduction as reduction,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.infrastructure.artifacts import ArtifactPlaneError
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.plans import (
-    ArtifactOutputSpec, BarrierKind, CandidateExecutionPlan, ExecutionTask, ExternalInputSpec, PlanLane,
-    ScientificInputRole, ScientificInputSpec,
-)
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_bindings as wave_bindings, programme_calibration as owner, programme_calibration_bindings as bindings, programme_reduction as reduction
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.artifacts import ArtifactPlaneError
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, CandidateExecutionPlan, ExecutionTask, ExternalInputSpec, PlanLane, ScientificInputRole, ScientificInputSpec
 from tests.test_matrix_scheduled_programme_reduction import declared as declared
 from tests.test_recursive_public_service import _plane
 
@@ -139,7 +133,7 @@ def completed(declared, tmp_path_factory):
         authenticate_wave=lambda result: None)
     model = _pin('model.synthetic', 'empirical-lawhood/matrix-response-error-prediction/model')
     # Use the unchanged scientific model schema, even in this declared fixture.
-    from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import MatrixResponseErrorModel
+    from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import MatrixResponseErrorModel
     model = replace(model, object_schema=MatrixResponseErrorModel.SCHEMA)
     semantic = owner.semantic_calibration(programme, reduced, calibration_id=config.calibration_id,
         model=model, independent_unit_id='unit.synthetic.whole-group')

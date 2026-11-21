@@ -7,14 +7,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_bindings as bindings
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseArrays, branch_census
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA, MatrixArrayMember
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_bindings as bindings
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseArrays, branch_census
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA, MatrixArrayMember
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
 from tests.test_matrix_native_utility import utility_case
 
 ROOT = Path(__file__).parents[1]
@@ -151,14 +151,14 @@ def test_actual_closed_public_e2_retains_scored_nonuse_adverse_and_missing_whole
     """Future mixed public control using the already-disclosed finite000 recipe."""
     from decimal import Decimal
     from threadpoolctl import threadpool_limits
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as owner
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_custody_records import NativeUtilityCustodyAssessment
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as owner
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_custody_records import NativeUtilityCustodyAssessment
     from empirical_lawhood.api.experiment_preparation import author_prepared_experiment
     from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
     from empirical_lawhood.api.recursive_execution import run_recursive_wave
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, ResourceAdmissionError
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor, ResourceAdmissionError
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
     from tests.test_matrix_native_training_public_lifecycle import _actual_case
     from tests.test_matrix_native_utility import copied_preparation
     with threadpool_limits(limits=1):

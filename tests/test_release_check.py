@@ -31,6 +31,19 @@ def release_runner(monkeypatch):
     return module
 
 
+def test_native_rubisco_profile_owns_construction_and_prediction_cases(release_runner):
+    groups, selection = release_runner.PROFILES["native-rubisco"]
+    assert set(groups) == {"rubisco-construction", "rubisco-prediction"}
+    assert selection[-2:] == ["-m", "native"]
+    root = Path(__file__).resolve().parents[1]
+    for name in selection[:-2]:
+        assert (root / name).is_file()
+        assert f"--ignore={name}" in release_runner.PROFILES["native-open"][1]
+    assert {"tests/test_rubisco_amber_terminal_fragments.py", "tests/test_rubisco_molprobity.py",
+            "tests/test_rubisco_kcx_backbone.py", "tests/test_rubisco_interface_transfer.py",
+            "tests/test_rubisco_repair_progress.py"} <= set(selection)
+
+
 def invoke(runner, monkeypatch, packet, child):
     monkeypatch.setattr(runner.subprocess, "run", child)
     monkeypatch.setattr(runner.sys, "argv", ["release_check.py", "--profile", "native-open",
@@ -242,8 +255,10 @@ def test_uv_prerequisite_interrupt_creates_no_unfinalized_packet(release_runner,
 
 
 @pytest.mark.parametrize(("script", "check_name"), (
+    ("scripts/generate_extension_projections.py", "generated-extension_projections"),
     ("scripts/generate_integration_examples.py", "generated-integration_examples"),
     ("scripts/generate_matrix_experiment_examples.py", "generated-matrix_experiment_examples"),
+    ("scripts/generate_rubisco_response_experiment.py", "generated-rubisco_response_experiment"),
     ("scripts/check_frozen_rc_inputs.py", "frozen-rc-numerical-inputs"),
 ))
 def test_source_drift_refuses_before_portable_suite(release_runner, monkeypatch, tmp_path, script, check_name):
@@ -404,7 +419,7 @@ def test_sdist_researcher_closure_checks_exact_guides_inputs_and_excludes_plans(
     import tarfile
 
     checkout = tmp_path / "checkout"
-    from empirical_lawhood.infrastructure.source_policy import ROOT_WORK_PLAN_NAMES, DOCUMENT_WORK_PLAN_PATHS
+    from empirical_lawhood.storage.source_policy import ROOT_WORK_PLAN_NAMES, DOCUMENT_WORK_PLAN_PATHS
 
     names = ("README.md", "docs/development/architecture.md", "programmes/foundations/example/records/current-science.md",
              "programmes/materials/superconductivity/workflows/recursive-materials/materials-partial.json")
@@ -429,7 +444,8 @@ def test_sdist_researcher_closure_checks_exact_guides_inputs_and_excludes_plans(
     export(changed, changed=names[-1])
     with pytest.raises(RuntimeError, match="researcher inputs differ"):
         release_runner.compare_sdist_researcher_inputs(checkout, changed)
-    for ordinal, name in enumerate(("FINALISEARCH.md", "docs/plans/preserved.md",
+    for ordinal, name in enumerate(("FINALISEARCH.md", "docs/plans/preserved.md", "docs/plans/results/figure.png",
+                                    "docs/plans/data.zip", "PROREVIEW/audit.json",
                                     *sorted(ROOT_WORK_PLAN_NAMES | DOCUMENT_WORK_PLAN_PATHS))):
         leaked = tmp_path / f"leaked-{ordinal}.tar.gz"
         export(leaked, extra=name)
@@ -555,6 +571,7 @@ def test_portable_partition_hook_excludes_native_and_held_after_marker_selection
     (root / "conftest.py").write_text(
         "import profile_fixture\n"
         "profile_fixture.CI_FILES = frozenset({'tests/test_bounded.py'})\n"
+        "profile_fixture.CI_REQUIRED_CASES = frozenset({'tests/test_bounded.py::test_bounded'})\n"
         "profile_fixture.SCALE_FILES = frozenset()\n")
     (root / "profile_fixture.py").write_bytes(Path(profiles.__file__).read_bytes())
     census = root / "selection.json"
@@ -571,6 +588,27 @@ def test_portable_partition_hook_excludes_native_and_held_after_marker_selection
     result = subprocess.run([*command, "-k", "bounded"], cwd=root, capture_output=True, text=True,
                             env=dict(os.environ, PYTEST_DISABLE_PLUGIN_AUTOLOAD="1", PYTEST_ADDOPTS=""))
     assert result.returncode != 0 and "without -k" in result.stderr
+
+    # Required contract coverage cannot silently disappear behind a marker.
+    module.write_text("import pytest\n@pytest.mark.native\ndef test_bounded(): pass\n")
+    census.unlink()
+    result = subprocess.run(command, cwd=root, capture_output=True, text=True,
+                            env=dict(os.environ, PYTEST_DISABLE_PLUGIN_AUTOLOAD="1", PYTEST_ADDOPTS=""))
+    assert result.returncode != 0 and "missing required recursive contract cases" in result.stderr
+    assert json.loads(census.read_text())["selected_nodeids"] == []
+
+
+def test_ci_recursive_contract_floor_requires_selected_success_and_refusal_cases():
+    from scripts import test_profiles as profiles
+
+    nodes = sorted(profiles.CI_REQUIRED_CASES)
+    record = profiles.selection_record(nodes, "ci")
+    profiles.require_ci_contracts(record)
+    assert set(record["selected_nodeids"]) == profiles.CI_REQUIRED_CASES
+    for omitted in nodes:
+        with pytest.raises(ValueError, match="missing required recursive contract cases"):
+            profiles.require_ci_contracts(profiles.selection_record([node for node in nodes if node != omitted], "ci"))
+    profiles.require_ci_contracts(profiles.selection_record([], "integration"))
 
 
 @pytest.mark.parametrize("profile", ("ci", "integration", "scale"))

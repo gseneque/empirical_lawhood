@@ -9,10 +9,12 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.composition.finite_response_law.assignment import FiniteResponseLawCohortAssignment, assigned_native_seed_ids
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment import FiniteResponseLawCohortAssignment, assigned_native_seed_ids
 from empirical_lawhood.adapters.composition.finite_response_law import stage_input
-from empirical_lawhood.adapters.composition.finite_response_law.stage_input import STAGE_BINDINGS, FiniteResponseLawStageInput, check_finite_stage_input
-from empirical_lawhood.adapters.methods.finite_response_law.science import FiniteResponseLawScienceSpec
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.stage_input import STAGE_BINDINGS
+from empirical_lawhood.adapters.composition.finite_response_law.stage_input import check_finite_stage_input
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.stage_input import FiniteResponseLawStageInput
+from empirical_lawhood.domains.matrix.finite_response_law.science import FiniteResponseLawScienceSpec
 from empirical_lawhood.api.codecs import load_registered_authoring
 
 ROOT = Path(__file__).parents[1] / "programmes/foundations/emergent-structure/workflows/finite-response-law"

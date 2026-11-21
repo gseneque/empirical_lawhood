@@ -8,6 +8,8 @@ once per branch.
 """
 
 from __future__ import annotations
+from empirical_lawhood.domains.energy.grid2op.topology import connected_substation_components
+
 
 from datetime import UTC
 from decimal import Decimal
@@ -18,10 +20,10 @@ import re
 from threading import local
 from typing import Callable, Protocol
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.adapters.methods.structured_target import IndependentSubstrateTargetPhase
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.methods.structured_target import IndependentSubstrateTargetPhase
 
-from .contracts import Grid2OpActionBranchRequest, Grid2OpActionKind, Grid2OpBranchTrace, Grid2OpChronicBinding, Grid2OpEpisodeRequest, Grid2OpEpisodeResult, Grid2OpSourceBinding, Grid2OpNativeStep
+from empirical_lawhood.domains.energy.grid2op.contracts import Grid2OpActionBranchRequest, Grid2OpActionKind, Grid2OpBranchTrace, Grid2OpChronicBinding, Grid2OpEpisodeRequest, Grid2OpEpisodeResult, Grid2OpSourceBinding, Grid2OpNativeStep
 
 
 class Grid2OpEnvironmentPort(Protocol):
@@ -51,38 +53,6 @@ def _topology_sha256(observation: object) -> str:
     return sha256(payload).hexdigest()
 
 
-def _connected_substation_components(observation: object) -> int:
-    """Count components on the native active-line substation graph.
-
-    The busbar-resolved state remains separately bound by ``topo_vect``.  This
-    receiver is intentionally a coarser declared gauge, not a replacement for
-    the native topology observation.
-    """
-
-    n_sub = int(observation.n_sub)  # type: ignore[attr-defined]
-    parents = list(range(n_sub))
-
-    def find(value: int) -> int:
-        while parents[value] != value:
-            parents[value] = parents[parents[value]]
-            value = parents[value]
-        return value
-
-    def union(left: int, right: int) -> None:
-        left_root = find(left)
-        right_root = find(right)
-        if left_root != right_root:
-            parents[right_root] = left_root
-
-    for active, origin, extremity in zip(
-        observation.line_status,  # type: ignore[attr-defined]
-        observation.line_or_to_subid,  # type: ignore[attr-defined]
-        observation.line_ex_to_subid,  # type: ignore[attr-defined]
-        strict=True,
-    ):
-        if bool(active):
-            union(int(origin), int(extremity))
-    return len({find(value) for value in range(n_sub)})
 
 
 def _line_index(target_id: str) -> int:
@@ -251,7 +221,7 @@ class Grid2OpOfflineEnvironmentAdapter:
                         realization_observed=realized,
                         topology_state_id=f"topology.grid2op.{topology_sha256[:24]}",
                         topology_vector_sha256=topology_sha256,
-                        connected_component_count=_connected_substation_components(observation),
+                        connected_component_count=connected_substation_components(observation.n_sub, observation.line_status, observation.line_or_to_subid, observation.line_ex_to_subid),
                         disconnected_line_count=sum(
                             not bool(value)
                             for value in observation.line_status  # type: ignore[attr-defined]

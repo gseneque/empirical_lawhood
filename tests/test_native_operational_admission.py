@@ -11,19 +11,13 @@ import sys
 import pytest
 from typer.testing import CliRunner
 
-from empirical_lawhood.adapters.simulators._native_admission import (
-    MAX_NATIVE_UPDATES_PER_ARM,
-    TORAX_ESTIMATED_BYTES_PER_RADIAL_CELL,
-    TORAX_ESTIMATED_BYTES_PER_RETAINED_SAMPLE,
-    TORAX_MAX_ESTIMATED_HISTORY_BYTES,
-    admit_native_time_grid,
-)
-from empirical_lawhood.adapters.simulators.brian2_neuron_current_response.contracts import Brian2LIFNativeConfig
+from empirical_lawhood.execution.native_time_grid import MAX_NATIVE_UPDATES_PER_ARM, TORAX_ESTIMATED_BYTES_PER_RADIAL_CELL, TORAX_ESTIMATED_BYTES_PER_RETAINED_SAMPLE, TORAX_MAX_ESTIMATED_HISTORY_BYTES, admit_native_time_grid
+from empirical_lawhood.domains.biology.neuron_current_response.contracts import Brian2LIFNativeConfig
 from empirical_lawhood.adapters.simulators.brian2_neuron_current_response import native_quickstart as brian
 from empirical_lawhood.adapters.simulators.torax_native.native_quickstart import NativeToraxQuickstart
 from empirical_lawhood.adapters.simulators.torax_native import runtime as torax
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 TORAX_INPUT = ROOT / "programmes/energy/fusion/workflows/tokamak-heat-response/config.json"

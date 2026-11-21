@@ -9,39 +9,19 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import (
-    contracts as c,
-    science,
-    preparation,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import (
-    operation_bindings as ob,
-    recursive_translation as rt,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_structure import (
-    contracts as sc,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import (
-    EvidenceCeiling,
-    OutcomeAccess,
-    VisibilityCeiling,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-from empirical_lawhood.kernel.scientific_contributions import (
-    ContributionManifest,
-    ContributionProduct,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    WorkerInputKind,
-    WorkerOutputPort,
-    DependencyReceiptBinding,
-)
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as c, science, preparation
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import operation_bindings as ob, recursive_translation as rt
+from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import contracts as sc
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import WorkerInputKind, WorkerOutputPort, DependencyReceiptBinding
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_battery_refined_inquiry_binding import Port
 from tests.test_rubisco_nomination_preparation import parent
 from tests.rubisco_nomination_fixture import nominee
@@ -196,8 +176,8 @@ class Refuse(importlib.abc.MetaPathFinder):
  def find_spec(self,fullname,path=None,target=None):
   if fullname.split('.')[0] in ('openmm','pybamm','pdbfixer','parmed'): raise AssertionError(fullname)
 sys.meta_path.insert(0,Refuse())
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import extension_bundle,executable_binding
-assert {row.binding.capability_key for row in executable_binding.EXECUTABLE_BINDING_FACTORIES} == {
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import extension
+assert {row.binding.capability_key for row in extension.EXTENSION.factories} == {
  'rubisco-insilico-dynamics.assess-preparation','rubisco-insilico-dynamics.prepare',
  'rubisco-durable-preparation.prepare','rubisco-durable-preparation.reuse-geometry'}
 """,
@@ -416,8 +396,8 @@ def test_exposed_original_input_census_requires_complete_prepared_native_progres
     def forbidden_prepare(*args, **kwargs):
         raise AssertionError("unprepared synthetic context reached native execution")
 
-    module_name = "empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.native"
-    import empirical_lawhood.adapters.methods.rubisco_insilico_dynamics as package
+    module_name = "empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics.native"
+    import empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics as package
     fixture_native = N(prepare=forbidden_prepare)
     monkeypatch.setitem(sys.modules, module_name, fixture_native)
     monkeypatch.setattr(package, 'native', fixture_native, raising=False)

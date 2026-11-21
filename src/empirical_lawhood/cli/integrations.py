@@ -40,9 +40,9 @@ def _configuration(path: Path, consumer: str):
 def _storage(*, read_only=False):
     from empirical_lawhood.cli import platform
     from empirical_lawhood.api.codecs import load_registered_authoring
-    from empirical_lawhood.api.integration_handoffs import integration_artifact_profile_validators
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-    from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile, resolve_external_root_contract
+    from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+    from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, resolve_external_root_contract
     if type(read_only) is not bool:
         raise TypeError('Storage read-only selection must be an exact boolean')
     root, profile_path = platform.CLI_PROJECT_ROOT, platform.CLI_OPERATOR_PROFILE
@@ -55,7 +55,7 @@ def _storage(*, read_only=False):
     elif root is None or profile_path is None:
         raise ValueError('This operation requires --project-root and --operator-profile; select the storage profile described in the guide.')
     if not read_only:
-        from empirical_lawhood.infrastructure.source_origin import require_selected_implementation
+        from empirical_lawhood.storage.source_origin import require_selected_implementation
         require_selected_implementation(root)
     profile = load_registered_authoring(profile_path, root_schemas={OperatorStorageProfile.SCHEMA: OperatorStorageProfile})
     plane = ExternalArtifactPlane(GuardedExternalRoot(resolve_external_root_contract(profile, repo_root=root, home_root=Path.home(),
@@ -191,9 +191,9 @@ def register_integration_commands(campaign_app: typer.Typer) -> None:
         """Select an exact RC result; protected outcomes require actual current grants."""
         from empirical_lawhood.api.configuration import _write_new_file, preflight_new_configuration_output
         from empirical_lawhood.api.rc_challenge_results import bind_rc_challenge_selected_output, read_rc_challenge_result
-        from empirical_lawhood.adapters.simulator_morphism_challenges.retained_results import RCChallengeResultAuthorityContext
-        from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore, ExternalIssuedStudyPublisher, PROGRAMME_ISSUE_GRANTEE_ID
-        from empirical_lawhood.kernel.provenance import ObjectIdentity
+        from empirical_lawhood.domains.history.simulator_morphism_challenges.retained_results import RCChallengeResultAuthorityContext
+        from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore, ExternalIssuedStudyPublisher, PROGRAMME_ISSUE_GRANTEE_ID
+        from empirical_lawhood.science.identity.provenance import ObjectIdentity
         try:
             _, _, plane = _storage()
             output = preflight_new_configuration_output(output)
@@ -394,7 +394,7 @@ def register_integration_commands(campaign_app: typer.Typer) -> None:
         """Publish actual current numerical RC inputs and committed source/export receipts."""
         from empirical_lawhood.api.configuration import _write_new_file, preflight_new_configuration_output
         from empirical_lawhood.api.rc_challenge_inputs import publish_rc_source_export
-        from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
+        from empirical_lawhood.storage.bounded_io import read_bounded_bytes
         try:
             output = preflight_new_configuration_output(output)
             _, _, plane = _storage()
@@ -471,12 +471,12 @@ def register_integration_commands(campaign_app: typer.Typer) -> None:
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
     ) -> None:
         """Compile one independently issued current RC phase with exact prerequisite custody."""
-        from empirical_lawhood.adapters.simulator_morphism_challenges.prerequisites import phase_external_records
+        from empirical_lawhood.domains.history.simulator_morphism_challenges.prerequisites import phase_external_records
         from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
         from empirical_lawhood.api.rc_challenge_authoring import author_rc_challenge_phase
         from empirical_lawhood.api.rc_challenge_inputs import read_rc_challenge_numeric_input, MAXIMUM_RC_NUMERIC_INPUT_BYTES
         from empirical_lawhood.api.rc_challenge_results import read_rc_challenge_result
-        from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
+        from empirical_lawhood.storage.bounded_io import read_bounded_bytes
         try:
             root, _, plane = _storage()
             destination = preflight_authoring_output_directory(directory=output_dir,

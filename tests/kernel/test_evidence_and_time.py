@@ -7,23 +7,9 @@ from decimal import Decimal
 
 import pytest
 
-from empirical_lawhood.kernel.evidence import (
-    ClaimSpec,
-    EvidenceCeiling,
-    EvidenceRung,
-    OutcomeAccess,
-    VisibilityCeiling,
-    inherited_visibility,
-)
-from empirical_lawhood.kernel.systems import SystemSpec
-from empirical_lawhood.kernel.time import (
-    CausalPhase,
-    ClockRelationKind,
-    ClockRelationSpec,
-    InformationCutoff,
-    parse_utc_timestamp,
-    validate_utc_timestamp,
-)
+from empirical_lawhood.science.evidence.evidence import ClaimSpec, EvidenceCeiling, EvidenceRung, OutcomeAccess, VisibilityCeiling, inherited_visibility
+from empirical_lawhood.science.models.systems import SystemSpec
+from empirical_lawhood.science.models.time import CausalPhase, ClockRelationKind, ClockRelationSpec, InformationCutoff, parse_utc_timestamp, validate_utc_timestamp
 
 
 def _claim(system: SystemSpec, **changes: object) -> ClaimSpec:

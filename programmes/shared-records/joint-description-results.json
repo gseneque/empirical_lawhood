@@ -1,0 +1,1488 @@
+{
+  "evidence_date": "2026-11-21",
+  "scope": "EXPOSED_DEVELOPMENT",
+  "protocol": "joint-description.development",
+  "observational_unit": "Independent roots within each family. Counts across families sum design assignments.",
+  "loss_scope": "Receiver MAE is conditional on supported observations. The all-use loss and control criteria retain missing cases.",
+  "cost_scope": "Sum of measured worker CPU on the twenty primary CPU studies. Independent verifications and superseded attempts have separate receipts.",
+  "totals": {
+    "calibration_roots": 680,
+    "evaluation_roots": 484,
+    "calibration_rows": 13464,
+    "evaluation_rows": 9612,
+    "authenticated_tasks": 120,
+    "satisfied_suppliers": 180,
+    "supported_evaluation_rows": 8738,
+    "unsupported_evaluation_rows": 874,
+    "measured_original_cpu_seconds": "1377.9512739009999788866"
+  },
+  "studies": [
+    {
+      "family": "R01",
+      "entry": "COMPLETED",
+      "question": "When does mean-voltage compression lose control-relevant contrast, and when do independent branch laws already suffice?",
+      "source_kind": "analytical-simulator",
+      "calibration_roots": 16,
+      "evaluation_roots": 32,
+      "calibration_rows": 288,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 576,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "independent-branches",
+      "assigned_evaluation_action_menus": 96,
+      "complete_evaluation_action_menus": 96,
+      "arms_meeting_authored_criteria": [
+        "independent-branches",
+        "interface",
+        "joint",
+        "memory"
+      ],
+      "selected_receiver_errors": {
+        "mean_voltage_a": {
+          "conditional_mean_absolute_error": 2.010833629236449e-16,
+          "max_abs_error": "0.02",
+          "supported_observations": 288,
+          "units": "V"
+        },
+        "mean_voltage_b": {
+          "conditional_mean_absolute_error": 1.9987869384310545e-16,
+          "max_abs_error": "0.02",
+          "supported_observations": 288,
+          "units": "V"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 3.8726321800583357e-28,
+        "standard_error": 1.4114184967287976e-29,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 0.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "0.6694675830000000885",
+      "evidence_summary_sha256": "271fe1754f60fea251968a36b95641a419ce7f7b4daf619136f1b61e4128b9c4",
+      "run_id": "recursive.c0922efbe2468991f5caf4ea",
+      "producing_commit": "21da716d9a17cfec2230194541854ccd16011441",
+      "producing_tree": "f94381066c43689c814fabcc27cd6b0482dacfda",
+      "design_sha256": "84b5cf31d70f21f440b082e1fdbb9c7b6e17edc6a0e373796be14d49db5215c9",
+      "plan_sha256": "3bfbe475cbc430ab8fbceec3dd49f12bb10df21ae667253e79e77fb8579e0eed",
+      "cold_read_sha256": "45b69637fae1b542d2e41a13f177bdbb2e753ac385b46be21bdae85b6e9e93a4",
+      "product_sha256": {
+        "assessment": "f544ed49ced6b1df2c4104342653d37b205d452802b3b83fff4a3b09459e5f36",
+        "calibration": "210ac273e0c32556b82ce16c71bfd541093fbdde3c54d1b5ba9d88611aa4ab53",
+        "forecast": "34a6cc9b6e818eb97d89dfe76f85a606dd821e7e31ba4ba519b9bf576e80c051",
+        "model": "b26695ba6b48d6866ed4576cb72e3b2260dd69a498845a68871bf6cf7227c00f",
+        "outcomes": "fb32e66afcda301486c6b3737a8135e66f153f39a5475d0df12421961b552f38",
+        "predictors": "0a0415cbbbd9f68c5d433ccc16298d38be5e3634fd3eddf91636b8a0c7997ba8"
+      }
+    },
+    {
+      "family": "R02",
+      "entry": "COMPLETED",
+      "question": "For coupled RC preparations, which finite information descriptions meet receiver accuracy and control utility at each horizon?",
+      "source_kind": "linear-physical-simulator",
+      "calibration_roots": 16,
+      "evaluation_roots": 32,
+      "calibration_rows": 288,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 576,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "interface",
+      "assigned_evaluation_action_menus": 96,
+      "complete_evaluation_action_menus": 96,
+      "arms_meeting_authored_criteria": [
+        "joint",
+        "memory"
+      ],
+      "selected_receiver_errors": {
+        "mean_voltage": {
+          "conditional_mean_absolute_error": 0.006680458799459168,
+          "max_abs_error": "0.03",
+          "supported_observations": 288,
+          "units": "V"
+        },
+        "terminal_voltage": {
+          "conditional_mean_absolute_error": 0.02350074565521554,
+          "max_abs_error": "0.03",
+          "supported_observations": 288,
+          "units": "V"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 1.1406763615341449,
+        "standard_error": 0.308516778387661,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 0.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "0.6266450840000019597",
+      "evidence_summary_sha256": "19fdcc960494bf487c24ab69c1292c034bb669c02c7e1a7be351d282a9eee957",
+      "run_id": "recursive.466296a6c130618e49a893c7",
+      "producing_commit": "21da716d9a17cfec2230194541854ccd16011441",
+      "producing_tree": "f94381066c43689c814fabcc27cd6b0482dacfda",
+      "design_sha256": "6cec8048b2e43533eb659a6ea305c9e9b79680c4cbd7b0a6ad5665551e3cf5fe",
+      "plan_sha256": "ad95072e0de92066e7eb7117404458aab14af82cbfe4d4f9649bf93fd53e5e6b",
+      "cold_read_sha256": "ee674e6d59922cbf1a1c028d10455ae8e40ed430e2f2631081246c3b8560352f",
+      "product_sha256": {
+        "assessment": "1c5c48845fa9d0e1a5acda084404abe047aefd67267a5962cb86af2c2f6b1bb2",
+        "calibration": "1779d81f260af2fa4abd1dd1a446bb1a05fae15871a243f7b849788b8302a50d",
+        "forecast": "ae6be0a24fd6f3a6e8709a8690e9f275b61a5787f3e5d19e4bdf855d90de780d",
+        "model": "bd0eda0ebc4a61c35a4c06b449a0046efb66e4e72f4ee9df04e1af2e396f05ff",
+        "outcomes": "5de9c7c7f4803a5be739d73601d809db295a84bef5be2f815bf7653265896422",
+        "predictors": "4835a3d00f8d5f61deb77f5b6ee75721baa02a283f0a2ddb9d9ba6ca91b398b3"
+      }
+    },
+    {
+      "family": "R03",
+      "entry": "COMPLETED",
+      "question": "Which preparation and action scope admits a useful geometry description, and where does removing cross-sector information move its prediction error?",
+      "source_kind": "fresh-six-matrix-q2-baoab-native-simulation",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "calibration_rows": 2016,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 1344,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "joint",
+      "assigned_evaluation_action_menus": 64,
+      "complete_evaluation_action_menus": 64,
+      "arms_meeting_authored_criteria": [
+        "joint",
+        "local-interface"
+      ],
+      "selected_receiver_errors": {
+        "joint-admitted": {
+          "conditional_mean_absolute_error": 0.2471832027843772,
+          "max_abs_error": "0.2",
+          "supported_observations": 192,
+          "units": "probability"
+        },
+        "joint-gap": {
+          "conditional_mean_absolute_error": 0.09227701879932652,
+          "max_abs_error": "0.1",
+          "supported_observations": 192,
+          "units": "dimensionless"
+        },
+        "x-admitted": {
+          "conditional_mean_absolute_error": 0.11184506092334147,
+          "max_abs_error": "0.2",
+          "supported_observations": 192,
+          "units": "probability"
+        },
+        "x-gap": {
+          "conditional_mean_absolute_error": 0.02184736156130597,
+          "max_abs_error": "0.1",
+          "supported_observations": 192,
+          "units": "dimensionless"
+        },
+        "xy-angle": {
+          "conditional_mean_absolute_error": 0.04461035396683217,
+          "max_abs_error": "0.1",
+          "supported_observations": 192,
+          "units": "dimensionless"
+        },
+        "y-admitted": {
+          "conditional_mean_absolute_error": 0.11329019790774612,
+          "max_abs_error": "0.2",
+          "supported_observations": 192,
+          "units": "probability"
+        },
+        "y-gap": {
+          "conditional_mean_absolute_error": 0.08245818475122697,
+          "max_abs_error": "0.1",
+          "supported_observations": 192,
+          "units": "dimensionless"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 0.9698740874836912,
+        "standard_error": 0.12290605763812805,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 1.2234844200369188e-06,
+        "standard_error": 3.461325552550362e-07,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "42.55024272899998267",
+      "evidence_summary_sha256": "c63be55599c79a3c09a7ec46a20f165da561620b679e4889d8ff8442ff678370",
+      "run_id": "recursive.667c3eeedf71277a28551198",
+      "producing_commit": "a183f964b27b321770071da73f75e543e2c9078e",
+      "producing_tree": "e039873e7653aaedadec36f77a3ae00432887cfe",
+      "design_sha256": "7c1ec8fff9db820c9635f14dd8ba027effc20fb3c8aee0c740fc102e97b463ee",
+      "plan_sha256": "50452296aa1e9829cef98a9c841354282fb5613fc34de64d055a7a44473f0100",
+      "cold_read_sha256": "d0feba4adea1504f15b99bef3539fe879595296fe57b56f0908628ae75fe4d64",
+      "product_sha256": {
+        "assessment": "6cbc20170aaf2706af9a6a34a50b5af2a895363c2e78286e95e0adb97d741ffe",
+        "calibration": "61a475e8acd9041b8a3b943fb5f3a4f29e90d45a8db42555a65c0b8bbd3c5e11",
+        "forecast": "2d047756904daa73f07717c356866b22a8bf782d523e84dac045634a29f8a1aa",
+        "model": "d4aa405405ad0a731f4d8b6571233d5ecfe70c871f64a4eb3f9a72ba048e3be2",
+        "outcomes": "dab33c70ed6bb66651400fbb8e4324696d36c32a29b7dd56d881b4320b11e0f3",
+        "predictors": "6a4455535e0394eefa4bcbb432e6e1435fedb0bec21c78f3b97ce5b98fc3e316"
+      }
+    },
+    {
+      "family": "R04",
+      "entry": "COMPLETED",
+      "question": "Given a checkpoint selected only from its past, is a local, interface-augmented, remembered or joint description sufficient for conditional commitment?",
+      "source_kind": "fresh-six-matrix-q2-baoab-native-simulation",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "calibration_rows": 576,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 216,
+          "status": "supported"
+        },
+        {
+          "reason": "CONDITIONAL_NONENTRY_NO_PAST_ADMITTED_EVENT",
+          "rows": 168,
+          "status": "unsupported"
+        }
+      ],
+      "selected_description": "local",
+      "assigned_evaluation_action_menus": 64,
+      "complete_evaluation_action_menus": 36,
+      "arms_meeting_authored_criteria": [],
+      "selected_receiver_errors": {
+        "commitment": {
+          "conditional_mean_absolute_error": 1.8339188192742186e-11,
+          "max_abs_error": "0.2",
+          "supported_observations": 108,
+          "units": "probability"
+        },
+        "occupation": {
+          "conditional_mean_absolute_error": 1.8339188192742186e-11,
+          "max_abs_error": "0.2",
+          "supported_observations": 108,
+          "units": "probability"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 437500.0,
+        "standard_error": 89098.30562090465,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 437500.0,
+        "standard_error": 89098.30562090465,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "50.066461460999981457",
+      "evidence_summary_sha256": "99cb7f5f7d3e4f314b41ad44aecb2db6ad81823c4d370ad9ce778ef36ae48517",
+      "run_id": "recursive.c7beb1310ea5bf201d1776f0",
+      "producing_commit": "a183f964b27b321770071da73f75e543e2c9078e",
+      "producing_tree": "e039873e7653aaedadec36f77a3ae00432887cfe",
+      "design_sha256": "e4bbbbe1cc91ec18ec9345b713c698297ce908b0f06afca70d86dd70397e2a34",
+      "plan_sha256": "a6e85cd0c0f7aa1097c594d19e29f354c544b343e984bd5412702e6e619a22ec",
+      "cold_read_sha256": "01a377549f9f7c7a8b49058fe4e44876b7ce9bd159cf7c9fa2b7b0c64e4ab008",
+      "product_sha256": {
+        "assessment": "95ee82d67320e42e31c928aa9b66979e37b0d3d5f05942e3ced0732deea084fd",
+        "calibration": "fb6c393a2fef626bfbd36edad99fb88403fbf295022b7c5b25bcd45171144c12",
+        "forecast": "4431ace00a006d4794ae817b209b87085b5c745063ceaa6656c3fdc50014b4a2",
+        "model": "05cac57d02add6cf5fe274f6dcfd6fa16b3a699f0933e1afc55383fc6d5a3c08",
+        "outcomes": "adcbcc3718b39d8799f14a0aad5513c43fdc40914bc26525a9453ea4b2a649bc",
+        "predictors": "9707ebf19f2c3810ff4e7877957c1836577db6e248a46a060165bbcf8bdde162"
+      }
+    },
+    {
+      "family": "R05",
+      "entry": "COMPLETED",
+      "question": "Does approximate algebra persist prospectively, and which joint, interface or memory information is needed when a scalar geometry summary is inadequate?",
+      "source_kind": "fresh-six-matrix-q2-baoab-native-simulation",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "calibration_rows": 1440,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 360,
+          "status": "supported"
+        },
+        {
+          "reason": "CONDITIONAL_NONENTRY_ORIGIN_ALGEBRA_NOT_ADMITTED",
+          "rows": 600,
+          "status": "unsupported"
+        }
+      ],
+      "selected_description": "local",
+      "assigned_evaluation_action_menus": 64,
+      "complete_evaluation_action_menus": 24,
+      "arms_meeting_authored_criteria": [],
+      "selected_receiver_errors": {
+        "algebra-survival": {
+          "conditional_mean_absolute_error": 1.1016752325213966e-11,
+          "max_abs_error": "0.2",
+          "supported_observations": 72,
+          "units": "probability"
+        },
+        "associative-leakage": {
+          "conditional_mean_absolute_error": 0.00855769082163344,
+          "max_abs_error": "0.1",
+          "supported_observations": 72,
+          "units": "dimensionless"
+        },
+        "band-ratio": {
+          "conditional_mean_absolute_error": 0.07803065669701034,
+          "max_abs_error": "0.1",
+          "supported_observations": 72,
+          "units": "dimensionless"
+        },
+        "commutant-mixing": {
+          "conditional_mean_absolute_error": 0.028160801479539463,
+          "max_abs_error": "0.1",
+          "supported_observations": 72,
+          "units": "dimensionless"
+        },
+        "lie-leakage": {
+          "conditional_mean_absolute_error": 0.007797480809823366,
+          "max_abs_error": "0.1",
+          "supported_observations": 72,
+          "units": "dimensionless"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 625000.039691254,
+        "standard_error": 86951.03375184316,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 625000.0000000002,
+        "standard_error": 86951.04295503149,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "14.646339679999999828",
+      "evidence_summary_sha256": "f75cdf77734b9e9166409bdb5ea78462c2dd6954595672c6bfe1283c9e21b79d",
+      "run_id": "recursive.91c7e70b8c18c597764bcd93",
+      "producing_commit": "a183f964b27b321770071da73f75e543e2c9078e",
+      "producing_tree": "e039873e7653aaedadec36f77a3ae00432887cfe",
+      "design_sha256": "c95c997c78adc049826e688e53fbcc287eedf19c319fef6c996fa70fb8c04cbe",
+      "plan_sha256": "b3f6f646a65e18cacf576f037b9e3f83b8519ad662b224f1d8b4cb8944069880",
+      "cold_read_sha256": "b6d3a7eb54cc45c991d5ab111915b09e7de6745eb4a81f76b6b3da83111e95fe",
+      "product_sha256": {
+        "assessment": "4108e41d0ff3ad810c7019686162e7f30c95cf93b94f2cfd3a8c9b01746f67a6",
+        "calibration": "a5312c26738378b5ff2d5fbaadd3d7980d693188d8796477d3e6fcb624f60130",
+        "forecast": "941f233fa82426fc5293d6374db4b6cf2608ef94f622f288f30a832c7711b22f",
+        "model": "3d60855ee3529d6bae22d6d3c881a48cdd84db37d99970821fe8faa2799a845a",
+        "outcomes": "af96f68c5df4db6e2cdef8b4437297a1a86838afd05b592c6d4b4d3f74feb161",
+        "predictors": "6c9e1df2ed2a49d542439d0d3c5b638d3804b1da77f70b410188917805a0fcbd"
+      }
+    },
+    {
+      "family": "R06",
+      "entry": "COMPLETED",
+      "question": "When full passive response is decomposed into scalar directions, how much omitted operator coupling must be restored as interface information or memory?",
+      "source_kind": "fresh-six-matrix-q2-baoab-native-simulation",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "calibration_rows": 2880,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 1920,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "scalar",
+      "assigned_evaluation_action_menus": 64,
+      "complete_evaluation_action_menus": 64,
+      "arms_meeting_authored_criteria": [
+        "joint-operator",
+        "operator-memory",
+        "scalar"
+      ],
+      "selected_receiver_errors": {
+        "direction.00": {
+          "conditional_mean_absolute_error": 0.0006681807260080649,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.01": {
+          "conditional_mean_absolute_error": 0.001643637726450247,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.02": {
+          "conditional_mean_absolute_error": 0.00043530307865216394,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.03": {
+          "conditional_mean_absolute_error": 0.0007271993376898045,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.04": {
+          "conditional_mean_absolute_error": 0.001068146304991744,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.05": {
+          "conditional_mean_absolute_error": 0.0007340131628176178,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.06": {
+          "conditional_mean_absolute_error": 0.0006888945566062257,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.07": {
+          "conditional_mean_absolute_error": 0.0010780477229797077,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.08": {
+          "conditional_mean_absolute_error": 0.0007868807556639366,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.09": {
+          "conditional_mean_absolute_error": 0.0006857280163796446,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.10": {
+          "conditional_mean_absolute_error": 0.0010718987690040934,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.11": {
+          "conditional_mean_absolute_error": 0.0007391057417393434,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.12": {
+          "conditional_mean_absolute_error": 0.0006781925683626948,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.13": {
+          "conditional_mean_absolute_error": 0.0010731683658369092,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        },
+        "direction.14": {
+          "conditional_mean_absolute_error": 0.0006491137394994198,
+          "max_abs_error": "0.1",
+          "supported_observations": 128,
+          "units": "passive-HS-coordinate"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 0.00017583549701044224,
+        "standard_error": 2.8092574630059554e-05,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 0.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "42.65760959699999933",
+      "evidence_summary_sha256": "4ddcc2b4e69c18c22047ad2633c30a3897ab6f7a69870f426636c3b2bbf29ca8",
+      "run_id": "recursive.fa3dbeaad11ded4ff41625cf",
+      "producing_commit": "603b6e833e648e3febd2ed5fa08a6428ab29fbe8",
+      "producing_tree": "40732eabad6a5f13f0ac7a82b591baeed0edd84e",
+      "design_sha256": "2f740a6c5a768e75dba8b1715640c66cb2afa2496dae65c11663f0a8a897f825",
+      "plan_sha256": "16c2414ac399176fb1275253ab80e91032ab5311cf9023bc43ec88ac7b3d4f6c",
+      "cold_read_sha256": "ff6b3cffe61bf213b68c45246c593d03397f18e9e922d2f188720f7eeab64145",
+      "product_sha256": {
+        "assessment": "191d763720d9063d5ac364549c250731cedba40460cc4cbe31163a442495e438",
+        "calibration": "ca621d2dd075db33a1110e94c022e63286db418c98f61b7346fd406dfd3fdeb3",
+        "forecast": "256adc4eefa61c35522eab55c63c5125b4a70fad5c1e73aba86017ca4daa7b08",
+        "model": "a00599edd92bc13da4287d4d66eebfccd7f4c3bfc287c41b1ba50843e3b1d7d4",
+        "outcomes": "22884983c43b6ea06421c6b273c20d3fd1b804d9208e4971154f933363ca030e",
+        "predictors": "59264fbe494e43e62457f59fb44fb5fd45c5e3b48bf6d09ffd0ef30fff77dee9"
+      }
+    },
+    {
+      "family": "R07",
+      "entry": "COMPLETED",
+      "question": "When does a full coupled origin Hessian predict signed finite response economically better than a local scalar curvature, and can interface information repair the reduction?",
+      "source_kind": "fresh-six-matrix-q2-baoab-native-simulation",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "calibration_rows": 576,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 384,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "local-mechanism",
+      "assigned_evaluation_action_menus": 64,
+      "complete_evaluation_action_menus": 64,
+      "arms_meeting_authored_criteria": [
+        "interface-mechanism",
+        "joint-mechanism",
+        "local-mechanism",
+        "memory-mechanism"
+      ],
+      "selected_receiver_errors": {
+        "signed-response": {
+          "conditional_mean_absolute_error": 2.2473345444270025e-08,
+          "max_abs_error": "0.00005",
+          "supported_observations": 192,
+          "units": "native-HS-displacement"
+        },
+        "transverse-response": {
+          "conditional_mean_absolute_error": 3.729978231293386e-09,
+          "max_abs_error": "0.00005",
+          "supported_observations": 192,
+          "units": "native-HS-displacement"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 7.489468835735696e-07,
+        "standard_error": 2.1498426641567467e-07,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 0.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "102.40213170399998971",
+      "evidence_summary_sha256": "0ac12d80ce7afea0d818f26525f50915d2416dfdd9296e4b23844d18d6fee7f8",
+      "run_id": "recursive.e499854896f5453a021fdf8e",
+      "producing_commit": "a183f964b27b321770071da73f75e543e2c9078e",
+      "producing_tree": "e039873e7653aaedadec36f77a3ae00432887cfe",
+      "design_sha256": "fb3a756b29ac7ab7a7f5061b59b9f1e852213e8d2492d69fabc7ec772d162de8",
+      "plan_sha256": "f7228514eb044dd68a15b00112314f2e51b1030e96df1340e4ef3571a7bdf16d",
+      "cold_read_sha256": "dfa6ab14aacb198467d8b2267626fe9e0bcba5d1cbd0a85ac536cd693b5b7e9f",
+      "product_sha256": {
+        "assessment": "ddf6d12b931306ebc29715c1a0643577a3a604c3e3d78e9bba0ecd5139e12d1e",
+        "calibration": "f050b4763f862cc960e52df5f34518d3e7836472d0b44736430642d139dc9c01",
+        "forecast": "1ea86aee94cd3c84361d235ddee40c7146a758ddd5d78e6fa89a2f9e0a429442",
+        "model": "e050e3b9507a66d5ef35c51df01faf7800150b29d6cfcf63f76f70362b5f99ed",
+        "outcomes": "dd7717946d05e6200c898613f205b9a1b3e82fe824787ce73492d7d514c12c8a",
+        "predictors": "e59eebed69a10fbcf4ed0271a74e45f32b6ee0c67340fff04d1de9a7dcfa4403"
+      }
+    },
+    {
+      "family": "R08",
+      "entry": "COMPLETED",
+      "question": "Can a radial preparation-increment law remain useful after other-sector dynamics are removed, or is their influence paid as interface data, memory or error?",
+      "source_kind": "fresh-six-matrix-q2-baoab-native-simulation",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "calibration_rows": 288,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 192,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "local-mechanism",
+      "assigned_evaluation_action_menus": 64,
+      "complete_evaluation_action_menus": 64,
+      "arms_meeting_authored_criteria": [
+        "interface-mechanism",
+        "joint-mechanism",
+        "local-mechanism",
+        "memory-mechanism"
+      ],
+      "selected_receiver_errors": {
+        "radial-increment": {
+          "conditional_mean_absolute_error": 4.991220921439632e-08,
+          "max_abs_error": "0.01",
+          "supported_observations": 192,
+          "units": "native-radius-squared"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 1.3257226737179596e-10,
+        "standard_error": 4.002484334889839e-11,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 0.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "45.43500529099999794",
+      "evidence_summary_sha256": "d8dc06c7f73f03089a11f0e400c420e7f700051160ebca4a26fa85a8d5288921",
+      "run_id": "recursive.31826f8d8754fce5797375a0",
+      "producing_commit": "a183f964b27b321770071da73f75e543e2c9078e",
+      "producing_tree": "e039873e7653aaedadec36f77a3ae00432887cfe",
+      "design_sha256": "c4bba19339b64043299fe1fb896743149789e2ca84a5a8d07b533bde05dd3b9c",
+      "plan_sha256": "ab7ec79b7dfe24c4217b5c3646645221f216a7eb251b818eaa6afa27196a8932",
+      "cold_read_sha256": "80454253f7cd38d0713ae4e9e060c5dc438f4c2b29c3311f4fa96f475075b265",
+      "product_sha256": {
+        "assessment": "ded8627ce99b3aa3f62679fd7b2fbedf98ab396a4bf9af78e83cd8655fab68ca",
+        "calibration": "c811bbb3d49223584e42cab631004883eb3e971b84d1678921395a804f2d4917",
+        "forecast": "e7e3cb34b3014fed8d71c40bdba2337ef57ec77b6a47a224c9b0e2e6fa3190a4",
+        "model": "568c553e229d538691e0fee1b77c65f3190bb9a82a8d7a0011f1f7086516f3ae",
+        "outcomes": "59f6a052ed53bcf28631c109f5bcfa2840097d50574cf20edfa55fbede4fd26f",
+        "predictors": "bbbcb526ff7436513528b7e461cfbe72a34c806349a030d599c5c76c4ba333bb"
+      }
+    },
+    {
+      "family": "R09",
+      "entry": "COMPLETED",
+      "question": "Can an increment description meet absolute-state decisions without carrying its baseline and declared preparation support?",
+      "source_kind": "fresh-six-matrix-q2-baoab-native-simulation",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "calibration_rows": 288,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 192,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "interface-mechanism",
+      "assigned_evaluation_action_menus": 64,
+      "complete_evaluation_action_menus": 64,
+      "arms_meeting_authored_criteria": [
+        "interface-mechanism",
+        "joint-mechanism",
+        "memory-mechanism"
+      ],
+      "selected_receiver_errors": {
+        "absolute-position": {
+          "conditional_mean_absolute_error": 0.003254299053191315,
+          "max_abs_error": "0.1",
+          "supported_observations": 192,
+          "units": "native-HS-position"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 0.002024607954336033,
+        "standard_error": 0.0004202753233555669,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 0.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "51.89244812200002327",
+      "evidence_summary_sha256": "54a2dbdee4b3fd784361179f4ffe026f3e51f57d6d48dad25bd1da6891fb19b5",
+      "run_id": "recursive.017798a73be0525fae58bf08",
+      "producing_commit": "a183f964b27b321770071da73f75e543e2c9078e",
+      "producing_tree": "e039873e7653aaedadec36f77a3ae00432887cfe",
+      "design_sha256": "5e10f8939eb8aec7513a1f2c8d699b9a780efca71b40794e03e179f6663dae34",
+      "plan_sha256": "7c7a5f4ae3bd73f99279f2fde449e7f4934c3a6009e30ef5435468bf1c277196",
+      "cold_read_sha256": "d3918aa97618058bc00c446375b6eb6b7162ded896a06f793caf07daaf80f402",
+      "product_sha256": {
+        "assessment": "4b2874d2d2101760f24d43caa49300743e38d87558a39a17c729831b7c2bffeb",
+        "calibration": "48975433de1993dd79ec08ac56bec5817992fb0e18dbea057cc0b845079b4b34",
+        "forecast": "14c0d3abb756f68e994dc485baa114ad2929df61943bafdc9b438e654173239d",
+        "model": "1cfd14440ec3efabcc222511ccff289e506196d3b81f4f55a65c62cb9c568a12",
+        "outcomes": "cc58a688064dbe7910a15626a9fac5177eebb063cac915c3d1c8b65d80ca5a3f",
+        "predictors": "e600938126a03a144959feb12ec591c55227c27835e3b176351a902a528afa17"
+      }
+    },
+    {
+      "family": "R10",
+      "entry": "COMPLETED",
+      "question": "Can a causally forecast handoff supply the joint description needed by an unchanged lower response mechanism, and what does its decomposition cost?",
+      "source_kind": "fresh-six-matrix-q2-baoab-native-simulation",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "calibration_rows": 288,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 192,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "local-mechanism",
+      "assigned_evaluation_action_menus": 64,
+      "complete_evaluation_action_menus": 64,
+      "arms_meeting_authored_criteria": [
+        "interface-mechanism",
+        "joint-mechanism",
+        "local-mechanism",
+        "memory-mechanism"
+      ],
+      "selected_receiver_errors": {
+        "signed-response": {
+          "conditional_mean_absolute_error": 1.9616196340105766e-08,
+          "max_abs_error": "0.00005",
+          "supported_observations": 192,
+          "units": "native-HS-displacement"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 1.1453575401714244e-06,
+        "standard_error": 3.776043667065464e-07,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 0.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "64.73593010500002219",
+      "evidence_summary_sha256": "9be279d241fa1c02258c09cb8ab4d2126ab1020f0617433ee0e882c26a428a65",
+      "run_id": "recursive.ecb713eb494a4167e6ba4ac5",
+      "producing_commit": "a183f964b27b321770071da73f75e543e2c9078e",
+      "producing_tree": "e039873e7653aaedadec36f77a3ae00432887cfe",
+      "design_sha256": "b995e2a6d1a540e72aa32f6a1c5cf6946bdd999a78a20306b07e2b5080d94d9d",
+      "plan_sha256": "59ccfe6777104ba4cb66a673102b51003892d670c93c46f8bbe2732912ef1466",
+      "cold_read_sha256": "a27a21ffd616be0930a239c01a37fcd7046799cd2ef2a68bb8e3f863394c70ab",
+      "product_sha256": {
+        "assessment": "98266fa93b830b2c7238768987a08094fcc029381e2d434e645d9aa4fadc04e0",
+        "calibration": "43e3a0e96641e00b7535461138fe241944b0d9f18bbd7577c6734337d43b1147",
+        "forecast": "a131391c34e856526c0b47ebe475f437b7b386906b4872fc9d99bc6f72e57a04",
+        "model": "e9309f1360a0e582cf3d7823eba72f1bb57e82c82087403d1f2d562e27a1b4c6",
+        "outcomes": "87f146f510074244070d55545b6e11763a5285566e5f4c05f197cc2838841441",
+        "predictors": "ca8b56bff881650782765aeefed3ef08f9a2e29dc434d9844aa0121b736a14ca"
+      }
+    },
+    {
+      "family": "R11",
+      "entry": "COMPLETED",
+      "question": "Can a parent preparation supply conditions for an unchanged lower response mechanism, with interface and memory costs included?",
+      "source_kind": "fresh-six-matrix-q2-baoab-native-simulation",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "calibration_rows": 576,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 384,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "local-mechanism",
+      "assigned_evaluation_action_menus": 64,
+      "complete_evaluation_action_menus": 64,
+      "arms_meeting_authored_criteria": [
+        "interface-mechanism",
+        "joint-mechanism",
+        "local-mechanism",
+        "memory-mechanism"
+      ],
+      "selected_receiver_errors": {
+        "service": {
+          "conditional_mean_absolute_error": 0.0,
+          "max_abs_error": "0.2",
+          "supported_observations": 192,
+          "units": "probability"
+        },
+        "signed-response": {
+          "conditional_mean_absolute_error": 3.738864391745651e-08,
+          "max_abs_error": "0.00005",
+          "supported_observations": 192,
+          "units": "native-HS-displacement"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 1.2036516414539584e-06,
+        "standard_error": 3.2507982608251573e-07,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 0.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "67.17273011699999306",
+      "evidence_summary_sha256": "f6def307258697ddca99a7f1e7f4a271f346ec81cdc488b4d0dfa6cea17b54a5",
+      "run_id": "recursive.d8e6b0d0ea55eb28c9ae6b55",
+      "producing_commit": "a183f964b27b321770071da73f75e543e2c9078e",
+      "producing_tree": "e039873e7653aaedadec36f77a3ae00432887cfe",
+      "design_sha256": "3954f297528fc6b809aa3b5487730cccb24765be5eb91d974fbd348abd855bb8",
+      "plan_sha256": "7c4c22b869dd2f849befe6b95976ad8a407fbe93e506f8738ffeba2b6c63e517",
+      "cold_read_sha256": "5fef44fd1ff0dde49e4bb2b8979699918a2eaa69b4cd15cf865aa7839d9dfac1",
+      "product_sha256": {
+        "assessment": "002b07fc5969a2e0675ecd96040d9ac32c0ab9dec19d482136f3d460611f8023",
+        "calibration": "11e26a9f4f092c41f99f9252652e63362c2375948177cf9b3a32e6e11b8ceeb3",
+        "forecast": "0d83cfaeedd411c346a847c9c1db6b19a6ae53cfe04aa77090849969ed464ef4",
+        "model": "2b77651b5178b33831a466239504ab1832aeac971cb4db61026a5d255b098199",
+        "outcomes": "d845e5fdc9f0566f2c53066539d0ab9e352a7e2321550b730112d52d8bc191cf",
+        "predictors": "76f3a414b0c4c51294178a0d1f05aff2ddbbe2216901081383376d92d506cf5e"
+      }
+    },
+    {
+      "family": "R12",
+      "entry": "COMPLETED",
+      "question": "Are apparent description savings stable under physically paired native timestep refinement, including failed preparation and response outcomes?",
+      "source_kind": "fresh-six-matrix-q2-baoab-native-simulation",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "calibration_rows": 576,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 384,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "local-mechanism",
+      "assigned_evaluation_action_menus": 64,
+      "complete_evaluation_action_menus": 64,
+      "arms_meeting_authored_criteria": [
+        "interface-mechanism",
+        "joint-mechanism",
+        "local-mechanism",
+        "memory-mechanism"
+      ],
+      "selected_receiver_errors": {
+        "service": {
+          "conditional_mean_absolute_error": 0.0,
+          "max_abs_error": "0.2",
+          "supported_observations": 192,
+          "units": "probability"
+        },
+        "signed-response": {
+          "conditional_mean_absolute_error": 3.3405014615376654e-08,
+          "max_abs_error": "0.00005",
+          "supported_observations": 192,
+          "units": "native-HS-displacement"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 1.0396617291532164e-06,
+        "standard_error": 3.000748934984683e-07,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 0.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "107.23670101600000763",
+      "evidence_summary_sha256": "4c9913ecf9501eae7eb428ea671839c5e1224514e037453a7cf263608ed539d4",
+      "run_id": "recursive.37b05bd8d22ee677856e93c7",
+      "producing_commit": "a183f964b27b321770071da73f75e543e2c9078e",
+      "producing_tree": "e039873e7653aaedadec36f77a3ae00432887cfe",
+      "design_sha256": "1b401a9d8cf0deb8ca1783fac4597b757a688b4357959ab351ee9cb392e4bcdd",
+      "plan_sha256": "cfb571f676578452b3409ff15d13d30d44fe7b7cd8138eadbb57ef47ce5642e1",
+      "cold_read_sha256": "4ffd1985ed9f5116b3340faec43b9f4592849b94fafe6c6eda2d8b33e54f6fe5",
+      "product_sha256": {
+        "assessment": "2ce83b9be5342c178332854bdf7efb5b7e1b63e46311f7b359d537d9473ecbfd",
+        "calibration": "2e4ce32c8e141ff17a5466dbe7e319f5850adf51f1e6598419a5b92433e208a2",
+        "forecast": "54d7e8e13f1885b1734035ba8021a47e10103edbd5fdac5cbc5aa8bd8a87058a",
+        "model": "9090bf9a982f6f6aa3c3693f3f2f72ae91c1831f5e47b5ee6db49616654c2b0c",
+        "outcomes": "08b4693bf0e65ae3a5f427e7e46b787fef776f4b8744a66aefecd995ce70c147",
+        "predictors": "cd0837f0eee294488e5d76d50940ce361e09ffc34568cbb6dbaa58c9afbf15ea"
+      }
+    },
+    {
+      "family": "R13",
+      "entry": "COMPLETED",
+      "question": "Which preparation, history and current-action coordinates preserve useful firing-rate selection?",
+      "source_kind": "recorded-archive",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "calibration_rows": 72,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 14,
+          "status": "supported"
+        },
+        {
+          "reason": "UNLOGGED_ACTION_NO_COUNTERFACTUAL",
+          "rows": 22,
+          "status": "unsupported"
+        }
+      ],
+      "selected_description": "minimal",
+      "assigned_evaluation_action_menus": 12,
+      "complete_evaluation_action_menus": 0,
+      "arms_meeting_authored_criteria": [],
+      "selected_receiver_errors": {
+        "firing_rate_hz": {
+          "conditional_mean_absolute_error": 1.6373725628017703,
+          "max_abs_error": "2",
+          "supported_observations": 14,
+          "units": "Hz"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 6,
+        "mean": 611111.465639964,
+        "standard_error": 55555.5858070768,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 6,
+        "mean": 1000000.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "0.0889492050000000322",
+      "evidence_summary_sha256": "e7f5bee80da709a6aeb445222100d2a0454712dc71c20d35d2b9a8300cf1e329",
+      "run_id": "recursive.76484564a478ff8470031a22",
+      "producing_commit": "21da716d9a17cfec2230194541854ccd16011441",
+      "producing_tree": "f94381066c43689c814fabcc27cd6b0482dacfda",
+      "design_sha256": "e43bb7eedd77b1c711fee90fcdd77fcee0cbc3b58ff138b3e9c47eca58f18894",
+      "plan_sha256": "8256167263ba5605e1db2918a1fd3b6679dbef18902323aa82c088f4c405cd6c",
+      "cold_read_sha256": "c850e9b63854590682ff1ef37c95115b14aa76da79a6a2f9b1ef5b5b2d07f240",
+      "product_sha256": {
+        "assessment": "eb0d5e5fd15a661b6186c63f03560142624be57dc42996c071a5468c0bf7fafe",
+        "calibration": "4a3a44fc5a81190d9892643424a34420ac1f75225caa869b309492b538ab6e36",
+        "forecast": "b42f3398ce9bc1c7d5e270e78cdc566e53589140e5218cd3c95be6650afbc44c",
+        "model": "693b73647536d3a357f08a1f512f70c7202c2766364c5e690088799c35c191d5",
+        "outcomes": "eedeea7033c1e06af99f0a77b7a5eed4019079a12a3286402c0b8bcaeba9b8da",
+        "predictors": "99328a09e4dd8bc386e7769c5f3f374b3e9f6db1d6c951b188d6d48e22b020dc"
+      }
+    },
+    {
+      "family": "R14",
+      "entry": "BLOCKED_BEFORE_ACQUISITION",
+      "question": "How much state, history and action-sign information is required for useful mirror displacement predictions?",
+      "acquired_calibration_roots": 0,
+      "acquired_evaluation_roots": 0,
+      "primary_result": null,
+      "preparation_sha256": "10f7754a9efb8680875a11f8aa050a5090391a8bba4d0e908d2d6c9554b55993",
+      "design_review_sha256": "73e0a116732219118d63e03e1745f5e8bc2de5070170c9ca6f749327f039ddbb"
+    },
+    {
+      "family": "R15",
+      "entry": "COMPLETED",
+      "question": "Which joint description maintains voltage and capacity error promises across recorded cells?",
+      "source_kind": "recorded-archive",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "calibration_rows": 144,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 24,
+          "status": "supported"
+        },
+        {
+          "reason": "UNLOGGED_ACTION_NO_COUNTERFACTUAL",
+          "rows": 48,
+          "status": "unsupported"
+        }
+      ],
+      "selected_description": "interface",
+      "assigned_evaluation_action_menus": 12,
+      "complete_evaluation_action_menus": 0,
+      "arms_meeting_authored_criteria": [],
+      "selected_receiver_errors": {
+        "discharge_capacity_ah": {
+          "conditional_mean_absolute_error": 9.894311339022436e-06,
+          "max_abs_error": "0.005",
+          "supported_observations": 12,
+          "units": "A.h"
+        },
+        "terminal_voltage_v": {
+          "conditional_mean_absolute_error": 0.013070943005531244,
+          "max_abs_error": "0.05",
+          "supported_observations": 12,
+          "units": "V"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 6,
+        "mean": 666666.6918381404,
+        "standard_error": 0.01695940838963806,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 6,
+        "mean": 1000000.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "0.1852065929999999736",
+      "evidence_summary_sha256": "5aeca8e929f755ef8d75941cc24f1f76a5d0b16643ead8e6001180db0a72a521",
+      "run_id": "recursive.6e69227b6e0ffd986a8260f3",
+      "producing_commit": "51bd67bc2d0235603eb5c2c685710a4aa02c5110",
+      "producing_tree": "21ee548c0192c5bb63dc9cf6712365341ba44a96",
+      "design_sha256": "c80a2668d22edf821b56c13737f2a8c5307dc97c273c1bf37e6fcaadcf16610c",
+      "plan_sha256": "77bad9cc74cb8a1a9cdfb0bf4f4d407df75cd1e89bdda70f9511748255aae92c",
+      "cold_read_sha256": "1241f9fcb3d382cb39cf17b36949d7cf7fb674b55b89254f728c83680cada8a6",
+      "product_sha256": {
+        "assessment": "359062de5011750c41f077df90d1ec75aa266f8651f89ac7f6973ed15d8cec7d",
+        "calibration": "55e730599c244f683ad29fe26f9d1513589a78defa473d2f0f1d310a7bac2e29",
+        "forecast": "744ae9c996123b211e303bbec976f4347c31e8d2b7cb213222374f6cc82a2f02",
+        "model": "aca0e214b415b0b7483cce717434a7d1efe3226d49a226a167138ba8e9b93404",
+        "outcomes": "fbfaefcf91aa25233b74c644b8d6d0b6b423722e7c64ebeeb3c237762f2e71c0",
+        "predictors": "96d4e235a5d10f265e07b3410c28d10d2a7c73946f606962d1f0a2fd646aea6c"
+      }
+    },
+    {
+      "family": "R16",
+      "entry": "BLOCKED_BEFORE_ACQUISITION",
+      "question": "Which state and interface coordinates preserve the complex divertor response across requested modulation frequencies?",
+      "acquired_calibration_roots": 0,
+      "acquired_evaluation_roots": 0,
+      "primary_result": null,
+      "preparation_sha256": "542612b13068fb055cf4d23221d8aa788fb8b4415dd139dd8b615ccabbb18275",
+      "design_review_sha256": "dd83cff13fa0c6a755608b13c0c941e56d954a5db2aa4a59bd47333ae780e147"
+    },
+    {
+      "family": "R17",
+      "entry": "COMPLETED",
+      "question": "How much coupled preparation information is needed to forecast and select effective heating actions in Gym-TORAX?",
+      "source_kind": "fresh-native-simulation",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "calibration_rows": 72,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 36,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "minimal",
+      "assigned_evaluation_action_menus": 12,
+      "complete_evaluation_action_menus": 12,
+      "arms_meeting_authored_criteria": [
+        "additive",
+        "interface",
+        "joint",
+        "minimal"
+      ],
+      "selected_receiver_errors": {
+        "fusion_gain": {
+          "conditional_mean_absolute_error": 0.0004448196722092935,
+          "max_abs_error": "1",
+          "supported_observations": 36,
+          "units": "dimensionless"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 6,
+        "mean": 3.0739311076678235e-07,
+        "standard_error": 8.127212731264028e-08,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 6,
+        "mean": 1.8125163750076778e-05,
+        "standard_error": 1.0385223922249967e-06,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "119.8254121240000051600",
+      "evidence_summary_sha256": "a65e0ec931ce163748c82aee9cbe8dd55b25434dcc4269f3867561dedc2328a8",
+      "run_id": "recursive.c534a7284ec2ee992a166d9c",
+      "producing_commit": "21da716d9a17cfec2230194541854ccd16011441",
+      "producing_tree": "f94381066c43689c814fabcc27cd6b0482dacfda",
+      "design_sha256": "9cfa25822262d669b6724d3d244a64d3fae9128dfb318730b71c25c52041ebb0",
+      "plan_sha256": "a65908f26b8e67d0d8f8efe49eb77750ca3daece9367b02f4f384f9e5de1038c",
+      "cold_read_sha256": "ef27f2b0aa3bd1f98684a9db4ee3e3c07819210921d702b54f6f5b14a6a5a578",
+      "product_sha256": {
+        "assessment": "3a83c645f7ec079c61c7bd5066033cd5b14be4f53c35fad0ae41f92def213b72",
+        "calibration": "9d2dc118f06604510569d6d3615e7004fbf35b9435cfc9f46421572eb42c7d18",
+        "forecast": "93366743036d599af43704993c541725a8ed668b7a9ad399ebf0b7b6633a0adb",
+        "model": "fac1a8a3d81275fff5c60b8d1dc4056898a36fed41b4884ca06408b238650c5d",
+        "outcomes": "53d1056423342542da90696f8bebc430d79d25ce10ed59e7bdf8c6d16570638c",
+        "predictors": "8aa9b304658a807b9ca644b2d39e013c598e32c401635ac722bd6ee1b79c498e"
+      }
+    },
+    {
+      "family": "R18",
+      "entry": "COMPLETED",
+      "question": "Which preparation/history description supports useful current-action selection without violating voltage or temperature limits?",
+      "source_kind": "fresh-native-simulation",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "calibration_rows": 216,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 108,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "additive",
+      "assigned_evaluation_action_menus": 12,
+      "complete_evaluation_action_menus": 12,
+      "arms_meeting_authored_criteria": [
+        "additive",
+        "interface",
+        "joint"
+      ],
+      "selected_receiver_errors": {
+        "discharge_capacity_ah": {
+          "conditional_mean_absolute_error": 0.0046293595904045035,
+          "max_abs_error": "0.005",
+          "supported_observations": 36,
+          "units": "A.h"
+        },
+        "peak_temperature_k": {
+          "conditional_mean_absolute_error": 0.0039044602141507945,
+          "max_abs_error": "1",
+          "supported_observations": 36,
+          "units": "K"
+        },
+        "terminal_voltage_v": {
+          "conditional_mean_absolute_error": 0.0038276995048607265,
+          "max_abs_error": "0.05",
+          "supported_observations": 36,
+          "units": "V"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 6,
+        "mean": 0.3628558171960873,
+        "standard_error": 0.0005211140910772903,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 6,
+        "mean": 0.004294110594198773,
+        "standard_error": 0.0027646421691693494,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "37.2848461890000048937",
+      "evidence_summary_sha256": "ba3c035822e63246ed67783778257fdaa9c3d851abe83633b3f5e1c348f9d1a4",
+      "run_id": "recursive.aa0bc8eca69c43d645a2bf60",
+      "producing_commit": "21da716d9a17cfec2230194541854ccd16011441",
+      "producing_tree": "f94381066c43689c814fabcc27cd6b0482dacfda",
+      "design_sha256": "905abb5731ea480d0b34c8682975729dc2031b0f602387c71eea5da7b2c09d5d",
+      "plan_sha256": "3c2d1878bb62271fcc4f1359da2359198d000e25f8a7e7acfaeedcc891edeb6f",
+      "cold_read_sha256": "6efb680cf6ea4ebc58c2f720fb07388539be753bac8104b4568d8975757b66a5",
+      "product_sha256": {
+        "assessment": "902738ce5b1cf1c024ad03579b9831b0c7c6628d5449c87a45087183f064b28d",
+        "calibration": "5e0082d9204563167c90e2d0b0a49c251dbb9395b933cd6c54acb54b3c290661",
+        "forecast": "334f5065ac02a28f1c6617446bb63ff6c728289505bee8c621094fb131e91ab4",
+        "model": "11bbdef99e075642d9f4306025f88bf04ef245b1c70a2325b6d780f94f8fd5c4",
+        "outcomes": "e68a99b8fa64af9adfded0f69c17d07e6e27484bf45f9742440c24642b23bbfd",
+        "predictors": "460a979b4632adc35bdacdb196de6b9f339362e02554071dca56970be3bf4111"
+      }
+    },
+    {
+      "family": "R19",
+      "entry": "COMPLETED",
+      "question": "When does an SPMe continuation preserve the DFN voltage/temperature promise, and where do state/history omissions cause costly error?",
+      "source_kind": "fresh-native-simulation",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "calibration_rows": 144,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 72,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "minimal",
+      "assigned_evaluation_action_menus": 12,
+      "complete_evaluation_action_menus": 12,
+      "arms_meeting_authored_criteria": [
+        "additive",
+        "interface",
+        "joint",
+        "minimal"
+      ],
+      "selected_receiver_errors": {
+        "temperature_reduction_defect_k": {
+          "conditional_mean_absolute_error": 5.866524192419333e-05,
+          "max_abs_error": "0.5",
+          "supported_observations": 36,
+          "units": "K"
+        },
+        "voltage_reduction_defect_v": {
+          "conditional_mean_absolute_error": 2.7149534719102466e-05,
+          "max_abs_error": "0.02",
+          "supported_observations": 36,
+          "units": "V"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 6,
+        "mean": 1.8289046669125028e-06,
+        "standard_error": 1.117057080898437e-06,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 6,
+        "mean": 1.864383317156587e-05,
+        "standard_error": 3.899485594076558e-06,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "81.2513663969999912549",
+      "evidence_summary_sha256": "fbba3ce943f9a3d44638d25e45d35f644661ed02384696413b148e860ab4a43d",
+      "run_id": "recursive.ea886702cd17b20ab5f17136",
+      "producing_commit": "21da716d9a17cfec2230194541854ccd16011441",
+      "producing_tree": "f94381066c43689c814fabcc27cd6b0482dacfda",
+      "design_sha256": "31aab013fb8f479cd7d95144bbd92161b49d5b3947c210ac1b758e7c14df90de",
+      "plan_sha256": "861c5f415fe59aa441a9abffb95acdfa65018ddedffa0649dab1946fc780c1c9",
+      "cold_read_sha256": "ad418a39fb0a93ca2ff779308e347920e02e3e8fff5ae058de84b426243ab741",
+      "product_sha256": {
+        "assessment": "4d8042aa5fb6a689a1fb9c0535751cea2aaa8f37f69035f6c0fbfa85b2e162f4",
+        "calibration": "e1083339a8707f832f97c3626935f1d63a541d1c1dcf07309e90c210137e8d81",
+        "forecast": "deead6e467aea8148dbadb475de5e94153fbd35901c3cdc3fb4bb4cfcb81295d",
+        "model": "bce7457f4981963e729d172df4dd5723a9fa563fcfe75754c1ee7baa8fe0e303",
+        "outcomes": "07d5a59176411f1000271c88929f153e2d542690a4af4ad41a84df64b3afbfe7",
+        "predictors": "72b5eef472e6b02a6013207b03647ace2e92df4388f590a18cbd71ea3b376385"
+      }
+    },
+    {
+      "family": "R20",
+      "entry": "COMPLETED",
+      "question": "Which observed description supports prospective response prediction and economically useful bounded action selection?",
+      "source_kind": "pinned-native-reactor-action-panel",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "calibration_rows": 1296,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 864,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "partitioned",
+      "assigned_evaluation_action_menus": 96,
+      "complete_evaluation_action_menus": 96,
+      "arms_meeting_authored_criteria": [
+        "interface",
+        "joint",
+        "memory",
+        "partitioned"
+      ],
+      "selected_receiver_errors": {
+        "conversion_b": {
+          "conditional_mean_absolute_error": 0.004241177288717082,
+          "max_abs_error": "0.03",
+          "supported_observations": 288,
+          "units": "1"
+        },
+        "delivered_mass_kg": {
+          "conditional_mean_absolute_error": 9.522307508092912e-05,
+          "max_abs_error": "0.1",
+          "supported_observations": 288,
+          "units": "kg"
+        },
+        "peak_temperature_k": {
+          "conditional_mean_absolute_error": 0.0791216340369522,
+          "max_abs_error": "1",
+          "supported_observations": 288,
+          "units": "K"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 0.020822513822189543,
+        "standard_error": 0.004750637634527151,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 0.0009242028984078332,
+        "standard_error": 4.057557375121381e-05,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "124.81556339600001590",
+      "evidence_summary_sha256": "d5ffafe8d14d0fae608633282c86e86d3a258c325b2239d1b0d6f91dc51343f4",
+      "run_id": "recursive.3c8e30c5e15c024f4a77758e",
+      "producing_commit": "a183f964b27b321770071da73f75e543e2c9078e",
+      "producing_tree": "e039873e7653aaedadec36f77a3ae00432887cfe",
+      "design_sha256": "54142f9fb302c5ed9c8ee61664faf7dacac9b67ceb95a220d6e9f713d124b7b5",
+      "plan_sha256": "e2c2a602a8ff5757b61ee0d50206d0dff1e320b8df8cab4df64e3241af67b5b6",
+      "cold_read_sha256": "a611309af511d07ba3229dc5d355fbb753d18fa500934f78bf4fa6b991fe6d2e",
+      "product_sha256": {
+        "assessment": "dce6305b6fb80641a8f7a390a01e874fb5e7cc0a08e5335decaedf06354260d2",
+        "calibration": "96ff72fb915e17b72e94e571f34c9f875994d7ca9002548b14b14e97713457e0",
+        "forecast": "fcf36fefe02a3f9b16a05cd4fb9a7ac0bb2f0e567a84bcd3c106e26facb9691e",
+        "model": "c26a10aa5d7b1910f603b8ac74ffdfa13512f113b16764f74c48a194fb09b2b2",
+        "outcomes": "133154b46f5c6b388025f10d75ea43b94f992cd6a8165397820c684f34f8a0a9",
+        "predictors": "e206ef441e8b60f50fea6b417c6f05a4316d835e114a57d657664d9e28a436d5"
+      }
+    },
+    {
+      "family": "R21",
+      "entry": "COMPLETED",
+      "question": "On identical fresh reactor roots, do interface or memory descriptions preserve policy utility under switching preparation history?",
+      "source_kind": "pinned-native-reactor-action-panel",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "calibration_rows": 1296,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 864,
+          "status": "supported"
+        }
+      ],
+      "selected_description": "memory",
+      "assigned_evaluation_action_menus": 96,
+      "complete_evaluation_action_menus": 96,
+      "arms_meeting_authored_criteria": [
+        "interface",
+        "joint",
+        "memory",
+        "partitioned"
+      ],
+      "selected_receiver_errors": {
+        "conversion_b": {
+          "conditional_mean_absolute_error": 0.019720680719676136,
+          "max_abs_error": "0.03",
+          "supported_observations": 288,
+          "units": "1"
+        },
+        "delivered_mass_kg": {
+          "conditional_mean_absolute_error": 0.013333333334454293,
+          "max_abs_error": "0.1",
+          "supported_observations": 288,
+          "units": "kg"
+        },
+        "peak_temperature_k": {
+          "conditional_mean_absolute_error": 0.1692663664140562,
+          "max_abs_error": "1",
+          "supported_observations": 288,
+          "units": "K"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 32,
+        "mean": 0.3251214265859773,
+        "standard_error": 0.061153366954071246,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 32,
+        "mean": 0.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "367.3127594789999667",
+      "evidence_summary_sha256": "a4ac34f5936c93f46ab6e82cd34d49fb7404b7f465c9670833682963ca038466",
+      "run_id": "recursive.f63a4517ca2fe1c9be754782",
+      "producing_commit": "a183f964b27b321770071da73f75e543e2c9078e",
+      "producing_tree": "e039873e7653aaedadec36f77a3ae00432887cfe",
+      "design_sha256": "38718d075fc4c3a337f73535b875b7609cb7ea91aabe9c1e8b152da9423a370d",
+      "plan_sha256": "33fa12bb999295efeede091eab3473377dacfb715a11baf94bf09036b9d87fc7",
+      "cold_read_sha256": "7cab4d065df0bd77a7640506e2a216993703f0121950bf0d5ea96418a6eb7bee",
+      "product_sha256": {
+        "assessment": "bb270ac841f225aca8913e07e1dc9095324f42ec82b9342c4e47670783792014",
+        "calibration": "89bc12559f87146603bb772fca296409196045d2c348a899c9700f1097fd66e5",
+        "forecast": "9adcc522e7ca43c9f03f037a046b571b1f1092e58356949ebd5248da646e2dc3",
+        "model": "cee2bd8a8c306b99982b27259816d4d4f6003e8c3c360bd7f4c7897e45af764a",
+        "outcomes": "1cbf91c5600b9a1b4c99c326b2d549af3285fcddef60a639ff14ec99bf53baa6",
+        "predictors": "8202c1e13e35d67bfddcce2d3447c31bede74a34900a7bdb1e8914febb307704"
+      }
+    },
+    {
+      "family": "R22",
+      "entry": "COMPLETED",
+      "question": "Which recorded-state information and declared transport assumptions preserve separate physical and simulated heating-response predictions?",
+      "source_kind": "archive-and-native",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "calibration_rows": 144,
+      "evaluation_census": [
+        {
+          "reason": "",
+          "rows": 36,
+          "status": "supported"
+        },
+        {
+          "reason": "MEASURED_NBI_MATCHES_NO_FULL_PREFIX_FOR_OPTION",
+          "rows": 36,
+          "status": "unsupported"
+        }
+      ],
+      "selected_description": "minimal",
+      "assigned_evaluation_action_menus": 12,
+      "complete_evaluation_action_menus": 0,
+      "arms_meeting_authored_criteria": [],
+      "selected_receiver_errors": {
+        "archive_temperature_change_ev": {
+          "conditional_mean_absolute_error": null,
+          "max_abs_error": "20",
+          "supported_observations": 0,
+          "units": "eV"
+        },
+        "simulator_temperature_change_ev": {
+          "conditional_mean_absolute_error": 318.2459167592822,
+          "max_abs_error": "20",
+          "supported_observations": 36,
+          "units": "eV"
+        }
+      },
+      "selected_all_use_normalized_loss": {
+        "independent_roots": 6,
+        "mean": 500194.0564416623,
+        "standard_error": 89.96248557711368,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "selected_paired_regret": {
+        "independent_roots": 6,
+        "mean": 1000000.0,
+        "standard_error": 0.0,
+        "uncertainty": "standard error over independent roots; no asymptotic coverage guarantee"
+      },
+      "original_cpu_seconds": "57.095458028999995839",
+      "evidence_summary_sha256": "8414fdb47d938c9ee5c1f058a5408f3fce39bd2af658be523944bc2e53824ab3",
+      "run_id": "recursive.efe4d83057606769d9d5423e",
+      "producing_commit": "d9093e5b58e37160713cce62319c38cdb4b35149",
+      "producing_tree": "cae52760e1d66869f495dfc8cc152c2c6907e390",
+      "design_sha256": "5aea86b1283193b7a4c0f8c0550c44a96c53a80c1463b5a91d3a9fcb3a9e619b",
+      "plan_sha256": "c25bfcde9d47246798bac747397d6fbe62e533ff65ed2708d8adba2b703bd203",
+      "cold_read_sha256": "2859a48cf7975add3801d2056538ffb331a2bacbf4df888bc330becdf66b90e3",
+      "product_sha256": {
+        "assessment": "3bb85561a9d1978d198efccdd41f04fcd28283f926de587fb955a32808382673",
+        "calibration": "0c8886bfc77aa3222ca7d6b1fe5bb03163a2ec02e0e7f02b573e64d54af27955",
+        "forecast": "cf3d986ef593aa61d879b4dd36c1a48d48d634cbd9d66f26610fb12b8566d9ca",
+        "model": "cf9c644d21a0fead140cbde20d0ce17055a7b1ff9a46afec80d7e40f656d9c40",
+        "outcomes": "d65fd97f4253821ceed7fbbfd39fb1c98ad9e416159e4eb94af4bda9e8091d05",
+        "predictors": "9f5285d7dd8510eada8514963019e72a39b2a40e5fbdfb846247ec5540a96c1e"
+      }
+    }
+  ]
+}

@@ -13,9 +13,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure import source_origin
-from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.storage import source_origin
+from empirical_lawhood.storage.study_issue import GitStudySourceClosureInspector
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,9 +23,9 @@ PROBE = """
 import json
 from pathlib import Path
 import sys
-from empirical_lawhood.infrastructure.source_closure import capture_target_closure
-from empirical_lawhood.infrastructure.source_origin import require_executing_target_source
-from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
+from empirical_lawhood.storage.source_closure import capture_target_closure
+from empirical_lawhood.storage.source_origin import require_executing_target_source
+from empirical_lawhood.storage.study_issue import GitStudySourceClosureInspector
 root = Path(sys.argv[1]); require_executing_target_source(root)
 captured = capture_target_closure(root, 'synthetic.actual-source-positive')
 assert GitStudySourceClosureInspector(root).observe(captured.closure) == captured.closure

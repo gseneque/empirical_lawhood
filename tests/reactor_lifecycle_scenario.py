@@ -21,28 +21,25 @@ for _variable in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS",
 
 from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import AssignedReactorAuthoringProfile
 from empirical_lawhood.api.reactor_preissue import prove_fresh_reactor
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.assigned import ReactorPrefixAssignedUnit, ReactorPrefixAssignment, ReactorPrefixPriorCensus
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.panel import SCENARIOS
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_assigned import ReactorPrefixAssignedUnit, ReactorPrefixAssignment, ReactorPrefixPriorCensus
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_panel import SCENARIOS
 from empirical_lawhood.api.reactor_authoring import author_fresh_reactor
 from empirical_lawhood.api.composition import create_cli_api
 from empirical_lawhood.api.models import assemble_issued_study_package
 from empirical_lawhood.api.results import AssembleExperimentPackageRequest, CompileCampaignRequest, IssueStudyRequest, IssueExtensionsRequest, ResumeCampaignRequest, RunCampaignRequest
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.packaged_source import load_packaged_reactor_source
-from empirical_lawhood.infrastructure.authority import Ed25519ApprovalAttestationSigner
-from empirical_lawhood.infrastructure.study_issue import PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_ISSUE_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID
-from empirical_lawhood.kernel.authority import AuthorityAction
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.approval import (
-    ApprovalCheckerRegistration, ApprovalCheckerRegistry, ApprovalGateKind,
-    ApprovalSignatureAlgorithm, AttestationResult, issue_approval_gate_attestation,
-)
-from empirical_lawhood.planning.study_issue import AccountableHumanIdentity, HumanProposerAttestation, ImplementationSourceClosure, SourceClosureKind, StudyAuthorityKind, StudyOperationAuthority
-from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCompilationReport
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile, resolve_external_root_contract
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.authority import Ed25519ApprovalAttestationSigner
+from empirical_lawhood.storage.study_issue import PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_ISSUE_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID
+from empirical_lawhood.science.identity.authority import AuthorityAction
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.approval import ApprovalCheckerRegistration, ApprovalCheckerRegistry, ApprovalGateKind, ApprovalSignatureAlgorithm, AttestationResult, issue_approval_gate_attestation
+from empirical_lawhood.design.study_issue import AccountableHumanIdentity, HumanProposerAttestation, ImplementationSourceClosure, SourceClosureKind, StudyAuthorityKind, StudyOperationAuthority
+from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCompilationReport
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile, resolve_external_root_contract
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
 from empirical_lawhood.api.reactor_source_provenance import authenticate_reactor_authoring_source
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan
+from empirical_lawhood.execution.plans import CandidateExecutionPlan
 from scripts.operator_records import (
     authorize_reviewed, export_record, freeze_for_review, identity, open_stores,
     publish_reviewed_authority, read_record,
@@ -204,28 +201,13 @@ def scenario(repo, trust_dir, storage, mount, catalog_relative_path, *, scale=Fa
     preview = preview_result.payload
     assert not preview.confirmed and preview.external_bytes_written == 0 and snapshot(storage) == before
     if scale:
-        from empirical_lawhood.runtime.study_issue import MAX_ISSUE_PAYLOAD_BYTES
         assert len(census.prior_unit_ids) == 20_000 and len(census.prior_seed_ids) == 230_000
         assert len(census.authoring_seed_ids) == 130_000
         roundtrip = read_record(directory / "profile.json", AssignedReactorAuthoringProfile)
         assert roundtrip.prior_census == census
-        assert all(0 < member.size_bytes <= MAX_ISSUE_PAYLOAD_BYTES for member in preview.manifest.members)
-        assert proof["issue_authoring_member_byte_ceiling"] == MAX_ISSUE_PAYLOAD_BYTES
-        # The next byte above the real production bound must be refused by proof
-        # before it decodes, creates a provider, or writes another control record.
-        member = directory / "base-authoring.json"
-        original = member.read_bytes()
-        with member.open("wb") as stream:
-            stream.truncate(MAX_ISSUE_PAYLOAD_BYTES + 1)
-        try:
-            prove_fresh_reactor(repo_root=repo, storage_profile=profile, directory=directory,
-                               approval_checker_trust_path=trust, catalog_relative_path=catalog_relative_path)
-        except ValueError as error:
-            assert str(error) == "REACTOR_AUTHORING_EXCEEDS_PRODUCTION_ISSUE_BYTE_BOUND"
-        else:
-            raise AssertionError("production authoring member byte limit was not enforced")
-        member.write_bytes(original)
-        print("realistic census and production member bounds verified", proof["issue_authoring_member_bytes"], flush=True)
+        assert all(member.size_bytes > 0 for member in preview.manifest.members)
+        assert proof["issue_authoring_member_byte_ceiling"] is None
+        print("realistic census and observed member sizes verified", proof["issue_authoring_member_bytes"], flush=True)
         return
     issued_base = checked(api.issue_study(replace(request, confirmed=True)))
     base_publication = stores.publisher.load_study(issued_base.manifest.issue_id)

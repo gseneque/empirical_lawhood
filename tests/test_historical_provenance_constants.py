@@ -11,18 +11,15 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.physical.mast_archive_response_qualification import development
+import empirical_lawhood.domains.fusion.mast_archive_response_qualification.development as development
 from empirical_lawhood.api import rc_authoring
-from empirical_lawhood.infrastructure.campaign_elapsed_budgets import (
-    CampaignElapsedBudgetConflict,
-    ExternalCampaignElapsedBudgetStore,
-)
+from empirical_lawhood.execution.resources.campaign_elapsed_budgets import CampaignElapsedBudgetConflict, ExternalCampaignElapsedBudgetStore
 
 
 def _partition_leaf():
     # Full deferred-family import requires optional scikit-learn. Execute its
     # exact pure leaf with its real enum/constants, without selecting a model.
-    root = Path(__file__).resolve().parents[1] / "src/empirical_lawhood/adapters/reference_worlds/material_family_discovery"
+    root = Path(__file__).resolve().parents[1] / "src/empirical_lawhood/domains/reference_worlds/material_family_discovery"
     contract = ast.parse((root / "contracts.py").read_text())
     source = ast.parse((root / "worlds.py").read_text())
     selected = [node for node in contract.body if isinstance(node, ast.ClassDef) and node.name == "MaterialFamilyDiscoveryPhase" or isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id in {"UNPARTITIONED_CANDIDATE_ALGORITHM_ID", "PHASE_DISJOINT_CANDIDATE_ALGORITHM_ID"} for target in node.targets)]

@@ -9,13 +9,13 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import eligibility as eligibility
-from empirical_lawhood.adapters.methods.matrix_parameter_response import paired_grid
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.experimental_matching import MatchedArmDesign
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-from empirical_lawhood.runtime.experimental_matching import validate_matched_arms
+from empirical_lawhood.domains.matrix.matrix_factor_response import eligibility as eligibility
+from empirical_lawhood.domains.matrix.matrix_parameter_response import paired_grid
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.experiments.experimental_matching import MatchedArmDesign
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
+from empirical_lawhood.execution.experimental_matching import validate_matched_arms
 from tests.test_matrix_factor_confirmation_eligibility import (
     provenance as provenance, publish, stock as stock,
 )

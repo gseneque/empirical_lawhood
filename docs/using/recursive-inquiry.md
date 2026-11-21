@@ -19,6 +19,13 @@ exposed three-member roster through this same route. It preserves partial and
 rejected members, unknown covariance and a conditional numerical evidence
 ceiling; it supplies no mutation-to-kinetics or nomination authority.
 
+The separate [Rubisco preparation-response route](../../programmes/biology/photosynthesis/workflows/rubisco-response/preparation-response-v1.md)
+uses the same inquiry services for bounded checkpoint, diagnostic, assessment and destination-supply waves.
+Its typed preparers derive the complete selected draft and input origins from original evidence.
+Its operator recipe composes shared commitment and successor services; it does not introduce another execution architecture.
+Component acceptance and an actual unentered successor are retained, while complete installed/deployment acceptance and molecular findings remain pending.
+The original root's HOLD and later owner-directed ACT retain their distinct decisions and evidence scopes.
+
 Authoring refuses a preparation outside the assigned roster or a repeated native acquisition slot.
 Fixed scientific operations also refuse unsupported quantities, units, receivers, times or criteria.
 Use the [extension guide](../development/extending-the-engine.md#bind-scientific-units-and-effect-slots) when a new question needs another registered operation.
@@ -137,6 +144,12 @@ with invented values.
 The [robust policy contract](../development/recursive-inquiry-policy.md) defines the current version-three request with version-two specification, menu and policy.
 It binds target requirements, compatible stock, supplier alternatives, uncertainty and actual independent assessment.
 Its branch stop retains unresolved target requirements.
+An assessed target finding requires a registered independent assessor for the exact claim revision.
+The service binds its assessment contract, scope, evidence, receipt, independent units and evidence ceiling.
+Commitment and current readback repeat this semantic check.
+Raw sources, supplied procedures and a declared `SATISFIED` value cannot establish target satisfaction.
+The material assessor supports its exact analytic use claim only.
+Physical application claims remain unresolved without their own assessment owner.
 Historical version-1 records keep their exact original bytes and scientific scope.
 Historical robust version-two requests cannot be freshly committed or admitted.
 Read retained version-two decisions with `campaign recursive-inquiry-result
@@ -156,18 +169,18 @@ uv run --no-sync python - <<'PY'
 from decimal import Decimal
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.analytic_material_inquiry import policy_binding as binding
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.native_quickstart import UniformElectronGasAnalyticReferenceConfig
+from empirical_lawhood.domains.materials.analytic_material_inquiry import policy_binding as binding
+from empirical_lawhood.domains.materials.electron_gas.native_quickstart import UniformElectronGasAnalyticReferenceConfig
 from empirical_lawhood.api.codecs import load_registered_authoring
 from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
 from empirical_lawhood.api.recursive_authoring import author_recursive_wave, load_authored_wave
 from empirical_lawhood.api.recursive_inquiry import project_inquiry_state
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_inquiry import identity
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile, resolve_external_root_contract
-from empirical_lawhood.runtime.recursive_inquiry import InquiryStateSources, InquiryWaveSource, WorkBoundInquiryDecisionRequest
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_inquiry import identity
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, resolve_external_root_contract
+from empirical_lawhood.execution.recursive_inquiry import InquiryStateSources, InquiryWaveSource, WorkBoundInquiryDecisionRequest
 
 project = Path('/selected/checkout').resolve(strict=True)
 profile = load_registered_authoring(Path('/work/operator-profile.json'),
@@ -313,8 +326,8 @@ from hashlib import sha256
 from io import BytesIO
 import json
 import tarfile
-from empirical_lawhood.adapters.methods.rubisco_inquiry import policy_binding as binding
-from empirical_lawhood.adapters.methods.rubisco_combinations.source_binding import (
+from empirical_lawhood.domains.rubisco.rubisco_inquiry import policy_binding as binding
+from empirical_lawhood.domains.rubisco.rubisco_combinations.source_binding import (
     GENBANK_SOURCE_SHA256, WILSON_SOURCE_SHA256, TeParentGenbankInputV1, WilsonArticleInputV1)
 
 fixture = project / 'tests/fixtures/rubisco/nomination'
@@ -421,11 +434,11 @@ sources or issue/reveal rights for a real prospective study.
 
 | Entry and current status | Exact input and draft owner | Scientific protocol and retained boundary |
 |---|---|---|
-| Rubisco portfolio — COMPLETED, two pure operations | [`SourceAudit` and `source_audit_from_bytes(raw_sources, candidate_ids=...)`](../../src/empirical_lawhood/adapters/methods/rubisco_portfolio_inquiry/science.py) authenticate all 34 selected original/dependency members; [`supply_draft(source)` and `use_draft(supplier, instance, parent=manifest)`](../../src/empirical_lawhood/adapters/methods/rubisco_portfolio_inquiry/recursive_translation.py) bind source construction and distinct later assessment. | The [portfolio selection](../../programmes/biology/photosynthesis/records/rubisco-portfolio-selection.md) owns the 32 exact biological hypotheses, observed whole-effect support and joint-target queries. Unknown Gp endpoints stay unknown; nonextrapolative support failure does not reject all descendants or mechanisms. |
-| Rubisco gas cycle — COMPLETED, three pure operations | [`MechanismSourceAudit` and `source_audit_from_bytes(raw_sources)`](../../src/empirical_lawhood/adapters/methods/rubisco_cycle_constraints/contracts.py) authenticate the two exact primary mechanism files; [`instance_from_source`, `supply_draft`, `use_draft` and `reuse_draft`](../../src/empirical_lawhood/adapters/methods/rubisco_cycle_constraints/recursive_translation.py) bind actual assessed procedures and distinct source-bound queries. | The [broad programme protocol](../../programmes/biology/photosynthesis/records/rubisco-broad-programme-protocol.md) owns the declared reversible topology, complete latent/query census and five selected hypotheses. Hypothetical microscopic rates are mathematical witnesses, not measured candidate effects or biological qualification. |
-| Battery thermal inquiry — repair supplier COMPLETED, reference precision UNEVALUABLE | [`BatteryInquirySource`](../../src/empirical_lawhood/adapters/methods/battery_thermal_inquiry/contracts.py) pins the separate protocol and installed native-source bytes; [`supply_draft`, `use_draft` and `reuse_draft`](../../src/empirical_lawhood/adapters/methods/battery_thermal_inquiry/recursive_translation.py) bind the native procedure, later instance and actual prior-use assessment. | The [thermal inquiry selection](../../programmes/energy/battery-charging/records/battery-thermal-inquiry-selection.md) owns the 2.5 Ah operational-SOC endpoint, three guarded CC/CV recipes and development 5/25/35°C. All 36 forecasts returned; all nine reference pairs failed precision. The later 20°C and subsequent 30°C uses remain UNENTERED. One exposed family, zero physical units. |
-| Rubisco exploratory nomination — preparation and terminal audit complete | [`NominationPreparationSource`](../../src/empirical_lawhood/adapters/methods/rubisco_nomination_preparation/contracts.py) and [`preparation_draft`](../../src/empirical_lawhood/adapters/methods/rubisco_nomination_preparation/recursive_translation.py) bind the original macro SOURCE and actual earlier cycle-use OUTCOME. | The [nomination selection](../../programmes/biology/photosynthesis/records/rubisco-nomination-preparation-selection.md) records the actual PURE receipt, separate dossier-scope terminal STOP, independent audit and complete eight-section review packet. Exact proposed Gp I95M material, full construction sequences, conditional/adverse rationale and paired assay are prepared. Mutant biology, actual construction, all 24 preparations/assays and external submission remain UNENTERED. |
-| Battery component precision — entered, unknown completion | [`DiagnosticSource`](../../src/empirical_lawhood/adapters/methods/battery_dfn_precision_diagnostic/contracts.py) and [`diagnostic_draft`](../../src/empirical_lawhood/adapters/methods/battery_dfn_precision_diagnostic/recursive_translation.py) retain the exact negative procedure as a DESIGN_OPERAND contribution and MODEL input, with an explicit evidential requirement. | The [component selection](../../programmes/energy/battery-charging/records/battery-dfn-precision-diagnostic-selection.md) owns twelve forecasts and nine single-factor precision comparisons. Its actual native attempt retains BLOCKED/unknown-completion after a global host OOM kill, with no returned scientific result. Forecast/subcall counts remain unknown. It does not qualify the full development roster or later use/reuse. |
+| Rubisco portfolio — COMPLETED, two pure operations | [`SourceAudit` and `source_audit_from_bytes(raw_sources, candidate_ids=...)`](../../src/empirical_lawhood/domains/rubisco/rubisco_portfolio_inquiry/science.py) authenticate all 34 selected original/dependency members; [`supply_draft(source)` and `use_draft(supplier, instance, parent=manifest)`](../../src/empirical_lawhood/domains/rubisco/rubisco_portfolio_inquiry/recursive_translation.py) bind source construction and distinct later assessment. | The [portfolio selection](../../programmes/biology/photosynthesis/records/rubisco-portfolio-selection.md) owns the 32 exact biological hypotheses, observed whole-effect support and joint-target queries. Unknown Gp endpoints stay unknown; nonextrapolative support failure does not reject all descendants or mechanisms. |
+| Rubisco gas cycle — COMPLETED, three pure operations | [`MechanismSourceAudit` and `source_audit_from_bytes(raw_sources)`](../../src/empirical_lawhood/domains/rubisco/rubisco_cycle_constraints/contracts.py) authenticate the two exact primary mechanism files; [`instance_from_source`, `supply_draft`, `use_draft` and `reuse_draft`](../../src/empirical_lawhood/domains/rubisco/rubisco_cycle_constraints/recursive_translation.py) bind actual assessed procedures and distinct source-bound queries. | The [broad programme protocol](../../programmes/biology/photosynthesis/records/rubisco-broad-programme-protocol.md) owns the declared reversible topology, complete latent/query census and five selected hypotheses. Hypothetical microscopic rates are mathematical witnesses, not measured candidate effects or biological qualification. |
+| Battery thermal inquiry — repair supplier COMPLETED, reference precision UNEVALUABLE | [`BatteryInquirySource`](../../src/empirical_lawhood/domains/battery/battery_thermal_inquiry/contracts.py) pins the separate protocol and installed native-source bytes; [`supply_draft`, `use_draft` and `reuse_draft`](../../src/empirical_lawhood/domains/battery/battery_thermal_inquiry/recursive_translation.py) bind the native procedure, later instance and actual prior-use assessment. | The [thermal inquiry selection](../../programmes/energy/battery-charging/records/battery-thermal-inquiry-selection.md) owns the 2.5 Ah operational-SOC endpoint, three guarded CC/CV recipes and development 5/25/35°C. All 36 forecasts returned; all nine reference pairs failed precision. The later 20°C and subsequent 30°C uses remain UNENTERED. One exposed family, zero physical units. |
+| Rubisco exploratory nomination — preparation and terminal audit complete | [`NominationPreparationSource`](../../src/empirical_lawhood/domains/rubisco/rubisco_nomination_preparation/contracts.py) and [`preparation_draft`](../../src/empirical_lawhood/domains/rubisco/rubisco_nomination_preparation/recursive_translation.py) bind the original macro SOURCE and actual earlier cycle-use OUTCOME. | The [nomination selection](../../programmes/biology/photosynthesis/records/rubisco-nomination-preparation-selection.md) records the actual PURE receipt, separate dossier-scope terminal STOP, independent audit and complete eight-section review packet. Exact proposed Gp I95M material, full construction sequences, conditional/adverse rationale and paired assay are prepared. Mutant biology, actual construction, all 24 preparations/assays and external submission remain UNENTERED. |
+| Battery component precision — entered, unknown completion | [`DiagnosticSource`](../../src/empirical_lawhood/domains/battery/battery_dfn_precision_diagnostic/contracts.py) and [`diagnostic_draft`](../../src/empirical_lawhood/domains/battery/battery_dfn_precision_diagnostic/recursive_translation.py) retain the exact negative procedure as a DESIGN_OPERAND contribution and MODEL input, with an explicit evidential requirement. | The [component selection](../../programmes/energy/battery-charging/records/battery-dfn-precision-diagnostic-selection.md) owns twelve forecasts and nine single-factor precision comparisons. Its actual native attempt retains BLOCKED/unknown-completion after a global host OOM kill, with no returned scientific result. Forecast/subcall counts remain unknown. It does not qualify the full development roster or later use/reuse. |
 
 The actual `rubisco-broad01` continuation completed portfolio supply/use and
 cycle supply/use/reuse with zero native contacts. The portfolio retained 32
@@ -469,8 +482,8 @@ and imports no native simulator:
 ```bash
 uv run --no-sync python - <<'PY'
 from pathlib import Path
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import BatteryInquirySource
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.recursive_translation import supply_draft
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquirySource
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.recursive_translation import supply_draft
 
 source = BatteryInquirySource()
 selected = Path('/work/thermal-selection')
@@ -480,7 +493,7 @@ PY
 ```
 
 For Rubisco, provide the selected complete raw-byte mapping to its source builder;
-the [portfolio member manifest](../../src/empirical_lawhood/adapters/methods/rubisco_portfolio_inquiry/source_manifest.py)
+the [portfolio member manifest](../../src/empirical_lawhood/domains/rubisco/rubisco_portfolio_inquiry/source_manifest.py)
 and cycle source contract own exact member names, sizes and hashes. A summary,
 fixture or source-path list cannot replace those bytes. The cycle successor must
 also bind its authenticated macroparameter source and exact candidate/reference
@@ -578,11 +591,12 @@ Run and read Wave B with the same development commands shown above.
 The portable packet includes its original authoring, source binding, products and receipt closure.
 The importer authenticates that closure without visiting the producer directory or running a simulator.
 
-The current development handoff binds one imported contribution parent per wave.
-Its transitive receipt closure may retain earlier ancestors; cycles refuse.
-There is no fixed ancestry-depth ceiling. Multiple independent parent imports in one wave are outside
-this first implementation. Shared suppliers and joins within a wave retain their
-separate declared graph contracts.
+Development authoring supports multiple imported contribution parents through the Python API's `contribution_dirs` tuple.
+Each parent retains its exact manifest, producing receipts and complete transitive custody closure.
+Explicit input origins bind each selected operand to its parent, product, receipt and permitted role.
+The importer refuses missing parents, duplicate selections, cycles and substituted scientific scopes.
+There is no fixed two-parent or ancestry-depth limit.
+The CLI's `--contribution-dir` option selects one parent.
 
 The battery example first investigates an exact-state continuation procedure.
 Its later wave applies that procedure to a new preparation and acquires voltage
@@ -598,6 +612,72 @@ inputs and instance products have different permissions. An exposed development
 result remains non-promotable qualification evidence after export. A developed
 procedure may motivate a frozen candidate evaluated on separately eligible new
 evidence through the existing prospective lifecycle.
+
+### Import two exact parents
+
+Select a domain-authored draft and its explicit input-origin record before this command.
+The example draft declares two contribution parents and has no separate source inputs.
+Its registered consumer must accept both scientific operands and assess their joined use.
+Copy both complete contribution directories under the selected guarded root.
+Replace the paths below with those selected files and storage profile.
+
+```sh
+uv run --no-sync python - <<'PY'
+from pathlib import Path
+
+from empirical_lawhood.api.codecs import load_registered_authoring
+from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
+from empirical_lawhood.api.recursive_authoring import author_recursive_wave
+from empirical_lawhood.api.recursive_contributions import authenticate_recursive_parents
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.science.inquiry.recursive_inquiry import identity
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigins
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, resolve_external_root_contract
+
+project = Path('/selected/checkout').resolve(strict=True)
+profile = load_registered_authoring(Path('/work/operator-profile.json'),
+    root_schemas={OperatorStorageProfile.SCHEMA: OperatorStorageProfile})
+contract = resolve_external_root_contract(profile, repo_root=project, home_root=Path.home())
+plane = ExternalArtifactPlane(GuardedExternalRoot(contract), integration_artifact_profile_validators())
+draft = load_registered_authoring(Path('/work/selected-join.json'),
+    root_schemas={RecursiveStudyDraft.SCHEMA: RecursiveStudyDraft})
+origins = load_registered_authoring(Path('/work/selected-join-origins.json'),
+    root_schemas={RecursiveInputOrigins.SCHEMA: RecursiveInputOrigins})
+origins.validate_draft(draft)
+parents = tuple(plane.root.resolve(name, for_write=False)
+                for name in ('contribution-a', 'contribution-b'))
+authenticated = authenticate_recursive_parents(
+    draft=draft, artifact_writer=plane, directories=parents)
+for _, _, manifest, _, _, _ in authenticated:
+    print(identity(manifest, manifest.contribution_id).to_document())
+report = author_recursive_wave(
+    draft=draft, origins=origins, contribution_dirs=parents,
+    project_root=project, artifact_writer=plane,
+    output_dir=plane.root.resolve('joined-wave', for_write=True))
+print(report['authoring_dir'])
+PY
+```
+
+Authentication compares complete canonical manifests with `draft.contribution_parents`.
+The printed identities include each original schema, revision, identifier and fingerprint.
+Directory order does not change canonical parent order.
+Select `contribution_dirs` or `contribution_dir`, never both.
+For separate source operands, add their exact `input_bindings` and retain their declared `SOURCE` origins.
+Parent-produced bytes cannot be relabelled as a source input.
+
+Use the returned authoring directory with `campaign recursive-development-run` and `campaign recursive-development-result` above.
+Authoring itself acquires no scientific observations.
+Export with `campaign recursive-contribution --authoring-dir PATH --output-dir NEW_PATH` after the selected wave completes.
+Multiple parents use `parent-closures.json`; singleton packets retain `parent-closure.json`.
+Export retains every direct parent and includes shared custody paths once.
+After relocation, authenticate the complete exported directory before use.
+
+Custody authentication establishes record ownership and integrity.
+Heterogeneous scientific composition still requires a suitable registered domain assessment owner.
+Different scopes require an explicit compatibility assessment at the consumer boundary.
+Neither shared ancestry nor successful import supplies compatibility, qualification or fresh independent units.
+The [multiple-parent controls](../../tests/test_recursive_multiple_parents.py) exercise authoring, execution, refusal, export and relocated readback.
 
 ## Author a different topology or retain a stop
 

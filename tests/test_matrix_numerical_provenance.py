@@ -11,12 +11,12 @@ import pytest
 
 from empirical_lawhood.api import finite_operands, matrix_history_analysis
 from empirical_lawhood.api import matrix_numerical_provenance as provenance
-from empirical_lawhood.infrastructure import numerical_provenance as observation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.storage import numerical_provenance as observation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_matrix_operand_transport import allocation
-from tests.numerical_provenance_fixtures import numerical_plane
+from tests.numerical_provenance_fixtures import numerical_plane, selected_test_mount
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -31,6 +31,26 @@ def plane(tmp_path):
     diagnostic = selected.root.diagnostic()
     assert diagnostic.read_ready and diagnostic.write_ready, diagnostic
     return selected
+
+
+def test_disposable_storage_checks_the_selected_mount_before_creating_its_root(tmp_path, monkeypatch):
+    destination = tmp_path / "new-root"
+    monkeypatch.setenv("EL_TEST_EXTERNAL_MOUNT", str(tmp_path / "missing-mount"))
+    with pytest.raises(ValueError, match="select pytest basetemp"):
+        numerical_plane(destination)
+    assert not destination.exists()
+
+    monkeypatch.delenv("EL_TEST_EXTERNAL_MOUNT")
+    with pytest.raises(ValueError, match="actual external test mount"):
+        selected_test_mount(Path("/"), external=True)
+    alias = tmp_path / "alias"
+    alias.symlink_to(tmp_path, target_is_directory=True)
+    with pytest.raises(ValueError, match="symbolic links"):
+        numerical_plane(alias / destination.name)
+    assert not destination.exists()
+    observed = selected_test_mount(destination)
+    monkeypatch.setenv("EL_TEST_EXTERNAL_MOUNT", str(observed))
+    assert numerical_plane(destination).root.contract.required_mount_path == str(observed)
 
 
 def test_complete_source_inventory_has_no_additional_size_or_count_ceiling(tmp_path):
@@ -92,7 +112,7 @@ def invocation(route, destination, writer, monkeypatch):
             allocation_id="test.runtime.allocation", namespace="test.runtime", master_seed=865)
         config = matrix_history_analysis.prepare_matrix_history_source_configuration(
             config_id="test.runtime.history", allocation=inputs, repo_root=ROOT)
-        monkeypatch.setattr("empirical_lawhood.adapters.simulators.six_matrix_response.history_source.acquire_history", producer)
+        monkeypatch.setattr("empirical_lawhood.domains.matrix.six_matrix_response.history_source.acquire_history", producer)
         return lambda: matrix_history_analysis.produce_matrix_histories(config=config, allocation=inputs,
             writer=writer, relative_root="source", repo_root=ROOT, root_indices=(0,))
     inputs = allocation(24 if route == "fixed24" else 2)
@@ -103,7 +123,7 @@ def invocation(route, destination, writer, monkeypatch):
         "empirical-lawhood/methods/finite-response-law/original-finite-response-law", "1.0.0", "a" * 64))
     config = finite_operands.prepare_matrix_source_configuration(config_id="test.runtime.source",
         allocation=inputs, original_f=lower if route == "fixed24" else None, project_root=ROOT)
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source.acquire_current_preparation_root", producer)
+    monkeypatch.setattr("empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source.acquire_current_preparation_root", producer)
     if route == "fixed24":
         return lambda: finite_operands.current_preparation_source_export(destination, config=config,
             allocation=inputs, original_f=lower, project_root=ROOT, artifact_writer=writer)
@@ -152,10 +172,10 @@ def test_complete_producing_manifest_and_reader_environment_are_distinct(monkeyp
     record = provenance.capture_matrix_provenance(project_root=ROOT)
     names = {name for name, _ in record.package_sources}
     assert {
-        "adapters/simulators/six_matrix_response/gradients.py",
-        "adapters/simulators/six_matrix_response/model.py",
-        "adapters/simulators/six_matrix_response/response_hessian.py",
-        "adapters/methods/prepared_response/projection.py",
+        "domains/matrix/six_matrix_response/gradients.py",
+        "domains/matrix/six_matrix_response/model.py",
+        "domains/matrix/six_matrix_response/response_hessian.py",
+        "domains/matrix/prepared_response/projection.py",
     } <= names
     assert record.code_sources_sha256 == provenance.numerical_package_code_sha256()
     import subprocess
@@ -166,9 +186,7 @@ def test_complete_producing_manifest_and_reader_environment_are_distinct(monkeyp
 
 
 def test_native_completion_authenticates_provenance_without_reacquisition(tmp_path, monkeypatch, plane):
-    from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source_records import (
-        CurrentPreparationNativeCell, CurrentPreparationRootReport, current_preparation_cell_ids,
-    )
+    from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source_records import CurrentPreparationNativeCell, CurrentPreparationRootReport, current_preparation_cell_ids
     inputs = allocation(2)
     config = finite_operands.prepare_matrix_source_configuration(config_id="test.completed.source",
         allocation=inputs, project_root=ROOT)
@@ -178,7 +196,7 @@ def test_native_completion_authenticates_provenance_without_reacquisition(tmp_pa
         report = CurrentPreparationRootReport(root.root_id, ObjectIdentity.from_record(root.root_id, root),
             config.identity, cells, "UNEVALUABLE", "SYNTHETIC_SOFTWARE_FIXTURE")
         return SimpleNamespace(report=report, arrays={"x": np.zeros((24, 2))})
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source.acquire_current_preparation_root", exposed_mock_producer)
+    monkeypatch.setattr("empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source.acquire_current_preparation_root", exposed_mock_producer)
     directory = Path(plane.root.contract.canonical_path) / "completed"
     directory.mkdir()
     manifest = finite_operands.matrix_preparation_source_export(directory, config=config, allocation=inputs,

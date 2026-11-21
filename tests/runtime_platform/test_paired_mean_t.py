@@ -6,11 +6,7 @@ from fractions import Fraction
 
 import pytest
 
-from empirical_lawhood.runtime.experimental_statistics import (
-    PairedMeanTAlternative as Alternative,
-    PairedMeanTDisposition as Disposition,
-    paired_mean_t,
-)
+from empirical_lawhood.methods.statistics.experimental_statistics import PairedMeanTAlternative as Alternative, PairedMeanTDisposition as Disposition, paired_mean_t
 
 
 def calculate(values, *, null=Fraction(0), alternative=Alternative.TWO_SIDED_POINT_NULL):

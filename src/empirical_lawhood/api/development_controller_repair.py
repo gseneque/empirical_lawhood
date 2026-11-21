@@ -3,22 +3,20 @@
 
 from hashlib import sha256
 
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, validate_stable_id
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.development_controller_repair import (
-    DevelopmentControllerRepair, DevelopmentControllerRepairRecoveryIndex,
-)
-from empirical_lawhood.runtime.execution import OperationalFailureClass
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex, TaskRecoveryDisposition
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.development_controller_repair import DevelopmentControllerRepair, DevelopmentControllerRepairRecoveryIndex
+from empirical_lawhood.execution.execution import OperationalFailureClass
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex, TaskRecoveryDisposition
 
-from .development_output_repair import _pin
-from .retained_e3_control_repair import _read_record, observe_frozen_repair_worker, observe_frozen_worker_package_root
+from empirical_lawhood.api.development_output_repair import _pin
+from empirical_lawhood.api.retained_e3_control_repair import _read_record, observe_frozen_repair_worker, observe_frozen_worker_package_root
 
 
 def repair_relative_path(run_id):
@@ -28,15 +26,10 @@ def repair_relative_path(run_id):
 
 def require_scientific_source(worker, controller):
     """Frozen science and registry; programme continuation metadata may change."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import require_numerical_source_continuity
-    require_numerical_source_continuity(worker, controller)
-    metadata = frozenset(('adapters/methods/matrix_researcher_programme/source_continuation.py',
-        'adapters/methods/matrix_researcher_programme/extension_bundle.py'))
-    for prefix in ('adapters/', 'kernel/'):
-        old = {key: value for key, value in worker.package_sources if key.startswith(prefix) and key not in metadata}
-        new = {key: value for key, value in controller.package_sources if key.startswith(prefix) and key not in metadata}
-        if not old or old != new:
-            raise PermissionError('development controller repair changes original scientific source: ' + prefix)
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import (
+        CONTROLLER_REPAIR_METADATA, require_development_repair_source,
+    )
+    require_development_repair_source(worker, controller, mutable_metadata=CONTROLLER_REPAIR_METADATA)
 
 
 def _contacts(writer, plan):
@@ -45,9 +38,9 @@ def _contacts(writer, plan):
 
 
 def _original_census(*, writer, plan, predecessor, output_bytes, require_absent, repair_index=None):
-    from .recursive_execution import _custody_control_pins
-    from .recursive_operations import operation_catalog
-    from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog, SQLiteOperationalRepository
+    from empirical_lawhood.api.recursive_execution import _custody_control_pins
+    from empirical_lawhood.api.recursive_operations import operation_catalog
+    from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog, SQLiteOperationalRepository
 
     if type(predecessor) is not DevelopmentRunRecoveryIndex:
         raise PermissionError('development controller repair requires the original development index')
@@ -190,7 +183,7 @@ def select_development_controller_repair(*, writer, plan, predecessor):
 
 
 def publish_development_controller_repair(*, writer, repair, index):
-    from .recursive_execution import _custody_control_pins
+    from empirical_lawhood.api.recursive_execution import _custody_control_pins
     if type(index) is not DevelopmentControllerRepairRecoveryIndex or index.repair != repair:
         raise PermissionError('development controller repair changes its derived index')
     if _custody_control_pins(writer, index.predecessor) != repair.original_controls:
@@ -234,10 +227,10 @@ def repair_report(index):
 def recover_development_controller(*, service, directory, run_id, output_bytes,
         owner_instruction_sha256, worker_interpreter, worker_source_root,
         maximum_parallel_tasks, read_access=None):
-    from .recursive_authoring import implementation_binding, load_authored_wave
-    from .recursive_execution import _retained_plans, run_recursive_wave
-    from empirical_lawhood.infrastructure.run_source_admission import _capture_source
-    from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
+    from empirical_lawhood.api.recursive_authoring import implementation_binding, load_authored_wave
+    from empirical_lawhood.api.recursive_execution import _retained_plans, run_recursive_wave
+    from empirical_lawhood.storage.run_source_admission import _capture_source
+    from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
 
     writer = service.artifact_writer
     _, draft, source, payloads = load_authored_wave(directory=directory, artifact_writer=writer,

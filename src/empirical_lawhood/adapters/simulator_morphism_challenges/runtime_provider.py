@@ -1,8 +1,10 @@
 """Closed runtime-provider binding for all four simulator morphism challenges phase DAGs."""
 
 from __future__ import annotations
+from empirical_lawhood.domains.history.simulator_morphism_challenges.record_registry import _RECORD_TYPES
 
-from empirical_lawhood.adapters.history_budget_scientific_inputs import HistoryBudgetUnitScientificInput, require_history_budget_unit_inputs
+
+from empirical_lawhood.domains.history.history_budget_scientific_inputs import HistoryBudgetUnitScientificInput, require_history_budget_unit_inputs
 
 from dataclasses import dataclass, fields
 from decimal import Decimal
@@ -11,79 +13,62 @@ from typing import Any, Mapping, TypeVar, cast
 
 from threadpoolctl import threadpool_limits  # type: ignore[import-untyped]
 
-from empirical_lawhood.adapters.methods.simulator_morphism_challenges.inference import synthesize_recurrence
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    canonical_json_bytes,
-    validate_sha256,
-)
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-)
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-    lineage_parent_sort_key,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityManifest, CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-    TaskProgressEmitter,
-)
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.plans import ScientificInputRole
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
+from empirical_lawhood.domains.history.simulator_morphism_challenges.inference import synthesize_recurrence
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes, validate_sha256
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck, lineage_parent_sort_key
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner, TaskProgressEmitter
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.plans import ScientificInputRole
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .authoring import ARRAY_PAYLOAD_SCHEMA, CONFIG_MEDIA_TYPE, DEVELOPMENT_REPORTER_KEY, SimulatorMorphismChallengeExternalRecord, REPORTER_KEY, VERSION, simulator_morphism_challenges_phase_registry, protocol_template, scientific_graph
-from .conformance import audit_source_firewall, merge_canary_reports, run_cross_implementation_conformance, run_generator_canary, run_observer_canary, run_resource_canary
-from .contracts import SimulatorMorphismChallengeConfig, SimulatorMorphismChallengeMethodFreeze, SimulatorMorphismChallengePhase, SimulatorMorphismChallengeRecurrenceResult, SimulatorMorphismChallengeSeedRosterCommitment, SimulatorMorphismChallengeTerminal, SimulatorMorphismChallengeTerminalCloseout
-from .descriptors import deterministic_development_seed
-from .runtime_contracts import SimulatorMorphismChallengeAdjudicationBundle, SimulatorMorphismChallengeArrayManifest, SimulatorMorphismChallengeBootstrapSummary, SimulatorMorphismChallengeCanaryReport, SimulatorMorphismChallengeDenominatorBundle, SimulatorMorphismChallengeDevelopmentGate, SimulatorMorphismChallengeDevelopmentLedger, SimulatorMorphismChallengeEvaluationDesignFreeze, SimulatorMorphismChallengeGeneratorBundle, SimulatorMorphismChallengeHistoryBundle, SimulatorMorphismChallengeNominationFreeze, SimulatorMorphismChallengeObserverBundle, SimulatorMorphismChallengePhaseCloseout, SimulatorMorphismChallengeRequestedUnitLedger, SimulatorMorphismChallengeSeedRoster
-from .workflow import adjudication_bundle, create_seed_roster, denominator_bundle, development_ledger, evaluate_development_gate, freeze_evaluation_design, freeze_method, freeze_nominations, generator_bundle, history_bundle, receipt_closure_sha256, requested_unit_ledger, targeter_bundle, validate_seed_roster_commitment
-from .capability_configs import CAPABILITY_CONFIG_TYPES, RCChallengeCapabilityConfig
+from empirical_lawhood.domains.history.simulator_morphism_challenges.authoring import ARRAY_PAYLOAD_SCHEMA, CONFIG_MEDIA_TYPE, DEVELOPMENT_REPORTER_KEY, SimulatorMorphismChallengeExternalRecord, REPORTER_KEY, VERSION, simulator_morphism_challenges_phase_registry, protocol_template, scientific_graph
+from empirical_lawhood.adapters.simulator_morphism_challenges.conformance import audit_source_firewall, merge_canary_reports, run_cross_implementation_conformance, run_generator_canary, run_observer_canary, run_resource_canary
+from empirical_lawhood.domains.history.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeConfig, SimulatorMorphismChallengeMethodFreeze, SimulatorMorphismChallengePhase, SimulatorMorphismChallengeRecurrenceResult, SimulatorMorphismChallengeSeedRosterCommitment, SimulatorMorphismChallengeTerminal, SimulatorMorphismChallengeTerminalCloseout
+from empirical_lawhood.domains.history.simulator_morphism_challenges.descriptors import deterministic_development_seed
+from empirical_lawhood.domains.history.simulator_morphism_challenges.runtime_contracts import SimulatorMorphismChallengeAdjudicationBundle, SimulatorMorphismChallengeArrayManifest, SimulatorMorphismChallengeBootstrapSummary, SimulatorMorphismChallengeCanaryReport, SimulatorMorphismChallengeDenominatorBundle, SimulatorMorphismChallengeDevelopmentGate, SimulatorMorphismChallengeEvaluationDesignFreeze, SimulatorMorphismChallengeGeneratorBundle, SimulatorMorphismChallengeHistoryBundle, SimulatorMorphismChallengeNominationFreeze, SimulatorMorphismChallengeObserverBundle, SimulatorMorphismChallengePhaseCloseout, SimulatorMorphismChallengeRequestedUnitLedger, SimulatorMorphismChallengeSeedRoster
+from empirical_lawhood.domains.history.simulator_morphism_challenges.workflow import adjudication_bundle, denominator_bundle, development_ledger, evaluate_development_gate, freeze_evaluation_design, freeze_method, freeze_nominations, generator_bundle, history_bundle, receipt_closure_sha256, requested_unit_ledger, targeter_bundle, validate_seed_roster_commitment
+from empirical_lawhood.adapters.simulator_morphism_challenges.workflow import create_seed_roster
+from empirical_lawhood.domains.history.simulator_morphism_challenges.capability_configs import CAPABILITY_CONFIG_TYPES, RCChallengeCapabilityConfig
 
 
-SIMULATOR_MORPHISM_CHALLENGE_SOURCE_CLOSURE_PATHS = ('src/empirical_lawhood/adapters/history_budget_fixed_scientific_inputs.py',
- 'src/empirical_lawhood/adapters/history_budget_scientific_inputs.py',
- 'src/empirical_lawhood/adapters/history_budget_seed_constants.py',
- 'src/empirical_lawhood/adapters/methods/rc_challenges/executable_binding.py',
- 'src/empirical_lawhood/adapters/methods/rc_challenges/extension_bundle.py',
- 'src/empirical_lawhood/adapters/methods/simulator_morphism_challenges/evaluator.py',
- 'src/empirical_lawhood/adapters/methods/simulator_morphism_challenges/inference.py',
- 'src/empirical_lawhood/adapters/methods/simulator_morphism_challenges/observer.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/array_io.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/authoring.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/capability_configs.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/composition.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/conformance.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/contracts.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/descriptors.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/executable_binding.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/extension_bundle.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/issued_inputs.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/numeric_inputs.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/prerequisites.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/retained_results.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/runtime_contracts.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/runtime_provider.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/specification.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/study_authoring.py',
- 'src/empirical_lawhood/adapters/simulator_morphism_challenges/workflow.py',
- 'src/empirical_lawhood/adapters/simulators/rc_ladder_morphism_challenges/generator.py')
+SIMULATOR_MORPHISM_CHALLENGE_SOURCE_CLOSURE_PATHS = (
+    'src/empirical_lawhood/adapters/simulator_morphism_challenges/composition.py',
+    'src/empirical_lawhood/adapters/simulator_morphism_challenges/conformance.py',
+    'src/empirical_lawhood/adapters/simulator_morphism_challenges/extension.py',
+    'src/empirical_lawhood/adapters/simulator_morphism_challenges/input_custody.py',
+    'src/empirical_lawhood/adapters/simulator_morphism_challenges/numeric_inputs.py',
+    'src/empirical_lawhood/adapters/simulator_morphism_challenges/runtime_provider.py',
+    'src/empirical_lawhood/adapters/simulator_morphism_challenges/workflow.py',
+    'src/empirical_lawhood/domains/circuits/rc_ladder_morphism_challenges/generator.py',
+    'src/empirical_lawhood/domains/circuits/reference_oracles.py',
+    'src/empirical_lawhood/domains/history/history_budget_fixed_scientific_inputs.py',
+    'src/empirical_lawhood/domains/history/history_budget_scientific_inputs.py',
+    'src/empirical_lawhood/domains/history/history_budget_seed_constants.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/array_codec.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/authoring.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/capability_configs.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/contracts.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/descriptors.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/evaluator.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/inference.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/issued_inputs.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/numeric_inputs.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/numeric_publications.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/observer.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/prerequisites.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/record_registry.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/retained_results.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/runtime_contracts.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/specification.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/study_authoring.py',
+    'src/empirical_lawhood/domains/history/simulator_morphism_challenges/workflow.py',
+)
 
 
 def _closure_digest(source_files: Mapping[str, bytes], paths: tuple[str, ...]) -> str:
@@ -128,46 +113,22 @@ def implementation_closures(
         complete_sha256=source_closure_sha256(source_files),
         observer_sha256=_closure_digest(
             source_files,
-            ('src/empirical_lawhood/adapters/methods/simulator_morphism_challenges/observer.py', 'src/empirical_lawhood/adapters/history_budget_scientific_inputs.py',),
+            ('src/empirical_lawhood/domains/history/simulator_morphism_challenges/observer.py', 'src/empirical_lawhood/domains/history/history_budget_scientific_inputs.py',),
         ),
         generator_sha256=_closure_digest(
             source_files,
-            ('src/empirical_lawhood/adapters/simulators/rc_ladder_morphism_challenges/generator.py',),
+            ('src/empirical_lawhood/domains/circuits/rc_ladder_morphism_challenges/generator.py',),
         ),
         evaluator_sha256=_closure_digest(
             source_files,
             (
-                'src/empirical_lawhood/adapters/methods/simulator_morphism_challenges/evaluator.py',
-                'src/empirical_lawhood/adapters/methods/simulator_morphism_challenges/inference.py',
+                'src/empirical_lawhood/domains/history/simulator_morphism_challenges/evaluator.py',
+                'src/empirical_lawhood/domains/history/simulator_morphism_challenges/inference.py',
             ),
         ),
     )
 
 
-_RECORD_TYPES: dict[str, type[CanonicalRecord]] = {
-    SimulatorMorphismChallengeAdjudicationBundle.SCHEMA: SimulatorMorphismChallengeAdjudicationBundle,
-    SimulatorMorphismChallengeArrayManifest.SCHEMA: SimulatorMorphismChallengeArrayManifest,
-    SimulatorMorphismChallengeBootstrapSummary.SCHEMA: SimulatorMorphismChallengeBootstrapSummary,
-    SimulatorMorphismChallengeCanaryReport.SCHEMA: SimulatorMorphismChallengeCanaryReport,
-    SimulatorMorphismChallengeConfig.SCHEMA: SimulatorMorphismChallengeConfig,
-    SimulatorMorphismChallengeDenominatorBundle.SCHEMA: SimulatorMorphismChallengeDenominatorBundle,
-    SimulatorMorphismChallengeDevelopmentGate.SCHEMA: SimulatorMorphismChallengeDevelopmentGate,
-    SimulatorMorphismChallengeDevelopmentLedger.SCHEMA: SimulatorMorphismChallengeDevelopmentLedger,
-    SimulatorMorphismChallengeEvaluationDesignFreeze.SCHEMA: SimulatorMorphismChallengeEvaluationDesignFreeze,
-    SimulatorMorphismChallengeGeneratorBundle.SCHEMA: SimulatorMorphismChallengeGeneratorBundle,
-    SimulatorMorphismChallengeHistoryBundle.SCHEMA: SimulatorMorphismChallengeHistoryBundle,
-    SimulatorMorphismChallengeMethodFreeze.SCHEMA: SimulatorMorphismChallengeMethodFreeze,
-    SimulatorMorphismChallengeNominationFreeze.SCHEMA: SimulatorMorphismChallengeNominationFreeze,
-    SimulatorMorphismChallengeObserverBundle.SCHEMA: SimulatorMorphismChallengeObserverBundle,
-    SimulatorMorphismChallengePhaseCloseout.SCHEMA: SimulatorMorphismChallengePhaseCloseout,
-    SimulatorMorphismChallengeRecurrenceResult.SCHEMA: SimulatorMorphismChallengeRecurrenceResult,
-    SimulatorMorphismChallengeRequestedUnitLedger.SCHEMA: SimulatorMorphismChallengeRequestedUnitLedger,
-    SimulatorMorphismChallengeSeedRoster.SCHEMA: SimulatorMorphismChallengeSeedRoster,
-    SimulatorMorphismChallengeSeedRosterCommitment.SCHEMA: SimulatorMorphismChallengeSeedRosterCommitment,
-    SimulatorMorphismChallengeTerminalCloseout.SCHEMA: SimulatorMorphismChallengeTerminalCloseout,
-    ScientificAdjudicationRecord.SCHEMA: ScientificAdjudicationRecord,
-}
-_RECORD_TYPES.update((kind.SCHEMA, kind) for kind in CAPABILITY_CONFIG_TYPES.values())
 
 
 def output_semantic_contracts_from_execution_plan(

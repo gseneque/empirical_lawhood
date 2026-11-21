@@ -14,11 +14,11 @@ import time
 
 # These scripts are also importable by focused tests from the repository root.
 if __package__:
-    from .release_check import (portable_test_environment_policy, release_source_disclosure,
+    from .release_check import (check_generated_files, portable_test_environment_policy, release_source_disclosure,
                                retained_test_options, seal_log_snapshot)
     from .release_portable_evidence import SCHEMA, candidate_inventory, inventory_digest, release_input_paths
 else:
-    from release_check import (portable_test_environment_policy, release_source_disclosure,
+    from release_check import (check_generated_files, portable_test_environment_policy, release_source_disclosure,
                                retained_test_options, seal_log_snapshot)
     from release_portable_evidence import SCHEMA, candidate_inventory, inventory_digest, release_input_paths
 
@@ -35,7 +35,7 @@ def main():
     if (".." in packet.parts or packet.exists() or packet.is_relative_to(ROOT)
             or any(part.is_symlink() for part in (packet, *packet.parents))):
         raise SystemExit("Select one new ordinary evidence directory outside the checkout")
-    selected_paths = release_input_paths(ROOT)
+    selected_paths = release_input_paths(ROOT, require_exportable=True)
     inventory = candidate_inventory(ROOT, selected_paths=selected_paths, verify_selected=True)
     disclosure = release_source_disclosure(ROOT, selected_paths)
     tree = subprocess.check_output(["git", "write-tree"], cwd=ROOT, text=True).strip()
@@ -80,7 +80,7 @@ def main():
     persist()
 
     def require_stability():
-        if release_input_paths(ROOT) != selected_paths:
+        if release_input_paths(ROOT, require_exportable=True) != selected_paths:
             raise RuntimeError("Selected release input census changed during its suite")
         after = inventory_digest(candidate_inventory(ROOT, selected_paths=selected_paths, verify_selected=True))
         record["final_source_disclosure"] = release_source_disclosure(ROOT, selected_paths)
@@ -115,7 +115,7 @@ def main():
     try:
         run("environment", [*python, "-c", "import importlib.metadata as m,json,os,platform,sys; "
             "from pathlib import Path; import empirical_lawhood; "
-            "from empirical_lawhood.infrastructure.source_origin import require_executing_target_source; "
+            "from empirical_lawhood.storage.source_origin import require_executing_target_source; "
             "require_executing_target_source(Path.cwd()); "
             "assert empirical_lawhood.__version__ == m.version('empirical-lawhood'); "
             "assert platform.python_version() == '3.11.14'; "
@@ -127,10 +127,7 @@ def main():
         # artifact route before its once-only expensive portable invocation.
         # A passing test selection cannot excuse stale shipped examples.
         run("static-errors", ["uv", "run", "--no-sync", "ruff", "check", "src", "tests", "scripts"])
-        for generator in ("extension_bundle_aggregate", "executable_binding_aggregate", "cli_reference",
-                          "test_fixture", "operator_examples", "workflow_index", "config_schemas",
-                          "integration_examples", "recursive_examples", "matrix_experiment_examples"):
-            run(f"generated-{generator}", [*python, f"scripts/generate_{generator}.py", "--check"])
+        check_generated_files(run, python)
         run("documentation-links", [*python, "scripts/check_documentation.py"])
         run("frozen-rc-numerical-inputs", [*python, "scripts/check_frozen_rc_inputs.py"])
         run("coverage-configuration", [*python, "scripts/check_coverage_inventory.py", "--checkout", str(ROOT)])
@@ -138,7 +135,7 @@ def main():
         record["full_suite_invocations"] = 1
         # Portable software controls can acquire disclosed native fixtures.
         # Keep successful bodies as well as failures for the exposure census.
-        run("tests", [*python, "-m", "coverage", "run", "-m", "pytest", "-q", "-ra", "--fail-on-skip",
+        run("tests", [*python, "-m", "coverage", "run", "-m", "pytest", "-q", "-ra", "--fail-on-skip", "-p", "scripts.test_purposes",
             *retained_test_options(packet), "tests", "-m", "not native and not held"])
         run("critical-coverage", [*python, "-m", "coverage", "report"])
         run("critical-coverage-json", [*python, "-m", "coverage", "json", "-o", str(packet / "coverage.json")])

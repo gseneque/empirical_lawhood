@@ -6,13 +6,13 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_experiment as public
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_experiment as public
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 from tests.test_matrix_selected_e3_e4_bridge import selected_bridge, transfer, disclosed_operational_budgets, disclosed_operational_resources  # noqa: F401 - disclosed metadata
 
@@ -74,7 +74,7 @@ def test_operational_selection_refuses_incomplete_or_outside_ceiling(selected_br
 
 def test_missing_operator_selection_is_a_dependency_before_authoring(selected_bridge):  # noqa: F811
     f, campaign = selected_bridge, campaign_fixture()[0].campaign
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
     spec = public.SelectedE3E4ExperimentSpecification("experiment.selected-e4.missing-operational-budget",
         f.programme.identity, f.bank.identity, f.evidence.identity, ObjectIdentity.from_record(campaign.campaign_id, campaign),
         *disclosed_structure(f.bank, budget=dict(disclosed_operational_resources().phase_budgets)["collect"]))

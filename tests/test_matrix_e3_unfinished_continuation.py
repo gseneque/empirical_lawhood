@@ -8,14 +8,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_composition as composition
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error, selected_configs, task_id, operation_class
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import source_binding
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3UnfinishedPreparationSelection, retained_file_versions
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_unfinished_execution import ConfiguredE3CompletedOutput, ConfiguredE3UnfinishedExecution
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.execution_envelope import RunExecutionResourceEnvelope
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_composition as composition
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error, selected_configs, task_id, operation_class
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import source_binding
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3UnfinishedPreparationSelection, retained_file_versions
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_unfinished_execution import ConfiguredE3CompletedOutput, ConfiguredE3UnfinishedExecution
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.execution_envelope import RunExecutionResourceEnvelope
 from tests.test_matrix_e3_retained_continuation import continuation_case, public_case, _changed_source, _unexecuted_receipt, _pin  # noqa: F401
 
 
@@ -107,13 +107,11 @@ def test_unfinished_projection_refreshes_access_without_whole_history_checks(unf
 
 
 def test_unfinished_compiler_keeps_completed_work_out_of_execution(unfinished_case):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import (
-        _source_projection, derive_protected_e3_design_inputs,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import _source_projection, derive_protected_e3_design_inputs
     from empirical_lawhood.api.derived_metadata_access import _semantic_access
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.planning.experiment_entry import StudyDefinition
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.design.experiment_entry import StudyDefinition
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     case = unfinished_case
     scope = case.scope
     assert decode_canonical_bytes(scope.canonical_bytes(), type(scope), maximum_bytes=None) == scope
@@ -167,9 +165,9 @@ def test_unfinished_transition_refuses_every_native_contact(contact):
 
 @pytest.mark.parametrize('damage', (None, 'access', 'visibility', 'bytes', 'producer'))
 def test_imported_operand_keeps_actual_receipt_bytes_and_access(unfinished_case, damage):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_unfinished_execution import require_imported_input
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.execution import WorkerInputKind
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_unfinished_execution import require_imported_input
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.execution.execution import WorkerInputKind
     scope = unfinished_case.scope
     imported = scope.imported_outputs[0]
     logical, physical = imported.logical, imported.materialization

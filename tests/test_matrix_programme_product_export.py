@@ -13,25 +13,23 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import (
-    PHASES, MatrixProgrammeObservation, programme_frontier,
-)
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.product_export import MatrixProgrammeProductExportSelection
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.product_export import MatrixProgrammePortableProductExportSelection
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixResearchProgrammePlan
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import PHASES, MatrixProgrammeObservation, programme_frontier
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.product_export import MatrixProgrammeProductExportSelection
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.product_export import MatrixProgrammePortableProductExportSelection
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixResearchProgrammePlan
 from empirical_lawhood.api import matrix_programme_products as delivery
 from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammeE3Originals
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
 from tests.runtime_platform.test_recursive_compiler import Config
 from tests.test_recursive_public_service import ROOT, _plane
 from tests.test_current_result_custody import actual_issued_current_task_controls  # noqa: F401
@@ -126,7 +124,7 @@ def _delivery_case(plane):
 
 
 def test_export_keeps_exact_reports_products_receipts_and_complete_missing_phase_census(case):
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
 
     before = {path: path.read_bytes() for path in (case.root / 'runs').rglob('*') if path.is_file()}
     with scientific_reconstruction_operation('full'):
@@ -301,7 +299,8 @@ def test_export_selection_is_closed_canonical_operational_configuration():
     path = ROOT / 'programmes/foundations/emergent-structure/workflows/matrix-programme/product-export.example.json'
     selected = decode_canonical_bytes(path.read_bytes(), MatrixProgrammeProductExportSelection, maximum_bytes=1024**2)
     assert selected.canonical_bytes() == path.read_bytes()
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.extension import EXTENSION as _extension_owner_1
+    EXPERIMENT_PROTOCOL_DECLARATIONS = _extension_owner_1.protocols
     declaration, = (value for value in EXPERIMENT_PROTOCOL_DECLARATIONS
         if value.protocol_id == 'matrix.researcher-programme.v2')
     config, = (row for row in declaration.configuration_inputs if row.consumer_id == 'matrix-programme-product-export')
@@ -325,7 +324,7 @@ def _select_portable(case):
 
 @pytest.mark.parametrize('portable', (False, True))
 def test_full_report_and_delivery_share_one_authenticated_observation(case, monkeypatch, portable):
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
 
     observed = []
     original = _DeliveryControlOwner._observe
@@ -354,7 +353,7 @@ def test_full_report_and_delivery_share_one_authenticated_observation(case, monk
 
 
 def test_completed_phase_survives_delivery_failure_and_resumes_without_scientific_read(case, monkeypatch):
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
 
     original = delivery._receipt_products
     def interrupted(*args, **kwargs):
@@ -381,9 +380,7 @@ def test_completed_phase_survives_delivery_failure_and_resumes_without_scientifi
 @pytest.mark.parametrize('damage', ('none', 'execution', 'body'))
 def test_saved_report_finalization_opens_recorded_context_and_never_calls_phase_reader(case, monkeypatch, damage):
     from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammeProjectionContext
-    from empirical_lawhood.runtime.operational_configuration import (
-        scientific_reconstruction_enabled, scientific_reconstruction_operation,
-    )
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled, scientific_reconstruction_operation
 
     report = {**case.report, 'scientific_result': {**case.report['scientific_result'],
         'scientific_completion': 'COMPLETE_NATIVE_UTILITY_ASSESSMENT'}}
@@ -436,7 +433,7 @@ def test_saved_report_finalization_opens_recorded_context_and_never_calls_phase_
 @pytest.mark.parametrize('damage', ('binding', 'execution', 'execution-census', 'checkpoint', 'source'))
 def test_phase_checkpoint_refuses_substitution(case, monkeypatch, damage):
     from empirical_lawhood.api import matrix_programme_export_checkpoints as checkpoints
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
 
     with scientific_reconstruction_operation('full'):
         case.owner.export_products(directory=case.directory, selection_path=case.selection_path)
@@ -462,7 +459,7 @@ def test_phase_checkpoint_refuses_substitution(case, monkeypatch, damage):
 @pytest.mark.parametrize('changed_report', (False, True))
 def test_aggregate_checkpoint_keeps_bounded_phase_references_and_exact_reassembly(case, monkeypatch, changed_report):
     from empirical_lawhood.api import matrix_programme_export_checkpoints as checkpoints
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
 
     # Disclosed complete reports exceed the aggregate's test bound together,
     # while each individual saved phase remains within that same bound.
@@ -516,17 +513,31 @@ def test_aggregate_checkpoint_keeps_bounded_phase_references_and_exact_reassembl
 
 
 @pytest.mark.parametrize('damage', ('none', 'scientific-owner', 'lock', 'runtime', 'commit',
-    'library-relocation', 'library-bytes', 'late-library-bytes'))
+    'library-relocation', 'library-bytes', 'late-library-bytes',
+    'current-policy', 'current-transport-owner'))
 def test_v1_checkpoint_migration_allows_only_exact_transport_owner_change(case, monkeypatch, damage):
     from empirical_lawhood.api import matrix_programme_export_checkpoints as checkpoints
-    from empirical_lawhood.infrastructure.numerical_provenance import observe_implementation_source
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.storage.numerical_provenance import observe_implementation_source
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
 
-    rows, _, lock, _, _ = observe_implementation_source(ROOT)
+    rows, _, lock, commit, source_files = observe_implementation_source(ROOT)
+    # Disclosed historical source observation: this transport migration admits
+    # only its pinned historical policy and repair owners. Later checkout edits
+    # must not widen that production allowlist or disable these refusal cases.
+    current = dict(rows)
+    current[checkpoints._POLICY_MEMBER] = checkpoints._V2_POLICY_SHA256
+    current.update({name: after for name, _, after in checkpoints._V1_TRANSPORT_REPAIRS})
+    if damage == 'current-policy':
+        current[checkpoints._POLICY_MEMBER] = '0' * 64
+    elif damage == 'current-transport-owner':
+        current[checkpoints._V1_TRANSPORT_REPAIRS[0][0]] = '0' * 64
+    rows = tuple(sorted(current.items()))
+    observed = (rows, sha256(canonical_json_bytes(rows)).hexdigest(), lock, commit, source_files)
+    monkeypatch.setattr(checkpoints, 'observe_implementation_source', lambda root: observed)
     previous = dict(rows)
     previous['api/matrix_programme_export_checkpoints.py'] = 'a7d67ee368fe1d05043699828cd411e0ccff6303bbe2efa2353ccfdfb2341142'
-    previous['infrastructure/source_policy.py'] = 'bdcceede975971cd9711d507ebac5a9eb71cdd4a881ae81f30c7c3373be6cf64'
+    previous['storage/source_policy.py'] = 'bdcceede975971cd9711d507ebac5a9eb71cdd4a881ae81f30c7c3373be6cf64'
     previous.update({name: before for name, before, _ in checkpoints._V1_TRANSPORT_REPAIRS})
     if damage == 'scientific-owner':
         previous['api/matrix_researcher_programme.py'] = '0' * 64
@@ -597,8 +608,8 @@ def test_v1_checkpoint_migration_allows_only_exact_transport_owner_change(case, 
 
 @pytest.mark.parametrize('damage', ('none', 'after-child-read', 'after-checkpoint'))
 def test_checkpoint_uses_real_observer_and_keeps_independent_child_read_bytes(case, monkeypatch, damage):
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
 
     record = Config('independent.scientific-operand', 23)
     extra = case.plane.write(ArtifactWriteRequest('independent.scientific-operand', 'child/operand.json',
@@ -653,7 +664,7 @@ def test_checkpoint_uses_real_observer_and_keeps_independent_child_read_bytes(ca
 def test_resumed_protected_checkpoint_refreshes_actual_grant_before_body_access(
         actual_issued_current_task_controls, monkeypatch):  # noqa: F811
     from empirical_lawhood.api import matrix_programme_export_checkpoints as checkpoints
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
 
     f = actual_issued_current_task_controls
     case = _delivery_case(f.control.service.artifact_plane)
@@ -717,7 +728,7 @@ def test_export_shares_real_original_grant_custody_but_refreshes_every_access(
 
 @pytest.mark.parametrize('damage', ('none', 'masked-body', 'pin', 'access'))
 def test_saved_file_pins_share_exact_live_census_and_keep_final_guard(case, monkeypatch, damage):
-    from empirical_lawhood.infrastructure import read_checkpoint
+    from empirical_lawhood.storage import read_checkpoint
     from tests.test_reduced_artifact_verification import _mask_changed_stat
     names = sorted(case.owner._control.sources)
     pins = tuple((name, (case.root / name).stat().st_size,
@@ -753,7 +764,7 @@ def test_saved_file_pins_share_exact_live_census_and_keep_final_guard(case, monk
 def test_public_portable_export_copies_actual_npz_receipts_and_original_publication_bytes(case):
     from io import BytesIO
     import numpy as np
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
 
     buffer = BytesIO()
     values = np.array([[1.25, -2.5], [3.0, 4.5]], dtype='<f8')
@@ -810,7 +821,7 @@ def test_portable_export_refuses_bounds_without_a_complete_replica(case, limit):
 
 def test_portable_export_rechecks_actual_stored_reveal_during_copy(
         actual_issued_current_task_controls, monkeypatch):  # noqa: F811
-    from empirical_lawhood.infrastructure import artifact_replication
+    from empirical_lawhood.storage import artifact_replication
 
     f = actual_issued_current_task_controls
     case = _delivery_case(f.control.service.artifact_plane)
@@ -846,7 +857,7 @@ def test_portable_export_rechecks_actual_stored_reveal_during_copy(
 
 
 def test_portable_completion_rechecks_the_larger_original_read_closure(case, monkeypatch):
-    from empirical_lawhood.infrastructure import artifact_replication
+    from empirical_lawhood.storage import artifact_replication
 
     metadata = case.plane.write(ArtifactWriteRequest('metadata.read-control', 'controls/original.json',
         case.product.logical.payload_schema, ArtifactProfile.CANONICAL_JSON, 'application/json',

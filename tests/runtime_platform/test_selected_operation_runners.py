@@ -7,8 +7,8 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import recursive_operations as owner
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform.test_recursive_compiler import fixture
 
 
@@ -29,10 +29,13 @@ def selected(monkeypatch, *, absent=False, factory_drift=False, runner_drift=Fal
             calls.append(manifest.capability_key)
             actual = replace(manifest, implementation_sha256="c" * 64) if runner_drift else manifest
             return SimpleNamespace(manifest=actual)
-        factories.append(SimpleNamespace(manifest=declared, runner_factory=build, runner_preparation_factory=None))
+        factories.append(SimpleNamespace(manifest=declared, registration=registrations[index],
+            runner_factory=build, runner_preparation_factory=None))
     def unavailable():
         pytest.fail("unselected domain implementation was constructed")
-    factories.append(SimpleNamespace(manifest=unused, runner_factory=unavailable))
+    unused_registration = replace(registrations[0],
+        selection=replace(registrations[0].selection, capability_key=unused.capability_key))
+    factories.append(SimpleNamespace(manifest=unused, registration=unused_registration, runner_factory=unavailable))
     monkeypatch.setattr(owner, "operation_factories", lambda: tuple(factories))
     return registry, plan, calls
 
@@ -79,11 +82,11 @@ def test_declared_parent_preparation_requires_supplier_before_runner_constructio
 
 
 def test_development_uses_exact_registered_parent_preparation_without_running_it(monkeypatch):
-    from empirical_lawhood.runtime.execution import ParentPreparedTaskRunner
+    from empirical_lawhood.execution.execution import ParentPreparedTaskRunner
 
     registry, plan, calls = selected(monkeypatch)
     factories = owner.operation_factories()
-    factories[0].registration = SimpleNamespace(native_effect=False)
+    assert factories[0].registration.native_effect is False
     supplied, observations = object(), []
     def prepare(supplier, runner):
         observations.append((supplier, runner.manifest))

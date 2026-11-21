@@ -6,19 +6,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import retained_training_continuation as domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import (
-    MatrixContinuedProgrammeSpecification, MatrixProgrammePhaseBinding, MatrixResearchProgrammeSpecification,
-    prepare,
-)
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import retained_training_continuation as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixContinuedProgrammeSpecification, MatrixProgrammePhaseBinding, MatrixResearchProgrammeSpecification, prepare
 from empirical_lawhood.api import matrix_programme_retained_training_continuation as owner
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
 from empirical_lawhood.api.matrix_researcher_programme import _publish
 from empirical_lawhood.api.recursive_authoring import implementation_binding
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticated_programme_inputs
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticated_programme_inputs
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_programme_source_continuation import metadata_case  # noqa: F401
 
 ROOT = Path(__file__).parents[1]
@@ -26,14 +23,14 @@ ROOT = Path(__file__).parents[1]
 
 @pytest.fixture(scope='module')
 def retained_case(metadata_case):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import coordinate_identity
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-    from empirical_lawhood.runtime.native_training_export import NativeTrainingExportAdoptionSelection
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
-    from empirical_lawhood.runtime.recovery import RunRecoveryTerminalEvent, DevelopmentRunRecoveryTerminalEvent
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import coordinate_identity
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.execution.native_training_export import NativeTrainingExportAdoptionSelection
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
+    from empirical_lawhood.execution.recovery import RunRecoveryTerminalEvent, DevelopmentRunRecoveryTerminalEvent
     case, original = metadata_case.case, metadata_case.original
     root = Path(case.writer.root.contract.canonical_path)
     original_commitment = load_experiment_inputs(case.specification, case.output_selection_path).method_inputs.input_commitments
@@ -105,12 +102,10 @@ def test_new_handoff_is_explicit_and_preserves_all_original_science(retained_cas
 
 def test_e3_projection_publishes_and_reopens_the_complete_handoff_handle(retained_case, monkeypatch):
     """Exercise actual input publication/binding; stop before untrusted TRAIN use."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_assembly import (
-        ConfiguredProtectedE3AssemblySpecification,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_assembly import ConfiguredProtectedE3AssemblySpecification
     from empirical_lawhood.api.matrix_programme_initial_phases import project_initial_phase
     from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammeProjectionContext
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection
 
     value = retained_case
     plane = value.case.writer
@@ -233,7 +228,7 @@ def test_new_plan_cannot_open_without_its_exact_handoff(retained_case, monkeypat
 
 
 def test_e3_future_source_rebinding_preserves_exact_original_reserves_and_panels(retained_case):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest
     from empirical_lawhood.api.matrix_prepared_source_runtime import _future_source_selections
     value = retained_case
     inputs, commitments = value.original, value.original.commitments
@@ -269,7 +264,7 @@ def test_e3_future_source_rebinding_preserves_exact_original_reserves_and_panels
 
 def test_prepared_source_join_checks_original_c_and_exact_train_locator(retained_case, monkeypatch):
     """Only the request-body validation seam is disclosed; both C reads are real."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_publications
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_publications
     from empirical_lawhood.api.matrix_prepared_source_runtime import _committed_e4_selections
     value, validated = retained_case, []
     request = SimpleNamespace(identity=value.lineage.export_adoption.request, input_commitments=value.lineage.input_commitments)

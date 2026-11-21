@@ -52,7 +52,7 @@ Edit the copied JSON before running it. Keep the outer schema
 the nested preparation schema, version `1.0.0` and their `value` envelopes.
 Decimal fields retain their `{"decimal":"..."}` representation; seed and output
 size remain JSON integers. Unknown fields, duplicate keys and bare fractional
-numbers refuse. The [preparation contract](../../../../../src/empirical_lawhood/adapters/simulators/gym_torax_native/diagnostic_contracts.py)
+numbers refuse. The [preparation contract](../../../../../src/empirical_lawhood/domains/fusion/gym_torax_native/diagnostic_contracts.py)
 and [quickstart contract](../../../../../src/empirical_lawhood/adapters/simulators/gym_torax_native/native_quickstart.py)
 permit only these input choices:
 

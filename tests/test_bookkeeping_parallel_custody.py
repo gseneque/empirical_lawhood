@@ -9,12 +9,12 @@ from threading import Event, Lock
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifact_validation as formats
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
-from empirical_lawhood.infrastructure.parallel_verification import CanonicalValidationPool
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactSemanticValidationRegistry, ArtifactWriteRequest
+from empirical_lawhood.storage import artifact_validation as formats
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+from empirical_lawhood.storage.parallel_verification import CanonicalValidationPool
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactSemanticValidationRegistry, ArtifactWriteRequest
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 
 
@@ -23,7 +23,7 @@ def test_json_format_worker_does_not_import_array_and_model_stacks():
 import io
 import sys
 from types import SimpleNamespace
-from empirical_lawhood.infrastructure import artifact_validation as formats
+from empirical_lawhood.storage import artifact_validation as formats
 raw = b'{"schema":"empirical-lawhood/testing/light-format","value":1}\\n'
 request = SimpleNamespace(payload_schema='empirical-lawhood/testing/light-format', semantic_validation=None)
 assert formats._inspect_canonical_json_file(io.BytesIO(raw), request, size=len(raw)).schema == request.payload_schema
@@ -36,7 +36,7 @@ assert np.array_equal(formats.validate_numpy_no_pickle(formats.numpy_no_pickle_b
 
 @pytest.mark.parametrize('batch', (False, True))
 def test_verification_refills_a_free_slot_before_the_oldest_read_finishes(batch):
-    from empirical_lawhood.infrastructure.parallel_verification import ParallelValidationBatch, verify_in_parallel
+    from empirical_lawhood.storage.parallel_verification import ParallelValidationBatch, verify_in_parallel
 
     first_started, third_started = Event(), Event()
     lock = Lock()
@@ -187,9 +187,9 @@ def test_memory_and_file_codecs_keep_identical_canonical_byte_refusals(file_read
 def test_normal_controller_state_selects_shared_read_and_publication_batches(tmp_path, workers):
     from empirical_lawhood.api.integration_artifact_profiles import INTEGRATION_ARTIFACT_PROFILE_VALIDATORS
     from empirical_lawhood.api.recursive_execution import _read_only_custody_policy
-    from empirical_lawhood.infrastructure.publication_metadata import supports_closed_publication_access
-    from empirical_lawhood.infrastructure.recursive_custody import _can_batch_compact_output_custody
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.publication_metadata import supports_closed_publication_access
+    from empirical_lawhood.storage.recursive_custody import _can_batch_compact_output_custody
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
 
     original, _ = _publication(tmp_path, 1)
     plane = ExternalArtifactPlane(original.root, INTEGRATION_ARTIFACT_PROFILE_VALIDATORS,
@@ -212,7 +212,7 @@ def test_normal_controller_state_selects_shared_read_and_publication_batches(tmp
 
 def test_factory_lookup_uses_the_closed_index_without_scanning_the_population():
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
-    from empirical_lawhood.runtime.executable_bindings import ExecutableCapabilityProviderFactoryRegistry
+    from empirical_lawhood.execution.executable_bindings import ExecutableCapabilityProviderFactoryRegistry
 
     original = EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
     visits = []

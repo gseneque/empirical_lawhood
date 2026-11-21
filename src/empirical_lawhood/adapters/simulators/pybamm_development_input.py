@@ -12,15 +12,13 @@ from typing import ClassVar
 import numpy as np
 
 from empirical_lawhood.adapters.simulators import pybamm_electrothermal_hierarchy as battery_electrothermal
+import empirical_lawhood.domains.battery.electrothermal_hierarchy as battery_electrothermal_science
 from empirical_lawhood.adapters.simulators import pybamm_exact_restart as battery_restart
+import empirical_lawhood.domains.battery.exact_restart as battery_restart_science
 from empirical_lawhood.adapters.simulators import pybamm_reduced_coordinate_sufficiency as battery_reduced_observation
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_strings,
-    validate_decimal,
-    validate_stable_id,
-)
+import empirical_lawhood.domains.battery.reduced_coordinate_sufficiency as battery_reduced_observation_science
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_strings, validate_decimal, validate_stable_id
 
 
 @dataclass(frozen=True, slots=True)
@@ -132,18 +130,18 @@ def run_native_development_check(
 
     import pybamm
 
-    if pybamm.__version__ != battery_electrothermal.BATTERY_ELECTROTHERMAL_SOURCE_VERSION:
+    if pybamm.__version__ != battery_electrothermal_science.BATTERY_ELECTROTHERMAL_SOURCE_VERSION:
         raise ValueError("installed PyBaMM version differs from the source design")
     denominator = next(
         item
-        for item in battery_electrothermal.denominators(include_x_full=False)
+        for item in battery_electrothermal_science.denominators(include_x_full=False)
         if item.denominator_id == config.denominator_id
     )
-    words = {item.word_id: item for item in battery_electrothermal.action_words()}
-    unit_b = battery_electrothermal.BatteryElectrothermalPreparation(
+    words = {item.word_id: item for item in battery_electrothermal_science.action_words()}
+    unit_b = battery_electrothermal_science.BatteryElectrothermalPreparation(
         config.electrothermal_unit_id,
-        battery_electrothermal.BatteryElectrothermalStage.DEVELOPMENT,
-        battery_electrothermal.BatteryElectrothermalUnitRole.DEVELOPMENT,
+        battery_electrothermal_science.BatteryElectrothermalStage.DEVELOPMENT,
+        battery_electrothermal_science.BatteryElectrothermalUnitRole.DEVELOPMENT,
         'middle-state-of-charge-cool',
         config.initial_soc,
         config.initial_temperature_k,
@@ -177,23 +175,23 @@ def run_native_development_check(
             "Electrothermal action integral, voltage response or future cutoff differs"
         )
 
-    unit_c = battery_restart.BatteryExactRestartPreparation(
+    unit_c = battery_restart_science.BatteryExactRestartPreparation(
         config.restart_unit_id,
-        battery_restart.BatteryExactRestartStage.LOCALIZATION,
-        battery_restart.BatteryExactRestartUnitRole.LOCALIZATION,
+        battery_restart_science.BatteryExactRestartStage.LOCALIZATION,
+        battery_restart_science.BatteryExactRestartUnitRole.LOCALIZATION,
         'middle-state-of-charge-cool',
         config.initial_soc,
         config.initial_temperature_k,
         False,
     )
     history_c = next(
-        item for item in battery_restart.histories() if item.history_id == config.restart_history_id
+        item for item in battery_restart_science.histories() if item.history_id == config.restart_history_id
     )
     pybamm_module, source, prefix, _ = battery_restart._step_prefix(
         unit=unit_c, denominator=denominator, history=history_c
     )
-    state = battery_restart.decode_hex(
-        battery_restart._hex_values(np.asarray(prefix.all_ys[0], dtype=np.float64).reshape(-1))
+    state = battery_restart_science.decode_hex(
+        battery_restart_science._hex_values(np.asarray(prefix.all_ys[0], dtype=np.float64).reshape(-1))
     )
     source_inputs = {
         name: float(np.asarray(value, dtype=np.float64).reshape(-1)[0])
@@ -243,18 +241,18 @@ def run_native_development_check(
 
     denominator_d = next(
         item
-        for item in battery_reduced_observation.denominators()
+        for item in battery_reduced_observation_science.denominators()
         if item.denominator_id == config.denominator_id
     )
     history_d = next(
-        item for item in battery_reduced_observation.histories() if item.history_id == config.reduced_observation_history_id
+        item for item in battery_reduced_observation_science.histories() if item.history_id == config.reduced_observation_history_id
     )
     implementation_sha256 = sha256(Path(battery_reduced_observation.__file__).read_bytes()).hexdigest()
     captures = []
     for index, unit_id in enumerate(config.reduced_observation_unit_ids):
-        unit_d = battery_reduced_observation.BatteryReducedObservationPreparation(
+        unit_d = battery_reduced_observation_science.BatteryReducedObservationPreparation(
             unit_id=unit_id,
-            stage=battery_reduced_observation.BatteryReducedObservationStage.DEVELOPMENT,
+            stage=battery_reduced_observation_science.BatteryReducedObservationStage.DEVELOPMENT,
             stratum_id=('low-state-of-charge-cool' if index < 2 else 'high-state-of-charge-warm'),
             initial_soc=config.reduced_observation_initial_socs[index],
             initial_temperature_k=config.reduced_observation_initial_temperatures_k[index],
@@ -281,8 +279,8 @@ def run_native_development_check(
         ):
             raise ValueError("Reduced-observation exact comparator did not close")
         captures.append(capture)
-    chart = next(item for item in battery_reduced_observation.charts() if item.chart_id == config.reduced_observation_chart_id)
-    scale, predictions = battery_reduced_observation.build_prediction_rows(
+    chart = next(item for item in battery_reduced_observation_science.charts() if item.chart_id == config.reduced_observation_chart_id)
+    scale, predictions = battery_reduced_observation_science.build_prediction_rows(
         development_captures=captures[:2],
         target_captures=captures[2:],
         chart=chart,

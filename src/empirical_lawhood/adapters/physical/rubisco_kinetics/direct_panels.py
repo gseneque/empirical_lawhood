@@ -14,14 +14,11 @@ from hashlib import sha256
 import re
 from typing import ClassVar
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord, require_sorted_unique_strings, validate_decimal,
-    validate_sha256, validate_stable_id,
-)
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_strings, validate_decimal, validate_sha256, validate_stable_id
 
-from .workbook import NativeWorkbookCellV1, NativeWorkbookV1, NativeWorksheetV1
-from .wilson2017 import MAX_HTML_BYTES, NativeHTMLTableRowV1, _TableParser
+from empirical_lawhood.adapters.physical.rubisco_kinetics.workbook import NativeWorkbookCellV1, NativeWorkbookV1, NativeWorksheetV1
+from empirical_lawhood.adapters.physical.rubisco_kinetics.wilson2017 import MAX_HTML_BYTES, NativeHTMLTableRowV1, _TableParser
 
 MCDONALD_SHEETS = ("Figure 3 Raw Data + Stats", "Kinetic table")
 DAVIDI_SHEETS = ("spectroscopic assay", "radiometric assay")

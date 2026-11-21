@@ -2,28 +2,17 @@
 """Closed-package emission capacity; synthetic software conformance only."""
 from __future__ import annotations
 
-from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.api import facade
 from empirical_lawhood.api.codecs import load_campaign_package_authoring
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
 from empirical_lawhood.api.models import bind_issued_execution_package_elapsed_budget
-from empirical_lawhood.api.results import (
-    AssembleExperimentPackageRequest,
-    BindElapsedBudgetRequest,
-    CompileCampaignRequest,
-    OperationStatus,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.campaign_elapsed_budget import (
-    CampaignElapsedBudgetSpec,
-    CampaignElapsedReservationPlan,
-    CampaignElapsedTaskProjection,
-)
+from empirical_lawhood.api.results import AssembleExperimentPackageRequest, BindElapsedBudgetRequest, CompileCampaignRequest, OperationStatus
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.campaign_elapsed_budget import CampaignElapsedBudgetSpec, CampaignElapsedReservationPlan, CampaignElapsedTaskProjection
 from tests.issued_study_support import build_issued_study_fixture
 from tests.runtime_platform.test_deadline_free_execution_package import _execution_package_fixture, _identity
 from tests.runtime_platform.test_standard_issued_package import _AuthorityStore
@@ -96,8 +85,6 @@ def test_closed_package_api_emission_uses_its_existing_package_allocation(
         )
         invoke = api.assemble_package
     raw = expected.canonical_bytes()
-    monkeypatch.setattr(facade, "MAX_AUTHORING_BYTES", len(raw) - 1)
-    assert len(raw) < facade.MAX_CAMPAIGN_PACKAGE_BYTES
 
     result = invoke(request)
     assert result.status is OperationStatus.SUCCEEDED, result.to_mapping()
@@ -110,16 +97,10 @@ def test_closed_package_api_emission_uses_its_existing_package_allocation(
     compiled = api.compile_campaign(CompileCampaignRequest(emitted))
     assert compiled.status is OperationStatus.SUCCEEDED, compiled.to_mapping()
 
-    # Ordinary candidate emission keeps its independent original limit.
-    with pytest.raises(ValueError, match="authoring byte limit"):
+    # An operator-selected allowance still refuses before writing output.
+    with pytest.raises(ValueError, match="selected byte allowance"):
         api._emit_local_candidate(
             draft_path=local / "base-package.json" if not elapsed else local / "plain-package.json",
-            requested_path=Path("ordinary-candidate.json"), payload=raw,
+            requested_path=Path("ordinary-candidate.json"), payload=raw, maximum_bytes=len(raw)-1,
         )
     assert not (local / "ordinary-candidate.json").exists()
-
-    # The larger closed allocation is still finite and fails before any output.
-    monkeypatch.setattr(facade, "MAX_CAMPAIGN_PACKAGE_BYTES", len(raw) - 1)
-    refused = invoke(replace(request, emit_path=Path("oversized-package.json")))
-    assert not refused.succeeded
-    assert not (local / "oversized-package.json").exists()

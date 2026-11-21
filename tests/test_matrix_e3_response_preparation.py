@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Actual guarded current ports over literal records; no native acquisition."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from collections import defaultdict
 from dataclasses import replace
@@ -7,23 +8,23 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_preparation as prep
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import ProtectedE3SourcePhase, source_task_id
-from empirical_lawhood.infrastructure.execution import _prepare_native_work, prepare_worker_invocation
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
-from empirical_lawhood.runtime.recursive_compiler import RegisteredPublicationRequirement
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_preparation as prep
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import ProtectedE3SourcePhase, source_task_id
+from empirical_lawhood.execution.local.execution import _prepare_native_work, prepare_worker_invocation
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.execution.recursive_compiler import RegisteredPublicationRequirement
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.worker_configuration_support import freeze_worker_configuration
 from tests.test_matrix_e3_response_lifecycle import compiled_response_output
 from tests.test_matrix_e3_response_records import case as original_case, forbid_native as forbid_native, error_operands, physical  # noqa: F401
@@ -33,9 +34,9 @@ from tests.test_matrix_factor_confirmation_eligibility import _matrix_plane
 
 @pytest.fixture(scope="module")
 def case(original_case):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_science as prefix
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import identity
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_forecast import array_product
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_science as prefix
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import identity
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_forecast import array_product
     import numpy as np
 
     result = SimpleNamespace(**vars(original_case))
@@ -359,13 +360,12 @@ def test_actual_compiled_sealed_development_lane_cannot_be_falsely_promoted(case
 
 
 def test_shared_native_begin_validator_accepts_all15_sources_eight_streams_and_original_mixed_boundaries(case):
-    from empirical_lawhood.infrastructure.native_subwork_inputs import validate_native_subwork_inputs
-    from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
+    from empirical_lawhood.execution.local.native_subwork_inputs import validate_native_subwork_inputs
+
 
     selected = prepared(case)
     try:
-        manifests = tuple(decode_artifact_manifest(selected.plane.root.resolve(row.materialization.relative_path + ".manifest.json",
-            for_write=False).read_bytes()) for row in selected.verified)
+        manifests = tuple(resolve_artifact_sidecar_bytes(selected.plane, selected.plane.root.resolve(row.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()) for row in selected.verified)
         work = _prepare_native_work(owner.prepare_native_work, selected.runner, selected.bound, selected.parent)
         validate_native_subwork_inputs(selected.plane, work.definitions[0], manifests,
             visibility=Visibility.DEVELOPMENT_ONLY, access=Access.EVALUATION_SEALED, frozen_parent_inputs=manifests)
@@ -375,8 +375,8 @@ def test_shared_native_begin_validator_accepts_all15_sources_eight_streams_and_o
 
 
 def test_seedless_worker_preserves_development_original_profile_publication(case):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_response_records import project_protected_e3_response_numerics
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import identity
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_response_records import project_protected_e3_response_numerics
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import identity
     from tests.test_matrix_e3_response_records import publication, qualification
 
     altered = SimpleNamespace(**vars(case))

@@ -10,9 +10,9 @@ from threading import Barrier
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.entry_guards import publish_entry_guards
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_response.entry_guards import publish_entry_guards
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.runtime_platform.test_native_subwork import _plane
 
 

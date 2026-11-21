@@ -5,15 +5,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_preparation as domain
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as protected
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import (
-    ScheduledFullFactorScope, ScheduledFullFactorScopeReference, ScheduledFullFactorSourceReference)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
-from empirical_lawhood.runtime.plans import ExecutionPlan
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_preparation as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as protected
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorScope, ScheduledFullFactorScopeReference, ScheduledFullFactorSourceReference
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
+from empirical_lawhood.execution.plans import ExecutionPlan
 from tests.test_matrix_e4_full_factor_values import scopes, pin  # noqa: F401
 from tests.test_matrix_selected_e4_bank_recipe import literal_recipe_source_inputs  # noqa: F401
 from tests.test_matrix_e4_full_factor_public import _real_plane
@@ -65,7 +64,7 @@ def test_protected_request_and_reference_retain_only_declaration_pin(scopes,lite
 
 
 def test_original_reveal_refusal_precedes_declaration_body_io(scopes,monkeypatch):  # noqa: F811
-    from empirical_lawhood.api import matrix_full_factor_custody as custody,recursive_qualified_parents as parents,matrix_selected_runtime as source
+    from empirical_lawhood.api import matrix_full_factor_custody as custody, recursive_qualified_parents as parents, matrix_selected_runtime as source
     programme,_,_=scopes['CONFIRMATION'];waves=_waves(programme)
     package=object();actual_pin=custody._pin;events=[]
     monkeypatch.setattr(parents,'_actual_package',lambda writer,run_id:package)

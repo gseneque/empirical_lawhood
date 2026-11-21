@@ -8,7 +8,7 @@ import stat
 import pytest
 
 from empirical_lawhood.adapters import _bounded_files as adapter
-from empirical_lawhood.infrastructure import bounded_io as control
+from empirical_lawhood.storage import bounded_io as control
 
 
 OPERATIONS = ("control-read", "control-hash", "control-match", "control-search",
@@ -272,15 +272,12 @@ def test_final_symlink_refusal_closes_every_acquired_directory(tmp_path, monkeyp
     assert all(count == 1 for _, count in acquired)
 
 
-def test_search_needle_ceiling_refuses_before_descriptor_open(tmp_path, monkeypatch):
-    monkeypatch.setattr(control, "MAX_CONTROL_PLANE_JSON_BYTES", 2)
-
-    def forbidden(*args, **kwargs):
-        pytest.fail("oversized needle reached descriptor opening")
-
-    monkeypatch.setattr(os, "open", forbidden)
-    with pytest.raises(control.BoundedFileIOError, match="forbidden-payload probe exceeds"):
-        control.bounded_file_contains_any(tmp_path / "missing", (b"abc",), maximum_bytes=64)
+def test_search_uses_selected_file_extent_for_large_patterns(tmp_path):
+    path = tmp_path / 'member'
+    path.write_bytes(b'prefix-abcdefghij-tail')
+    assert control.bounded_file_contains_any(path, (b'abcdefghij',), maximum_bytes=path.stat().st_size)
+    with pytest.raises(control.BoundedFileIOError, match='byte limit'):
+        control.bounded_file_contains_any(path, (b'abcdefghij',), maximum_bytes=1)
 
 
 def test_explicit_comparison_bound_preserves_exact_stable_bytes(tmp_path, monkeypatch):

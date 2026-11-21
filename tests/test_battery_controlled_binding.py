@@ -9,19 +9,19 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import controlled_forecast_config as config_owner
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import controlled_operation_bindings as binding
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_step_control as step
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry import operation_bindings as original
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry import recursive_translation as translation
-from empirical_lawhood.infrastructure.artifact_stream_primitives import _anonymous_input_descriptor, _PreopenedBoundedReader, _seal_anonymous_input
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveOperationSpec, RecursiveStudyDraft
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.battery.battery_refined_inquiry import controlled_forecast_config as config_owner
+from empirical_lawhood.domains.battery.battery_refined_inquiry import controlled_operation_bindings as binding
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_step_control as step
+from empirical_lawhood.domains.battery.battery_segmented_inquiry import operation_bindings as original
+from empirical_lawhood.domains.battery.battery_segmented_inquiry import recursive_translation as translation
+from empirical_lawhood.storage.artifact_stream_primitives import _anonymous_input_descriptor, _PreopenedBoundedReader, _seal_anonymous_input
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveOperationSpec, RecursiveStudyDraft
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_battery_forecast_step_control import selected as control_fixture, config as native_fixture
 from tests.test_battery_segmented_graph import stock as stock_fixture
 
@@ -68,7 +68,7 @@ def cold_scope(stock, selected):
     external = tuple(RecursiveExternalInput("external." + node + "." + role, binding.artifact_id(config, role),
         ref.object_schema, original.MEDIA, None, OutcomeAccess.DEVELOPMENT_VISIBLE, VisibilityCeiling.DEVELOPMENT_ONLY,
         ref.object_fingerprint, "HISTORY" if role in {"history", "uncertain-work"} else "SOURCE") for role, ref in config.role_bindings)
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry.recursive_translation import _campaign
+    from empirical_lawhood.domains.battery.battery_refined_inquiry.recursive_translation import _campaign
     draft = RecursiveStudyDraft("draft.exposed-controlled-cold", original.QUESTION, _campaign(root, "draft.exposed-controlled-cold"),
         (requirement,), (connection,), (), (operation,), external, binding.input_links(config), (node,),
         development_study=root, contribution_parents=(stock.parent,))
@@ -197,8 +197,10 @@ def test_closed_config_revision_and_reference_tamper_refuse(cold_scope):
 
 
 def test_installed_factory_uses_one_declaration_and_original_six_descriptors():
-    from empirical_lawhood.adapters.methods.battery_segmented_inquiry.executable_binding import EXECUTABLE_BINDING_FACTORIES
-    from empirical_lawhood.adapters.methods.battery_segmented_inquiry.extension_bundle import EXTENSION_BUNDLE_CONTRIBUTION
+    from empirical_lawhood.domains.battery.battery_segmented_inquiry.extension import EXTENSION as _extension_owner_1
+    EXECUTABLE_BINDING_FACTORIES = _extension_owner_1.factories
+    from empirical_lawhood.domains.battery.battery_segmented_inquiry.extension import EXTENSION as _extension_owner_2
+    EXTENSION_BUNDLE_CONTRIBUTION = _extension_owner_2.discovery
     expected = {
         "assess": ("340ce56caa229be35dbb29d7e00da2e54d083941d7e72f0746810ad83e45a77a", "bc17a83f0d6e665ebaf087bc645b732068e95792a7e4d740bb82c0f5ba575b84"),
         "compare": ("cd3f9af9eee9a1c88d5486f81323fdaf497ee92d0b20c6882605b310b8163310", "d3ef974fc79548d5ded0d5088e1da4a44af8c362d2c97a31e74f8676d98917f7"),

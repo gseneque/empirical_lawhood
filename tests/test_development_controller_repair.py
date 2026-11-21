@@ -8,14 +8,24 @@ import pytest
 
 from empirical_lawhood.api import development_controller_repair as owner
 from empirical_lawhood.api.recursive_execution import _custody_control_pins
-from empirical_lawhood.infrastructure.recovery import decode_run_recovery_index, decode_run_recovery_terminal_event
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.development_controller_repair import DevelopmentControllerRepair, DevelopmentControllerRepairRecoveryIndex
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from tests.test_development_output_repair import blocked_case as blocked_case
+from empirical_lawhood.storage.recovery import decode_run_recovery_index, decode_run_recovery_terminal_event
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.development_controller_repair import DevelopmentControllerRepair, DevelopmentControllerRepairRecoveryIndex
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from tests.test_development_output_repair import _IndexedRoster, blocked_case as blocked_case
+
+
+@pytest.mark.parametrize('size', (16, 4096))
+def test_controller_repair_nonselected_tasks_use_bounded_roster_lookups(size):
+    from types import SimpleNamespace
+    rows = _IndexedRoster(f'task.{i:06d}' for i in range(size))
+    selected = SimpleNamespace(output_task_ids=rows)
+    original = SimpleNamespace(task_id='task.999999')
+    assert DevelopmentControllerRepair.task(selected, original) is original
+    assert rows.reads <= size.bit_length() + 1
 
 
 def _derive(case, monkeypatch, **changes):
@@ -75,7 +85,7 @@ def test_controller_repair_refuses_unsafe_original_work_or_changed_science(block
     elif damage == 'lock':
         changes['controller'] = replace(case.controller, dependency_lock_sha256='e' * 64)
     elif damage == 'science':
-        rows = tuple((name, 'e' * 64 if name.startswith('kernel/') else digest)
+        rows = tuple((name, 'e' * 64 if name.startswith('science/') else digest)
             for name, digest in case.controller.package_sources)
         changes['controller'] = replace(case.controller, package_sources=rows,
             code_sources_sha256=sha256(canonical_json_bytes(rows)).hexdigest())
@@ -130,8 +140,8 @@ def test_controller_repair_includes_unstarted_tasks_without_replacing_original_p
 
 @pytest.mark.parametrize('blocked_case', ('native-dependent',), indirect=True)
 def test_controller_repair_enters_only_original_uncontacted_native_task_once(blocked_case, monkeypatch):
-    from empirical_lawhood.runtime.artifacts import ReceiptCheck
-    from empirical_lawhood.runtime.execution import RunnerResult, TaskOutputPayload, WorkerInputKind
+    from empirical_lawhood.storage.contracts.artifacts import ReceiptCheck
+    from empirical_lawhood.execution.execution import RunnerResult, TaskOutputPayload, WorkerInputKind
     from tests.runtime_platform.test_recursive_compiler import Config
     case = blocked_case
     contacts = owner._contacts(case.plane, case.plan)

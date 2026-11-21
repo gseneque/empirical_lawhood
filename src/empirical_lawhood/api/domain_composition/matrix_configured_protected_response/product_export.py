@@ -3,24 +3,21 @@
 
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_exports import ConfiguredProtectedE3ProductExportSelection
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_inputs import ConfiguredProtectedE3PreFitJoin
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_statistical_bindings import statistical_task_id
-from empirical_lawhood.api.codecs import MAX_CAMPAIGN_PACKAGE_BYTES
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_exports import ConfiguredProtectedE3ProductExportSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_inputs import ConfiguredProtectedE3PreFitJoin
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_statistical_bindings import statistical_task_id
 from empirical_lawhood.api.current_result_custody import _current_control
 from empirical_lawhood.api.models import ExperimentPackage
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, inherited_visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, derived_outcome_access, lineage_parent_sort_key,
-)
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, inherited_visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, derived_outcome_access, lineage_parent_sort_key
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
 
 
 _PRODUCTS = (("models", "fit", ""), ("model-freeze", "freeze", "model"),
@@ -82,7 +79,7 @@ def _write_request(selection, filename, record, parents, *, logical_id):
 def export_configured_protected_e3_products(*, directory, selected, project_root, artifact_writer,
         selection_path):
     """Read, validate and publish without scheduling, repairing or issuing work."""
-    from .scientific_read import read_protected_e3_original_products
+    from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.scientific_read import read_protected_e3_original_products
 
     path = Path(selection_path)
     if any(value.is_symlink() for value in (path, *path.parents)):
@@ -94,7 +91,7 @@ def export_configured_protected_e3_products(*, directory, selected, project_root
     for filename in _FILENAMES:
         artifact_writer.root.resolve(selection.output_relative_path + "/" + filename, for_write=True)
     package = _current_control(writer=artifact_writer, run_id=selection.run_id, name="campaign-package",
-        record_type=ExperimentPackage, maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES)
+        record_type=ExperimentPackage, maximum_bytes=None)
     if _identity(package, "package_id") != selection.original_package:
         raise PermissionError("configured E3 export substitutes its selected original issued package")
     with read_protected_e3_original_products(selected=selected, artifact_writer=artifact_writer,

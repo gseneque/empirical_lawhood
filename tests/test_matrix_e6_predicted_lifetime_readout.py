@@ -12,8 +12,8 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import matrix_selected_scientific_read as reader
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.e6_transport_records import METHODS
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import PREDICTORS
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.e6_transport_records import METHODS
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import PREDICTORS
 
 
 HORIZONS = (16, 64, 128)

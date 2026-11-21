@@ -7,16 +7,16 @@ reduction. It never acquires, predicts, opens arrays or confers qualification.
 """
 from hashlib import sha256
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as r
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_science as science
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_publications import authenticate_request
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census, has_response_measurements, validate_response_native_evidence
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as r
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_science as science
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_publications import authenticate_request
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census, has_response_measurements, validate_response_native_evidence
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 from empirical_lawhood.api.matrix_native_read_custody import _record, _array, _producers, _graph
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
 
 def _deferred(specification, reason):
     return {"scientific_completion": "NOT_ESTABLISHED", "state": "NATIVE_UTILITY_ASSESSMENT_DEFERRED",

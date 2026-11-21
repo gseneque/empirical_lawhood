@@ -6,13 +6,13 @@ from fractions import Fraction
 from hashlib import sha256
 
 import pytest
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import records as old,science as old_science
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_records as r,compact_science as science
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import lifetime
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import MatrixHistorySeed
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import ScientificStatus
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import records as old, science as old_science
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_records as r, compact_science as science
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import lifetime
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import MatrixHistorySeed
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import ScientificStatus
 from tests.test_matrix_factor_confirmation_history import e1 as e1
 from tests.test_matrix_factor_confirmation_eligibility import publish,provenance as provenance,stock as stock
 from tests.test_matrix_factor_confirmation_adjudication import products as old_products

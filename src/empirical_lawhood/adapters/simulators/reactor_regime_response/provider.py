@@ -15,55 +15,40 @@ from typing import Callable, Protocol, TypeVar
 
 import numpy as np
 
-from empirical_lawhood.adapters.methods.reactor_causal_response.campaign_records import EmpiricalStudySource
-from empirical_lawhood.adapters.methods.reactor_causal_response.provider import DependencyCustodyReader, validate_dependency
-from empirical_lawhood.adapters.methods.reactor_causal_response.resource_contract import EmpiricalResourceGuard
-from empirical_lawhood.adapters.methods.reactor_regime_response.config import ROOTS
-from empirical_lawhood.adapters.methods.reactor_regime_response.calibration_pipeline import RegimeCalibrationPackage
-from empirical_lawhood.adapters.methods.reactor_regime_response.causal_contexts import causal_contexts
-from empirical_lawhood.adapters.methods.reactor_regime_response.records import RegimeAssayPanel, RegimeCausalPreparation, RegimePredictionSeal, RegimePrivatePreparation
-from empirical_lawhood.adapters.methods.reactor_regime_response.nomination_records import RegimeNominationPackage
-from empirical_lawhood.adapters.methods.reactor_regime_response.control_prospective_plan import ReactorRegimeResponsePreparedProspectivePlanBundle
-from empirical_lawhood.adapters.methods.reactor_regime_response.control_owner import ControlRecordPublisher
-from empirical_lawhood.adapters.methods.reactor_regime_response.prospective_decision import CausalValidityRegimeAssignment
-from empirical_lawhood.adapters.methods.law_assessment import CandidatePayloadReader
-from empirical_lawhood.adapters.methods.reactor_regime_response.prior import RegimePriorArtifact
-from empirical_lawhood.adapters.methods.reactor_regime_response.continuation import NoRegimeRetainedInputs, RegimeRetainedInputsPort, retained_input_map
-from empirical_lawhood.adapters.methods.reactor_regime_response.qualification_pipeline import RegimeQualificationPackage
-from empirical_lawhood.adapters.methods.reactor_regime_response.release import require_scientific_release
-from empirical_lawhood.adapters.methods.reactor_regime_response.law_terminal import RESULT_ID, RegimeJointLawResult
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.controller_evaluation_nested import DurablePreparedExecutionEventStore
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskProgressEmitter,
-    TaskRunner,
-    WorkerInputKind,
-)
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
+from empirical_lawhood.domains.reactor.reactor_causal_response.campaign_records import EmpiricalStudySource
+from empirical_lawhood.domains.reactor.reactor_causal_response.provider import DependencyCustodyReader, validate_dependency
+from empirical_lawhood.domains.reactor.reactor_causal_response.resource_contract import EmpiricalResourceGuard
+from empirical_lawhood.domains.reactor.reactor_regime_response.config import ROOTS
+from empirical_lawhood.domains.reactor.reactor_regime_response.calibration_pipeline import RegimeCalibrationPackage
+from empirical_lawhood.domains.reactor.reactor_regime_response.causal_contexts import causal_contexts
+from empirical_lawhood.domains.reactor.reactor_regime_response.records import RegimeAssayPanel, RegimeCausalPreparation, RegimePredictionSeal, RegimePrivatePreparation
+from empirical_lawhood.domains.reactor.reactor_regime_response.nomination_records import RegimeNominationPackage
+from empirical_lawhood.domains.reactor.reactor_regime_response.control_prospective_plan import ReactorRegimeResponsePreparedProspectivePlanBundle
+from empirical_lawhood.domains.reactor.reactor_regime_response.control_owner import ControlRecordPublisher
+from empirical_lawhood.domains.reactor.reactor_regime_response.prospective_decision import CausalValidityRegimeAssignment
+from empirical_lawhood.methods.law_assessment import CandidatePayloadReader
+from empirical_lawhood.domains.reactor.reactor_regime_response.prior import RegimePriorArtifact
+from empirical_lawhood.domains.reactor.reactor_regime_response.continuation import NoRegimeRetainedInputs, RegimeRetainedInputsPort, retained_input_map
+from empirical_lawhood.domains.reactor.reactor_regime_response.qualification_pipeline import RegimeQualificationPackage
+from empirical_lawhood.domains.reactor.reactor_regime_response.release import require_scientific_release
+from empirical_lawhood.domains.reactor.reactor_regime_response.law_terminal import RESULT_ID, RegimeJointLawResult
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.controller_evaluation_nested import DurablePreparedExecutionEventStore
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskProgressEmitter, TaskRunner, WorkerInputKind
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .acquisition import acquire_assays, acquire_preparation
-from .config import ReactorRegimeNativeConfig
-from .extension_bundle import CAPABILITY
-from .prospective_acquisition import acquire_prospective_root
-from .prospective_records import RegimeDNativeRoot
+from empirical_lawhood.adapters.simulators.reactor_regime_response.acquisition import acquire_assays, acquire_preparation
+from empirical_lawhood.domains.reactor.reactor_regime_response.native_config import ReactorRegimeNativeConfig
+from empirical_lawhood.adapters.simulators.reactor_regime_response.extension import CAPABILITY
+from empirical_lawhood.adapters.simulators.reactor_regime_response.prospective_acquisition import acquire_prospective_root
+from empirical_lawhood.domains.reactor.reactor_regime_response.prospective_records import RegimeDNativeRoot
 
 RecordT = TypeVar("RecordT", bound=CanonicalRecord)
 

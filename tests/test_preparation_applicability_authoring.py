@@ -8,14 +8,14 @@ from contextlib import nullcontext
 import pytest
 
 from tests.preparation_applicability_fixtures import stage_and_source,allocation
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.records import ConstructedPreparationReport
-from empirical_lawhood.adapters.methods.preparation_applicability.exposure import effective_seed_ids
-from empirical_lawhood.adapters.composition.phase_authoring import PhaseContextProvider
-from empirical_lawhood.api.authoring_handoff import create_authoring_api,write_exclusive_record
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.records import ConstructedPreparationReport
+from empirical_lawhood.domains.matrix.preparation_applicability.exposure import effective_seed_ids
+from empirical_lawhood.execution.phase_authoring import PhaseContextProvider
+from empirical_lawhood.api.authoring_handoff import create_authoring_api, write_exclusive_record
 from empirical_lawhood.api.results import CompileCandidateRequest
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.compiler import compile_preissue_run_plan,lower_run_plan
-from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.compiler import compile_preissue_run_plan, lower_run_plan
+from empirical_lawhood.execution.study_issue import project_standard_study_extensions
 
 
 def qualified_report(stage,source,qualified=True):
@@ -29,8 +29,8 @@ def qualified_report(stage,source,qualified=True):
 
 
 def ordinary_stage(phase):
-    from empirical_lawhood.adapters.methods.preparation_applicability.config import PreparationApplicabilityStage,PreparationApplicabilitySource
-    from empirical_lawhood.adapters.methods.preparation_applicability.records import PreparationApplicabilityDesign
+    from empirical_lawhood.domains.matrix.preparation_applicability.config import PreparationApplicabilityStage, PreparationApplicabilitySource
+    from empirical_lawhood.domains.matrix.preparation_applicability.records import PreparationApplicabilityDesign
     q,source=stage_and_source()
     source=PreparationApplicabilitySource(source.implementation_plan_sha256,source.dependency_lock_sha256,source.native_implementation,source.conformance_receipt)
     return PreparationApplicabilityStage(f"exposed.synthetic.ordinary.{phase.lower()}",PreparationApplicabilityDesign(),phase,
@@ -40,16 +40,16 @@ def ordinary_stage(phase):
 @pytest.mark.parametrize("family,phase,count",[("constructed","Q",50),("constructed","E",194),("ordinary","D",194),("ordinary","E",386)])
 def test_full_size_current_candidate_outputs_resources_and_factories(tmp_path,family,phase,count):
     if family=="constructed":
-        from empirical_lawhood.adapters.composition.constructed_preparation_applicability.authoring import build_authoring
-        from empirical_lawhood.adapters.composition.constructed_preparation_applicability.resources import resource_envelope
+        from empirical_lawhood.domains.matrix.constructed_preparation_applicability.authoring.authoring import build_authoring
+        from empirical_lawhood.domains.matrix.constructed_preparation_applicability.authoring.resources import resource_envelope
         stage,source=stage_and_source(phase)
         report=qualified_report(stage,source) if phase=="E" else None
         if report:
             stage=replace(stage,upstream=(stage.upstream[0],replace(stage.upstream[1],artifact=replace(stage.upstream[1].artifact,sha256=report.fingerprint(),size_bytes=len(report.canonical_bytes())))))
         bundle=build_authoring(stage,source,implementation_sha256="c"*64,specification_sha256="1"*64,qualified_report=report)
     else:
-        from empirical_lawhood.adapters.composition.preparation_applicability.authoring import build_authoring
-        from empirical_lawhood.adapters.composition.preparation_applicability.resources import resource_envelope
+        from empirical_lawhood.domains.matrix.preparation_applicability.authoring.authoring import build_authoring
+        from empirical_lawhood.domains.matrix.preparation_applicability.authoring.resources import resource_envelope
         stage,source=ordinary_stage(phase)
         bundle=build_authoring(stage,source,implementation_sha256="c"*64,specification_sha256="1"*64)
     authoring=write_exclusive_record(tmp_path,"authoring.json",bundle.authoring)
@@ -80,8 +80,8 @@ def test_full_size_current_candidate_outputs_resources_and_factories(tmp_path,fa
 @pytest.mark.parametrize("failure",("missing","unqualified","numerical","wrong-lower","overlap"))
 def test_native_E_guard_precedes_every_prefix_contact(monkeypatch,failure):
     from empirical_lawhood.adapters.simulators.constructed_preparation_applicability.provider import ConstructedPreparationNativeRunner
-    from empirical_lawhood.adapters.methods.constructed_preparation_applicability.config import ConstructedPreparationNativeConfig
-    from empirical_lawhood.runtime.execution import WorkerInputKind
+    from empirical_lawhood.domains.matrix.constructed_preparation_applicability.config import ConstructedPreparationNativeConfig
+    from empirical_lawhood.execution.execution import WorkerInputKind
     stage,source=stage_and_source("E")
     report=qualified_report(stage,source,qualified=failure!="unqualified")
     if failure=="numerical":

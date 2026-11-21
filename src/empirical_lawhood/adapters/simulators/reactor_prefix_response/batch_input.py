@@ -11,11 +11,11 @@ import os
 from empirical_lawhood.adapters._bounded_files import AdapterFileBoundError, read_bounded_contained
 from typing import ClassVar
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
 
-from .batch_design import BATCH_SOURCE_SHA256, ReactorBatchSource, validate_nominal_spec
-from .contracts import PARAMS_SHA256, PLANT_SHA256, PUBLIC_SCENARIOS_SHA256
-from .forecast import REFERENCE_SHA256
+from empirical_lawhood.domains.reactor.reactor_prefix_response.batch_design import BATCH_SOURCE_SHA256, ReactorBatchSource, validate_nominal_spec
+from empirical_lawhood.domains.reactor.reactor_prefix_response.contracts import PARAMS_SHA256, PLANT_SHA256, PUBLIC_SCENARIOS_SHA256
+from empirical_lawhood.domains.reactor.reactor_prefix_response.forecast_contracts import REFERENCE_SHA256
 
 SOURCE_MEMBERS = (
     ("tests/plant.py", 32768, PLANT_SHA256),
@@ -177,8 +177,8 @@ def check_batch_input(
 ) -> dict[str, object]:
     """Select the retained batch provider without issue or native contact."""
 
-    from .batch_design import ReactorBatchConfig, assigned_scenarios
-    from .reactor_binding import inspect_reactor_binding
+    from empirical_lawhood.domains.reactor.reactor_prefix_response.batch_design import ReactorBatchConfig, assigned_scenarios
+    from empirical_lawhood.adapters.simulators.reactor_prefix_response.reactor_binding import inspect_reactor_binding
 
     source = load_batch_source(source_root)
     if source.fingerprint() != config.source_sha256:

@@ -35,8 +35,8 @@ and `HistoryBudgetPhaseDiagramDiscreteRankBracket` with one shared numerical cer
 The [scientific integrity guide](../reference/scientific-integrity.md#rigorous-threshold-rank) states its mathematical target, proof obligations and evidence limits. The Student paths assemble separate
 `ControllerUnitEvaluation` and `NestedControllerUnitEvaluation` records.
 
-The small locator import seam now uses `kernel.serialization` directly in
-runtime plans and catalog; the existing `runtime.artifacts` re-export remains
+The small locator import seam now uses `science.records.serialization` directly in
+runtime plans and catalog; the existing `storage.contracts.artifacts` re-export remains
 the same function. This changes ownership references without changing locator
 acceptance, scientific algorithms or canonical products.
 

@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Exposed real custody controls; never a molecular model or native qualification."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from hashlib import sha256
@@ -13,24 +14,22 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import durable_contracts as d
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_roster import definitions, freeze, census, recover_unit, completed_call_custody
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_preparation import (
-    DurableCallLedger, DurablePreparationRunner, complete_unit, copy_completed_geometry, directory_census, raw_archive_chunks,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_instrumentation import instrument_completion, selected_value
-from empirical_lawhood.infrastructure.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, TaskProcessError
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
-from empirical_lawhood.runtime.execution import WorkerOutputPort
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import durable_contracts as d
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_roster import definitions, freeze, census, recover_unit, completed_call_custody
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_preparation import DurableCallLedger, DurablePreparationRunner, complete_unit, copy_completed_geometry, directory_census, raw_archive_chunks
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_instrumentation import instrument_completion, selected_value
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
+
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, TaskProcessError
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.execution.execution import WorkerOutputPort
 from tests.runtime_platform.test_native_subwork import ExposedInput, _plane, _store, _process_context
 
 
@@ -62,8 +61,7 @@ def selected(tmp_path, request):
         result = plane.write(ArtifactWriteRequest(name, "inputs/" + name + ".json", record.SCHEMA,
             ArtifactProfile.CANONICAL_JSON, "application/json", "selected.inputs", "inputs", record.canonical_bytes(),
             VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
-        manifests.append(decode_artifact_manifest(plane.root.resolve(
-            result.materialization.relative_path + ".manifest.json", for_write=False).read_bytes()))
+        manifests.append(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()))
     parent = NativeEffectContact("synthetic.run", "native.parent", "synthetic.run.native.parent.attempt-001",
         ObjectIdentity("plan.selected", "empirical-lawhood/runtime/development-execution-plan", "1.0.0", "1" * 64),
         ObjectIdentity("native.parent", "empirical-lawhood/runtime/execution-task", "1.0.0", "2" * 64),
@@ -141,6 +139,10 @@ def test_actual_conditional_operands_and_full_binary_returns_survive_before_guar
     assert after in raw(selected, call, "files.raw")
     carrier, = selected.store.iter_roster_definitions(call.parent_contact, call.subwork_id + ".operand-roster")
     assert before in raw(selected, carrier, "files.raw")
+    operand_completion = selected.progress.recover(carrier).completion
+    assert operand_completion.cost.cpu_seconds is not None and operand_completion.cost.cpu_seconds >= 0
+    assert operand_completion.cost.wall_seconds is not None and operand_completion.cost.wall_seconds > 0
+    assert 'request census and operand publication' in operand_completion.cost_scope
     bound = json.loads(raw(selected, carrier, "call.operand"))
     assert bound["value"]["requested_json"] == '{"full_state":"positions.bin","internal_iterations":null}'
     assert call.configuration.object_fingerprint == sha256(raw(selected, carrier, "call.operand")).hexdigest()
@@ -323,7 +325,44 @@ def test_native_file_mutation_cannot_satisfy_old_raw_census(selected):
     selected_census = directory_census(directory, selected.root)
     path.write_bytes(b"changed!")
     with pytest.raises(ValueError, match="byte census"):
-        b"".join(raw_archive_chunks(directory, selected.root, selected_census, maximum_chunk_bytes=3))
+        b"".join(raw_archive_chunks(selected.root, selected_census, maximum_chunk_bytes=3))
+
+
+def test_native_operand_publication_reuses_exact_request_census(selected, monkeypatch):
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import durable_preparation as durable
+    _, _, directory, ledger = unit(selected)
+    (directory/'operand.bin').write_bytes(b'original')
+    original = durable.directory_census
+    reads = []
+    def counted(*args):
+        result = original(*args)
+        reads.append(result)
+        return result
+    monkeypatch.setattr(durable, 'directory_census', counted)
+    assert ledger.call('exposed.no-molecular-work', {}, lambda: 17) == 17
+    # Request selection, operand close, return selection, return close.
+    # The two framed-body reads remain independently pinned to those selections.
+    assert len(reads) == 4
+    assert all(row == reads[0] for row in reads)
+    assert len(ledger.calls) == 1
+
+
+def test_operand_archive_cannot_resample_changed_request_files_before_native_entry(selected, monkeypatch):
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import durable_preparation as durable
+    _, _, directory, ledger = unit(selected)
+    path = directory/'operand.bin'
+    path.write_bytes(b'original')
+    original = durable.publish_record
+    contacted = []
+    def changed(progress, entry, output_id, record):
+        result = original(progress, entry, output_id, record)
+        if output_id == 'call.operand':
+            path.write_bytes(b'changed!')
+        return result
+    monkeypatch.setattr(durable, 'publish_record', changed)
+    with pytest.raises(ValueError, match='selected byte census'):
+        ledger.call('exposed.no-molecular-work', {}, lambda: contacted.append(True))
+    assert contacted == [] and ledger.call_definitions == []
 
 
 def test_complete_native_quantity_keeps_units_binary_values_and_array_shape():
@@ -366,7 +405,7 @@ def test_numpy_scalar_vec3_quantity_and_arrays_retain_actual_dtype_shape_bits():
 
 def test_large_native_positions_are_streamed_as_complete_file_operands(tmp_path):
     import numpy as np
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_instrumentation import write_full_positions
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_instrumentation import write_full_positions
     original = np.arange(3 * 100_000, dtype="<f8").reshape((-1, 3))
     path = tmp_path / "complete-positions.json"
     write_full_positions(path, original)
@@ -377,7 +416,7 @@ def test_large_native_positions_are_streamed_as_complete_file_operands(tmp_path)
 
 
 def test_tleap_environment_is_minimal_and_does_not_capture_inherited_credentials(selected, monkeypatch):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_native_entry import selected_tleap_environment
+    from empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics.durable_native_entry import selected_tleap_environment
     monkeypatch.setenv("EXPOSED_CREDENTIAL_SENTINEL", "never-retain-this-value")
     environment = selected_tleap_environment(selected.plan, selected.root)
     assert "EXPOSED_CREDENTIAL_SENTINEL" not in environment
@@ -390,7 +429,7 @@ def test_network_refusal_precedes_resolution_and_keeps_only_redacted_event(tmp_p
     repo = Path(__file__).resolve().parents[1]
     path = tmp_path / "network-refusal.jsonl"
     script = """import socket, sys
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_native_entry import refuse_external_network
+from empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics.durable_native_entry import refuse_external_network
 refuse_external_network(sys.argv[1])
 try:
     socket.getaddrinfo('exposed-never-contact.invalid', 443)
@@ -414,7 +453,8 @@ class Refuse:
         if fullname.split('.')[0] in {'numpy','scipy','openmm','pdbfixer','parmed','pybamm','flint'}:
             raise AssertionError('unselected native/scientific import ' + fullname)
 sys.meta_path.insert(0, Refuse())
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import durable_contracts, durable_roster, durable_preparation, durable_instrumentation, durable_native_entry
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import durable_contracts, durable_roster, durable_preparation, durable_instrumentation
+from empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics import durable_native_entry
 """
     result = subprocess.run([sys.executable, "-c", script], cwd=repo,
         env={"PYTHONPATH": str(repo / "src"), "PYTHONDONTWRITEBYTECODE": "1"}, capture_output=True, check=False)
@@ -422,9 +462,7 @@ from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import durable
 
 
 def test_complete_selected_engine_file_link_and_actual_loaded_module_authentication(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_native_entry import (
-        authenticate_engine_stock, authenticate_loaded_engine_modules,
-    )
+    from empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics.durable_native_entry import authenticate_engine_stock, authenticate_loaded_engine_modules
     selected_file = tmp_path / "selected-engine-file.py"
     selected_file.write_bytes(b"exposed selected engine source, no engine or model\n")
     link = tmp_path / "selected-engine-link"
@@ -463,7 +501,7 @@ def test_complete_selected_engine_file_link_and_actual_loaded_module_authenticat
 
 
 def test_actual_fixer_mutation_and_missing_atom_returns_keep_full_positions_topology(selected):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_instrumentation import selected_fixer_factory
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_instrumentation import selected_fixer_factory
     definition, entry, directory, ledger = unit(selected)
     chain = SimpleNamespace(index=0, id="A")
     residue = SimpleNamespace(index=0, id="1", name="MET", chain=chain)
@@ -500,7 +538,7 @@ def test_actual_fixer_mutation_and_missing_atom_returns_keep_full_positions_topo
 @pytest.mark.parametrize("dtype,strided", [(">f8", False), (">f8", True), ("<f8", True)])
 def test_full_position_file_preserves_non_native_byteorder_noncontiguous_shape_and_nan_payload(tmp_path, dtype, strided):
     import numpy as np
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_instrumentation import write_full_positions
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_instrumentation import write_full_positions
     value = np.arange(36, dtype=dtype).reshape(6, 6)
     # Deliberately chosen binary64 payload, negative zero and infinity survive.
     value.view(dtype.replace("f8", "u8"))[0, :3] = (0x7ff8000000000123, 0x8000000000000000, 0x7ff0000000000000)

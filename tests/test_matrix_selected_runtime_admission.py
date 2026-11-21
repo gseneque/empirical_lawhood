@@ -5,8 +5,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_bindings import ENTRY_ORIGINAL_COMMITMENTS_KEY, operation_declarations
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_workers import SelectedProtectedWorker
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_bindings import ENTRY_ORIGINAL_COMMITMENTS_KEY, operation_declarations
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_workers import SelectedProtectedWorker
 from empirical_lawhood.api import matrix_selected_runtime as owner
 
 
@@ -50,7 +50,7 @@ def test_source_qualification_distinguishes_authenticated_compiler_config_from_s
 
 def test_registered_api_binding_validates_original_instance_before_binding_ports(monkeypatch):
     from empirical_lawhood.api.domain_composition.matrix_selected_declarative import experiment_binding as binding
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as domain
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as domain
     calls = []
     def refuse(**kwargs):
         calls.append('exact-retained-instance')

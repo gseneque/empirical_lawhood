@@ -9,36 +9,36 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods import matrix_prepared_source_records as r
-from empirical_lawhood.adapters.methods import matrix_prepared_source_bindings as bindings
-from empirical_lawhood.adapters.methods import matrix_prepared_source_pipeline as rows_owner
-from empirical_lawhood.adapters.methods import matrix_prepared_source_experiment as public
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_records as preparation
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_prefix
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_forecast import MatrixPreparedMechanicalForecast
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_response_science import MatrixPreparedResponseReadout
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_development_product import MatrixSelectedDevelopmentProduct
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_opportunity_future import MatrixSelectedOpportunityFutureHistory
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as train
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import MatrixParameterNumericalDesign
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledResponseSelection
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+from empirical_lawhood.domains.matrix import matrix_prepared_source_records as r
+from empirical_lawhood.domains.matrix import matrix_prepared_source_bindings as bindings
+from empirical_lawhood.domains.matrix import matrix_prepared_source_pipeline as rows_owner
+from empirical_lawhood.domains.matrix import matrix_prepared_source_experiment as public
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import preparation_records as preparation
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_prefix
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_forecast import MatrixPreparedMechanicalForecast
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_response_science import MatrixPreparedResponseReadout
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_development_product import MatrixSelectedDevelopmentProduct
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_opportunity_future import MatrixSelectedOpportunityFutureHistory
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as train
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import MatrixParameterNumericalDesign
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledResponseSelection
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
 from tests.test_matrix_finite_dt_source import _unexecuted
 from tests.test_matrix_selected_opportunity import opportunity, literal_observations  # noqa: F401
 from tests.test_matrix_selected_protected import transfer, confirmation, unpublished  # noqa: F401
 
 
 def prepared_bank(programme, *, publisher=None):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import corpus_artifact, exposure_support
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import corpus_artifact, exposure_support
     closure = programme.sources.closure
     # Default descriptors remain deliberately unexecuted. Custody controls can
     # explicitly publish these same scientific records on their ordinary plane.
@@ -83,7 +83,7 @@ def disclosed_control(bank, source, *, available=True):
 
 
 def disclosed_certificate(bank, opportunity):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_opportunity import nominate_selected_opportunity
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_opportunity import nominate_selected_opportunity
     _, nomination = nominate_selected_opportunity(opportunity, literal_observations(opportunity), result_id='nomination.disclosed.prepared-source')
     publication = unpublished(nomination, 'publication.disclosed.prepared-source')
     publication = replace(publication, logical=replace(publication.logical, outcome_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
@@ -147,7 +147,7 @@ def test_prepared_source_preserves_nonuse_and_rejects_invented_completed_control
 
 
 def test_installed_prepared_methods_declare_every_real_phase_specific_operand():
-    from empirical_lawhood.runtime.candidate_compiler import _ALLOWED_STAGE_KINDS
+    from empirical_lawhood.execution.candidate_compiler import _ALLOWED_STAGE_KINDS
     declarations = bindings.gate_declarations()
     assert len(declarations) == 12 and len({value.capability_key for value in declarations}) == 12
     for phase in ('E5_CONFIRMATION', 'E6_TRANSFER'):
@@ -166,7 +166,7 @@ def test_installed_prepared_methods_declare_every_real_phase_specific_operand():
 
 def test_public_prepared_source_first_stop_is_static_and_four_worker_selected(tmp_path):
     from empirical_lawhood.api.experiment_preparation import load_experiment_specification, prepare_experiment
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
     specification = public.MatrixPreparedSourceQualificationSpecification('specification.disclosed.prepared-source',
         _unexecuted('selection.prepared-source', public.MatrixPreparedSourceQualificationSelection), 4)
     path = tmp_path / 'prepared-source-specification.json'
@@ -180,7 +180,7 @@ def test_public_prepared_source_first_stop_is_static_and_four_worker_selected(tm
 
 def test_prepared_roster_keeps_hold_recipe_nested_units_and_actual_metadata_owner(confirmation):  # noqa: F811
     from empirical_lawhood.api.matrix_finite_dt_dataset_metadata import select_rows_owner, dataset_registries
-    from empirical_lawhood.kernel.authority import ResourceBudget
+    from empirical_lawhood.science.identity.authority import ResourceBudget
     bank = prepared_bank(confirmation)
     rows = rows_owner.MatrixPreparedPendingSourceRows.from_bank(bank, bank, record_id='rows.disclosed.prepared-source')
     rule = rows_owner.MatrixPreparedSourceValidationRule('rule.disclosed.prepared-source', bank.identity, bank.identity, rows.identity)
@@ -240,19 +240,19 @@ def prepared_public_case(tmp_path, bank, certificate, writer):
     from decimal import Decimal
     from pathlib import Path
     from unittest.mock import patch
-    from empirical_lawhood.adapters.methods.matrix_source_evidence import MatrixSourcePipelineEvidence
+    from empirical_lawhood.domains.matrix.matrix_source_evidence import MatrixSourcePipelineEvidence
     from empirical_lawhood.api.matrix_finite_dt_source_pipeline import publish_finite_dt_source_metadata
     from empirical_lawhood.api.recursive_authoring import implementation_binding
     from empirical_lawhood.api.recursive_operations import operation_catalog
     from empirical_lawhood.api.recursive_prospective_authoring import preview_recursive_prospective_candidate
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_preparation import _source_projection
-    from empirical_lawhood.kernel.authority import ResourceBudget
-    from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-    from empirical_lawhood.planning.evidence_profiles import EvidenceWorldKind, bind_profile_selection, build_observation_evidence_world_registry
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-    from empirical_lawhood.runtime.experiment_resources import bind_execution_resources
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-    from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveDesignInputs, RecursiveProspectiveOperand
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_preparation import _source_projection
+    from empirical_lawhood.science.identity.authority import ResourceBudget
+    from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+    from empirical_lawhood.design.evidence_profiles import EvidenceWorldKind, bind_profile_selection, build_observation_evidence_world_registry
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.experiment_resources import bind_execution_resources
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveDesignInputs, RecursiveProspectiveOperand
     from tests import matrix_selected_source_predecessor as existing
     from tests.experiment_entry_support import standard_authoring_for_draft
     from tests.matrix_selected_e4_public_fixture import _source_admissions
@@ -340,7 +340,7 @@ def prepared_public_case(tmp_path, bank, certificate, writer):
 
 def test_disclosed_prepared_source_projection_compiles_but_public_bootstrap_refuses_missing_locators(tmp_path, confirmation, opportunity):  # noqa: F811
     from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, load_experiment_specification, prepare_experiment
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
     from tests.test_matrix_native_training_acquisition import fresh_training_metadata_case
     (tmp_path / 'training').mkdir()
     training=fresh_training_metadata_case(tmp_path / 'training')
@@ -380,7 +380,7 @@ def test_pure_certificate_does_not_bypass_actual_original_dev_or_native_custody(
 
 def test_actual_consumer_must_use_exact_qualified_source_assay_and_future_panels(confirmation):  # noqa: F811
     from hashlib import sha256
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource
     from empirical_lawhood.api.matrix_prepared_source_runtime import _validate_consumer_programme
     bank = prepared_bank(confirmation)
     point = replace(confirmation.point_design, sources=tuple(sorted(((arm, MatrixPreparedPublicSource.from_source(source))
@@ -431,8 +431,8 @@ def test_e6_prepared_cutoffs_keep_both_original_regime_clocks_and_refuse_invalid
 def test_e6_source_scientific_root_retains_each_exact_original_physical_cutoff(transfer,opportunity):  # noqa: F811
     from decimal import Decimal
     from empirical_lawhood.api.domain_composition.matrix_prepared_source_assembly.assembly import source_root_from_e3
-    from empirical_lawhood.kernel.authority import ResourceBudget
-    from empirical_lawhood.kernel.experiments import validate_experiment_against_system
+    from empirical_lawhood.science.identity.authority import ResourceBudget
+    from empirical_lawhood.science.experiments.experiments import validate_experiment_against_system
     from tests.test_matrix_finite_dt_source_production import _source_test_template
     bank=prepared_bank(transfer)
     certificate=disclosed_certificate(bank,opportunity)

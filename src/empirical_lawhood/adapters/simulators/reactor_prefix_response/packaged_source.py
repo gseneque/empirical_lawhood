@@ -5,7 +5,7 @@ SPDX-License-Identifier: MPL-2.0
 
 from importlib import resources
 
-from .panel import ReactorSourceBundle
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_panel import ReactorSourceBundle
 
 
 _RESOURCE_ROOT = resources.files("empirical_lawhood").joinpath(

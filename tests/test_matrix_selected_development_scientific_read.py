@@ -13,12 +13,12 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import matrix_selected_development_scientific_read as reader
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as declarative
-from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile,ArtifactWriteRequest,CanonicalTaskReceipt
-from empirical_lawhood.runtime.prospective_experiment import source_filename
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as declarative
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.prospective_experiment import source_filename
 from tests.test_matrix_selected_protected import transfer  # noqa: F401
 from tests.test_matrix_selected_opportunity import opportunity,literal_observations  # noqa: F401
 from tests.test_matrix_selected_declarative_preparation import science, request as selected_request, selection
@@ -120,7 +120,7 @@ def test_current_dev_read_exposes_all_three_arms_and_adverse_nomination(actual_c
 @pytest.mark.parametrize('mode', ('off', 'full'))
 def test_programme_decision_consumption_preserves_nomination_without_optional_reports(actual_context, monkeypatch, mode):
     from empirical_lawhood.api import matrix_programme_decisions as decisions, recursive_execution, experiment_scientific_read
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
     f = actual_context
     calls = []
     def retained(**options):
@@ -197,7 +197,7 @@ def test_current_public_dev_route_registers_its_lazy_scientific_reader():
 def test_development_science_bounds_whole_census_guards(actual_context,record_property):
     """Many retained products must not rescan the growing census per member."""
     import sys
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
     f=actual_context
     guards=[]
     code=ExternalArtifactPlane._require_verification_snapshot_paths.__code__
@@ -215,7 +215,7 @@ def test_development_science_bounds_whole_census_guards(actual_context,record_pr
 
 
 def test_development_science_rechecks_final_bytes_and_expires_its_scope(actual_context,monkeypatch):
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
     f=actual_context
     publication=f.publications[f.final.task_id,'product']
     path=f.plane.root.resolve(publication.materialization.relative_path,for_write=False)

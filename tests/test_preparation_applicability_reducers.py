@@ -10,11 +10,11 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.finite_response_law.assigned_prediction import AssignedPrediction
-from empirical_lawhood.adapters.methods.preparation_applicability import measurement
-from empirical_lawhood.adapters.methods.preparation_applicability.science import CAPS, DELTA
-from empirical_lawhood.adapters.methods.preparation_applicability.statistics import paired_binary_test
-from empirical_lawhood.adapters.simulators.preparation_applicability.contracts import WORDS
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_prediction import AssignedPrediction
+from empirical_lawhood.domains.matrix.preparation_applicability import measurement
+from empirical_lawhood.domains.matrix.preparation_applicability.science import CAPS, DELTA
+from empirical_lawhood.domains.matrix.preparation_applicability.statistics import paired_binary_test
+from empirical_lawhood.domains.matrix.preparation_applicability.words import WORDS
 
 
 class _SyntheticLower:

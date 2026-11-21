@@ -8,14 +8,10 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammeProjectionContext
-from empirical_lawhood.infrastructure.artifacts import (
-    ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot,
-)
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, ExternalRootContract,
-)
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
 
 
 def _case(tmp_path, count=4):

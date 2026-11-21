@@ -7,17 +7,17 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import matrix_selected_producer_scope as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_composition as e3
-from empirical_lawhood.adapters.methods.matrix_factor_response.eligibility import MatrixFactorExposureCensus
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_statistical_bindings import ProtectedE3FitConfig, ProtectedE3StatisticalConfig, statistical_task_id
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_original_publications import ProtectedE3OriginalPublications
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.study_authoring import DesignOrigin, DesignOriginKind, StudyDraft, StudyDraftLifecycle
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteResult, LogicalArtifactIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRegistry, CapabilityRequirement
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_composition as e3
+from empirical_lawhood.domains.matrix.matrix_factor_response.eligibility import MatrixFactorExposureCensus
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_statistical_bindings import ProtectedE3FitConfig, ProtectedE3StatisticalConfig, statistical_task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_original_publications import ProtectedE3OriginalPublications
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.study_authoring import DesignOrigin, DesignOriginKind, StudyDraft, StudyDraftLifecycle
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteResult, LogicalArtifactIdentity
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRegistry, CapabilityRequirement
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec
 from tests.test_matrix_selected_package import package as exposed_package, reference
 from tests.test_matrix_selected_e4_bank_recipe import literal_recipe_source_inputs  # noqa: F401
 from tests.test_matrix_sampling_follow_on import prior_product
@@ -41,9 +41,8 @@ def case_for(phase, *, frozen=None, training_coordinates=None):
     frozen = exposed_package() if frozen is None else frozen
     family = selected_e3_product_family(frozen.specification)
     if family.configured:
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_statistical_bindings import (
-            ConfiguredProtectedE3FitConfig as FitConfig, ConfiguredProtectedE3StatisticalConfig as StatisticalConfig, fit_capability_key)
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_originals import ConfiguredProtectedE3OriginalPublications as OriginalPublications
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_statistical_bindings import ConfiguredProtectedE3FitConfig as FitConfig, ConfiguredProtectedE3StatisticalConfig as StatisticalConfig, fit_capability_key
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_originals import ConfiguredProtectedE3OriginalPublications as OriginalPublications
     else:
         FitConfig, StatisticalConfig, OriginalPublications = ProtectedE3FitConfig, ProtectedE3StatisticalConfig, ProtectedE3OriginalPublications
     operation, mode = {"fit": ("fit", ""), "model-freeze": ("freeze", "model"),
@@ -208,7 +207,7 @@ def test_missing_real_selected_opportunity_owner_refuses_instead_of_schema_admis
 @pytest.mark.parametrize("phase", ("fit", "model-freeze", "calibrate", "calibration-freeze"))
 def test_original_batch_checks_assay_only_at_fit_and_reuses_authenticated_config(phase, monkeypatch):
     from empirical_lawhood.api import matrix_selected_e3_e4_runtime as projection
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
     from tests.test_matrix_prepared_assay_method import literal_protocol
 
     case, reads, checks = case_for(phase), [], []
@@ -231,8 +230,8 @@ def test_original_batch_checks_assay_only_at_fit_and_reuses_authenticated_config
 
 def _disclosed_original_projection(f):
     """Actual typed lowerer operands; only bounded original control I/O is replaced."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_response_records import ProtectedE3PhysicalForecastConfig
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_response_records import ProtectedE3PhysicalForecastConfig
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
     case, records = f.case, {}
     protocol = case.protocols[0]
@@ -278,7 +277,7 @@ def _disclosed_original_projection(f):
 @pytest.mark.parametrize("damage", (None, "criterion", "force", "template", "tolerance", "fit-pin"))
 def test_complete_selected_assay_matches_actual_original_projection_and_authenticates_supplied_fit(
         literal_recipe_source_inputs, monkeypatch, reuse_fit, damage):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
     from empirical_lawhood.api import matrix_selected_e3_e4_runtime as projection, matrix_selected_runtime
 
     f = literal_recipe_source_inputs
@@ -317,13 +316,13 @@ def test_complete_selected_assay_matches_actual_original_projection_and_authenti
     if damage == "fit-pin":
         assert reads == [ProtectedE3FitConfig]
     else:
-        from empirical_lawhood.adapters.methods.matrix_factor_response.protected_response_records import ProtectedE3PhysicalForecastConfig
+        from empirical_lawhood.domains.matrix.matrix_factor_response.protected_response_records import ProtectedE3PhysicalForecastConfig
         assert reads.count(ProtectedE3PhysicalForecastConfig) == 1
 
 
 def test_declarative_original_batch_forwards_complete_selected_assay_before_publication(monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import MatrixSelectedPublicPackage
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import MatrixSelectedPublicPackage
     from empirical_lawhood.api import matrix_sampling_runtime
     from empirical_lawhood.api.domain_composition.matrix_selected_declarative.derivation import original_e3_package
     from tests.test_matrix_prepared_assay_method import literal_protocol

@@ -5,10 +5,10 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_authoring import SupplierProposal, explain_recursive_draft
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave, project_recursive_assessments
-from empirical_lawhood.runtime.scientific_graph_preservation import prove_development_graph_parity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_authoring import SupplierProposal, explain_recursive_draft
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave, project_recursive_assessments
+from empirical_lawhood.execution.scientific_graph_preservation import prove_development_graph_parity
 from tests.runtime_platform.test_recursive_compiler import fixture
 
 
@@ -99,8 +99,8 @@ def test_selected_supplier_edge_cannot_be_omitted_from_authoritative_requirement
 
 
 def test_issued_recursive_parity_rejects_scientific_cycle_before_issuing_a_proof(tmp_path):
-    from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCandidate
-    from empirical_lawhood.runtime.scientific_graph_preservation import prove_recursive_graph_parity
+    from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCandidate
+    from empirical_lawhood.execution.scientific_graph_preservation import prove_recursive_graph_parity
     from tests.runtime_platform.test_recursive_compiler import prospective_fixture
     from tests.runtime_platform.test_recursive_prospective_workflow import _actual_source, _issued_fixture
 

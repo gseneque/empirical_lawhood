@@ -9,7 +9,7 @@ from typer.testing import CliRunner
 from empirical_lawhood.api.experiment_preparation import prepare_experiment
 from empirical_lawhood.api.results import RunCampaignRequest, ResumeCampaignRequest
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, select_experiment_workers
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, select_experiment_workers
 from tests.test_experiment_preparation_public import _copied_input, _report
 from tests.test_programme_catalog_selection import (
     CATALOG, ROOT, _service, _source_catalog_census,
@@ -17,20 +17,22 @@ from tests.test_programme_catalog_selection import (
 )
 
 
-def test_missing_workers_remain_a_reported_dependency(tmp_path, monkeypatch):
+def test_omitted_workers_are_derived_without_inventing_scientific_dependencies(tmp_path, monkeypatch):
     from empirical_lawhood.cli import platform
 
     monkeypatch.setattr(platform, "CLI_OPERATOR_PROFILE", None)
     spec, path = _copied_input(tmp_path)
     assert ExecutionSelection().workers is None
     prepared = prepare_experiment(spec)
-    assert "experiment.workers" in {row.code for row in prepared.dependencies}
+    assert "experiment.workers" not in {row.code for row in prepared.dependencies}
+    assert prepared.execution.workers >= 1
     assert not prepared.executable
     report = _report(CliRunner().invoke(app, ["campaign", "experiment-explain", "--input", str(path)]))
-    assert "experiment.workers" in {row["code"] for row in report["dependencies"]}
+    assert "experiment.workers" not in {row["code"] for row in report["dependencies"]}
+    assert report["execution"]["workers"] >= 1
 
 
-@pytest.mark.parametrize("workers, profile_maximum", ((True, 4), (0, 4), (4, True), (4, 0), (1, 4)))
+@pytest.mark.parametrize("workers, profile_maximum", ((True, 4), (0, 4), (4, True), (4, 0), (5, 4)))
 def test_invalid_or_conflicting_selection_refuses(workers, profile_maximum):
     with pytest.raises(ValueError):
         select_experiment_workers(workers, profile_maximum=profile_maximum)
@@ -38,7 +40,7 @@ def test_invalid_or_conflicting_selection_refuses(workers, profile_maximum):
 
 def test_public_explanation_uses_selected_profile_without_mount_or_execution(tmp_path, operator, monkeypatch):  # noqa: F811
     from empirical_lawhood.cli import platform
-    from empirical_lawhood.infrastructure.artifacts import GuardedExternalRoot
+    from empirical_lawhood.storage.artifacts import GuardedExternalRoot
 
     profile = replace(operator, maximum_parallel_tasks=4)
     profile_path = tmp_path / "operator.json"
@@ -55,16 +57,19 @@ def test_public_explanation_uses_selected_profile_without_mount_or_execution(tmp
     assert report["execution"]["workers"] == 4
     assert "experiment.workers" not in {row["code"] for row in report["dependencies"]}
     assert report["scientific_execution_performed"] is False
-    bad = CliRunner().invoke(app, ["--project-root", str(ROOT), "--operator-profile", str(profile_path),
+    selected = CliRunner().invoke(app, ["--project-root", str(ROOT), "--operator-profile", str(profile_path),
         "campaign", "experiment-explain", "--input", str(path), "--workers", "1"])
-    assert bad.exit_code == 2 and "selected operator profile" in bad.stderr
+    assert _report(selected)["execution"]["workers"] == 1
+    bad = CliRunner().invoke(app, ["--project-root", str(ROOT), "--operator-profile", str(profile_path),
+        "campaign", "experiment-explain", "--input", str(path), "--workers", "5"])
+    assert bad.exit_code == 2 and "usable CPU capacity" in bad.stderr
 
 
 @pytest.mark.parametrize("lifecycle", ("run", "recover"))
 def test_omitted_run_and_recovery_use_real_selected_api_before_any_worker(
         prospective_selection, operator, monkeypatch, lifecycle):  # noqa: F811
     from empirical_lawhood.api import composition
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
 
     profile = replace(operator, maximum_parallel_tasks=4)
     service = _service(prospective_selection, profile, catalog_relative_path=CATALOG)

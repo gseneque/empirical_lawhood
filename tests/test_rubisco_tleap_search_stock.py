@@ -7,9 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_native_entry import (
-    TLEAP_SEARCH_KINDS, authenticate_tleap_search_stock, selected_tleap_command,
-)
+from empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics.durable_native_entry import TLEAP_SEARCH_KINDS, authenticate_tleap_search_stock, selected_tleap_command
 
 
 @pytest.fixture

@@ -11,9 +11,9 @@ import tarfile
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_prediction import historical_curation as r
-from empirical_lawhood.adapters.methods.rubisco_prediction import historical_curation_sources as s
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.rubisco.rubisco_prediction import historical_curation as r
+from empirical_lawhood.domains.rubisco.rubisco_prediction import historical_curation_sources as s
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 FIXTURES = Path(__file__).parent / "fixtures/rubisco/historical-curation"
 
@@ -217,7 +217,7 @@ def guarded(name, *args, **kwargs):
         raise AssertionError('native/acquisition import: ' + name)
     return real(name, *args, **kwargs)
 builtins.__import__ = guarded
-from empirical_lawhood.adapters.methods.rubisco_prediction.historical_curation_sources import decode_primary
+from empirical_lawhood.domains.rubisco.rubisco_prediction.historical_curation_sources import decode_primary
 assert callable(decode_primary)
 """
     result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=20)

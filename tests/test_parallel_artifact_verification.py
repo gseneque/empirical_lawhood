@@ -6,8 +6,8 @@ import time
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.runtime.artifacts import ArtifactSemanticValidationRegistry
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.storage.contracts.artifacts import ArtifactSemanticValidationRegistry
 from tests.runtime_platform.test_execution_scheduler import _plane
 
 

@@ -6,34 +6,30 @@ import platform
 
 import numpy as np
 
-from empirical_lawhood.adapters.methods.law_assessment import CandidatePayloadReader
-from empirical_lawhood.adapters.methods.reactor_selected_action_response.config import assignment
-from empirical_lawhood.adapters.methods.reactor_selected_action_response.control_prospective_plan import ReactorSelectedActionResponseProspectivePlan
-from empirical_lawhood.adapters.methods.reactor_selected_action_response.law_terminal import ClassicalLaw, RESULT_ID
-from empirical_lawhood.adapters.methods.reactor_selected_action_response.provider import ClassicalControlCustody
-from empirical_lawhood.adapters.methods.reactor_selected_action_response.provider_common import artifact, config_input, contracts, dependency, external_config, result, verify_registry
-from empirical_lawhood.adapters.methods.reactor_selected_action_response.records import ClassicalCausal, ClassicalPrivate, ClassicalDecision, ClassicalQualification
-from empirical_lawhood.adapters.methods.reactor_causal_response.campaign_records import EmpiricalStudySource
-from empirical_lawhood.adapters.methods.reactor_causal_response.provider import DependencyCustodyReader
-from empirical_lawhood.adapters.methods.reactor_causal_response.resource_contract import EmpiricalResourceGuard
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import ScientificStatus
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationOutputContract
-from empirical_lawhood.runtime.execution import TaskContext, RunnerResult, TaskRunner, TaskProgressEmitter
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
-from .acquisition import acquire_preparation, acquire_assays
-from .config import ClassicalNativeConfig
-from .extension_bundle import CAPABILITY, OUTPUT_RECORDS
-from .prospective_acquisition import acquire_prospective_root
-from .prospective_records import ClassicalNativeRoot
+from empirical_lawhood.methods.law_assessment import CandidatePayloadReader
+from empirical_lawhood.domains.reactor.reactor_selected_action_response.config import assignment
+from empirical_lawhood.domains.reactor.reactor_selected_action_response.control_prospective_plan import ReactorSelectedActionResponseProspectivePlan
+from empirical_lawhood.domains.reactor.reactor_selected_action_response.law_terminal import ClassicalLaw, RESULT_ID
+from empirical_lawhood.domains.reactor.reactor_selected_action_response.provider import ClassicalControlCustody
+from empirical_lawhood.domains.reactor.reactor_selected_action_response.provider_common import artifact, config_input, contracts, dependency, external_config, result, verify_registry
+from empirical_lawhood.domains.reactor.reactor_selected_action_response.records import ClassicalCausal, ClassicalPrivate, ClassicalDecision, ClassicalQualification
+from empirical_lawhood.domains.reactor.reactor_causal_response.campaign_records import EmpiricalStudySource
+from empirical_lawhood.domains.reactor.reactor_causal_response.provider import DependencyCustodyReader
+from empirical_lawhood.domains.reactor.reactor_causal_response.resource_contract import EmpiricalResourceGuard
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import ScientificStatus
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationOutputContract
+from empirical_lawhood.execution.execution import TaskContext, RunnerResult, TaskRunner, TaskProgressEmitter
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
+from empirical_lawhood.adapters.simulators.reactor_selected_action_response.acquisition import acquire_preparation, acquire_assays
+from empirical_lawhood.domains.reactor.reactor_selected_action_response.native_config import ClassicalNativeConfig
+from empirical_lawhood.adapters.simulators.reactor_selected_action_response.extension import CAPABILITY, OUTPUT_RECORDS
+from empirical_lawhood.adapters.simulators.reactor_selected_action_response.prospective_acquisition import acquire_prospective_root
+from empirical_lawhood.domains.reactor.reactor_selected_action_response.prospective_records import ClassicalNativeRoot
 
 
 @dataclass(frozen=True)

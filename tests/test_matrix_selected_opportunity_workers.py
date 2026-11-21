@@ -5,6 +5,7 @@ All grants, locators and receipt descriptors here are disclosed synthetic
 software controls. No native child, source qualification or publication runs.
 """
 
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as _preparation_io_effect
 from dataclasses import replace
 from decimal import Decimal as D
 from hashlib import sha256
@@ -15,23 +16,23 @@ import multiprocessing
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity as science
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_opportunity_workers import SelectedOpportunityWorker
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_point import MatrixSelectedPointForecast
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import MatrixSelectedPointPayload, package_identity
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.science import MatrixPreparationNomination
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity as science
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_opportunity_workers import SelectedOpportunityWorker
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_point import MatrixSelectedPointForecast
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import MatrixSelectedPointPayload, package_identity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.science import MatrixPreparationNomination
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.test_matrix_selected_package import reference
 from tests.worker_configuration_support import freeze_worker_configuration
 from tests.test_matrix_selected_point import literal_unavailable_measurement
@@ -103,7 +104,7 @@ def invocation(config, values, producers, *, selected_owner=owner):
         execution_task_record=task, required_input_artifact_ids=tuple(row.artifact_id for row in ports),
         native_effect=config.phase in owner.NATIVE)
     context = replace(context, prepared_invocation=prepared)
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_workers import SelectedProtectedWorker
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_workers import SelectedProtectedWorker
     runner_type = SelectedProtectedWorker if protected else SelectedOpportunityWorker
     runner = runner_type(config.phase, manifest).with_prepared_scope((context.run_id, task_id, context.input_materialization_ids, plan))
     return runner, context
@@ -112,9 +113,9 @@ def invocation(config, values, producers, *, selected_owner=owner):
 @pytest.mark.parametrize("protected", (False, True))
 def test_current_history_worker_pure_projection_binds_actual_direct_carriers_before_native(opportunity, transfer, protected):  # noqa: F811
     from tests.test_matrix_selected_declarative_preparation import literal_files
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_protected_bindings
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_results import entry_seal
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_protected_bindings
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_results import entry_seal
     from tests.test_matrix_selected_native_work import literal_history
     programme = MatrixSelectedPublicProgramme.from_programme(transfer) if protected else science.public_programme(opportunity)
     current = selected_protected_bindings if protected else owner
@@ -159,10 +160,10 @@ def test_current_history_worker_pure_projection_binds_actual_direct_carriers_bef
 @pytest.mark.parametrize("failure", (False, True))
 def test_native_arrays_prepare_only_in_actual_child_reuse_exact_scope_and_clear_after_attempt(opportunity, monkeypatch, failure):  # noqa: F811
     from tests.test_matrix_selected_declarative_preparation import literal_files
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_native_body
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_native_execution
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_workers as workers
+    import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as preparation_science_owner_0
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_native_body
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_native_execution
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_workers as workers
     programme = science.public_programme(opportunity)
     source = programme.sources.sources[0]
     allocation = next(value for value in programme.sources.allocations
@@ -175,11 +176,11 @@ def test_native_arrays_prepare_only_in_actual_child_reuse_exact_scope_and_clear_
         **{name: value for name, _, value in owner.preparation.native_input_records(source)}}
     runner, context = invocation(config, values, {"design": owner.global_node(programme, "design")})
     calls = []
-    actual_initial = preparation_science.initial_state
+    actual_initial = preparation_science_owner_0.initial_state
     def observed_initial(*args):
         calls.append("initial")
         return actual_initial(*args)
-    monkeypatch.setattr(preparation_science, "initial_state", observed_initial)
+    monkeypatch.setattr(_preparation_io_effect, "initial_state", observed_initial)
     for _ in range(2):
         runner.prepare_native_work(context, expected_parent=context.prepared_invocation.expected_parent_contact)
     assert calls == []
@@ -219,15 +220,15 @@ def test_native_arrays_prepare_only_in_actual_child_reuse_exact_scope_and_clear_
 
 
 def _response_invocation(programme, *, protected=False, damage=None, score=False):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_protected_bindings
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_future, selected_future
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import preparation_identity
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_forecast import forecast_public
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_prefix import identity
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_point import forecast_selected_point
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_results import entry_seal
-    from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_protected_bindings
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_future, selected_future
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import preparation_identity
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_forecast import forecast_public
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_prefix import identity
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_point import forecast_selected_point
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_results import entry_seal
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
     from tests.test_matrix_selected_native_work import literal_history
     from tests.test_matrix_selected_point import feature
 
@@ -272,8 +273,8 @@ def _response_invocation(programme, *, protected=False, damage=None, score=False
         "causal": future.node_id(source, "project"), "point": future.node_id(source, "point"),
         "mechanical": future.node_id(source, "mechanical"), "mechanical-arrays": future.node_id(source, "mechanical")}
     if score:
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_future_custody import MatrixPreparedFutureArrays
-        from empirical_lawhood.kernel.references import ArtifactIdentity
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_future_custody import MatrixPreparedFutureArrays
+        from empirical_lawhood.science.identity.references import ArtifactIdentity
         raw, members = encode_matrix_arrays({"unentered_branches": np.arange(48, dtype="<i8")})
         operand = MatrixPreparedFutureArrays("arrays.disclosed-score-unentered", source.identity,
             ArtifactIdentity("array.disclosed-score-unentered", "software-unentered-marker", MATRIX_ARRAY_SCHEMA,
@@ -325,8 +326,8 @@ def test_current_response_worker_projects_exact_four_rng_inputs_and_reuses_only_
         selected_context.prec += 1
         with pytest.raises(ValueError, match="preflight array inputs"):
             runner._native_array_preparation.arrays(context)
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_native_execution
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_protected_workers, selected_opportunity_workers
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_native_execution
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_protected_workers, selected_opportunity_workers
     workers = selected_protected_workers if protected else selected_opportunity_workers
     def future(*args, prepared_arrays, **kwargs):
         assert prepared_arrays == cached[1:]
@@ -357,15 +358,15 @@ def test_current_response_worker_refuses_missing_rng_wrong_producer_and_changed_
 @pytest.mark.parametrize("protected", (False, True))
 def test_future_custody_refuses_coherent_completion_from_another_array_lane(opportunity, transfer, protected, monkeypatch):  # noqa: F811
     """Isolate embedded receipt custody; this fabricates no scientific observation."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_protected_workers, selected_opportunity_workers
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_future, selected_opportunity_future
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import preparation_identity
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_prefix import identity
-    from empirical_lawhood.adapters.methods.matrix_parameter_history.records import MatrixParameterNativeHistory
-    from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.artifacts import ArtifactMaterialization, CanonicalTaskReceipt
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion, NativeSubworkContact
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_protected_workers, selected_opportunity_workers
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_future, selected_opportunity_future
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import preparation_identity
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_prefix import identity
+    from empirical_lawhood.domains.matrix.matrix_parameter_history.records import MatrixParameterNativeHistory
+    from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactMaterialization, CanonicalTaskReceipt
+    from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion, NativeSubworkContact
     from tests.native_completion_fixtures import literal_completion, receipt_with_completion
     from tests.test_matrix_prepared_future_custody import marker
 
@@ -560,8 +561,8 @@ def test_actual_design_worker_requires_exact_original_four_products_and_emits_on
 
 @pytest.mark.parametrize("protected", (False, True))
 def test_actual_selected_response_score_worker_expands_mechanical_archive_once(opportunity, transfer, protected, monkeypatch):  # noqa: F811
-    from empirical_lawhood.infrastructure import matrix_array_io
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_response_science
+    from empirical_lawhood.adapters.matrix_storage import matrix_array_io
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_response_science
     runner, context = _response_invocation(transfer if protected else opportunity, protected=protected, score=True)
     original_decode = matrix_array_io._decode_matrix_arrays
     target = next(port for port in context.input_ports if port.artifact_id == "artifact.mechanical-arrays")

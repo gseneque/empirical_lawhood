@@ -1,47 +1,26 @@
-"""Replay a frozen nominal tape with one actual finite-controller delivery.
-
-The caller must persist all four request commitments before opening any of
-their native branches.  This owner never selects an action or changes a tape.
-"""
+"""Native acquisition, external-format translation and custody integration."""
 
 from __future__ import annotations
-
 from dataclasses import dataclass, field
 from decimal import Decimal as D
 from typing import Any, Callable, Protocol, cast
-
 import numpy as np
+from empirical_lawhood.domains.reactor.native_ports import NativeController
+from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import acquire_episode
+from empirical_lawhood.domains.reactor.reactor_causal_response.measurements import NativeEpisode, TapeController
+from empirical_lawhood.domains.reactor.reactor_prefix_response.batch_design import ReactorAssignedScenario, ReactorBatchSource
+from empirical_lawhood.domains.reactor.reactor_prefix_response.contracts import ReactorCommand, ReactorDelivery, ReactorFinalDelivery
+from empirical_lawhood.execution.controller_runtime import TickDisposition
 
-from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import NativeController, NativeEpisode, TapeController, acquire_episode
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_design import ReactorAssignedScenario, ReactorBatchSource
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.contracts import ReactorCommand, ReactorDelivery, ReactorFinalDelivery
-from empirical_lawhood.runtime.controller_runtime import TickDisposition
-
+from empirical_lawhood.domains.reactor.reactor_regime_response.prepared_tape import (
+    WatchedPreparedTape as _science_WatchedPreparedTape,
+)
 
 class PreparedRequest(Protocol):
     @property
     def delivery(self) -> Any: ...
 
     def deliver(self, publisher: Any) -> Any: ...
-
-
-class WatchedPreparedTape(TapeController):
-    """Remember the actual delayed callback seen by the fixed tape."""
-
-    def __init__(self, tape: np.ndarray) -> None:
-        super().__init__(tape)
-        self.latest: tuple[float, float, float, float] | None = None
-
-    def reset(self, spec: dict[str, Any]) -> None:
-        self.latest = None
-        super().reset(spec)
-
-    def step(self, t_s: float, y: dict[str, float], dt_s: float) -> tuple[float, float]:
-        self.latest = (
-            t_s, y["t_reactor_k"], y["t_jacket_k"], y["dosed_kg"]
-        )
-        return TapeController.step(self, t_s, y, dt_s)
-
 
 @dataclass
 class CommittedNominalBranchOwner:
@@ -100,7 +79,7 @@ class CommittedNominalBranchOwner:
         self, controller: NativeController, previous: tuple[float, float], session: Any
     ) -> ReactorDelivery | ReactorFinalDelivery | None:
         k = self.checked_callbacks
-        if k >= 2880 or not isinstance(controller, WatchedPreparedTape) or controller.latest is None:
+        if k >= 2880 or not isinstance(controller, _science_WatchedPreparedTape) or controller.latest is None:
             raise ValueError("native callback differs from the saved causal preparation")
         if k <= self.callback and controller.latest != tuple(self.expected_observations[k]):
             raise ValueError("native callback differs from the saved causal preparation")
@@ -134,7 +113,6 @@ class CommittedNominalBranchOwner:
             )
         ))
 
-
 def acquire_committed_nominal_branch(
     *,
     source: ReactorBatchSource,
@@ -148,7 +126,7 @@ def acquire_committed_nominal_branch(
     progress: Callable[[int], None] | None = None,
 ) -> tuple[NativeEpisode, CommittedNominalBranchOwner]:
     """One owner-delivered full continuation from the saved selected prefix."""
-    from .panel import assay_tape
+    from empirical_lawhood.domains.reactor.reactor_regime_response.panel import assay_tape
 
     command = prepared.delivery.mapping.full_native.command
     if (
@@ -175,12 +153,11 @@ def acquire_committed_nominal_branch(
         kwargs["progress"] = progress
     episode = acquire(
         source, scenario, f"{scenario.unit_id}.request-{request_index}.committed-task",
-        WatchedPreparedTape(tape), **kwargs,
+        _science_WatchedPreparedTape(tape), **kwargs,
     )
     if episode.complete and (not owner.delivered or owner.checked_callbacks != 2880):
         raise ValueError("complete nominal branch omitted its actual owner delivery")
     return episode, owner
-
 
 def acquire_committed_refined_replay(
     *,
@@ -195,7 +172,7 @@ def acquire_committed_refined_replay(
     progress: Callable[[int], None] | None = None,
 ) -> NativeEpisode:
     """Replay the same nominal tape at dt=.5 after the owner commitment."""
-    from .panel import assay_tape
+    from empirical_lawhood.domains.reactor.reactor_regime_response.panel import assay_tape
 
     if (
         base.root != scenario.unit_id
@@ -223,7 +200,6 @@ def acquire_committed_refined_replay(
         raise ValueError("refined branch changed its frozen same-tape causal prefix")
     return episode
 
-
 def acquire_prepared_evaluator_chart(
     *,
     source: ReactorBatchSource,
@@ -235,7 +211,7 @@ def acquire_prepared_evaluator_chart(
     progress: Callable[[int], None] | None = None,
 ) -> tuple[NativeEpisode, ...]:
     """Six separate evaluator branches, with one zero reference per view."""
-    from .panel import FEED_WORDS, assay_tape
+    from empirical_lawhood.domains.reactor.reactor_regime_response.panel import FEED_WORDS, assay_tape
 
     if (
         nominal_preparation.root != scenario.unit_id

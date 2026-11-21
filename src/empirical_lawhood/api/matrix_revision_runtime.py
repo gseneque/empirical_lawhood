@@ -5,18 +5,15 @@ This API composes existing current-task and prior-execution readers. It creates
 no issue, grant, publication, qualification or native execution of its own.
 """
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import operation_bindings as core, response_bindings as response
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition_bindings import ScheduledProgrammeAcquisitionAdmission
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition_custody import validate_acquisition_operation_census
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_future_bindings import (
-    BLIND, MAXIMUM_RECORD_BYTES, ROLES, AuthenticatedRevisionFuture, ScheduledRevisionFutureScope,
-    ScheduledRevisionSealCustody, prepared_runner,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_calibration import ScheduledRevisionForecastSeal
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_seal_custody import prior_seal_scope_validator
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import operation_bindings as core, response_bindings as response
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition_bindings import ScheduledProgrammeAcquisitionAdmission
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition_custody import validate_acquisition_operation_census
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_future_bindings import BLIND, MAXIMUM_RECORD_BYTES, ROLES, AuthenticatedRevisionFuture, ScheduledRevisionFutureScope, ScheduledRevisionSealCustody, prepared_runner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_calibration import ScheduledRevisionForecastSeal
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_seal_custody import prior_seal_scope_validator
 from empirical_lawhood.api.current_task_custody import issued_custody_for_supplier
 from empirical_lawhood.api.recursive_qualified_parents import _authenticate_prior_execution
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def prepare_revision_future(supplier, context, runner):
@@ -40,11 +37,11 @@ def prepare_revision_future(supplier, context, runner):
     scope = record("revision-scope", ScheduledRevisionFutureScope)
     calibration_custody = None
     if scope.calibration is not None:
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_calibrated_future_bindings import NAMESPACE as CALIBRATED_NAMESPACE
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_calibrated_future_bindings import NAMESPACE as CALIBRATED_NAMESPACE
         if not runner.manifest.capability_key.startswith(CALIBRATED_NAMESPACE + "."):
             # The historical variant never accepts an undeclared extra parent.
             raise PermissionError("SOFTWARE: genuine original E4 revision-CAL producer custody is not installed for confirmation futures")
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_calibration_custody import ScheduledRevisionCalibrationCustody
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_calibration_custody import ScheduledRevisionCalibrationCustody
         from empirical_lawhood.api.matrix_revision_calibration_runtime import authenticate_revision_calibration
         from empirical_lawhood.api.recursive_operations import operation_catalog
         calibration_custody = record("revision-calibration-custody", ScheduledRevisionCalibrationCustody)
@@ -74,7 +71,7 @@ def prepare_revision_future(supplier, context, runner):
         raise PermissionError("revision future preparation changes its complete assigned wave")
     validate_acquisition_operation_census(scope.programme, wave, "collect", plan, revision_scope=scope)
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
 
     _, _, installed = operation_catalog()
     with current.original_read_scope() as (writer, read_scope):
@@ -92,6 +89,6 @@ def prepare_revision_future(supplier, context, runner):
         ObjectIdentity.from_record(plan.execution_plan_id, plan), scope.identity, seal.identity,
         ObjectIdentity.from_record(custody.prior_execution.binding_id, custody.prior_execution))
     if calibration_custody is not None:
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_calibrated_future_bindings import prepared_runner as calibrated_runner
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_calibrated_future_bindings import prepared_runner as calibrated_runner
         return calibrated_runner(runner, view, calibration_custody.identity)
     return prepared_runner(runner, view)

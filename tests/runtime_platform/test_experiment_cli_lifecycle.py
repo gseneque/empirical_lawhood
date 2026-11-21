@@ -13,9 +13,9 @@ from empirical_lawhood.api.experiment_programme import ExperimentProgrammeServic
 from empirical_lawhood.api.recursive_authoring import implementation_binding, load_authored_wave
 from empirical_lawhood.cli import integrations
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
 from tests.test_experiment_preparation_public import PROTOCOL_PATH, _write_source_selection
 from tests.test_matrix_experiment_methods import fixture, selected_input_records
 from tests.test_recursive_public_service import _plane
@@ -55,7 +55,7 @@ def _files(directory):
 
 
 def test_author_cli_retains_real_declared_graph_and_automatically_bound_original_records(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import experiment_methods as science
+    from empirical_lawhood.domains.matrix.matrix_factor_response import experiment_methods as science
 
     specification, snapshot, plane, directory, args = _author_inputs(tmp_path, monkeypatch)
     selected_inputs = {name: raw for name, raw in _files(tmp_path).items() if not name.startswith("guarded-custody/")}

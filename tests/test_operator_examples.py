@@ -35,5 +35,5 @@ def test_assigned_example_is_not_a_prospective_roster_and_inventory_is_exact():
         )
     with pytest.raises(ValueError, match="COLLISION"):
         revised = replace(profile.prior_census, prior_seed_ids=profile.assignment.seed_ids)
-        from empirical_lawhood.kernel.provenance import ObjectIdentity
+        from empirical_lawhood.science.identity.provenance import ObjectIdentity
         replace(profile.assignment, prior_census=ObjectIdentity.from_record(revised.census_id, revised)).check_prior_census(revised)

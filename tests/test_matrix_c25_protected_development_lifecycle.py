@@ -22,38 +22,41 @@ from empirical_lawhood.api.experiment_programme import ExperimentProgrammeServic
 from empirical_lawhood.api.prospective_experiment import load_prepared_prospective_experiment
 from empirical_lawhood.api.results import RunCampaignRequest
 from empirical_lawhood.api.selected_e3_access import original_input_access, select_current_e3_access
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExecutionSelection, PreparedExperimentFile
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection, PreparedExperimentFile
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
+from tests.numerical_provenance_fixtures import selected_test_mount
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EL = Path('/media/chevre/EL')
 WORKERS = 4
 
 
 def _exposed_inputs(directory, *, root_contract_factory=None):
-    """Keep the complete existing fixture with an actually guarded EL plane."""
+    """Keep the complete fixture on the caller's guarded external mount."""
     import numpy as np
 
     from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
     from empirical_lawhood.api.recursive_operations import operation_storage_codecs
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
     from tests import test_matrix_e3_protected_source_records as templates
     from tests import test_matrix_factor_confirmation_eligibility as stock
     from tests import test_matrix_scheduled_history as scheduled
     from tests.test_matrix_finite_dt_source_assembly import source_metadata_case
     from tests.test_matrix_scheduled_response_forecast import pauli
 
+    mount = selected_test_mount(directory, external=True)
+
     def actual_plane(path, *, storage_codecs):
-        path.mkdir()
+        assert path.is_relative_to(directory)
         contract = (ExternalRootContract('recursive-software-fixture', 'Exposed C25 software custody',
-            str(path), str(EL), OperatorStorageProfile.SCHEMA, 1)
-            if root_contract_factory is None else root_contract_factory(path))
+            str(path), str(mount), OperatorStorageProfile.SCHEMA, 1)
+            if root_contract_factory is None else root_contract_factory(path, mount))
+        path.mkdir()
         plane = ExternalArtifactPlane(GuardedExternalRoot(contract),
             validators=ArtifactProfileValidatorRegistry(binary_codecs=operation_storage_codecs()))
         diagnostic = plane.root.diagnostic()
@@ -85,31 +88,30 @@ def _exposed_inputs(directory, *, root_contract_factory=None):
 
 
 def _profile(plane):
-    return _profile_for_path(Path(plane.root.contract.canonical_path))
+    contract = plane.root.contract
+    return _profile_for_path(Path(contract.canonical_path), Path(contract.required_mount_path))
 
 
-def _profile_for_path(path):
+def _profile_for_path(path, mount):
     return OperatorStorageProfile('software.c25.storage', 'external-filesystem', '1.0.0',
-        str(path.parent), str(EL), path.name, 'c25-scratch', OperatorStorageAccessMode.READ_WRITE,
+        str(path.parent), str(mount), path.name, 'c25-scratch', OperatorStorageAccessMode.READ_WRITE,
         None, None, (), 'strict-mount-contained-no-symlink', 1, (), WORKERS, False)
 
 
 def _run_original(case, directory, monkeypatch):
     """Author/issue/run the installed configured producers and native futures."""
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
-    from empirical_lawhood.adapters.composition.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import (
-        RESOURCE_BINDING_DEPENDENCY, bind_protected_e3_experiment_inputs,
-    )
-    from empirical_lawhood.infrastructure.source_closure import capture_target_closure
-    from empirical_lawhood.planning.formal_analysis import derive_formal_gap_applicability
+    from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import RESOURCE_BINDING_DEPENDENCY, bind_protected_e3_experiment_inputs
+    from empirical_lawhood.storage.source_closure import capture_target_closure
+    from empirical_lawhood.design.formal_analysis import derive_formal_gap_applicability
     from tests.experiment_entry_support import entry_package_for_draft
     from tests.runtime_platform.test_recursive_prospective_workflow import _issue_public_handoff
     from tests.runtime_platform.test_study_issue import _issue_api_fixture
     from tests.test_matrix_e3_public_programme import _execution, _native_receipt_census, _primary_census
     from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest, _read_exact_record
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation
-    from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+    from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
 
     plane, profile = case.plane, _profile(case.plane)
     selection = case.preparation
@@ -225,19 +227,15 @@ def _run_original(case, directory, monkeypatch):
 
 def _publish_development(case, public, products, parents, execution, current):
     """Publish exact C-derived DEV sources, preserving real original custody."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.e4_inputs import compose_programme_e4_banks
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.e4_inputs import compose_programme_e4_banks
     from empirical_lawhood.api.recursive_authoring import implementation_binding
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as workers
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorResources
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import (
-        PROTOCOL_ID, SelectedE3E4ExperimentSpecification, SelectedE3E4OperationalSelection,
-    )
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence
-    from empirical_lawhood.kernel.authority import ResourceBudget
-    from empirical_lawhood.planning.experiment_inputs import (
-        ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding,
-    )
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as workers
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorResources
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import PROTOCOL_ID, SelectedE3E4ExperimentSpecification, SelectedE3E4OperationalSelection
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence
+    from empirical_lawhood.science.identity.authority import ResourceBudget
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
 
     composed = compose_programme_e4_banks(case.committed, original_e3=public,
         criterion_publication=case.criterion_publication)
@@ -342,7 +340,7 @@ def _publish_development(case, public, products, parents, execution, current):
 
 def _assert_authored_custody(*, directory, plane, parents, current, output):
     """Inspect actual final task/config publications, not preliminary rows."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_execution import _retained_plans
     from empirical_lawhood.api.recursive_operations import operation_catalog
@@ -395,18 +393,17 @@ def _assert_authored_custody(*, directory, plane, parents, current, output):
 
 @pytest.mark.native
 def test_actual_configured_e3_protected_parents_bootstrap_native_dev_and_ordinary_structure(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_exports import ConfiguredProtectedE3ProductExportSelection
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_exports import ConfiguredProtectedE3ProductExportSelection
     from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.product_export import _PRODUCTS, _original_product
     from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.scientific_read import read_protected_e3_original_products
     from empirical_lawhood.api.prospective_experiment import load_retained_prospective_experiment
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.runtime.artifacts import lineage_parent_sort_key
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.storage.contracts.artifacts import lineage_parent_sort_key
     from tests.test_matrix_e3_public_programme import _primary_census
 
-    assert tmp_path.is_relative_to(EL), 'select an explicit EL pytest basetemp for this actual worker control'
     case = _exposed_inputs(tmp_path / 'original-inputs')
     original_c = case.committed.commitments.canonical_bytes()
     root = Path(case.plane.root.contract.canonical_path)

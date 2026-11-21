@@ -10,9 +10,9 @@ import signal
 import subprocess
 import time
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
-from .progress import FREEGSNKE_PROGRESS_PREFIX, FreeGsnkeProgressEvent, FreeGsnkeProgressStage
+from empirical_lawhood.adapters.simulators.freegsnke.progress import FREEGSNKE_PROGRESS_PREFIX, FreeGsnkeProgressEvent, FreeGsnkeProgressStage
 
 
 FreeGsnkeProgressSink = Callable[[FreeGsnkeProgressEvent], None]

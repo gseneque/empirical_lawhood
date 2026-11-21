@@ -6,111 +6,33 @@ from dataclasses import dataclass
 from decimal import Decimal
 from hashlib import sha256
 
-from empirical_lawhood.adapters.methods.independent_substrate_design_protocol import IndependentSubstrateTargetAuthoringManifest
-from empirical_lawhood.kernel.authority import (
-    AuthorityAction,
-    AuthorityPolicy,
-    ResourceBudget,
-    SourceAccessClass,
-)
-from empirical_lawhood.kernel.evidence import (
-    ClaimSpec,
-    EvidenceCeiling,
-    OutcomeAccess,
-    VisibilityCeiling,
-)
-from empirical_lawhood.kernel.experiments import (
-    AssignmentKind,
-    AssignmentSpec,
-    ControlKind,
-    ControlSpec,
-    ExperimentSpec,
-    PrecisionGoal,
-    RevealBarrierSpec,
-)
-from empirical_lawhood.kernel.obligations import (
-    ClosureSpec,
-    ComputabilityEvidence,
-    FalsifierKind,
-    FalsifierSpec,
-    ObligationStatus,
-    ScientificObligations,
-    StructuralConvergenceSpec,
-    SupportSpec,
-    UncertaintySpec,
-    ValiditySpec,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.quantities import (
-    QuantityKind,
-    QuantitySpec,
-    ResponseDirection,
-)
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import LifecycleStatus, ReadinessStatus
-from empirical_lawhood.kernel.systems import (
-    BalanceRole,
-    IndependentUnitSpec,
-    PortDirection,
-    PortSpec,
-    RelationalIdentity,
-    SystemBoundaryKind,
-    SystemSpec,
-)
-from empirical_lawhood.kernel.time import (
-    AvailabilitySpec,
-    CausalPhase,
-    ClockLabelSemantics,
-    ClockSpec,
-    HoldSemantics,
-    HorizonSpec,
-    InformationCutoff,
-    SamplingSemantics,
-)
-from empirical_lawhood.kernel.worlds import (
-    ComputabilityEnvelope,
-    EvidenceUnitScope,
-    NumericalCoordinateKind,
-    NumericalCoordinateSpec,
-    NumericalViewSpec,
-    RandomnessSemantics,
-    WorldKind,
-    WorldSpec,
-)
-from empirical_lawhood.planning.campaigns import (
-    CampaignLane,
-    CampaignNode,
-    CampaignNodeKind,
-    CampaignSpec,
-    DecisionRight,
-)
-from empirical_lawhood.planning.experiment_entry import ExperimentEntryChecklist, ExperimentEntryPackage, ExperimentEntryRequirement, ExperimentEntryRequirementBinding, ExperimentEntryTransition, ExperimentTerminalClass, StudyDefinition
-from empirical_lawhood.planning.formal_gaps import (
-    FormalGapApplicability,
-    FormalGapCoverage,
-    FormalGapCoverageAssignment,
-    FormalGapCoverageDisposition,
-    FormalGapEvidenceWorld,
-    FormalGapRegister,
-)
-from empirical_lawhood.planning.study_authoring import CapabilitySelection, DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, MaterializationQualificationReceipt, StudyDraft, StudyDraftLifecycle, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
-from empirical_lawhood.runtime.candidate_compiler import CandidateCompilationContext, StudyTemplate
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityCatalog
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.plans import ProtocolTemplate
-from empirical_lawhood.runtime.source_resolution import (
-    SourceMaterializationConfig,
-    SourceReadMode,
-)
+from empirical_lawhood.methods.independent_substrate_design_protocol import IndependentSubstrateTargetAuthoringManifest
+from empirical_lawhood.science.identity.authority import AuthorityAction, AuthorityPolicy, ResourceBudget, SourceAccessClass
+from empirical_lawhood.science.evidence.evidence import ClaimSpec, EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experiments import AssignmentKind, AssignmentSpec, ControlKind, ControlSpec, ExperimentSpec, PrecisionGoal, RevealBarrierSpec
+from empirical_lawhood.science.evidence.obligations import ClosureSpec, ComputabilityEvidence, FalsifierKind, FalsifierSpec, ObligationStatus, ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.quantities import QuantityKind, QuantitySpec, ResponseDirection
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import LifecycleStatus, ReadinessStatus
+from empirical_lawhood.science.models.systems import BalanceRole, IndependentUnitSpec, PortDirection, PortSpec, RelationalIdentity, SystemBoundaryKind, SystemSpec
+from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase, ClockLabelSemantics, ClockSpec, HoldSemantics, HorizonSpec, InformationCutoff, SamplingSemantics
+from empirical_lawhood.science.models.worlds import ComputabilityEnvelope, EvidenceUnitScope, NumericalCoordinateKind, NumericalCoordinateSpec, NumericalViewSpec, RandomnessSemantics, WorldKind, WorldSpec
+from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
+from empirical_lawhood.design.experiment_entry import ExperimentEntryChecklist, ExperimentEntryPackage, ExperimentEntryRequirement, ExperimentEntryRequirementBinding, ExperimentEntryTransition, ExperimentTerminalClass, StudyDefinition
+from empirical_lawhood.design.formal_gaps import FormalGapApplicability, FormalGapCoverage, FormalGapCoverageAssignment, FormalGapCoverageDisposition, FormalGapEvidenceWorld, FormalGapRegister
+from empirical_lawhood.design.study_authoring import CapabilitySelection, DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, MaterializationQualificationReceipt, StudyDraft, StudyDraftLifecycle, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
+from empirical_lawhood.execution.candidate_compiler import CandidateCompilationContext, StudyTemplate
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRegistry
+from empirical_lawhood.execution.plans import ProtocolTemplate
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
 
-from .contracts import FreeGsnkePhase, FreeGsnkeProcessRequest, FreeGsnkeSavedPreparation, FreeGsnkeSourceBinding
-from .generation_protocol import FREEGSNKE_SOURCE_ARTIFACT_ID
-from .registry import FREEGSNKE_CAPABILITY_VERSION, FREEGSNKE_DEVELOPMENT_CAPABILITY_KEY
-from .source_qualification_protocol import FREEGSNKE_SOURCE_QUALIFICATION_CONFIG_ARTIFACT_ID, FREEGSNKE_SOURCE_QUALIFICATION_EVALUATOR_KEY, FREEGSNKE_SOURCE_QUALIFICATION_REDUCER_KEY, build_freegsnke_source_qualification_protocol, freegsnke_source_qualification_candidate_registrations, freegsnke_source_qualification_study_template, freegsnke_source_qualification_registry, freegsnke_source_qualification_scientific_graph
-from .source_qualification import FreeGsnkeSourceQualificationConfig
+from empirical_lawhood.domains.fusion.freegsnke.contracts import FreeGsnkePhase, FreeGsnkeProcessRequest, FreeGsnkeSavedPreparation, FreeGsnkeSourceBinding
+from empirical_lawhood.adapters.simulators.freegsnke.generation_protocol import FREEGSNKE_SOURCE_ARTIFACT_ID
+from empirical_lawhood.adapters.simulators.freegsnke.registry import FREEGSNKE_CAPABILITY_VERSION, FREEGSNKE_DEVELOPMENT_CAPABILITY_KEY
+from empirical_lawhood.adapters.simulators.freegsnke.source_qualification_protocol import FREEGSNKE_SOURCE_QUALIFICATION_CONFIG_ARTIFACT_ID, FREEGSNKE_SOURCE_QUALIFICATION_EVALUATOR_KEY, FREEGSNKE_SOURCE_QUALIFICATION_REDUCER_KEY, build_freegsnke_source_qualification_protocol, freegsnke_source_qualification_candidate_registrations, freegsnke_source_qualification_study_template, freegsnke_source_qualification_registry, freegsnke_source_qualification_scientific_graph
+from empirical_lawhood.domains.fusion.freegsnke.source_qualification import FreeGsnkeSourceQualificationConfig
 
 
 FREEGSNKE_SOURCE_QUALIFICATION_CAMPAIGN_ID = (

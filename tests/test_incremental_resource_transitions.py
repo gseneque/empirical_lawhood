@@ -5,12 +5,9 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.infrastructure.execution import DurableExecutionResourceEnvelopeCoordinator
-from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
-from empirical_lawhood.runtime.execution_envelope import (
-    RunExecutionResourceEnvelope, RunExecutionResourceEnvelopeMachine as Machine,
-    reconstruct_execution_resource_envelope,
-)
+from empirical_lawhood.execution.local.execution import DurableExecutionResourceEnvelopeCoordinator
+from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+from empirical_lawhood.execution.execution_envelope import RunExecutionResourceEnvelope, RunExecutionResourceEnvelopeMachine as Machine, reconstruct_execution_resource_envelope
 from tests.recovery_support import case as case
 from tests.runtime_platform.test_deadline_free_execution_package import _plane
 

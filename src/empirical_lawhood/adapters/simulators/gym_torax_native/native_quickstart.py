@@ -8,16 +8,16 @@ from typing import ClassVar
 
 import numpy as np
 
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
 
-from .action_word import GYM_TORAX_FUTURE_IP_ACTION_WORD_ID, GYM_TORAX_NATIVE_HOLD_ACTION_WORD_ID, build_gym_torax_action_word, build_gym_torax_native_schedule
-from .diagnostic_contracts import GymToraxPreparation, gym_torax_numerical_members
-from .field_metadata_contracts import GymToraxFieldMetadataEpisodeRequest, GymToraxRequestRole
-from .extraction_manifest import build_gym_torax_extraction_manifest
-from .field_metadata import build_gym_torax_field_metadata_manifest
-from .runtime import acquire_gym_torax_episode
+from empirical_lawhood.domains.fusion.gym_torax_native.action_word import GYM_TORAX_FUTURE_IP_ACTION_WORD_ID, GYM_TORAX_NATIVE_HOLD_ACTION_WORD_ID, build_gym_torax_action_word, build_gym_torax_native_schedule
+from empirical_lawhood.domains.fusion.gym_torax_native.diagnostic_contracts import GymToraxPreparation, gym_torax_numerical_members
+from empirical_lawhood.domains.fusion.gym_torax_native.field_metadata_contracts import GymToraxFieldMetadataEpisodeRequest, GymToraxRequestRole
+from empirical_lawhood.adapters.simulators.gym_torax_native.extraction_manifest import build_gym_torax_extraction_manifest
+from empirical_lawhood.domains.fusion.gym_torax_native.field_metadata import build_gym_torax_field_metadata_manifest
+from empirical_lawhood.adapters.simulators.gym_torax_native.runtime import acquire_gym_torax_episode
 
 
 @dataclass(frozen=True, slots=True)

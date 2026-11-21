@@ -10,26 +10,24 @@ from datetime import UTC, datetime
 from pathlib import Path
 import os
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import require_numerical_source_continuity
-from empirical_lawhood.infrastructure.bounded_process import run_bounded_command
-from empirical_lawhood.infrastructure.execution import DurableExecutionResourceEnvelopeCoordinator, LocalProcessExecutor
-from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, most_restrictive_outcome_access
-from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeState, RunExecutionResourceEnvelopeMachine
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedWorkerEnvironment
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
-from empirical_lawhood.runtime.recovery import RunRecoveryIndex
-from empirical_lawhood.runtime.retained_e3_repair import RetainedE3ControlRepair, RetainedE3RepairRecoveryIndex, RetainedE3ControllerAdmission, RetainedE3ControllerInputReuseAdmission, RetainedE3ControllerRetainedScopeAdmission, RetainedE3ContinuedRepairRecoveryIndex
+from empirical_lawhood.execution.local.bounded_process import run_bounded_command
+from empirical_lawhood.execution.local.execution import DurableExecutionResourceEnvelopeCoordinator, LocalProcessExecutor
+from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, most_restrictive_outcome_access
+from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeState, RunExecutionResourceEnvelopeMachine
+from empirical_lawhood.execution.prepared_native_invocation import PreparedWorkerEnvironment
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.execution.recovery import RunRecoveryIndex
+from empirical_lawhood.execution.retained_e3_repair import RetainedE3ControlRepair, RetainedE3RepairRecoveryIndex, RetainedE3ControllerAdmission, RetainedE3ControllerInputReuseAdmission, RetainedE3ControllerRetainedScopeAdmission, RetainedE3ContinuedRepairRecoveryIndex
 
-from .configured_e3_retained_custody import _resources
-from .current_result_custody import require_current_result_reveal_authority
-from .recursive_authoring import implementation_binding
+from empirical_lawhood.api.current_result_custody import require_current_result_reveal_authority
+from empirical_lawhood.api.recursive_authoring import implementation_binding
 
 
 def _pin(value, name):
@@ -37,7 +35,7 @@ def _pin(value, name):
 
 
 def repair_relative_path(run_id):
-    from empirical_lawhood.kernel.serialization import validate_stable_id
+    from empirical_lawhood.science.records.serialization import validate_stable_id
     validate_stable_id(run_id)
     return f'runs/{run_id}/repairs/retained-e3-control-lane/repair.json'
 
@@ -89,7 +87,7 @@ def selected_repair_index(*, writer, plan, predecessor):
         raise PermissionError('retained E3 repair changes its derived additional wave')
     if index is None:
         return predecessor
-    from .retained_e3_repair_continuation import read_repair_continuation
+    from empirical_lawhood.api.retained_e3_repair_continuation import read_repair_continuation
     while True:
         selected = read_repair_continuation(writer=writer, plan=plan, predecessor=index)
         if selected is index:
@@ -105,7 +103,7 @@ def observe_frozen_repair_worker(*, interpreter, source_root):
     program = (
         'from pathlib import Path; import sys; from dataclasses import replace; '
         'from empirical_lawhood.api.recursive_authoring import implementation_binding; '
-        'from empirical_lawhood.infrastructure.numerical_provenance import '
+        'from empirical_lawhood.storage.numerical_provenance import '
         'observe_worker_environment, selected_worker_environment; '
         'print(implementation_binding(Path(sys.argv[1])).canonical_bytes().decode()); '
         'print(replace(observe_worker_environment(), '
@@ -122,9 +120,9 @@ def observe_frozen_repair_worker(*, interpreter, source_root):
         decode_canonical_bytes(rows[1], PreparedWorkerEnvironment, maximum_bytes=len(rows[1])))
 
 
-def observe_frozen_worker_package_root(environment):
-    program = ('from pathlib import Path; from empirical_lawhood.infrastructure import execution; '
-        'print(Path(execution.__file__).resolve().parents[2])')
+def observe_frozen_worker_package_root(environment, *, source_root=None):
+    program = ('from pathlib import Path; from empirical_lawhood.execution.local import execution; '
+        'print(Path(execution.__file__).resolve().parents[3])')
     result = run_bounded_command([environment.interpreter_path, '-I', '-B', '-c', program],
         environment=os.environ, timeout_seconds=60, maximum_stdout_bytes=16 * 1024,
         maximum_stderr_bytes=64 * 1024)
@@ -132,7 +130,9 @@ def observe_frozen_worker_package_root(environment):
     if result.returncode != 0 or len(rows) != 1:
         raise PermissionError('retained E3 cannot observe its frozen worker package location')
     root = Path(rows[0])
-    if not root.is_absolute() or root != root.resolve(strict=True) or not root.is_relative_to(environment.prefix):
+    selected_checkout = None if source_root is None else Path(source_root).resolve(strict=True) / 'src'
+    if (not root.is_absolute() or root != root.resolve(strict=True)
+            or not (root.is_relative_to(environment.prefix) or root == selected_checkout)):
         raise PermissionError('retained E3 worker package leaves its selected interpreter prefix')
     return str(root)
 
@@ -146,8 +146,8 @@ def reuse_frozen_provider_input(*, writer, run_id, spec, request, require_access
     validator and compare every incoming source chunk under the publication's
     before/after snapshot. No new input or validation stamp is published.
     """
-    from .current_task_custody import _require_provider_input_manifest
-    from empirical_lawhood.runtime.artifacts import ArtifactStreamWriteRequest
+    from empirical_lawhood.api.current_task_custody import _require_provider_input_manifest
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactStreamWriteRequest
     if type(request) is not ArtifactStreamWriteRequest or not callable(require_access):
         raise TypeError('retained E3 input reuse requires its exact stream and current access guard')
     request.__post_init__()
@@ -192,6 +192,7 @@ def _retained_scope_admission_path(run_id):
 
 
 def _controller_admission(writer, index):
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import require_numerical_source_continuity
     admission = _read_record(writer, _controller_admission_path(index.run_id), RetainedE3ControllerAdmission)
     correction = _read_record(writer, _input_reuse_admission_path(index.run_id), RetainedE3ControllerInputReuseAdmission)
     scope_correction = _read_record(writer, _retained_scope_admission_path(index.run_id), RetainedE3ControllerRetainedScopeAdmission)
@@ -225,6 +226,8 @@ def derive_retained_e3_control_repair(*, service, run_id, repair_id, owner_instr
     This does not execute or publish. The existing grant is checked separately
     from the owner-requested PURE retry and installation selection.
     """
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import require_numerical_source_continuity
+    from empirical_lawhood.api.configured_e3_retained_custody import _resources
     package = service._load_package(run_id)
     plan, predecessor, recovery = service._load_status_index(run_id, package=package)
     if type(predecessor) is not RunRecoveryIndex:
@@ -318,7 +321,7 @@ def publish_retained_e3_control_repair(*, service, repair, index, original_envel
 
 
 def _require_repair_catalog(service, index):
-    from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository
+    from empirical_lawhood.storage.sql import SQLiteOperationalRepository
     engine = service.engine_factory()
     try:
         repository = SQLiteOperationalRepository(engine)
@@ -333,7 +336,7 @@ def _require_repair_catalog(service, index):
 def repair_resource_coordinator(*, writer, package, plan, index):
     """Seed a separate replay-verified journal, then append the explicit repair."""
     if type(index) is RetainedE3ContinuedRepairRecoveryIndex:
-        from .retained_e3_repair_continuation import continuation_resource_coordinator
+        from empirical_lawhood.api.retained_e3_repair_continuation import continuation_resource_coordinator
         return continuation_resource_coordinator(writer=writer, package=package, index=index)
     recovery = ExternalRunRecoveryStore(writer)
     original = recovery.reconstruct_execution_resource_envelope(index=index.predecessor,

@@ -14,21 +14,21 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_assembly as domain
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_records as source
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_operational_resources import SelectedE4OperationalResources
-from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs,load_experiment_inputs,prepare_experiment
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_assembly as domain
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_records as source
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_operational_resources import SelectedE4OperationalResources
+from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs, load_experiment_inputs, prepare_experiment
 from empirical_lawhood.api.recursive_authoring import implementation_binding
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import ReadinessStatus
-from empirical_lawhood.planning.dataset_authority import DatasetWorkEnvelope,DatasetFileLimits,DatasetControlLimits
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection,ExperimentInputBinding
-from empirical_lawhood.runtime.execution_envelope import ChildResourceTokenLimit,ProgressHeartbeat,ProgressLivenessContract
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-from empirical_lawhood.runtime.experiment_resources import ExecutionResourceSelection
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import ReadinessStatus
+from empirical_lawhood.design.dataset_authority import DatasetWorkEnvelope, DatasetFileLimits, DatasetControlLimits
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.execution.execution_envelope import ChildResourceTokenLimit, ProgressHeartbeat, ProgressLivenessContract
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.experiment_resources import ExecutionResourceSelection
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
 
 ROOT=Path(__file__).parents[1]
 
@@ -41,21 +41,21 @@ def source_metadata_case(tmp_path):
     fit inputs were produced by this unexecuted native request; the positive
     wrapper control explicitly substitutes that original-producer I/O boundary.
     """
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native
-    from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES,MatrixHistorySeed
-    from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole,MatrixProgrammeRoot
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput, MatrixProgrammeProducedInput
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponsePanel
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native
+    from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+    from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput, MatrixProgrammeProducedInput
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponsePanel
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
     from empirical_lawhood.api.codecs import load_authoring
     from empirical_lawhood.api.recursive_operations import operation_storage_codecs
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.runtime.experiment_preparation import PreparedExperimentFile
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.execution.experiment_preparation import PreparedExperimentFile
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
     from tests.test_matrix_configured_protected_public_preparation import prepared_case
     from tests.test_matrix_configured_protected_statistical import config as fit_config
     from tests.test_matrix_configured_selected_package import configured_package
@@ -105,7 +105,7 @@ def source_metadata_case(tmp_path):
         reservation_publication=publish(case.plane,reservation,'c-backed-source.train-reservation'))
     index=ScheduledSourceIndex.from_shared(reservation=reservation,specification=specification,provenances=train.provenances)
     protocols,panels=[],[]
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
     for row in roots:
         resolved=index.resolve(index.reference(source_id='source.'+row.root.root_id,root_id=row.root.root_id,
             provenance=train.provenances[0].identity))
@@ -126,12 +126,12 @@ def source_metadata_case(tmp_path):
     campaign=load_authoring(ROOT/'tests/fixtures/reference-campaign.json').campaign
     acquisition_spec=native.NativeTrainingAcquisitionSpecification('experiment.disclosed-c-backed-source.train',public.specification.measurement,
         tuple(value.public_source.root.root_id for value in protocols),scheduled.identity(future.reservation),public.specification.identity)
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as acquisition
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as acquisition
     request_id='request.disclosed-c-backed-source.train'
     campaign=replace(campaign,objective=acquisition.QUESTION,system_ids=(request_id,),world_ids=(acquisition.WORLD,),
         target_claim_ids=('claim.study.'+acquisition_spec.specification_id,),
         budget=ResourceBudget.aggregate((budget,)*(len(native.PHASES)*count+2)))
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support,corpus_artifact
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support, corpus_artifact
     mandatory=(commitment,committed.commitments.availability,committed.commitments.e6_policy,
         *(committed.commitments.phase(role).responses for role in ('e3.calibration','e3.confirmation','e6.nearby','e6.shifted')))
     campaign=replace(campaign,evidence_state=tuple(sorted((row.record for row in mandatory),key=lambda row:row.object_id)))
@@ -190,9 +190,9 @@ def selected_request(case):
 
 
 def test_current_source_request_separates_produced_e3_from_blind_known_inputs(c_backed_source_case):
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammeProducedInput,MatrixProgrammePublishedInput
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammeProducedInput, MatrixProgrammePublishedInput
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
     request=selected_request(c_backed_source_case)
     assert type(request.original_e3) is MatrixProgrammeProducedInput
     assert all(type(value) is MatrixProgrammePublishedInput for value in
@@ -250,8 +250,8 @@ def test_public_source_assembly_real_metadata_materializer_target_reopen_and_exa
     from empirical_lawhood.api.experiment_preparation import author_prepared_experiment
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_execution import _retained_plans
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-    from empirical_lawhood.kernel.time import CausalPhase,InformationCutoff
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+    from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
     from tests.test_matrix_finite_dt_source import _certificate,_control
     from tests.test_matrix_native_training_public_lifecycle import _copied_preparation
 
@@ -294,7 +294,7 @@ def test_public_source_assembly_real_metadata_materializer_target_reopen_and_exa
             reserved_future_effective_seeds=tuple(sorted({stream.effective_seed for value in case.preparation.manifest.reservation.allocation.roots for stream in value.streams})),
             future_bank=bank.identity,future_group_ids=kwargs['programme'].group_ids,cutoff=kwargs['cutoff'])
     monkeypatch.setattr(instrument_reader,'certify_native_training_instrument',disclosed_certificate)
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_bindings as workers
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_bindings as workers
     monkeypatch.setattr(workers,'execute_parameter_native_work',lambda *a,**kw:pytest.fail('source metadata entered native'))
     monkeypatch.setattr(workers,'execute_paired_response_native_work',lambda *a,**kw:pytest.fail('source metadata entered native panels'))
     execution=ExecutionSelection(4,'environment.disclosed-positive-source',
@@ -315,10 +315,10 @@ def test_public_source_assembly_real_metadata_materializer_target_reopen_and_exa
     receipt_ids=tuple(value.receipt_id for value in qualifications)
     assert receipt_ids==tuple(sorted(set(receipt_ids)))
     assert len(qualifications)==len(first.preparation.draft.external_inputs)
-    from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
     # Direct metadata controls stay blind; full model-bearing inputs retain
     # the disclosed original's actual irreversible exposure.
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseBank,SelectedE4PhaseProgramme
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseBank, SelectedE4PhaseProgramme
     model_inputs=tuple(value for value in first.preparation.draft.external_inputs
         if value.payload_schema in (SelectedE4PhaseBank.SCHEMA,SelectedE4PhaseProgramme.SCHEMA))
     assert len(model_inputs)==2
@@ -334,7 +334,7 @@ def test_public_source_assembly_real_metadata_materializer_target_reopen_and_exa
     assert case.original_e3.record in {value.identity for value in first.requirements_publication.logical.lineage_parents}
     assert {value.source_id for value in qualifications}=={value.input_id for value in first.preparation.draft.external_inputs}
     reopened=load_experiment_inputs(first.target_specification,first.source_selection_path)
-    from empirical_lawhood.adapters.methods import matrix_finite_dt_source_experiment as target_domain
+    from empirical_lawhood.domains.matrix import matrix_finite_dt_source_experiment as target_domain
     assert type(reopened.method_inputs) is target_domain.MatrixFiniteDtSourceQualificationSelection
     assert set(reopened.method_inputs.certificate.provenances)=={value.identity for value in reopened.method_inputs.bank.provenances}
     assert reopened.method_inputs.bank.reservation==case.committed.phase('e4.calibration').reservation
@@ -346,6 +346,6 @@ def test_public_source_assembly_real_metadata_materializer_target_reopen_and_exa
     second=derive_experiment_inputs(**kwargs)
     assert second.target_specification==first.target_specification
     assert second.source_selection==first.source_selection and second.preparation==first.preparation
-    from empirical_lawhood.infrastructure import authority as keys
+    from empirical_lawhood.storage import authority as keys
     actual_key=case.plane.root.resolve(selected.metadata_private_key_relative_path,for_write=False)
     assert keys.Ed25519DatasetAuthorizationSigner.from_private_key_file(actual_key).verification_key_hex

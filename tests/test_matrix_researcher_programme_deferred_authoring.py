@@ -15,7 +15,7 @@ from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammePrerequisite
 from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExperimentDependency
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExperimentDependency
 from tests.test_matrix_configured_protected_public_preparation import public_case, write_public_file_selection  # noqa: F401
 from tests.test_matrix_researcher_programme import ROOT, _execution
 

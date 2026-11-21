@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Focused software-only integrity checks for avoiding repeated control work."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import dataclass, replace
 from decimal import Decimal
@@ -12,10 +13,10 @@ import pytest
 from empirical_lawhood.api import finite_rerun_authoring as application
 from empirical_lawhood.api.finite_operands import current_nomination_operand_export
 from empirical_lawhood.adapters.composition.finite_response_law.consumer_ports import FiniteResponseLawRuntimeContext
-from empirical_lawhood.adapters.composition.finite_response_law.rerun_input import FiniteResponseLawCurrentExposure, FiniteResponseLawRerunInput, original_development_exposure
-from empirical_lawhood.infrastructure import bounded_io
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.rerun_input import FiniteResponseLawCurrentExposure, FiniteResponseLawRerunInput, original_development_exposure
+from empirical_lawhood.storage import bounded_io
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 from tests.test_finite_response_rerun_integrity import allocation
 
 
@@ -74,10 +75,9 @@ def test_expected_projection_retains_descriptor_and_consumer_bounds(tmp_path, mo
     elif kind == 'fifo':
         os.mkfifo(path)
     elif kind == 'oversized':
-        monkeypatch.setattr(application, 'MAX_RUNTIME_PLAN_JSON_BYTES', 256)
         with path.open('wb') as handle:
             handle.truncate(257)
-    with pytest.raises((OSError, bounded_io.BoundedFileIOError)):
+    with pytest.raises((OSError, ValueError, bounded_io.BoundedFileIOError)):
         application._assert_expected_record(tmp_path, path.name, record, 'same-refusal')
 
 
@@ -137,7 +137,7 @@ def test_operational_run_identity_retains_exact_packet_commitment(tmp_path):
 
 
 def test_changed_actual_source_refuses_before_parent_or_reconstruction(tmp_path, monkeypatch):
-    from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
+    from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
     packet, _ = _packet_and_nomination(tmp_path)
     units, seeds = original_development_exposure()
     exposure = FiniteResponseLawCurrentExposure('synthetic.latency-source-exposure', units, seeds)
@@ -187,16 +187,16 @@ def test_preparation_authenticates_parent_once_then_preserves_real_operand_joins
     Only the outer issue/grant authenticator is a software sentinel here. This
     fixture publishes fictional data and asserts no genuine study authority.
     """
-    from empirical_lawhood.adapters.composition.finite_response_law.exposure import native_seed_ids
-    from empirical_lawhood.adapters.composition.finite_response_law.rerun_input import FiniteResponseLawCurrentParent
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-    from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.planning.study_issue import StudyOperationAuthority
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ExternalRootContract, ReceiptCheck
-    from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
-    from empirical_lawhood.runtime.study_issue import IssuedExecutableStudyManifest
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.exposure import native_seed_ids
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.rerun_input import FiniteResponseLawCurrentParent
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.design.study_issue import StudyOperationAuthority
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ExternalRootContract, ReceiptCheck
+    from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
+    from empirical_lawhood.execution.study_issue import IssuedExecutableStudyManifest
     from tests.finite_response_custody_fixtures import synthetic_native
 
     packet, directory = _packet_and_nomination(tmp_path)
@@ -210,8 +210,7 @@ def test_preparation_authenticates_parent_once_then_preserves_real_operand_joins
         media_type='application/json', publication_scope_id='synthetic.latency-native', publication_scope_relative_root='fictional',
         payload=raw, visibility_ceiling=VisibilityCeiling.PROSPECTIVE, parent_visibility_ceilings=(),
         outcome_access=OutcomeAccess.EVALUATOR_REVEAL, minimum_free_bytes=1))
-    manifest = decode_artifact_manifest(plane.root.resolve(written.manifest_materialization.relative_path,
-        for_write=False).read_bytes())
+    manifest = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(written.manifest_materialization.relative_path, for_write=False).read_bytes())
     run, task = 'synthetic.latency-run', 'finite-response-law.native-evaluate'
     attempt = f'{run}.{task}.attempt-001'
     receipt = CanonicalTaskReceipt(f'receipt.{attempt}', run, task, attempt, '0' * 40, (),

@@ -80,7 +80,7 @@ the authenticated 32-root census explicitly and returns root, parent and
 candidate rows. This audit retains the original negative development contract.
 It performs no additional fits and cannot supply fresh confirmation or promotion.
 
-`prepared_checkpoint_features` in the [response-composition scalar owner](../../../../../src/empirical_lawhood/adapters/composition/response_composition/scalar_parent.py)
+`prepared_checkpoint_features` in the [response-composition scalar owner](../../../../../src/empirical_lawhood/domains/matrix/response_composition/authoring/scalar_parent.py)
 retains the original 200-scalar checkpoint recipe: 192 causal history entries
 followed by eight native mechanism entries. It validates the endpoint against the
 last history sample and the declared numerical-view clock. Source/root and

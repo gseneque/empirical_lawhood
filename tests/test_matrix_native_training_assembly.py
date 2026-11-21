@@ -6,10 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_assembly import (
-    PROTOCOL_ID,NativeTrainingAssemblyRequest,NativeTrainingAssemblySpecification)
-from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs,load_experiment_inputs,prepare_experiment
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection,ExperimentInputBinding
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_assembly import PROTOCOL_ID, NativeTrainingAssemblyRequest, NativeTrainingAssemblySpecification
+from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs, load_experiment_inputs, prepare_experiment
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 
 ROOT=Path(__file__).parents[1]
 
@@ -36,11 +35,11 @@ def assembly_case(tmp_path, *, training_count=1):
     """
     from types import SimpleNamespace
     import json
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_records import ALL_PHASES, NativeTrainingResources
-    from empirical_lawhood.adapters.methods.matrix_factor_response.eligibility import MatrixFactorExposureCensus
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_records import ALL_PHASES, NativeTrainingResources
+    from empirical_lawhood.domains.matrix.matrix_factor_response.eligibility import MatrixFactorExposureCensus
     from empirical_lawhood.api.matrix_programme_allocations import publish_matrix_programme_allocations
-    from empirical_lawhood.kernel.authority import ResourceBudget
-    from empirical_lawhood.kernel.decoding import decode_canonical_record
+    from empirical_lawhood.science.identity.authority import ResourceBudget
+    from empirical_lawhood.science.records.decoding import decode_canonical_record
     from empirical_lawhood.api.codecs import load_authoring
     from tests.test_matrix_programme_allocations import _publisher_case
     from tests.test_matrix_programme_scientific_design import build_scientific_design
@@ -77,7 +76,7 @@ def assembly_case(tmp_path, *, training_count=1):
 
 
 def test_public_native_input_preprocessing_commits_complete_future_panels_and_exact_replay(tmp_path,monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_bindings as workers
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_bindings as workers
     monkeypatch.setattr('tests.test_matrix_e3_protected_public_lowering.prepared_case',
         lambda *a,**kw:pytest.fail('native inputs reconstructed an old protected preparation'))
     monkeypatch.setattr(workers,'execute_parameter_native_work',lambda *a,**kw:pytest.fail('metadata assembly entered native prefix'))
@@ -98,12 +97,12 @@ def test_public_native_input_preprocessing_commits_complete_future_panels_and_ex
     assert first.preparation.executable
     assert first.preparation.census.native_effect_count==2
     actual=load_experiment_inputs(first.target_specification,first.source_selection_path).method_inputs.request
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_input_custody import read_protected_e3_original_publication
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_input_custody import read_protected_e3_original_publication
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
     handle_path = target_root / 'inputs/train-unit-allocation-publication.json'
     handle_raw = handle_path.read_bytes()
     allocation_publication = decode_canonical_bytes(handle_raw, ArtifactWriteResult, maximum_bytes=len(handle_raw))
@@ -120,11 +119,11 @@ def test_public_native_input_preprocessing_commits_complete_future_panels_and_ex
         (allocation_publication.logical, allocation_publication.materialization,
             allocation_publication.manifest_materialization) for row in first.publications)
     assert not (Path(old.plane.root.contract.canonical_path) / 'runs').exists()
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import authenticate_future_response_selections
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_future_response_selections
     future=authenticate_future_response_selections(old.plane,actual)
     assert tuple(role for role,_ in future)==('CALIBRATION','EVALUATION','TRANSFER_NEARBY','TRANSFER_SHIFTED')
     assert len(actual.campaign.evidence_state)==7 and len(actual.exposure_support)==8
-    from empirical_lawhood.planning.approval import SystemDecisionClock
+    from empirical_lawhood.design.approval import SystemDecisionClock
     monkeypatch.setattr(SystemDecisionClock,'now_utc',lambda self:pytest.fail('exact retry replaced original pre-TRAIN availability'))
     second=derive_experiment_inputs(**kwargs)
     assert first.target_specification==second.target_specification
@@ -147,7 +146,7 @@ def test_public_native_input_preprocessing_commits_complete_future_panels_and_ex
     changed=replace(request,resources=replace(request.resources,record_id=request.resources.record_id+'.foreign'))
     changed_spec=replace(specification,request=changed.identity)
     source_path.parent.joinpath('request.json').write_bytes(changed.canonical_bytes())
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     selected=decode_canonical_bytes(source_path.read_bytes(),ExperimentFileInputSelection,maximum_bytes=None)
     selected=replace(selected,bindings=(replace(selected.bindings[0],identity=changed.identity,maximum_bytes=len(changed.canonical_bytes())),))
     source_path.write_bytes(selected.canonical_bytes());spec_path.write_bytes(changed_spec.canonical_bytes())
@@ -158,7 +157,7 @@ def test_public_native_input_preprocessing_commits_complete_future_panels_and_ex
 def test_direct_math_and_assay_preserve_existing_per_root_canonical_outputs(tmp_path):
     """Current source operands retain the independent original math/assay bytes."""
     from tests.test_matrix_native_training_protocol import scientific_inputs
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
     scientific, assay = scientific_inputs()
     old, *_ = assembly_case(tmp_path)
     actual = old.programme_inputs
@@ -180,7 +179,7 @@ def test_direct_math_and_assay_preserve_existing_per_root_canonical_outputs(tmp_
 
 
 def test_native_assembly_refuses_missing_operands_and_mixed_candidate_before_publication(tmp_path):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_assembly import bind_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_assembly import bind_inputs
     _, specification, request, _, source, execution = assembly_case(tmp_path)
     with pytest.raises(TypeError, match='actual programme commitment'):
         replace(specification, input_commitments=None)
@@ -217,8 +216,8 @@ def test_direct_scientific_file_refusals_precede_any_publication(tmp_path, monke
 
 
 def test_nested_source_selector_stays_immutable_in_requirements_serialization():
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes,canonical_json_document_bytes
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes, canonical_json_document_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     selected=ExperimentFileInputSelection('selection.disclosed-nested','protocol.disclosed-nested',(),())
     raw=canonical_json_bytes({'source_selection':selected})
     import json
@@ -227,8 +226,8 @@ def test_nested_source_selector_stays_immutable_in_requirements_serialization():
 
 
 def test_current_c_backed_specification_keeps_original_policy_and_refuses_source_substitution(tmp_path):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_assembly import bind_inputs
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_assembly import bind_inputs
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     old, specification, request, _, _, _ = assembly_case(tmp_path)
     assert bind_inputs(specification, {'request': request}).method_inputs.request is request
     assert decode_canonical_bytes(request.canonical_bytes(), type(request), maximum_bytes=None) == request
@@ -236,7 +235,7 @@ def test_current_c_backed_specification_keeps_original_policy_and_refuses_source
     assert not hasattr(request, 'input_commitments')
     original_policy = old.programme_inputs.e6_policy
     assert original_policy.criterion == old.programme_inputs.scientific_design.e6_policy.criterion
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.e6_transport_science import validate_e6_transport_criterion
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.e6_transport_science import validate_e6_transport_criterion
     for changes in ({'null_success_numerator': 1, 'null_success_denominator': 3},
             {'alpha_denominator': 480},
             {'family_slots': tuple(sorted('e1.foreign' if value == 'e1.recurrence-survival' else value
@@ -252,12 +251,11 @@ def test_current_c_backed_specification_keeps_original_policy_and_refuses_source
 
 
 def test_transport_policy_is_published_and_freshly_authenticated_before_train(tmp_path,monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_bindings as workers
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import (
-        authenticate_e6_transport_policy,authenticate_future_response_selections)
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.e6_transport_records import MatrixE6EmpiricalTransportPolicy
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.time import AvailabilitySpec
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_bindings as workers
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_e6_transport_policy, authenticate_future_response_selections
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.e6_transport_records import MatrixE6EmpiricalTransportPolicy
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.models.time import AvailabilitySpec
     monkeypatch.setattr(workers,'execute_parameter_native_work',lambda *a,**kw:pytest.fail('policy assembly acquired prefix'))
     monkeypatch.setattr(workers,'execute_paired_response_native_work',lambda *a,**kw:pytest.fail('policy assembly acquired future'))
     old,specification,request,spec_path,source_path,execution=assembly_case(tmp_path)

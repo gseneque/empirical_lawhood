@@ -6,51 +6,32 @@ from hashlib import sha256
 from typing import Protocol, cast
 
 from empirical_lawhood.adapters.simulators.prepared_response.native_pair import NATIVE_PAIR_SCHEMA as RETAINED_PAIR_SCHEMA
-from empirical_lawhood.adapters.simulators.prepared_response.source import PreparedNativeCheckpoint
+from empirical_lawhood.domains.matrix.prepared_response.source import PreparedNativeCheckpoint
 from empirical_lawhood.adapters.simulators.prepared_response.source_outputs import PreparedNativeTaskResult
 from empirical_lawhood.adapters.simulators.response_geometry_prospective.provider import decode_port, envelope, output_result, read_port, semantic_contracts
-from empirical_lawhood.adapters.simulators.six_matrix_response.response_observer import _encode
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.linked_campaign import LinkedCampaignStageRole
-from empirical_lawhood.planning.source_qualification import PredecessorBoundSourceQualificationExperiment
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    CanonicalTaskReceipt,
-)
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityManifest,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskProgressEmitter,
-    TaskRunner,
-    WorkerInputKind,
-)
-from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignStageEnvelope
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    MAX_EXTERNAL_INPUT_CHUNK_BYTES,
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-    ExternalInputSource,
-)
-from empirical_lawhood.runtime.source_qualification import retained_qualification_input_reasons
+from empirical_lawhood.domains.matrix.six_matrix_response.response_observer import _encode
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.linked_campaign import LinkedCampaignStageRole
+from empirical_lawhood.design.source_qualification import PredecessorBoundSourceQualificationExperiment
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskProgressEmitter, TaskRunner, WorkerInputKind
+from empirical_lawhood.execution.linked_campaigns import LinkedCampaignStageEnvelope
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import MAX_EXTERNAL_INPUT_CHUNK_BYTES, CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload, ExternalInputSource
+from empirical_lawhood.execution.source_qualification import retained_qualification_input_reasons
 
-from .assigned_contracts import FiniteResponseLawAssignedCalibrationConfig, FiniteResponseLawAssignedEvaluationConfig
-from .contracts import FiniteResponseLawNativeConfig, FiniteResponseLawNativeInvocation, native_invocations
-from .evaluation_contracts import FiniteResponseLawEvaluationConfig
-from .fresh_contracts import FiniteResponseLawCalibrationConfig
-from .native_artifact import MAXIMUM_PAIR_BYTES, NATIVE_PAIR_SCHEMA, encode_native_pair
-from .retained import authenticate_retained_handoff
-from .source import FiniteResponseLawNativeCheckpoint, execute_native_phase, frozen_prefix_frame
-from .source_outputs import FiniteResponseLawAssignedCalibrationTaskResult, FiniteResponseLawAssignedEvaluationTaskResult, FiniteResponseLawCalibrationTaskResult, FiniteResponseLawEvaluationTaskResult, FiniteResponseLawNativeTaskResult, decode_task_native, unentered_native_bytes
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedCalibrationConfig, FiniteResponseLawAssignedEvaluationConfig
+from empirical_lawhood.domains.matrix.finite_response_law.contracts import FiniteResponseLawNativeConfig, FiniteResponseLawNativeInvocation, native_invocations
+from empirical_lawhood.domains.matrix.finite_response_law.evaluation_contracts import FiniteResponseLawEvaluationConfig
+from empirical_lawhood.domains.matrix.finite_response_law.fresh_contracts import FiniteResponseLawCalibrationConfig
+from empirical_lawhood.adapters.simulators.finite_response_law.native_artifact import MAXIMUM_PAIR_BYTES, NATIVE_PAIR_SCHEMA, encode_native_pair
+from empirical_lawhood.adapters.simulators.finite_response_law.retained import authenticate_retained_handoff
+from empirical_lawhood.domains.matrix.finite_response_law.source import FiniteResponseLawNativeCheckpoint, execute_native_phase, frozen_prefix_frame
+from empirical_lawhood.adapters.simulators.finite_response_law.source_outputs import FiniteResponseLawAssignedCalibrationTaskResult, FiniteResponseLawAssignedEvaluationTaskResult, FiniteResponseLawCalibrationTaskResult, FiniteResponseLawEvaluationTaskResult, FiniteResponseLawNativeTaskResult, decode_task_native, unentered_native_bytes
 
 
 def native_result_type(config: FiniteResponseLawNativeConfig) -> type[FiniteResponseLawNativeTaskResult]:
@@ -212,7 +193,7 @@ class FiniteResponseLawSourceTask:
                             "Finite response-law retained input differs from its authenticated bytes"
                         )
                     payloads[artifact.payload_schema] = raw
-                from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+                from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
                 receipt = decode_canonical_bytes(
                     payloads[CanonicalTaskReceipt.SCHEMA],

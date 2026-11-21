@@ -9,25 +9,28 @@ import numpy as np
 import pytest
 
 from empirical_lawhood.adapters.simulators import pybamm_electrothermal_hierarchy as battery_electrothermal
+import empirical_lawhood.domains.battery.electrothermal_hierarchy as battery_electrothermal_science
 from empirical_lawhood.adapters.simulators import pybamm_exact_restart as battery_restart
+import empirical_lawhood.domains.battery.exact_restart as battery_restart_science
 from empirical_lawhood.adapters.simulators import pybamm_reduced_coordinate_sufficiency as battery_reduced_observation
-from empirical_lawhood.kernel.evidence import OutcomeAccess
+import empirical_lawhood.domains.battery.reduced_coordinate_sufficiency as battery_reduced_observation_science
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
 
 pytestmark = pytest.mark.native("pybamm")
 
 
-def _spme_isothermal_casadi() -> battery_electrothermal.BatteryElectrothermalDenominator:
+def _spme_isothermal_casadi() -> battery_electrothermal_science.BatteryElectrothermalDenominator:
     return next(
         item
-        for item in battery_electrothermal.denominators(include_x_full=False)
+        for item in battery_electrothermal_science.denominators(include_x_full=False)
         if item.denominator_id == "denominator.pybamm.spme.isothermal.casadi-coarse"
     )
 
 
 def test_electrothermal_native_current_changes_capacity_and_voltage_after_action() -> None:
-    unit = battery_electrothermal.qualification_preparations()[0]
+    unit = battery_electrothermal_science.qualification_preparations()[0]
     denominator = _spme_isothermal_casadi()
-    words = {item.word_id: item for item in battery_electrothermal.action_words()}
+    words = {item.word_id: item for item in battery_electrothermal_science.action_words()}
     _, hold, _, _ = battery_electrothermal._step_schedule(
         unit=unit,
         denominator=denominator,
@@ -61,18 +64,18 @@ def test_electrothermal_native_current_changes_capacity_and_voltage_after_action
 
 
 def test_state_restart_lossless_state_and_source_input_reconstruct_native_hold() -> None:
-    unit = battery_restart.build_design().localization_units[0]
+    unit = battery_restart_science.build_design().localization_units[0]
     denominator = _spme_isothermal_casadi()
     history = next(
-        item for item in battery_restart.histories() if item.word.word_id == "word.battery-electrothermal.i-plus-600"
+        item for item in battery_restart_science.histories() if item.word.word_id == "word.battery-electrothermal.i-plus-600"
     )
     pybamm, source, prefix, _ = battery_restart._step_prefix(
         unit=unit, denominator=denominator, history=history
     )
     assert prefix.termination == "final time"
     assert prefix.t[-1] == history.checkpoint_s
-    state_hex = battery_restart._hex_values(np.asarray(prefix.all_ys[0], dtype=np.float64).reshape(-1))
-    assert battery_restart._hex_values(battery_restart.decode_hex(state_hex)) == state_hex
+    state_hex = battery_restart_science._hex_values(np.asarray(prefix.all_ys[0], dtype=np.float64).reshape(-1))
+    assert battery_restart_science._hex_values(battery_restart_science.decode_hex(state_hex)) == state_hex
     source_inputs = {
         name: float(np.asarray(value, dtype=np.float64).reshape(-1)[0])
         for name, value in prefix.all_inputs[-1].items()
@@ -88,7 +91,7 @@ def test_state_restart_lossless_state_and_source_input_reconstruct_native_hold()
     start = battery_restart._starting_solution(
         pybamm,
         checkpoint_s=history.checkpoint_s,
-        state=battery_restart.decode_hex(state_hex),
+        state=battery_restart_science.decode_hex(state_hex),
         model=rebuilt.built_model,
         inputs=source_inputs,
     )
@@ -107,7 +110,7 @@ def test_state_restart_lossless_state_and_source_input_reconstruct_native_hold()
 
 
 def test_reduced_observation_native_restart_and_distinct_target_refuse_unsupported_donor() -> None:
-    design = battery_reduced_observation.build_design()
+    design = battery_reduced_observation_science.build_design()
     denominator = _spme_isothermal_casadi()
     history = next(
         item for item in design.histories if item.word_id == "word.battery-electrothermal.i-plus-600"
@@ -132,7 +135,7 @@ def test_reduced_observation_native_restart_and_distinct_target_refuse_unsupport
         captures.append(capture)
 
     chart = design.charts[0]
-    scale, predictions = battery_reduced_observation.build_prediction_rows(
+    scale, predictions = battery_reduced_observation_science.build_prediction_rows(
         development_captures=captures[:2],
         target_captures=captures[2:],
         chart=chart,
@@ -142,7 +145,7 @@ def test_reduced_observation_native_restart_and_distinct_target_refuse_unsupport
     assert len(predictions) == 1
     row = predictions[0]
     assert row.target_unit_id != row.donor_unit_id
-    assert row.distance is not None and row.distance > battery_reduced_observation.BATTERY_REDUCED_OBSERVATION_SUPPORT_RADIUS
+    assert row.distance is not None and row.distance > battery_reduced_observation_science.BATTERY_REDUCED_OBSERVATION_SUPPORT_RADIUS
     assert row.inside_support is False
     assert row.adequate is None
     assert row.reason_codes == ("OUTSIDE_FROZEN_LOCAL_SUPPORT",)

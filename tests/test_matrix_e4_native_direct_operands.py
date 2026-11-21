@@ -7,13 +7,13 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as dev
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_bindings as protected
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as records
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as programme
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import bind_selected_native_source
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as dev
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_bindings as protected
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as records
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as programme
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import bind_selected_native_source
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_selected_e4_methods import selected_revision, selected_e4_populations, selected_bridge, transfer  # noqa: F401
 
 

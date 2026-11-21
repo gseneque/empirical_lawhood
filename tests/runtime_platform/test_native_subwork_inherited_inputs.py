@@ -6,12 +6,10 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.native_subwork_conformance import (
-    ExposedDerivedOperand, ExposedNativeSubworkRunner,
-)
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.native_subwork import NativeSubworkOutput, NativeSubworkRoster, NativeSubworkState
+from empirical_lawhood.methods.native_subwork_conformance import ExposedDerivedOperand, ExposedNativeSubworkRunner
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.native_subwork import NativeSubworkOutput, NativeSubworkRoster, NativeSubworkState
 from tests.runtime_platform.test_native_subwork import _process_context, _selected
 from tests.runtime_platform.test_native_subwork_completed_relay import pipe
 

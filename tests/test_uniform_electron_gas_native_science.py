@@ -11,10 +11,10 @@ import pytest
 from scipy.constants import elementary_charge, hbar, m_e, mu_0, physical_constants
 from typer.testing import CliRunner
 
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.native_quickstart import UniformElectronGasAnalyticReferenceConfig, build_analytic_development_rows, run_analytic_development_check
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.physics import finite_q_estimate, penetration_depth_from_kernel, row_map, ueg_scales
+from empirical_lawhood.domains.materials.electron_gas.native_quickstart import UniformElectronGasAnalyticReferenceConfig, build_analytic_development_rows, run_analytic_development_check
+from empirical_lawhood.domains.materials.electron_gas.physics import finite_q_estimate, penetration_depth_from_kernel, row_map, ueg_scales
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def _config() -> UniformElectronGasAnalyticReferenceConfig:
@@ -25,6 +25,7 @@ def _config() -> UniformElectronGasAnalyticReferenceConfig:
     )
 
 
+@pytest.mark.numerical(oracle="Independent free-electron SI density/kF/EF formula and Maxwell slab 1/cosh solution")
 def test_ueg_si_scale_and_finite_q_intercept_against_free_electron_formula() -> None:
     config = _config()
     scales = ueg_scales(config.r_s)

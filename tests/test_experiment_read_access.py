@@ -9,9 +9,9 @@ import pytest
 from empirical_lawhood.api import experiment_read_access as owner
 from empirical_lawhood.api import generated_experiment_runtime_bindings as registry
 from empirical_lawhood.api import selected_e3_access, selected_e4_access
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4WaveLocator
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4WaveLocator
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 from tests.test_selected_e3_current_access import literal_originals
 from tests.test_selected_e4_current_access import _literal_locator
 
@@ -113,7 +113,7 @@ def test_explicit_protocol_selects_one_of_two_real_same_codec_projection_owners(
     def project(protocol):
         def selected(records):
             calls.append(protocol)
-            return SimpleNamespace(protocol_id=protocol, records=records)
+            return selected_e3_access.select_current_e3_access(records)
         return selected
 
     e3 = replace(rows[0], select_read_access=project(rows[0].protocol_id))
@@ -122,7 +122,8 @@ def test_explicit_protocol_selects_one_of_two_real_same_codec_projection_owners(
     monkeypatch.setattr(registry, 'EXPERIMENT_RUNTIME_BINDINGS', (e3, rows[1], prepared))
     originals, paths = locator_files(tmp_path)
     current = owner.load_experiment_read_access(paths, protocol_id=selected_protocol)
-    assert current.protocol_id == selected_protocol and current.records == originals
+    assert type(current) is selected_e3_access.SelectedE3CurrentAccess
+    assert current.effective_originals(originals) == originals
     assert calls == [selected_protocol]
 
 
@@ -166,4 +167,25 @@ def test_projection_cannot_return_a_permission_verdict_or_new_canonical_authorit
     install_locator_codecs(monkeypatch, callbacks=(project, selected_e4_access.select_current_e4_access))
     _, paths = locator_files(tmp_path)
     with pytest.raises(TypeError, match='operation-local selection, not a permission result'):
+        owner.load_experiment_read_access(paths, protocol_id='protocol.disclosed.access.0')
+
+
+@pytest.mark.parametrize('damage', ('omitted', 'repeated', 'changed-reveal', 'untyped'))
+def test_projection_preserves_every_copied_locator_before_any_access(tmp_path, monkeypatch, damage):
+    def project(records):
+        if damage == 'omitted':
+            selected = records[:-1]
+        elif damage == 'repeated':
+            selected = (*records, records[0])
+        elif damage == 'changed-reveal':
+            selected = (replace(records[0], reveal_authority=replace(records[0].reveal_authority,
+                object_id='reveal.unselected')), *records[1:])
+        else:
+            selected = (object(),)
+        return SimpleNamespace(selected_records=selected)
+
+    install_locator_codecs(monkeypatch, callbacks=(project, selected_e4_access.select_current_e4_access))
+    monkeypatch.setattr(selected_e3_access, 'original_input_access', _forbidden)
+    _, paths = locator_files(tmp_path)
+    with pytest.raises((TypeError, ValueError), match='selected_records|selected locator census'):
         owner.load_experiment_read_access(paths, protocol_id='protocol.disclosed.access.0')

@@ -7,7 +7,7 @@ PURE receipt, and historical STOP remain unchanged. Original literature Macro
 SourceAudit is SOURCE; historical assessments are not relabelled as source data.
 
 The code-owned selection is `MechanismSelection` in
-`src/empirical_lawhood/adapters/methods/rubisco_insilico_mechanism/contracts.py`.
+`src/empirical_lawhood/domains/rubisco/rubisco_insilico_mechanism/contracts.py`.
 `source_manifest.py` fixes six original primary-source files by DOI, raw size and
 SHA256; complete originals are retained in the selected mechanism source. Three
 papers are available as authenticated publisher article originals, and the

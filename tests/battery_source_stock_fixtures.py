@@ -9,9 +9,7 @@ from pathlib import Path, PurePosixPath
 import tarfile
 from types import SimpleNamespace
 
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import (
-    BatteryInquirySource, PROTOCOL_SHA256, SOURCE_MEMBERS, SOURCE_VERSION,
-)
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquirySource, PROTOCOL_SHA256, SOURCE_MEMBERS, SOURCE_VERSION
 
 FIXTURE = Path(__file__).parent / 'fixtures/battery/thermal_source_stock'
 CENSUS_SHA256 = '0df981752de8a66903db017e141893de77361ee5c8d5084ef13d5b0d814e4705'

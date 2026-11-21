@@ -12,9 +12,9 @@ import pytest
 
 from empirical_lawhood.api import matrix_programme_prepared_phases as owner
 from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammeProjectionContext
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.prepared_operations import MatrixProgrammePreparedOperations
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.prepared_operations import MatrixProgrammePreparedOperations
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 from tests.test_matrix_programme_allocations import census, _publisher_case, _forbid_acquisition  # noqa: F401
 from tests.test_matrix_programme_scientific_design import scientific_design  # noqa: F401
 

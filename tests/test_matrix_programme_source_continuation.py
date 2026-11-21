@@ -7,16 +7,13 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import source_continuation as domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import (
-    MatrixContinuedProgrammeSpecification, MatrixResearchProgrammePlan, MatrixResearchProgrammeSpecification,
-    prepare, programme_protocol,
-)
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import source_continuation as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixContinuedProgrammeSpecification, MatrixResearchProgrammePlan, MatrixResearchProgrammeSpecification, prepare, programme_protocol
 from empirical_lawhood.api import matrix_programme_source_continuation as owner
 from empirical_lawhood.api.matrix_researcher_programme import _publish
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticate_programme_inputs, _input_record_scope
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticate_programme_inputs, _input_record_scope
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
 from tests.test_matrix_programme_input_assembly import build_public_file_case, _derive, _inventory, _forbid_acquisition
 
@@ -25,7 +22,7 @@ ROOT = Path(__file__).parents[1]
 
 @pytest.fixture(scope='module')
 def metadata_case(tmp_path_factory):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.eligibility import MatrixFactorExposureCensus
+    from empirical_lawhood.domains.matrix.matrix_factor_response.eligibility import MatrixFactorExposureCensus
     census = decode_canonical_bytes((ROOT / 'programmes/foundations/emergent-structure/workflows/matrix-response-experiment/exposure-census.example.json').read_bytes(),
         MatrixFactorExposureCensus, maximum_bytes=None)
     case = build_public_file_case(tmp_path_factory.mktemp('source-continuation-metadata'), census)
@@ -97,7 +94,7 @@ def test_response_panel_and_policy_substitutions_refuse(metadata_case):
 
 
 def _count_response_binds(monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseAssay
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseAssay
     calls, original = [], ScheduledResponseAssay.bind
     def counted(self, source, **kwargs):
         calls.append(source)
@@ -172,7 +169,7 @@ def _plans(metadata_case):
     case = metadata_case.case
     specification = decode_canonical_bytes((ROOT / 'programmes/foundations/emergent-structure/workflows/matrix-programme/specification.example.json').read_bytes(),
         MatrixResearchProgrammeSpecification, maximum_bytes=None)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import coordinate_identity
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import coordinate_identity
     design = metadata_case.original.scientific_design
     nominal, = (coordinate for coordinate in design.training_protocol.coordinates
         if coordinate_identity(coordinate) == dict(design.e3.role_coordinates)['CALIBRATION'])
@@ -199,7 +196,7 @@ def test_original_and_continued_plans_decode_with_required_distinct_lineage(meta
     assert type(original.specification) is MatrixResearchProgrammeSpecification
     document = continued.specification.to_document()
     del document['value']['continuation_request']
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
     with pytest.raises(ValueError):
         decode_canonical_bytes(canonical_json_document_bytes(document), MatrixContinuedProgrammeSpecification, maximum_bytes=None)
     assert not domain.prepare(request, execution=metadata_case.case.execution).executable
@@ -244,10 +241,10 @@ def test_partial_binding_cannot_be_treated_as_unentered_future():
 
 def test_completed_source_handoff_retains_all_original_phase_and_terminal_contracts(metadata_case):
     from empirical_lawhood.api.matrix_programme_completed_continuation import read_source_continuation
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding
-    from empirical_lawhood.runtime.recovery import RunRecoveryTerminalEvent, DevelopmentRunRecoveryTerminalEvent
-    from empirical_lawhood.runtime.retained_e3_repair import RetainedE3ContinuedRepairTerminalEvent
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding
+    from empirical_lawhood.execution.recovery import RunRecoveryTerminalEvent, DevelopmentRunRecoveryTerminalEvent
+    from empirical_lawhood.execution.retained_e3_repair import RetainedE3ContinuedRepairTerminalEvent
     _, request, target = _plans(metadata_case)
     bindings = tuple((phase, ObjectIdentity('binding.disclosed.' + phase, MatrixProgrammePhaseBinding.SCHEMA,
         MatrixProgrammePhaseBinding.VERSION, 'a' * 64)) for phase in domain.COMPLETED_PHASES)

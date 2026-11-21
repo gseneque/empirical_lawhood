@@ -7,20 +7,20 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_package as selected
-from empirical_lawhood.adapters.methods.matrix_factor_response import experiment_methods as original
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as e3
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_specification import selected_deanneal_specification
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_experiment_inputs import ProtectedE3PreFitJoin
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES, FEATURE_BLOCKS
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledAllocation, ScheduledReservation, ScheduledSpecification
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.time import AvailabilitySpec, CausalPhase, InformationCutoff
-from empirical_lawhood.runtime.experimental_statistics import StandardizedRidgeParameters
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_package as selected
+from empirical_lawhood.domains.matrix.matrix_factor_response import experiment_methods as original
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as e3
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_specification import selected_deanneal_specification
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_experiment_inputs import ProtectedE3PreFitJoin
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES, FEATURE_BLOCKS
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledAllocation, ScheduledReservation, ScheduledSpecification
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase, InformationCutoff
+from empirical_lawhood.methods.statistics.experimental_statistics import StandardizedRidgeParameters
 
 
 def reference(name, kind):

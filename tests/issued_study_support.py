@@ -12,42 +12,19 @@ from typing import Protocol
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
 from empirical_lawhood.api.models import IssuedStudyPackage, EnvelopeExperimentPackage, assemble_issued_study_package, assemble_envelope_experiment_package
 from empirical_lawhood.api.results import OperationStatus
-from empirical_lawhood.kernel.authority import AuthorityAction, SourceAccessClass
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.models import ViewModelSetSpec, ModelSetSpec
-from empirical_lawhood.planning.adaptive_acquisition import (
-    FixedRoundAcquisitionPlan,
-    FixedRoundArmSpec,
-    FixedRoundStopRule,
-)
-from empirical_lawhood.planning.approval import (
-    ApprovalCheckerRegistry,
-    AttestationResult,
-    CompleteApprovalService,
-    issue_approval_gate_attestation,
-)
-from empirical_lawhood.planning.experiment_entry import ExecutableStudyDefinition, ProposedStudyExtension, ProposedStudyExtensionSet
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, StudyOperationAuthority
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactGenericValidation,
-    ArtifactMaterialization,
-    ArtifactProfile,
-    ArtifactPublicationBinding,
-    ArtifactPublicationMember,
-    ArtifactPublicationScope,
-    LogicalArtifactIdentity,
-    artifact_publication_batch_id,
-    artifact_publication_commit_relative_path,
-    artifact_publication_member,
-)
-from empirical_lawhood.runtime.candidate_compiler import bind_standard_candidate_extensions
-from empirical_lawhood.runtime.execution_envelope import (
-    ExecutionEnvelopeCellSpec,
-    ExecutionEnvelopeSpec,
-)
-from empirical_lawhood.runtime.study_issue import IssuedStudyMember, StudyPublicationReceipt, StudyExtensionDecoderRegistration, IssuedExecutableStudyManifest, bind_standard_issued_extensions, build_study_approval_proposal, validate_issued_study_extensions
+from empirical_lawhood.science.identity.authority import AuthorityAction, SourceAccessClass
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.models.models import ViewModelSetSpec, ModelSetSpec
+from empirical_lawhood.design.adaptive_acquisition import FixedRoundAcquisitionPlan, FixedRoundArmSpec, FixedRoundStopRule
+from empirical_lawhood.design.approval import ApprovalCheckerRegistry, AttestationResult, CompleteApprovalService, issue_approval_gate_attestation
+from empirical_lawhood.design.experiment_entry import ExecutableStudyDefinition, ProposedStudyExtension, ProposedStudyExtensionSet
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, StudyOperationAuthority
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactPublicationBinding, ArtifactPublicationMember, ArtifactPublicationScope, LogicalArtifactIdentity, artifact_publication_batch_id, artifact_publication_commit_relative_path, artifact_publication_member
+from empirical_lawhood.execution.candidate_compiler import bind_standard_candidate_extensions
+from empirical_lawhood.execution.execution_envelope import ExecutionEnvelopeCellSpec, ExecutionEnvelopeSpec
+from empirical_lawhood.execution.study_issue import IssuedStudyMember, StudyPublicationReceipt, StudyExtensionDecoderRegistration, IssuedExecutableStudyManifest, bind_standard_issued_extensions, build_study_approval_proposal, validate_issued_study_extensions
 from tests.approval_support import FixedDecisionClock, deterministic_approval_signer
 from tests.runtime_platform.test_study_approval import _AttestationStore, _AuthorizationStore, _StudyProposalStore, _checker_registrations
 from tests.runtime_platform.test_study_issue import _issue_api_fixture, _issue_request

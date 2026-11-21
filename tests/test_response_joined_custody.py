@@ -17,10 +17,10 @@ from tests.response_dependent_fixtures import _selection_config, calibration_rec
 from tests.test_response_dependent_binding import _authoring_input
 from tests.test_doctor_profile import _profile
 from tests.test_finite_response_retained_development_input import fixture as finite_retained_development_parent
-from empirical_lawhood.adapters.composition.finite_response_law.informative_composition_input import FiniteResponseLawInformativeCompositionParent
-from empirical_lawhood.adapters.composition.response_composition.scalar_parent import ResponseCompositionScalarParent, SHAPES
-from empirical_lawhood.adapters.methods.prepared_response.qualification import evaluate_prepared_response_source_qualification
-from empirical_lawhood.adapters.methods.response_composition.development import ResponseCompositionDevelopmentSpec
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.informative_composition_input import FiniteResponseLawInformativeCompositionParent
+from empirical_lawhood.domains.matrix.response_composition.authoring.scalar_parent import ResponseCompositionScalarParent, SHAPES
+from empirical_lawhood.domains.matrix.prepared_response.qualification import evaluate_prepared_response_source_qualification
+from empirical_lawhood.domains.matrix.response_composition.development import ResponseCompositionDevelopmentSpec
 from empirical_lawhood.cli.app import app
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -130,7 +130,7 @@ def _finite_cli_args(profile_path, stage, args, *, plan, prior, assignment=None,
 
 def _finite_inputs(source_root, roots):
     plan = source_root / "plan.md"
-    plan.write_bytes((ROOT / 'src/empirical_lawhood/adapters/methods/finite_response_law/specification.md').read_bytes())
+    plan.write_bytes((ROOT / 'src/empirical_lawhood/domains/matrix/finite_response_law/specification.md').read_bytes())
     prior = source_root / "prior.json"
     prior.write_text(json.dumps({
         "schema": 'empirical-lawhood/methods/finite-response-law/native-exposure-metadata',

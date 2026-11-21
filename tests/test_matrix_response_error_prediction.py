@@ -8,18 +8,13 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import FactorObservation
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import (
-    ENDPOINTS, FEATURES, METHODS, ROOT_IDS, STRATA, SUBROLES, WARRANT,
-    MatrixResponseErrorPredictionSpec, calibrate_error_model, development_roles,
-    error_readout, fit_error_model, forecast_error, forecast_error_points, identity, origin_features,
-    query_forecast_tolerance, rank_radius, readout_census, root_error_summaries,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_frontier import MatrixResponseRootFrontier
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_population_statistics import MatrixResponseRootLossBounds
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import FactorObservation
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import ENDPOINTS, FEATURES, METHODS, ROOT_IDS, STRATA, SUBROLES, WARRANT, MatrixResponseErrorPredictionSpec, calibrate_error_model, development_roles, error_readout, fit_error_model, forecast_error, forecast_error_points, identity, origin_features, query_forecast_tolerance, rank_radius, readout_census, root_error_summaries
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_frontier import MatrixResponseRootFrontier
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_population_statistics import MatrixResponseRootLossBounds
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 from tests.test_matrix_response_population_statistics import spec as population_fixture
 
 
@@ -145,7 +140,7 @@ def test_only_pre_cutoff_channels_and_future_changes_leave_features_identical(sp
                               observations=(observation(16),), unavailable_reason='missing-prefix')
     assert refused.disposition == 'UNAVAILABLE' and not refused.values
     with pytest.raises(ValueError, match='cutoff'):
-        from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import _validate_feature
+        from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import _validate_feature
         _validate_feature(spec, replace(ordinary, cutoff=D('.032')))
 
 
@@ -206,7 +201,7 @@ def test_actual_fixed_estimator_and_train_standardisation_covariant_on_conjugate
 
 
 def test_training_only_and_thinned_foreign_role_labels_refuse_before_solver(spec, corpus, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_prediction as owner
+    from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_prediction as owner
     def forbidden(*args, **kwargs):
         raise AssertionError('solver entered before scientific role/label admission')
     monkeypatch.setattr(owner.np.linalg, 'solve', forbidden)
@@ -218,7 +213,7 @@ def test_training_only_and_thinned_foreign_role_labels_refuse_before_solver(spec
 
 
 def test_context_comparator_is_literal_family_mean_with_empty_family_refusal(spec, corpus, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_prediction as owner
+    from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_prediction as owner
     def forbidden(*args, **kwargs):
         raise AssertionError('literal family mean must not call the ridge solver')
     monkeypatch.setattr(owner.np.linalg, 'solve', forbidden)

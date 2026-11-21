@@ -6,16 +6,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from empirical_lawhood.planning.experiment_entry import StudyDefinition
-from empirical_lawhood.planning.study_authoring import StudyDraft
-from empirical_lawhood.runtime.candidate_compiler import StandardCandidateCompilationContext
-from empirical_lawhood.runtime.candidate_composition import (
-    CandidateCapabilityCatalog,
-    CandidateCapabilityRegistration,
-    CandidateContextResolution,
-    StandardCandidateContextResolution,
-)
-from empirical_lawhood.runtime.source_resolution import CandidateSourceResolution
+from empirical_lawhood.design.experiment_entry import StudyDefinition
+from empirical_lawhood.design.study_authoring import StudyDraft
+from empirical_lawhood.execution.candidate_compiler import StandardCandidateCompilationContext
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog, CandidateCapabilityRegistration, CandidateContextResolution, StandardCandidateContextResolution
+from empirical_lawhood.execution.source_resolution import CandidateSourceResolution
 
 
 @dataclass(frozen=True, slots=True)

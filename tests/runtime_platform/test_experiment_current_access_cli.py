@@ -11,8 +11,8 @@ from empirical_lawhood.api.experiment_programme import ExperimentProgrammeServic
 from empirical_lawhood.api.selected_e3_access import SelectedE3CurrentAccess
 from empirical_lawhood.cli import experiment_preparation as owner, integrations, platform
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_experiment_read_access import install_locator_codecs, locator_files
 from tests.test_recursive_public_service import _plane
 

@@ -8,12 +8,15 @@ from typing import ClassVar
 import pytest
 
 from empirical_lawhood.api import recursive_qualified_parents as owner
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ReceiptCheck
-from empirical_lawhood.runtime.recursive_qualified_parents import QualifiedParentEvidence
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ReceiptCheck
+from empirical_lawhood.execution.recursive_qualified_parents import QualifiedParentEvidence
+from empirical_lawhood.design.study_authoring import CapabilitySelection
+
+PRODUCER = CapabilitySelection("testing.companion", "1.0.0", "1"*64)
 from tests.test_recursive_public_service import _plane
 
 
@@ -45,13 +48,13 @@ def actual(tmp_path):
 
 def test_default_empty_evidence_preserves_existing_route_without_extra_io(monkeypatch):
     monkeypatch.setattr(owner, '_output_payload', lambda *args: pytest.fail('undeclared companion read'))
-    assert owner._additional_products(None, None, (), {}) == ()
+    assert owner._additional_products(None, None, (), {}, producer_selection=PRODUCER) == ()
     assert QualifiedParentEvidence(None, None, None, None, None, None, b'primary').additional_products == ()
 
 
 def test_actual_successful_companion_publication_retains_exact_bytes_and_metadata(actual):
     plane, record, publication, receipt, _ = actual
-    products = owner._additional_products(plane, receipt, (record.SCHEMA,), {record.SCHEMA: Companion})
+    products = owner._additional_products(plane, receipt, (record.SCHEMA,), {record.SCHEMA: Companion}, producer_selection=PRODUCER)
     assert len(products) == 1
     assert (products[0].logical, products[0].materialization, products[0].payload) == (
         publication.logical, publication.materialization, record.canonical_bytes())
@@ -67,7 +70,7 @@ def test_actual_companion_custody_tamper_refuses(actual, damage):
     else:
         target.write_bytes(target.read_bytes()[:-1]+b' ')
     with pytest.raises((PermissionError, ValueError, RuntimeError, OSError)):
-        owner._additional_products(plane, receipt, (record.SCHEMA,), {record.SCHEMA: Companion})
+        owner._additional_products(plane, receipt, (record.SCHEMA,), {record.SCHEMA: Companion}, producer_selection=PRODUCER)
 
 
 @pytest.mark.parametrize('damage', ['missing', 'duplicate', 'foreign-codec', 'oversize', 'wrong-access', 'unsuccessful'])
@@ -91,7 +94,7 @@ def test_companion_declarations_refuse_before_any_payload_read(actual, monkeypat
         receipt = replace(receipt, operational_status=OperationalStatus.FAILED, reason_codes=('synthetic-failure',))
     monkeypatch.setattr(owner, '_output_payload', lambda *args: pytest.fail('companion read before declaration refusal'))
     with pytest.raises(PermissionError):
-        owner._additional_products(plane, receipt, (record.SCHEMA,), codecs)
+        owner._additional_products(plane, receipt, (record.SCHEMA,), codecs, producer_selection=PRODUCER)
 
 
 @pytest.mark.parametrize('damage', ['version', 'decimal-spelling'])
@@ -105,4 +108,4 @@ def test_companion_installed_version_and_exact_canonical_decimal_bytes_refuse(ac
     # Even authenticated equal-value decimal spellings must match the exact
     # installed canonical re-encoding before reaching a domain assessor.
     with pytest.raises((PermissionError, ValueError, RuntimeError)):
-        owner._additional_products(plane, receipt, (record.SCHEMA,), {record.SCHEMA: Companion})
+        owner._additional_products(plane, receipt, (record.SCHEMA,), {record.SCHEMA: Companion}, producer_selection=PRODUCER)

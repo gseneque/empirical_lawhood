@@ -6,6 +6,7 @@ completion and qualified-parent readers. It neither issues authority nor
 repairs old acquisitions. In particular a later byte-identical criteria
 product cannot replace the producer pinned in an original issued design.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from datetime import UTC, datetime
 from hashlib import sha256
@@ -14,55 +15,39 @@ from types import SimpleNamespace
 from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader, authenticate_current_execution_plan, require_current_result_receipt_outputs
 from empirical_lawhood.api.matrix_scheduled_programme_runtime import authenticate_programme_qualified_parent
 from empirical_lawhood.api.models import ExperimentPackage
-from empirical_lawhood.api.recursive_qualified_parents import (
-    _actual_package, _collect_receipt_closure, _output_payload, _prior_native_subwork,
-    _semantic_writer, _verify_receipt_closure,
-)
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from empirical_lawhood.infrastructure.publication_metadata import read_publication_metadata
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.study_issue import (
-    ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore,
-    PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_ISSUE_GRANTEE_ID,
-)
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, require_study_authority
-from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-from empirical_lawhood.runtime.plans import ExecutionPlan
-from empirical_lawhood.runtime.recovery import RunRecoveryIndex, TaskRecoveryDisposition, build_run_recovery_index
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding, RecursivePriorNativeBinding
+from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _collect_receipt_closure, _output_payload, _prior_native_subwork, _semantic_writer, _verify_receipt_closure
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+from empirical_lawhood.storage.publication_metadata import read_publication_metadata
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_ISSUE_GRANTEE_ID
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, require_study_authority
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
+from empirical_lawhood.execution.plans import ExecutionPlan
+from empirical_lawhood.execution.recovery import RunRecoveryIndex, TaskRecoveryDisposition, build_run_recovery_index
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding, RecursivePriorNativeBinding
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import NAMESPACE as COMPACT, ScheduledCompactBank
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_qualification import _qualification
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition import (
-    ScheduledProgrammeAcquisitionAdmissionConfig, validate_acquisition_root,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition_custody import (
-    ScheduledProgrammeAcquisitionWaveCustody, acquisition_phase_roles, validate_acquisition_operation_census, validate_acquisition_wave_custody,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_confirmation import ScheduledProgrammeConfirmationParentBinding
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial import ScheduledFactorialSpecification, validate_factorial_inputs
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial_confirmation import (
-    ScheduledFactorialCaseCustody, ScheduledFactorialConfirmationConfig, ScheduledFactorialCriteriaBinding, ScheduledFactorialCriteriaConfig,
-    ScheduledFactorialConfirmationInputSeal, ScheduledFactorialConfirmationSealConfig,
-    INPUT_SEAL, ScheduledFactorialProtectedWorker, ScheduledFactorialWaveCustody, case_custody_state, confirmation_input_seal, input_seal_node_id,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial_confirmation_custody import (
-    VerifiedFactorialInvocation, require_original_criteria_design,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import ScheduledProgramme
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_reduction import ScheduledProgrammeReduction, ScheduledProgrammeWaveResult, reduce_programme
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_selection import ScheduledRevisionDataBank
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledCausalPrefix, identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseScore
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import NAMESPACE as COMPACT, ScheduledCompactBank
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_qualification import _qualification
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition import ScheduledProgrammeAcquisitionAdmissionConfig, validate_acquisition_root
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition_custody import ScheduledProgrammeAcquisitionWaveCustody, acquisition_phase_roles, validate_acquisition_operation_census, validate_acquisition_wave_custody
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_confirmation import ScheduledProgrammeConfirmationParentBinding
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial import ScheduledFactorialSpecification, validate_factorial_inputs
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial_confirmation import ScheduledFactorialCaseCustody, ScheduledFactorialConfirmationConfig, ScheduledFactorialCriteriaBinding, ScheduledFactorialCriteriaConfig, ScheduledFactorialConfirmationInputSeal, ScheduledFactorialConfirmationSealConfig, INPUT_SEAL, ScheduledFactorialProtectedWorker, ScheduledFactorialWaveCustody, case_custody_state, confirmation_input_seal, input_seal_node_id
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial_confirmation_custody import VerifiedFactorialInvocation, require_original_criteria_design
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import ScheduledProgramme
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_reduction import ScheduledProgrammeReduction, ScheduledProgrammeWaveResult, reduce_programme
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_selection import ScheduledRevisionDataBank
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledCausalPrefix, identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseScore
 
 
 def _live_package(writer, run_id):
@@ -106,7 +91,7 @@ def _require_locator(package, plan, run_id, locator):
 def _manifest(writer, relative):
     raw = read_bounded_bytes(writer.root.resolve(relative+".manifest.json", for_write=False),
         maximum_bytes=writer.custody_limits.manifest_bytes)
-    manifest = decode_artifact_manifest(raw, maximum_bytes=writer.custody_limits.manifest_bytes)
+    manifest = resolve_artifact_sidecar_bytes(writer, raw, maximum_bytes=writer.custody_limits.manifest_bytes)
     physical = manifest.materialization
     if (physical.relative_path != relative or physical.storage_root_id != writer.root.contract.storage_root_id
             or physical.compression != "none" or physical.partition_selector is not None or manifest.publication is None):
@@ -138,7 +123,7 @@ def _original_external(writer, run_id, spec):
 
 
 def _expected_inputs(writer, run_id, task, dependencies):
-    from empirical_lawhood.infrastructure.execution import LocalScheduler
+    from empirical_lawhood.execution.local.execution import LocalScheduler
     by_task = {}
     for receipt in dependencies:
         physical = {value.logical_artifact_id: value for value in receipt.output_materializations}
@@ -293,7 +278,7 @@ def _wave_metadata(writer, locator, config, bank, current_root, *, parent_writer
     wanted = {COMPACT+"."+root_id+"."+role for root_id in wave.root_ids for role in roles}
     if {value.task_id for value in plan.tasks} != wanted | {wave.wave_id+".open", wave.wave_id+".collect"}:
         raise PermissionError("factorial acquisition changes its original complete eleven-phase task census")
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition import ScheduledProgrammeAcquisitionCollectorConfig
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition import ScheduledProgrammeAcquisitionCollectorConfig
     collector_task, = (value for value in plan.tasks if value.task_id == wave.wave_id+".collect")
     collector_config, config_publication = _original_config(writer, locator.run_id, collector_task, ScheduledProgrammeAcquisitionCollectorConfig)
     if (collector_config.programme != config.programme.identity or collector_config.wave != wave

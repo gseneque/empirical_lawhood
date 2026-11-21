@@ -7,21 +7,14 @@ from math import log
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.simulators.rubisco_assay import core
-from empirical_lawhood.adapters.simulators.rubisco_assay.core import (
-    GasQuery, Kinetics, Products, compatible_kinetics, execute_assay,
-    log_sensitivity, next_query, reduce_products, reference_rates, specificity_energy_scale,
-)
-from empirical_lawhood.adapters.simulators.rubisco_assay.fixture import historical_r1_config
-from empirical_lawhood.adapters.simulators.rubisco_assay.records import (
-    AssayConfig, AssayEvaluation, AssayProjection, AssayQuery, AssayResult,
-)
-from empirical_lawhood.adapters.simulators.rubisco_assay.science import (
-    evaluate_histories, execute_round, project_history, run_assay,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import ScientificStatus
+from empirical_lawhood.domains.rubisco.assay import core
+from empirical_lawhood.domains.rubisco.assay.core import GasQuery, Kinetics, Products, compatible_kinetics, execute_assay, log_sensitivity, next_query, reduce_products, reference_rates, specificity_energy_scale
+from empirical_lawhood.domains.rubisco.assay.fixture import historical_r1_config
+from empirical_lawhood.domains.rubisco.assay.records import AssayConfig, AssayEvaluation, AssayProjection, AssayQuery, AssayResult
+from empirical_lawhood.domains.rubisco.assay.science import evaluate_histories, execute_round, project_history, run_assay
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import ScientificStatus
 
 P = Kinetics(6, 75, 1, 750)
 
@@ -180,7 +173,7 @@ def test_predecessor_identity_and_policy_checked_before_solver(monkeypatch):
     first = execute_round(config, case.case_id, 0)
     def forbidden(*args):
         raise AssertionError("native calculation entered before predecessor check")
-    monkeypatch.setattr("empirical_lawhood.adapters.simulators.rubisco_assay.science.execute_assay", forbidden)
+    monkeypatch.setattr("empirical_lawhood.domains.rubisco.assay.science.execute_assay", forbidden)
     with pytest.raises(ValueError, match="predecessor"):
         execute_round(config, case.case_id, 1, replace(first, case=ObjectIdentity.from_record(
             config.cases[1].case_id, config.cases[1])))

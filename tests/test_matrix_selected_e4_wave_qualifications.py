@@ -5,11 +5,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as native
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition import _local_root
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as native
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition import _local_root
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
 from tests.runtime_platform.test_candidate_compiler import _fixture
 from tests.test_matrix_selected_e4_fixtures import selected_e4_populations, selected_bridge, transfer  # noqa: F401
 

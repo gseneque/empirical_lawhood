@@ -13,21 +13,15 @@ import pytest
 
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
 from empirical_lawhood.api.results import IssueStudyRequest, OperationStatus
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.infrastructure.artifacts import (
-    ArtifactIdentityConflict,
-    ExternalArtifactPlane,
-    ExternalRootUnavailable,
-    FilesystemState,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, GitStudySourceClosureInspector
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_entry import StudyDefinition
-from empirical_lawhood.planning.study_issue import AccountableHumanIdentity, HumanProposerAttestation, ImplementationSourceClosure, StudyAuthorityKind, StudyOperationAuthority, SourceClosureKind
-from empirical_lawhood.runtime.candidate_compiler import AuthoringMaterializationIdentity, StudyCompilationReport, StandardCandidateCompilationContext, compile_draft_candidate, compile_study_candidate
-from empirical_lawhood.runtime.study_issue import ISSUE_PUBLICATION_RELATIVE_ROOT, IssuedStudyMember, MAX_ISSUE_PAYLOAD_BYTES, MAX_STANDARD_PROGRAMME_CONTROL_BYTES, prepare_draft_candidate_issue
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ExternalRootContract
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, ExternalRootUnavailable, FilesystemState, GuardedExternalRoot
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, GitStudySourceClosureInspector
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_entry import StudyDefinition
+from empirical_lawhood.design.study_issue import AccountableHumanIdentity, HumanProposerAttestation, ImplementationSourceClosure, StudyAuthorityKind, StudyOperationAuthority, SourceClosureKind
+from empirical_lawhood.execution.candidate_compiler import AuthoringMaterializationIdentity, StudyCompilationReport, StandardCandidateCompilationContext, compile_draft_candidate, compile_study_candidate
+from empirical_lawhood.execution.study_issue import ISSUE_PUBLICATION_RELATIVE_ROOT, IssuedStudyMember, prepare_draft_candidate_issue
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ExternalRootContract
 from tests.approval_support import FixedDecisionClock
 from tests.experiment_entry_support import entry_package_for_draft
 from tests.runtime_platform.test_candidate_compiler import _fixture
@@ -35,23 +29,15 @@ from tests.runtime_platform.test_standard_formal_candidate import _standard_fixt
 from tests.standard_candidate_support import FixedStandardCandidateContextProvider
 
 
-def test_generated_compilation_member_capacity_keeps_scientific_payloads_bounded() -> None:
-    member = IssuedStudyMember(
-        "issue.fixture.compilation",
-        "issued-programmes/fixture/report.json",
-        StudyCompilationReport.SCHEMA,
-        "application/json",
-        ArtifactProfile.CANONICAL_JSON,
-        MAX_ISSUE_PAYLOAD_BYTES + 1,
-        "a" * 64,
-        "a" * 64,
-    )
-    with pytest.raises(ValueError, match="byte bound"):
-        replace(member, payload_schema='empirical-lawhood/testing/fixtures/scientific-payload')
-    with pytest.raises(ValueError, match="byte bound"):
-        replace(member, profile=ArtifactProfile.TEXT_PARAMETERS)
-    with pytest.raises(ValueError, match="byte bound"):
-        replace(member, size_bytes=MAX_STANDARD_PROGRAMME_CONTROL_BYTES + 1)
+def test_issue_member_preserves_exact_positive_observed_size_without_global_cap():
+    member = IssuedStudyMember("issue.fixture.compilation", "issued-programmes/fixture/report.json",
+        StudyCompilationReport.SCHEMA, "application/json", ArtifactProfile.CANONICAL_JSON,
+        256 * 1024**2 + 1, "a" * 64, "a" * 64)
+    assert member.size_bytes == 256 * 1024**2 + 1
+    assert replace(member, payload_schema='empirical-lawhood/testing/fixtures/scientific-payload').size_bytes == member.size_bytes
+    for invalid in (0, -1, True):
+        with pytest.raises(ValueError, match="observed positive byte count"):
+            replace(member, size_bytes=invalid)
 
 
 def _issue_inputs(*, raw_padding_bytes: int = 0) -> dict[str, object]:
@@ -341,9 +327,6 @@ def test_guarded_issue_publisher_is_atomic_no_replace_and_replay_safe(
     from pathlib import Path
 
     assert isinstance(tmp_path, Path)
-    monkeypatch.setattr(
-        "empirical_lawhood.infrastructure.artifacts.MAX_IN_MEMORY_ARTIFACT_BYTES", in_memory_limit
-    )
     root = tmp_path / "external"
     root.mkdir()
     inputs = _issue_inputs(raw_padding_bytes=1024**2)
@@ -351,6 +334,8 @@ def test_guarded_issue_publisher_is_atomic_no_replace_and_replay_safe(
     assert isinstance(authority, StudyOperationAuthority)
     preparation = prepare_draft_candidate_issue(**inputs)  # type: ignore[arg-type]
     publisher = _publisher(root, authority)
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits
+    publisher.artifact_plane.custody_limits = ArtifactCustodyLimits(in_memory_payload_bytes=in_memory_limit)
 
     first = publisher.publish(preparation, at_utc="2026-07-24T20:32:00Z")
     second = publisher.publish(preparation, at_utc="2026-07-24T20:33:00Z")
@@ -384,6 +369,29 @@ def test_guarded_issue_publisher_is_atomic_no_replace_and_replay_safe(
         publisher.publish(preparation, at_utc="2026-07-24T20:32:00Z")
 
 
+def test_selected_issue_manifest_size_allows_its_exact_bytes_and_streamed_raw_draft(tmp_path, monkeypatch):
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits
+    from empirical_lawhood.storage import study_issue as owner
+
+    inputs = _issue_inputs(raw_padding_bytes=1024**2)
+    preparation = prepare_draft_candidate_issue(**inputs)
+    publisher = _publisher(tmp_path, inputs["custody_authority"])
+    size = preparation.manifest.canonical_size_bytes()
+    assert any(value.member.size_bytes > size for value in preparation.payloads)
+    publisher.artifact_plane.custody_limits = ArtifactCustodyLimits(control_record_bytes=size)
+    receipt = publisher.publish(preparation, at_utc="2026-07-24T20:32:00Z")
+    assert publisher.load(preparation.manifest.issue_id).publication_receipt == receipt
+
+    publisher.artifact_plane.custody_limits = ArtifactCustodyLimits(control_record_bytes=size - 1)
+    original = owner.read_bounded_bytes
+    def observe(path, **kwargs):
+        assert path.name != "manifest.json", "reader consumed the oversized issue manifest"
+        return original(path, **kwargs)
+    monkeypatch.setattr(owner, "read_bounded_bytes", observe)
+    with pytest.raises(ValueError, match="selected custody byte allowance control_record_bytes"):
+        publisher.load(preparation.manifest.issue_id)
+
+
 @pytest.mark.parametrize("capacity", ("space", "record"))
 def test_guarded_issue_publisher_refuses_capacity_before_any_publication(
     tmp_path: object,
@@ -401,13 +409,12 @@ def test_guarded_issue_publisher_refuses_capacity_before_any_publication(
     preparation = prepare_draft_candidate_issue(**inputs)  # type: ignore[arg-type]
     publisher = _publisher(root, authority, free_bytes=1 if capacity == "space" else 100_000_000)
     if capacity == "record":
-        monkeypatch.setattr(
-            'empirical_lawhood.infrastructure.study_issue.MAX_ISSUED_PROGRAMME_MANIFEST_BYTES', 1
-        )
+        monkeypatch.setattr(publisher.artifact_plane, 'custody_limits',
+            replace(publisher.artifact_plane.custody_limits, control_record_bytes=1))
 
     with pytest.raises(
-        ExternalRootUnavailable if capacity == "space" else ValueError,
-        match="free-space" if capacity == "space" else "bounded reader capacity",
+        ExternalRootUnavailable if capacity == "space" else (ValueError, RuntimeError),
+        match="free-space" if capacity == "space" else "byte|allowance",
     ):
         publisher.publish(preparation, at_utc="2026-07-24T20:32:00Z")
 
@@ -425,7 +432,7 @@ def test_git_source_closure_inspector_reobserves_commit_tree_and_cleanliness(
     # This unit test isolates Git observations. The joint executing-source and
     # clean-commit boundary is exercised in test_source_origin.py subprocesses.
     monkeypatch.setattr(
-        "empirical_lawhood.infrastructure.source_origin.require_executing_target_source",
+        "empirical_lawhood.storage.source_origin.require_executing_target_source",
         lambda root: root / "src" / "empirical_lawhood",
     )
     repo = tmp_path / "repo"

@@ -7,13 +7,11 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.protected_preparation_records import (
-    MatrixConfirmationSources, MatrixProtectedSourceClosure, MatrixReservedTransferSources,
-)
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as original
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.protected_preparation_records import MatrixConfirmationSources, MatrixProtectedSourceClosure, MatrixReservedTransferSources
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as original
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests import test_matrix_coupling_preparation as preparation
 from tests import test_matrix_scheduled_history as scheduled
 from tests import test_matrix_scheduled_history_bindings as bindings

@@ -10,23 +10,16 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_array_chunks import (
-    ChunkedMatrixArrays, MatrixArrayInterval, encode_chunk, framed_artifact, iter_chunk_arrays,
-    iter_framed_bytes, whole_member,
-)
-from empirical_lawhood.adapters.methods.matrix_dataset_readers import (
-    bridge_chunked_arrays, bridge_framed_arrays, bridge_saved_arrays, bridge_worker_arrays,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import MatrixResponseArrays
-from empirical_lawhood.infrastructure.artifact_stream_primitives import (
-    ArtifactInputLimitExceeded, _PreopenedBoundedReader, _anonymous_input_descriptor, _seal_anonymous_input,
-)
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA, MatrixAllocation, SavedMatrixArrays
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort
+from empirical_lawhood.domains.matrix.matrix_array_chunks import ChunkedMatrixArrays, MatrixArrayInterval, encode_chunk, framed_artifact, iter_chunk_arrays, iter_framed_bytes, whole_member
+from empirical_lawhood.domains.matrix.matrix_dataset_readers import bridge_chunked_arrays, bridge_framed_arrays, bridge_saved_arrays, bridge_worker_arrays
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import MatrixResponseArrays
+from empirical_lawhood.storage.artifact_stream_primitives import ArtifactInputLimitExceeded, _PreopenedBoundedReader, _anonymous_input_descriptor, _seal_anonymous_input
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA, MatrixAllocation, SavedMatrixArrays
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort
 from tests.test_matrix_factor_confirmation_eligibility import stock, provenance  # noqa: F401
 import os
 
@@ -274,7 +267,7 @@ def test_exact_historical_response_owner_keeps_absent_allocation_and_original_id
 
 @pytest.mark.parametrize("defect", ("exact", "source", "allocation", "exposed-sha", "access", "visibility", "producers"))
 def test_shared_worker_bridge_retains_every_original_eligible_array_guard(stock, defect):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_factor_response import eligibility as selected
+    from empirical_lawhood.domains.matrix.matrix_factor_response import eligibility as selected
     _, source = stock
     arrays = {"momenta": np.zeros((3, 2, 3, 4, 4), dtype="<c16"), "positions": np.ones((3, 2, 3, 4, 4), dtype="<c16")}
     raw, members = encode_matrix_arrays(arrays)

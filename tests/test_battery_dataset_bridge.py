@@ -9,14 +9,12 @@ import tracemalloc
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.dataset_bridge import (
-    BatteryColumnSource, bridge_lossless_frame, bridge_raw_segment,
-)
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_arrays as codec
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_records as records
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import preparation_contracts as pc
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_native as native
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.battery.battery_refined_inquiry.dataset_bridge import BatteryColumnSource, bridge_lossless_frame, bridge_raw_segment
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_arrays as codec
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_records as records
+from empirical_lawhood.domains.battery.battery_refined_inquiry import preparation_contracts as pc
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as native
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_battery_lossless_segment_records import encoded_original
 
 

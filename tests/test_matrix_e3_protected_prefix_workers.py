@@ -5,6 +5,7 @@ The fixture explicitly authors its native metadata/control publication and
 ordinary dependency receipts. Guarded byte ports are real; no signer, issue,
 genuine source qualification or actual native contact is created.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from collections import defaultdict
 from dataclasses import replace
@@ -13,23 +14,23 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_bindings as declarations
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_science as science
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_workers as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import ProtectedE3SourcePhase as Phase, source_task_id
-from empirical_lawhood.infrastructure.execution import prepare_worker_invocation
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
-from empirical_lawhood.infrastructure.prepared_native_invocation import NativeInputPublication, prepare_native_invocation
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_bindings as declarations
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_science as science
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_workers as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import ProtectedE3SourcePhase as Phase, source_task_id
+from empirical_lawhood.execution.local.execution import prepare_worker_invocation
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
+from empirical_lawhood.storage.prepared_native_invocation import NativeInputPublication, prepare_native_invocation
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.worker_configuration_support import freeze_worker_configuration
 from tests.test_matrix_e3_protected_prefix_science import blocked, case as original_case, forbid_native as forbid_native  # noqa: F401
 from tests.test_matrix_factor_confirmation_eligibility import _matrix_plane
@@ -61,8 +62,7 @@ def case(original_case):  # noqa: F811
 
 
 def _manifest(plane, result):
-    return decode_artifact_manifest(plane.root.resolve(result.materialization.relative_path + ".manifest.json",
-        for_write=False).read_bytes())
+    return resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes())
 
 
 def prepared_case(case, phase, *, directory, damage=None, qualified_outputs=True):

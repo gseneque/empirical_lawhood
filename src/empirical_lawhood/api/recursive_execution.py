@@ -1,34 +1,34 @@
 # SPDX-License-Identifier: MPL-2.0
 """General exposed development execution through the existing local scheduler."""
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
+from functools import cached_property
 from dataclasses import replace
 from hashlib import sha256
 import json
 import os
 
-from empirical_lawhood.api.recursive_authoring import (
-    _authenticate_authored_wave_roots, _external_storage_contract, implementation_binding, load_authored_wave,
-)
-from empirical_lawhood.api.recursive_operations import operation_catalog, operation_runners
-from empirical_lawhood.runtime.artifacts import artifact_custody_limits
-from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256, read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactStreamWriteRequest, ArtifactWriteRequest, lineage_parent_sort_key
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, DevelopmentRunPlan, PlanLane
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+from empirical_lawhood.api.recursive_authoring import _authenticate_authored_wave_roots, _external_storage_contract, implementation_binding, load_authored_wave
+from empirical_lawhood.api.recursive_operations import operation_catalog_for_draft, operation_catalog, operation_runners
+from empirical_lawhood.storage.contracts.artifacts import artifact_custody_limits
+from empirical_lawhood.storage.bounded_io import bounded_file_sha256
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactStreamWriteRequest, ArtifactWriteRequest, lineage_parent_sort_key
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, DevelopmentRunPlan, PlanLane
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
 
-from .experiment_runtime_bindings import experiment_runtime_binding
+from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding
 
 
 def _retained_plans(payloads, draft):
-    from empirical_lawhood.infrastructure.recursive_control_read import decode_authored_control
-    from empirical_lawhood.runtime.recursive_compiler import derive_recursive_scientific_selection
-    from empirical_lawhood.runtime.candidate_compiler import StudyTemplate
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.scientific_graph_preservation import DevelopmentGraphPreservationReceipt, prove_development_graph_parity
+    from empirical_lawhood.storage.recursive_control_read import decode_authored_control
+    from empirical_lawhood.execution.recursive_compiler import derive_recursive_scientific_selection
+    from empirical_lawhood.execution.candidate_compiler import StudyTemplate
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.scientific_graph_preservation import DevelopmentGraphPreservationReceipt, prove_development_graph_parity
 
     def decode(name, codec):
         return decode_authored_control(payloads, name, codec)
@@ -52,20 +52,17 @@ def _retained_plans(payloads, draft):
         raise ValueError("recursive execution substitutes its authored draft or scientific plan")
     index = DevelopmentRunRecoveryIndex.from_execution_plan(plan, run_id=run.run_plan_id,
         wave_id="wave.development", authority_identities=())
-    from .development_output_repair import select_development_output_repair
+    from empirical_lawhood.api.development_output_repair import select_development_output_repair
     if getattr(payloads, "plane", None) is not None:
-        index = select_development_output_repair(writer=payloads.plane, plan=plan, predecessor=index)
+        index = select_development_output_repair(writer=payloads.plane, plan=plan, predecessor=index,
+            retained_registry=registry)
     return run, plan, index
 
 
 def _can_batch_readonly_inputs(*, plane, payloads, input_count, policy):
     """Local stock-policy choice; every invocation still authenticates all bytes."""
-    from empirical_lawhood.infrastructure.artifacts import (
-        ExternalArtifactPlane, _ScopedArtifactPlane, _has_stock_manifest_reads,
-    )
-    from empirical_lawhood.infrastructure.recursive_custody import (
-        AuthenticatedRecursivePayloads, _can_batch_authored_members,
-    )
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, _ScopedArtifactPlane, _has_stock_manifest_reads
+    from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads, _can_batch_authored_members
     current = _read_only_custody_policy(plane)
     return (input_count > 0 and type(payloads) is AuthenticatedRecursivePayloads
         and type(plane) in (ExternalArtifactPlane, _ScopedArtifactPlane)
@@ -78,10 +75,10 @@ def _can_batch_readonly_inputs(*, plane, payloads, input_count, policy):
 def _external_inputs(*, plane, plan, draft, payloads, read_only, _allow_batch=True, _source_scope=False,
         _publication_writer=None):
     """Materialize only exact declared inputs, preserving their scoped lineage."""
-    from empirical_lawhood.infrastructure.recursive_custody import read_exposed_recursive_payload
-    from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads
-    from empirical_lawhood.infrastructure.artifacts import supports_closed_batch_writes, _has_stock_manifest_reads
-    from empirical_lawhood.infrastructure.recursive_custody import _can_batch_authored_members
+    from empirical_lawhood.storage.recursive_custody import read_exposed_recursive_payload
+    from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads
+    from empirical_lawhood.storage.artifacts import supports_closed_batch_writes, _has_stock_manifest_reads
+    from empirical_lawhood.storage.recursive_custody import _can_batch_authored_members
     writer = plane if _publication_writer is None else _publication_writer
     if (_allow_batch and not read_only and not _source_scope
             and type(payloads) is AuthenticatedRecursivePayloads and supports_closed_batch_writes(writer)
@@ -115,7 +112,7 @@ def _external_inputs(*, plane, plan, draft, payloads, read_only, _allow_batch=Tr
         and (read_only or supports_closed_batch_writes(writer)) else None)
     batch = _can_batch_readonly_inputs(plane=plane, payloads=payloads, input_count=len(specs), policy=policy)
     if batch:
-        from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
+        from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
         if type(plane) is ExternalArtifactPlane:
             # Full reads own this input-only scope. It closes before all later
             # typed/domain consumers; compact reads reuse their existing scope.
@@ -123,7 +120,7 @@ def _external_inputs(*, plane, plan, draft, payloads, read_only, _allow_batch=Tr
                 return _external_inputs(plane=scoped, plan=plan, draft=draft, payloads=payloads,
                     read_only=read_only, _allow_batch=_allow_batch, _source_scope=_source_scope,
                     _publication_writer=writer)
-    from .recursive_operations import operation_storage_codecs
+    from empirical_lawhood.api.recursive_operations import operation_storage_codecs
     storage_codecs = operation_storage_codecs()
     pending = []
     values = []
@@ -226,7 +223,7 @@ def _external_inputs(*, plane, plan, draft, payloads, read_only, _allow_batch=Tr
                 plane.write(request)
         accept(spec, artifact_id, raw, raw_size, access, visibility, parents, expected_profile, relative, path)
     if writes:
-        from empirical_lawhood.infrastructure.recursive_input_publication import publish_recursive_metadata
+        from empirical_lawhood.storage.recursive_input_publication import publish_recursive_metadata
         publish_recursive_metadata(writer, writes, require_current=require_current,
             before_member=None if original_access is None else original_access.require_member)
         for selection in selections:
@@ -260,9 +257,9 @@ def _external_inputs(*, plane, plan, draft, payloads, read_only, _allow_batch=Tr
 
 def _provenance(*, plane, run_id, observed=None):
     from empirical_lawhood.api.numerical_provenance import authenticate_recorded_numerical_provenance
-    from empirical_lawhood.infrastructure.development_native_custody import read_development_native_payload
-    from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-    from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
+    from empirical_lawhood.storage.development_native_custody import read_development_native_payload
+
+    from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
 
     relative = f"runs/{run_id}/inputs/producing-provenance.json"
     path = plane.root.resolve(relative, for_write=False)
@@ -274,7 +271,7 @@ def _provenance(*, plane, run_id, observed=None):
             ArtifactProfile.CANONICAL_JSON, "application/json", run_id + ".inputs",
             f"runs/{run_id}/inputs", observed.canonical_bytes(), VisibilityCeiling.DEVELOPMENT_ONLY,
             (), OutcomeAccess.DEVELOPMENT_VISIBLE))
-    manifest = decode_artifact_manifest(read_bounded_bytes(manifest_path, maximum_bytes=artifact_custody_limits(plane).manifest_bytes), maximum_bytes=artifact_custody_limits(plane).manifest_bytes)
+    manifest = read_artifact_sidecar(plane, (manifest_path).relative_to(plane.root.contract.canonical_path).as_posix(), maximum_bytes=artifact_custody_limits(plane).manifest_bytes)
     if manifest.materialization.relative_path != relative or manifest.logical.payload_schema != NumericalProducingProvenance.SCHEMA:
         raise ValueError("recursive producing provenance changes its exact record/path")
     size = max(1, manifest.materialization.size_bytes)
@@ -343,14 +340,15 @@ def read_recursive_wave(*, directory, artifact_writer, include_products=False,
 
 def _read_recursive_wave_with_retained_roots(*, directory, artifact_writer, include_products=False,
                         terminal_product_format="documents", allow_partial=False, read_access=None,
-                        expected_specification_bytes=None, allow_unexecuted=False, _scientific_consumer=None):
+                        expected_specification_bytes=None, allow_unexecuted=False, _scientific_consumer=None,
+                        _validate_authored=None):
     """Return immutable authored roots from the same fully guarded public read.
 
     Locator consumers need the actual packet and run, not another packet load
     after science. No payload mapping or read authority escapes this boundary.
     """
     from contextlib import nullcontext
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
 
     # Stock full reads share one immutable custody context through scientific
     # replay. Current access and explicit pre-product guards remain eager.
@@ -366,12 +364,16 @@ def _read_recursive_wave_with_retained_roots(*, directory, artifact_writer, incl
     ordinary_writer = artifact_writer
     original_accesses = []
     unexecuted_paths = []
-    with scope as artifact_writer:
+    from empirical_lawhood.api.recursive_contributions import recursive_contribution_read_context
+    # Parent views retained by the ancestry owner must finish before the
+    # enclosing artifact scope closes their shared canonical-validation pool.
+    with scope as artifact_writer, recursive_contribution_read_context():
         result, roots, _ = _read_recursive_wave_with_roots(directory=directory, artifact_writer=artifact_writer,
             include_products=include_products, terminal_product_format=terminal_product_format,
             allow_partial=allow_partial, read_access=read_access,
             expected_specification_bytes=expected_specification_bytes, allow_unexecuted=allow_unexecuted,
             scientific_consumer=_scientific_consumer,
+            validate_authored=_validate_authored,
             _retain_unexecuted_guard=unexecuted_paths.append,
             _retain_original_input_access=original_accesses.append)
     for original_access in original_accesses:
@@ -385,11 +387,9 @@ def _read_recursive_wave_with_retained_roots(*, directory, artifact_writer, incl
 def _read_only_custody_policy(artifact_writer):
     """Select actual stock composition for one bounded readonly custody phase."""
     from empirical_lawhood.api.integration_artifact_profiles import INTEGRATION_ARTIFACT_PROFILE_VALIDATORS
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-    from empirical_lawhood.infrastructure.artifacts import (
-        GuardedExternalRoot, LocalFilesystemInspector, _has_stock_artifact_plane_state,
-    )
-    from empirical_lawhood.runtime.artifacts import ExternalRootContract, ArtifactSemanticValidationRegistry, ArtifactCustodyLimits
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.storage.artifacts import GuardedExternalRoot, LocalFilesystemInspector, _has_stock_artifact_plane_state
+    from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract, ArtifactSemanticValidationRegistry, ArtifactCustodyLimits
 
     if (not _has_stock_artifact_plane_state(artifact_writer)
             or type(artifact_writer.validators) is not ArtifactProfileValidatorRegistry
@@ -426,11 +426,9 @@ def _read_recursive_wave_with_roots(*, directory, artifact_writer, include_produ
         raise TypeError("selected development specification must have exact canonical bytes")
     if allow_partial and terminal_product_format != "compact":
         raise ValueError("partial recursive custody requires the explicit compact report route")
-    from empirical_lawhood.infrastructure.recursive_custody import (
-        RAW_BYTES_CONSUMER_JOIN_DEFERRED, read_recursive_products,
-    )
-    from empirical_lawhood.infrastructure.artifacts import _ScopedArtifactPlane
-    from .experiment_scientific_read import read_prepared_development_science
+    from empirical_lawhood.storage.recursive_custody import RAW_BYTES_CONSUMER_JOIN_DEFERRED, read_recursive_products
+    from empirical_lawhood.storage.artifacts import _ScopedArtifactPlane
+    from empirical_lawhood.api.experiment_scientific_read import read_prepared_development_science
 
     if validate_authored is not None and not callable(validate_authored):
         raise TypeError("authored read preflight requires a callable")
@@ -465,7 +463,7 @@ def _read_recursive_wave_with_roots(*, directory, artifact_writer, include_produ
             _retain_unexecuted_guard(run_path)
 
     def read_products():
-        from .experiment_scientific_read import validate_prepared_development_read_access
+        from empirical_lawhood.api.experiment_scientific_read import validate_prepared_development_read_access
         validate_prepared_development_read_access(directory=directory, artifact_writer=artifact_writer,
             payloads=payloads, draft=draft, plan=plan, read_access=read_access)
         science_options = {} if read_access is None else {"read_access": read_access}
@@ -489,7 +487,7 @@ def _read_recursive_wave_with_roots(*, directory, artifact_writer, include_produ
         if (provenance.code_sources_sha256, provenance.dependency_lock_sha256, provenance.observed_git_head) != (
             source.code_sources_sha256, source.dependency_lock_sha256, source.observed_git_head):
             raise ValueError("recursive producing evidence differs from the selected authored source")
-        registrations, _, codecs = operation_catalog()
+        registrations, _, codecs = operation_catalog_for_draft(draft, catalog=operation_catalog)
         from empirical_lawhood.api.numerical_provenance import validate_registered_provenance
         validate_registered_provenance(provenance=provenance, draft=draft, registrations=registrations)
         if isinstance(artifact_writer, _ScopedArtifactPlane):
@@ -502,7 +500,7 @@ def _read_recursive_wave_with_roots(*, directory, artifact_writer, include_produ
                                            _read_policy=_read_only_custody_policy(artifact_writer),
                                            **product_options)
         products['external_inputs'] = inputs
-        from empirical_lawhood.runtime.recursive_compiler import project_recursive_assessments
+        from empirical_lawhood.execution.recursive_compiler import project_recursive_assessments
         authenticated_outputs = {(task_id, output_id.removeprefix(task_id + ".")): record
                                  for task_id, values in products["records"].items() for output_id, record in values.items()}
         assessments = () if compact else project_recursive_assessments(
@@ -560,6 +558,11 @@ def _read_recursive_wave_with_roots(*, directory, artifact_writer, include_produ
                   "new_native_contact_count": 0,
                   "scientific_authority": "NONE", "qualification": "NOT_ESTABLISHED",
                   "operational_terminal": "ABSENT" if products["terminal"] is None else "AUTHENTICATED"}
+        from empirical_lawhood.api.retained_diagnostics import retained_failure_diagnostics
+        diagnostics = retained_failure_diagnostics(plan=plan, index=index,
+            events=products["recovery_events"], draft=draft)
+        if diagnostics:
+            report["failure_diagnostics"] = diagnostics
         native_facts = products.get("native_observations", {})
         unavailable = products.get("native_observation_unavailable", {})
         if native_facts or unavailable:
@@ -588,7 +591,7 @@ def _read_recursive_wave_with_roots(*, directory, artifact_writer, include_produ
             report["typed_product_validation"] = "DEFERRED"
             report["connection_assessment_projection"] = "NOT_DECODED"
             report["scientific_completion"] = "NOT_ASSESSED_BY_COMPACT_CUSTODY"
-        from .development_output_repair import repair_report
+        from empirical_lawhood.api.development_output_repair import repair_report
         report.update(repair_report(index))
         scientific = consume_science(directory=directory, artifact_writer=artifact_writer,
             payloads=payloads, report=report, products=products, draft=draft, plan=plan,
@@ -604,9 +607,7 @@ def _read_recursive_wave_with_roots(*, directory, artifact_writer, include_produ
     def validate():
         return validate_authored(packet=packet, draft=draft, source=source, payloads=payloads,
             run=run, plan=plan, index=index)
-    from empirical_lawhood.infrastructure.recursive_custody import (
-        AuthenticatedRecursivePayloads, _can_batch_authored_members,
-    )
+    from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads, _can_batch_authored_members
     # The infrastructure owner preserves stock/custom policy and request limits.
     original_access = getattr(payloads, "original_input_access", None)
     guarded_reads = {} if original_access is None else {"before_member": original_access.require_member}
@@ -654,17 +655,20 @@ def _read_recursive_wave_with_roots(*, directory, artifact_writer, include_produ
 def _custody_control_pins(artifact_writer, index):
     """Bounded fresh primary control census; scientific arrays are not reopened."""
     paths = {index.index_relative_path, index.terminal_event_relative_path}
-    from empirical_lawhood.runtime.development_output_repair import DevelopmentOutputRepairRecoveryIndex
-    from .development_output_repair import repair_relative_path
+    from empirical_lawhood.execution.development_output_repair import DevelopmentOutputRepairRecoveryIndex
+    from empirical_lawhood.api.development_output_repair import repair_relative_path
     indexes = (index,)
     if isinstance(index, DevelopmentOutputRepairRecoveryIndex):
         indexes += (index.predecessor,)
-        from empirical_lawhood.runtime.development_controller_repair import DevelopmentControllerRepairRecoveryIndex
+        from empirical_lawhood.execution.development_controller_repair import DevelopmentControllerRepairRecoveryIndex
         if type(index) is DevelopmentControllerRepairRecoveryIndex:
-            from .development_controller_repair import repair_relative_path
-        from empirical_lawhood.runtime.native_continuation_execution import DevelopmentNativeContinuationRecoveryIndex
+            from empirical_lawhood.api.development_controller_repair import repair_relative_path
+        from empirical_lawhood.execution.development_scratch_repair import DevelopmentScratchRepairRecoveryIndex
+        if type(index) is DevelopmentScratchRepairRecoveryIndex:
+            from empirical_lawhood.api.development_scratch_repair import repair_relative_path
+        from empirical_lawhood.execution.native_continuation_execution import DevelopmentNativeContinuationRecoveryIndex
         if type(index) is DevelopmentNativeContinuationRecoveryIndex:
-            from .native_continuation_execution import continuation_relative_path as repair_relative_path
+            from empirical_lawhood.api.native_continuation_execution import continuation_relative_path as repair_relative_path
         paths.add(repair_relative_path(index.run_id))
     for owner in indexes:
         paths.update((owner.index_relative_path, owner.terminal_event_relative_path))
@@ -688,8 +692,8 @@ def _custody_control_pins(artifact_writer, index):
 
 def _custody_contacts(*, plan, index, contacts, receipts, external_inputs, attempts, native_keys):
     """Join actual original parent headers with the DEV task's declared inputs."""
-    from empirical_lawhood.runtime.native_effects import NativeEffectContact
-    from empirical_lawhood.runtime.execution import dependency_artifact_inputs
+    from empirical_lawhood.execution.native_effects import NativeEffectContact
+    from empirical_lawhood.execution.execution import dependency_artifact_inputs
     by_task = {row.task_id: row for row in receipts}
     dependency_outputs = {}
     for receipt in receipts:
@@ -740,16 +744,14 @@ def recover_recursive_custody(*, directory, project_root, artifact_writer, read_
     authenticated independently. This function creates no task completion,
     retry authority, native work, scratch retirement or scientific score.
     """
-    from empirical_lawhood.infrastructure.source_closure import (
-        _observe_admitted_target_source_current, capture_admitted_target_source,
-    )
-    from ..infrastructure.recovery import ExternalRunRecoveryStore, RunRecoveryError, settled_recovery_tasks
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog, SQLiteOperationalRepository
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
-    from empirical_lawhood.runtime.execution import TaskBlockReason, TaskAttemptDisposition
+    from empirical_lawhood.storage.source_closure import _observe_admitted_target_source_current, capture_admitted_target_source
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore, RunRecoveryError, settled_recovery_tasks
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog, SQLiteOperationalRepository
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
+    from empirical_lawhood.execution.execution import TaskBlockReason, TaskAttemptDisposition
     from empirical_lawhood.api.numerical_provenance import validate_registered_provenance
     packet, draft, source, payloads = load_authored_wave(directory=directory, artifact_writer=artifact_writer,
         lazy_payloads=True, require_initial_experiment=True, read_access=read_access)
@@ -772,7 +774,7 @@ def recover_recursive_custody(*, directory, project_root, artifact_writer, read_
                 provenance.observed_git_head) != (source.package_sources, source.code_sources_sha256,
                     source.dependency_lock_sha256, source.observed_git_head):
             raise PermissionError("custody-only recovery changes original producing provenance")
-        registrations, _, _ = operation_catalog()
+        registrations, _, _ = operation_catalog_for_draft(draft, catalog=operation_catalog)
         validate_registered_provenance(provenance=provenance, draft=draft, registrations=registrations)
         native_keys = {row.selection.capability_key for row in registrations if row.native_effect}
         external = _external_inputs(plane=artifact_writer, plan=plan, draft=draft, payloads=payloads, read_only=True)
@@ -834,11 +836,72 @@ def recover_recursive_custody(*, directory, project_root, artifact_writer, read_
 
 
 def validate_recursive_worker_controls(maximum_parallel_tasks, parallel_resource_capacity):
-    from ..infrastructure.execution import ExecutionResourceCapacity
+    from empirical_lawhood.execution.local.execution import ExecutionResourceCapacity
     if type(maximum_parallel_tasks) is not int or maximum_parallel_tasks < 1:
         raise ValueError("maximum_parallel_tasks must be a positive integer")
     if parallel_resource_capacity is not None and not isinstance(parallel_resource_capacity, ExecutionResourceCapacity):
         raise TypeError("parallel_resource_capacity must be an ExecutionResourceCapacity")
+
+
+class _DevelopmentInputSupplier:
+    """Open only exact inputs from the current authenticated development plan."""
+
+    def __init__(self, plan, resolver, plane, original_access):
+        self.plan = plan
+        self.resolver = resolver
+        self.plane = plane
+        self.original_access = original_access
+
+    @cached_property
+    def specs(self):
+        return frozenset(spec for task in self.plan.tasks for spec in task.external_inputs)
+
+    def resolve_input(self, spec):
+        from empirical_lawhood.execution.plans import ExternalInputSpec
+        from empirical_lawhood.execution.providers import ExternalInputPayload, MAX_EXTERNAL_INPUT_CHUNK_BYTES
+
+        if type(spec) is not ExternalInputSpec or spec not in self.specs:
+            raise ValueError("development input differs from its exact frozen specification")
+        value, = self.resolver.resolve((spec.logical_artifact_id,))
+        logical, material = value.logical, value.materialization
+        limit = max(1, material.size_bytes)
+        if self.original_access is not None:
+            self.original_access.require_current()
+        port = self.plane.open(value, maximum_bytes=limit, **({} if self.original_access is None
+            else {"before_member": self.original_access.require_member}))
+        try:
+            return ExternalInputPayload(logical_artifact_id=logical.logical_artifact_id,
+                payload_schema=logical.payload_schema, profile=logical.profile, media_type=logical.media_type,
+                source=_DevelopmentInputSource(port, self.original_access), size_bytes=material.size_bytes,
+                source_sha256=material.physical_sha256, logical_content_sha256=logical.content_sha256,
+                maximum_bytes=limit, maximum_chunk_bytes=min(limit, MAX_EXTERNAL_INPUT_CHUNK_BYTES),
+                visibility_ceiling=logical.visibility_ceiling, outcome_access=logical.outcome_access,
+                parent_visibility_ceilings=tuple(sorted((row.visibility_ceiling for row in logical.lineage_parents),
+                    key=lambda ceiling: ceiling.value)), lineage_parents=logical.lineage_parents)
+        except BaseException:
+            port.close()
+            raise
+
+
+class _DevelopmentInputSource:
+    def __init__(self, port, original_access):
+        self.port = port
+        self.original_access = original_access
+
+    def chunks(self, maximum_chunk_bytes):
+        try:
+            while True:
+                if self.original_access is not None:
+                    self.original_access.require_current()
+                chunk = self.port.read(maximum_chunk_bytes)
+                if not chunk:
+                    return
+                yield chunk
+        finally:
+            self.close()
+
+    def close(self):
+        self.port.close()
 
 
 def _development_runtime_supplier(*, directory, writer, plan, payloads, supplier, output_codecs, read_access=None):
@@ -851,7 +914,7 @@ def _development_runtime_supplier(*, directory, writer, plan, payloads, supplier
         if read_access is not None:
             raise ValueError("development access selection requires its original experiment owner")
         return supplier
-    from .experiment_preparation import experiment_protocols
+    from empirical_lawhood.api.experiment_preparation import experiment_protocols
 
     raw = payloads["experiment-specification.json"]
     document = json.loads(raw)
@@ -883,31 +946,58 @@ def _development_runtime_supplier(*, directory, writer, plan, payloads, supplier
         options["read_access"] = read_access
     if getattr(payloads, "original_input_access", None) is not None:
         options["payloads"] = payloads
-    return binding.bind_development_runtime(supplier=supplier, writer=writer,
+    bound = binding.bind_development_runtime(supplier=supplier, writer=writer,
         directory=directory, plan=plan, output_codecs=output_codecs, **options)
+    from empirical_lawhood.execution.recursive_provider import require_recursive_input_supplier
+
+    return require_recursive_input_supplier(bound)
 
 
 def run_recursive_wave(*, directory, project_root, artifact_writer, terminal_product_format="documents",
                        maximum_parallel_tasks=1, parallel_resource_capacity=None, require_initial_experiment=False,
-                       read_access=None, result_read_scope="FULL"):
+                       read_access=None, result_read_scope="FULL", expected_packet_sha256=None):
+    return _run_recursive_wave(directory=directory, project_root=project_root, artifact_writer=artifact_writer,
+        terminal_product_format=terminal_product_format, maximum_parallel_tasks=maximum_parallel_tasks,
+        parallel_resource_capacity=parallel_resource_capacity, require_initial_experiment=require_initial_experiment,
+        read_access=read_access, result_read_scope=result_read_scope, expected_packet_sha256=expected_packet_sha256)
 
+
+def finalize_returned_recursive_tasks(*, directory, project_root, artifact_writer,
+        worker_interpreter, worker_source_root, read_access=None):
+    """Finish original returned parent publications with the frozen installed worker.
+
+    The current controller is independently authenticated. Only an existing
+    contact with complete native custody can reach the original producer through
+    its read-only progress port. Unentered tasks and the whole graph survive.
+    """
+    return _run_recursive_wave(directory=directory, project_root=project_root, artifact_writer=artifact_writer,
+        read_access=read_access,
+        _returned_finalization=(worker_interpreter, worker_source_root))
+
+
+def _run_recursive_wave(*, directory, project_root, artifact_writer, terminal_product_format="documents",
+        maximum_parallel_tasks=1, parallel_resource_capacity=None, require_initial_experiment=False,
+        read_access=None, result_read_scope="FULL", _returned_finalization=None, expected_packet_sha256=None):
+
+    from empirical_lawhood.api.recursive_inquiry_read import require_inquiry_execution_boundary
+    require_inquiry_execution_boundary(artifact_writer)
     if result_read_scope not in ("FULL", "EXECUTION_RECORDS"):
         raise ValueError("recursive execution requires an explicit full or execution-record result scope")
     if type(require_initial_experiment) is not bool:
         raise TypeError("initial experiment scope requires an explicit boolean")
     _validate_terminal_product_format(terminal_product_format)
     validate_recursive_worker_controls(maximum_parallel_tasks, parallel_resource_capacity)
-    from .execution import _StaticInputResolver
+    from empirical_lawhood.api.execution import _StaticInputResolver
     from empirical_lawhood.api.numerical_provenance import capture_numerical_provenance, validate_registered_provenance
-    from ..infrastructure.execution import LocalExecutionResourceAdmitter, LocalProcessExecutor, LocalScheduler
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.run_source_admission import _capture_source, ensure_run_source_entry
-    from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
-    from ..infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog, SQLiteOperationalRepository
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile
-    from empirical_lawhood.runtime.recursive_compiler import project_recursive_assessments
+    from empirical_lawhood.execution.local.execution import LocalExecutionResourceAdmitter, LocalProcessExecutor, LocalScheduler
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.run_source_admission import _capture_source, ensure_run_source_entry
+    from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog, SQLiteOperationalRepository
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.execution.execution import ExecutionAssuranceProfile
+    from empirical_lawhood.execution.recursive_compiler import project_recursive_assessments
     from threadpoolctl import threadpool_limits
 
     admitter = LocalExecutionResourceAdmitter(capacity=parallel_resource_capacity)
@@ -918,21 +1008,35 @@ def run_recursive_wave(*, directory, project_root, artifact_writer, terminal_pro
         raise ValueError("maximum_parallel_tasks exceeds current process CPU affinity")
     packet, draft, source, payloads = load_authored_wave(directory=directory, artifact_writer=artifact_writer,
         lazy_payloads=True, require_initial_experiment=require_initial_experiment, read_access=read_access)
+    if expected_packet_sha256 is not None and packet.fingerprint() != expected_packet_sha256:
+        raise PermissionError("execution package differs from the reviewed authoring packet")
     run, plan, index = _retained_plans(payloads, draft)
-    from .experiment_scientific_read import validate_prepared_development_read_access
+    from empirical_lawhood.api.experiment_scientific_read import validate_prepared_development_read_access
     validate_prepared_development_read_access(directory=directory, artifact_writer=artifact_writer,
         payloads=payloads, draft=draft, plan=plan, read_access=read_access)
     admitted_source = _capture_source(project_root)
     current = implementation_binding(project_root, _admitted_source=admitted_source)
-    from empirical_lawhood.runtime.development_output_repair import DevelopmentOutputRepairRecoveryIndex
-    from .development_output_repair import authenticate_repair_controller
+    from empirical_lawhood.execution.development_output_repair import DevelopmentOutputRepairRecoveryIndex
+    from empirical_lawhood.api.development_output_repair import authenticate_repair_controller
     repair = index.repair if isinstance(index, DevelopmentOutputRepairRecoveryIndex) else None
     worker_package_root = (authenticate_repair_controller(index=index, source=source, controller=current)
         if repair is not None else None)
-    if repair is None and (current.code_sources_sha256, current.dependency_lock_sha256, current.observed_git_head) != (
+    frozen_environment = None
+    if _returned_finalization is not None:
+        if repair is not None or type(index) is not DevelopmentRunRecoveryIndex:
+            raise PermissionError("returned finalization requires the unchanged original development index")
+        if draft.development_study.access_pair != (OutcomeAccess.DEVELOPMENT_VISIBLE, VisibilityCeiling.DEVELOPMENT_ONLY):
+            raise PermissionError("returned finalization requires ordinary exposed development custody")
+        from empirical_lawhood.api.retained_e3_control_repair import observe_frozen_repair_worker, observe_frozen_worker_package_root
+        worker, frozen_environment = observe_frozen_repair_worker(
+            interpreter=_returned_finalization[0], source_root=_returned_finalization[1])
+        if worker != source:
+            raise PermissionError("returned finalization changes its original installed producing source")
+        worker_package_root = observe_frozen_worker_package_root(frozen_environment)
+    if repair is None and frozen_environment is None and (current.code_sources_sha256, current.dependency_lock_sha256, current.observed_git_head) != (
         source.code_sources_sha256, source.dependency_lock_sha256, source.observed_git_head):
         raise ValueError("recursive execution source or lock changed after authoring; author a new wave")
-    registrations, registry, output_codecs = operation_catalog()
+    registrations, registry, output_codecs = operation_catalog_for_draft(draft, catalog=operation_catalog)
     if registry.fingerprint() != plan.registry_sha256:
         raise ValueError("recursive operation registry changed after the plan froze")
     # A structurally preserved task graph cannot establish its scientific
@@ -942,14 +1046,15 @@ def run_recursive_wave(*, directory, project_root, artifact_writer, terminal_pro
     artifact_writer.root.verify(for_write=True, operation_minimum_free_bytes=plan.minimum_free_bytes)
     with threadpool_limits(limits=1):
         require_admitted_target_source_current(project_root, admitted_source)
-        observed = (_provenance(plane=artifact_writer, run_id=run.run_plan_id) if repair is not None else
+        observed = (_provenance(plane=artifact_writer, run_id=run.run_plan_id) if repair is not None or frozen_environment is not None else
             capture_numerical_provenance(project_root=project_root,
                 expected_code_sha256=source.code_sources_sha256, expected_lock_sha256=source.dependency_lock_sha256,
                 _admitted_source=admitted_source))
         validate_registered_provenance(provenance=observed, draft=draft, registrations=registrations)
-        if repair is None:
+        if repair is None and frozen_environment is None:
             _provenance(plane=artifact_writer, run_id=run.run_plan_id, observed=observed)
-        inputs = _external_inputs(plane=artifact_writer, plan=plan, draft=draft, payloads=payloads, read_only=repair is not None)
+        inputs = _external_inputs(plane=artifact_writer, plan=plan, draft=draft, payloads=payloads,
+            read_only=repair is not None or frozen_environment is not None)
         input_resolver = _StaticInputResolver(inputs)
         recovery = ExternalRunRecoveryStore(artifact_writer)
         recovery.freeze(index)
@@ -968,7 +1073,7 @@ def run_recursive_wave(*, directory, project_root, artifact_writer, terminal_pro
                                         and any(task.capability.capability_key == value.selection.capability_key for task in plan.tasks)}))
             if native_keys and draft.development_study.access_pair[0] is OutcomeAccess.EVALUATION_REVEALED:
                 raise PermissionError("revealed follow-up cannot acquire new native evidence")
-            from empirical_lawhood.runtime.native_continuation_execution import native_continuation_scopes
+            from empirical_lawhood.execution.native_continuation_execution import native_continuation_scopes
             contact = ExternalNativeEffectContactStore(plane=artifact_writer,
                 execution_plan=ObjectIdentity.from_record(plan.execution_plan_id, plan),
                 visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY,
@@ -978,8 +1083,9 @@ def run_recursive_wave(*, directory, project_root, artifact_writer, terminal_pro
                                     if task.capability.capability_key in native_keys)
             prior_contacts = {task_id for task_id in native_task_ids
                               if contact.read(run.run_plan_id, task_id) is not None} if contact else set()
-            executor = LocalProcessExecutor(scratch_root=artifact_writer.root, **({} if repair is None else {
-                'worker_environment': repair.worker_environment, 'worker_package_root': worker_package_root}))
+            selected_environment = repair.worker_environment if repair is not None else frozen_environment
+            executor = LocalProcessExecutor(scratch_root=artifact_writer.root, **({} if selected_environment is None else {
+                'worker_environment': selected_environment, 'worker_package_root': worker_package_root}))
             diagnostic = artifact_writer.root.diagnostic()
             reservation_plan = plan if repair is None else replace(plan, tasks=tuple(repair.task(task) for task in plan.tasks))
             admission = admitter.assess(reservation_plan,
@@ -990,7 +1096,9 @@ def run_recursive_wave(*, directory, project_root, artifact_writer, terminal_pro
                 raise ValueError("recursive resource admission refused: " + ", ".join(admission.reason_codes))
             if {receipt.task_id for receipt in recovered.recovered_receipts} != {task.task_id for task in plan.tasks}:
                 ensure_run_source_entry(project_root=project_root, artifact_writer=artifact_writer,
-                    run_id=(run.run_plan_id if repair is None else run.run_plan_id + '.' + repair.repair_id + '.controller'),
+                    run_id=(run.run_plan_id + '.returned-finalization.' + current.code_sources_sha256[:24]
+                        if frozen_environment is not None else run.run_plan_id if repair is None
+                        else run.run_plan_id + '.' + repair.repair_id + '.controller'),
                     expected_commit=current.observed_git_head,
                     invocation=("programme.run_recursive_wave", run.run_plan_id),
                     source_bindings=(*(() if repair is None else (repair.identity,)), ObjectIdentity.from_record(draft.draft_id, draft),
@@ -998,7 +1106,8 @@ def run_recursive_wave(*, directory, project_root, artifact_writer, terminal_pro
                         ObjectIdentity.from_record(plan.execution_plan_id, plan)),
                     _admitted_source=admitted_source)
             parent_supplier = _development_runtime_supplier(directory=directory, writer=artifact_writer,
-                plan=plan, payloads=payloads, supplier=input_resolver, output_codecs=output_codecs,
+                plan=plan, payloads=payloads, supplier=_DevelopmentInputSupplier(
+                    plan, input_resolver, artifact_writer, original_access), output_codecs=output_codecs,
                 read_access=read_access)
             runners = operation_runners(registry=registry, plan=plan, input_supplier=parent_supplier)
             scheduler = LocalScheduler(operational_repository=repository, artifact_writer=artifact_writer,
@@ -1022,30 +1131,45 @@ def run_recursive_wave(*, directory, project_root, artifact_writer, terminal_pro
                 native_entry_guard=getattr(parent_supplier, "require_native_entry", None),
                 before_input_member=(None if original_access is None else
                     parent_supplier.custody.member_preflight))
-            if repair is not None:
-                scheduler.repair_worker_environment = repair.worker_environment
+            if selected_environment is not None:
+                scheduler.repair_worker_environment = selected_environment
             from empirical_lawhood.api.current_task_custody import current_issued_task_control_scope
             with current_issued_task_control_scope(parent_supplier):
-                scheduler_result = scheduler.execute(run.run_plan_id, plan)
+                scheduler_result = (scheduler.finalize_returned_tasks(run.run_plan_id, plan)
+                    if frozen_environment is not None else scheduler.execute(run.run_plan_id, plan))
             current_contacts = {task_id for task_id in native_task_ids
                                 if contact.read(run.run_plan_id, task_id) is not None} if contact else set()
             new_contact_count = len(current_contacts - prior_contacts)
+            if frozen_environment is not None and new_contact_count:
+                raise PermissionError("returned parent finalization created a new native contact")
         finally:
             engine.dispose()
         require_admitted_target_source_current(project_root, admitted_source)
         final = implementation_binding(project_root, _admitted_source=admitted_source)
         if (final.code_sources_sha256, final.dependency_lock_sha256) != (current.code_sources_sha256, current.dependency_lock_sha256):
             raise ValueError("recursive producing source changed during the execution; preserve its outputs for inspection")
-    from empirical_lawhood.kernel.status import OperationalStatus
+        if frozen_environment is not None:
+            worker_after, environment_after = observe_frozen_repair_worker(
+                interpreter=_returned_finalization[0], source_root=_returned_finalization[1])
+            if (worker_after, environment_after) != (source, frozen_environment):
+                raise PermissionError("returned finalization changed its original worker during publication")
+            return {"run_id": run.run_plan_id, "status": "RETURNED_PARENT_PUBLICATIONS_FINALIZED",
+                "task_count": len(plan.tasks), "receipted_task_ids": tuple(row.task_id for row in scheduler_result),
+                "unreceipted_task_ids": tuple(task.task_id for task in plan.tasks
+                    if task.task_id not in {row.task_id for row in scheduler_result}),
+                "controller": current.to_document(), "original_worker": source.to_document(),
+                "native_contact": "none", "new_native_contact_count": 0,
+                "scientific_completion": "NOT_ASSESSED", "original_graph_unchanged": True}
+    from empirical_lawhood.science.records.status import OperationalStatus
     if scheduler_result.status is OperationalStatus.SUCCEEDED:
         if set(scheduler_result.completed_task_ids) != {task.task_id for task in plan.tasks}:
             raise ValueError("successful recursive execution lacks its complete assigned task census")
-        from .experiment_scientific_read import complete_prepared_development_science
+        from empirical_lawhood.api.experiment_scientific_read import complete_prepared_development_science
         complete_prepared_development_science(directory=directory, artifact_writer=artifact_writer,
             project_root=project_root, maximum_parallel_tasks=maximum_parallel_tasks,
             payloads=payloads, draft=draft, plan=plan, scheduler_result=scheduler_result, read_access=read_access)
         if result_read_scope == "EXECUTION_RECORDS":
-            from .experiment_execution_read import read_development_execution
+            from empirical_lawhood.api.experiment_execution_read import read_development_execution
             report = read_development_execution(directory=directory, artifact_writer=artifact_writer,
                 read_access=read_access)
         else:

@@ -3,18 +3,18 @@
 from dataclasses import replace
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import MatrixE3SecondaryTarget, bind_secondary_selection
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.publication_metadata import authenticate_published_materialization
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import MatrixE3SecondaryTarget, bind_secondary_selection
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 
 
 def authenticate_secondary_target(*, writer, selection):
     """Read the declared immutable carrier; never choose or default a tolerance."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import configured_preparation_types
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import configured_preparation_types
     if type(selection) not in configured_preparation_types():
         raise TypeError("secondary readout requires the exact current configured preparation")
     if selection.secondary_readout is None:
@@ -36,12 +36,10 @@ def derive_secondary_input_selection(*, specification, inputs, selector, source,
         metadata, original_raw, artifact_writer, execution, project_root, read_access=None):
     """Enrich the actual selected source; retain its genuine native TRAIN operands."""
     from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
-    from empirical_lawhood.infrastructure.source_closure import (
-        capture_admitted_target_source, require_admitted_target_source_current,
-    )
-    from empirical_lawhood.infrastructure.source_origin import require_selected_implementation
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+    from empirical_lawhood.storage.source_closure import capture_admitted_target_source, require_admitted_target_source_current
+    from empirical_lawhood.storage.source_origin import require_selected_implementation
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
     bound = inputs.method_inputs
     bound.__post_init__()
@@ -89,7 +87,7 @@ def derive_secondary_input_selection(*, specification, inputs, selector, source,
         if artifact_writer._replay_committed_publication((request,), preflight) is not None:
             selected = candidate
             break
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import bind_protected_e3_experiment_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import bind_protected_e3_experiment_inputs
     current = bind_protected_e3_experiment_inputs(specification, {"protected-selection": selected}, files=dict(bound.files))
     result = prepare_experiment(specification, scientific_inputs=current.scientific_inputs,
         method_inputs=current.method_inputs, execution=execution)
@@ -105,7 +103,7 @@ def derive_secondary_input_selection(*, specification, inputs, selector, source,
     if read_bounded_bytes(source, maximum_bytes=len(original_raw)) != original_raw:
         raise PermissionError("secondary derivation original input selector changed before publication")
     require_admitted_target_source_current(root, before)
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
     from hashlib import sha256
     requirements = canonical_json_bytes({"schema": "empirical-lawhood/operational/experiment-input-requirements", "version": "1.0.0",
         "value": {"specification": specification.identity, "source_selection": ObjectIdentity.from_record(output.selection_id, output),
@@ -127,7 +125,7 @@ def derive_secondary_input_selection(*, specification, inputs, selector, source,
 
 
 def selected_secondary_target(*, selected, writer):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import configured_preparation_types
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import configured_preparation_types
     values = tuple(record for _, record in getattr(selected, "design_records", ()) if type(record) in configured_preparation_types())
     if not values:
         return None

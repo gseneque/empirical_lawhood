@@ -7,44 +7,46 @@ execution, receipt custody and retained independent replay remain real.
 """
 from dataclasses import replace
 from decimal import Decimal
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import E4_LINEAGE_SCOPE as LINEAGE_SCOPE
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import E4_LINEAGE_SCOPE as LINEAGE_SCOPE
 from tests.matrix_e4_structure_support import publish_secondary, disclosed_secondary_target
-from empirical_lawhood.runtime.artifacts import ArtifactProfile,ArtifactWriteRequest
-from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_preparation as domain,full_factor_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorScope,scope_reference
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_bank_recipe as recipe,records as old
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_method_bindings import SelectedE4DevelopmentAcquisition
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_preparation as domain, full_factor_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorScope, scope_reference
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_bank_recipe as recipe, records as old
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_method_bindings import SelectedE4DevelopmentAcquisition
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
-from empirical_lawhood.api.recursive_authoring import implementation_binding,load_authored_wave
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding,ExperimentInputSelection
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
+from empirical_lawhood.api.recursive_authoring import implementation_binding, load_authored_wave
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 from tests.test_matrix_e4_full_factor_values import scopes,pin  # noqa: F401
 from tests.test_matrix_selected_e4_bank_recipe import literal_recipe_source_inputs  # noqa: F401
 from tests.test_matrix_selected_protected import unpublished
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from tests.numerical_provenance_fixtures import selected_test_mount
 
 
 def _real_plane(path):
+    mount = selected_test_mount(path)
     path.mkdir()
     contract = ExternalRootContract("matrix-full-factor-disclosed", "Disclosed E4 public control",
-        str(path.resolve()), "/media/chevre/EL", "empirical-lawhood/testing/matrix-full-factor", 1)
+        str(path.resolve()), str(mount), "empirical-lawhood/testing/matrix-full-factor", 1)
     plane = ExternalArtifactPlane(GuardedExternalRoot(contract), integration_artifact_profile_validators())
     assert plane.root.diagnostic().write_ready
     return plane
@@ -85,7 +87,7 @@ def selected_values(scope_values,f,*,plane):
     request=domain.ScheduledFullFactorDevelopmentRequestV3('request.full-factor.disclosed',programme.identity,bank.identity,
         resources.identity,ObjectIdentity.from_record(campaign.campaign_id,campaign),locator,publish_secondary(plane,bank,Path(plane.root.contract.canonical_path)/"early-secondary")[1])
     specification=domain.ScheduledFullFactorDevelopmentSpecification('experiment.full-factor.disclosed',request.identity,None,None,None)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence
     evidence=SelectedE3E4Evidence('evidence.full-factor.disclosed',programme.identity,
         f.inputs.original_products,scope.produced_input_parents)
     return SimpleNamespace(programme=programme,bank=bank,scope=scope,resources=resources,campaign=campaign,
@@ -189,10 +191,10 @@ def test_current_full_factor_contract_refuses_retired_request_and_preparation_ro
 
 def test_one_original_case_measurement_uses_production_npz_codec_and_exact_reopen(selected,tmp_path):
     """Disclosed unentered original: real PURE measure/custody, no native claim."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_records as records,full_factor_science as science
-    from empirical_lawhood.infrastructure.artifact_stream_primitives import ArtifactIdentityConflict
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-    from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_records as records, full_factor_science as science
+    from empirical_lawhood.storage.artifact_stream_primitives import ArtifactIdentityConflict
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+    from empirical_lawhood.execution.execution import VerifiedArtifactInput
 
     root=tmp_path/'one-original-measure'
     plane=_real_plane(root)
@@ -225,9 +227,8 @@ def test_one_original_case_measurement_uses_production_npz_codec_and_exact_reope
 
 
 def test_public_copied_derive_author_pure_run_read_and_partial_guard(selected,tmp_path,monkeypatch):
-    from empirical_lawhood.api import matrix_full_factor_derivation as derive,matrix_full_factor_authoring as author,matrix_full_factor_runtime as runtime,matrix_full_factor_read as reader
+    from empirical_lawhood.api import matrix_full_factor_derivation as derive, matrix_full_factor_authoring as author, matrix_full_factor_runtime as runtime, matrix_full_factor_read as reader
     root=tmp_path/'full-factor-public-disclosed'
-    assert root.is_relative_to(Path('/media/chevre/EL/empirical-lawhood'))
     plane=_real_plane(root)
     before=selected.request.canonical_bytes()
     selected,document,target_publication=_published_secondary(selected,plane)
@@ -273,11 +274,11 @@ def test_public_copied_derive_author_pure_run_read_and_partial_guard(selected,tm
     assert draft==result.preparation.draft
     completed=service.run(directory=directory,maximum_parallel_tasks=4)
     assert completed['status']=='SUCCEEDED'
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     monkeypatch.setattr(LocalProcessExecutor,'execute',lambda *args,**kwargs:pytest.fail('completed full-factor recovery entered executor'))
     recovered=service.recover(directory=directory,maximum_parallel_tasks=4)
     assert recovered['status']=='SUCCEEDED' and recovered['new_native_contact_count']==0
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
     with scientific_reconstruction_operation('full'):
         retained=service.read(directory=directory)
     science=retained['scientific_result']
@@ -321,7 +322,7 @@ def test_public_copied_derive_author_pure_run_read_and_partial_guard(selected,tm
 
 
 def test_original_callbacks_refuse_partial_and_noncallable_before_io(monkeypatch):
-    from empirical_lawhood.api import matrix_selected_e3_e4_read as dev,selected_e4_native_read as protected
+    from empirical_lawhood.api import matrix_selected_e3_e4_read as dev, selected_e4_native_read as protected
     monkeypatch.setattr(dev,'_read_recursive_wave_with_roots',lambda **kwargs:pytest.fail('partial original consumer reached I/O'))
     with pytest.raises(ValueError,match='complete ordinary'):
         dev.read_selected_e3_e4_development(directory=None,artifact_writer=None,allow_partial=True,_consume_original=lambda **kwargs:None)
@@ -339,12 +340,12 @@ def test_full_factor_dev_uses_one_ordinary_reader_and_its_exact_access_evidence(
     projection are real. These unissued software operands establish no producer
     custody, grant, native result, freshness or scientific qualification.
     """
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as dev_owner
-    from empirical_lawhood.api import matrix_full_factor_access as access_owner,matrix_full_factor_custody as custody
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as dev_owner
+    from empirical_lawhood.api import matrix_full_factor_access as access_owner, matrix_full_factor_custody as custody
     from empirical_lawhood.api import matrix_selected_e3_e4_read as original_reader
     from empirical_lawhood.api.selected_e3_access import SelectedE3OriginalInputAccess
-    from empirical_lawhood.planning.recursive_authoring import RecursiveOperationSpec
-    from empirical_lawhood.runtime.prospective_experiment import source_filename
+    from empirical_lawhood.design.recursive_authoring import RecursiveOperationSpec
+    from empirical_lawhood.execution.prospective_experiment import source_filename
     writer=_real_plane(tmp_path/'ordinary-original')
     selected,_,_=_published_secondary(selected,writer)
     (Path(writer.root.contract.canonical_path)/selected.scope.development.authored_directory).mkdir()
@@ -451,11 +452,11 @@ def test_full_factor_dev_uses_one_ordinary_reader_and_its_exact_access_evidence(
 
 
 def test_e4_early_target_publication_is_blind_reopens_exactly_and_refuses_changed_bytes(selected, tmp_path, monkeypatch):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryTarget
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryTarget
     from empirical_lawhood.api.matrix_full_factor_secondary import publish_e4_secondary_target, authenticate_e4_secondary_target
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, DirectTaskExecutor
-    from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor, DirectTaskExecutor
+    from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
     # These are disclosed software operands. No issue, native contact, source
     # qualification or scientific result is supplied by this target publication.
     def forbidden(*args, **kwargs):
@@ -486,7 +487,7 @@ def test_e4_early_target_publication_is_blind_reopens_exactly_and_refuses_change
 
 
 def test_e4_early_publisher_rejects_old_e3_target_before_any_publication(selected, tmp_path):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import MatrixE3SecondaryTarget
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import MatrixE3SecondaryTarget
     from empirical_lawhood.api.matrix_full_factor_secondary import publish_e4_secondary_target
     plane = _real_plane(tmp_path / 'e4-refuse-old-target-disclosed')
     before = tuple(Path(plane.root.contract.canonical_path).rglob('*'))

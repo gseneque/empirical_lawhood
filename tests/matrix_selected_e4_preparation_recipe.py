@@ -3,14 +3,14 @@
 from dataclasses import dataclass
 from typing import ClassVar
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import MatrixParameterCoordinate
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import MatrixParameterCoordinate
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
 
 
 @dataclass(frozen=True, slots=True)

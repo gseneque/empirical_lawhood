@@ -5,10 +5,10 @@ import pytest
 
 from empirical_lawhood.api import current_task_custody
 from empirical_lawhood.api.matrix_selected_runtime import _published_input
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.plans import ExternalInputSpec
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.plans import ExternalInputSpec
 from tests.runtime_platform.test_recursive_compiler import Config
 from tests.test_recursive_public_service import _plane
 

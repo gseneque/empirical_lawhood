@@ -1,0 +1,23 @@
+--- a/sky/provision/runpod/utils.py
++++ b/sky/provision/runpod/utils.py
+@@ -134,7 +134,19 @@
+ 
+ def list_instances() -> Dict[str, Dict[str, Any]]:
+     """Lists instances associated with API key."""
+-    return {pod['id']: _parse_pod(pod) for pod in _list_pods()}
++    instances = {}
++    for pod in _list_pods():
++        info = _parse_pod(pod)
++        # The v2 list response may omit runtime and direct SSH details even
++        # for a running pod. Resolve that same pod through its detail route.
++        if info['status'] == 'RUNNING' and info.get('ssh_port') is None:
++            detail = runpod.rest_request(
++                'GET', f"/pods/{runpod.path_segment(pod['id'])}")
++            if detail['id'] != pod['id']:
++                raise ValueError('RunPod detail response changed the selected pod ID.')
++            info = _parse_pod(detail)
++        instances[pod['id']] = info
++    return instances
+ 
+ 
+ def delete_pod_template(template_id: str) -> None:

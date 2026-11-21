@@ -2,24 +2,20 @@
 
 SPDX-License-Identifier: MPL-2.0
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 import os
 from pathlib import Path
 import pwd
 
-from empirical_lawhood.adapters.composition.generated_executable_bindings import (
-    EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY,
-    EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY,
-)
-from empirical_lawhood.adapters.composition.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ExternalRootContract, artifact_custody_limits
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityCatalog, CandidateContextProvider
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile, resolve_external_root_contract
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract, artifact_custody_limits
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog, CandidateContextProvider
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, resolve_external_root_contract
+from empirical_lawhood.execution.plans import CandidateExecutionPlan
 
 
 def write_exclusive_record(directory: Path, name: str, record: CanonicalRecord) -> Path:
@@ -34,6 +30,10 @@ def create_authoring_api(
     *, repo_root: Path, candidate_context_provider: CandidateContextProvider,
     candidate_capability_catalog: CandidateCapabilityCatalog,
 ) -> EmpiricalLawhoodApi:
+    from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY, EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
+
+    from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+
     return EmpiricalLawhoodApi(
         repo_root=repo_root,
         external_root=None,
@@ -68,7 +68,7 @@ def preflight_authoring_output_directory(
     allow_existing_empty: bool = False,
 ) -> Path:
     """Validate a guarded output before upstream reads; create no directory."""
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
 
     if not isinstance(artifact_writer, ExternalArtifactPlane):
         raise TypeError("current authoring requires its actual guarded external artifact plane")
@@ -101,28 +101,31 @@ def resolve_authoring_directory(
     return directory, contract
 
 
-def load_authoring_execution_projection(directory: Path, *, artifact_writer=None) -> CandidateExecutionPlan:
+def _read_authoring_control(path, record_type, artifact_writer):
     limits = artifact_custody_limits(artifact_writer)
     selected = tuple(value for value in (limits.control_record_bytes, limits.in_memory_payload_bytes)
         if value is not None)
-    raw = read_bounded_bytes(directory / "preissue-execution-plan.json",
-        maximum_bytes=min(selected) if selected else None)
-    return decode_canonical_bytes(raw, CandidateExecutionPlan, maximum_bytes=len(raw))
+    raw = read_bounded_bytes(path, maximum_bytes=min(selected) if selected else None)
+    return decode_canonical_bytes(raw, record_type, maximum_bytes=len(raw))
+
+
+def load_authoring_execution_projection(directory: Path, *, artifact_writer=None) -> CandidateExecutionPlan:
+    return _read_authoring_control(directory / "preissue-execution-plan.json", CandidateExecutionPlan, artifact_writer)
 
 
 def read_authoring_source_companion(*, writer, directory, name, expected_schema):
     """Authenticate the original prospective source publication before decoding."""
     from hashlib import sha256
-    from empirical_lawhood.infrastructure.publication_metadata import read_publication_metadata
-    from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile
+    from empirical_lawhood.storage.publication_metadata import read_publication_metadata
+
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
 
     relative = (directory/name).relative_to(Path(writer.root.contract.canonical_path)).as_posix()
     limits = artifact_custody_limits(writer)
     manifest_raw = read_bounded_bytes(writer.root.resolve(relative+'.manifest.json', for_write=False),
         maximum_bytes=limits.manifest_bytes)
-    manifest = decode_artifact_manifest(manifest_raw, maximum_bytes=len(manifest_raw))
+    manifest = resolve_artifact_sidecar_bytes(writer, manifest_raw, maximum_bytes=len(manifest_raw))
     logical, physical = manifest.logical, manifest.materialization
     if ((logical.payload_schema, logical.profile, logical.media_type, logical.outcome_access, logical.visibility_ceiling)
             != (expected_schema, ArtifactProfile.CANONICAL_JSON, 'application/json', OutcomeAccess.OUTCOME_BLIND, VisibilityCeiling.PROSPECTIVE)
@@ -145,7 +148,7 @@ def read_authoring_source_companion(*, writer, directory, name, expected_schema)
 
 def require_authoring_source_kind_layout(*, directory, closure):
     """Do not downgrade retained selected-source provenance to legacy CLEAN."""
-    from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
+    from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
 
     if type(closure) is not ImplementationSourceClosure:
         raise TypeError('authoring source kind requires its exact closure')
@@ -164,8 +167,8 @@ def authenticate_selected_authoring_source(*, directory, project_root, artifact_
     no fallback source, authority or cross-invocation proof cache.
     """
     from empirical_lawhood.api.recursive_prospective_authoring import _load_source_provenance
-    from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
-    from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
+    from empirical_lawhood.storage.study_issue import GitStudySourceClosureInspector
+    from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
 
     if type(closure) is not ImplementationSourceClosure or closure.kind is not SourceClosureKind.EXACT_SOURCE_CLOSURE:
         raise PermissionError('authoring requires its exact supported selected-source closure')
@@ -182,12 +185,10 @@ def authenticate_selected_authoring_source(*, directory, project_root, artifact_
 
 def authenticate_authoring_source(*, directory, project_root, artifact_writer):
     """Read source companions before provider composition; retain old CLEAN packets."""
-    from empirical_lawhood.api.recursive_prospective_authoring import MAXIMUM_SPEC_BYTES
-    from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
+    from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
 
     directory = Path(directory).resolve(strict=True)
-    closure = decode_canonical_bytes(read_bounded_bytes(directory/'source-closure.json', maximum_bytes=MAXIMUM_SPEC_BYTES),
-        ImplementationSourceClosure, maximum_bytes=MAXIMUM_SPEC_BYTES)
+    closure = _read_authoring_control(directory / 'source-closure.json', ImplementationSourceClosure, artifact_writer)
     require_authoring_source_kind_layout(directory=directory, closure=closure)
     if closure.kind is SourceClosureKind.CLEAN_GIT_COMMIT:
         return closure

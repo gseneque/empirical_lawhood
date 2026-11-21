@@ -2,17 +2,17 @@
 """Typed public native TRAIN preprocessing; no native task or scientific grant."""
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_assembly import NativeTrainingAssemblyInputs
-from empirical_lawhood.api.experiment_preparation import load_experiment_inputs,prepare_experiment
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile,ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_assembly import NativeTrainingAssemblyInputs
+from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
 
 def derive_input_selection(*,specification,source_selection_path,project_root,artifact_writer,
         metadata_directory,output_selection_path,execution, read_access=None):
-    from .assembly import assemble_native_training_inputs
+    from empirical_lawhood.api.domain_composition.matrix_native_training_assembly.assembly import assemble_native_training_inputs
     inputs=load_experiment_inputs(specification,source_selection_path, artifact_writer=artifact_writer, read_access=read_access)
     bound=inputs.method_inputs
     if type(bound) is not NativeTrainingAssemblyInputs or bound.request is None or bound.request_path is None:

@@ -2,11 +2,11 @@
 """Explicit exposed structural choices for existing E4 engineering fixtures."""
 from decimal import Decimal
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryTarget
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.scientific_design import MatrixE4StructuralChoices
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorResources
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import selected_structural_prediction
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import selected_original_factor_rule
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryTarget
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.scientific_design import MatrixE4StructuralChoices
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorResources
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import selected_structural_prediction
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import selected_original_factor_rule
 
 
 def disclosed_structure(bank, *, budget):
@@ -45,14 +45,15 @@ def published_secondary(bank, directory):
     """One actual guarded publication for shared exposed E4 worker fixtures."""
     from pathlib import Path
     from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-    from empirical_lawhood.runtime.artifacts import ExternalRootContract
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+    from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+    from tests.numerical_provenance_fixtures import selected_test_mount
     directory = Path(directory)
-    assert directory.is_relative_to(Path("/media/chevre/EL/empirical-lawhood"))
+    mount = selected_test_mount(directory)
     directory.mkdir(parents=True, exist_ok=False)
     plane = ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
         "matrix-e4-target-disclosed", "Exposed E4 early target custody", str(directory.resolve()),
-        "/media/chevre/EL", "empirical-lawhood/testing/matrix-e4-target", 1)),
+        str(mount), "empirical-lawhood/testing/matrix-e4-target", 1)),
         integration_artifact_profile_validators())
     assert plane.root.diagnostic().write_ready
     target, secondary = publish_secondary(plane, bank, directory / "early-target")
@@ -73,16 +74,16 @@ def dense_array_operands(fixture):
 
     import numpy as np
 
-    from empirical_lawhood.adapters.methods.matrix_parameter_history.records import expected_members
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import records, science
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as development
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseArrays
-    from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import initial_parameter_state
-    from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.domains.matrix.matrix_parameter_history.records import expected_members
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import records, science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as development
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseArrays
+    from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import initial_parameter_state
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 
     plane = fixture.secondary_plane
     pauli = np.asarray(([[0, 1], [1, 0]], [[0, -1j], [1j, 0]], [[1, 0], [0, -1]]), dtype='<c16')
@@ -145,9 +146,9 @@ def dense_response_arrays(source, protocol, panels, prefix_arrays, frozen_arrays
     """All48 real128-step equation branches; no native receipt/contact claim."""
     import numpy as np
 
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_native import native_scheduled_branch
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census
-    from empirical_lawhood.adapters.simulators.six_matrix_response.model import SixMatrixState
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_native import native_scheduled_branch
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census
+    from empirical_lawhood.domains.matrix.six_matrix_response.model import SixMatrixState
 
     values = {}
     for panel in panels:
@@ -170,8 +171,8 @@ def dense_response_arrays(source, protocol, panels, prefix_arrays, frozen_arrays
 def unentered_dense_functional_rows(bank, case, score, *, dense_score, target, secondary):
     """Explicit absent-account projection for disclosed unentered test seams."""
     from dataclasses import replace
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_secondary_readout import dense_e4_functional_rows
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import prediction_case
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_secondary_readout import dense_e4_functional_rows
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import prediction_case
     assert score is dense_score is case.forecast is None
     row = dense_e4_functional_rows(bank, case, score, dense_score=dense_score, target=target, secondary=secondary)
     return replace(row, prediction=prediction_case(bank, case, row, None))

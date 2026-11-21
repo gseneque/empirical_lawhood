@@ -9,21 +9,21 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import input_assembly as domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.allocation_request import MatrixProgrammeAllocationRequest
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import PHASE_INPUT_ROLES
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_streams import SelectedE4StreamRecipe, STREAM_RULE
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import input_assembly as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.allocation_request import MatrixProgrammeAllocationRequest
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import PHASE_INPUT_ROLES
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_streams import SelectedE4StreamRecipe, STREAM_RULE
 from empirical_lawhood.api import matrix_programme_input_assembly as owner
 from empirical_lawhood.api import matrix_programme_allocations as compiler
 from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs, load_experiment_inputs
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticate_programme_inputs
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticate_programme_inputs
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_matrix_programme_allocations import MATERIALS, NAMESPACE, census as census  # noqa: F401
 from tests.test_matrix_programme_scientific_design import matched_scientific_design  # noqa: F401
 
@@ -63,7 +63,7 @@ def build_public_file_case(tmp_path, census, *, design=None):
     import numpy as np
     from empirical_lawhood.api.recursive_authoring import implementation_binding
     from empirical_lawhood.api.recursive_operations import operation_storage_codecs
-    from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
     from tests.runtime_platform.test_native_subwork import _plane
     from tests.test_matrix_programme_e1_allocation import public_e1_case, derive as derive_e1
     from tests.test_matrix_programme_scientific_design import build_scientific_design
@@ -80,7 +80,7 @@ def build_public_file_case(tmp_path, census, *, design=None):
     raw, _ = encode_matrix_arrays({'generic_basis': np.zeros((3, 4, 4), dtype='<c16'),
         'force_coefficients': np.zeros((2, 3, 3), dtype='<f8'), 'trace_coefficients': np.zeros((2, 3), dtype='<f8'),
         'receiver_coefficients': np.zeros((48, 2, 2, 3, 4), dtype='<f8')})
-    source = ROOT / 'src/empirical_lawhood/adapters/simulators/six_matrix_response/response_observer.py'
+    source = ROOT / 'src/empirical_lawhood/package_data/scientific_originals/matrix_scalar_response_observer.py.txt'
     normalization = design.training_protocol.full_factor_rule.scalar_closure.normalization_owner
     payloads = {artifact: raw for artifact in (design.training_assay.array_artifact, design.e2.assay.array_artifact)}
     payloads[normalization] = source.read_bytes()
@@ -154,13 +154,13 @@ def _assert_public_compiler_roundtrip(case, monkeypatch):
     assert existing and all(path.is_relative_to(case.e1_metadata_directory) for path in existing)
     assert not case.directory.exists()
     from empirical_lawhood.api import selected_e4_bank_recipe as source_selection
-    from empirical_lawhood.infrastructure import numerical_provenance, source_closure
+    from empirical_lawhood.storage import numerical_provenance, source_closure
 
     # Observe the real public C path, preserving every actual admission and byte guard.
     captured, archives, current_checks, observed_publications, runtimes, events = [], [], [], [], [], []
     actual_capture = source_closure.capture_admitted_target_source
     actual_current = source_closure.require_admitted_target_source_current
-    actual_git = source_closure._git
+    actual_archive = source_closure._git_archive_stream
     actual_runtime = numerical_provenance.numerical_runtime_observation
     actual_write, actual_batch = case.writer.write, case.writer.write_batch
 
@@ -170,10 +170,9 @@ def _assert_public_compiler_roundtrip(case, monkeypatch):
         events.append('capture')
         return source
 
-    def git(selected_root, *arguments):
-        if arguments[0] == 'archive':
-            archives.append(arguments)
-        return actual_git(selected_root, *arguments)
+    def archive(selected_root, consumer):
+        archives.append(selected_root)
+        return actual_archive(selected_root, consumer)
 
     def current(selected_root, source):
         assert captured and source is captured[-1]
@@ -197,7 +196,7 @@ def _assert_public_compiler_roundtrip(case, monkeypatch):
 
     monkeypatch.setattr(source_closure, 'capture_admitted_target_source', capture)
     monkeypatch.setattr(source_selection, 'capture_admitted_target_source', capture)
-    monkeypatch.setattr(source_closure, '_git', git)
+    monkeypatch.setattr(source_closure, '_git_archive_stream', archive)
     for consumer in (source_selection, compiler, owner):
         monkeypatch.setattr(consumer, 'require_admitted_target_source_current', current)
     monkeypatch.setattr(numerical_provenance, 'numerical_runtime_observation', runtime)
@@ -261,7 +260,7 @@ def _assert_public_compiler_roundtrip(case, monkeypatch):
     assert requirements['value']['qualification'] == 'NOT_ESTABLISHED'
     assert not tuple(Path(case.writer.root.contract.canonical_path).rglob('native-subwork'))
     before = _inventory(Path(case.writer.root.contract.canonical_path))
-    monkeypatch.setattr('empirical_lawhood.planning.approval.SystemDecisionClock.now_utc',
+    monkeypatch.setattr('empirical_lawhood.design.approval.SystemDecisionClock.now_utc',
         lambda _: pytest.fail('exact retry reconstructed original availability'))
     replay = _derive(case)
     assert len(captured) == len(archives) == 2

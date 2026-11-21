@@ -15,24 +15,24 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.records import E1FactorRule
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import ScalarClosureSpec
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.scalar_assessment import independent_scalar_closure_ratio
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_protocol as protocol_owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_source_records as source_owner
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import MatrixFactorAction, MatrixFactorResponseModel
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_parameter_factor.records import MatrixParameterScalarDefinition
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as sr, response_records as rr
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import ScheduledExposureAudit, corpus_artifact
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.records import E1FactorRule
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import ScalarClosureSpec
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.scalar_assessment import independent_scalar_closure_ratio
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_protocol as protocol_owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_source_records as source_owner
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import MatrixFactorAction, MatrixFactorResponseModel
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_parameter_factor.records import MatrixParameterScalarDefinition
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as sr, response_records as rr
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import ScheduledExposureAudit, corpus_artifact
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 from tests.test_matrix_e3_protected_inputs import build_source_inputs
 from tests.test_matrix_factor_confirmation_eligibility import publish, stock as stock, provenance as provenance  # noqa: F401
 from tests.test_matrix_scheduled_history import scheduled as scheduled  # noqa: F401
@@ -74,7 +74,7 @@ def fixture(scheduled, *, selected64=False):
     args = dict(specification=inputs.specification, candidate_bytes=raw, nominal=inputs.nominal, nearby=inputs.nearby,
         shifted=inputs.shifted, mathematical_protocol=mathematical, original_factor_rule=full_rule, prefix_policy=policy,
         scalar_definition=definition, normalization_source=full_rule.scalar_closure.normalization_owner,
-        normalization_source_bytes=(ROOT / "src/empirical_lawhood/adapters/simulators/six_matrix_response/response_observer.py").read_bytes(),
+        normalization_source_bytes=(ROOT / "src/empirical_lawhood/package_data/scientific_originals/matrix_scalar_response_observer.py.txt").read_bytes(),
         record_id="projection.literal.e3-source")
     projection = protocol_owner.project_protected_e3_protocol(**args)
     return SimpleNamespace(plane=plane, inputs=inputs, manifest=manifest, sources=sources, descriptors=descriptors,

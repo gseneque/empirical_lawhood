@@ -7,12 +7,12 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import science
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.source_selection_metadata import _validate_source_metadata
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import science
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.source_selection_metadata import _validate_source_metadata
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
 
 @dataclass(frozen=True, slots=True)

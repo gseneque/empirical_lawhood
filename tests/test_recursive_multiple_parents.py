@@ -8,63 +8,26 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.api import (
-    recursive_authoring as author,
-    recursive_execution as execution,
-)
+from empirical_lawhood.api import recursive_authoring as author, recursive_execution as execution
 from empirical_lawhood.api import recursive_contributions as contributions
-from empirical_lawhood.adapters.composition.discovery import (
-    manifest as capability_manifest,
-)
-from empirical_lawhood.adapters.methods.battery_recursive_construction.contracts import (
-    BatteryProcedureContribution,
-    BatteryFurtherProduct,
-)
-from empirical_lawhood.adapters.methods.battery_recursive_construction.examples import (
-    battery_wave_b_draft,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import (
-    EvidenceCeiling,
-    OutcomeAccess,
-    VisibilityCeiling,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-from empirical_lawhood.kernel.scientific_contributions import ContributionManifest
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.recursive_authoring import (
-    RecursiveOperationSpec,
-    RecursiveExternalInput,
-    RecursiveInputLink,
-)
-from empirical_lawhood.planning.recursive_input_origins import (
-    RecursiveInputOrigins,
-    RecursiveInputOrigin,
-    RecursiveInputOriginKind,
-    contribution_graph_role,
-)
-from empirical_lawhood.planning.study_authoring import CapabilitySelection
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityKind,
-    CapabilityRegistry,
-    CapabilityPermission,
-)
-from empirical_lawhood.runtime.execution import (
-    RunnerRegistry,
-    RunnerResult,
-    TaskOutputPayload,
-)
-from empirical_lawhood.runtime.plans import OutputTemplate, ScientificStage
-from empirical_lawhood.runtime.recursive_compiler import (
-    RecursiveOperationRegistration,
-    RecursivePortContract,
-)
-from empirical_lawhood.runtime.recursive_handoff import (
-    RecursiveParentClosuresBinding,
-    recursive_parent_closure_bindings,
-)
+from empirical_lawhood.execution.declaration_helpers import manifest as capability_manifest
+from empirical_lawhood.domains.battery.battery_recursive_construction.contracts import BatteryProcedureContribution, BatteryFurtherProduct
+from empirical_lawhood.domains.battery.battery_recursive_construction.examples import battery_wave_b_draft
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.recursive_authoring import RecursiveOperationSpec, RecursiveExternalInput, RecursiveInputLink
+from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigins, RecursiveInputOrigin, RecursiveInputOriginKind, contribution_graph_role
+from empirical_lawhood.design.study_authoring import CapabilitySelection
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityPermission
+from empirical_lawhood.execution.execution import RunnerRegistry, RunnerResult, TaskOutputPayload
+from empirical_lawhood.execution.plans import OutputTemplate, ScientificStage
+from empirical_lawhood.execution.recursive_compiler import RecursiveOperationRegistration, RecursivePortContract
+from empirical_lawhood.execution.recursive_handoff import RecursiveParentClosuresBinding, recursive_parent_closure_bindings
 from tests.test_recursive_contribution_custody import (
     portable_a as portable_a,
     ROOT,
@@ -337,15 +300,30 @@ def test_multiple_exact_receipt_parents_author_run_export_and_relocate(
             BatteryFurtherProduct,
         )
     }
-    old_registrations, old_registry, old_codecs = author.operation_catalog()
-    codecs = {**old_codecs, **codecs}
-    registry = CapabilityRegistry(
-        "registry.testing.multiple-parent-byte-join",
-        tuple(
-            sorted((*old_registry.capabilities, manifest), key=lambda r: r.registry_id)
-        ),
+    # Custom composition must expose the same synthetic operation to retained
+    # inquiry reads as to authoring and execution. Keep the installed closed
+    # selection route unchanged; its unknown-key refusal is production behavior.
+    from empirical_lawhood.api import recursive_operations
+    from empirical_lawhood.execution.recursive_provider import (
+        RecursiveOperationProviderFactory, recursive_operation_binding,
     )
-    catalog = lambda: ((*old_registrations, registration), registry, codecs)
+    original_factories = recursive_operations.operation_factories()
+    pair_factory = RecursiveOperationProviderFactory(
+        recursive_operation_binding(registration=registration, manifest=manifest),
+        registration,
+        manifest,
+        lambda: PairRunner(manifest),
+        {PairRead.SCHEMA: PairRead},
+    )
+    monkeypatch.setattr(
+        recursive_operations,
+        "operation_factories",
+        lambda: (*original_factories, pair_factory),
+    )
+    registrations, registry, registered_codecs = recursive_operations.operation_catalog()
+    codecs = registered_codecs.with_record_types(tuple(codecs.values()))
+    catalog = lambda: (registrations, registry, codecs)
+    monkeypatch.setattr(recursive_operations, "operation_catalog", catalog)
     monkeypatch.setattr(author, "operation_catalog", catalog)
     monkeypatch.setattr(execution, "operation_catalog", catalog)
     monkeypatch.setattr(
@@ -402,10 +380,8 @@ def test_multiple_exact_receipt_parents_author_run_export_and_relocate(
 
     # Complete ancestry export, including the common first parent, creates no new producing receipt.
     def described(d, p):
-        from empirical_lawhood.kernel.references import ArtifactIdentity
-        from empirical_lawhood.kernel.scientific_contributions import (
-            ContributionProduct,
-        )
+        from empirical_lawhood.science.identity.references import ArtifactIdentity
+        from empirical_lawhood.science.inquiry.scientific_contributions import ContributionProduct
 
         receipt = p["receipts"][NODE]
         artifact = next(iter(p["outputs"].values()))
@@ -574,10 +550,7 @@ def test_multiple_exact_receipt_parents_author_run_export_and_relocate(
 
 
 def test_parent_collection_is_complete_canonical_census_without_two_parent_limit():
-    from empirical_lawhood.runtime.recursive_handoff import (
-        RecursiveParentClosureBinding,
-        PortableRecursiveContribution,
-    )
+    from empirical_lawhood.execution.recursive_handoff import RecursiveParentClosureBinding, PortableRecursiveContribution
 
     values = tuple(
         RecursiveParentClosureBinding(

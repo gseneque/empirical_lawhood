@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Exposed real receipt/archive controls; zero molecular preparation or entry."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from hashlib import sha256
@@ -12,23 +13,21 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as c
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_contracts import DurablePreparationPlan, DurableUnitReturn
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_preparation import DurableCallLedger, complete_unit
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_roster import definitions, freeze, census
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.geometry_reuse import (
-    GeometryReusePlan, GeometryReuseSupply, invocation_bytes, materialize_geometry_inputs, validate_reuse_assessment,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.preamber_geometry_integrity import PreAmberGeometryIntegrity
-from empirical_lawhood.infrastructure.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as c
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_contracts import DurablePreparationPlan, DurableUnitReturn
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_preparation import DurableCallLedger, complete_unit
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_roster import definitions, freeze, census
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.geometry_reuse import GeometryReusePlan, GeometryReuseSupply, invocation_bytes, materialize_geometry_inputs, validate_reuse_assessment
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.preamber_geometry_integrity import PreAmberGeometryIntegrity
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.native_effects import NativeEffectContact
 from tests.runtime_platform.test_native_subwork import _plane, _store, _process_context
 from tests.test_rubisco_preparation_integrity import exposed_preparation
 from tests.rubisco_nomination_fixture import nominee
@@ -39,7 +38,7 @@ def original(tmp_path_factory):
     """Actual exposed artifact-plane receipt, not a biological/raw-source claim."""
     tmp_path = tmp_path_factory.mktemp("original-geometry-reuse-custody")
     source, _, _ = exposed_preparation()
-    from empirical_lawhood.adapters.methods.rubisco_insilico_structure.contracts import StructuralInventory, AssemblyCoordinates
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_structure.contracts import StructuralInventory, AssemblyCoordinates
     _, nomination = nominee()
     inventory = StructuralInventory("inventory.exposed", ObjectIdentity("source.exposed.structure",
         "empirical-lawhood/rubisco-insilico-structure/source", "1.0.0", "7" * 64),
@@ -67,8 +66,7 @@ def original(tmp_path_factory):
         result = plane.write(ArtifactWriteRequest(name, "inputs/" + name + ".json", record.SCHEMA,
             ArtifactProfile.CANONICAL_JSON, "application/json", "exposed.inputs", "inputs",
             record.canonical_bytes(), VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
-        manifests.append(decode_artifact_manifest(plane.root.resolve(
-            result.materialization.relative_path + ".manifest.json", for_write=False).read_bytes()))
+        manifests.append(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()))
     parent = NativeEffectContact("exposed.original", "native.parent", "exposed.original.native.parent.attempt-001",
         ObjectIdentity("plan.exposed", "empirical-lawhood/runtime/development-execution-plan", "1.0.0", "4" * 64),
         ObjectIdentity("native.parent", "empirical-lawhood/runtime/execution-task", "1.0.0", "5" * 64),
@@ -105,11 +103,11 @@ def original(tmp_path_factory):
     prefix = inspection.receipt.task_id
     archive_root = "runs/" + parent.run_id + "/native-subwork/" + prefix.removeprefix("native-subwork.")
     def manifest(name):
-        return decode_artifact_manifest(plane.root.resolve(archive_root + "/" + name + ".manifest.json", for_write=False).read_bytes())
+        return resolve_artifact_sidecar_bytes(plane, plane.root.resolve(archive_root + '/' + name + '.manifest.json', for_write=False).read_bytes())
     def output(name, kind):
         raw = b"".join(progress.iter_completed_output(definition, name))
         return decode_canonical_bytes(raw, kind, maximum_bytes=len(raw))
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_contracts import DurableRawFileCensus
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_contracts import DurableRawFileCensus
     returned = output("unit.return", DurableUnitReturn)
     retained = output("files.census", DurableRawFileCensus)
     by_name = {Path(row.relative_path).name: row for row in retained.files}
@@ -163,7 +161,7 @@ def test_exact_original_receipt_roundtrip_and_full36_new_attempt_denominator(ori
 @pytest.mark.parametrize("change", (None, "missing-slot", "wrong-owner", "wrong-code", "wrong-lock", "wrong-input", "missing-assessment"))
 def test_full_invocation_exact_roundtrip_and_owner_contracts_before_contact(original, monkeypatch, change):
     import json
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import science
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import science
     source, plan = fresh(original)
     monkeypatch.setattr(science, "validate_source", lambda *args: source)
     parent = original.supply.definition.parent_contact
@@ -309,8 +307,8 @@ class Refuse(importlib.abc.MetaPathFinder):
         if name.split('.')[0] in ('numpy','scipy','openmm','pdbfixer','parmed','ash') or name.endswith('.native'):
             raise RuntimeError('native producer entered: '+name)
 sys.meta_path.insert(0, Refuse())
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.geometry_reuse import GeometryReuseRunner
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import geometry_reuse_native_entry
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.geometry_reuse import GeometryReuseRunner
+from empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics import geometry_reuse_native_entry
 assert GeometryReuseRunner._entry_target(None)[0].endswith('.geometry_reuse_native_entry')
 assert callable(geometry_reuse_native_entry.selected_child)
 '''

@@ -12,43 +12,33 @@ from hashlib import sha256
 from pathlib import Path
 import sys
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.records import E1AllocationReservation
-from empirical_lawhood.adapters.methods.matrix_factor_response.eligibility import MatrixFactorExposureCensus
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import (
-    PHASE_INPUT_ROLES, MatrixProgrammeInputCommitments, MatrixProgrammePhaseInputs, MatrixProgrammePublishedInput,
-)
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.e1_allocation import (
-    e1_allocation, ordinary_streams as _ordinary_streams,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import (
-    ScheduledExposureAudit, authenticate_publication, corpus_artifact,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponsePanel
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledResponseSelection
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_population import (
-    CONSTRUCTION, _selected_e4_population_members,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_streams import SelectedE4StreamRecipe
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import validate_sha256, validate_stable_id
-from empirical_lawhood.kernel.time import AvailabilitySpec, CausalPhase
-from empirical_lawhood.planning.approval import SystemDecisionClock
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.records import E1AllocationReservation
+from empirical_lawhood.domains.matrix.matrix_factor_response.eligibility import MatrixFactorExposureCensus
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import PHASE_INPUT_ROLES, MatrixProgrammeInputCommitments, MatrixProgrammePhaseInputs, MatrixProgrammePublishedInput
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.e1_allocation import e1_allocation, ordinary_streams as _ordinary_streams
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import ScheduledExposureAudit, authenticate_publication, corpus_artifact
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponsePanel
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledResponseSelection
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_population import CONSTRUCTION, _selected_e4_population_members
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_streams import SelectedE4StreamRecipe
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import validate_sha256, validate_stable_id
+from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase
+from empirical_lawhood.design.approval import SystemDecisionClock
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.input_records import (
-    ResolvedMatrixProgrammeInputs, ResolvedMatrixProgrammePhaseInputs, validate_programme_input_records,
-)
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.input_records import ResolvedMatrixProgrammeInputs, ResolvedMatrixProgrammePhaseInputs, validate_programme_input_records
 
 
 _NATIVE_ROLES = {
@@ -116,10 +106,10 @@ def _body_size(value, seen=None):
 
 
 def _require_memory(limit):
-    from empirical_lawhood.runtime.metadata_memory import metadata_rss_limit
+    from empirical_lawhood.execution.metadata_memory import metadata_rss_limit
     limit = metadata_rss_limit(limit)
     if _process_rss_bytes() > limit:
-        from empirical_lawhood.infrastructure.process_memory import release_unused_process_memory
+        from empirical_lawhood.execution.resources.process_memory import release_unused_process_memory
         # Completed metadata decodes can leave free allocator pages resident.
         # Reclaim only unused storage, then enforce the selected actual RSS limit.
         release_unused_process_memory()
@@ -218,7 +208,7 @@ def _source_plan(*, design, census, namespace, root_material, future_material, e
     preparations = tuple(sorted(design.e4_preparation_coordinates, key=lambda co: co.family_id))
     designs = (("CALIBRATION", design.e4_calibration), ("CONFIRMATION", design.e4_confirmation),
         ("DEVELOPMENT", design.e4_development))
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_population import selected_e4_population_groups
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_population import selected_e4_population_groups
     e4_groups = selected_e4_population_groups(namespace=namespace + '.e4', population_designs=designs,
         preparations=preparations, streams=e4_streams)
     e4_history = tuple((group, e4_streams.streams(group, future=False))
@@ -295,13 +285,13 @@ def publish_matrix_programme_allocations(*, design, census, namespace,
         support_publications, file_bindings, request_path, project_root, artifact_writer,
         metadata_directory, execution, metadata_budget, validate_copied_inputs=None, _admitted_source=None):
     """Publish known inputs C after all prospective child metadata, without entry."""
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.scientific_design import MatrixProgrammeScientificDesign
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_protocol import project_protected_e3_protocol
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.e6_transport_science import build_e6_transport_policy
-    from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-    from .experiment_preparation import _input_member
-    from .matrix_numerical_provenance import capture_matrix_provenance
-    from .selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.scientific_design import MatrixProgrammeScientificDesign
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_protocol import project_protected_e3_protocol
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.e6_transport_science import build_e6_transport_policy
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+    from empirical_lawhood.api.experiment_preparation import _input_member
+    from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
+    from empirical_lawhood.api.selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest
 
     validate_stable_id(namespace)
     if validate_copied_inputs is not None and not callable(validate_copied_inputs):

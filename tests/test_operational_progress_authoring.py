@@ -1,20 +1,21 @@
 # SPDX-License-Identifier: MPL-2.0
 """Operational counters preserve actual preparation and custody decisions."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_specification import selected_deanneal_specification
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_specification import selected_deanneal_specification
 from empirical_lawhood.api.experiment_preparation import experiment_preparation_report, prepare_experiment
 from empirical_lawhood.api.prospective_experiment import load_prepared_prospective_experiment
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
-from empirical_lawhood.infrastructure.candidate_sources import ExternalCandidateInputPublisher
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.progress import progress_reporting
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+from empirical_lawhood.storage.candidate_sources import ExternalCandidateInputPublisher
+
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.progress import progress_reporting
 from tests.test_unrestricted_source_resolution import _root
 
 
@@ -43,8 +44,7 @@ def _publication(tmp_path, count=3):
             ObjectIdentity.SCHEMA, ArtifactProfile.CANONICAL_JSON, "application/json", "exposed.complete-batch", "outputs",
             subject.canonical_bytes(), VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
     results = plane.write_batch(tuple(requests))
-    manifests = tuple(decode_artifact_manifest(plane.root.resolve(
-        row.manifest_materialization.relative_path, for_write=False).read_bytes()) for row in results)
+    manifests = tuple(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(row.manifest_materialization.relative_path, for_write=False).read_bytes()) for row in results)
     return plane, manifests
 
 
@@ -151,16 +151,16 @@ def test_artifact_completion_follows_consumer_and_final_snapshot_without_extra_d
 
     def consume(members):
         assert len(members) == len(manifests)
-        assert recorder.events[-1]["done"] == len(manifests) - 1
-        assert all(event["done"] != event["total"] for event in recorder.events)
+        assert _events(recorder, "verify_artifact_members")[-1]["done"] == len(manifests) - 1
+        assert all(event["done"] != event["total"] for event in _events(recorder, "verify_artifact_members"))
         return tuple(members)
 
     with progress_reporting(recorder):
         result = plane.verify_manifest_members(manifests[0], validate_members=consume)
     assert set(result) == {row.materialization.relative_path for row in manifests}
     assert len(reads) == len(manifests) + 1
-    assert [event["done"] for event in recorder.events] == [0, 1, 2, 3]
-    assert recorder.events[-1] == {"phase": "verify_artifact_members", "done": 3, "total": 3, "failed": 0}
+    assert [event["done"] for event in _events(recorder, "verify_artifact_members")] == [0, 1, 2, 3]
+    assert _events(recorder, "verify_artifact_members")[-1] == {"phase": "verify_artifact_members", "done": 3, "total": 3, "failed": 0}
     assert {path: path.read_bytes() for path in before} == before
 
 
@@ -180,8 +180,8 @@ def test_artifact_refusal_never_emits_guarded_completion(tmp_path, failure):
     with progress_reporting(recorder), pytest.raises(ArtifactIdentityConflict):
         plane.verify_manifest_members(manifests[0], validate_members=consume)
     assert entered == ([True] if failure == "callback-mutation" else [])
-    assert not any(event["done"] == event["total"] for event in recorder.events)
-    assert recorder.events[-1]["failed"] == 1
+    assert not any(event["done"] == event["total"] for event in _events(recorder, "verify_artifact_members"))
+    assert _events(recorder, "verify_artifact_members")[-1]["failed"] == 1
 
 
 def test_scoped_verification_reports_work_once_and_new_calls_remain_fresh(tmp_path):
@@ -189,12 +189,12 @@ def test_scoped_verification_reports_work_once_and_new_calls_remain_fresh(tmp_pa
     recorder = _Recorder()
     with progress_reporting(recorder), plane.verification_scope() as scoped:
         scoped.verify_manifests(manifests)
-        first = len(recorder.events)
+        first = len(_events(recorder, "verify_artifact_members"))
         scoped.verify_manifests(manifests)
-    assert recorder.events[first:] == [
+    assert _events(recorder, "verify_artifact_members")[first:] == [
         {"phase": "verify_artifact_members", "done": 0, "total": None, "failed": 0},
         {"phase": "verify_artifact_members", "done": 0, "total": 0, "failed": 0}]
     recorder.events.clear()
     with progress_reporting(recorder):
         plane.verify_manifest(manifests[0])
-    assert recorder.events[-1]["done"] == len(manifests)
+    assert _events(recorder, "verify_artifact_members")[-1]["done"] == len(manifests)

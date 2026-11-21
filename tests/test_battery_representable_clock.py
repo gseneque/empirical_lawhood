@@ -7,11 +7,11 @@ import math
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import representable_clock as clock
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_fidelity_stream as paired
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_science as science
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.battery.battery_refined_inquiry import representable_clock as clock
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_fidelity_stream as paired
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_science as science
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_battery_segmented_fidelity_stream import _compare, _port, _stream, prepared as prepared_fixture
 
 prepared = prepared_fixture

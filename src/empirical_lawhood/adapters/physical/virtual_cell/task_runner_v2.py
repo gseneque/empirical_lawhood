@@ -13,21 +13,21 @@ from hashlib import sha256
 
 import numpy as np
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 
-from . import runtime as original
-from .config_v2 import VirtualCellPipelineSelectionV2
-from .correction_records_v2 import OfficialMetricSetV2
-from .custody_transport_v2 import CanonicalEvidenceV2, MAXIMUM_CUSTODY_BYTES_V2
-from .custody_views_v2 import ActualRecordsV2, development_view_v2, selection_view_v2, freeze_view_v2, evaluation_view_v2
-from .prediction_payload_v2 import encode_raw_prediction_deltas_v2
-from .ports_v2 import CAPABILITY_VERSION_V2, virtual_cell_config_ref_v2, virtual_cell_capability_registry_v2
-from .receiver_observation_v2 import CandidateValidationObservationV2, ReceiverObservation
-from .receiver_readiness_v2 import require_receiver_ready_v2
-from .records_v2 import CandidateValidationRecordV2, ModelDevelopmentRecordV2, ModelSelectionRecordV2, PredictionFreezeRecordV2, OfficialEvaluationRecordV2, RAW_PREDICTION_DELTAS_SCHEMA
+from empirical_lawhood.adapters.physical.virtual_cell import runtime as original
+from empirical_lawhood.domains.biology.virtual_cell.config_v2 import VirtualCellPipelineSelectionV2
+from empirical_lawhood.domains.biology.virtual_cell.correction_records_v2 import OfficialMetricSetV2
+from empirical_lawhood.domains.biology.virtual_cell.custody_transport_v2 import CanonicalEvidenceV2, MAXIMUM_CUSTODY_BYTES_V2
+from empirical_lawhood.domains.biology.virtual_cell.custody_views_v2 import ActualRecordsV2, development_view_v2, selection_view_v2, freeze_view_v2, evaluation_view_v2
+from empirical_lawhood.domains.biology.virtual_cell.prediction_payload_v2 import encode_raw_prediction_deltas_v2
+from empirical_lawhood.domains.biology.virtual_cell.ports_v2 import CAPABILITY_VERSION_V2, virtual_cell_config_ref_v2, virtual_cell_capability_registry_v2
+from empirical_lawhood.domains.biology.virtual_cell.receiver_observation_v2 import CandidateValidationObservationV2, ReceiverObservation
+from empirical_lawhood.adapters.physical.virtual_cell.receiver_readiness_v2 import require_receiver_ready_v2
+from empirical_lawhood.domains.biology.virtual_cell.records_v2 import CandidateValidationRecordV2, ModelDevelopmentRecordV2, ModelSelectionRecordV2, PredictionFreezeRecordV2, OfficialEvaluationRecordV2, RAW_PREDICTION_DELTAS_SCHEMA
 
 @dataclass(slots=True)
 class _StageEvidence:
@@ -68,7 +68,7 @@ def _artifact(artifact_id, schema, media_type, digest, size):
     return ArtifactIdentity(artifact_id, "virtual-cell-evidence", schema, digest, media_type, size)
 
 
-class VirtualCellTaskRunnerV2(original.VirtualCellTaskRunner):
+class VirtualCellTaskRunnerV2(original.VirtualCellTaskExecutionBase):
     """An explicit v2 task runner using the original stage orchestration."""
 
     def __init__(self, *, selection, **kwargs):
@@ -76,7 +76,7 @@ class VirtualCellTaskRunnerV2(original.VirtualCellTaskRunner):
         if type(selection) is not VirtualCellPipelineSelectionV2:
             raise TypeError("corrected task requires its actual frozen selection")
         selection.validate_original(self.config)
-        from .registry import virtual_cell_capability_keys
+        from empirical_lawhood.domains.biology.virtual_cell.capabilities import virtual_cell_capability_keys
 
         expected = virtual_cell_capability_registry_v2({key: self.manifest.implementation_sha256
             for key in virtual_cell_capability_keys()}).resolve(self.manifest.capability_key, CAPABILITY_VERSION_V2)
@@ -201,7 +201,7 @@ class VirtualCellTaskRunnerV2(original.VirtualCellTaskRunner):
         return result
 
     def _write_prediction_file(self, *, path, roster, gene_ids, prediction_action, control_reservoir, control_reservoir_sha256):
-        from .prediction_v2 import write_shared_template_shift_v2_prediction_h5ad
+        from empirical_lawhood.adapters.physical.virtual_cell.prediction_v2 import write_shared_template_shift_v2_prediction_h5ad
 
         receipt = write_shared_template_shift_v2_prediction_h5ad(path=path, roster=roster, gene_ids=gene_ids,
             predicted_deltas=prediction_action, control_reservoir=control_reservoir,
@@ -212,7 +212,7 @@ class VirtualCellTaskRunnerV2(original.VirtualCellTaskRunner):
         return receipt
 
     def _evaluate_arrays(self, *, predicted, real, scratch_directory, num_threads, validation):
-        from .evaluation import evaluate_official_2025_v2
+        from empirical_lawhood.adapters.physical.virtual_cell.evaluation import evaluate_official_2025_v2
 
         run = evaluate_official_2025_v2(predicted=predicted, real=real,
             metric_contract=(self.config.model_selection.validation_metric_contract if validation else self.config.metric_contract),
@@ -229,8 +229,8 @@ class VirtualCellTaskRunnerV2(original.VirtualCellTaskRunner):
 
     def _development_record(self, context, development, *, training_summary_sha256, validation_summary_sha256,
             feature_provenance_sha256, model_payloads, validation_metric_payloads):
-        from .codecs import decode_linear_model
-        from .records import ModelArtifactBinding, MODEL_SAFETENSORS_SCHEMA, ResponseSummaryRecord
+        from empirical_lawhood.adapters.physical.virtual_cell.codecs import decode_linear_model
+        from empirical_lawhood.domains.biology.virtual_cell.records import ModelArtifactBinding, MODEL_SAFETENSORS_SCHEMA, ResponseSummaryRecord
 
         stage = _STAGE.get()
         fits = {value.candidate_id: value.fit for value in development.candidates}

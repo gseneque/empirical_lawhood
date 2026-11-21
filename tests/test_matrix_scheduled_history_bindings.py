@@ -15,30 +15,30 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES, MatrixResponseErrorModel
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import commitment as c, forecast as f, operation_bindings as b, records as r, retained, science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.continuation import ScheduledFullHistory
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments as segments, parameter_source
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, CandidateExecutionPlan, ExecutionTask, ExternalInputSpec, PlanLane, ScientificInputRole, ScientificInputSpec
-from empirical_lawhood.runtime.capabilities import CapabilityRequirement
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES, MatrixResponseErrorModel
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import commitment as c, forecast as f, operation_bindings as b, records as r, retained, science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.continuation import ScheduledFullHistory
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments as segments, parameter_source
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, CandidateExecutionPlan, ExecutionTask, ExternalInputSpec, PlanLane, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.execution.capabilities import CapabilityRequirement
 from tests.test_matrix_factor_confirmation_eligibility import publish
 from tests.test_matrix_factor_confirmation_eligibility import provenance as provenance
 from tests.test_matrix_factor_confirmation_eligibility import stock as stock
 from tests.test_matrix_response_error_prediction import spec as old_spec
 from tests.test_matrix_scheduled_history import scheduled as scheduled
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex, ScheduledNativeSourceContext
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex, ScheduledNativeSourceContext
 
 TEST_BUDGET = ResourceBudget(1, 512*1024**2, 0, None, 64*1024**2, 64*1024**2)
 
@@ -96,8 +96,8 @@ def write(plane, logical_id, payload, schema, *, access=Access.OUTCOME_BLIND, vi
 
 
 def context(plane, config, role, inputs, dependencies=(), *, budget=TEST_BUDGET):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_bindings import RESPONSE_PHASES
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.calibration_bindings import CALIBRATION_PHASES
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_bindings import RESPONSE_PHASES
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.calibration_bindings import CALIBRATION_PHASES
     m = next(m for m in b.operation_manifests() if m.capability_key == r.NAMESPACE+'.'+role)
     task = c.COMMIT_KEY if role == 'commit' else r.NAMESPACE+'.'+role if role in ('calibrate', 'calibration-qualify') else r.NAMESPACE+'.'+(config.root_id if hasattr(config, 'root_id') else config.source.root_id)+'.'+role
     config_manifest = write(plane, config.config_id, config.canonical_bytes(), config.SCHEMA, phase=role,
@@ -279,8 +279,10 @@ def actual_plan(bank, source, *, publish_plan=True, additional_tasks=()):
 
 
 def test_static_default_descriptors_are_cold_and_worker_forecast_config_has_no_current_noise(bank, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.executable_binding import EXECUTABLE_BINDING_FACTORIES
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.extension_bundle import EXTENSION_BUNDLE_CONTRIBUTION
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.extension import EXTENSION as _extension_owner_1
+    EXECUTABLE_BINDING_FACTORIES = _extension_owner_1.factories
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.extension import EXTENSION as _extension_owner_2
+    EXTENSION_BUNDLE_CONTRIBUTION = _extension_owner_2.discovery
     monkeypatch.setattr(np.random, 'Generator', blocked)
     monkeypatch.setattr(np.linalg, 'eigh', blocked)
     monkeypatch.setattr(segments, 'acquire_parameter_segment', blocked)
@@ -379,7 +381,7 @@ def pipeline(bank, *, root_id=None, plan=None, before_continue=None):
 
 
 def test_actual_point_seal_then_continuation_and_original_cold_store_read(bank, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.retained_bindings import read_history
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.retained_bindings import read_history
     snapshots = []
     received = []
     forecast_ports = set()

@@ -8,18 +8,18 @@ from types import SimpleNamespace
 import pytest
 from threadpoolctl import threadpool_limits
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_bindings as bindings
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as r
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_science as science
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_bindings as bindings
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as r
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_science as science
 from empirical_lawhood.api import matrix_native_utility_read as reader
 from empirical_lawhood.api.experiment_preparation import author_prepared_experiment
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.recursive_authoring import load_authored_wave
 from empirical_lawhood.api.recursive_execution import _retained_plans, read_recursive_wave
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
 from tests.test_matrix_native_utility import copied_preparation, utility_case
 
 ROOT = Path(__file__).parents[1]
@@ -34,7 +34,7 @@ class _Unreadable:
 
 
 def test_native_e2_root_read_refuses_a_foreign_source_index_before_opening_products(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 
     case = utility_case(tmp_path)
     manifest = case.request.source_manifest
@@ -97,7 +97,7 @@ def test_native_e2_read_joins_exact_authored_request_and_complete_graph_without_
 
 @pytest.mark.native
 def test_actual_public_native_e2_strict_read_replays_received_scores_and_recovery_without_contact(tmp_path, monkeypatch):
-    from empirical_lawhood.runtime import recursive_compiler
+    from empirical_lawhood.execution import recursive_compiler
     from tests.test_matrix_native_training_public_lifecycle import _actual_case
     with threadpool_limits(limits=1):
         case = utility_case(tmp_path, original=_actual_case(tmp_path, monkeypatch))

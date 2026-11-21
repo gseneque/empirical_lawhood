@@ -6,11 +6,11 @@ from pathlib import Path
 from types import SimpleNamespace
 import pytest
 from empirical_lawhood.api import authoring_handoff as owner, reactor_authoring, recursive_prospective_authoring as prospective
-from empirical_lawhood.infrastructure import publication_metadata, task_receipts, study_issue
-from empirical_lawhood.infrastructure import source_closure
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
-from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits, ArtifactProfile
+from empirical_lawhood.storage import publication_metadata, study_issue
+from empirical_lawhood.storage import source_closure
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits, ArtifactProfile
 from tests.prospective_source_capture_fixture import synthetic_capture
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,7 +28,7 @@ def companion_control(monkeypatch):
     writer = SimpleNamespace(root=SimpleNamespace(contract=SimpleNamespace(canonical_path='/guarded', storage_root_id='software.root'),
         resolve=lambda name, **_: Path('/guarded')/name), custody_limits=ArtifactCustodyLimits(manifest_bytes=65536),
         verify_manifest=lambda _: events.append('verified'))
-    monkeypatch.setattr(task_receipts, 'decode_artifact_manifest', lambda *_args, **_kwargs: manifest)
+    monkeypatch.setattr(owner, 'resolve_artifact_sidecar_bytes', lambda *_args, **_kwargs: manifest)
     monkeypatch.setattr(publication_metadata, 'read_publication_metadata', lambda *_: events.append('publication'))
     monkeypatch.setattr(owner, 'read_bounded_bytes', lambda path, **_:
         b'original manifest' if path.name.endswith('.manifest.json') else events.append('payload') or raw)

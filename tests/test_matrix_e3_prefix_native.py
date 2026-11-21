@@ -14,21 +14,21 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_science as science
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_prefix_records import ProtectedE3PrefixHistory
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as sr
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history, parameter_history_segments as segments
-from empirical_lawhood.infrastructure.execution import LocalScheduler, prepare_worker_invocation
-from empirical_lawhood.infrastructure.artifact_stream_primitives import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_science as science
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_prefix_records import ProtectedE3PrefixHistory
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as sr
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history, parameter_history_segments as segments
+from empirical_lawhood.execution.local.execution import LocalScheduler, prepare_worker_invocation
+from empirical_lawhood.storage.artifact_stream_primitives import ArtifactIdentityConflict
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
 from tests.test_matrix_e3_prefix_preparation import _context, _work
 from tests.test_matrix_e3_prefix_preparation import case as case, scheduled as scheduled, stock as stock, provenance as provenance  # noqa: F401
 from tests.test_matrix_e3_prefix_science_extraction import literal_segment

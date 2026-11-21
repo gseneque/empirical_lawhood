@@ -7,10 +7,10 @@ import json
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_preparation as preparation
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_secondary_readout as target_owner
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_preparation as preparation
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_secondary_readout as target_owner
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
 
 ROOT = Path(__file__).parents[1]
 EXAMPLE = ROOT / "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/secondary-response-target.example.json"
@@ -64,10 +64,7 @@ def test_current_preparation_keeps_v4_fields_without_original_request_decoder():
         "numerical_profiles", "training_features", "training_outcomes", "formal_methods", "formal_source_inventories",
         "resource_selection", "qualifications", "source_configs", "numerical_qualifications", "numerical_containers",
         "secondary_readout", "primary_amendment")
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import (
-        ConfiguredE3ContinuedPreparationSelection, ConfiguredE3UnfinishedPreparationSelection,
-        ConfiguredE3ClosedPreparationSelection,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection, ConfiguredE3UnfinishedPreparationSelection, ConfiguredE3ClosedPreparationSelection
     assert preparation.configured_preparation_types() == (current, ConfiguredE3ContinuedPreparationSelection,
         ConfiguredE3UnfinishedPreparationSelection, ConfiguredE3ClosedPreparationSelection)
     assert not hasattr(preparation, "ConfiguredProtectedE3PreparationSelectionV2")

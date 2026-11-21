@@ -67,8 +67,8 @@ def test_original_scope_controls_survive_own_effect_expiry_but_ready_refuses(
 
 def test_original_read_expiry_refuses_controls_before_own_grant_or_body_access(
         actual_issued_current_task_controls, monkeypatch):
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-    from empirical_lawhood.infrastructure import artifacts
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.storage import artifacts
     f = actual_issued_current_task_controls
     disclosed_contract(f)
     scope = _DisclosedOriginalScope(f.control.service.artifact_plane)

@@ -4,44 +4,31 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from empirical_lawhood.kernel.authority import AuthorityAction
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experiments import ExperimentSpec
-from empirical_lawhood.kernel.models import ModelIntersectionSemantics, ViewModelSetSpec
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import LifecycleStatus, ReadinessStatus
-from empirical_lawhood.kernel.systems import SystemSpec
-from empirical_lawhood.planning.campaigns import (
-    CampaignLane,
-    CampaignNode,
-    CampaignNodeKind,
-    CampaignSpec,
-    DecisionRight,
-)
-from empirical_lawhood.planning.experiment_entry import ExperimentEntryChecklist, ExperimentEntryPackage, ExperimentEntryRequirement, ExperimentEntryRequirementBinding, ExperimentEntryTransition, ExperimentTerminalClass, StudyDefinition
-from empirical_lawhood.planning.formal_gaps import (
-    FormalGapApplicability,
-    FormalGapCoverage,
-    FormalGapCoverageAssignment,
-    FormalGapCoverageDisposition,
-    FormalGapEvidenceWorld,
-    FormalGapRegister,
-)
-from empirical_lawhood.planning.formal_analysis import FormalGapSourceCapabilityInventory
-from empirical_lawhood.planning.study_authoring import CapabilitySelection, DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, MaterializationQualificationReceipt, StudyDraft, StudyDraftLifecycle, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
-from empirical_lawhood.runtime.candidate_compiler import CandidateCompilationContext, StudyTemplate
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityCatalog
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.plans import ProtocolTemplate
-from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig, SourceReadMode
-from empirical_lawhood.kernel.worlds import EvidenceUnitScope
+from empirical_lawhood.science.identity.authority import AuthorityAction
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experiments import ExperimentSpec
+from empirical_lawhood.science.models.models import ModelIntersectionSemantics, ViewModelSetSpec
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import LifecycleStatus, ReadinessStatus
+from empirical_lawhood.science.models.systems import SystemSpec
+from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
+from empirical_lawhood.design.experiment_entry import ExperimentEntryChecklist, ExperimentEntryPackage, ExperimentEntryRequirement, ExperimentEntryRequirementBinding, ExperimentEntryTransition, ExperimentTerminalClass, StudyDefinition
+from empirical_lawhood.design.formal_gaps import FormalGapApplicability, FormalGapCoverage, FormalGapCoverageAssignment, FormalGapCoverageDisposition, FormalGapEvidenceWorld, FormalGapRegister
+from empirical_lawhood.design.formal_analysis import FormalGapSourceCapabilityInventory
+from empirical_lawhood.design.study_authoring import CapabilitySelection, DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, MaterializationQualificationReceipt, StudyDraft, StudyDraftLifecycle, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
+from empirical_lawhood.execution.candidate_compiler import CandidateCompilationContext, StudyTemplate
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.plans import ProtocolTemplate
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
+from empirical_lawhood.science.models.worlds import EvidenceUnitScope
 
-from .candidate import excluded_solver_control_candidate_catalog, excluded_solver_control_template
-from .contracts import ExcludedSolverControlConfig, ExcludedSolverControlSourceManifest, SOURCE_MANIFEST_SOURCE_ID
-from .registration import excluded_solver_control_registry
-from .runtime import excluded_solver_control_protocol
-from .source import expected_excluded_solver_control_source_manifest
-from .system import CONTROL_UNIT_IDS, excluded_solver_control_experiment, excluded_solver_control_system, study_budget
+from empirical_lawhood.domains.materials.superconductivity.candidate import excluded_solver_control_candidate_catalog, excluded_solver_control_template
+from empirical_lawhood.domains.materials.superconductivity.solver_control_contracts import ExcludedSolverControlConfig, ExcludedSolverControlSourceManifest, SOURCE_MANIFEST_SOURCE_ID
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.registration import excluded_solver_control_registry
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.runtime import excluded_solver_control_protocol
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.source import expected_excluded_solver_control_source_manifest
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.system import CONTROL_UNIT_IDS, excluded_solver_control_experiment, excluded_solver_control_system, study_budget
 
 
 def excluded_solver_control_model_set(system: SystemSpec, experiment: ExperimentSpec) -> ViewModelSetSpec:

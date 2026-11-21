@@ -58,25 +58,25 @@ def test_publication_preserves_mounted_containment_and_checkout_refusal(tmp_path
 
 def _package(tmp_path):
     package = tmp_path / "src/package"
-    root = package / "adapters/methods"
+    root = package / "methods"
     root.mkdir(parents=True)
     return package, root
 
 
 def test_descriptor_discovery_is_closed_sorted_and_module_names_unchanged(tmp_path):
     package, root = _package(tmp_path)
-    first = root / "alpha/extension_bundle.py"
-    last = root / "zeta/extension_bundle.py"
+    first = root / "alpha/extension.py"
+    last = root / "zeta/extension.py"
     for path in (last, first):
         path.parent.mkdir()
         path.write_text("contribution = None\n")
-    other = package / "outside/extension_bundle.py"
+    other = package / "outside/extension.py"
     other.parent.mkdir()
     other.write_text("ignored\n")
-    assert discover_descriptors(package_root=package, roots=(root,), name="extension_bundle.py", kind="extension") == (first, last)
-    assert module_name(first, package_root=package) == "package.adapters.methods.alpha.extension_bundle"
+    assert discover_descriptors(package_root=package, roots=(root,), name="extension.py", kind="extension") == (first, last)
+    assert module_name(first, package_root=package) == "package.methods.alpha.extension"
     with pytest.raises(ValueError, match="absent or unsafe"):
-        discover_descriptors(package_root=package, roots=(root / "absent",), name="extension_bundle.py", kind="extension")
+        discover_descriptors(package_root=package, roots=(root / "absent",), name="extension.py", kind="extension")
 
 
 @pytest.mark.parametrize("linked", ("root", "ancestor", "descriptor"))
@@ -84,7 +84,7 @@ def test_both_descriptor_kinds_refuse_links(tmp_path, linked):
     package, root = _package(tmp_path)
     real = package / "real"
     real.mkdir()
-    for name in ("extension_bundle.py", "executable_binding.py"):
+    for name in ("extension.py", "public_facets.py"):
         (real / name).write_text("descriptor\n")
     if linked == "root":
         root.rmdir()
@@ -92,9 +92,9 @@ def test_both_descriptor_kinds_refuse_links(tmp_path, linked):
     elif linked == "ancestor":
         (root / "linked").symlink_to(real, target_is_directory=True)
     else:
-        for name in ("extension_bundle.py", "executable_binding.py"):
+        for name in ("extension.py", "public_facets.py"):
             (root / name).symlink_to(real / name)
-    for kind, name in (("extension", "extension_bundle.py"), ("executable", "executable_binding.py")):
+    for kind, name in (("extension", "extension.py"), ("executable", "public_facets.py")):
         with pytest.raises(ValueError, match="symlink"):
             discover_descriptors(package_root=package, roots=(root,), name=name, kind=kind)
 

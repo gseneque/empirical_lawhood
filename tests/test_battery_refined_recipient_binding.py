@@ -7,13 +7,13 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, science, native
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import recipient_bindings as owner
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.operation_bindings import source_policy_admission, record_identity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, WorkerInputKind, WorkerOutputPort
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, science, native
+from empirical_lawhood.domains.battery.battery_refined_inquiry import recipient_bindings as owner
+from empirical_lawhood.domains.battery.battery_refined_inquiry.operation_bindings import source_policy_admission, record_identity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, WorkerInputKind, WorkerOutputPort
 from tests.test_battery_refined_inquiry import selected as selected, table, exposed
 from tests.test_battery_refined_inquiry_binding import stock as stock, Port
 
@@ -81,7 +81,7 @@ class RefuseNative(importlib.abc.MetaPathFinder):
     def find_spec(self,fullname,path=None,target=None):
         if fullname.split('.')[0]=='pybamm': raise AssertionError('cold recipient imports native')
 sys.meta_path.insert(0,RefuseNative())
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import recipient_bindings as b
+from empirical_lawhood.domains.battery.battery_refined_inquiry import recipient_bindings as b
 assert len(b.operation_manifests())==len(b.operation_registrations())==20
 assert all(b.RecipientRunner(op).manifest for op in b.OPERATIONS)
 assert 'pybamm' not in sys.modules
@@ -203,11 +203,11 @@ def test_prior_cost_forgery_and_forecast_ordinal_substitution_refused(original, 
 
 def exposed_parent(original):
     """Unsigned software fixture metadata; not actual supplier qualification."""
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling, VisibilityCeiling
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.kernel.scientific_contributions import ContributionManifest, ContributionProduct
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, VisibilityCeiling
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
     rows = []
     for index, record in enumerate((original.supplier, original.source_gate, *original.traces)):
         identity = record_identity(record)
@@ -226,19 +226,19 @@ def exposed_parent(original):
 def test_actual_scheduler_canonical_receipts_and_callbacks_rejoin_complete_custody(original, tmp_path, monkeypatch, count):
     """PURE fixture emitters + actual gates/choices/reducers/custody, no native science."""
     from hashlib import sha256
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import recursive_translation as drafts
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import recursive_translation as drafts
     from empirical_lawhood.api.recursive_execution import _external_inputs
-    from empirical_lawhood.infrastructure.execution import DirectTaskExecutor, LocalScheduler
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.infrastructure.recursive_custody import read_recursive_products
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityRegistry
-    from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, RunnerRegistry
-    from empirical_lawhood.runtime.plans import PlanLane
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.local.execution import DirectTaskExecutor, LocalScheduler
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.recursive_custody import read_recursive_products
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityRegistry
+    from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry
+    from empirical_lawhood.execution.plans import PlanLane
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     from tests.runtime_platform.test_execution_scheduler import StaticExternalInputResolver
     from tests.test_recursive_public_service import _plane
     from tests.test_battery_refined_inquiry_binding import ExposedTraceEmitter
@@ -364,7 +364,7 @@ def test_comparator_choices_use_only_their_own_foregrounds_and_reference_failure
     broken = tuple(replace(row, disposition='TECHNICAL_FAILURE', error_type='ExposedFailure', error_message='software fixture')
                    if row.config.component_view == 'dfn-refined' else row for row in actual)
     unresolved = owner.assess_comparator(cfg, broken, direct)
-    from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition
+    from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition
     assert unresolved.assessment.disposition is AssessmentDisposition.UNEVALUABLE
     with pytest.raises(ValueError, match='complete raw reduction'):
         owner.validate_comparator_assessment(cfg, evaluated, broken)

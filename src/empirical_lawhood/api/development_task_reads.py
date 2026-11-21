@@ -7,10 +7,7 @@ from dataclasses import dataclass, field
 from functools import wraps
 from threading import RLock, get_ident
 
-from empirical_lawhood.infrastructure.artifacts import (
-    ConcurrentArtifactMemberPreflight, ExternalArtifactPlane, GuardedExternalRoot,
-    LocalFilesystemInspector, _has_stock_artifact_plane_state, _has_stock_manifest_reads,
-)
+from empirical_lawhood.storage.artifacts import ConcurrentArtifactMemberPreflight, ExternalArtifactPlane, GuardedExternalRoot, LocalFilesystemInspector, _has_stock_artifact_plane_state, _has_stock_manifest_reads
 
 
 @dataclass
@@ -99,7 +96,7 @@ class DevelopmentTaskReadScopes:
                 or not self._independent_reads_supported()):
             yield self
             return
-        from .selected_e3_access import original_e3_authority_read_context
+        from empirical_lawhood.api.selected_e3_access import original_e3_authority_read_context
         original = self._writer
         # The scheduler owns the eight task slots. A task's small metadata
         # reads must not create another eight-worker pool inside each slot.

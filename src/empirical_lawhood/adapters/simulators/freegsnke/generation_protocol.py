@@ -13,47 +13,22 @@ from dataclasses import fields
 import subprocess
 from typing import Protocol
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityManifest,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.candidate_compiler import (
-    CandidateGraphEdge,
-    CandidateGraphExternalInput,
-    CandidateGraphNode,
-    CandidateScientificGraph,
-    ContentIdentityPolicy,
-    ScientificInputRole,
-)
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityRegistration
-from empirical_lawhood.runtime.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.candidate_compiler import CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ScientificInputRole
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityRegistration
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, CampaignRuntimeProvider, ExternalInputPayload
 
-from .contracts import FREEGSNKE_TARGET_SAVED_PREPARATION_SCHEMA, FreeGsnkePhase, FreeGsnkeProcessRequest, FreeGsnkeSavedPreparation, FreeGsnkeSourceBinding, FreeGsnkeTargetEpisodeStatus, FreeGsnkeTargetProcessResponse, FreeGsnkeTargetWorkerInput
-from .registry import (
-    FREEGSNKE_CAPABILITY_VERSION,
-    FREEGSNKE_DEVELOPMENT_CAPABILITY_KEY,
-    FREEGSNKE_EVALUATION_CAPABILITY_KEY,
-    build_freegsnke_registry,
-)
-from .runtime import (
-    FreeGsnkeWorkerInvocation,
-    decode_freegsnke_target_response,
-    run_freegsnke_target_worker,
-    target_worker_failure_response,
-)
-from .worker_process import FreeGsnkeProgressSink
+from empirical_lawhood.domains.fusion.freegsnke.contracts import FREEGSNKE_TARGET_SAVED_PREPARATION_SCHEMA, FreeGsnkePhase, FreeGsnkeProcessRequest, FreeGsnkeSavedPreparation, FreeGsnkeSourceBinding, FreeGsnkeTargetEpisodeStatus, FreeGsnkeTargetProcessResponse, FreeGsnkeTargetWorkerInput
+from empirical_lawhood.adapters.simulators.freegsnke.registry import FREEGSNKE_CAPABILITY_VERSION, FREEGSNKE_DEVELOPMENT_CAPABILITY_KEY, FREEGSNKE_EVALUATION_CAPABILITY_KEY, build_freegsnke_registry
+from empirical_lawhood.adapters.simulators.freegsnke.runtime import FreeGsnkeWorkerInvocation, decode_freegsnke_target_response, run_freegsnke_target_worker, target_worker_failure_response
+from empirical_lawhood.adapters.simulators.freegsnke.worker_process import FreeGsnkeProgressSink
 
 
 FREEGSNKE_SOURCE_ARTIFACT_ID = "artifact.independent-substrate-grounding.freegsnke.source-binding"

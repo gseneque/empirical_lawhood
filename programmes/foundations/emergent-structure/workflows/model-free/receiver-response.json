@@ -1,0 +1,276 @@
+{
+  "schema": "model-free-matrix-definition.v1",
+  "label": "Fresh bounded H64 signed FACTOR response and shifted single-query transport",
+  "roots": [
+    {
+      "seed": 1800401,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800402,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800403,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800404,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800405,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800406,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800407,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800408,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800409,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800410,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800411,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800412,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800413,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800414,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800415,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    },
+    {
+      "seed": 1800416,
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "confirmation"
+    }
+  ],
+  "settings": {
+    "resources": {
+      "memory_bytes": 4294967296,
+      "wall_time_seconds": 14400,
+      "output_bytes": 2147483648
+    },
+    "evidence_scope": "FRESH_CONFIRMATION",
+    "alpha": "0.05",
+    "inference": {
+      "module_alpha_weights": {
+        "M0": "0.01",
+        "M1": "0.03",
+        "M2": "0.01",
+        "M3": "0.80",
+        "M4": "0.12",
+        "M5": "0.01",
+        "M6": "0.01",
+        "M7": "0.01"
+      }
+    },
+    "native": {
+      "coordinates": [
+        {
+          "id": "nominal",
+          "temperature": "1",
+          "friction": "1",
+          "cross_coupling": "1"
+        },
+        {
+          "id": "low-coupling",
+          "temperature": "1",
+          "friction": "1",
+          "cross_coupling": "0.5"
+        },
+        {
+          "id": "high-coupling",
+          "temperature": "1",
+          "friction": "1",
+          "cross_coupling": "2"
+        },
+        {
+          "id": "temperature-1-125",
+          "temperature": "1.125",
+          "friction": "1",
+          "cross_coupling": "1"
+        },
+        {
+          "id": "temperature-3-25",
+          "temperature": "3.25",
+          "friction": "1",
+          "cross_coupling": "1"
+        }
+      ],
+      "horizon_ticks": 64
+    },
+    "response": {
+      "selection_tick": 32
+    },
+    "transfer": {
+      "source_coordinate_id": "nominal",
+      "destination_coordinate_ids": [
+        "nominal",
+        "temperature-1-125",
+        "temperature-3-25",
+        "high-coupling"
+      ],
+      "probe_action_budget": 24
+    },
+    "confirmation": {
+      "capacity_basis": "AUTHENTICATED_PARENT_AND_OPERATOR_MEASURED_HOST",
+      "endpoints": [
+        {
+          "name": "M3.signed_response_contrast",
+          "practical_effect": "0.001",
+          "units": "actuator-normalized-response"
+        }
+      ],
+      "independent_verification": [
+        "COMPLETE_ASSIGNED_AND_FAILED_ROOT_CENSUS",
+        "INDEPENDENT_ANALYSIS_OPERATION",
+        "COUPLED_H_H2_H4",
+        "WITHHELD_FUTURE_SUFFIX"
+      ],
+      "parent_readout_sha256": "bf28978c9857165a49e1e40331d3a5ea1825d46faa1be65aa32ef3d4b5b760ac",
+      "population_target": "COMPLETE_ASSIGNED_ROOT_POPULATION",
+      "target_law": "DECLARED_FINITE_AGE_ROOT_LAW",
+      "precision_goal": "DETECTION_ONLY",
+      "stopping_rule": "FIXED_ROOT_CENSUS_AND_PREDECLARED_RECORD_LADDER"
+    },
+    "receiver_study": {
+      "revision": "matrix-receiver-study.v2",
+      "instrument": "SELECT_ORIGINAL_SCI02C",
+      "M1": {
+        "structural_service": false
+      },
+      "M3": {
+        "signed_coordinates": [
+          "nominal",
+          "low-coupling",
+          "high-coupling"
+        ],
+        "signed_halfwidth": "0.001",
+        "view_allowance": "0.0001",
+        "absolute_block_allowance": "0.01",
+        "selection_disagreement": "0.0005",
+        "reconstruction_tolerance": "0.0000000001",
+        "enrichment_directions": 4,
+        "dense_seed_modulus": 8,
+        "panels": [
+          0,
+          1
+        ]
+      },
+      "M4": {
+        "destination_ids": [
+          "nominal",
+          "temperature-1-125",
+          "temperature-3-25",
+          "high-coupling"
+        ],
+        "signed_pair_allowance": "0.01",
+        "probe_columns": 24,
+        "local_columns": 48
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Exposed declared observation controls, never scientific battery acquisition."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from decimal import Decimal as D
@@ -13,18 +14,20 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, durable_roster as dr
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import preparation_contracts as pc, preparation_science as ps
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_native as base, segmented_observation_contracts as oc
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_observation_native as native, segmented_science as ss
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.source_derived_preparation import supply_source_roots, assess_source_roots
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkUncertainContact
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, durable_roster as dr
+from empirical_lawhood.domains.battery.battery_refined_inquiry import preparation_contracts as pc, preparation_science as ps
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as base
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_observation_contracts as oc
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_observation_native as native
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_science as ss
+from empirical_lawhood.domains.battery.battery_refined_inquiry.source_derived_preparation import supply_source_roots, assess_source_roots
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkUncertainContact
 from tests.runtime_platform.test_native_subwork import _plane, _store
 from tests.test_battery_durable_graph import stock as old_stock_fixture
 from tests.test_battery_segmented_native import custody as old_custody_fixture, exposed_backend, selected as selected_fixture
@@ -67,12 +70,12 @@ def _custody(tmp_path, selected, observation, method_index, *, selected_abi_payl
         result = plane.write(ArtifactWriteRequest(name, "inputs/" + name + ".json", record.SCHEMA,
             ArtifactProfile.CANONICAL_JSON, "application/json", "exposed.observation.inputs", "inputs", record.canonical_bytes(),
             VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
-        manifests.append(decode_artifact_manifest(plane.root.resolve(result.materialization.relative_path + ".manifest.json", for_write=False).read_bytes()))
+        manifests.append(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()))
     for source, payload in ((abi, abi_payload), (resource_source, resource_payload)):
         result = plane.write(ArtifactWriteRequest(source.object_id, "inputs/" + source.object_id + ".json", source.object_schema,
             ArtifactProfile.RAW_SOURCE_BYTES, "text/plain", "exposed.observation.inputs", "inputs", payload,
             VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
-        manifests.append(decode_artifact_manifest(plane.root.resolve(result.materialization.relative_path + ".manifest.json", for_write=False).read_bytes()))
+        manifests.append(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()))
     manifests = tuple(sorted(manifests, key=lambda row: row.materialization.materialization_id))
     parent = NativeEffectContact("exposed.observation", "battery.observation", "exposed.observation.effect",
         old.store.parent_contact.execution_plan,
@@ -275,6 +278,6 @@ def test_resource_snapshots_do_not_become_bounds_or_effect_authority():
 
 
 def test_observation_native_owner_import_is_inert():
-    result = subprocess.run((sys.executable, "-c", "import sys; import empirical_lawhood.adapters.methods.battery_refined_inquiry.segmented_observation_native; assert 'pybamm' not in sys.modules; assert 'numpy' not in sys.modules"),
+    result = subprocess.run((sys.executable, "-c", "import sys; import empirical_lawhood.adapters.battery.battery_refined_inquiry.segmented_observation_native; assert 'pybamm' not in sys.modules; assert 'numpy' not in sys.modules"),
         capture_output=True, text=True, check=False)
     assert result.returncode == 0, result.stderr

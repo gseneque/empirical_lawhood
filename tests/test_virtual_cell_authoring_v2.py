@@ -6,14 +6,14 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.formal_gaps import FormalDomain, FormalGapRegister, FormalGapSpec, FormalGapEvidenceWorld
-from empirical_lawhood.planning.study_authoring import DesignInputRecord, DesignInputRole
-from empirical_lawhood.runtime.candidate_compiler import AuthoringMaterializationIdentity, CandidateCompilationDisposition, compile_study_candidate
-from empirical_lawhood.adapters.physical.virtual_cell.authoring import build_virtual_cell_authoring_bundle
-from empirical_lawhood.adapters.physical.virtual_cell.authoring_v2 import project_authoring_bundle_v2
-from empirical_lawhood.adapters.physical.virtual_cell.materialization import TargetFeatureMaterializationReceipt
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.formal_gaps import FormalDomain, FormalGapRegister, FormalGapSpec, FormalGapEvidenceWorld
+from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole
+from empirical_lawhood.execution.candidate_compiler import AuthoringMaterializationIdentity, CandidateCompilationDisposition, compile_study_candidate
+from empirical_lawhood.domains.biology.virtual_cell.authoring import build_virtual_cell_authoring_bundle
+from empirical_lawhood.domains.biology.virtual_cell.authoring_v2 import project_authoring_bundle_v2
+from empirical_lawhood.domains.biology.virtual_cell.materialization_records import TargetFeatureMaterializationReceipt
 from tests.test_virtual_cell_ports_v2 import _metadata
 
 
@@ -65,7 +65,7 @@ def test_projected_authoring_compiles_through_standard_service_preserving_origin
 @pytest.mark.parametrize("damage", ["absent", "exposed", "changed-cutoff"])
 def test_current_selection_cannot_inherit_historical_provenance_or_hide_exposure(damage):
     from decimal import Decimal
-    from empirical_lawhood.adapters.physical.virtual_cell.contracts import VirtualCellContractError
+    from empirical_lawhood.domains.biology.virtual_cell.contracts import VirtualCellContractError
 
     original, selection = _original()
     if damage == "absent":

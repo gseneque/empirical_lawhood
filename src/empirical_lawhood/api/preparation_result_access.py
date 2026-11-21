@@ -1,10 +1,10 @@
 """Actual issued run and effective grant checks before protected output contact."""
 
 
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore, ExternalIssuedStudyPublisher, PROGRAMME_ISSUE_GRANTEE_ID
-from empirical_lawhood.adapters.methods.preparation_applicability.result_access import PREPARATION_PROTECTED_OUTCOMES
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore, ExternalIssuedStudyPublisher, PROGRAMME_ISSUE_GRANTEE_ID
+from empirical_lawhood.domains.matrix.preparation_applicability.result_access import PREPARATION_PROTECTED_OUTCOMES
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def authenticate_preparation_result_access(*, context, receipt, logical, writer, include_package=False):
@@ -27,7 +27,7 @@ def authenticate_preparation_result_access(*, context, receipt, logical, writer,
 
 def preparation_result_access(*, run_id, issued_study_id, execution_authority_id, reveal_authority_id, writer):
     """Resolve selected IDs from the actual publication and authority stores."""
-    from empirical_lawhood.adapters.methods.preparation_applicability.result_access import PreparationApplicabilityResultAccess
+    from empirical_lawhood.domains.matrix.preparation_applicability.result_access import PreparationApplicabilityResultAccess
     store = ExternalStudyOperationAuthorityStore(writer)
     issued = ExternalIssuedStudyPublisher(artifact_plane=writer, authority_store=store,
         grantee_id=PROGRAMME_ISSUE_GRANTEE_ID).load_executable_study(issued_study_id).manifest

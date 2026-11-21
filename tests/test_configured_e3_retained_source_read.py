@@ -14,11 +14,11 @@ import pytest
 
 from empirical_lawhood.api.domain_composition.matrix_configured_protected_response import scientific_read as owner
 from empirical_lawhood.api.prospective_experiment import RetainedProspectiveExperiment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.prospective_experiment import PreparedProspectiveExperimentHandoff, source_filename
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.prospective_experiment import PreparedProspectiveExperimentHandoff, source_filename
 from tests.test_matrix_e3_secondary_selection import originals as originals  # noqa: F401
 from tests.test_matrix_e3_secondary_selection import current_selection, target_for, published
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_secondary_readout as secondary
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_secondary_readout as secondary
 
 
 def _retained(selection):

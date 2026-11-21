@@ -9,11 +9,12 @@ from decimal import Decimal
 import pytest
 
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.bridge import ReactorBridge
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.contracts import ReactorCommand
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.panel import native_task_id
+from empirical_lawhood.domains.reactor.reactor_prefix_response.contracts import ReactorCommand
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_panel import native_task_id
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.packaged_source import load_packaged_reactor_source
 
 
+@pytest.mark.numerical(oracle='With no initial reactant A and zero feed, reaction heat vanishes. Compare the bounded native RK4 trajectory with the independent sum-of-exponentials solution of the coupled linear jacket/reactor ODE, including declared sensor delay and noise.')
 def test_native_clipping_rate_limit_realized_exposure_and_delayed_receiver() -> None:
     source = load_packaged_reactor_source()
     params = json.loads(source.plant_params)

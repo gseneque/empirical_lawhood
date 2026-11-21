@@ -1,0 +1,34 @@
+{
+  "schema": "empirical-lawhood/presentation/brand-assets",
+  "version": "1.0.0",
+  "selection": "EL blog design; recursive equal-circle explorer and retained gentle-growth tools marks",
+  "assets": [
+    {
+      "file": "el-logo.svg",
+      "sha256": "34acdcab6d42568a177b2b551d806c0037e581b3d8b8f53f8c200c2d30bdc36f",
+      "size_bytes": 635,
+      "source": "docs/blog/brand/el-logo.svg",
+      "license": "CC-BY-4.0",
+      "modifications": "NONE"
+    },
+    {
+      "file": "InterVariable.woff2",
+      "sha256": "f400d1c19888bd3d9e10ff991d6234744efae6958a9b911f6c3813ec66d54e70",
+      "size_bytes": 349360,
+      "source": "docs/blog/logostudies/assets/InterVariable.woff2",
+      "license": "OFL-1.1",
+      "modifications": "NONE"
+    },
+    {
+      "file": "el-equal-circles.svg",
+      "sha256": "bb5ea35de31de78989f5fa76efcda584c9c940b3b3d45568782770850467faff",
+      "size_bytes": 1040,
+      "source": "docs/blog/logostudies/variants/i-equal-circles.svg",
+      "license": "CC-BY-4.0",
+      "modifications": "NONE"
+    }
+  ],
+  "font_upstream": "https://github.com/rsms/inter",
+  "font_license": "Inter-LICENSE.txt",
+  "font_license_sha256": "262481e844521b326f5ecd053e59b98c8b2da78c8ee1bdbb6e8174305e54935a"
+}

@@ -3,21 +3,21 @@
 
 from dataclasses import replace
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile
-from empirical_lawhood.runtime.providers import CapabilityOutputSemanticContract, ExternalInputPayload
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .config_v2 import VirtualCellPipelineSelectionV2
-from .correction_records_v2 import OfficialMetricSetV2
-from .custody_transport_v2 import CanonicalEvidenceV2
-from .ports_v2 import CAPABILITY_VERSION_V2, ORIGINAL_CONFIG_INPUT_ID_V2, virtual_cell_capability_registry_v2
-from .protocol import CONFIG_ARTIFACT_ID
-from .provider import VirtualCellCampaignRuntimeProvider, _JSON_TYPES, _PROFILE_BY_SCHEMA
-from .records_v2 import ModelDevelopmentRecordV2, ModelSelectionRecordV2, PredictionFreezeRecordV2, OfficialEvaluationRecordV2, RAW_PREDICTION_DELTAS_SCHEMA
-from .runtime import canonical_json_record_value_keys
-from .task_runner_v2 import VirtualCellTaskRunnerV2
+from empirical_lawhood.domains.biology.virtual_cell.config_v2 import VirtualCellPipelineSelectionV2
+from empirical_lawhood.domains.biology.virtual_cell.correction_records_v2 import OfficialMetricSetV2
+from empirical_lawhood.domains.biology.virtual_cell.custody_transport_v2 import CanonicalEvidenceV2
+from empirical_lawhood.domains.biology.virtual_cell.ports_v2 import CAPABILITY_VERSION_V2, ORIGINAL_CONFIG_INPUT_ID_V2, virtual_cell_capability_registry_v2
+from empirical_lawhood.domains.biology.virtual_cell.protocol import CONFIG_ARTIFACT_ID
+from empirical_lawhood.adapters.physical.virtual_cell.provider import VirtualCellRuntimePortsBase, _JSON_TYPES, _PROFILE_BY_SCHEMA
+from empirical_lawhood.domains.biology.virtual_cell.records_v2 import ModelDevelopmentRecordV2, ModelSelectionRecordV2, PredictionFreezeRecordV2, OfficialEvaluationRecordV2, RAW_PREDICTION_DELTAS_SCHEMA
+from empirical_lawhood.adapters.physical.virtual_cell.runtime import canonical_json_record_value_keys
+from empirical_lawhood.adapters.physical.virtual_cell.task_runner_v2 import VirtualCellTaskRunnerV2
 
 
 class VirtualCellConfigDecoderV2:
@@ -40,7 +40,7 @@ class VirtualCellConfigDecoderV2:
             raise ValueError("corrected config bytes differ from their frozen selection")
 
 
-class VirtualCellCampaignRuntimeProviderV2(VirtualCellCampaignRuntimeProvider):
+class VirtualCellCampaignRuntimeProviderV2(VirtualCellRuntimePortsBase):
     def __init__(self, *, selection, **kwargs):
         super().__init__(**kwargs)
         selection.validate_original(self.config)

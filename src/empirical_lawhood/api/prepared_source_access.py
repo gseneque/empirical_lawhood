@@ -9,15 +9,13 @@ from contextlib import contextmanager
 from dataclasses import dataclass, fields, replace
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods import matrix_prepared_source_experiment as domain
-from empirical_lawhood.adapters.methods.matrix_prepared_source_records import (
-    MatrixPreparedSourceGateConfig, MatrixPreparedSourceScope, gate_configs,
-)
-from empirical_lawhood.adapters.methods.matrix_prepared_source_assembly import prepared_assembly_request_types, prepared_assembly_request_kind, DEVELOPMENT_TYPES
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
+from empirical_lawhood.domains.matrix import matrix_prepared_source_experiment as domain
+from empirical_lawhood.domains.matrix.matrix_prepared_source_records import MatrixPreparedSourceGateConfig, MatrixPreparedSourceScope, gate_configs
+from empirical_lawhood.domains.matrix.matrix_prepared_source_assembly import prepared_assembly_request_types, prepared_assembly_request_kind, DEVELOPMENT_TYPES
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
 from empirical_lawhood.api import selected_prepared_access as original
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactManifest, lineage_parent_sort_key
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactManifest, lineage_parent_sort_key
 
 
 def _specification(value):
@@ -27,19 +25,14 @@ def _specification(value):
 
 
 def _graph_record_types():
-    from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft, RecursiveScientificSelection
-    from empirical_lawhood.runtime.candidate_compiler import StudyTemplate, ExecutableStudyCompilationReport, ExecutableStudyCandidate
-    from empirical_lawhood.runtime.plans import CandidateRunPlan, CandidateExecutionPlan
-    from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec
-    from empirical_lawhood.planning.experiment_entry import ExecutableStudyDefinition
-    from empirical_lawhood.runtime.recursive_prospective_envelope import (
-        RecursiveProspectiveAuthoringEnvelope, RecursiveProspectiveAuthoringEnvelopeV3,
-        RecursiveProspectiveAuthoringEnvelopeV4,
-    )
+    from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft, RecursiveScientificSelection
+    from empirical_lawhood.execution.candidate_compiler import StudyTemplate, ExecutableStudyCompilationReport, ExecutableStudyCandidate
+    from empirical_lawhood.execution.plans import CandidateRunPlan, CandidateExecutionPlan
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec
+    from empirical_lawhood.design.experiment_entry import ExecutableStudyDefinition
     return (RecursiveStudyDraft, RecursiveScientificSelection, StudyTemplate, ExecutableStudyCompilationReport,
         ExecutableStudyCandidate, CandidateRunPlan, CandidateExecutionPlan, RecursiveProspectiveAuthoringSpec,
-        ExecutableStudyDefinition, RecursiveProspectiveAuthoringEnvelope,
-        RecursiveProspectiveAuthoringEnvelopeV3, RecursiveProspectiveAuthoringEnvelopeV4)
+        ExecutableStudyDefinition)
 
 
 @dataclass(frozen=True, slots=True)
@@ -111,7 +104,7 @@ def authenticated_prepared_source_access(*, scope, locator):
 
 def _original_access(*, artifact_writer, request, development, read_access=None):
     from empirical_lawhood.api.matrix_programme_e4_inputs import _require_original_e3_access, prepared_source_lineage
-    from empirical_lawhood.infrastructure.publication_metadata import read_publication_metadata
+    from empirical_lawhood.storage.publication_metadata import read_publication_metadata
 
     if type(request) not in prepared_assembly_request_types() or type(development) not in DEVELOPMENT_TYPES:
         raise TypeError("prepared source bootstrap requires its exact original request and DEV locator")
@@ -158,7 +151,7 @@ def _companions(bindings, read):
 
 def bootstrap_selected_input_access(*, specification, selection, read_locator, artifact_writer,
         read_access=None, selection_path=None):
-    from empirical_lawhood.planning.experiment_inputs import ExperimentInputSelection, ExperimentFileInputSelection
+    from empirical_lawhood.design.experiment_inputs import ExperimentInputSelection, ExperimentFileInputSelection
 
     _specification(specification)
     if type(selection) not in (ExperimentInputSelection, ExperimentFileInputSelection):
@@ -260,10 +253,9 @@ def require_prepared_source_scope(scope, specification, read_access):
 def bootstrap_assembly_selected_input_access(*, specification, selection, read_locator, artifact_writer,
         read_access=None, selection_path=None):
     """Read existing request/DEV locators before the assembly programme body."""
-    from empirical_lawhood.adapters.methods.matrix_prepared_source_assembly import (
-        MatrixPreparedSourceAssemblySpecification, MatrixPreparedRetainedE3AssemblySpecification)
-    from empirical_lawhood.planning.experiment_inputs import ExperimentInputSelection, ExperimentFileInputSelection
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_assembly as assembly
+    from empirical_lawhood.domains.matrix.matrix_prepared_source_assembly import MatrixPreparedSourceAssemblySpecification, MatrixPreparedRetainedE3AssemblySpecification
+    from empirical_lawhood.design.experiment_inputs import ExperimentInputSelection, ExperimentFileInputSelection
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_assembly as assembly
     if type(specification) not in (MatrixPreparedSourceAssemblySpecification, MatrixPreparedRetainedE3AssemblySpecification):
         raise TypeError("prepared source assembly bootstrap requires its exact specification")
     specification.__post_init__()

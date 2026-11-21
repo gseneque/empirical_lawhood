@@ -3,22 +3,18 @@
 from contextlib import ExitStack, contextmanager
 from dataclasses import replace
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import source_continuation as domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import PHASES
-from empirical_lawhood.runtime.retained_e3_repair import RetainedE3RepairRecoveryIndex
-from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
-from empirical_lawhood.runtime.progress import report_progress
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import source_continuation as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import PHASES
+from empirical_lawhood.execution.retained_e3_repair import RetainedE3RepairRecoveryIndex
+from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
+from empirical_lawhood.execution.progress import report_progress
 
-from .matrix_researcher_programme_lineage import read_published_record, retained_run_binding
-from .matrix_programme_source_continuation import (
-    _OriginalExecutionCustody, _pin, _pin_original_selection, _predecessor,
-)
+from empirical_lawhood.api.matrix_researcher_programme_lineage import read_published_record, retained_run_binding
+from empirical_lawhood.api.matrix_programme_source_continuation import _OriginalExecutionCustody, _pin, _pin_original_selection, _predecessor
 
 
 def require_numerical_continuity(original, current):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import (
-        require_numerical_source_continuity, source_binding,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import require_numerical_source_continuity, source_binding
     require_numerical_source_continuity(source_binding(original), source_binding(current))
 
 
@@ -77,7 +73,7 @@ def completed_e4_terminals(report):
 @contextmanager
 def recorded_completed_e4_custody(owner, context, record):
     """Hold both exact execution censuses through a recorded handoff's use."""
-    from .recursive_execution import _custody_control_pins
+    from empirical_lawhood.api.recursive_execution import _custody_control_pins
     controls = []
     report = owner._read_phase(context, 'e4.development', execution_only=True,
         observe_controls=lambda index, pins: controls.append((index, pins)))
@@ -103,10 +99,10 @@ def recorded_completed_e4_custody(owner, context, record):
 @contextmanager
 def original_completed_custody(owner, context):
     """Authenticate completed phases and keep their original grants live."""
-    from .matrix_researcher_programme import _phase_complete
-    from .recursive_execution import _custody_control_pins
-    from .matrix_programme_retained_bank_metadata import retained_e4_bank_metadata
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.api.matrix_researcher_programme import _phase_complete
+    from empirical_lawhood.api.recursive_execution import _custody_control_pins
+    from empirical_lawhood.api.matrix_programme_retained_bank_metadata import retained_e4_bank_metadata
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
     if context.service.storage_profile is None:
         raise ValueError('completed source continuation requires the selected operator profile')
@@ -123,7 +119,7 @@ def original_completed_custody(owner, context):
             if observed.get('execution_complete') is True:
                 _, structure_terminal = completed_e4_terminals(observed)
                 e4_report, phases = observed, domain.COMPLETED_E4_PHASES
-        from .matrix_programme_unentered_e4 import unentered_e4_custody
+        from empirical_lawhood.api.matrix_programme_unentered_e4 import unentered_e4_custody
         unentered = None if e4_report is not None else lifetime.enter_context(unentered_e4_custody(current))
         metadata_guard = (None if unentered is not None or e4_report is not None
             else lifetime.enter_context(retained_e4_bank_metadata(current)))
@@ -184,7 +180,7 @@ def original_completed_custody(owner, context):
                 for _, products in current._e3_products:
                     products.require_current()
             else:
-                from .retained_e3_evidence import current_e3_evidence
+                from empirical_lawhood.api.retained_e3_evidence import current_e3_evidence
                 evidence = current_e3_evidence(writer)
                 if evidence is not None:
                     evidence.require_access()
@@ -214,10 +210,8 @@ def continued_context(owner, context, record):
         raise PermissionError('completed source continuation changes operations or lacks a new source')
     with original_owner._read_context(original_plan, operation=context.operation) as original, ExitStack() as lifetime:
         require_numerical_continuity(original.inputs.producing_provenance, context.inputs.producing_provenance)
-        from empirical_lawhood.adapters.methods.matrix_researcher_programme.completed_source import (
-            MatrixCompletedE3InputSource, validate_completed_inputs,
-        )
-        from empirical_lawhood.infrastructure.matrix_completed_source import read_completed_source, original_e3_commitment, original_e3_programme_inputs
+        from empirical_lawhood.domains.matrix.matrix_researcher_programme.completed_source import MatrixCompletedE3InputSource, validate_completed_inputs
+        from empirical_lawhood.adapters.matrix_storage.matrix_completed_source import read_completed_source, original_e3_commitment, original_e3_programme_inputs
         source = read_completed_source(context.writer, context.commitments)
         selected = original_e3_commitment(context.writer, original.inputs, original.plan.specification.input_commitments)
         original_inputs = lifetime.enter_context(original_e3_programme_inputs(writer=context.writer,

@@ -7,15 +7,12 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Generic, TypeVar
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_value
-from empirical_lawhood.planning.datasets import (
-    AcquisitionState,
-    CustodyState,
-    DatasetBindingRole,
-    ExternalIdentifier,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityKind
-from empirical_lawhood.runtime.datasets import DatasetCatalogRecordKind
+from empirical_lawhood.api.diagnostics import OperationDiagnostic
+
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_value
+from empirical_lawhood.design.datasets import AcquisitionState, CustodyState, DatasetBindingRole, ExternalIdentifier
+from empirical_lawhood.execution.capabilities import CapabilityKind
+from empirical_lawhood.execution.datasets import DatasetCatalogRecordKind
 
 
 class OperationStatus(StrEnum):
@@ -47,6 +44,7 @@ class ApiError:
     reason_code: str
     message: str
     field: str | None = None
+    diagnostic: OperationDiagnostic | None = None
 
 
 PayloadT = TypeVar("PayloadT", covariant=True)
@@ -89,6 +87,7 @@ class ApiResult(Generic[PayloadT]):
                     "field": error.field,
                     "message": error.message,
                     "reason_code": error.reason_code,
+                    "diagnostic": None if error.diagnostic is None else error.diagnostic.to_mapping(),
                 }
                 for error in self.errors
             ],

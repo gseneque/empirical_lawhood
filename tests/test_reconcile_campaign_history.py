@@ -13,8 +13,8 @@ import pytest
 
 from empirical_lawhood.api import recursive_authoring
 from empirical_lawhood.api.results import ResumeCampaignRequest, RunCampaignRequest
-from empirical_lawhood.infrastructure.execution import DirectTaskExecutor, InjectedSchedulerCrash, LocalScheduler
-from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog
+from empirical_lawhood.execution.local.execution import DirectTaskExecutor, InjectedSchedulerCrash, LocalScheduler
+from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog
 from tests.execution_support import ENFORCING_TEST_EXECUTOR_CAPABILITY
 from tests.runtime_platform import test_recursive_prospective_workflow as fixtures
 from tests.test_issued_worker_preparation import _binding

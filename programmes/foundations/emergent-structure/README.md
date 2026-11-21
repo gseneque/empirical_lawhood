@@ -31,13 +31,21 @@ The [scientific record index](records/README.md) provides the retained document 
 
 | Study | Design | Result | Supported operation | Evidence availability |
 |---|---|---|---|---|
+| Consolidated v1.0 classical matrix series | [Scientific definition](workflows/classical-series/science.md) | Completed 290 production and 81 retained reanalysis operations. The 880 root/stage comparisons agreed. Qualification remains `NOT_ESTABLISHED`. | [Execution and read guide](../../../docs/v1.0/classical-matrix-series.md) | The 17 November 2026 assessment is retained with the original production and reanalysis. The [historical crosswalk](workflows/classical-series/history.md) identifies the earlier populations. |
 | Earlier geometry and response studies | [Study design](../../../paper/SOURCES.md#paper-studies-and-current-software) | [Findings](../../../paper/revision-and-evidence-notes.md) | [Run guide](workflows/matrix-geometry/guide.md) | Public documentary account; historical primary records remain external. |
 | Matrix E1–E6 | [Study design](records/matrix-programme.md) | [Findings](records/release-results.md) | [Run guide](workflows/matrix-programme/guide.md) | Original completed reports and nonentry records remain in external custody. |
+| SCI02 preparation and H64 shortcut | [Study design](workflows/matrix-preparation-shortcut/protocol-v1.md) | Separate study; acquisition and findings require original custody | [Run guide](workflows/matrix-preparation-shortcut/guide.md) | DEV8 successor composition; no inherited molecular or scientific qualification. |
+| SCI02-B paired descriptions and finite reuse | [Successor protocol](workflows/matrix-preparation-shortcut/protocol-b-v1.md) | Retained original DEV8; bounded candidate comparison | [Run guide](workflows/matrix-preparation-shortcut/guide-b.md) | [Completed development result](records/matrix-sci02b-development-result.md): both candidates pass 7/8; registered menu closed before calibration. |
+| SCI02-C consumer prediction and selective correction | [Protocol](workflows/matrix-preparation-shortcut/protocol-c-v1.md) | [Completed result](records/matrix-sci02c-result.md) | [Run guide](workflows/matrix-preparation-shortcut/guide-c.md) | Eight training, eight calibration and 32 held roots; 8/32 forecast margin wins, 0/32 reduced deliveries. |
+| SCI02-D paired equilibrium estimator bridge | [Protocol](workflows/matrix-equilibrium-bridge/protocol-v1.md) | [Completed result](records/matrix-sci02d-result.md) | [Run guide](workflows/matrix-equilibrium-bridge/guide.md) | Sixteen training, 64 confirmation and eight references; full production retained, no demonstrated 20% complete-cost saving or molecular qualification. |
 | History and passive prediction | [Study design](records/matrix-history-analysis-v1.md) | [Findings](records/matrix-deanneal-numerical-assay.md) | [Run guide](workflows/matrix-history-analysis/guide.md) | Retained selected-history findings do not establish a fresh population result. |
 | Forecast and preparation applicability | [Study design](records/empirical-lawhood.constructed-preparation-applicability.md) | [Findings](../../../paper/revision-and-evidence-notes.md) | [Run guide](workflows/preparation-applicability/guide.md) | Original paper evidence and new execution have separate producing identities. |
 
 ## Available workflows
 
+- [Model-free M0–M7 matrix programme](../../../docs/v1.0/model-free-matrix-programme.md) and [results of the five receiver studies](records/model-free-receiver-results.md), including signed-response failures, direct fallbacks, transfer and commitment entry.
+
+- [Consolidated capstone/E1–E6 classical matrix series](../../../docs/v1.0/classical-matrix-series.md).
 - [Causal response: fitted-bank authoring and retained development](workflows/causal-response/guide.md).
 - [Causal-transfer adequacy: authenticated post-hoc parent inspection](workflows/causal-transfer-audit/guide.md).
 - [Finite response law: current forecast-mediated reuse](workflows/finite-response-law/guide.md).
@@ -47,6 +55,10 @@ The [scientific record index](records/README.md) provides the retained document 
 - [Current matrix inputs and finite operands](workflows/matrix-inputs/guide.md).
 - [Assess native factor-response utility](workflows/matrix-native-utility/guide.md).
 - [Matrix E1–E6 researcher programme](workflows/matrix-programme/guide.md).
+- [SCI02 preparation and H64 shortcut study](workflows/matrix-preparation-shortcut/guide.md).
+- [SCI02-B paired descriptions and finite reuse](workflows/matrix-preparation-shortcut/guide-b.md).
+- [SCI02-C consumer prediction and selective correction](workflows/matrix-preparation-shortcut/guide-c.md).
+- [SCI02-D paired equilibrium estimator bridge](workflows/matrix-equilibrium-bridge/guide.md).
 - [Declarative Matrix response-error experiment](workflows/matrix-response-experiment/guide.md).
 - [Selected protected E4 calibration and confirmation](workflows/matrix-selected-e4-protected/guide.md).
 - [Selected E4 revision from original DEV acquisition](workflows/matrix-selected-e4-revision/guide.md).

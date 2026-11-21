@@ -10,14 +10,14 @@ import pytest
 
 from empirical_lawhood.api import native_continuation_preparation as owner
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
-from empirical_lawhood.infrastructure.native_parent_finalization import NativeParentFinalizationPending
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.native_continuation_proposal import DevelopmentNativeContinuationProposal
-from empirical_lawhood.runtime.native_effects import NativeEntryRefused
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+from empirical_lawhood.storage.native_parent_finalization import NativeParentFinalizationPending
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.native_continuation_proposal import DevelopmentNativeContinuationProposal
+from empirical_lawhood.execution.native_effects import NativeEntryRefused
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
 from tests.runtime_platform.test_native_parent_finalization_scheduler import _runtime
 
 
@@ -93,10 +93,11 @@ def test_complete_original_proposal_preserves_begun_and_unknown_without_executio
     assert not proposal.execution_authorized and proposal.additional_independent_observations == 0
     assert decode_canonical_bytes(proposal.canonical_bytes(), type(proposal), maximum_bytes=None) == proposal
     assert _files(state.root) == before
+    assert replace(proposal, pure_output_bytes=256 * 1024**2 + 1).pure_output_bytes == 256 * 1024**2 + 1
     for changes in ({'execution_authorized': True}, {'additional_independent_observations': 1},
             {'original_run_id': 'substitute.run'}, {'candidates': ()}, {'native_task_ids': ()},
             {'worker_environment': replace(proposal.worker_environment, interpreter_path='/another/python')},
-            {'pure_output_bytes': 256 * 1024**2 + 1}):
+            {'pure_output_bytes': 0}):
         with pytest.raises((ValueError, TypeError)):
             replace(proposal, **changes)
     with pytest.raises(ValueError, match='completed or unselected'):
@@ -147,7 +148,7 @@ def test_changed_registry_and_current_access_refuse_before_proposal(interrupted,
 
 def _public_selection(state, tmp_path, monkeypatch, *, require_access=lambda: None):
     from empirical_lawhood.api import recursive_authoring, recursive_execution
-    from empirical_lawhood.infrastructure import run_source_admission, source_closure
+    from empirical_lawhood.storage import run_source_admission, source_closure
     source = state.invocation.implementation
     monkeypatch.setattr(run_source_admission, '_capture_source', lambda _: object())
     monkeypatch.setattr(recursive_authoring, 'implementation_binding', lambda *a, **k: source)
@@ -176,7 +177,7 @@ def test_public_preparation_publishes_only_separate_proposal_and_retains_origina
     state = interrupted
     options = _public_selection(state, tmp_path, monkeypatch)
     before = _files(state.root)
-    from empirical_lawhood.infrastructure.execution import LocalScheduler
+    from empirical_lawhood.execution.local.execution import LocalScheduler
     monkeypatch.setattr(LocalScheduler, 'execute', lambda *a, **k: pytest.fail('preparation dispatched work'))
     monkeypatch.setattr(ExternalNativeSubworkStore, 'recover', lambda *a, **k: pytest.fail('preparation recovered native work'))
     result = ExperimentProgrammeService(tmp_path, state.plane).prepare_native_continuation(**options)
@@ -201,7 +202,7 @@ def test_public_preparation_refuses_revoked_access_or_late_original_changes(inte
         if boundary == 'initial-access' or boundary == 'closing-access' and published:
             raise PermissionError('disclosed current access revoked')
     options = _public_selection(state, tmp_path, monkeypatch, require_access=access)
-    from empirical_lawhood.infrastructure import source_closure
+    from empirical_lawhood.storage import source_closure
     def source_current(*args):
         if boundary == 'closing-source' and published:
             raise PermissionError('disclosed preparation source changed')

@@ -6,16 +6,16 @@ Runtime decoders continue to require the exact original record edition.
 """
 import json
 
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
 
 
 def example_input_bytes(path):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as protected
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammeInputCommitments
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as protected
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammeInputCommitments
     kinds = (ConfiguredProtectedE3Specification, ConfiguredMatrixSelectedFrozenPackage,
         ConfiguredMatrixSelectedPublicPackage, protected.ConfiguredProtectedE3ModelSet,
         protected.ConfiguredProtectedE3FrozenProducts, protected.ConfiguredProtectedE3Forecast,

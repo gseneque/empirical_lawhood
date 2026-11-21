@@ -8,14 +8,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import (
-    NAMESPACE, ScheduledCompactBank, ScheduledCompactConfig, compact_identity,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import (
-    ScheduledNativeSourceContext, ScheduledSourceIndex,
-)
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import NAMESPACE, ScheduledCompactBank, ScheduledCompactConfig, compact_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledNativeSourceContext, ScheduledSourceIndex
 from tests.test_matrix_scheduled_history_bindings import (
     bank as bank, provenance as provenance, scheduled as scheduled, stock as stock,
 )

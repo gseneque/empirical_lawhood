@@ -8,12 +8,12 @@ import pytest
 
 from tests.runtime_platform.test_execution_scheduler import _runtime, CrashAfterReceipt
 from tests.runtime_platform.test_run_recovery import _delete_test_projection
-from empirical_lawhood.infrastructure.execution import InjectedSchedulerCrash, LocalScheduler, SchedulerConsistencyError
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.execution import TaskAttemptDisposition, TaskBlockReason
+from empirical_lawhood.execution.local.execution import InjectedSchedulerCrash, LocalScheduler, SchedulerConsistencyError
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.execution import TaskAttemptDisposition, TaskBlockReason
 
 
 def _native_runtime(path, fixture, *, failures=0, clock=None, crash=None):

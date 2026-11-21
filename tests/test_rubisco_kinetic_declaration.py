@@ -7,26 +7,18 @@ import json
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.executable_binding import (
-    EXECUTABLE_BINDING_CONTRIBUTION, EXECUTABLE_BINDING_FACTORIES,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.extension_bundle import (
-    EXTENSION_BUNDLE_CONTRIBUTION,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.operation_bindings import (
-    KineticJoinConfig, operation_declarations, operation_manifests, operation_registrations,
-    scientific_operand_sha256s, scientific_root_validator, scientific_unit_ids,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.recursive_translation import scientific_work
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.numerical_runtime import (
-    KINETIC_PROVENANCE_REQUIREMENT, validate_kinetic_producing_provenance,
-)
-from empirical_lawhood.adapters.methods.matrix_response_study.numerical_runtime import (
-    MATRIX_PROVENANCE_REQUIREMENT, validate_matrix_producing_provenance,
-    validate_matrix_runtime_observation_json,
-)
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.extension import EXTENSION as _extension_owner_1
+EXECUTABLE_BINDING_CONTRIBUTION = _extension_owner_1.executable
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.extension import EXTENSION as _extension_owner_2
+EXECUTABLE_BINDING_FACTORIES = _extension_owner_2.factories
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.extension import EXTENSION as _extension_owner_3
+EXTENSION_BUNDLE_CONTRIBUTION = _extension_owner_3.discovery
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.operation_bindings import KineticJoinConfig, operation_declarations, operation_manifests, operation_registrations, scientific_operand_sha256s, scientific_root_validator, scientific_unit_ids
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.recursive_translation import scientific_work
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.numerical_runtime import KINETIC_PROVENANCE_REQUIREMENT, validate_kinetic_producing_provenance
+from empirical_lawhood.domains.matrix.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT, validate_matrix_producing_provenance, validate_matrix_runtime_observation_json
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 
 
 def test_declaration_migration_preserves_original_installed_descriptors():

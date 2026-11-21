@@ -11,21 +11,21 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_assembly import NativeTrainingAssemblyRequest
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import PROTOCOL_ID, MatrixResearchProgrammeSpecification
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_assembly import NativeTrainingAssemblyRequest
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import PROTOCOL_ID, MatrixResearchProgrammeSpecification
 from empirical_lawhood.api.recursive_authoring import implementation_binding
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection
 from tests.test_matrix_c25_protected_development_lifecycle import ROOT, _exposed_inputs, _profile, _profile_for_path
 from tests.test_matrix_programme_e1 import scientific_context
 
 def copied_whole_inputs(tmp_path):
     from tests import test_matrix_programme_scientific_design as mathematical
-    from empirical_lawhood.kernel.authority import AuthorityAction, ResourceBudget
-    from empirical_lawhood.kernel.status import LifecycleStatus
-    from empirical_lawhood.planning.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
+    from empirical_lawhood.science.identity.authority import AuthorityAction, ResourceBudget
+    from empirical_lawhood.science.records.status import LifecycleStatus
+    from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
     original = mathematical.build_scientific_design
 
     def selected_design():
@@ -37,9 +37,9 @@ def copied_whole_inputs(tmp_path):
             relation=ObjectIdentity.from_record(system.relation.relation_id, system.relation),
             independent_unit_id=system.independent_unit.unit_id))
 
-    def operator_contract(path):
-        from empirical_lawhood.runtime.operator_profile import resolve_external_root_contract
-        return resolve_external_root_contract(_profile_for_path(path), repo_root=ROOT, home_root=Path.home())
+    def operator_contract(path, mount):
+        from empirical_lawhood.execution.operator_profile import resolve_external_root_contract
+        return resolve_external_root_contract(_profile_for_path(path, mount), repo_root=ROOT, home_root=Path.home())
 
     # End construction seams before invoking any public programme operation.
     with pytest.MonkeyPatch.context() as patch:
@@ -67,7 +67,7 @@ def copied_whole_inputs(tmp_path):
     training = NativeTrainingAssemblyRequest('request.disclosed.whole.train',
         case.training.request.resources, case.training.request.campaign)
     cutoff = case.preparation.fit_config.fit_cutoff
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import coordinate_identity
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import coordinate_identity
     nominal_pin = dict(design.e3.role_coordinates)['CALIBRATION']
     nominal, = (coordinate for coordinate in design.training_protocol.coordinates
         if coordinate_identity(coordinate) == nominal_pin)
@@ -99,8 +99,8 @@ def copied_whole_inputs(tmp_path):
 
 
 def test_copied_whole_programme_cli_derives_actual_initial_frontier_without_native_entry(tmp_path, monkeypatch):
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
     case, copied, specification = copied_whole_inputs(tmp_path)
     root = Path(case.plane.root.contract.canonical_path)
 
@@ -127,8 +127,8 @@ def test_copied_whole_programme_cli_derives_actual_initial_frontier_without_nati
 
 
 def test_wrong_e3_view_scope_refuses_outer_derivation_before_any_child_or_native_entry(tmp_path, monkeypatch):
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
     from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService
 
     case, copied, specification = copied_whole_inputs(tmp_path)

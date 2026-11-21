@@ -6,9 +6,9 @@ import json
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifact_validation as owner
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage import artifact_validation as owner
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 
 
 SCHEMA = "empirical-lawhood/testing/canonical-stream"
@@ -42,8 +42,7 @@ def test_exact_numbers_and_escapes_across_every_small_chunk_boundary(monkeypatch
 
 @pytest.mark.parametrize("token", (b"01", b"-0", b"1.", b"1e0", b"1e-7", b"1E-07", b"1.000",
     b"NaN", b"Infinity", b"1e309", b"--1", b"1+2", b"0x1", b"9" * 129))
-@pytest.mark.parametrize("chunk_bytes", (1, 7, 65536))
-@pytest.mark.parametrize('fast', (False, True))
+@pytest.mark.parametrize("fast,chunk_bytes", ((False, 1), (False, 7), (False, 65536), (True, 65536)))
 def test_noncanonical_or_unbounded_numbers_still_refuse(monkeypatch, token, chunk_bytes, fast):
     monkeypatch.setattr(owner, "_CANONICAL_READ_CHUNK_BYTES", chunk_bytes)
     raw = document(None).replace(b'"value":null', b'"value":' + token)
@@ -107,7 +106,7 @@ def test_bounded_c_codec_preserves_exact_bytes_and_schema_refusals(change):
 
 
 def test_bounded_c_codec_uses_streaming_only_for_selected_bounds(monkeypatch):
-    from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits
     raw = document({'a': [1, 2, 3]})
     expected = owner._CanonicalJsonFileInspector(io.BytesIO(raw), request(raw)).validate()
     def forbidden(*args, **kwargs):

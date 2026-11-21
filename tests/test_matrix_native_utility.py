@@ -13,23 +13,23 @@ import shutil
 
 import pytest
 from threadpoolctl import threadpool_limits
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as r
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_bindings as bindings
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_science as science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseLossCell
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support
-from empirical_lawhood.api.experiment_preparation import author_prepared_experiment,load_experiment_inputs,load_experiment_specification,prepare_experiment
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as r
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_bindings as bindings
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_science as science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseLossCell
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support
+from empirical_lawhood.api.experiment_preparation import author_prepared_experiment, load_experiment_inputs, load_experiment_specification, prepare_experiment
 from empirical_lawhood.api.recursive_authoring import implementation_binding
-from empirical_lawhood.api.recursive_execution import read_recursive_wave,run_recursive_wave
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding,ExperimentFileInputSelection,ExperimentInputBinding
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.api.recursive_execution import read_recursive_wave, run_recursive_wave
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_matrix_native_training_acquisition import fresh_training_metadata_case
 
 ROOT=Path(__file__).parents[1]
@@ -58,8 +58,8 @@ def utility_case(tmp_path,*,original=None,root_count=1,amended=False):
     request=r.NativeUtilityRequest(record_id,manifest,old.request.sources,old.request.protocols,old.request.panels,
         old.request.mathematical_protocol,old.request.template_publications,support,campaign,resources)
     if amended:
-        from empirical_lawhood.adapters.methods.matrix_factor_response.origin_mechanics import MatrixIO48Construction, MatrixOriginResponseModel
-        from empirical_lawhood.adapters.methods.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
+        from empirical_lawhood.domains.matrix.matrix_factor_response.origin_mechanics import MatrixIO48Construction, MatrixOriginResponseModel
+        from empirical_lawhood.domains.matrix.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
         mathematical = replace(request.mathematical_protocol, protocol_id='mathematical.disclosed-amended-e2',
             horizon_steps=DENSE_RESPONSE_HORIZONS)
         protocols = tuple(replace(protocol, criterion=mathematical.identity, horizon_steps=DENSE_RESPONSE_HORIZONS,
@@ -203,8 +203,8 @@ def test_actual_public_native_e2_execution_and_receipt_recovery_never_become_tra
 
 def _finite_score(case,*,factor_loss):
     """Disclosed 48-receiver arithmetic, never an acquired scientific result."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census
     protocol=case.request.protocols[0];panels=r.panels_for(case.request,case.source);cells=[]
     for view in ("PRIMARY","FINE"):
         for panel in panels:

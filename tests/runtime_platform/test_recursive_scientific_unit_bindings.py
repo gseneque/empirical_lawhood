@@ -5,24 +5,16 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain import operation_contracts as rc_records
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.operation_bindings import (
-    operation_manifests as rc_manifests, operation_registrations as rc_registrations,
-    output_codecs as rc_codecs,
-)
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.science import default_chain_config
-from empirical_lawhood.adapters.methods.battery_recursive_construction.contracts import BatteryOperation, BatteryOperationConfig
-from empirical_lawhood.adapters.methods.battery_recursive_construction.examples import (
-    battery_wave_a_draft, battery_wave_b_draft,
-)
-from empirical_lawhood.adapters.methods.battery_recursive_construction.executable_binding import (
-    operation_manifests as battery_manifests,
-    operation_registrations as battery_registrations, output_codecs as battery_codecs,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave, project_recursive_assessments
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain import operation_contracts as rc_records
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.operation_bindings import operation_manifests as rc_manifests, operation_registrations as rc_registrations, output_codecs as rc_codecs
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.science import default_chain_config
+from empirical_lawhood.domains.battery.battery_recursive_construction.contracts import BatteryOperation, BatteryOperationConfig
+from empirical_lawhood.domains.battery.battery_recursive_construction.examples import battery_wave_a_draft, battery_wave_b_draft
+from empirical_lawhood.domains.battery.battery_recursive_construction.extension import operation_manifests as battery_manifests, operation_registrations as battery_registrations, output_codecs as battery_codecs
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave, project_recursive_assessments
 
 
 def _compile(draft, *, battery=False, registrations=None):

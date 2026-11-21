@@ -2,13 +2,11 @@
 """Compose the selected descriptive comparison from authenticated phase reads."""
 from contextlib import ExitStack
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import (
-    E4StructuralPredictionCase, E4MatchedRelationSelection, structural_prediction_comparison,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4DevelopmentProgramme
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseProgramme
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes, canonical_value
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import E4StructuralPredictionCase, E4MatchedRelationSelection, structural_prediction_comparison
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4DevelopmentProgramme
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseProgramme
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes, canonical_value
 
 
 def programme_structural_prediction(context, *, revision=None):
@@ -23,7 +21,7 @@ def programme_structural_prediction(context, *, revision=None):
             'scope': 'FROZEN_DESCRIPTIVE_PHYSICAL_VERSUS_PHYSICAL_PLUS_STRUCTURE'}
     if 'original_programme' not in structure or 'prediction_cases' not in structure:
         raise PermissionError('completed structural phase omits its original programme or causal prediction cases')
-    from .matrix_programme_products import _current_grants
+    from empirical_lawhood.api.matrix_programme_products import _current_grants
     with ExitStack() as lifetime:
         # Reuse the delivery owner's current original grant checks. Model work
         # must not extend a reveal beyond its actual expiry or revocation.
@@ -58,13 +56,13 @@ def programme_structural_prediction(context, *, revision=None):
 
 def _frozen_relation(context, *, revision=None):
     """Deliver the actual original fit and consumed CONF policies without refitting."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as methods
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4PublicCalibration
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import relation_loss_readout
-    from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-    from .matrix_researcher_programme_e4_lineage import programme_revision_read
-    from .matrix_researcher_programme_lineage import _issued_e4_record
-    from .matrix_programme_products import _current_grants
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as methods
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4PublicCalibration
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import relation_loss_readout
+    from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+    from empirical_lawhood.api.matrix_researcher_programme_e4_lineage import programme_revision_read
+    from empirical_lawhood.api.matrix_researcher_programme_lineage import _issued_e4_record
+    from empirical_lawhood.api.matrix_programme_products import _current_grants
     observed = context.observations.get('e4.revision')
     scope = 'ACTUAL_FROZEN_SR_BR_WITH_ORIGINAL_CAL_NO_CONFIRMATION_SELECTION'
     if observed is None or not observed.complete:
@@ -117,9 +115,7 @@ def _frozen_relation(context, *, revision=None):
             'downstream_account': None if downstream is None else downstream.selected,
             'qualification': 'NOT_ESTABLISHED', 'new_native_contact_count': 0}
         if nomination.relation_fit.selection.is_curve_primary:
-            from empirical_lawhood.adapters.methods.matrix_factor_response.curve_duration import (
-                duration_diagnostic_summary, evaluation_median_K,
-            )
+            from empirical_lawhood.domains.matrix.matrix_factor_response.curve_duration import duration_diagnostic_summary, evaluation_median_K
             result['DEV_K_diagnostics'] = canonical_value(tuple((model.method_key, duration_diagnostic_summary(model))
                 for model in nomination.relation_fit.models))
             if confirmation is not None:

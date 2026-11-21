@@ -7,9 +7,9 @@ import pytest
 
 from empirical_lawhood.api import matrix_factor_confirmation_compact_read as reader
 from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.kernel.decoding import decimal_context_key
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.science.records.decoding import decimal_context_key
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 from tests.test_reduced_artifact_verification import _work
 

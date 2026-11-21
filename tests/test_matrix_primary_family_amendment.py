@@ -4,10 +4,10 @@ from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
 import pytest
-from empirical_lawhood.adapters.methods.matrix_primary_family import AMENDED_PRIMARY_FAMILY
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_primary_amendment import MatrixE3PrimaryFamilyAmendment
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity as scheduled_identity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_primary_family import AMENDED_PRIMARY_FAMILY
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_primary_amendment import MatrixE3PrimaryFamilyAmendment
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity as scheduled_identity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_matrix_configured_protected_assembly import _case
 
 

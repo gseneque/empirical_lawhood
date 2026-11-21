@@ -14,13 +14,13 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as r, science
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history, parameter_history_segments as segments, parameter_source
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as r, science
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history, parameter_history_segments as segments, parameter_source
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_matrix_factor_confirmation_eligibility import publish, stock as stock, provenance as provenance
 from tests.test_matrix_scheduled_history import (prefix_case, scheduled as scheduled, with_parents,
     pure_assess_prefix, pure_measure_prefix, pure_check_frames, pure_causal_delivery)

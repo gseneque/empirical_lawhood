@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Actual custody/relay/consumer route with an exposed solver; no molecular work."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import fields, replace
 from io import BytesIO
@@ -8,21 +9,21 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_evidence_stream as stream
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_consumer as consumer
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_native as storage
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_records as records
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_runner as runner
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_evidence as evidence
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_fidelity as local
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_native as native
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_science as science
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry import evidence_stream as old
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry import operation_bindings as bindings
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactStreamWriteRequest
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_evidence_stream as stream
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_consumer as consumer
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_native as storage
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_records as records
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_runner as runner
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_evidence as evidence
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_fidelity as local
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as native
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_science as science
+from empirical_lawhood.domains.battery.battery_segmented_inquiry import evidence_stream as old
+from empirical_lawhood.domains.battery.battery_segmented_inquiry import operation_bindings as bindings
+
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactStreamWriteRequest
 from tests.test_battery_segmented_native import custody as custody_fixture, exposed_backend, acquire
 from tests.test_battery_refined_inquiry import selected as selected_fixture
 from tests.test_battery_segmented_fidelity import _operand, _receipt, prepared as prepared_fixture
@@ -76,7 +77,7 @@ def test_actual_new_physical_receipts_and_complete_ordinary_consumer(custody, mo
         visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY, parent_visibility_ceilings=(), outcome_access=OutcomeAccess.DEVELOPMENT_VISIBLE)
     written = custody.plane.write_stream(request)
     raw_path = custody.plane.root.resolve(written.materialization.relative_path, for_write=False)
-    manifest = decode_artifact_manifest(raw_path.with_name(raw_path.name + ".manifest.json").read_bytes())
+    manifest = resolve_artifact_sidecar_bytes(custody.plane, raw_path.with_name(raw_path.name + ".manifest.json").read_bytes())
     assert manifest.logical.payload_schema == stream.LosslessEvidenceLine.SCHEMA and manifest.materialization.size_bytes == sum(map(len, lines))
     payload = raw_path.read_bytes()
     port = SimpleNamespace(size_bytes=len(payload), read=BytesIO(payload).read)
@@ -243,9 +244,9 @@ def test_unchanged_full_interval_math_uses_complete_new_custody_and_lazy_rows(pr
 
 def selected_preparation(prepared, selected):
     """A prospectively selected exposed scalar recipe, with original toy state."""
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_step_control as step
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import source_derived_preparation as roots
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_step_control as step
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import source_derived_preparation as roots
     chosen = next(row for row in selected[1].configurations
         if row.component_view == prepared[0].native.component_view and row.recipe == prepared[0].native.recipe)
     root = roots.supply_source_roots(c.identity(selected[1].source), 'ORegan2022')
@@ -270,7 +271,7 @@ def selected_stream(prepared, selected, directory, temporary_file, *, horizon, c
     """Entire exposed original/new receipt closure; no solver or native contact."""
     from tests.test_battery_segmented_fidelity_stream import _stream
     from tests.test_battery_forecast_step_control import witness
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
     original_evidence, frames = _stream(prepared, directory / 'old', horizon=horizon, changed_state=changed_state)
     frame, config = frames[0], original_evidence.trace.config
     assignment = replace(witness(selected[2], config)[2], assignment_id='assignment.exposed.' + str(horizon))

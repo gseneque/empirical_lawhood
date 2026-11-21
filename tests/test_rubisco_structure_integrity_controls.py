@@ -10,7 +10,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_structure import contracts as c, independent_assessment as independent
+from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import contracts as c, independent_assessment as independent
 from tests.test_rubisco_structure_independent import exposed  # noqa: F401
 
 
@@ -66,6 +66,6 @@ class Refuse(importlib.abc.MetaPathFinder):
   if name.split('.')[0] in ('numpy','openmm','pdbfixer','parmed','pybamm') or name.endswith('rubisco_insilico_structure.science'):
    raise AssertionError(name)
 sys.meta_path.insert(0, Refuse())
-from empirical_lawhood.adapters.methods.rubisco_insilico_structure import independent_assessment, integrity_records
+from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import independent_assessment, integrity_records
 assert independent_assessment.DISTANCE_TOLERANCE.is_finite()
 """], check=True)

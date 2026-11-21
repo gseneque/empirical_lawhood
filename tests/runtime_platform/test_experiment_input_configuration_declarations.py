@@ -7,10 +7,8 @@ import pytest
 
 from empirical_lawhood.api import configuration_registry
 from empirical_lawhood.api.configuration import validate_configuration
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.experiment_preparation import (
-    ExperimentInputConfigurationDeclaration, ExperimentProtocolDeclaration, PreparedExperimentInputs,
-)
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputConfigurationDeclaration, ExperimentProtocolDeclaration, PreparedExperimentInputs
 
 
 @dataclass(frozen=True, slots=True)
@@ -49,17 +47,21 @@ def declaration():
 
 def test_only_explicit_role_is_editable_and_config_validation_has_no_prerequisite_contact(tmp_path, monkeypatch):
     from empirical_lawhood.api import experiment_preparation
+    from tests.test_isolated_native_starter import operands
 
-    owner = declaration()
+    operand, _, specification, _ = operands()
+    record = specification.worker
+    role = ExperimentInputConfigurationDeclaration("test-explicit-operational-input", type(record), 65536)
+    owner = replace(declaration(), specification_type=type(specification),
+        input_record_types=(type(record), type(operand)), configuration_inputs=(role,))
     monkeypatch.setattr(experiment_preparation, "experiment_protocols", lambda: (owner,))
     values = configuration_registry._configuration_consumers()
-    assert [row.consumer for row in values if row.schema_id == EditableOperationalInput.SCHEMA] == [
+    assert [row.consumer for row in values if row.schema_id == record.SCHEMA] == [
         "test-explicit-operational-input"]
     # Evidence is permitted only as a protocol source operand. Merely listing
     # its decoder does not create an editable evidence configuration consumer.
-    assert not any(row.schema_id == OriginalEvidenceInput.SCHEMA for row in values)
+    assert not any(row.schema_id == operand.SCHEMA for row in values)
     path = tmp_path / "operational.json"
-    record = EditableOperationalInput(4)
     path.write_bytes(record.canonical_bytes())
     result = validate_configuration(path, consumer="test-explicit-operational-input")
     assert result["status"] == "VALIDATED" and result["consumer_byte_ready"]
@@ -90,8 +92,8 @@ def test_configuration_parser_bounds_remain_explicit_positive_integers(bound):
 @pytest.mark.parametrize("reverse", (False, True))
 def test_public_inputs_keep_exact_same_schema_editions_without_roster_order_dependence(tmp_path, monkeypatch, reverse):
     from empirical_lawhood.api import experiment_preparation
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
 
     kinds = (EditableOperationalInput, EditableOperationalInputV2)
     owner = replace(declaration(), input_record_types=kinds[::-1] if reverse else kinds,

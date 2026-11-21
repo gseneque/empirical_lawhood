@@ -1,142 +1,24 @@
-"""Evaluator-only 2025 cell-eval integration and exact aggregate normalization."""
+"""Native acquisition and external-format binding for the domain science."""
 
 from __future__ import annotations
-
-from dataclasses import dataclass
-from decimal import Decimal
 import math
 from pathlib import Path
 from typing import TYPE_CHECKING, BinaryIO, cast
-
 import h5py  # type: ignore[import-untyped]
 import numpy as np
 from numpy.typing import NDArray
+from empirical_lawhood.domains.biology.virtual_cell.analysis import VirtualCellAnalysisError, verify_official_evaluator_versions
+from empirical_lawhood.domains.biology.virtual_cell.contracts import MetricContract, VirtualCellContractError
+from empirical_lawhood.domains.biology.virtual_cell.metric_interpretation_v2 import metric_set_from_source_columns, score_source_aggregate
+from empirical_lawhood.domains.biology.virtual_cell.correction_records_v2 import DES_SOURCE_COLUMN, PDS_SOURCE_COLUMN, OfficialMetricGaugeV2, require_metric_contract_gauge
 
-from .analysis import (
-    OfficialAggregateScore,
-    VirtualCellAnalysisError,
-    official_aggregate_score,
-    verify_official_evaluator_versions,
-)
-from .contracts import MetricContract, VirtualCellContractError
-from .metric_correction_v2 import (
-    DES_SOURCE_COLUMN,
-    PDS_SOURCE_COLUMN,
-    OfficialMetricGaugeV2,
-    OfficialMetricSetV2,
-    metric_set_from_source_columns,
-    require_metric_contract_gauge,
-    score_source_aggregate,
+from empirical_lawhood.domains.biology.virtual_cell.evaluation_statistics import (
+    OfficialEvaluatorRunV2 as _science_OfficialEvaluatorRunV2,
 )
 
 if TYPE_CHECKING:
     import anndata as ad
     import polars as pl
-
-
-@dataclass(frozen=True, slots=True)
-class HistoricalOfficialEvaluatorRun:
-    target_ids: tuple[str, ...]
-    des: NDArray[np.float64]
-    pds: NDArray[np.float64]
-    mae: NDArray[np.float64]
-    score: OfficialAggregateScore
-    metrics_arrow: bytes
-    cell_eval_version: str
-    pdex_version: str
-    profile: str
-    control_label: str
-    perturbation_column: str
-    response_outcome_read: bool
-
-    def __post_init__(self) -> None:
-        if tuple(sorted(set(self.target_ids))) != self.target_ids:
-            raise ValueError("official evaluator targets must be sorted and unique")
-        expected = (len(self.target_ids),)
-        if any(values.shape != expected for values in (self.des, self.pds, self.mae)):
-            raise ValueError("official evaluator arrays are not target aligned")
-        if any(
-            not np.all(np.isfinite(values)) for values in (self.des, self.pds, self.mae)
-        ):
-            raise ValueError("official evaluator arrays contain nonfinite values")
-        if (
-            self.profile != "vcc"
-            or not self.control_label
-            or not self.perturbation_column
-        ):
-            raise ValueError("official evaluator configuration differs from VCC")
-        if not self.response_outcome_read:
-            raise ValueError(
-                "official evaluation must acknowledge its response outcome read"
-            )
-
-
-@dataclass(frozen=True, slots=True)
-class OfficialEvaluatorRunV2:
-    metrics: OfficialMetricSetV2
-    score: OfficialAggregateScore
-    cell_eval_version: str
-    pdex_version: str
-    profile: str
-    control_label: str
-    perturbation_column: str
-    response_outcome_read: bool
-
-    @property
-    def metrics_canonical(self):
-        return self.metrics.canonical_bytes()
-
-
-def bootstrap_official_score_standard_error(
-    *,
-    des: NDArray[np.float64],
-    pds: NDArray[np.float64],
-    mae: NDArray[np.float64],
-    metric_contract: MetricContract,
-    resamples: int,
-    seed: int,
-) -> Decimal:
-    """Deterministic target-unit bootstrap SE for the exact aggregate score.
-
-    Calling this function with the same seed for every candidate produces the
-    same target-index resamples, preserving the plan's paired target design.
-    Cells are never treated as independent units.
-    """
-
-    if isinstance(resamples, bool) or resamples <= 1:
-        raise ValueError("official-score bootstrap requires at least two resamples")
-    if isinstance(seed, bool) or seed < 0:
-        raise ValueError("official-score bootstrap seed must be nonnegative")
-    expected = des.shape
-    if (
-        len(expected) != 1
-        or expected[0] == 0
-        or pds.shape != expected
-        or mae.shape != expected
-    ):
-        raise ValueError(
-            "official-score bootstrap arrays must be aligned nonempty vectors"
-        )
-    if any(not np.all(np.isfinite(values)) for values in (des, pds, mae)):
-        raise ValueError("official-score bootstrap arrays contain nonfinite values")
-    rng = np.random.default_rng(seed)
-    indices = rng.integers(0, expected[0], size=(resamples, expected[0]))
-    scores = np.empty(resamples, dtype=np.float64)
-    for index, target_indices in enumerate(indices):
-        score = official_aggregate_score(
-            des=Decimal(str(float(np.mean(des[target_indices], dtype=np.float64)))),
-            pds=Decimal(str(float(np.mean(pds[target_indices], dtype=np.float64)))),
-            mae=Decimal(str(float(np.mean(mae[target_indices], dtype=np.float64)))),
-            metric_contract=metric_contract,
-        )
-        scores[index] = float(score.average_score)
-    standard_error = float(np.std(scores, ddof=1))
-    if not math.isfinite(standard_error):
-        raise VirtualCellAnalysisError(
-            "official-score bootstrap standard error is nonfinite"
-        )
-    return Decimal(str(standard_error))
-
 
 def read_anndata_h5ad_stream(stream: BinaryIO) -> ad.AnnData:
     """Read one already-authorized seekable H5AD stream without a caller path."""
@@ -229,7 +111,7 @@ def evaluate_official_2025_v2(
     num_threads: int,
     control_label: str = "non-targeting",
     perturbation_column: str = "target_gene",
-) -> OfficialEvaluatorRunV2:
+) -> _science_OfficialEvaluatorRunV2:
     """Produce a separately versioned corrected metric artifact using the pinned evaluator."""
 
     if type(metric_gauge) is not OfficialMetricGaugeV2:
@@ -309,7 +191,7 @@ def evaluate_official_2025_v2(
         columns={DES_SOURCE_COLUMN: des, PDS_SOURCE_COLUMN: pds, "mae": mae},
         gauge=metric_gauge,
     )
-    return OfficialEvaluatorRunV2(
+    return _science_OfficialEvaluatorRunV2(
         metrics=metrics,
         score=score,
         cell_eval_version=cell_eval_version,
@@ -319,21 +201,3 @@ def evaluate_official_2025_v2(
         perturbation_column=perturbation_column,
         response_outcome_read=True,
     )
-
-
-def evaluate_official_2025(**_kwargs):
-    """Do not publish corrected meanings under original crossed artifact contracts."""
-    raise VirtualCellContractError(
-        "SOFTWARE: select evaluate_official_2025_v2 and its versioned gauge/output "
-        "contracts; original crossed evaluation receipts remain historical"
-    )
-
-
-__all__ = [
-    "HistoricalOfficialEvaluatorRun",
-    "OfficialEvaluatorRunV2",
-    "bootstrap_official_score_standard_error",
-    "evaluate_official_2025",
-    "evaluate_official_2025_v2",
-    "read_anndata_h5ad_stream",
-]

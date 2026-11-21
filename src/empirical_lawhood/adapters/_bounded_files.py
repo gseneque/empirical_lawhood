@@ -5,7 +5,7 @@ from __future__ import annotations
 import os as os
 from pathlib import Path
 
-from empirical_lawhood.infrastructure import bounded_io
+from empirical_lawhood.storage import bounded_io
 
 
 _CHUNK_BYTES = 1024 * 1024

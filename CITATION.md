@@ -4,7 +4,7 @@ SPDX-License-Identifier: CC-BY-4.0
 
 The author is **Gareth Seneque**, [ORCID 0009-0003-3046-6899](https://orcid.org/0009-0003-3046-6899). Machine-readable metadata is in [CITATION.cff](CITATION.cff).
 
-For software, cite *Empirical Lawhood*, the [repository](https://github.com/gseneque/empirical_lawhood), and the exact tag or commit used. Use version **0.3.0** and tag **v0.3.0** for this release. Its [GitHub Release](https://github.com/gseneque/empirical_lawhood/releases/tag/v0.3.0) records the publication date, downloadable artifacts and any separately assigned software DOI.
+For software, cite *Empirical Lawhood* and the exact tag or commit you used. For the first 1.0 release candidate, cite the tag `1.0.0-RC1`. For work using version 0.3.0, cite `v0.3.0`. [RC1 source](https://github.com/gseneque/empirical_lawhood/tree/1.0.0-RC1) · [0.3.0 release record](https://github.com/gseneque/empirical_lawhood/releases/tag/v0.3.0)
 
 For the retained Matrix reports, cite Gareth Seneque (2026), *Empirical Lawhood: retained Matrix programme reports (E1, E2, TRAIN, E3 and E4)*, version **1.0.0**, Zenodo, [DOI 10.5281/zenodo.23914232](https://doi.org/10.5281/zenodo.23914232).
 This report deposit has a separate identity from the software and preprint.

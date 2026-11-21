@@ -4,38 +4,38 @@ from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.composition.preparation_applicability.selection import PreparationApplicabilitySelection
-from empirical_lawhood.adapters.composition.preparation_applicability.authoring import build_authoring, SPECIFICATION_PATH
-from empirical_lawhood.adapters.composition.preparation_applicability.resources import resource_envelope
-from empirical_lawhood.adapters.composition.phase_authoring import PhaseAuthoringBundle, PhaseContextProvider
+from empirical_lawhood.domains.matrix.preparation_applicability.authoring.selection import PreparationApplicabilitySelection
+from empirical_lawhood.domains.matrix.preparation_applicability.authoring.authoring import build_authoring, SPECIFICATION_PATH
+from empirical_lawhood.domains.matrix.preparation_applicability.authoring.resources import resource_envelope
+from empirical_lawhood.execution.phase_authoring import PhaseAuthoringBundle, PhaseContextProvider
 from empirical_lawhood.adapters.composition.preparation_applicability.ports import runtime_platform_ports
 from empirical_lawhood.api.authoring_handoff import create_authoring_api, write_exclusive_record, resolve_authoring_directory, load_authoring_execution_projection, preflight_authoring_output_directory
 from empirical_lawhood.api.authoring_output import report_incomplete_output
 from empirical_lawhood.api.results import CompileCandidateRequest
-from empirical_lawhood.adapters.methods.preparation_applicability.config import preparation_run_id
+from empirical_lawhood.domains.matrix.preparation_applicability.config import preparation_run_id
 from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.bounded_io import MAX_CONTROL_PLANE_JSON_BYTES, MAX_RUNTIME_PLAN_JSON_BYTES, read_bounded_bytes
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
 from empirical_lawhood.api.recursive_prospective_authoring import _capture_prospective_source, _publish_source_provenance
-from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
-from empirical_lawhood.infrastructure.source_closure import capture_clean_target_closure
+from empirical_lawhood.storage.study_issue import GitStudySourceClosureInspector
+from empirical_lawhood.storage.source_closure import capture_clean_target_closure
 from empirical_lawhood.api.authoring_handoff import authenticate_selected_authoring_source, require_authoring_source_kind_layout
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_entry import ExecutableStudyDefinition
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
-from empirical_lawhood.runtime.artifacts import ArtifactWriter
-from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_run_plan
-from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeSpec
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan, ProtocolExecutionPlan, ProtocolRunPlan
-from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_entry import ExecutableStudyDefinition
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriter
+from empirical_lawhood.execution.compiler import compile_preissue_run_plan, lower_run_plan
+from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeSpec
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
+from empirical_lawhood.execution.plans import CandidateExecutionPlan
+from empirical_lawhood.execution.study_issue import project_standard_study_extensions
 
 
 def _bundle(selection, root, closure):
-    from empirical_lawhood.adapters.methods.preparation_applicability.conformance import current_native_implementation
+    from empirical_lawhood.adapters.simulators.preparation_applicability.source_identity import current_native_implementation
     if selection.source.native_implementation != current_native_implementation():
         raise ValueError("selected native implementation differs from the installed current owners")
     specification = read_bounded_bytes(root / SPECIFICATION_PATH, maximum_bytes=2 * 1024**2)
@@ -156,15 +156,14 @@ def load_preparation_applicability_handoff(*, directory: Path, root: Path, stora
 
 
 def _read_handoff_record(directory, name, kind):
-    maximum = (MAX_RUNTIME_PLAN_JSON_BYTES if issubclass(kind, (ProtocolRunPlan, ProtocolExecutionPlan))
-               else MAX_CONTROL_PLANE_JSON_BYTES)
+    maximum = None
     return decode_canonical_bytes(read_bounded_bytes(directory / name, maximum_bytes=maximum),
                                   kind, maximum_bytes=maximum)
 
 
 def _verify_handoff_projection(*,directory,root,selection,bundle,closure,projection,resources,resource_builder):
     """Recompile exact retained inputs and compare all tasks/edges/resources."""
-    from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCandidate
+    from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCandidate
     def read(name,kind):
         return _read_handoff_record(directory, name, kind)
     payloads=tuple(directory/f"payload-{index:02d}.json" for index in range(len(bundle.payloads)))
@@ -196,8 +195,8 @@ def _verify_handoff_projection(*,directory,root,selection,bundle,closure,project
 def prove_preparation_applicability_handoff(handoff):
     """Check exact installed provider/output/resource coverage without native work."""
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
-    from empirical_lawhood.runtime.executable_bindings import LayeredCampaignRuntimeProviderResolver
-    from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
+    from empirical_lawhood.execution.executable_bindings import LayeredCampaignRuntimeProviderResolver
+    from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
     from empirical_lawhood.api.integration_proof import prove_provider_projection
     registry=handoff.bundle.standard_context.base.registry
     resolver=LayeredCampaignRuntimeProviderResolver(precomposed=CampaignRuntimeProviderRegistry(()),

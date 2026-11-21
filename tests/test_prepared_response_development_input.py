@@ -7,8 +7,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.simulators.prepared_response.contracts import PreparedForceWord
-from empirical_lawhood.adapters.simulators.prepared_response.instruments import prepared_force_components
+from empirical_lawhood.domains.matrix.prepared_response.contracts import PreparedForceWord
+from empirical_lawhood.domains.matrix.prepared_response.instruments import prepared_force_components
 from empirical_lawhood.adapters.simulators.prepared_response.native_quickstart import PreparedResponsePreparedCanary, run_prepared_canary
 from empirical_lawhood.api.codecs import load_registered_authoring
 

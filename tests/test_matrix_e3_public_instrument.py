@@ -11,13 +11,13 @@ import json
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_forecast import instrument
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_science import receiver_metric
-from empirical_lawhood.infrastructure.execution import _prepare_native_work
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_forecast import instrument
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_science import receiver_metric
+from empirical_lawhood.execution.local.execution import _prepare_native_work
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
 from tests.test_matrix_e3_protected_encoding_acceptance import assess, received_negative
 from tests.test_matrix_e3_public_programme import _selected_case
 from tests.test_matrix_e3_response_lifecycle_available import available as available
@@ -71,7 +71,7 @@ def test_public_original_instrument_matches_existing_available_owner_before_lowe
 
 
 def test_available_instrument_enters_current_native_preparer_and_complete_negative_reader_without_acquisition(available, tmp_path):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_bindings
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_bindings
 
     selected = prepared(available)
     try:

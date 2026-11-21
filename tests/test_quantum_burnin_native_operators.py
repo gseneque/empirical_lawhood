@@ -7,12 +7,13 @@ from math import cos, exp, sin, sqrt
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.simulators.quantum_trajectory_burnin_screen.basis import build_basis
-from empirical_lawhood.adapters.simulators.quantum_trajectory_burnin_screen.jumps import ZeroProjectedMassError, apply_jump, jump_masses, sample_mark
-from empirical_lawhood.adapters.simulators.quantum_trajectory_burnin_screen.operators import DenseEigensystemPropagator, SparseKrylovPropagator, build_hamiltonian, lindblad_superoperator, propagate_density
-from empirical_lawhood.adapters.simulators.quantum_trajectory_burnin_screen.types import Action
+from empirical_lawhood.domains.quantum.trajectory_burnin_screen.basis import build_basis
+from empirical_lawhood.domains.quantum.trajectory_burnin_screen.jumps import ZeroProjectedMassError, apply_jump, jump_masses, sample_mark
+from empirical_lawhood.domains.quantum.trajectory_burnin_screen.operators import DenseEigensystemPropagator, SparseKrylovPropagator, build_hamiltonian, lindblad_superoperator, propagate_density
+from empirical_lawhood.domains.quantum.trajectory_burnin_screen.types import Action
 
 
+@pytest.mark.numerical(oracle='Analytic two-site Rabi sine/cosine evolution with independently specified piecewise action frequencies')
 def test_two_site_action_and_cutoff_follow_analytic_rabi_clock() -> None:
     basis = build_basis(2, 1)
     initial = basis.state_vector(1)
@@ -54,6 +55,7 @@ def test_two_site_action_and_cutoff_follow_analytic_rabi_clock() -> None:
     )
 
 
+@pytest.mark.numerical(oracle='Born projected masses 1/4 and 3/4 with exact normalized basis state after projection')
 def test_projected_jump_mass_is_distinct_from_normalized_post_jump_state() -> None:
     basis = build_basis(2, 1)
     state = (sqrt(0.25) * basis.state_vector(1)) + (
@@ -74,6 +76,7 @@ def test_projected_jump_mass_is_distinct_from_normalized_post_jump_state() -> No
         sample_mark(np.asarray([0.25, 0.5]), 0.5)
 
 
+@pytest.mark.numerical(oracle='Analytic zero-Hamiltonian dephasing: diagonal 1/2, off-diagonal exp(-0.6)/2')
 def test_two_site_lindblad_dephasing_preserves_population_and_trace() -> None:
     basis = build_basis(2, 1)
     hamiltonian = build_hamiltonian(

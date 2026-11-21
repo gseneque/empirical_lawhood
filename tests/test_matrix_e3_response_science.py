@@ -13,15 +13,15 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods import matrix_dataset_readers as datasets
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_science as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast, response_records as rr
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history, parameter_history_segments, parameter_source
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+from empirical_lawhood.domains.matrix import matrix_dataset_readers as datasets
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_science as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast, response_records as rr
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history, parameter_history_segments, parameter_source
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
 from tests.test_matrix_e3_response_records import arguments, case as case, completed_metadata
 
 

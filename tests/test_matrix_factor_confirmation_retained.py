@@ -12,25 +12,25 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import records as r, retained, science
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.commitment import COMMIT_KEY, E1CommitmentConfig, E1Commitment, committed
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.operation_bindings import BUDGET, NAMESPACE, PHASES, E1OperationConfig, operation_factories
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import MatrixParameterNativeHistory, coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import records as r, retained, science
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.commitment import COMMIT_KEY, E1CommitmentConfig, E1Commitment, committed
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.operation_bindings import BUDGET, NAMESPACE, PHASES, E1OperationConfig, operation_factories
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import MatrixParameterNativeHistory, coordinate_identity
 from empirical_lawhood.api.execution import CampaignExecutionService
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition, NativeSubworkOutput, NativeSubworkRoster
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, CandidateExecutionPlan, ExecutionTask, PlanLane, BarrierKind, ScientificStage, ScientificInputSpec, ScientificInputRole
-from empirical_lawhood.runtime.providers import ExternalInputPayload
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition, NativeSubworkOutput, NativeSubworkRoster
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, CandidateExecutionPlan, ExecutionTask, PlanLane, BarrierKind, ScientificStage, ScientificInputSpec, ScientificInputRole
+from empirical_lawhood.execution.providers import ExternalInputPayload
 from tests.test_matrix_factor_confirmation_eligibility import publish
 from tests.test_matrix_factor_confirmation_eligibility import provenance as provenance
 from tests.test_matrix_factor_confirmation_eligibility import stock as stock
@@ -83,7 +83,7 @@ def cold_case(e1, *, defect=None):
             ArtifactProfile.CANONICAL_JSON, 'application/json', Visibility.PROSPECTIVE, (), Access.EVALUATION_SEALED)]
         if role in ('history', 'measure'):
             logical = ('native.arrays.' if role == 'history' else 'factor.arrays.')+source.root_id
-            from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
+            from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
             outputs.append(ArtifactOutputSpec(task_id+'.arrays', logical, 'refined-inputs/'+logical, MATRIX_ARRAY_SCHEMA,
                 ArtifactProfile.MATRIX_ARRAY_NPZ, 'application/x-npz', Visibility.PROSPECTIVE, (), Access.EVALUATION_SEALED))
         if defect == 'wrong-capability' and role == 'check':
@@ -128,7 +128,7 @@ def cold_case(e1, *, defect=None):
         source.provenance.code_sources_sha256, source.provenance.dependency_lock_sha256, parent.input_materialization_ids,
         tuple(sorted((source.root.stream_identity(s) for s in source.root.streams), key=lambda x: x.object_id)),
         (NativeSubworkOutput('arrays', 'empirical-lawhood/data/matrix-array-npz', ArtifactProfile.MATRIX_ARRAY_NPZ, 'application/x-npz'),))
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
     definition = replace(definition, outputs=(replace(definition.outputs[0], payload_schema=MATRIX_ARRAY_SCHEMA),))
     native.freeze_roster(NativeSubworkRoster('selected.native-subwork', parent, (definition.identity,)), definitions=(definition,))
     entry = native.begin(definition)
@@ -172,7 +172,7 @@ def test_actual_protected_plan_receipts_and_native_completion_cold_read(e1, monk
     before = {str(p.relative_to(root)): sha256(p.read_bytes()).hexdigest() for p in Path(root).rglob('*') if p.is_file()}
     def blocked(*args, **kwargs):
         raise AssertionError('cold adapter entered a mutation, producer, RNG or eigensolver')
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
     monkeypatch.setattr(parameter_source, 'acquire_parameter_history', blocked)
     monkeypatch.setattr(ExternalNativeEffectContactStore, 'begin', blocked)
     for name in ('begin', 'contact', 'freeze_roster', 'publish_output', 'complete', 'recover'):

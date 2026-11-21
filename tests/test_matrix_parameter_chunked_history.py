@@ -1,4 +1,5 @@
 """Genuine exposed conditional segment receipts and complete cold assessment."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from io import BytesIO
@@ -12,21 +13,21 @@ import time
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_array_chunks import FRAMED_ARRAY_SCHEMA, FRAMED_ARRAY_MEDIA
-from empirical_lawhood.adapters.methods.matrix_parameter_history import chunked_operation_bindings as binding, chunked_science as science
-from empirical_lawhood.adapters.methods.matrix_parameter_history.chunked_records import MatrixParameterChunkedSource, MatrixParameterChunkedHistory, bind_source
-from empirical_lawhood.adapters.methods.matrix_parameter_history.chunked_control_records import MatrixParameterChunkedAssessmentReport
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind, WorkerOutputPort
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.matrix.matrix_array_chunks import FRAMED_ARRAY_SCHEMA, FRAMED_ARRAY_MEDIA
+from empirical_lawhood.domains.matrix.matrix_parameter_history import chunked_operation_bindings as binding, chunked_science as science
+from empirical_lawhood.domains.matrix.matrix_parameter_history.chunked_records import MatrixParameterChunkedSource, MatrixParameterChunkedHistory, bind_source
+from empirical_lawhood.domains.matrix.matrix_parameter_history.chunked_control_records import MatrixParameterChunkedAssessmentReport
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind, WorkerOutputPort
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform.test_native_subwork import _plane, _store
 from tests.test_matrix_parameter_compact_history import selected
 from tests.test_matrix_parameter_history import progress_store, provider, publish
@@ -53,7 +54,7 @@ def context(plane,s,a,p,role,*,history=None,raw=None):
         sidecar = existing.with_name(existing.name+'.manifest.json')
         if existing.exists() and sidecar.exists():
             assert existing.read_bytes() == payload
-            manifest = decode_artifact_manifest(sidecar.read_bytes())
+            manifest = resolve_artifact_sidecar_bytes(plane, sidecar.read_bytes())
             plane.verify_manifest(manifest)
             manifests.append(manifest)
         else:
@@ -63,7 +64,7 @@ def context(plane,s,a,p,role,*,history=None,raw=None):
         result = plane.write(ArtifactWriteRequest(artifact.artifact_id,'inputs/'+artifact.artifact_id,artifact.payload_schema,
             ArtifactProfile.RAW_SOURCE_BYTES,artifact.media_type,'test.chunked.exposed','inputs',raw,
             VisibilityCeiling.DEVELOPMENT_ONLY,(),OutcomeAccess.DEVELOPMENT_VISIBLE))
-        manifests.append(decode_artifact_manifest(plane.root.resolve(result.manifest_materialization.relative_path,for_write=False).read_bytes()))
+        manifests.append(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.manifest_materialization.relative_path, for_write=False).read_bytes()))
     manifests = tuple(manifests)
     ports = tuple(plane.open(m,binding=WorkerInputBinding(m.logical.logical_artifact_id,m.materialization.materialization_id,
         m.logical.payload_schema,m.logical.media_type,m.materialization.size_bytes,VisibilityCeiling.DEVELOPMENT_ONLY,
@@ -109,7 +110,7 @@ def completed(tmp_path_factory):
 def _assess_framed(bound,history,raw):
     sink = BytesIO()
     result = science.assess_framed(bound,history,BytesIO(raw).read,emit_control=sink.write,control_artifact_id='chunked.assess.controls')
-    from empirical_lawhood.adapters.methods.matrix_array_chunks import iter_framed_chunk_arrays
+    from empirical_lawhood.domains.matrix.matrix_array_chunks import iter_framed_chunk_arrays
     assert len(tuple(iter_framed_chunk_arrays(result.control_arrays,result.control_container,BytesIO(sink.getvalue()).read))) == len(history.segments)
     return result
 
@@ -227,9 +228,9 @@ def test_interrupted_segment_retains_completed_prefix_never_repeats(tmp_path,mon
 
 
 def test_complete_over4341_history_has_bounded_native_leaves_and_cold_denominators(tmp_path,monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_parameter_history.compact_records import compact_sources
-    from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-    from empirical_lawhood.kernel.matrix_inputs import MAXIMUM_MATRIX_ARRAY_BYTES
+    from empirical_lawhood.domains.matrix.matrix_parameter_history.compact_records import compact_sources
+    from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+    from empirical_lawhood.domains.matrix.input_contracts import MAXIMUM_MATRIX_ARRAY_BYTES
     original,a,p = selected()
     c = replace(a.coordinates[0],autonomous_ticks=4996,observation_ticks=(0,5000))
     root = replace(a.roots[0],coordinate=coordinate_identity(c))
@@ -268,7 +269,7 @@ def test_complete_over4341_history_has_bounded_native_leaves_and_cold_denominato
     assert tuple(c.denominator_steps for c in returned.controls) == (5000,10000,5000,5000)
     assert returned.numerical_pass
     assert sum(c.denominator_steps*c.denominator_real_coordinates for c in returned.controls) == 4320000
-    from empirical_lawhood.adapters.methods.matrix_array_chunks import iter_framed_chunk_arrays
+    from empirical_lawhood.domains.matrix.matrix_array_chunks import iter_framed_chunk_arrays
     with controls_path.open('rb') as inputs:
         assert sum(v.size for _,arrays in iter_framed_chunk_arrays(returned.control_arrays,returned.control_container,inputs.read) for v in arrays.values()) == 25000
     print('long_segment_cost',{'new_native':not bool(retained),'native_wall_cpu_s':native_cost,'cold_wall_cpu_s':cold_cost,

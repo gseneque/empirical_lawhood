@@ -16,12 +16,11 @@ from types import SimpleNamespace
 import pytest
 from threadpoolctl import threadpool_limits
 
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_experiment as domain
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_records as records
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import selected_public_package_types
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-from empirical_lawhood.api.experiment_preparation import (
-    load_experiment_inputs, load_experiment_specification, prepare_experiment)
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_experiment as domain
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_records as records
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import selected_public_package_types
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, load_experiment_specification, prepare_experiment
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.matrix_finite_dt_source_runtime import certify_native_training_instrument
 from empirical_lawhood.api.native_training_banks import _read_instance
@@ -29,14 +28,13 @@ from empirical_lawhood.api.prospective_experiment import load_prepared_prospecti
 from empirical_lawhood.api.recursive_authoring import load_authored_wave
 from empirical_lawhood.api.recursive_execution import _retained_plans
 from empirical_lawhood.api.recursive_prospective_authoring import prove_recursive_prospective_handoff
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import (
-    ExperimentFileInputSelection, ExperimentInputBinding)
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile, resolve_external_root_contract
+from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, resolve_external_root_contract
 from tests.test_matrix_finite_dt_source_production import future_case, source_case
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -103,8 +101,8 @@ def _copied_source_preparation(case, output):
 @pytest.mark.held
 def test_retained_native_train_source_public_nine_pure_workers_and_zero_executor_recovery(tmp_path, monkeypatch):
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
-    from empirical_lawhood.adapters.composition.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_bindings
+    from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_bindings
     from empirical_lawhood.api.results import CampaignStatusRequest, ResumeCampaignRequest, RunCampaignRequest
     from tests.matrix_selected_source_predecessor import _sdk_execution
     from tests.runtime_platform.test_recursive_prospective_workflow import _issue_public_handoff
@@ -181,8 +179,8 @@ def test_retained_native_train_source_public_nine_pure_workers_and_zero_executor
         # this actual installed source there too, using ordinary current bytes
         # and a fresh TRAIN reconstruction rather than an asserted certificate.
         from empirical_lawhood.api.matrix_finite_dt_source_experiment import pipeline_evidence
-        from empirical_lawhood.kernel.decoding import decode_canonical_record
-        from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
+        from empirical_lawhood.science.records.decoding import decode_canonical_record
+        from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
         pipeline, qualification = pipeline_evidence(case.selection)
         publications = tuple((decode_canonical_record(pin, ObjectIdentity),
             decode_canonical_record(publication, ArtifactWriteResult)) for pin, publication in science["publications"])

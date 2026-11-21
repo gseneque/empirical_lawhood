@@ -2,6 +2,7 @@
 """Dispatch retained scientific reads without compiling current domain source."""
 
 from empirical_lawhood.api.experiment_runtime_bindings import _binding_index
+from empirical_lawhood.execution.experiment_ports import require_experiment_report
 
 def read_prepared_experiment_science(*, selected, artifact_writer, run_id, reveal_authority_id=None, allow_partial=False,
         assess_incomplete=False, read_access=None):
@@ -11,9 +12,7 @@ def read_prepared_experiment_science(*, selected, artifact_writer, run_id, revea
     A domain reader owns current outcome authority, receipts and scientific bytes.
     Static dispatch performs no current operation discovery or source compilation.
     """
-    from empirical_lawhood.api.generated_experiment_runtime_bindings import (
-        EXPERIMENT_RUNTIME_BINDINGS, EXPERIMENT_SPECIFICATION_PROTOCOLS,
-    )
+    from empirical_lawhood.api.generated_experiment_runtime_bindings import EXPERIMENT_RUNTIME_BINDINGS, EXPERIMENT_SPECIFICATION_PROTOCOLS
     if type(assess_incomplete) is not bool or allow_partial and assess_incomplete:
         raise ValueError('incomplete assessment and metadata-only partial inspection are distinct selections')
 
@@ -46,7 +45,7 @@ def read_prepared_experiment_science(*, selected, artifact_writer, run_id, revea
         run_id=run_id, reveal_authority_id=reveal_authority_id, allow_partial=allow_partial, **options)
     if original_access is not None and original_access.require_current() is not None:
         raise ValueError("original input access must return None or raise")
-    return result
+    return require_experiment_report(result, hook="read_result")
 
 
 def read_prepared_development_science(*, directory, artifact_writer, payloads, report,
@@ -81,7 +80,7 @@ def read_prepared_development_science(*, directory, artifact_writer, payloads, r
         products=products, draft=draft, plan=plan, allow_partial=allow_partial, **options)
     if original_input_access is not None:
         original_input_access.require_current()
-    return result
+    return require_experiment_report(result, hook="read_development_result")
 
 
 def validate_prepared_development_read_access(*, directory, artifact_writer, payloads, draft, plan, read_access):
@@ -134,26 +133,25 @@ def complete_prepared_development_science(*, directory, artifact_writer, project
         scheduler_result=scheduler_result, **options)
     if original_input_access is not None:
         original_input_access.require_current()
-    return result
+    return require_experiment_report(result, hook="complete_development_result")
 
 
 def _development_runtime_context(*, payloads, draft, callback_name):
     """Select one exact ordinary owner from the original public companion."""
-    from empirical_lawhood.adapters.composition.generated_extension_bundles import EXPERIMENT_PROTOCOL_DECLARATIONS
-    from empirical_lawhood.api.generated_experiment_runtime_bindings import (
-        EXPERIMENT_RUNTIME_BINDINGS, EXPERIMENT_SPECIFICATION_PROTOCOLS,
-    )
-    from empirical_lawhood.api.experiment_runtime_bindings import validate_experiment_runtime_binding
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding, ExperimentProtocolDeclaration
-
     required = {"experiment-specification.json", "experiment-instance.json"}
     present = required.intersection(payloads)
     if not present:
         return None
     if present != required:
         raise ValueError("development scientific read omits an original experiment companion")
+
+    from empirical_lawhood.api.generated_experiment_protocols import EXPERIMENT_PROTOCOL_DECLARATIONS
+    from empirical_lawhood.api.generated_experiment_runtime_bindings import EXPERIMENT_RUNTIME_BINDINGS, EXPERIMENT_SPECIFICATION_PROTOCOLS
+    from empirical_lawhood.api.experiment_runtime_bindings import validate_experiment_runtime_binding
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding, ExperimentProtocolDeclaration
+
     raw = payloads["experiment-instance.json"]
     instance = decode_canonical_bytes(raw, ExperimentInstanceBinding, maximum_bytes=len(raw))
     pin = instance.specification

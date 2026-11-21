@@ -8,14 +8,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial as method
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_reduction as reduction_owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_selection as selection
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experimental_factorial import PairInteractionScale
-from empirical_lawhood.runtime.experimental_statistics import PairedMeanTAlternative
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial as method
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_reduction as reduction_owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_selection as selection
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experimental_factorial import PairInteractionScale
+from empirical_lawhood.methods.statistics.experimental_statistics import PairedMeanTAlternative
 from tests import test_matrix_programme_selection as fixture_owner
 from tests.test_matrix_programme_selection import pin
 
@@ -338,8 +338,8 @@ def test_canonical_output_preserves_exact_fractions_and_all_adverse_scope(assess
 
 
 def test_cold_declaration_is_pure_falsify_exposed_development_nonpromotable(monkeypatch):
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.plans import ScientificStage
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.execution.plans import ScientificStage
     monkeypatch.setattr(method, "assess_programme_factorial", lambda *a, **kw: pytest.fail("cold discovery executed scientific analysis"))
     declaration, = method.operation_declarations()
     assert declaration.capability_key == method.OPERATION and declaration.stage is ScientificStage.FALSIFY
@@ -374,8 +374,8 @@ def test_development_data_cannot_be_relabelled_as_calibration_or_confirmation(po
 def _compiled(exposed):
     from pathlib import Path
     from empirical_lawhood.api import load_authoring
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     declaration, = method.operation_declarations()
     campaign = replace(load_authoring(Path(__file__).parents[1]/"tests/fixtures/reference-campaign.json").campaign,
         budget=declaration.resources)
@@ -389,7 +389,7 @@ def _compiled(exposed):
 
 
 def test_existing_recursive_compiler_uses_real_declared_exposed_factorial_consumer(exposed):
-    from empirical_lawhood.runtime.plans import ScientificStage
+    from empirical_lawhood.execution.plans import ScientificStage
     lowered, _, compiled = _compiled(exposed)
     task, = compiled.execution_plan.tasks
     assert task.stage is ScientificStage.FALSIFY
@@ -400,8 +400,8 @@ def test_existing_recursive_compiler_uses_real_declared_exposed_factorial_consum
 
 @pytest.mark.parametrize("damage", ("thinned-root", "wrong-source-link", "missing-source-link", "swapped-input-role", "protected-input", "wrong-config"))
 def test_public_compiler_cannot_bypass_original_exposed_root_inputs_or_access(exposed, damage):
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     lowered, options, _ = _compiled(exposed)
     draft = lowered.draft
     if damage == "thinned-root":
@@ -447,8 +447,8 @@ def test_pure64_confirmation_shaped_fixture_retains_conditional_status_and_canno
     genuine new independent scientific units. This checks the full64 software
     census without claiming that the sampling assumption holds for this fixture.
     """
-    from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import ScheduledProgrammeWave
+    from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import ScheduledProgrammeWave
     cases, rows, results = [], [], []
     for group_index, group_id in enumerate(polynomial.programme.group_ids):
         originals = tuple((case, row, result) for case, row, result in zip(polynomial.programme.cases,
@@ -491,14 +491,10 @@ def test_pure64_confirmation_shaped_fixture_retains_conditional_status_and_canno
 def _sealed_context(case, *, damage=None):
     """In-process runner conformance with actual sealed inputs; no worker proof."""
     import os
-    from empirical_lawhood.infrastructure.artifact_stream_primitives import (
-        _anonymous_input_descriptor, _PreopenedBoundedReader, _seal_anonymous_input,
-    )
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-    from empirical_lawhood.runtime.execution import (
-        TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort,
-    )
+    from empirical_lawhood.storage.artifact_stream_primitives import _anonymous_input_descriptor, _PreopenedBoundedReader, _seal_anonymous_input
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+    from empirical_lawhood.execution.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
     declaration, = method.operation_declarations()
     manifest = declaration.manifest()
     specification = case.factorial_specification

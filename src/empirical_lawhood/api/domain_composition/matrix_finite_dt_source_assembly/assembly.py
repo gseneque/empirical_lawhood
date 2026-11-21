@@ -5,7 +5,7 @@ Metadata-only authorization is an explicit operational effect selected by the
 request. No scientific study issue, human attestation, reveal or acquisition is
 performed. Source comparators/nonuse retain their original actual custody.
 """
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support as current_exposure_support
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support as current_exposure_support
 from contextlib import contextmanager
 from dataclasses import replace
 from datetime import datetime
@@ -22,23 +22,18 @@ def source_root_from_e3(*, original, programme, bank, certificate, cutoff, compu
     The genuine numerical world, represented/unrepresented physics, relation,
     paired views and explicit computability evidence retain their real scope.
     """
-    from empirical_lawhood.adapters.composition.experiment_authoring import single_experiment_campaign
-    from empirical_lawhood.adapters.methods import matrix_finite_dt_source_bindings as bindings
-    from empirical_lawhood.adapters.methods import matrix_finite_dt_source_records as r
-    from empirical_lawhood.kernel.authority import AuthorityAction, ResourceBudget
-    from empirical_lawhood.kernel.evidence import ClaimSpec, OutcomeAccess
-    from empirical_lawhood.kernel.experiments import ControlKind, ControlSpec, PrecisionGoal, RevealBarrierSpec
-    from empirical_lawhood.kernel.obligations import (
-        ClosureSpec, FalsifierKind, FalsifierSpec, ObligationStatus, ScientificObligations,
-        StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec,
-    )
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
-    from empirical_lawhood.kernel.status import ReadinessStatus
-    from empirical_lawhood.kernel.worlds import WorldKind
-    from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceGateKind
-    from empirical_lawhood.planning.study_authoring import (
-        DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, StudyDraft, StudyDraftLifecycle,
-    )
+    from empirical_lawhood.execution.experiment_authoring import single_experiment_campaign
+    from empirical_lawhood.domains.matrix import matrix_finite_dt_source_bindings as bindings
+    from empirical_lawhood.domains.matrix import matrix_finite_dt_source_records as r
+    from empirical_lawhood.science.identity.authority import AuthorityAction, ResourceBudget
+    from empirical_lawhood.science.evidence.evidence import ClaimSpec, OutcomeAccess
+    from empirical_lawhood.science.experiments.experiments import ControlKind, ControlSpec, PrecisionGoal, RevealBarrierSpec
+    from empirical_lawhood.science.evidence.obligations import ClosureSpec, FalsifierKind, FalsifierSpec, ObligationStatus, ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
+    from empirical_lawhood.science.records.status import ReadinessStatus
+    from empirical_lawhood.science.models.worlds import WorldKind
+    from empirical_lawhood.design.scientific_source_qualification import ScientificSourceGateKind
+    from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, StudyDraft, StudyDraftLifecycle
     original.__post_init__()
     computability.__post_init__()
     if original.system is None or original.experiment is None or original.system.world.kind is not WorldKind.NUMERICAL_SIMULATOR:
@@ -125,31 +120,28 @@ def source_root_from_e3(*, original, programme, bank, certificate, cutoff, compu
 @contextmanager
 def assembled_finite_dt_source_inputs(*,assembly_specification,assembly_request,project_root,artifact_writer,
         metadata_directory,output_selection_path,execution):
-    from empirical_lawhood.adapters.methods import matrix_finite_dt_source_experiment as domain
-    from empirical_lawhood.adapters.methods import matrix_finite_dt_source_records as r
-    from empirical_lawhood.adapters.methods import matrix_finite_dt_source_bindings as bindings
-    from empirical_lawhood.adapters.methods import matrix_finite_dt_source_pipeline as rows_owner
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity
-    from empirical_lawhood.api.matrix_finite_dt_source_pipeline import (
-        publish_finite_dt_source_metadata)
+    from empirical_lawhood.domains.matrix import matrix_finite_dt_source_experiment as domain
+    from empirical_lawhood.domains.matrix import matrix_finite_dt_source_records as r
+    from empirical_lawhood.domains.matrix import matrix_finite_dt_source_bindings as bindings
+    from empirical_lawhood.domains.matrix import matrix_finite_dt_source_pipeline as rows_owner
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity
+    from empirical_lawhood.api.matrix_finite_dt_source_pipeline import publish_finite_dt_source_metadata
     from empirical_lawhood.api.matrix_finite_dt_source_runtime import certify_native_training_instrument
     from empirical_lawhood.api.selected_e4_bank_recipe import _read_exact_record, _publication_from_manifest
     from empirical_lawhood.api.matrix_programme_e4_inputs import published_programme_e4_inputs, original_e3_lineage, _require_original_e3_access
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.serialization import validate_stable_id
-    from empirical_lawhood.kernel.worlds import WorldKind
-    from empirical_lawhood.planning import dataset_authority as grants
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-    from empirical_lawhood.planning.source_pipelines import (
-        _validate_static_locator)
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.records.serialization import validate_stable_id
+    from empirical_lawhood.science.models.worlds import WorldKind
+    from empirical_lawhood.design import dataset_authority as grants
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.design.source_pipelines import _validate_static_locator
 
     from empirical_lawhood.api.recursive_authoring import implementation_binding
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_assembly import (
-        source_assembly_request_types)
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_assembly import source_assembly_request_types
     if type(assembly_request) not in source_assembly_request_types():
         raise TypeError('source preprocessing requires its exact typed request')
     assembly_request.__post_init__()
@@ -259,7 +251,7 @@ def assembled_finite_dt_source_inputs(*,assembly_specification,assembly_request,
         publication("scientific-root." + root.fingerprint(), root)
         rows = rows_owner.MatrixFiniteDtPendingSourceRows.from_bank(programme, bank, record_id="rows." + namespace)
         rule = rows_owner.MatrixFiniteDtSourceValidationRule("rule." + namespace, programme.identity, bank.identity, rows.identity)
-        from empirical_lawhood.api.matrix_source_input_assembly import materialize_source_input_rows,prepare_source_candidate
+        from empirical_lawhood.api.matrix_source_input_assembly import materialize_source_input_rows, prepare_source_candidate
         materialized,evidence_profile=materialize_source_input_rows(writer=writer,project=project,prefix=prefix,
             namespace=namespace,selected=selected,key_path=key_path,selected_start=selected_start,seconds=seconds,reasons=reasons,
             implementation=implementation,publication=publication,retained=retained,rows=rows,rule=rule,bank=bank,

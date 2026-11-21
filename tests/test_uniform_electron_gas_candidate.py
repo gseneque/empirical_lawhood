@@ -4,29 +4,22 @@ from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
-from empirical_lawhood.adapters.composition.generated_executable_bindings import (
-    EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY,
-    EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY,
-)
-from empirical_lawhood.adapters.composition.generated_extension_bundles import (
-    GENERATED_EXTENSION_BUNDLE_AGGREGATE,
-)
-from empirical_lawhood.adapters.composition.task_resources import (
-    progress_resource_envelope,
-)
-from empirical_lawhood.adapters.methods.uniform_electron_gas_analytic_reference.executable_binding import BINDING as EVALUATOR_BINDING
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.analytic_authoring import UniformElectronGasAnalyticCandidateContextProvider, build_uniform_electron_gas_analytic_authoring
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.analytic_design import BUDGET
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.analytic_science import check_analytic_panel, generate_analytic_panel
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.executable_binding import BINDING as NATIVE_BINDING
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.native_quickstart import UniformElectronGasAnalyticReferenceConfig
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime_provider import native_task_id
+from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY, EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
+from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+from empirical_lawhood.execution.task_resources import progress_resource_envelope
+from empirical_lawhood.domains.materials.uniform_electron_gas_analytic_reference.extension import BINDING as EVALUATOR_BINDING
+from empirical_lawhood.domains.materials.electron_gas.analytic_authoring import UniformElectronGasAnalyticCandidateContextProvider, build_uniform_electron_gas_analytic_authoring
+from empirical_lawhood.domains.materials.electron_gas.analytic_design import BUDGET
+from empirical_lawhood.domains.materials.electron_gas.analytic_science import check_analytic_panel, generate_analytic_panel
+from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.extension import BINDING as NATIVE_BINDING
+from empirical_lawhood.domains.materials.electron_gas.native_quickstart import UniformElectronGasAnalyticReferenceConfig
+from empirical_lawhood.domains.materials.electron_gas.analytic_design import native_task_id
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
 from empirical_lawhood.api.results import CompileCandidateRequest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_run_plan
-from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.compiler import compile_preissue_run_plan, lower_run_plan
+from empirical_lawhood.execution.study_issue import project_standard_study_extensions
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "programmes/materials/superconductivity/workflows/electron-gas-response/config.json"
@@ -92,7 +85,7 @@ def test_shipped_analytic_unit_compiles_and_selects_both_providers(
         issued_extensions=ObjectIdentity.from_record(
             issued.issued_extension_set_id, issued
         ),
-        cpu_seconds=BUDGET.wall_time_seconds,
+        summed_wall_time_ceiling_seconds=BUDGET.wall_time_seconds,
         native_preparations=(
             (
                 native_task_id(config),

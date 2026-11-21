@@ -1,0 +1,22 @@
+{
+  "source": "adapters/physical/virtual_cell/dataset.py",
+  "scientific_owner": "domains/biology/virtual_cell/response_reduction.py",
+  "extracted": [
+    "SHA-priority batch-stratified reservoir selection",
+    "fixed-total log1p normalization",
+    "target-by-batch grouping and complete row census",
+    "dense/CSR first and second moments",
+    "population mean and nonnegative population variance"
+  ],
+  "retained_adapter_responsibilities": [
+    "HDF5 schema/encoding/shape access",
+    "authenticated stream and gene registry reads",
+    "bounded chunk reads and dtype conversion"
+  ],
+  "intentional_repairs": [
+    "Noncanonical CSR duplicate coordinates coalesce before nonlinear normalization and second moments, matching the mathematical dense matrix.",
+    "Reject nonfinite normalization totals/results.",
+    "Reusable reducer refuses omitted, repeated or reordered original rows."
+  ],
+  "canonical_input_preservation": "Canonical CSR and dense supported-input arithmetic order and formulas retained; no original scientific records are rewritten."
+}

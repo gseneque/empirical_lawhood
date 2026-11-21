@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Exposed complete ordinary observation graph; no scientific acquisition."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from hashlib import sha256
@@ -9,25 +10,26 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_observation_inquiry import contracts as ct, operation_bindings as ob, recursive_translation as rt
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, preparation_contracts as pc, preparation_science as ps
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_native as base, segmented_observation_native as native, segmented_observation_contracts as oc
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.segmented_fidelity import FullStateControlProtocol
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.segmented_fidelity_stream import FullStateStreamAssessment
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry import evidence_stream as es
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.infrastructure.execution import LocalScheduler, ResourceAdmissionError
-from empirical_lawhood.infrastructure.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, WorkerInputBinding, WorkerInputKind, WorkerOutputPort
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.battery.battery_observation_inquiry import contracts as ct, operation_bindings as ob, recursive_translation as rt
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, preparation_contracts as pc, preparation_science as ps
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as base, segmented_observation_native as native
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_observation_contracts as oc
+from empirical_lawhood.domains.battery.battery_refined_inquiry.segmented_fidelity import FullStateControlProtocol
+from empirical_lawhood.domains.battery.battery_refined_inquiry.segmented_fidelity_stream import FullStateStreamAssessment
+from empirical_lawhood.domains.battery.battery_segmented_inquiry import evidence_stream as es
+
+from empirical_lawhood.execution.local.execution import LocalScheduler, ResourceAdmissionError
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, WorkerInputBinding, WorkerInputKind, WorkerOutputPort
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform.test_native_subwork import _plane, _store
 from tests.test_battery_durable_graph import stock as old_stock_fixture
 from tests.test_battery_segmented_observation import observation as observation_fixture
@@ -71,8 +73,8 @@ def compile_stock(stock, draft=None):
 
 
 def test_declarations_keep_canonical_input_types_separate_from_original_stream_codecs():
-    from empirical_lawhood.runtime.artifacts import is_canonical_json_media_type
-    from empirical_lawhood.runtime.recursive_storage_codecs import resolve_storage_codec
+    from empirical_lawhood.storage.contracts.artifacts import is_canonical_json_media_type
+    from empirical_lawhood.storage.contracts.recursive_storage_codecs import resolve_storage_codec
 
     for declaration in ob.operation_declarations():
         registration = declaration.registration()
@@ -189,7 +191,7 @@ def native_progress(plane, context, provenance, tmp_path):
         result = plane.write(ArtifactWriteRequest(port.artifact_id, "inputs/" + context.task_id + "/" + port.artifact_id + ".json", port.payload_schema,
             ArtifactProfile.RAW_SOURCE_BYTES if port.payload_schema == oc.RAW_SOURCE_SCHEMA else ArtifactProfile.CANONICAL_JSON,
             port.media_type, "exposed.observation.inputs", "inputs", port.raw, VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
-        manifest = decode_artifact_manifest(plane.root.resolve(result.materialization.relative_path + ".manifest.json", for_write=False).read_bytes())
+        manifest = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes())
         port.materialization_id = manifest.materialization.materialization_id
         manifests.append(manifest)
         bindings.append(WorkerInputBinding(port.artifact_id, port.materialization_id, port.payload_schema, port.media_type,
@@ -387,7 +389,7 @@ def test_worker_foreign_source_refuses_before_native_port(stock):
 def test_four_unregistered_descriptors_are_cold():
     import subprocess
     import sys
-    result = subprocess.run((sys.executable, "-c", "import sys; from empirical_lawhood.adapters.methods.battery_observation_inquiry.executable_binding import EXECUTABLE_BINDING_FACTORIES; assert len(EXECUTABLE_BINDING_FACTORIES)==4; assert 'pybamm' not in sys.modules; assert 'numpy' not in sys.modules; assert 'flint' not in sys.modules"), capture_output=True, text=True, check=False)
+    result = subprocess.run((sys.executable, "-c", "import sys; from empirical_lawhood.domains.battery.battery_observation_inquiry.extension import EXTENSION; assert len(EXTENSION.factories)==4; assert 'pybamm' not in sys.modules; assert 'numpy' not in sys.modules; assert 'flint' not in sys.modules"), capture_output=True, text=True, check=False)
     assert result.returncode == 0, result.stderr
 
 

@@ -13,37 +13,28 @@ from types import SimpleNamespace
 import pytest
 
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
-from empirical_lawhood.kernel.status import OperationalStatus
+from empirical_lawhood.science.records.status import OperationalStatus
 
 
-from empirical_lawhood.runtime.artifacts import (
-    CanonicalTaskReceipt,
-    ReceiptCheck,
-)
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt, ReceiptCheck
 
 
-from empirical_lawhood.runtime.execution import OperationalFailureClass
+from empirical_lawhood.execution.execution import OperationalFailureClass
 
 
-from empirical_lawhood.runtime.execution_envelope import (
-    ChildResourceTokenLimit, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec,
-    NonTimeResourceBudget, RunExecutionResourceEnvelopeMachine,
-)
+from empirical_lawhood.execution.execution_envelope import ChildResourceTokenLimit, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec, NonTimeResourceBudget, RunExecutionResourceEnvelopeMachine
 
 
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan, ExecutionPlan
+from empirical_lawhood.execution.plans import CandidateExecutionPlan, ExecutionPlan
 
 
-from empirical_lawhood.runtime.recovery import (
-    OperationalFailureDiagnostic, RecoveryTerminalAttempt, RecoveryTerminalDisposition,
-    RunRecoveryIndex, RunRecoveryTerminalEvent, TaskRecoveryDisposition, TaskRecoveryEvent,
-)
+from empirical_lawhood.execution.recovery import OperationalFailureDiagnostic, RecoveryTerminalAttempt, RecoveryTerminalDisposition, RunRecoveryIndex, RunRecoveryTerminalEvent, TaskRecoveryDisposition, TaskRecoveryEvent
 
 
 
@@ -107,35 +98,35 @@ from hashlib import sha256
 import pytest
 
 
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, FilesystemState, GuardedExternalRoot
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, FilesystemState, GuardedExternalRoot
 
 
-from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
 
 
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
 
 
-from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
 
 
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
 
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-
-
-
-
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
 
 
 
 
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactWriteRequest, ExternalRootContract
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 
 
-from empirical_lawhood.runtime.execution import OperationalAttempt, TaskAttemptDisposition
+
+
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactWriteRequest, ExternalRootContract
+
+
+from empirical_lawhood.execution.execution import OperationalAttempt, TaskAttemptDisposition
 
 
 
@@ -262,7 +253,7 @@ from empirical_lawhood.api import recursive_authoring
 
 from empirical_lawhood.api.results import RunCampaignRequest
 
-from empirical_lawhood.infrastructure.execution import DirectTaskExecutor
+from empirical_lawhood.execution.local.execution import DirectTaskExecutor
 
 
 
@@ -273,10 +264,10 @@ from empirical_lawhood.infrastructure.execution import DirectTaskExecutor
 
 
 
-from empirical_lawhood.runtime.execution_envelope import ProgressHeartbeat, ProgressLivenessContract
+from empirical_lawhood.execution.execution_envelope import ProgressHeartbeat, ProgressLivenessContract
 
 
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedNativeWork
+from empirical_lawhood.execution.prepared_native_invocation import PreparedNativeWork
 
 
 

@@ -6,13 +6,13 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.infrastructure.candidate_sources import ExternalCandidateInputPublisher
-from empirical_lawhood.infrastructure.recursive_prospective_inputs import RecursiveContentInputSupplier
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.plans import ExternalInputSpec
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveOperand
+from empirical_lawhood.storage.candidate_sources import ExternalCandidateInputPublisher
+from empirical_lawhood.storage.recursive_prospective_inputs import RecursiveContentInputSupplier
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.execution.plans import ExternalInputSpec
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveOperand
 from tests.test_recursive_public_service import _plane
 
 

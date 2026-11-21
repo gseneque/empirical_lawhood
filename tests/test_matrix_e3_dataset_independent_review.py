@@ -10,10 +10,10 @@ import os
 
 import pytest
 
-from empirical_lawhood.adapters.methods import matrix_dataset_readers as datasets
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import forecast, science
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.matrix_inputs import MAXIMUM_MATRIX_ARRAY_BYTES
+from empirical_lawhood.domains.matrix import matrix_dataset_readers as datasets
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import forecast, science
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.domains.matrix.input_contracts import MAXIMUM_MATRIX_ARRAY_BYTES
 from tests.test_matrix_dataset_readers import real_port
 from tests.test_matrix_e3_protected_feature import finite_case, project
 from tests.test_matrix_e3_protected_prefix_science import blocked

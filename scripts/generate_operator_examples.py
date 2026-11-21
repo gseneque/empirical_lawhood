@@ -8,11 +8,11 @@ from hashlib import sha256
 from pathlib import Path
 
 from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import AssignedReactorAuthoringProfile
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.assigned import ReactorPrefixAssignedUnit, ReactorPrefixAssignment, ReactorPrefixPriorCensus
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.panel import SCENARIOS
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_assigned import ReactorPrefixAssignedUnit, ReactorPrefixAssignment, ReactorPrefixPriorCensus
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_panel import SCENARIOS
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.packaged_source import load_packaged_reactor_source
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 
 
 def examples() -> dict[str, bytes]:

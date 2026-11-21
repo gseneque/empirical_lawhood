@@ -8,18 +8,11 @@ import runpy
 
 import pytest
 
-from empirical_lawhood.adapters.composition.recursive_examples import (
-    materials_partial_draft,
-    rc_scientific_examples,
-)
-from empirical_lawhood.adapters.methods.battery_recursive_construction.examples import (
-    battery_wave_a_draft,
-)
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.recursive_translation import (
-    rc_recursive_draft,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.adapters.composition.recursive_examples import materials_partial_draft, rc_scientific_examples
+from empirical_lawhood.domains.battery.battery_recursive_construction.examples import battery_wave_a_draft
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
 
 
 ROOT = Path(__file__).resolve().parents[1]

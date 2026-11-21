@@ -14,28 +14,28 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_methods import METHODS
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as common
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_native as development
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as dev_records
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_execution as protected
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as protected_records
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import FAMILY_MAP
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_forecast import array_product
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import PREDICTORS, branch_census
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import bind_selected_native_source, selected_stream_operands
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history_segments import ParameterGeneratorState
-from empirical_lawhood.infrastructure import execution as lifecycle
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, CanonicalTaskReceipt, LogicalArtifactIdentity
-from empirical_lawhood.runtime.native_subwork import NativeSubworkBegin, NativeSubworkCompletion, NativeSubworkContact
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_methods import METHODS
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as common
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_native as development
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as dev_records
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_execution as protected
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as protected_records
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import FAMILY_MAP
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_forecast import array_product
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import PREDICTORS, branch_census
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import bind_selected_native_source, selected_stream_operands
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history_segments import ParameterGeneratorState
+from empirical_lawhood.execution.local import execution as lifecycle
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, CanonicalTaskReceipt, LogicalArtifactIdentity
+from empirical_lawhood.execution.native_subwork import NativeSubworkBegin, NativeSubworkCompletion, NativeSubworkContact
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.native_completion_fixtures import literal_completion, receipt_with_completion
 from tests.test_matrix_e4_entry_source_identity import _case as development_prefix
 from tests.test_matrix_e4_protected_entry_source_identity import _prefix_case as protected_prefix
@@ -53,9 +53,9 @@ def pin(name, kind):
 def no_native(monkeypatch):
     def forbidden(*_args, **_kwargs):
         pytest.fail("response metadata/nonuse control entered a native effect")
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments, parameter_source
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments, parameter_source
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
     for owner, names in ((development, ("execute_parameter_native_work", "execute_paired_response_native_work")),
             (protected, ("execute_parameter_native_work", "execute_paired_response_native_work")),
             (parameter_history_segments, ("acquire_parameter_segment",)),
@@ -80,7 +80,7 @@ def literal_prefix(module, kinds, config, source, context, *, prefix_arrays=None
     child = "native-subwork." + sha256((context.task_id + ":" + definition.subwork_id).encode()).hexdigest()
     access, visibility = ((OutcomeAccess.DEVELOPMENT_VISIBLE, VisibilityCeiling.DEVELOPMENT_ONLY)
         if module is development else (OutcomeAccess.OUTCOME_BLIND, VisibilityCeiling.PROSPECTIVE))
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_science, selected_e4_native_science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_science, selected_e4_native_science
     science = selected_e3_e4_science if module is development else selected_e4_native_science
     values = {"literal": np.zeros(1, dtype="<f8")} if prefix_arrays is None else prefix_arrays
     raw, operand = science.array_product(source, values, role="PREFIX",
@@ -127,14 +127,14 @@ def response_case(fixture, population, causal_disposition, mechanical_dispositio
         kinds = (records.SelectedE3E4PrefixHistory, records.SelectedE3E4CausalPrefix,
             records.SelectedE3E4NumericalAssessment, records.SelectedE3E4Witness, records.SelectedE3E4Frames,
             records.SelectedE3E4Feature, records.SelectedE3E4MechanicalForecast)
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as bindings
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as bindings
     else:
         _, config, local, entry, _, context = protected_prefix(fixture)
         module, records, invoke = protected, protected_records, protected_invocation
         kinds = (records.SelectedE4ProtectedPrefixHistory, records.SelectedE4ProtectedCausalPrefix,
             records.SelectedE4ProtectedNumericalAssessment, records.SelectedE4ProtectedWitness, records.SelectedE4ProtectedFrames,
             records.SelectedE4ProtectedFeature, records.SelectedE4ProtectedMechanicalForecast)
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_bindings as bindings
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_bindings as bindings
     try:
         entry_producer, = (row.task_id for row in context.dependency_receipts)
         provenance = next(value for value in (fixture.bank.provenances if population == "development"
@@ -219,7 +219,7 @@ def test_adverse_responses_keep_exact_potential_work_and_all48_unentered_branche
         assert len(product.branch_ids) == len(branch_census(case.config.protocol, case.config.panels)) == 48
         values = decode_canonical_bytes(product.canonical_bytes(), type(product), maximum_bytes=None)
         assert values == product and product.reason_codes == ("complete48-pulse-slots-not-entered-" + expected.lower(),)
-        from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
+        from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
         assert np.array_equal(decode_matrix_arrays(raw, product.arrays)["unentered_branches"], np.arange(48, dtype="<i8"))
     finally:
         for port in case.context.input_ports:

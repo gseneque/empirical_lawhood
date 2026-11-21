@@ -1,38 +1,27 @@
 """Typed plan envelopes preserve compact-control limits and custody refusal."""
 
-from dataclasses import replace
 from pathlib import Path
 import os
 from types import MethodType, SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.api import authoring_handoff, codecs, finite_rerun_authoring, preparation_applicability
-from empirical_lawhood.api.execution import (
-    _CatalogSemanticReplayBudget, CampaignCapabilityError,
-    CampaignExecutionService, CampaignIdentityError,
-)
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.bounded_io import (
-    BoundedFileIOError, MAX_CONTROL_PLANE_JSON_BYTES, MAX_RUNTIME_PLAN_JSON_BYTES,
-)
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactCustodyLimits, ArtifactManifest, ArtifactProfile, ArtifactWriteRequest, ExternalRootContract,
-    artifact_publication_batch_id, artifact_publication_commit_relative_path,
-    artifact_publication_member,
-)
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan
+from empirical_lawhood.api import authoring_handoff, codecs
+from empirical_lawhood.api.execution import _CatalogSemanticReplayBudget, CampaignCapabilityError, CampaignExecutionService, CampaignIdentityError
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits, ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
+from empirical_lawhood.execution.plans import CandidateExecutionPlan
 
 
 FIXTURE = Path(__file__).parent / 'fixtures/authoring-execution-plan.json'
 
 
 def test_topological_generations_visit_each_dependency_list_once():
-    from empirical_lawhood.runtime.plans import _topological_order
+    from empirical_lawhood.execution.plans import _topological_order
 
     visits = []
     class Dependencies(dict):
@@ -55,65 +44,12 @@ def _sparse(path, size):
         handle.truncate(size)
 
 
-@pytest.mark.parametrize('owner', ('shared', 'finite', 'preparation'))
-def test_oversize_typed_plan_is_refused_before_decode(tmp_path, monkeypatch, owner):
-    """Descriptor size refusal happens before hostile JSON allocation/decoding."""
-    _sparse(tmp_path / 'preissue-execution-plan.json', MAX_RUNTIME_PLAN_JSON_BYTES + 1)
-
-    def forbidden(*args, **kwargs):
-        raise AssertionError('oversize plan reached its decoder')
-
-    selected = {'shared': authoring_handoff, 'finite': finite_rerun_authoring, 'preparation': preparation_applicability}[owner]
-    monkeypatch.setattr(selected, 'decode_canonical_bytes', forbidden)
-    with pytest.raises(BoundedFileIOError, match='exceeds its byte limit'):
-        if owner == 'shared':
-            writer = SimpleNamespace(custody_limits=ArtifactCustodyLimits(control_record_bytes=MAX_RUNTIME_PLAN_JSON_BYTES))
-            authoring_handoff.load_authoring_execution_projection(tmp_path, artifact_writer=writer)
-        elif owner == 'finite':
-            finite_rerun_authoring._read_record(tmp_path, 'preissue-execution-plan.json', CandidateExecutionPlan)
-        else:
-            preparation_applicability._read_handoff_record(tmp_path, 'preissue-execution-plan.json', CandidateExecutionPlan)
 
 
-@pytest.mark.parametrize('owner', ('finite', 'preparation'))
-def test_scientific_control_retains_compact_limit(tmp_path, monkeypatch, owner):
-    _sparse(tmp_path / 'source-closure.json', MAX_CONTROL_PLANE_JSON_BYTES + 1)
-
-    def forbidden(*args, **kwargs):
-        raise AssertionError('oversize compact control reached its decoder')
-
-    selected = finite_rerun_authoring if owner == 'finite' else preparation_applicability
-    monkeypatch.setattr(selected, 'decode_canonical_bytes', forbidden)
-    with pytest.raises(BoundedFileIOError, match='exceeds its byte limit'):
-        if owner == 'finite':
-            selected._read_record(tmp_path, 'source-closure.json', ObjectIdentity)
-        else:
-            selected._read_handoff_record(tmp_path, 'source-closure.json', ObjectIdentity)
 
 
-def test_closed_plan_codec_refuses_sparse_oversize_before_decode(tmp_path, monkeypatch):
-    path = tmp_path / 'plan.json'
-    _sparse(path, MAX_RUNTIME_PLAN_JSON_BYTES + 1)
-
-    def forbidden(*args, **kwargs):
-        raise AssertionError('oversize closed plan root reached its decoder')
-
-    monkeypatch.setattr(codecs, 'decode_record', forbidden)
-    with pytest.raises(codecs.AuthoringCodecError, match='byte limit'):
-        codecs.load_registered_authoring(path, root_schemas={CandidateExecutionPlan.SCHEMA: CandidateExecutionPlan})
 
 
-def test_mixed_root_codec_applies_typed_plan_bound_after_closed_selection(monkeypatch):
-    raw = FIXTURE.read_text()
-    monkeypatch.setattr(codecs, 'MAX_RUNTIME_PLAN_JSON_BYTES', len(raw.encode()) - 1)
-    registry = {CandidateExecutionPlan.SCHEMA: CandidateExecutionPlan, ObjectIdentity.SCHEMA: ObjectIdentity}
-    with pytest.raises(codecs.AuthoringCodecError, match='runtime plan exceeds'):
-        codecs.loads_registered_authoring(raw, media_type='application/json', root_schemas=registry)
-    # The same mixed registry retains its ordinary authoring envelope for roots
-    # outside the plan hierarchy, instead of lowering every input's bound.
-    identity = ObjectIdentity('synthetic.large-nonplan-root', ObjectIdentity.SCHEMA, '1.0.0', 'a' * 64)
-    monkeypatch.setattr(codecs, 'MAX_RUNTIME_PLAN_JSON_BYTES', 1)
-    assert codecs.loads_registered_authoring(identity.canonical_bytes().decode(), media_type='application/json', root_schemas=registry) == identity
 
 
 def _stored_plan(tmp_path):
@@ -166,7 +102,7 @@ def test_replay_aggregate_charges_both_manifest_and_plan_before_open(tmp_path, m
     monkeypatch.setattr(plane, 'open', observed)
     arguments = dict(logical_artifact_id=retained.logical.logical_artifact_id,
         relative_path=retained.materialization.relative_path,
-        payload_schemas=(plan.SCHEMA,), maximum_bytes=MAX_RUNTIME_PLAN_JSON_BYTES,
+        payload_schemas=(plan.SCHEMA,), maximum_bytes=None,
         budget=budget)
     if missing_bytes:
         with pytest.raises(CampaignCapabilityError, match='aggregate byte limit'):
@@ -178,36 +114,21 @@ def test_replay_aggregate_charges_both_manifest_and_plan_before_open(tmp_path, m
         assert opens == [retained.materialization.size_bytes] and budget.remaining_bytes == 0
 
 
-@pytest.mark.parametrize('purpose', ('plan', 'compact-provider-receipt'))
-def test_declared_oversize_control_is_refused_before_protected_open(tmp_path, monkeypatch, purpose):
-    plane, service, plan, retained = _stored_plan(tmp_path)
-    maximum = MAX_RUNTIME_PLAN_JSON_BYTES if purpose == 'plan' else MAX_CONTROL_PLANE_JSON_BYTES
-    # The manifest's declaration is itself sufficient to refuse a protected
-    # payload read. This intentionally unauthenticated tamper claims no issue.
-    manifest_path = plane.root.resolve(retained.materialization.relative_path + '.manifest.json', for_write=False)
-    original = decode_artifact_manifest(manifest_path.read_bytes())
-    materialization = replace(retained.materialization, size_bytes=maximum + 1)
-    members = (artifact_publication_member(retained.logical, materialization),)
-    scope = original.publication.publication_scope
-    batch_id = artifact_publication_batch_id(scope, members)
-    publication = replace(original.publication, members=members,
-        publication_batch_id=batch_id,
-        commit_marker_relative_path=artifact_publication_commit_relative_path(scope, batch_id))
-    altered = ArtifactManifest(retained.logical, materialization, publication)
-    manifest_path.write_bytes(altered.canonical_bytes())
 
-    def forbidden(*args, **kwargs):
-        raise AssertionError('oversize declared control reached protected open')
 
-    monkeypatch.setattr(plane, 'open', forbidden)
-    if purpose == 'plan':
-        with pytest.raises(CampaignIdentityError, match='frozen identity'):
-            CampaignExecutionService._load_status_execution_plan(service, plan.source_plan.object_id)
-    else:
-        with pytest.raises(CampaignIdentityError, match='frozen identity'):
-            service._verified_rebuild_control_payload(
-                logical_artifact_id=retained.logical.logical_artifact_id,
-                relative_path=retained.materialization.relative_path,
-                payload_schemas=(plan.SCHEMA,), maximum_bytes=maximum,
-                budget=_CatalogSemanticReplayBudget(),
-            )
+def test_closed_plan_loads_observed_extent_and_respects_explicit_allowance(tmp_path):
+    raw = FIXTURE.read_bytes()
+    path = tmp_path / 'plan.json'
+    path.write_bytes(raw + b' ' * 17)
+    registry = {CandidateExecutionPlan.SCHEMA: CandidateExecutionPlan}
+    assert codecs.load_registered_authoring(path, root_schemas=registry) == codecs.load_registered_authoring(FIXTURE, root_schemas=registry)
+    with pytest.raises(codecs.AuthoringCodecError, match='byte limit'):
+        codecs.load_registered_authoring(path, root_schemas=registry, maximum_bytes=len(raw))
+
+
+def test_selected_custody_allowance_refuses_plan_before_decode(tmp_path, monkeypatch):
+    _sparse(tmp_path / 'preissue-execution-plan.json', 257)
+    monkeypatch.setattr(authoring_handoff, 'decode_canonical_bytes', lambda *a, **kw: pytest.fail('selected byte allowance must refuse before decode'))
+    writer = SimpleNamespace(custody_limits=ArtifactCustodyLimits(control_record_bytes=256))
+    with pytest.raises(BoundedFileIOError, match='byte limit'):
+        authoring_handoff.load_authoring_execution_projection(tmp_path, artifact_writer=writer)

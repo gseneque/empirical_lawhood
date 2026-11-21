@@ -7,12 +7,16 @@ grant from the ordinary store; original scientific locators stay unchanged.
 from dataclasses import dataclass, replace
 from types import SimpleNamespace
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4WaveLocator, pin
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4WaveLocator, pin
 
 
 @dataclass(frozen=True, slots=True)
 class SelectedE4CurrentAccess:
     waves: tuple[SelectedE4WaveLocator, ...]
+
+    @property
+    def selected_records(self):
+        return self.waves
 
     def __post_init__(self):
         if (type(self.waves) is not tuple or not self.waves

@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: MPL-2.0
 """Pure compact score projection; custody stays in the calling controller."""
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as p
-from empirical_lawhood.kernel.decoded_record_store import decoded_record_scope
-from empirical_lawhood.kernel.decoding import record_validation_scope
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as p
+from empirical_lawhood.science.records.decoded_record_store import decoded_record_scope
+from empirical_lawhood.science.records.decoding import record_validation_scope
 
-from .matrix_selected_e3_e4_read import _decode_record_bytes, _record_bytes
-from .matrix_read_indexes import product_record_index
+from empirical_lawhood.api.matrix_selected_e3_e4_read import _decode_record_bytes, _record_bytes
+from empirical_lawhood.api.matrix_read_indexes import product_record_index
 
 
 def _project_score(value):

@@ -14,8 +14,8 @@ import subprocess
 import time
 from typing import Final, Protocol
 
-from .contracts import ExcludedSolverControlConfig, FIXED_EXECUTOR_IMPLEMENTATION_ID, SolverRunObservation
-from .source import DOCKER_EXECUTABLE
+from empirical_lawhood.domains.materials.superconductivity.solver_control_contracts import ExcludedSolverControlConfig, FIXED_EXECUTOR_IMPLEMENTATION_ID, SolverRunObservation
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.source import DOCKER_EXECUTABLE
 
 
 PROFILE_ID: Final = 'ambient-pressure-superconductor-qe76-epw61-local-ext4'

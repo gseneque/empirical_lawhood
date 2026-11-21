@@ -7,19 +7,13 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods import matrix_sampling_assessment as owner
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.planning.metatheory import (
-    MetatheoryAggregateDisposition as Aggregate, MetatheoryApplicability as Applicability,
-    MetatheoryCellDisposition as Cell, MetatheoryEvidenceCeiling, MetatheoryMethodSelection,
-)
-from empirical_lawhood.planning.scientific_source_qualification import (
-    ScientificSourceGateEvidence, ScientificSourceGateKind, ScientificSourceGateResult, ScientificSourceGateSpec,
-    ScientificSourceInvalidUnitPolicy, ScientificSourceQualificationResult, ScientificSourceQualificationSpec,
-)
+from empirical_lawhood.domains.matrix import matrix_sampling_assessment as owner
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.design.structural_claims import MetatheoryAggregateDisposition as Aggregate, MetatheoryApplicability as Applicability, MetatheoryCellDisposition as Cell, MetatheoryEvidenceCeiling, MetatheoryMethodSelection
+from empirical_lawhood.design.scientific_source_qualification import ScientificSourceGateEvidence, ScientificSourceGateKind, ScientificSourceGateResult, ScientificSourceGateSpec, ScientificSourceInvalidUnitPolicy, ScientificSourceQualificationResult, ScientificSourceQualificationSpec
 
 
 def pin(name, schema="empirical-lawhood/testing/exposed-sampling-pin"):
@@ -152,10 +146,10 @@ def test_gate_result_cannot_drop_original_scientific_evidence_links():
 
 
 def test_actual_qualification_service_result_keeps_pipeline_and_gate_custody_separate():
-    from empirical_lawhood.adapters.methods.backbone_structural_transport.source_free_property_transport_contracts import source_free_property_transport_capability_registry
-    from empirical_lawhood.adapters.methods.backbone_structural_transport.source_free_property_transport_source_qualification_input_parts import _pipeline_receipt_for_profile
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.scientific_source_qualification import ScientificSourceQualificationService
+    from empirical_lawhood.methods.backbone_structural_transport.source_free_property_transport_contracts import source_free_property_transport_capability_registry
+    from empirical_lawhood.methods.backbone_structural_transport.source_free_property_transport_source_qualification_input_parts import _pipeline_receipt_for_profile
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.scientific_source_qualification import ScientificSourceQualificationService
 
     request = request_for()
     supplied = evidence_for(request)

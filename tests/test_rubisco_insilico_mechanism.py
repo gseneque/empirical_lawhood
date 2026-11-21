@@ -4,14 +4,9 @@
 from dataclasses import replace
 from fractions import Fraction as F
 import pytest
-from empirical_lawhood.adapters.methods.rubisco_insilico_mechanism import (
-    contracts as c,
-    science,
-    operation_bindings as owner,
-    recursive_translation as drafts,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition
+from empirical_lawhood.domains.rubisco.rubisco_insilico_mechanism import contracts as c, science, operation_bindings as owner, recursive_translation as drafts
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition
 from tests.test_rubisco_nomination_preparation import parent
 from tests.rubisco_nomination_fixture import mechanistic_source, nominee
 
@@ -120,23 +115,15 @@ def test_real_registered_pure_runner_shared_scheduler_receipt_and_no_effect_reco
     or biological qualification. No worker or registry is replaced by a mock.
     """
     from empirical_lawhood.api.recursive_execution import _external_inputs
-    from empirical_lawhood.infrastructure.execution import (
-        DirectTaskExecutor,
-        LocalProcessExecutor,
-        LocalScheduler,
-    )
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.infrastructure.sql import (
-        SQLiteOperationalRepository,
-        create_catalog_engine,
-        upgrade_catalog,
-    )
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile
-    from empirical_lawhood.runtime.plans import PlanLane
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.local.execution import DirectTaskExecutor, LocalProcessExecutor, LocalScheduler
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.execution.execution import ExecutionAssuranceProfile
+    from empirical_lawhood.execution.plans import PlanLane
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     from tests.runtime_platform.test_execution_scheduler import (
         StaticExternalInputResolver,
     )
@@ -144,8 +131,8 @@ def test_real_registered_pure_runner_shared_scheduler_receipt_and_no_effect_reco
 
     source, macro, outcome = stock
     draft = drafts.challenge_draft(source, macro, outcome, parent=parent(outcome))
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.execution import RunnerRegistry
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.execution import RunnerRegistry
 
     registrations, registry, codecs = (
         tuple(declaration.registration() for declaration in owner.operation_declarations()),
@@ -235,10 +222,8 @@ def test_real_registered_pure_runner_shared_scheduler_receipt_and_no_effect_reco
 
         from copy import deepcopy
         from hashlib import sha256
-        from empirical_lawhood.infrastructure.recursive_custody import (
-            read_recursive_products,
-        )
-        from empirical_lawhood.kernel.recursive_requirements import ContributionRole
+        from empirical_lawhood.storage.recursive_custody import read_recursive_products
+        from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
 
         products = read_recursive_products(
             plane=plane,
@@ -313,15 +298,14 @@ class NoNative(importlib.abc.MetaPathFinder):
             raise AssertionError('cold mechanism discovery imports native battery')
 sys.meta_path.insert(0,NoNative())
 from empirical_lawhood.api.recursive_operations import operation_factories
-from empirical_lawhood.adapters.methods.rubisco_insilico_mechanism.executable_binding import EXECUTABLE_BINDING_FACTORIES
-from empirical_lawhood.adapters.methods.rubisco_insilico_mechanism.extension_bundle import EXTENSION_BUNDLE_CONTRIBUTION
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import RunnerRegistry
-factories={f.manifest.registry_id:f for f in (*operation_factories(),*EXECUTABLE_BINDING_FACTORIES)}
+from empirical_lawhood.domains.rubisco.rubisco_insilico_mechanism.extension import EXTENSION
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerRegistry
+factories={f.manifest.registry_id:f for f in (*operation_factories(),*EXTENSION.factories)}
 registry=CapabilityRegistry('registry.exposed-cold-mechanism',tuple(sorted((f.manifest for f in factories.values()),key=lambda m:m.registry_id)))
 runners=RunnerRegistry(tuple(f.runner_factory() for f in sorted(factories.values(),key=lambda f:f.manifest.registry_id)),registry_sha256=registry.fingerprint())
 assert tuple(r.manifest for r in runners._runners)==registry.capabilities
-assert tuple(f.manifest for f in EXECUTABLE_BINDING_FACTORIES)==EXTENSION_BUNDLE_CONTRIBUTION.capability_manifests
+assert tuple(f.manifest for f in EXTENSION.factories)==EXTENSION.discovery.capability_manifests
 assert all(callable(r.execute) for r in runners._runners)
 assert 'pybamm' not in sys.modules
 """

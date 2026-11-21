@@ -11,24 +11,24 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_statistical_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as science
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_originals as originals
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_tasks import NAMESPACE
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_statistical_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as science
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_originals as originals
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_tasks import NAMESPACE
 from empirical_lawhood.api.domain_composition.matrix_configured_protected_response import scientific_read as reader
 from empirical_lawhood.api.matrix_training_provenance import fitted_training_provenance
-from empirical_lawhood.infrastructure.execution import prepare_worker_invocation
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility, inherited_visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
-from empirical_lawhood.runtime.recursive_compiler import RegisteredPublicationRequirement
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.execution.local.execution import prepare_worker_invocation
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility, inherited_visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.execution.recursive_compiler import RegisteredPublicationRequirement
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.worker_configuration_support import freeze_worker_configuration
 from tests.test_matrix_configured_protected_e3 import selected, original_metadata
 from tests.test_matrix_e3_original_publications import case as original_case  # noqa: F401
@@ -307,7 +307,8 @@ def test_versioned_statistical_declarations_refuse_missing_parent_before_any_tra
 
 
 def test_protected_protocol_declares_native_banks_and_retained_outputs_without_exposed_banks():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS
+    from empirical_lawhood.domains.matrix.matrix_factor_response.extension import EXTENSION as _extension_owner_1
+    EXPERIMENT_PROTOCOL_DECLARATIONS = _extension_owner_1.protocols
     protocols = {row.protocol_id: row for row in EXPERIMENT_PROTOCOL_DECLARATIONS}
     files = protocols["matrix.response-error.configured-protected-v2"].input_file_record_types
     assert set(science.native_training_bank_types()) <= set(files)
@@ -339,14 +340,14 @@ def test_versioned_worker_rejects_foreign_current_fit_dependency_and_prepared_co
 def test_typed_configured_protocol_projects_exact_geometry_without_old_candidate_prose(case):
     from pathlib import Path
     import json
-    from empirical_lawhood.kernel.decoding import decode_canonical_record
-    from empirical_lawhood.adapters.methods.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_protocol as protocol
+    from empirical_lawhood.science.records.decoding import decode_canonical_record
+    from empirical_lawhood.domains.matrix.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_protocol as protocol
     original = json.loads((Path(__file__).resolve().parents[1] / "programmes/foundations/emergent-structure/records/matrix-e2-e3-candidate/candidate-design02.json").read_bytes())
     mathematical = decode_canonical_record(original["target"]["original_mathematical_protocol"], MatrixResponseFrontierProtocol)
     full_rule = mathematical.factor_rule_compatibilities[0].target
     policy = case.manifest.native_specification.selection.prefix_policies[0]
-    raw = (Path(__file__).resolve().parents[1] / "src/empirical_lawhood/adapters/simulators/six_matrix_response/response_observer.py").read_bytes()
+    raw = (Path(__file__).resolve().parents[1] / "src/empirical_lawhood/package_data/scientific_originals/matrix_scalar_response_observer.py.txt").read_bytes()
     parameters = dict(specification=case.inputs.specification, nominal=case.inputs.nominal, nearby=case.inputs.nearby,
         shifted=case.inputs.shifted, mathematical_protocol=mathematical, original_factor_rule=full_rule, prefix_policy=policy,
         scalar_definition=case.manifest.scalar_definition, normalization_source=full_rule.scalar_closure.normalization_owner,
@@ -367,7 +368,7 @@ def test_typed_configured_protocol_projects_exact_geometry_without_old_candidate
 
 def test_configured_forecast_refuses_coordinate_relabelling_before_prediction(case):
     from tests.test_matrix_configured_protected_e3 import causal
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
     operands = sources(case)
     fitted = execute(case, prepared(case, config(case, "fit"), operands))
     models, join = fitted["product"].record, fitted["prefit-join"]
@@ -386,9 +387,9 @@ def test_configured_forecast_refuses_coordinate_relabelling_before_prediction(ca
 
 
 def test_versioned_prefix_and_feature_schemas_do_not_replace_historical_owners():
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_prefix_bindings as current
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_prefix_records as records
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_records as original
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_prefix_bindings as current
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_prefix_records as records
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_records as original
     rows = current.prefix_declarations()
     assert len(rows) == 5
     assert {row.capability_key for row in rows if row.execution_properties.native_effect} == {"matrix-e3-configured-protected.prefix"}
@@ -405,8 +406,8 @@ def test_versioned_prefix_and_feature_schemas_do_not_replace_historical_owners()
 
 
 def test_versioned_response_declarations_keep_forecast_prerequisite_and_refuse_unprepared_native_entry():
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_response_bindings as current
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_feature_bindings as feature
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_response_bindings as current
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_feature_bindings as feature
     rows = current.response_declarations(publication_requirement=originals.ORIGINAL_PUBLICATION_REQUIREMENT,
         scientific_root_validator=exposed_root)
     assert len(rows) == 3 and feature.feature_task_id("root.control") == owner.feature_task_id("root.control")
@@ -420,10 +421,10 @@ def test_versioned_response_declarations_keep_forecast_prerequisite_and_refuse_u
 
 
 def test_configured_protected_public_missing_originals_retains_full_census_without_lowering(case, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_preparation as preparation
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_lowering as lowering
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_preparation as preparation
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_lowering as lowering
     from empirical_lawhood.api.experiment_preparation import prepare_experiment
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
     monkeypatch.setattr(lowering, "lower_protected_matrix_response_error", lambda *args: pytest.fail("lowering missing source evidence"))
     result = prepare_experiment(case.inputs.specification, scientific_inputs={}, execution=ExecutionSelection())
     assert not result.executable and result.draft is None
@@ -436,7 +437,7 @@ def test_configured_protected_public_missing_originals_retains_full_census_witho
 
 def _native_training_allocation(allocation):
     """Declared TEST request reference; never an authenticated acquisition."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_records import NativeTrainingAcquisitionRequest
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_records import NativeTrainingAcquisitionRequest
 
     request = ObjectIdentity("request.configured-fit-control", NativeTrainingAcquisitionRequest.SCHEMA,
         NativeTrainingAcquisitionRequest.VERSION, "d" * 64)
@@ -452,11 +453,8 @@ def _native_training_allocation(allocation):
 
 def _native_bank_control(case):
     """Typed dispatch fixtures only; these arithmetic rows prove no acquisition."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_records import (
-        NativeTrainingFeature, NativeTrainingFeatureBank, NativeTrainingOutcome, NativeTrainingOutcomeBank,
-        NativeTrainingAcquisitionSeal, NativeTrainingCausalPrefix,
-    )
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledSource
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_records import NativeTrainingFeature, NativeTrainingFeatureBank, NativeTrainingOutcome, NativeTrainingOutcomeBank, NativeTrainingAcquisitionSeal, NativeTrainingCausalPrefix
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledSource
 
     allocation, request = _native_training_allocation(case.inputs.training_allocation)
     acquisition = ObjectIdentity("acquisition.configured-fit-control", NativeTrainingAcquisitionSeal.SCHEMA,
@@ -481,7 +479,7 @@ def _native_bank_context(case, namespace):
     Request/source/prefix pins are disclosed fixture references. Their schemas
     exercise dispatch; no native acquisition seal or scientific warrant is made.
     """
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_inputs import project_protected_e3_allocation
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_inputs import project_protected_e3_allocation
     from tests.test_matrix_factor_confirmation_eligibility import publish
 
     if (type(case.train_features), type(case.train_outcomes)) == science.native_training_bank_types():

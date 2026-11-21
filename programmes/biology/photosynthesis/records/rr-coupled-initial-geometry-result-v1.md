@@ -22,7 +22,7 @@ and its preserved refusal/recovery have their own immutable identities.
 ## Admitted sources and actual construction
 
 The maintained
-[constructor](../../../../src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_coupled_preparation.py)
+[constructor](../../../../src/empirical_lawhood/domains/rubisco/kinetics/rr_coupled_preparation.py)
 consumed seven exact source operands once: the retained legacy dry-core
 projection, same-parent Asn donor templates, their closed source register,
 native source facts and the three independently recovered heavy projections.

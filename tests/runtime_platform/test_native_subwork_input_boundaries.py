@@ -4,19 +4,20 @@
 All records and contact metadata are exposed software fixtures. No backend,
 native child BEGIN, acquisition or scientific authority is exercised.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.native_subwork_inputs import validate_native_subwork_inputs
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.native_subwork import NativeSubworkInputError, NativeSubworkRoster, NativeSubworkState
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.execution.local.native_subwork_inputs import validate_native_subwork_inputs
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.native_subwork import NativeSubworkInputError, NativeSubworkRoster, NativeSubworkState
 from tests.runtime_platform.test_native_subwork import ExposedInput, _selected
 
 
@@ -24,8 +25,7 @@ def write_record(plane, record, name, *, access=Access.EVALUATION_SEALED, visibi
     written = plane.write(ArtifactWriteRequest(name, "inputs/" + name + ".json", record.SCHEMA,
         ArtifactProfile.CANONICAL_JSON, "application/json", "publication." + name, "inputs",
         record.canonical_bytes(), visibility, (), access))
-    return decode_artifact_manifest(plane.root.resolve(written.materialization.relative_path + ".manifest.json",
-        for_write=False).read_bytes())
+    return resolve_artifact_sidecar_bytes(plane, plane.root.resolve(written.materialization.relative_path + '.manifest.json', for_write=False).read_bytes())
 
 
 @pytest.fixture
@@ -38,8 +38,7 @@ def mixed(tmp_path):
         written = plane.write(ArtifactWriteRequest("mixed." + str(number), "inputs/mixed." + str(number) + ".json",
             item.logical.payload_schema, ArtifactProfile.CANONICAL_JSON, "application/json", "publication.mixed." + str(number),
             "inputs", raw, Visibility.PROSPECTIVE, (), Access.OUTCOME_BLIND))
-        inputs.append(decode_artifact_manifest(plane.root.resolve(written.materialization.relative_path + ".manifest.json",
-            for_write=False).read_bytes()))
+        inputs.append(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(written.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()))
     inputs.append(write_record(plane, ExposedInput("coarse.sealed", "exposed-return"), "coarse.sealed"))
     inputs = tuple(inputs)
     parent = replace(definition.parent_contact, run_id="run.mixed-software", task_id="task.mixed-software",

@@ -6,9 +6,9 @@ from decimal import Decimal
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history_segments import acquire_parameter_segment, segment_intervals, validate_segment_entry
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_source import acquire_parameter_history
-from empirical_lawhood.adapters.methods.matrix_parameter_history.chunked_records import MatrixParameterChunkedSource, bind_source, segment_plan
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history_segments import acquire_parameter_segment, segment_intervals, validate_segment_entry
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_source import acquire_parameter_history
+from empirical_lawhood.domains.matrix.matrix_parameter_history.chunked_records import MatrixParameterChunkedSource, bind_source, segment_plan
 from tests.test_matrix_parameter_compact_history import selected
 
 
@@ -64,8 +64,8 @@ def test_unsupported_numerical_domain_refuses_before_generators(monkeypatch):
 
 
 def test_source_duration_beyond4341_is_preserved_not_capped():
-    from empirical_lawhood.adapters.methods.matrix_parameter_history.compact_records import compact_sources
-    from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
+    from empirical_lawhood.domains.matrix.matrix_parameter_history.compact_records import compact_sources
+    from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
     sources,a,p = selected();c = replace(a.coordinates[0],autonomous_ticks=4996,observation_ticks=(0,5000))
     root = replace(a.roots[0],coordinate=coordinate_identity(c))
     a = replace(a,coordinates=(c,),roots=(root,))

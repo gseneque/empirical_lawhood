@@ -13,11 +13,9 @@ import os
 import pytest
 
 from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalRootUnavailable
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactSemanticValidation, ArtifactSemanticValidationRegistration, ArtifactSemanticValidationRegistry,
-)
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalRootUnavailable
+from empirical_lawhood.storage.contracts.artifacts import ArtifactSemanticValidation, ArtifactSemanticValidationRegistration, ArtifactSemanticValidationRegistry
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
 from tests.numerical_provenance_fixtures import numerical_plane
 from tests.test_unrestricted_artifact_custody import SoftwarePayload, manifest, request
 from tests.runtime_platform.test_recursive_prospective_parents import (

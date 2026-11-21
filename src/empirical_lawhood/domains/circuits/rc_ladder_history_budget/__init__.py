@@ -1,0 +1,1 @@
+"""Reusable scientific domain components."""

@@ -10,8 +10,8 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import CanonicalizationError, CanonicalRecord, canonical_json_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import CanonicalizationError, CanonicalRecord, canonical_json_bytes
 
 
 @dataclass(frozen=True, slots=True)

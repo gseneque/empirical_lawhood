@@ -5,8 +5,8 @@ from decimal import Decimal as D
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import amber_parameters as a
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import physical_preparation_geometry as g
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import amber_parameters as a
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import physical_preparation_geometry as g
 from tests.test_rubisco_physical_preparation_geometry import heavy_pdb, inpcrd, origins, stock
 from tests.test_rubisco_preparation_integrity import amber_text, expected_audit, topology
 

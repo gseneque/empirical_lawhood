@@ -11,99 +11,17 @@ from typing import Annotated, TypeVar
 import typer
 import yaml  # type: ignore[import-untyped]
 
-from empirical_lawhood.adapters.composition.rc_ladder_response.fresh_authoring import (
-    load_rc_study,
-)
-from empirical_lawhood.api.rc_authoring import author_fresh_rc
-from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import (
-    load_fresh_reactor_profile,
-)
-from empirical_lawhood.api.reactor_authoring import author_fresh_reactor
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.api.reactor_preissue import prove_fresh_reactor
-from empirical_lawhood.adapters.physical.mast_archive.fresh_source import (
-    load_fair_mast_selection,
-)
-from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.synthetic_material_method_packet import (
-    load_synthetic_material_response_config,
-)
-from empirical_lawhood.api.synthetic_material_authoring import (
-    author_synthetic_material_response,
-)
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.analytic_fresh_authoring import (
-    load_uniform_electron_gas_analytic_config,
-)
-from empirical_lawhood.api.uniform_electron_gas_authoring import author_uniform_electron_gas_analytic_reference
-from empirical_lawhood.api import (
-    MAX_DATASET_PAGE_RECORDS,
-    AcquisitionState,
-    AdvanceStudyBundleRequest,
-    ApiResult,
-    AssembleExperimentPackageRequest,
-    BindElapsedBudgetRequest,
-    CampaignStatusRequest,
-    CapabilityKind,
-    CapabilityListRequest,
-    CapabilityShowRequest,
-    CatalogQueryRequest,
-    CatalogRebuildRequest,
-    CloseStudyBundleRequest,
-    CompileCampaignRequest,
-    CompileStudyRequest,
-    CompileCandidateRequest,
-    CompileLinkedCampaignProfileRequest,
-    CompileStudyBundleRequest,
-    CompileSourceProfileRequest,
-    CustodyState,
-    DatabaseMutationRequest,
-    DatasetBindingRole,
-    DatasetCatalogRecordKind,
-    DatasetListRequest,
-    DatasetManifestRequest,
-    DatasetOperationPreviewRequest,
-    DatasetProjectionRebuildRequest,
-    DatasetRegistrationRequest,
-    DatasetShowRequest,
-    DocumentRequest,
-    EmpiricalLawhoodApi,
-    ExternalIdentifier,
-    ExternalIdentifierKind,
-    IssueStudyRequest,
-    IssueExtensionsRequest,
-    IssueStudyBundleRequest,
-    OperationStatus,
-    CheckReadinessRequest,
-    StudyBundleStatusRequest,
-    ResumeCampaignRequest,
-    RunCampaignRequest,
-    create_cli_api,
-    create_inspection_api,
-)
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.adapters.physical.mast_archive.fresh_source import load_fair_mast_selection
+from empirical_lawhood.api import MAX_DATASET_PAGE_RECORDS, AcquisitionState, AdvanceStudyBundleRequest, ApiResult, AssembleExperimentPackageRequest, BindElapsedBudgetRequest, CampaignStatusRequest, CapabilityKind, CapabilityListRequest, CapabilityShowRequest, CatalogQueryRequest, CatalogRebuildRequest, CloseStudyBundleRequest, CompileCampaignRequest, CompileStudyRequest, CompileCandidateRequest, CompileLinkedCampaignProfileRequest, CompileStudyBundleRequest, CompileSourceProfileRequest, CustodyState, DatabaseMutationRequest, DatasetBindingRole, DatasetCatalogRecordKind, DatasetListRequest, DatasetManifestRequest, DatasetOperationPreviewRequest, DatasetProjectionRebuildRequest, DatasetRegistrationRequest, DatasetShowRequest, DocumentRequest, EmpiricalLawhoodApi, ExternalIdentifier, ExternalIdentifierKind, IssueStudyRequest, IssueExtensionsRequest, IssueStudyBundleRequest, OperationStatus, CheckReadinessRequest, StudyBundleStatusRequest, ResumeCampaignRequest, RunCampaignRequest
 from empirical_lawhood.api.codecs import load_authoring, load_registered_authoring
-from empirical_lawhood.cli.attempts import (
-    ATTEMPT_DIRECTORY_OPTION,
-    ATTEMPT_OUTPUT_OPTION,
-    AttemptGroup,
-    attempt_input,
-    attempt_stage,
-    emit_development_report,
-    retained_command,
-)
-from empirical_lawhood.cli.capability_output import (
-    render_capability_list,
-    render_capability_show,
-)
+from empirical_lawhood.cli.attempts import ATTEMPT_DIRECTORY_OPTION, ATTEMPT_OUTPUT_OPTION, AttemptGroup, attempt_input, attempt_stage, emit_development_report, retained_command
+from empirical_lawhood.cli.capability_output import render_capability_list, render_capability_show
 from empirical_lawhood.cli.presentation import render_campaign_status, render_doctor
-from empirical_lawhood.infrastructure.artifacts import GuardedExternalRoot
-from empirical_lawhood.infrastructure.source_origin import (
-    ExecutingSourceMismatch,
-    require_selected_implementation,
-)
-from empirical_lawhood.kernel.time import InformationCutoff
-from empirical_lawhood.runtime.operator_profile import (
-    OperatorStorageProfile,
-    resolve_external_root_contract,
-)
+from empirical_lawhood.storage.artifacts import GuardedExternalRoot
+from empirical_lawhood.storage.source_origin import ExecutingSourceMismatch, require_selected_implementation
+from empirical_lawhood.science.models.time import InformationCutoff
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, resolve_external_root_contract
 
 
 class OutputFormat(StrEnum):
@@ -284,6 +202,67 @@ PARENT_INPUT_BINDING_OPTION = typer.Option(
 )
 
 
+# Keep the existing CLI injection seams. Importing an unrelated authoring family
+# must not add numerical libraries to a selected recursive producing process.
+def load_rc_study(path):
+    from empirical_lawhood.adapters.composition.rc_ladder_response.fresh_authoring import load_rc_study as load
+    return load(path)
+
+
+def author_fresh_rc(**kwargs):
+    from empirical_lawhood.api.rc_authoring import author_fresh_rc as author
+    return author(**kwargs)
+
+
+def load_fresh_reactor_profile(path):
+    from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import load_fresh_reactor_profile as load
+    return load(path)
+
+
+def author_fresh_reactor(**kwargs):
+    from empirical_lawhood.api.reactor_authoring import author_fresh_reactor as author
+    return author(**kwargs)
+
+
+def prove_fresh_reactor(**kwargs):
+    from empirical_lawhood.api.reactor_preissue import prove_fresh_reactor as prove
+    return prove(**kwargs)
+
+
+def load_uniform_electron_gas_analytic_config(path):
+    from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.analytic_fresh_authoring import load_uniform_electron_gas_analytic_config as load
+    return load(path)
+
+
+def author_uniform_electron_gas_analytic_reference(**kwargs):
+    from empirical_lawhood.api.uniform_electron_gas_authoring import author_uniform_electron_gas_analytic_reference as author
+    return author(**kwargs)
+
+
+def load_synthetic_material_response_config(path):
+    from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.synthetic_material_method_packet import load_synthetic_material_response_config as load
+    return load(path)
+
+
+def author_synthetic_material_response(**kwargs):
+    from empirical_lawhood.api.synthetic_material_authoring import author_synthetic_material_response as author
+    return author(**kwargs)
+
+
+def create_cli_api(**kwargs) -> EmpiricalLawhoodApi:
+    """Load the full composition only for a command that selects it."""
+    from empirical_lawhood.api.composition import create_cli_api as create
+
+    return create(**kwargs)
+
+
+def create_inspection_api(**kwargs) -> EmpiricalLawhoodApi:
+    """Keep unrelated numerical libraries out of selected recursive operations."""
+    from empirical_lawhood.api.inspection import create_inspection_api as create
+
+    return create(**kwargs)
+
+
 ApiFactory = Callable[[], EmpiricalLawhoodApi]
 CliPayloadT = TypeVar("CliPayloadT")
 EnumT = TypeVar("EnumT", bound=StrEnum)
@@ -328,7 +307,7 @@ def set_cli_inputs(
         CLI_SYNTHETIC_MATERIAL_AUTHORING_DIR
     CLI_PROJECT_ROOT = project_root
     CLI_OPERATOR_PROFILE = operator_profile
-    from empirical_lawhood.runtime.operational_configuration import ArtifactVerificationMode
+    from empirical_lawhood.execution.operational_configuration import ArtifactVerificationMode
     CLI_ARTIFACT_VERIFICATION = ArtifactVerificationMode(artifact_verification)
     CLI_ARTIFACT_ROOT_CONTRACT = artifact_root_contract
     CLI_CATALOG_RELATIVE_PATH = catalog_relative_path
@@ -544,7 +523,7 @@ def _selected_artifact_root_contract():
     """Load a typed operator selection; this does not authenticate evidence."""
     if CLI_ARTIFACT_ROOT_CONTRACT is None:
         return None
-    from empirical_lawhood.runtime.artifacts import ExternalRootContract
+    from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
 
     return load_registered_authoring(CLI_ARTIFACT_ROOT_CONTRACT,
         root_schemas={ExternalRootContract.SCHEMA: ExternalRootContract})
@@ -624,9 +603,7 @@ def _reactor_port_store():
     store = _response_parent_store()
     if store is None:
         return None
-    from empirical_lawhood.adapters.composition.reactor_prefix_response.port_store import (
-        ReactorExternalPortStore,
-    )
+    from empirical_lawhood.adapters.composition.reactor_prefix_response.port_store import ReactorExternalPortStore
 
     return ReactorExternalPortStore(store.plane)
 
@@ -637,10 +614,8 @@ def _response_parent_store():
         return None
     if CLI_PROJECT_ROOT is None:
         raise ValueError("RESPONSE_PARENT_PROJECT_ROOT_REQUIRED")
-    from empirical_lawhood.adapters.composition.response_parent_store import (
-        ResponseExternalParentAuthorityStore,
-    )
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.adapters.composition.response_parent_store import ResponseExternalParentAuthorityStore
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
 
     profile = load_registered_authoring(
         CLI_OPERATOR_PROFILE,
@@ -755,12 +730,29 @@ def doctor_command(
         str | None,
         typer.Option(
             "--route",
-            help="Read installed versions for reactor, prepared-response, open-simulators, reaction-response or grid2op.",
+            help="Read installed versions for an exact registered environment route; this inspection establishes no workflow readiness.",
         ),
     ] = None,
+    workflow: str | None = None,
+    profile: str = "standard",
+    worker_python: list[str] | None = None,
+    software: list[str] | None = None,
+    assert_prerequisites: bool = False,
 ) -> None:
     """Read-only environment, Git, catalog and external-storage diagnosis."""
 
+    if workflow is not None:
+        if route is not None:
+            typer.echo("Select either --workflow or the legacy --route inspection.", err=True)
+            raise typer.Exit(2)
+        from empirical_lawhood.cli.presentation import render_workflow_doctor
+        _emit(_api(storage_required=False).doctor_workflow(workflow, profile=profile,
+            worker_pythons=tuple(worker_python or ()), external_software=tuple(software or ()),
+            assert_prerequisites=assert_prerequisites), output_format, text_renderer=render_workflow_doctor)
+        return
+    if profile != "standard" or worker_python or software or assert_prerequisites:
+        typer.echo("Select --workflow for a profile, worker, external software or prerequisite assertion.", err=True)
+        raise typer.Exit(2)
     _emit(
         _api(storage_required=False).doctor(route=route), output_format,
         text_renderer=lambda summary: render_doctor(summary, project_root=CLI_PROJECT_ROOT),
@@ -1066,13 +1058,7 @@ def campaign_validate(
 ) -> None:
     'Validate a strict draft or specification. Package roots also replay authorization.'
 
-    from empirical_lawhood.api.models import (
-        CampaignPackage,
-        IssuedCampaignPackage,
-        IssuedStudyPackage,
-        EnvelopeExperimentPackage,
-        ExperimentPackage,
-    )
+    from empirical_lawhood.api.models import CampaignPackage, IssuedCampaignPackage, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage
 
     try:
         root = load_authoring(spec)
@@ -1377,10 +1363,8 @@ def campaign_rc_ladder_native_check(
 ) -> None:
     """Check a strict local RC ladder against two independent numerical solvers."""
 
-    from empirical_lawhood.adapters.simulators.rc_ladder_response.native_quickstart import (
-        check_native_model,
-    )
-    from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
+    from empirical_lawhood.adapters.simulators.rc_ladder_response.native_quickstart import check_native_model
+    from empirical_lawhood.storage.bounded_io import BoundedFileIOError
 
     try:
         config = attempt_input(config, maximum_bytes=65536, copy=True, role="config")
@@ -1402,15 +1386,9 @@ def campaign_electron_gas_reference_check(
 ) -> None:
     """Check the bounded uniform electron gas transverse-response reference without effects."""
 
-    from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.native_quickstart import (
-        UniformElectronGasAnalyticReferenceConfig,
-        run_analytic_development_check,
-    )
-    from empirical_lawhood.infrastructure.bounded_io import (
-        BoundedFileIOError,
-        read_bounded_bytes,
-    )
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.materials.electron_gas.native_quickstart import UniformElectronGasAnalyticReferenceConfig, run_analytic_development_check
+    from empirical_lawhood.storage.bounded_io import BoundedFileIOError, read_bounded_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
     try:
         config = attempt_input(config, maximum_bytes=32768, copy=True, role="config")
@@ -1442,14 +1420,10 @@ def campaign_brian2_native_check(
 
     import subprocess
 
-    from empirical_lawhood.adapters.simulators.brian2_neuron_current_response.contracts import (
-        Brian2LIFNativeConfig,
-    )
-    from empirical_lawhood.adapters.simulators.brian2_neuron_current_response.native_quickstart import (
-        run_native_development_check,
-    )
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.biology.neuron_current_response.contracts import Brian2LIFNativeConfig
+    from empirical_lawhood.adapters.simulators.brian2_neuron_current_response.native_quickstart import run_native_development_check
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -1482,10 +1456,7 @@ def campaign_reaction_response_native_check(
 ) -> None:
     """Run one strict Cantera or FiPy development unit and report its native panel."""
 
-    from empirical_lawhood.adapters.simulators.reaction_diffusion_development_input import (
-        ReactionDiffusionDevelopmentInput,
-        run_native_development_check,
-    )
+    from empirical_lawhood.adapters.simulators.reaction_diffusion_development_input import ReactionDiffusionDevelopmentInput, run_native_development_check
 
     try:
         config = attempt_input(config, maximum_bytes=32768, copy=True, role="config")
@@ -1518,10 +1489,7 @@ def campaign_grid2op_native_check(
     from importlib.metadata import PackageNotFoundError
     from zipfile import BadZipFile
 
-    from empirical_lawhood.adapters.simulators.grid2op_response.native_quickstart import (
-        Grid2OpDevelopmentInput,
-        run_native_development_check,
-    )
+    from empirical_lawhood.adapters.simulators.grid2op_response.native_quickstart import Grid2OpDevelopmentInput, run_native_development_check
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -1557,10 +1525,7 @@ def campaign_gym_torax_native_check(
 ) -> None:
     """Run paired bounded Gym--TORAX native development episodes."""
 
-    from empirical_lawhood.adapters.simulators.gym_torax_native.native_quickstart import (
-        GymToraxNativeQuickstart,
-        run_native_development_check,
-    )
+    from empirical_lawhood.adapters.simulators.gym_torax_native.native_quickstart import GymToraxNativeQuickstart, run_native_development_check
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -1589,10 +1554,7 @@ def campaign_torax_native_check(
 
     from importlib.metadata import PackageNotFoundError
 
-    from empirical_lawhood.adapters.simulators.torax_native.native_quickstart import (
-        NativeToraxQuickstart,
-        run_native_development_check,
-    )
+    from empirical_lawhood.adapters.simulators.torax_native.native_quickstart import NativeToraxQuickstart, run_native_development_check
 
     try:
         config = attempt_input(config, maximum_bytes=32768, copy=True, role="config")
@@ -1627,10 +1589,7 @@ def campaign_material_workflow_input_check(
 ) -> None:
     """Inspect ten separately custodied material-control raw workflow inputs."""
 
-    from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_input_preflight import (
-        MaterialControlInputPreflight,
-        inspect_material_control_input_roster,
-    )
+    from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_input_preflight import MaterialControlInputPreflight, inspect_material_control_input_roster
 
     try:
         config = attempt_input(config, maximum_bytes=32768, copy=True, role="config")
@@ -1657,12 +1616,8 @@ def campaign_material_workflow_wrap_raw(
 ) -> None:
     """Wrap one bounded researcher-supplied material-control raw tar in a native HDF5 envelope."""
 
-    from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_input_preflight import (
-        inspect_material_control_tar_input,
-    )
-    from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_raw import (
-        encode_raw_archive_hdf5,
-    )
+    from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_input_preflight import inspect_material_control_tar_input
+    from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_raw import encode_raw_archive_hdf5
 
     try:
         inspected = inspect_material_control_tar_input(archive, profile_id=profile_id)
@@ -1701,12 +1656,8 @@ def campaign_scale_morphism_reference_check(
 ) -> None:
     """Compare the physical scale-morphism method with generated reference cases."""
 
-    from empirical_lawhood.adapters.reference_worlds.physical_scale_morphism.contracts import (
-        PhysicalScaleMorphismTruthSuiteConfig,
-    )
-    from empirical_lawhood.adapters.reference_worlds.physical_scale_morphism.native_quickstart import (
-        run_truth_method_development_check,
-    )
+    from empirical_lawhood.domains.reference_worlds.physical_scale_morphism.contracts import PhysicalScaleMorphismTruthSuiteConfig
+    from empirical_lawhood.domains.reference_worlds.physical_scale_morphism.native_quickstart import run_truth_method_development_check
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -1735,10 +1686,7 @@ def campaign_propulsion_reference_check(
 ) -> None:
     """Run bounded propulsion closure and reliability reference worlds with known truth."""
 
-    from empirical_lawhood.adapters.methods.synthetic_propulsion_development_input import (
-        SyntheticPropulsionDevelopmentInput,
-        run_native_development_check,
-    )
+    from empirical_lawhood.domains.propulsion.synthetic_propulsion_development_input import SyntheticPropulsionDevelopmentInput, run_native_development_check
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -1769,11 +1717,7 @@ def campaign_glenn_import_check(
 ) -> None:
     """Inspect an exact public Glenn ZIP as retrospective, unqualified local input."""
 
-    from empirical_lawhood.adapters.physical.glenn.quickstart import (
-        GlennInputQuickstart,
-        preview_public_release,
-        run_local_import_check,
-    )
+    from empirical_lawhood.adapters.physical.glenn.quickstart import GlennInputQuickstart, preview_public_release, run_local_import_check
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -1807,10 +1751,7 @@ def campaign_battery_native_check(
 ) -> None:
     'Check the bounded battery electrothermal response, battery exact restart and battery reduced observation donor contracts.'
 
-    from empirical_lawhood.adapters.simulators.pybamm_development_input import (
-        PyBaMMDevelopmentInput,
-        run_native_development_check,
-    )
+    from empirical_lawhood.adapters.simulators.pybamm_development_input import PyBaMMDevelopmentInput, run_native_development_check
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -1841,10 +1782,7 @@ def campaign_reactor_batch_input_check(
 ) -> None:
     """Authenticate full-batch source and construct its provider without contact."""
 
-    from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_input import (
-        ReactorBatchInput,
-        check_batch_input,
-    )
+    from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_input import ReactorBatchInput, check_batch_input
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -1886,14 +1824,8 @@ def campaign_reactor_prepared_input_check(
 ) -> None:
     """Check reactor continuation inputs, binding and ports before native contact."""
 
-    from empirical_lawhood.adapters.simulators.reactor_prefix_response.prepared_input import (
-        ReactorPreparedInput,
-        check_prepared_input,
-    )
-    from empirical_lawhood.adapters.simulators.reactor_prefix_response.reactor_binding import (
-        ReactorSourceBinding,
-        EnvironmentBoundReactorSourceBinding,
-    )
+    from empirical_lawhood.adapters.simulators.reactor_prefix_response.prepared_input import ReactorPreparedInput, check_prepared_input
+    from empirical_lawhood.adapters.simulators.reactor_prefix_response.reactor_binding import ReactorSourceBinding, EnvironmentBoundReactorSourceBinding
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -1938,10 +1870,7 @@ def campaign_prepared_response_native_check(
 ) -> None:
     """Run one excluded prepared-response root in both numerical views."""
 
-    from empirical_lawhood.adapters.simulators.prepared_response.native_quickstart import (
-        PreparedResponsePreparedCanary,
-        run_prepared_canary,
-    )
+    from empirical_lawhood.adapters.simulators.prepared_response.native_quickstart import PreparedResponsePreparedCanary, run_prepared_canary
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -1997,9 +1926,7 @@ def campaign_matrix_response_author(
 ) -> None:
     """Compile a prepared, information or causal matrix-response development candidate."""
 
-    from empirical_lawhood.adapters.composition.prepared_response.native_authoring import (
-        PreparedResponseNativeAuthoringInput,
-    )
+    from empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring import PreparedResponseNativeAuthoringInput
     from empirical_lawhood.api.native_authoring import author_matrix_response
 
     try:
@@ -2052,10 +1979,8 @@ def campaign_dependent_response_input_check(
 ) -> None:
     """Authenticate a qualified dependence or calibration parent and inspect its native binding."""
 
-    from empirical_lawhood.adapters.composition.prepared_response.dependent_input import (
-        PreparedResponseDependentInput,
-        check_dependent_input,
-    )
+    from empirical_lawhood.domains.matrix.prepared_response.authoring.dependent_input import PreparedResponseDependentInput
+    from empirical_lawhood.adapters.composition.prepared_response.dependent_input import check_dependent_input
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -2099,10 +2024,8 @@ def campaign_response_composition_input_check(
 ) -> None:
     """Require trusted scalar-parent custody and authority before response-composition analysis."""
 
-    from empirical_lawhood.adapters.composition.response_composition.input import (
-        ResponseCompositionInput,
-        check_response_composition_input,
-    )
+    from empirical_lawhood.domains.matrix.response_composition.authoring.input import ResponseCompositionInput
+    from empirical_lawhood.adapters.composition.response_composition.input import check_response_composition_input
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -2151,13 +2074,9 @@ def campaign_finite_response_input_check(
 ) -> None:
     """Inspect the retained or externally assigned root roster before native binding."""
 
-    from empirical_lawhood.adapters.composition.finite_response_law.assignment import (
-        FiniteResponseLawCohortAssignment,
-    )
-    from empirical_lawhood.adapters.composition.finite_response_law.native_input import (
-        FiniteResponseLawCalibrationInput,
-        check_finite_calibration_input,
-    )
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment import FiniteResponseLawCohortAssignment
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.native_input import FiniteResponseLawCalibrationInput
+    from empirical_lawhood.adapters.composition.finite_response_law.native_input import check_finite_calibration_input
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -2224,13 +2143,9 @@ def campaign_finite_response_stage_input_check(
 ) -> None:
     """Select a finite stage and refuse missing assigned roots or parent authority."""
 
-    from empirical_lawhood.adapters.composition.finite_response_law.assignment import (
-        FiniteResponseLawCohortAssignment,
-    )
-    from empirical_lawhood.adapters.composition.finite_response_law.stage_input import (
-        FiniteResponseLawStageInput,
-        check_finite_stage_input,
-    )
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment import FiniteResponseLawCohortAssignment
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.stage_input import FiniteResponseLawStageInput
+    from empirical_lawhood.adapters.composition.finite_response_law.stage_input import check_finite_stage_input
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")
@@ -2286,9 +2201,7 @@ def campaign_response_composition_power(
 ) -> None:
     """Report fixed-sample design sensitivity without source or native contact."""
 
-    from empirical_lawhood.adapters.methods.finite_response_law.power import (
-        fixed_sample_power_report,
-    )
+    from empirical_lawhood.domains.matrix.finite_response_law.power import fixed_sample_power_report
 
     emit_development_report(fixed_sample_power_report(), allow_nan=False)
 
@@ -2303,10 +2216,7 @@ def campaign_finite_response_native_check(
 ) -> None:
     """Run one excluded finite-lawhood canary through both native futures."""
 
-    from empirical_lawhood.adapters.simulators.finite_response_law.native_quickstart import (
-        FiniteResponseLawCanary,
-        run_finite_canary,
-    )
+    from empirical_lawhood.adapters.simulators.finite_response_law.native_quickstart import FiniteResponseLawCanary, run_finite_canary
 
     try:
         config = attempt_input(config, maximum_bytes=16384, copy=True, role="config")

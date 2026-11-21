@@ -1,0 +1,107 @@
+{
+  "label": "Classical matrix small native software control; no qualification",
+  "roots": {
+    "calibration": [
+      161101,
+      161102
+    ],
+    "confirmation": [
+      161201,
+      161202
+    ],
+    "training": [
+      161001,
+      161002
+    ]
+  },
+  "schema": "classical-series-definition.v1",
+  "settings": {
+    "actions": [
+      "GENERIC",
+      "TRACE"
+    ],
+    "amplitude": "0.01",
+    "calibration_alpha": "0.5",
+    "capstone_horizon_tick": 16,
+    "capstone_support_radius": "3",
+    "capstone_task_threshold": "0",
+    "coordinates": [
+      {
+        "cross_coupling": "1",
+        "friction": "1",
+        "id": "nominal",
+        "temperature": "1"
+      },
+      {
+        "cross_coupling": "0.5",
+        "friction": "1",
+        "id": "cross-low",
+        "temperature": "1"
+      },
+      {
+        "cross_coupling": "2",
+        "friction": "1",
+        "id": "cross-high",
+        "temperature": "1"
+      },
+      {
+        "cross_coupling": "1",
+        "friction": "1",
+        "id": "transfer-t1p125",
+        "temperature": "1.125"
+      },
+      {
+        "cross_coupling": "1",
+        "friction": "1",
+        "id": "transfer-t3p25",
+        "temperature": "3.25"
+      }
+    ],
+    "decreasing_start": "8",
+    "derivation_blocks": 3,
+    "factor_angle_degrees": "15",
+    "factor_leakage_maximum": "0.05",
+    "family": "joint-decreasing",
+    "handoff_tick": 16,
+    "history_ticks": 32,
+    "horizon_ticks": 16,
+    "joint_rank": 48,
+    "mass": "0.5",
+    "numerical_tolerance": "0.01",
+    "observation_stride": 8,
+    "occurrence_deadline": 16,
+    "panels": 1,
+    "persistence_ticks": 8,
+    "phases": [
+      "capstone-forecast",
+      "capstone-preparation",
+      "e1",
+      "e2",
+      "e3",
+      "e4",
+      "e5",
+      "e6",
+      "sci01",
+      "sci02",
+      "derivations"
+    ],
+    "preparation_arms": [
+      "baseline",
+      "x-first"
+    ],
+    "preparation_minimum_gain": "0.1",
+    "pulse_ticks": 4,
+    "radius_limit": "1000000",
+    "ramp_ticks": 16,
+    "reduced_rank": 24,
+    "refresh_tick": 8,
+    "resolvent_imaginary": "1",
+    "response_tolerance": "0.1",
+    "ridge_penalty": "0.000001",
+    "strict_win_margin": "0.1",
+    "survival_ticks": 16,
+    "target_x": "0.6666666666666666666666666667",
+    "target_y": "7.333333333333333333333333334",
+    "timestep": "0.001"
+  }
+}

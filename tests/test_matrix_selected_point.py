@@ -7,19 +7,19 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_point as point
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import MatrixCouplingRecipe, MatrixPreparationInitialState, MatrixPreparationSource
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource, MatrixPreparedRecipeInterpretation
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_prefix import MatrixPreparedCausalPrefix
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.records import E1FactorRule
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import ScalarClosureSpec
-from empirical_lawhood.adapters.methods.matrix_parameter_factor.records import MatrixParameterFactorNumericalDesign, MatrixParameterScalarDefinition
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledPrefixPolicy, ScheduledSource
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import MatrixParameterCoordinate
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_point as point
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixCouplingRecipe, MatrixPreparationInitialState, MatrixPreparationSource
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource, MatrixPreparedRecipeInterpretation
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_prefix import MatrixPreparedCausalPrefix
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.records import E1FactorRule
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import ScalarClosureSpec
+from empirical_lawhood.domains.matrix.matrix_parameter_factor.records import MatrixParameterFactorNumericalDesign, MatrixParameterScalarDefinition
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledPrefixPolicy, ScheduledSource
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import MatrixParameterCoordinate
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 from tests.test_matrix_selected_package import package, reference
 
 
@@ -140,14 +140,14 @@ def test_unavailable_selected_observation_retains_all_endpoints_and_rejects_fami
 def literal_unavailable_measurement(phase="E5_OPPORTUNITY"):
     import numpy as np
     from hashlib import sha256
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import MatrixPreparationArrays, MatrixPreparationAssessment
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_prefix import MatrixPreparedFactorWitness, MatrixPreparedFrameAssessment, MatrixPreparedPrefixArrays
-    from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import FactorObservation
-    from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import lifetime
-    from empirical_lawhood.adapters.methods.matrix_parameter_factor.records import METHODS, MatrixParameterFactorControl
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledPrefixTrace, identity
-    from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixPreparationArrays, MatrixPreparationAssessment
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_prefix import MatrixPreparedFactorWitness, MatrixPreparedFrameAssessment, MatrixPreparedPrefixArrays
+    from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import FactorObservation
+    from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import lifetime
+    from empirical_lawhood.domains.matrix.matrix_parameter_factor.records import METHODS, MatrixParameterFactorControl
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledPrefixTrace, identity
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
 
     design = selected_design(phase)
     public = design.sources[0][1]
@@ -209,7 +209,7 @@ def test_literal_array_measurement_authenticates_bytes_and_preserves_unavailable
 
 
 def test_public_point_projection_preserves_exact_model_values_without_calibration_score_bank():
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import MatrixSelectedPointPayload
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import MatrixSelectedPointPayload
     design = selected_design("E5_CONFIRMATION")
     payload = MatrixSelectedPointPayload.from_design(design)
     before = feature(design, design.sources[0][1])

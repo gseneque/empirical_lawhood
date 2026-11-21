@@ -4,9 +4,9 @@ from hashlib import sha256
 from types import SimpleNamespace
 
 from empirical_lawhood.api.experiment_runtime_bindings import original_input_record_publication
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
 
 
 def test_mixed_dev_and_sealed_originals_do_not_declassify_model_bearing_input():

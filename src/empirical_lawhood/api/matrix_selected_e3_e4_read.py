@@ -8,17 +8,17 @@ upstream CAL scores. Missing case products never shrink the original32x9 census.
 
 from dataclasses import replace
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as r, selected_e3_e4_science as science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_reduction import ScheduledProgrammeNativeDisposition
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as r, selected_e3_e4_science as science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_reduction import ScheduledProgrammeNativeDisposition
 from empirical_lawhood.api.matrix_training_provenance import original_comparator_training
 from empirical_lawhood.api.recursive_execution import _read_recursive_wave_with_roots
 from empirical_lawhood.api.recursive_qualified_parents import _output_payload, MAX_PARENT_BYTES
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes_with_identity
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
-from .matrix_read_indexes import product_record_index, unique_index
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes_with_identity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
+from empirical_lawhood.api.matrix_read_indexes import product_record_index, unique_index
 
 
 def _record_bytes(writer, products, task, kind, *, original_input_access=None, product_lookup=None):
@@ -101,7 +101,7 @@ def _read_selected_e3_e4_development(*, directory, artifact_writer, allow_partia
         evidence=None
         if _consume_original is not None:
             from empirical_lawhood.api.selected_e3_access import SelectedE3OriginalInputAccess
-            from empirical_lawhood.runtime.prospective_experiment import source_filename
+            from empirical_lawhood.execution.prospective_experiment import source_filename
             if type(access) is not SelectedE3OriginalInputAccess:
                 raise PermissionError('original DEV scientific consumer lacks its actual current original E3 access')
             access.require_current(artifact_writer=artifact_writer)
@@ -149,8 +149,8 @@ def _development_result(*,artifact_writer,report,products,draft,plan,entry,_cons
             raise PermissionError('original DEV scientific consumer requires its actual access and packet evidence')
     plan_pin = ObjectIdentity.from_record(plan.execution_plan_id, plan)
     from functools import partial
-    from empirical_lawhood.kernel.evidence import VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import most_restrictive_outcome_access
+    from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import most_restrictive_outcome_access
     record = partial(_record, original_input_access=original_input_access,
         product_lookup=product_record_index(products))
     tasks = unique_index(plan.tasks, lambda task: task.task_id, label='execution task')
@@ -207,7 +207,7 @@ def _development_result(*,artifact_writer,report,products,draft,plan,entry,_cons
             raise ValueError("selected E4 incomplete read replaces actual full numerical assessment")
         protocol = protocols[case.root_id]
         panels = panels_by_group[case.independent_group_id][1]
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.paired_target_reduction import target_contract
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.paired_target_reduction import target_contract
         contract = target_contract(protocol)
         targets = (None,) * r.selected_target_shape(contract)[2] if score is None else science.paired_targets(score, protocol, panels)
         cases.append(incomplete_case(case, products=products, task_census=report["task_census"], native=tuple(observed_native),

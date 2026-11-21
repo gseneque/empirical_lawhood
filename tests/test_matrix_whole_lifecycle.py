@@ -14,18 +14,18 @@ import pytest
 from typer.testing import CliRunner
 
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_matrix_whole_public import ROOT, copied_whole_inputs
 
 
 def complete_e1_entry(case, copied, specification):
     """Construct explicit fixture entry inputs before freezing the outer plan."""
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_bindings, compact_preparation
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.e1_assembly import MatrixProgrammeE1AssemblySpecification
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_bindings, compact_preparation
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.e1_assembly import MatrixProgrammeE1AssemblySpecification
     from empirical_lawhood.api.recursive_authoring import implementation_binding
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     from tests.experiment_entry_support import standard_authoring_for_draft
 
     implementation = implementation_binding(ROOT)
@@ -80,12 +80,12 @@ def invoke(copied, command, *arguments, authoring_dir=None, checker_trust=None):
         global_arguments += ['--approval-checker-trust', str(checker_trust)]
     returned = CliRunner().invoke(app, global_arguments + ['campaign', command, *arguments])
     assert returned.exit_code == 0, returned.output + repr(returned.exception)
-    return json.loads(returned.output)
+    return json.loads(returned.stdout)
 
 
 def authored_initial_inputs(tmp_path, monkeypatch):
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
 
     def forbidden(*_args, **_kwargs):
         pytest.fail('metadata/authoring entered native execution')
@@ -110,7 +110,7 @@ def authored_initial_inputs(tmp_path, monkeypatch):
     assert {path.name for path in (directory / 'children').iterdir()} == {'e1', 'e2', 'train'}
     assert not (root / 'runs').exists()
     assert review_bytes == {path: sha256(path.read_bytes()).hexdigest() for path in review.rglob('*') if path.is_file()}
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation.compact_preparation import E1CompactExperimentSelectionV2
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation.compact_preparation import E1CompactExperimentSelectionV2
     before = decode_canonical_bytes((review / 'selection.json').read_bytes(), E1CompactExperimentSelectionV2, maximum_bytes=None)
     after = decode_canonical_bytes((review.parent / 'selection.json').read_bytes(), E1CompactExperimentSelectionV2, maximum_bytes=None)
     assert after.root == before.root and after.manifest == before.manifest
@@ -138,11 +138,9 @@ def test_actual_outer_cli_authors_all_initial_children_without_native_entry(tmp_
 
 
 def test_actual_outer_cli_issues_and_reopens_initial_protected_child_without_native_entry(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import (
-        MatrixProgrammeAuthoritySelection, MatrixProgrammeOperationSelection, MatrixResearchProgrammePlan,
-    )
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixProgrammeAuthoritySelection, MatrixProgrammeOperationSelection, MatrixResearchProgrammePlan
     from empirical_lawhood.api.prospective_experiment import load_prepared_prospective_experiment
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     from tests.prospective_public_controls import issue_public_child
     from tests.test_matrix_whole_public import _profile
 

@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: MPL-2.0
 """Shared received-record/array custody for current native Matrix DEV readers."""
 from hashlib import sha256
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.plans import BarrierKind
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.plans import BarrierKind
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
 
 
 def _record(products, tasks, run_id, selected_task, kind, label="product"):
@@ -39,10 +39,10 @@ def _record(products, tasks, run_id, selected_task, kind, label="product"):
     return value
 
 
-def _array(products, tasks, selected_task, arrays):
+def _array(products, tasks, selected_task, arrays, *, label="arrays"):
     """Join the consumer's descriptor to its actual ordinary array output."""
     task = tasks[selected_task]
-    output, = (value for value in task.outputs if value.output_id == selected_task + ".arrays")
+    output, = (value for value in task.outputs if value.output_id == selected_task + "." + label)
     receipt = products["receipts"][selected_task]
     logicals = tuple(value for value in receipt.output_logical_artifacts
         if value.logical_artifact_id == output.logical_artifact_id)
@@ -78,8 +78,8 @@ def _expected_contact(*, task, plan, run_id, attempt_id, products):
         if value is None:
             raise PermissionError("native E2 missing contact loses an original authenticated external operand")
         materials[value.materialization.materialization_id] = value
-    from empirical_lawhood.runtime.execution import dependency_artifact_inputs
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, ExecutionTask
+    from empirical_lawhood.execution.execution import dependency_artifact_inputs
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, ExecutionTask
     if type(plan) is not DevelopmentExecutionPlan or type(task) is not ExecutionTask:
         raise TypeError("native DEV parent contact requires its exact original development task/plan")
     dependency_outputs = {}
@@ -113,15 +113,15 @@ def _expected_contact(*, task, plan, run_id, attempt_id, products):
 def _graph(specification, request, draft, plan):
     # Pure mathematical layout, without current operation discovery, compilation,
     # provider construction or comparison to current source implementation bytes.
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as training
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as utility
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as training
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as utility
     if type(specification) is utility.NativeUtilitySpecification:
-        from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as owner
-        from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_bindings import ARRAY_PHASES, PRODUCTS, config_phase, stage
+        from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as owner
+        from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_bindings import ARRAY_PHASES, PRODUCTS, config_phase, stage
         r, score_kind = utility, utility.NativeUtilityScore
     elif type(specification) is training.NativeTrainingAcquisitionSpecification:
-        from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as owner
-        from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_bindings import ARRAY_PHASES, PRODUCTS, config_phase, config_capability_suffix, stage
+        from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as owner
+        from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_bindings import ARRAY_PHASES, PRODUCTS, config_phase, config_capability_suffix, stage
         r, score_kind = training, training.NativeTrainingScore
     else:
         raise TypeError("native graph read requires its exact TRAIN or E2 specification")

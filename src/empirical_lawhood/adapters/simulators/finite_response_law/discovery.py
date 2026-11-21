@@ -2,22 +2,22 @@
 
 from dataclasses import replace
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.source_qualification import PredecessorBoundSourceQualificationExperiment
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityPermission
-from empirical_lawhood.runtime.extension_bundles import ExtensionContributionKind
-from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignStageEnvelope
-from empirical_lawhood.runtime.source_qualification import PredecessorBoundSourceQualificationSubstrateBinding
-from empirical_lawhood.adapters.methods.finite_response_law.science import PROGRAMME
-from empirical_lawhood.adapters.composition.discovery import manifest, bundle
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.source_qualification import PredecessorBoundSourceQualificationExperiment
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityPermission
+from empirical_lawhood.execution.extension_bundles import ExtensionContributionKind
+from empirical_lawhood.execution.linked_campaigns import LinkedCampaignStageEnvelope
+from empirical_lawhood.execution.source_qualification import PredecessorBoundSourceQualificationSubstrateBinding
+from empirical_lawhood.domains.matrix.finite_response_law.science import PROGRAMME
+from empirical_lawhood.execution.declaration_helpers import manifest, bundle
 from empirical_lawhood.adapters.simulators.prepared_response.native_pair import NATIVE_PAIR_SCHEMA as RETAINED_PAIR_SCHEMA
 from empirical_lawhood.adapters.simulators.prepared_response.source_outputs import PreparedNativeTaskResult
-from .contracts import FiniteResponseLawNativeConfig
-from .native_artifact import NATIVE_PAIR_SCHEMA
-from .source_outputs import FiniteResponseLawNativeTaskResult
+from empirical_lawhood.domains.matrix.finite_response_law.contracts import FiniteResponseLawNativeConfig
+from empirical_lawhood.adapters.simulators.finite_response_law.native_artifact import NATIVE_PAIR_SCHEMA
+from empirical_lawhood.adapters.simulators.finite_response_law.source_outputs import FiniteResponseLawNativeTaskResult
 
 SOURCE_RECORDS: tuple[type[CanonicalRecord], ...] = (
     FiniteResponseLawNativeConfig,

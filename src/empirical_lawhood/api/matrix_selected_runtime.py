@@ -6,38 +6,32 @@ task. Later leaves authenticate that successful entry receipt and exact current
 inputs; they do not reconstruct the complete source roster in every worker.
 No authority, qualification, retry or publication is created here.
 """
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 from dataclasses import replace
 from hashlib import sha256
 
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustodySupplier
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import MatrixSelectedEntryEvidenceV3, MatrixSelectedProtectedRootConfigV3
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import (
-    reference, validate_selected_entry_evidence,
-)
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry_v2 import (
-    MatrixSelectedEntryEvidenceV2, validate_selected_entry_evidence_v2,
-)
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedProtectedRootConfig
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_results import MatrixSelectedProtectedEntrySeal
-from .recursive_qualified_parents import (
-    MAX_PARENT_BYTES, _output_payload, _semantic_writer,
-)
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import artifact_custody_limits
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixSelectedEntryEvidenceV3, MatrixSelectedProtectedRootConfigV3
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import reference, validate_selected_entry_evidence
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry_v2 import MatrixSelectedEntryEvidenceV2, validate_selected_entry_evidence_v2
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedProtectedRootConfig
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_results import MatrixSelectedProtectedEntrySeal
+from empirical_lawhood.api.recursive_qualified_parents import MAX_PARENT_BYTES, _output_payload, _semantic_writer
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import artifact_custody_limits
 
 
 def _published_input(writer, run_id, spec, kind, *, custody=None):
     """Authenticate one actual plan-selected control without consuming a port."""
     relative, _, _ = provider_input_location(writer, run_id, spec.logical_artifact_id)
     limit = artifact_custody_limits(writer).manifest_bytes
-    manifest = decode_artifact_manifest(read_bounded_bytes(writer.root.resolve(relative + ".manifest.json", for_write=False),
-        maximum_bytes=limit), maximum_bytes=limit)
+    manifest = read_artifact_sidecar(writer, (writer.root.resolve(relative + '.manifest.json', for_write=False)).relative_to(writer.root.contract.canonical_path).as_posix(), maximum_bytes=limit)
     if (manifest.materialization.relative_path != relative
             or manifest.materialization.storage_root_id != writer.root.contract.storage_root_id
             or manifest.logical.logical_artifact_id != spec.logical_artifact_id
@@ -57,7 +51,7 @@ def _published_input(writer, run_id, spec, kind, *, custody=None):
         lane["expected_outcome_access"] = spec.expected_outcome_access
     if spec.expected_visibility_ceiling is not None:
         lane["expected_visibility_ceiling"] = spec.expected_visibility_ceiling
-    from .current_task_custody import CurrentDevelopmentTaskCustody
+    from empirical_lawhood.api.current_task_custody import CurrentDevelopmentTaskCustody
     if type(custody) is CurrentDevelopmentTaskCustody:
         return custody.control_record(manifest,kind,manifest.materialization.size_bytes)
     read=(CurrentIssuedTaskCustody(writer=writer).control_record if custody is None else custody.immutable_control_record)
@@ -70,7 +64,7 @@ def _issued_configuration_lane(task):
     This pure metadata join grants no authority and opens no body. The issued
     task/input owner must already authenticate the actual plan and copy facts.
     """
-    from empirical_lawhood.runtime.input_access import validated_task_scientific_input_edges
+    from empirical_lawhood.execution.input_access import validated_task_scientific_input_edges
     validated_task_scientific_input_edges(task)
     spec,=(value for value in task.external_inputs if value.input_id=='config')
     return {'expected_outcome_access':spec.expected_outcome_access,
@@ -78,8 +72,8 @@ def _issued_configuration_lane(task):
 
 
 def _entry_task(plan):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_bindings import ENTRY_ORIGINAL_COMMITMENTS_KEY
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_e6_transport_config import ENTRY_TRANSPORT_KEY
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_bindings import ENTRY_ORIGINAL_COMMITMENTS_KEY
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_e6_transport_config import ENTRY_TRANSPORT_KEY
 
     tasks = tuple(task for task in plan.tasks if task.capability.capability_key in (ENTRY_ORIGINAL_COMMITMENTS_KEY, ENTRY_TRANSPORT_KEY))
     if len(tasks) != 1:
@@ -112,7 +106,7 @@ def _current_source_qualifications(package, task):
 
 
 def _publication(writer, pin, publication):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
     import json
 
     authenticate_publication(writer, publication)
@@ -147,9 +141,9 @@ def _reconstruct_entry_programme(programme, calibration, nomination=None):
     Children retain public projections. The original calibration bank arrives
     from its original issued/revealed producer, never from a relabelled control.
     """
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_point import MatrixSelectedPointDesign
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import MatrixSelectedPointPayload
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_point import MatrixSelectedPointDesign
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import MatrixSelectedPointPayload
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme
 
     if type(programme) is not MatrixSelectedPublicProgramme:
         raise TypeError("selected parent requires its exact public programme projection")
@@ -170,16 +164,14 @@ def _reconstruct_entry_programme(programme, calibration, nomination=None):
 
 
 def _authenticate_entry(writer, programme, evidence, codecs, *, source_scan_bytes, transport_policy=None, transport_calibration=None,current_access=None):
-    from .matrix_prepared_original_commitments import authenticate_prepared_original_commitments
+    from empirical_lawhood.api.matrix_prepared_original_commitments import authenticate_prepared_original_commitments
     original_commitments = authenticate_prepared_original_commitments(writer=writer, programme=programme, evidence=evidence, source_scan_bytes=source_scan_bytes,
             **({} if current_access is None else {"current_access":current_access}))
     original = authenticate_selected_original_products(writer, programme, evidence, codecs,current_access=current_access)
     if transport_policy is not None:
         request, future = original_commitments
-        from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import authenticate_e6_transport_policy
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.e6_transport_science import (
-            validate_e6_transport_scope, validate_e6_calibration_projection,
-        )
+        from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_e6_transport_policy
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.e6_transport_science import validate_e6_transport_scope, validate_e6_calibration_projection
         authenticate_e6_transport_policy(writer, request, transport_policy, future_selections=future)
         validate_e6_transport_scope(transport_policy, programme)
         if transport_calibration is not None:
@@ -191,9 +183,9 @@ def _authenticate_entry(writer, programme, evidence, codecs, *, source_scan_byte
 
 def authenticate_selected_original_products(writer, programme, evidence, codecs,*,current_access=None):
     """Reopen exact original producer/source operands without granting entry."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
-    from .matrix_sampling_runtime import _original_product, _original_products
-    from .matrix_source_runtime import authenticate_matrix_source_qualification, matrix_source_publication_references
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.api.matrix_sampling_runtime import _original_product, _original_products
+    from empirical_lawhood.api.matrix_source_runtime import authenticate_matrix_source_qualification, matrix_source_publication_references
     from empirical_lawhood.api.matrix_selected_producer_scope import selected_original_producer_scope
 
     validate_evidence = (validate_selected_entry_evidence_v2 if type(evidence) is MatrixSelectedEntryEvidenceV2
@@ -211,7 +203,7 @@ def authenticate_selected_original_products(writer, programme, evidence, codecs,
     nomination_pin = None if programme.nomination is None else programme.nomination.original_nomination
     e3_originals = tuple(original for original in evidence.upstream_products
         if original.record in upstream or original.record == package.calibration)
-    from .selected_prepared_access import _selected
+    from empirical_lawhood.api.selected_prepared_access import _selected
     selected_originals=_selected(e3_originals,current_access)
     payloads = _original_products(writer, tuple((original, original.record) for original in selected_originals),
         codecs, scope_validator=producer_scope)
@@ -226,7 +218,7 @@ def authenticate_selected_original_products(writer, programme, evidence, codecs,
             if reference(calibration, "record_id") != package.calibration or calibration.canonical_bytes() != raw:
                 raise PermissionError("selected entry substitutes its actual original sealed calibration")
         elif original.record == nomination_pin:
-            from empirical_lawhood.adapters.methods.matrix_experimental_programme.science import MatrixPreparationNomination
+            from empirical_lawhood.domains.matrix.matrix_experimental_programme.science import MatrixPreparationNomination
             nomination = decode_canonical_bytes(raw, MatrixPreparationNomination, maximum_bytes=MAX_PARENT_BYTES)
             receipt, publication = programme.nomination_receipt, programme.nomination_publication
             binding = original.prior_execution
@@ -239,7 +231,7 @@ def authenticate_selected_original_products(writer, programme, evidence, codecs,
         elif raw != upstream[original.record].canonical_bytes():
             raise PermissionError("selected entry substitutes actual original fitted or calibrated product bytes")
     if type(evidence) in (MatrixSelectedEntryEvidenceV2, MatrixSelectedEntryEvidenceV3) and evidence.development_nomination is not None:
-        from .matrix_selected_opportunity_runtime import authenticate_selected_development_nomination
+        from empirical_lawhood.api.matrix_selected_opportunity_runtime import authenticate_selected_development_nomination
 
         original_package = reconstruct_selected_package(package, calibration)
         nomination, receipt, publication = authenticate_selected_development_nomination(writer, evidence.development_nomination,
@@ -251,7 +243,7 @@ def authenticate_selected_original_products(writer, programme, evidence, codecs,
     programme = _reconstruct_entry_programme(programme, calibration, nomination)
     validate_evidence(evidence, programme)
     package = programme.point_design.package
-    from .prepared_source_replay import is_prepared_source_result, partition_prepared_source_publications
+    from empirical_lawhood.api.prepared_source_replay import is_prepared_source_result, partition_prepared_source_publications
     if is_prepared_source_result(evidence.source_result):
         scientific_publications, bootstrap_publications = partition_prepared_source_publications(
             writer=writer, publications=evidence.publications)
@@ -302,14 +294,11 @@ def _authenticate_spent_entry(writer, package, plan, task, receipts, codecs):
 
 def prepare_selected_matrix(supplier, context, runner):
     """Fresh current authority precedes every original or scientific read."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_bindings import MatrixPreparationOperationConfig, MatrixPreparationOperationConfigV2
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_future import MatrixSelectedFutureConfig, MatrixSelectedFutureConfigV2
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPreparedConfig
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_workers import SelectedProtectedWorker
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_e6_transport_config import (
-        MatrixSelectedTransportRootConfig, MatrixSelectedTransportPointConfig,
-        MatrixSelectedTransportFutureConfig, MatrixSelectedTransportScoreConfig,
-    )
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_bindings import MatrixPreparationOperationConfig, MatrixPreparationOperationConfigV2
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_future import MatrixSelectedFutureConfig, MatrixSelectedFutureConfigV2
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPreparedConfig
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_workers import SelectedProtectedWorker
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_e6_transport_config import MatrixSelectedTransportRootConfig, MatrixSelectedTransportPointConfig, MatrixSelectedTransportFutureConfig, MatrixSelectedTransportScoreConfig
     from empirical_lawhood.api.recursive_operations import operation_catalog
 
     if type(runner) is not SelectedProtectedWorker or runner.prepared_scope is not None:
@@ -351,7 +340,7 @@ def prepare_selected_matrix(supplier, context, runner):
             source_scan_bytes=context.resource_budget.source_scan_bytes,
             transport_policy=getattr(config, "transport_policy", None),
             transport_calibration=getattr(config, "transport_calibration", None),current_access=getattr(supplier,"current_access",None))
-        from .domain_composition.matrix_selected_declarative.derivation import require_evidence_produced_input_parents
+        from empirical_lawhood.api.domain_composition.matrix_selected_declarative.derivation import require_evidence_produced_input_parents
         require_evidence_produced_input_parents(supplier.writer, config.produced_input_parents, evidence,read_access=getattr(supplier,"current_access",None))
     else:
         with supplier.writer.verification_scope() as writer:
@@ -402,10 +391,10 @@ class SelectedMatrixRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
 
 def bind_selected_matrix_handoff(handoff, *, writer, reveal_authority_id=None,original_input_access=None,read_access=None):
     """Bind an actual authored selected programme to existing parent preparation."""
-    from .recursive_prospective_authoring import RecursiveProspectiveApplicationHandoff
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_e6_transport_config import MatrixSelectedTransportRootConfig
+    from empirical_lawhood.api.recursive_prospective_authoring import RecursiveProspectiveApplicationHandoff
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_e6_transport_config import MatrixSelectedTransportRootConfig
 
     if type(handoff) is not RecursiveProspectiveApplicationHandoff:
         raise TypeError("selected Matrix binding requires its exact public prospective handoff")

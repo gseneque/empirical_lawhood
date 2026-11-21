@@ -1,19 +1,16 @@
 # SPDX-License-Identifier: MPL-2.0
 """Actual stable custody reads, independent of scientific grants or native work."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 import json
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane, GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactProfile, ArtifactWriteRequest, ExternalRootContract,
-)
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
 
 
 def _publication(tmp_path, count=4):
@@ -30,8 +27,7 @@ def _publication(tmp_path, count=4):
         VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE,
     ) for index in range(count))
     results = plane.write_batch(requests)
-    manifests = tuple(decode_artifact_manifest(plane.root.resolve(
-        row.manifest_materialization.relative_path, for_write=False).read_bytes()) for row in results)
+    manifests = tuple(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(row.manifest_materialization.relative_path, for_write=False).read_bytes()) for row in results)
     return plane, manifests
 
 
@@ -74,8 +70,8 @@ def test_four_parent_threads_extend_real_snapshot_without_losing_final_mutation_
     from pathlib import Path
     import sys
     from threading import Barrier, Event, Lock, get_ident
-    from empirical_lawhood.infrastructure import artifacts as owner
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.storage import artifacts as owner
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
 
     plane, first = _publication(tmp_path, 1)
     requests = tuple(ArtifactWriteRequest(

@@ -5,87 +5,46 @@ providers. Historical model banks are development inputs, never new evidence.
 """
 
 from __future__ import annotations
+from empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring import PreparedNativeAuthoring as _science_PreparedNativeAuthoring, PreparedResponseNativeAuthoringInput as _science_PreparedResponseNativeAuthoringInput
 
 import json
-from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
 from hashlib import sha256
 from pathlib import Path
-from typing import ClassVar
 
 from empirical_lawhood.adapters._bounded_files import read_bounded_contained
 from empirical_lawhood.adapters._strict_json import loads_external_json
-from empirical_lawhood.adapters.composition.causal_response.authoring import CausalResponseAuthoringBundle, CausalResponseCandidateContextProvider, build_causal_response_authoring
-from empirical_lawhood.adapters.composition.causal_response.exposure import CausalResponseExposureInspection, causal_response_seed_ids
-from empirical_lawhood.adapters.composition.information_response.authoring import InformationResponseAuthoringBundle, InformationResponseCandidateContextProvider, build_information_response_authoring
-from empirical_lawhood.adapters.composition.information_response.exposure import InformationResponseExposureInspection, information_response_seed_ids
-from empirical_lawhood.adapters.composition.prepared_response.exposure import PreparedExposureInspection, prepared_seed_ids
-from empirical_lawhood.adapters.composition.prepared_response.qualification_design import PreparedResponseSourceQualificationAuthoringBundle, PreparedResponseSourceQualificationCandidateContextProvider, build_prepared_response_source_qualification_authoring
-from empirical_lawhood.adapters.composition.response_geometry_prospective.exposure import ResponseGeometryAssayExposureSource
-from empirical_lawhood.adapters.composition.generated_executable_bindings import (
-    EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY,
-)
-from empirical_lawhood.adapters.composition.generated_extension_bundles import (
-    GENERATED_EXTENSION_BUNDLE_AGGREGATE,
-)
-from empirical_lawhood.adapters.methods.causal_response.models import CausalResponseModelBank
-from empirical_lawhood.adapters.methods.information_response.models import InformationResponseModelBank
-from empirical_lawhood.adapters.simulators.causal_response.contracts import CausalResponseNativeConfig
-from empirical_lawhood.adapters.simulators.causal_response.executable_binding import SOURCE_BINDING as CAUSAL_RESPONSE_SOURCE_BINDING
-from empirical_lawhood.adapters.simulators.causal_response.extension_bundle import SOURCE_CAPABILITY as CAUSAL_RESPONSE_SOURCE_CAPABILITY
-from empirical_lawhood.adapters.simulators.information_response.contracts import InformationResponseNativeConfig
-from empirical_lawhood.adapters.simulators.information_response.executable_binding import SOURCE_BINDING as INFORMATION_RESPONSE_SOURCE_BINDING
-from empirical_lawhood.adapters.simulators.information_response.extension_bundle import SOURCE_CAPABILITY as INFORMATION_RESPONSE_SOURCE_CAPABILITY
-from empirical_lawhood.adapters.simulators.prepared_response.contracts import PreparedNativeSpec, PreparedRootRandomness, prepared_native_member, prepared_numerical_view, validate_prepared_seed_census
-from empirical_lawhood.adapters.simulators.prepared_response.executable_binding import SOURCE_QUALIFICATION_SOURCE_BINDING
-from empirical_lawhood.adapters.simulators.prepared_response.extension_bundle import SOURCE_QUALIFICATION_SOURCE_CAPABILITY
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    canonical_json_bytes,
-    require_sorted_unique_strings,
-    validate_stable_id,
-)
-from empirical_lawhood.planning.source_qualification import FreshSourceQualificationExperiment
-from empirical_lawhood.runtime.source_qualification import FreshSourceQualificationSubstrateBinding
+from empirical_lawhood.domains.matrix.causal_response.authoring.authoring import CausalResponseCandidateContextProvider, build_causal_response_authoring
+from empirical_lawhood.domains.matrix.causal_response.authoring.exposure import CausalResponseExposureInspection, causal_response_seed_ids
+from empirical_lawhood.domains.matrix.information_response.authoring.authoring import InformationResponseCandidateContextProvider, build_information_response_authoring
+from empirical_lawhood.domains.matrix.information_response.authoring.exposure import InformationResponseExposureInspection, information_response_seed_ids
+from empirical_lawhood.domains.matrix.prepared_response.authoring.exposure import PreparedExposureInspection, prepared_seed_ids
+from empirical_lawhood.domains.matrix.prepared_response.authoring.qualification_design import PreparedResponseSourceQualificationCandidateContextProvider, build_prepared_response_source_qualification_authoring
+from empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.exposure import ResponseGeometryAssayExposureSource
+from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+from empirical_lawhood.domains.matrix.causal_response.models import CausalResponseModelBank
+from empirical_lawhood.domains.matrix.information_response.models import InformationResponseModelBank
+from empirical_lawhood.domains.matrix.causal_response.contracts import CausalResponseNativeConfig
+from empirical_lawhood.adapters.simulators.causal_response.extension import SOURCE_BINDING as CAUSAL_RESPONSE_SOURCE_BINDING
+from empirical_lawhood.adapters.simulators.causal_response.extension import SOURCE_CAPABILITY as CAUSAL_RESPONSE_SOURCE_CAPABILITY
+from empirical_lawhood.domains.matrix.information_response.contracts import InformationResponseNativeConfig
+from empirical_lawhood.adapters.simulators.information_response.extension import SOURCE_BINDING as INFORMATION_RESPONSE_SOURCE_BINDING
+from empirical_lawhood.adapters.simulators.information_response.extension import SOURCE_CAPABILITY as INFORMATION_RESPONSE_SOURCE_CAPABILITY
+from empirical_lawhood.domains.matrix.prepared_response.contracts import PreparedNativeSpec, prepared_native_member, prepared_numerical_view
+from empirical_lawhood.adapters.simulators.prepared_response.extension import SOURCE_QUALIFICATION_SOURCE_BINDING
+from empirical_lawhood.adapters.simulators.prepared_response.extension import SOURCE_QUALIFICATION_SOURCE_CAPABILITY
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, require_sorted_unique_strings, validate_stable_id
+from empirical_lawhood.design.source_qualification import FreshSourceQualificationExperiment
+from empirical_lawhood.execution.source_qualification import FreshSourceQualificationSubstrateBinding
 
-ROUTES = ("source-qualification", "information-prediction", "causal-response-prediction")
 _MAX_PLAN = 2 * 1024**2
 _MAX_PRIOR = 64 * 1024**2
 _MAX_BANK = 16 * 1024**2
 
 
-@dataclass(frozen=True, slots=True)
-class PreparedResponseNativeAuthoringInput(CanonicalRecord):
-    SCHEMA: ClassVar[str] = 'empirical-lawhood/composition/prepared-response/prepared-response-native-authoring-input'
-    config_id: str
-    route: str
-    target_prefix: str
-    seed_label: str
-    source_seed_sha256: str
-    evidence_role: str = "EXPOSED_DEVELOPMENT_NONPROMOTABLE"
-    root_seed_census: tuple[PreparedRootRandomness, ...] = ()
-
-    def __post_init__(self) -> None:
-        family = {"source-qualification": "prepared-response", "information-prediction": "information-response", "causal-response-prediction": "causal-response"}.get(self.route, "invalid")
-        for name in ("config_id", "target_prefix", "seed_label"):
-            validate_stable_id(getattr(self, name), field_name=name)
-        if (
-            self.route not in ROUTES
-            or not self.config_id.startswith(f"empirical-lawhood-{family}-")
-            or not self.target_prefix.startswith(f"empirical-lawhood.{family}.")
-            or not self.seed_label.startswith(f"empirical-lawhood-{family}-")
-            or self.evidence_role != "EXPOSED_DEVELOPMENT_NONPROMOTABLE"
-        ):
-            raise ValueError(
-                "prepared response authoring input requires a target development identity"
-            )
-        object.__setattr__(self, "root_seed_census", validate_prepared_seed_census(
-            "qualification" if self.route == "source-qualification" else "prospective-evaluation",
-            self.source_seed_sha256, self.root_seed_census,
-        ))
 
 
 def _read_external(root: Path, path: Path, maximum: int) -> tuple[bytes, str]:
@@ -197,24 +156,10 @@ def _require_target_bank_document(document: object, expected_schema: str) -> byt
     return (json.dumps(document, sort_keys=True, separators=(",", ":")) + "\n").encode()
 
 
-@dataclass(frozen=True, slots=True)
-class PreparedNativeAuthoring:
-    """Scientific preparation handed to the application compiler without authority."""
-
-    bundle: PreparedResponseSourceQualificationAuthoringBundle | InformationResponseAuthoringBundle | CausalResponseAuthoringBundle
-    exposure: (
-        PreparedExposureInspection | InformationResponseExposureInspection | CausalResponseExposureInspection
-    )
-    context_provider_type: (
-        type[PreparedResponseSourceQualificationCandidateContextProvider]
-        | type[InformationResponseCandidateContextProvider]
-        | type[CausalResponseCandidateContextProvider]
-    )
-    selection_summary: dict[str, object]
 
 
 def prepare_prepared_response_native_authoring(
-    config: PreparedResponseNativeAuthoringInput,
+    config: _science_PreparedResponseNativeAuthoringInput,
     *,
     repo_root: Path,
     source_root: Path | None,
@@ -222,8 +167,9 @@ def prepare_prepared_response_native_authoring(
     design_packet: Path | None,
     prior_exposure: Path | None,
     model_bank: Path | None,
-) -> PreparedNativeAuthoring:
+) -> _science_PreparedNativeAuthoring:
     """Prepare source-owned scientific records and native providers without execution."""
+    from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
 
     if source_root is None:
         raise ValueError("SIX_MATRIX_RESPONSE_SOURCE_ROOT_REQUIRED")
@@ -387,7 +333,7 @@ def prepare_prepared_response_native_authoring(
         or native_runners[0].manifest.capability_key != source_capability.capability_key
     ):
         raise ValueError("SIX_MATRIX_RESPONSE_NATIVE_RUNNER_BINDING_MISMATCH")
-    return PreparedNativeAuthoring(
+    return _science_PreparedNativeAuthoring(
         bundle=bundle,
         exposure=exposure,
         context_provider_type=provider_type,
@@ -419,8 +365,4 @@ def prepare_prepared_response_native_authoring(
     )
 
 
-__all__ = [
-    'PreparedResponseNativeAuthoringInput',
-    "PreparedNativeAuthoring",
-    'prepare_prepared_response_native_authoring',
-]
+__all__ = ['prepare_prepared_response_native_authoring']

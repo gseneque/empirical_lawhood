@@ -12,7 +12,7 @@ from empirical_lawhood.cli.attempts import ATTEMPT_DIRECTORY_OPTION, retained_co
 
 
 def _commit(root):
-    from empirical_lawhood.infrastructure.bounded_process import run_bounded_command
+    from empirical_lawhood.execution.local.bounded_process import run_bounded_command
     value = run_bounded_command(("git", "-C", str(root), "rev-parse", "HEAD"),
         timeout_seconds=5, maximum_stdout_bytes=41, maximum_stderr_bytes=1024)
     if value.returncode or len(value.stdout) != 41:
@@ -22,7 +22,7 @@ def _commit(root):
 
 def _project():
     from empirical_lawhood.cli import platform
-    from empirical_lawhood.infrastructure.source_origin import require_executing_target_source
+    from empirical_lawhood.storage.source_origin import require_executing_target_source
     root = platform.CLI_PROJECT_ROOT
     if root is None:
         raise ValueError("Select --project-root for the current dependency lock and source")
@@ -33,6 +33,57 @@ def _project():
 def register_paper_analysis_commands(app):
     from empirical_lawhood.cli import integrations as h
     from empirical_lawhood.cli.preparation_integrations import _new_output, _write
+
+    @app.command('matrix-retained-refresh')
+    @retained_command('campaign matrix-retained-refresh', closed_output=True, native=False)
+    def retained_refresh(original_dir: Annotated[Path, typer.Option('--original-dir', exists=True, file_okay=False)],
+                         output_dir: Annotated[Path, typer.Option('--output-dir')],
+                         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None):
+        """Publish SCI01 and calculate the complete retained fixed-basis refresh comparison."""
+        from empirical_lawhood.api.matrix_retained_refresh import run_matrix_retained_refresh
+        try:
+            root, _, plane = h._storage()
+            attempt_stage('sci01_retained_calculation', native_contact='none')
+            report = run_matrix_retained_refresh(original_directory=original_dir, output_directory=output_dir,
+                project_root=root, artifact_writer=plane)
+        except (OSError, RuntimeError, TypeError, ValueError) as error:
+            h._error(error)
+        h._report(report)
+
+    @app.command('matrix-retained-refresh-assess')
+    @retained_command('campaign matrix-retained-refresh-assess', closed_output=True, native=False)
+    def retained_refresh_assess(original_dir: Annotated[Path, typer.Option('--original-dir', exists=True, file_okay=False)],
+                                calculation_dir: Annotated[Path, typer.Option('--calculation-dir', exists=True, file_okay=False)],
+                                output_dir: Annotated[Path, typer.Option('--output-dir')],
+                                attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None):
+        """Independently reconstruct SCI01 equations and publish all case and paired findings."""
+        from empirical_lawhood.api.matrix_retained_refresh import read_matrix_retained_refresh
+        try:
+            root, _, plane = h._storage()
+            attempt_stage('sci01_independent_assessment', native_contact='none')
+            report = read_matrix_retained_refresh(original_directory=original_dir, calculation_directory=calculation_dir,
+                assessment_directory=output_dir, project_root=root, artifact_writer=plane)
+        except (OSError, RuntimeError, TypeError, ValueError) as error:
+            h._error(error)
+        h._report(report)
+
+    @app.command('matrix-retained-matched')
+    @retained_command('campaign matrix-retained-matched', closed_output=True, native=False)
+    def retained_matched(original_dir: Annotated[Path, typer.Option('--original-dir', exists=True, file_okay=False)],
+                         calculation_dir: Annotated[Path, typer.Option('--calculation-dir', exists=True, file_okay=False)],
+                         assessment_dir: Annotated[Path, typer.Option('--assessment-dir', exists=True, file_okay=False)],
+                         output_dir: Annotated[Path, typer.Option('--output-dir')],
+                         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None):
+        """Export three retained SCI01 analyses: matched reversals, alignment and representation."""
+        from empirical_lawhood.api.matrix_refresh_matched import run_matrix_refresh_matched
+        try:
+            root, _, plane = h._storage()
+            attempt_stage('sci01_three_retained_analyses', native_contact='none')
+            report = run_matrix_refresh_matched(original_directory=original_dir, calculation_directory=calculation_dir,
+                assessment_directory=assessment_dir, output_directory=output_dir, project_root=root, artifact_writer=plane)
+        except (OSError, RuntimeError, TypeError, ValueError) as error:
+            h._error(error)
+        h._report(report)
 
     @app.command("matrix-geometry-prepare")
     @retained_command("campaign matrix-geometry-prepare", closed_output=True, native=False)
@@ -392,7 +443,7 @@ def register_paper_analysis_commands(app):
                         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None):
         """Analyze every assigned history; future evaluator operands cannot alter causal seals."""
         from empirical_lawhood.api.matrix_history_analysis import analyze_matrix_histories, matrix_history_result_summary
-        from empirical_lawhood.kernel.serialization import validate_relative_locator
+        from empirical_lawhood.science.records.serialization import validate_relative_locator
         try:
             root, _, plane = h._storage()
             validate_relative_locator(source_root)

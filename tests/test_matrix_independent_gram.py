@@ -4,7 +4,7 @@
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_parameter_factor import independent
+from empirical_lawhood.domains.matrix.matrix_parameter_factor import independent
 
 
 def literal_operator(triplet):

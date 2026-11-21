@@ -9,29 +9,25 @@ transformation manifest at the selected dataset control scope's fixed member.
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_pipeline as finite_dt_rows_owner
-from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import BLIND, PROSPECTIVE
-from empirical_lawhood.infrastructure import dataset_evidence
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.dataset_manifests import DatasetCapabilityKind, DatasetTransformationManifest
-from empirical_lawhood.planning.datasets import EvidenceReference, EvidenceReferenceKind
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
-from empirical_lawhood.runtime.datasets import (
-    DatasetCapabilityLimits, DatasetCapabilityRegistry, DatasetEvidenceOwnerKind,
-    DatasetEvidenceVerificationRequest, DatasetEvidenceVerifierRegistration,
-    DatasetFormatInspectorRegistration, DatasetTransformRegistration,
-)
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_pipeline as finite_dt_rows_owner
+from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import BLIND, PROSPECTIVE
+from empirical_lawhood.storage import dataset_evidence
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.dataset_manifests import DatasetCapabilityKind, DatasetTransformationManifest
+from empirical_lawhood.design.datasets import EvidenceReference, EvidenceReferenceKind
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.datasets import DatasetCapabilityLimits, DatasetCapabilityRegistry, DatasetEvidenceOwnerKind, DatasetEvidenceVerificationRequest, DatasetEvidenceVerifierRegistration, DatasetFormatInspectorRegistration, DatasetTransformRegistration
 
 MANIFEST_FILENAME = "dataset-transformation.json"
 
 
 def select_rows_owner(row_kind):
     """Select one exact current row type, without a default family."""
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_pipeline as prepared
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_pipeline as prepared
     if row_kind is finite_dt_rows_owner.MatrixFiniteDtPendingSourceRows:
         return finite_dt_rows_owner
     if row_kind is prepared.MatrixPreparedPendingSourceRows:
@@ -93,9 +89,9 @@ def authenticate_dataset_contract(*, writer, profile, registry, capabilities, re
     still replayed independently by the original dataset authority owner.
     """
     rows_owner = select_rows_owner(type(rows))
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
     from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef
     expected_capabilities, expected_registry = dataset_registries(profile.resource_ceiling, maximum_rows=len(rows.rows), row_kind=type(rows))
     if (registry != expected_registry or capabilities != expected_capabilities
             or profile.source_format_profile_id != rows_owner.FORMAT_ID
@@ -131,7 +127,7 @@ def authenticate_dataset_contract(*, writer, profile, registry, capabilities, re
     selected = {binding.kind: binding.implementation for binding in manifest.capabilities}
     if any(selected.get(kind) != value for kind, value in expected.items()):
         raise PermissionError("finite-dt manifest binds an unimplemented or substituted dataset reader")
-    from empirical_lawhood.planning.datasets import DatasetSelectorKind, DatasetSelectorRef
+    from empirical_lawhood.design.datasets import DatasetSelectorKind, DatasetSelectorRef
     source_scopes = tuple(value for value in request.source_scopes
         if value.storage_root.object_id == source_publication.materialization.storage_root_id
         and (source_publication.materialization.relative_path == value.relative_prefix
@@ -197,10 +193,10 @@ def make_dataset_manifest(*, namespace, source_publication, output_relative_path
     pure grammar does not execute or assert verified dataset custody for them.
     """
     rows_owner = select_rows_owner(type(rows))
-    from empirical_lawhood.planning import dataset_manifests as dm
-    from empirical_lawhood.planning.datasets import DatasetSelectorKind, DatasetSelectorRef
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-    from empirical_lawhood.kernel.time import CausalPhase
+    from empirical_lawhood.design import dataset_manifests as dm
+    from empirical_lawhood.design.datasets import DatasetSelectorKind, DatasetSelectorRef
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+    from empirical_lawhood.science.models.time import CausalPhase
     _, datasets = dataset_registries(envelope.resources, maximum_rows=len(rows.rows), row_kind=type(rows))
     inspector, = datasets.inspectors
     verifier, = datasets.evidence_verifiers
@@ -254,9 +250,7 @@ def make_dataset_manifest(*, namespace, source_publication, output_relative_path
 def _pending_materialization(source, rows, selector, *, materialization_id, release_id):
     """Exact metadata projection; ordinary dataset custody is not fabricated."""
     rows_owner = select_rows_owner(type(rows))
-    from empirical_lawhood.planning.datasets import (
-        CustodyState, DatasetEvidenceClass, DatasetMaterialization, DatasetMaterializationClass,
-    )
+    from empirical_lawhood.design.datasets import CustodyState, DatasetEvidenceClass, DatasetMaterialization, DatasetMaterializationClass
     return DatasetMaterialization(materialization_id, release_id,
         DatasetMaterializationClass.METADATA_OBSERVATION, DatasetEvidenceClass.METADATA_ONLY, BLIND,
         source.materialization.storage_root_id, source.materialization.relative_path, selector,

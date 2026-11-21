@@ -721,7 +721,10 @@ The exclusive original run lock prevents overlap with active execution.
 
 The repair retains the original plan, task configurations, inputs, receipts, failed events and terminal.
 A separate recovery index binds the output allowance, owner instruction and both source installations.
-All original adapter and kernel bytes and the dependency lock must match.
+The output repair verifies the original dependency lock and the complete source inventories
+under `science/`, `methods/`, `domains/` and `adapters/`. It also verifies the two former
+adapter modules now owned by `api/effective_law_comparison.py` and `storage/posthoc_sources.py`.
+For historical installations the comparison uses the original `kernel/` and adapter paths.
 Workers execute in the original interpreter with the original producing provenance.
 Current input access remains mandatory before protected reads.
 
@@ -769,8 +772,9 @@ The separate index gives each unfinished task one repair candidate and retains o
 Repeating the exact selection resumes that index without granting another attempt.
 
 The original worker installation and dependency lock remain frozen.
-The controller must preserve the capability registry, numerical owners, kernel and adapter sources;
-only the two programme continuation metadata modules may differ among adapter sources.
+The controller must preserve the capability registry, numerical owners and the scientific source
+inventories checked by output repair. The programme's source-continuation and extension metadata
+may change under their original names in each installation.
 Current input permission is refreshed throughout reads and immediately before native entry.
 The repair record and result readout disclose both sources, the original control census and task categories.
 Operational recovery does not establish scientific completion or qualification.
@@ -862,8 +866,9 @@ The original structural terminal must retain those failures and their unstarted 
 Successful structural outputs, uncertain attempts, native contacts and other failure classes refuse this route.
 
 Select a separately installed corrected source and the original operator profile.
-The source guard preserves the kernel, numerical implementations and dependency lock.
-It permits the structural access-label correction and documented programme metadata changes.
+The source guard verifies the same source inventories and dependency lock as output repair.
+It allows changes to the full-factor record's access label and to the programme's source-continuation,
+extension, selection and completed-source metadata.
 The corrected diagnostic record retains sealed ancestry with development visibility.
 Current original-input permission remains mandatory.
 

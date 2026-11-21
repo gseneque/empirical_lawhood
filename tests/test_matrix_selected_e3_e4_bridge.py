@@ -16,30 +16,30 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as r, selected_e3_e4_science as science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_experiment as public
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor as old_factor
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource, FAMILY_MAP
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponsePanel, ScheduledResponseArrays
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledResponseSelection
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import MatrixSelectedPublicPackage
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import MatrixHistorySeed, HISTORY_PURPOSES
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import DevelopmentStudySpec
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, PreparedExperimentFile
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave, validate_recursive_scientific_roots, decode_recursive_config_input
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as r, selected_e3_e4_science as science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_experiment as public
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor as old_factor
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource, FAMILY_MAP
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponsePanel, ScheduledResponseArrays
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledResponseSelection
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import MatrixSelectedPublicPackage
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import MatrixHistorySeed, HISTORY_PURPOSES
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import DevelopmentStudySpec
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, PreparedExperimentFile
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave, validate_recursive_scientific_roots, decode_recursive_config_input
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 from tests.test_matrix_selected_protected import transfer, unpublished  # noqa: F401 - in-memory shared source fixture
 from tests.test_matrix_selected_point import selected_design, feature
@@ -104,11 +104,11 @@ def build_selected_bridge(transferred, tmp_path_factory, *, public_package=None)
     raw, members = encode_matrix_arrays(template_arrays)
     artifact = ArtifactIdentity("array.selected-e4.disclosed-templates", "disclosed-software-input", "empirical-lawhood/matrix/array-input", sha256(raw).hexdigest(), "application/x-npz", len(raw))
     # Use the actual shared Matrix array schema, independent of a descriptor's schema.
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
     artifact = replace(artifact, payload_schema=MATRIX_ARRAY_SCHEMA)
-    from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import FactorEventSpec, EXPOSURE as FACTOR_EXPOSURE
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_protocol import ORIGINAL_SCALAR_SOURCE_BYTES, ORIGINAL_SCALAR_SOURCE_SHA256
-    from empirical_lawhood.adapters.methods.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol, MatrixResponseActionScale, MatrixResponseFactorRuleCompatibility
+    from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import FactorEventSpec, EXPOSURE as FACTOR_EXPOSURE
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_protocol import ORIGINAL_SCALAR_SOURCE_BYTES, ORIGINAL_SCALAR_SOURCE_SHA256
+    from empirical_lawhood.domains.matrix.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol, MatrixResponseActionScale, MatrixResponseFactorRuleCompatibility
     prefix_rule = policy.factor_rule
     original_normalization = ArtifactIdentity("matrix.scalar.closure.normalization-owner01", "native-normalization-source",
         "empirical-lawhood/source/checksummed-uninterpreted-public-bytes", ORIGINAL_SCALAR_SOURCE_SHA256,
@@ -141,7 +141,7 @@ def build_selected_bridge(transferred, tmp_path_factory, *, public_package=None)
     criterion = criterion_record.identity
     protocols = []
     if matched:
-        from empirical_lawhood.adapters.methods.matrix_factor_response.origin_mechanics import MatrixOriginResponseModel, MatrixIO48Construction
+        from empirical_lawhood.domains.matrix.matrix_factor_response.origin_mechanics import MatrixOriginResponseModel, MatrixIO48Construction
         base_protocol = replace(base_protocol, horizon_steps=package.specification.measurement.horizons,
             actions=tuple(replace(value, pulse_steps=16) for value in base_protocol.actions),
             mechanical_model=MatrixOriginResponseModel('test.e4.matched-origin', base_protocol.mechanical_model.implementation,
@@ -189,7 +189,7 @@ def build_selected_bridge(transferred, tmp_path_factory, *, public_package=None)
 
 def disclosed_produced_parents(originals, *, development=()):
     """Literal exposed control labels; never actual receipt or access evidence."""
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent,lineage_parent_sort_key
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, lineage_parent_sort_key
     rows=[ArtifactLineageParent(pin,r.EXPOSED,r.DEV) for value in originals
         for pin in (value.record,value.prior_execution.receipt)]
     rows.extend(ArtifactLineageParent(pin,value.publication.logical.visibility_ceiling,value.publication.logical.outcome_access)
@@ -199,8 +199,8 @@ def disclosed_produced_parents(originals, *, development=()):
 
 def disclosed_produced_publication(record, name, parents):
     """Unwritten fixture handle with honest exposed labels, never custody."""
-    from empirical_lawhood.kernel.evidence import inherited_visibility
-    from empirical_lawhood.runtime.artifacts import derived_outcome_access
+    from empirical_lawhood.science.evidence.evidence import inherited_visibility
+    from empirical_lawhood.storage.contracts.artifacts import derived_outcome_access
     publication=unpublished(record,name)
     access=derived_outcome_access(old.OutcomeAccess.OUTCOME_BLIND,*(value.outcome_access for value in parents))
     ceilings=tuple(value.visibility_ceiling for value in parents)
@@ -294,9 +294,7 @@ def compiler_inputs(draft):
 
 def test_current_e4_development_preserves_source_roles_and_cold_draft_bytes(selected_bridge):
     """Current E4 science inherits actual parent labels without reclassifying edges."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import (
-        produced_access, produced_record_parents,
-    )
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access, produced_record_parents
     f = selected_bridge
     assert f.evidence.produced_input_parents
     lowered = lowered_case(f)
@@ -318,7 +316,7 @@ def test_current_e4_development_preserves_source_roles_and_cold_draft_bytes(sele
     assert target.maximum_size_bytes == len(f.secondary_target.canonical_bytes())
     # The consumer alias is development-scoped; the pre-future publication
     # remains the exact blind original named by the entry seal.
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
     publication = f.secondary_plane.read_manifest(
         f.secondary_readout.publication.materialization.relative_path)
     assert publication.logical == f.secondary_readout.publication.logical
@@ -378,7 +376,7 @@ def test_selected_account_preserves_all_actual_original_points_and_no_uncertaint
     original_feature = feature(f.selected, f.selected.sources[0][1])
     values = original_feature.values
     predictions = f.bank.forecast_design.package.predict(values=values, disposition="AVAILABLE")
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_package import predict_selected_points
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_package import predict_selected_points
     assert predictions == predict_selected_points(f.selected.package, values=values, disposition="AVAILABLE")
     assert dict(predictions)["SPECTRAL_RIDGE"] == (D(0), D(2), D(2)) * 5
     prefix = ObjectIdentity("causal.literal-selected-e4", r.SelectedE3E4CausalPrefix.SCHEMA, "1.0.0", "c" * 64)
@@ -424,7 +422,7 @@ def test_public_prepare_retains_exact_complete_science_and_real_missing_inputs(s
     public.validate_instance(specification=spec, allocation=result.allocation, draft=result.draft, source_records=result.design_records)
     assert all(b'"scores"' not in value.canonical_bytes() for _, value in result.design_records)
     assert public.protocol_declaration().requires_development_runtime_binding
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
     assert public.protocol_declaration().input_storage_codecs == MATRIX_STORAGE_CODECS
 
 
@@ -449,8 +447,8 @@ def test_parent_refuses_missing_real_authored_custody_before_original_calibratio
 
 
 def test_pure_native_projection_keeps_exact_local_source_and_all_four_streams(selected_bridge):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_native import initial_native_work
-    from empirical_lawhood.runtime.native_effects import NativeEffectContact
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_native import initial_native_work
+    from empirical_lawhood.execution.native_effects import NativeEffectContact
 
     f = selected_bridge
     local = r.SelectedE3E4NativeSourceReference.from_bank(f.programme, f.bank, f.bank.sources[0],index=f.bank.source_index())
@@ -555,9 +553,9 @@ def test_failed_case_preserves_actual_original_frozen_points_already_received(se
 
 def test_partial_original_targets_keep_finite_positions_and_full_paired30_denominator(selected_bridge):
     from decimal import localcontext
-    from empirical_lawhood.adapters.methods.matrix_factor_response.records import PREDICTORS
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseLossCell, ScheduledResponseScore
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
+    from empirical_lawhood.domains.matrix.matrix_factor_response.records import PREDICTORS
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseLossCell, ScheduledResponseScore
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
 
     f, case = selected_bridge, selected_bridge.programme.cases[0]
     protocol = f.bank.response_selection.protocols[0]

@@ -12,8 +12,9 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.adapters.simulators import pybamm_reduced_coordinate_sufficiency as battery_reduced_observation
+import empirical_lawhood.domains.battery.reduced_coordinate_sufficiency as battery_reduced_observation_science
 from empirical_lawhood.adapters.simulators.pybamm_development_input import PyBaMMDevelopmentInput, run_native_development_check
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 CONFIG = (
     Path(__file__).resolve().parents[1] / "programmes/energy/battery-charging/workflows/battery-response-and-restart/config.json"
@@ -70,9 +71,9 @@ def test_reduced_observation_input_refuses_wrong_identity_before_native_contact(
 ) -> None:
     calls = []
     monkeypatch.setattr(battery_reduced_observation, "_step_prefix", lambda *_args: calls.append(True))
-    unit = battery_reduced_observation.BatteryReducedObservationPreparation(
+    unit = battery_reduced_observation_science.BatteryReducedObservationPreparation(
         "unit.empirical-lawhood-pybamm-rejection-001",
-        battery_reduced_observation.BatteryReducedObservationStage.DEVELOPMENT,
+        battery_reduced_observation_science.BatteryReducedObservationStage.DEVELOPMENT,
         'low-state-of-charge-cool',
         Decimal("0.30"),
         Decimal("291.5"),
@@ -80,11 +81,11 @@ def test_reduced_observation_input_refuses_wrong_identity_before_native_contact(
     )
     denominator = next(
         item
-        for item in battery_reduced_observation.denominators()
+        for item in battery_reduced_observation_science.denominators()
         if item.denominator_id == _config().denominator_id
     )
     history = next(
-        item for item in battery_reduced_observation.histories() if item.history_id == _config().reduced_observation_history_id
+        item for item in battery_reduced_observation_science.histories() if item.history_id == _config().reduced_observation_history_id
     )
     with pytest.raises(ValueError, match="SHA-256|sha256"):
         battery_reduced_observation.acquire_preparation(

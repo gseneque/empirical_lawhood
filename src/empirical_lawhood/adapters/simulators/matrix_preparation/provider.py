@@ -4,30 +4,20 @@ from collections.abc import Callable
 from decimal import Decimal
 from typing import Protocol, cast
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.linked_campaign import LinkedCampaignStageRole
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    lineage_parent_sort_key,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityManifest, CapabilityRegistry
-from empirical_lawhood.runtime.execution import TaskContext, RunnerResult, TaskRunner, TaskProgressEmitter
-from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignStageEnvelope
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan, ExecutionTask
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-    ExternalInputSource,
-    MAX_EXTERNAL_INPUT_CHUNK_BYTES,
-)
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.linked_campaign import LinkedCampaignStageRole
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, lineage_parent_sort_key
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import TaskContext, RunnerResult, TaskRunner, TaskProgressEmitter
+from empirical_lawhood.execution.linked_campaigns import LinkedCampaignStageEnvelope
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan, ExecutionTask
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload, ExternalInputSource, MAX_EXTERNAL_INPUT_CHUNK_BYTES
 from empirical_lawhood.adapters.simulators.response_geometry_prospective.provider import decode_port, envelope, output_result, semantic_contracts
-from .contracts import CANONICAL_MEDIA_TYPE, NATIVE_SCHEMA, PreparationNativeResult, PreparationSourceConfig, RetainedPreparationPrefix, PreparationPrefixBundleRef
-from .prefix_bundles import PreparationPrefixBundle
-from .continuation import PreparationDevelopmentContinuation
+from empirical_lawhood.domains.matrix.matrix_preparation.native_inputs import CANONICAL_MEDIA_TYPE, NATIVE_SCHEMA, PreparationNativeResult, PreparationSourceConfig, RetainedPreparationPrefix, PreparationPrefixBundleRef
+from empirical_lawhood.domains.matrix.matrix_preparation.prefix_bundles import PreparationPrefixBundle
+from empirical_lawhood.domains.matrix.matrix_preparation.native_continuation import PreparationDevelopmentContinuation
 
 
 PREFIX_SOURCE_PORT = "matrix-preparation-retained-prefix-sources"
@@ -159,7 +149,7 @@ class PreparationSourceTask:
                     imported = retained.for_root(prefix)
             if imported is None or imported.fingerprint() != prefix.artifact.sha256:
                 raise ValueError("preparation source lost its authenticated prefix identity")
-            from .source import execute_preparation_root
+            from empirical_lawhood.adapters.simulators.matrix_preparation.source import execute_preparation_root
 
             result, data = execute_preparation_root(
                 self.config, prefix.root, imported, progress=progress

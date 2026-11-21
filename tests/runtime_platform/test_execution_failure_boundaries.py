@@ -1,21 +1,22 @@
 """Current scheduler error classification, diagnostics and admitted worker drain."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 from dataclasses import replace
 from hashlib import sha256
 import json
 from pathlib import Path
 import threading
 import pytest
-from empirical_lawhood.infrastructure import execution as sdk
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.execution import OperationalFailureClass, RunnerRegistry, RunnerResult, TaskAttemptDisposition, TaskBlockReason
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, WorkerPreflightMismatch, WorkerPreflightResult
-from empirical_lawhood.runtime.recovery import OperationalFailureDiagnostic
+from empirical_lawhood.execution.local import execution as sdk
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.execution import OperationalFailureClass, RunnerRegistry, RunnerResult, TaskAttemptDisposition, TaskBlockReason
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, WorkerPreflightMismatch, WorkerPreflightResult
+from empirical_lawhood.execution.recovery import OperationalFailureDiagnostic
 from tests.runtime_platform.test_execution_scheduler import _runtime
 
 @pytest.mark.parametrize('name', ('SchedulerConsistencyError', 'LiveLeaseError', 'InjectedSchedulerCrash', 'ResourceLockUnavailable', 'TaskProcessError', 'ResourceAdmissionError', 'WorkerPreflightError', 'ProgressStalledError', 'CampaignElapsedBoundaryReached'))
@@ -198,7 +199,7 @@ def test_native_failure_retains_cause_and_admitted_workers_drain(tmp_path, proto
             assert diagnostic.failure_class is OperationalFailureClass.CHILD_PROCESS_FAILURE
             assert diagnostic.scientific_evidence is False
             assert b'PRIVATE' not in paths[0].read_bytes()
-            manifest = decode_artifact_manifest(Path(str(paths[0]) + '.manifest.json').read_bytes())
+            manifest = resolve_artifact_sidecar_bytes(plane, Path(str(paths[0]) + '.manifest.json').read_bytes())
             assert manifest.logical.content_sha256 == diagnostic.fingerprint()
             assert manifest.logical.outcome_access == fixture.execution_plan.tasks[0].capability.requested_outcome_access
             assert any((row.identity.object_schema == 'empirical-lawhood/runtime/native-effect-contact' for row in manifest.logical.lineage_parents))

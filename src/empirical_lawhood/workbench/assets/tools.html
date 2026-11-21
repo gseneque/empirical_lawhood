@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Empirical Lawhood · Research workbench</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#workspace">Skip to workspace</a>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Workbench navigation">
+      <div class="brand"><img class="brand-symbol" src="/el-logo.svg" width="68" height="53" alt=""><div>Empirical<br>Lawhood</div></div>
+      <p class="sidebar-kicker">RESEARCH WORKBENCH</p>
+      <a class="nav-button" href="/">← Research explorer</a>
+      <nav>
+        <button id="nav-results" class="nav-button selected" aria-current="page"><span aria-hidden="true">◈</span> Retained results</button>
+        <button id="nav-design" class="nav-button"><span aria-hidden="true">◇</span> Design &amp; run</button>
+        <button id="nav-programme" class="nav-button"><span aria-hidden="true">▤</span> Composite programmes</button>
+        <button id="nav-inquiry" class="nav-button"><span aria-hidden="true">↗</span> Inquiry &amp; successors</button>
+        <button id="nav-knowledge" class="nav-button"><span aria-hidden="true">⇄</span> Knowledge &amp; exchange</button>
+        <button id="nav-workflows" class="nav-button"><span aria-hidden="true">▦</span> Installed workflows</button>
+        <button id="nav-invocations" class="nav-button"><span aria-hidden="true">◷</span> Invocations</button>
+        <button id="nav-context" class="nav-button"><span aria-hidden="true">◎</span> Context &amp; access</button>
+      </nav>
+      <div class="sidebar-note"><span class="live-dot" aria-hidden="true"></span> Local session<p>Selected engines.<br>Original scientific records.</p></div>
+      <div class="sidebar-footer">Application contract <span id="contract-version">—</span><br>Bounded RC lifecycle &amp; retained inspection</div>
+    </aside>
+    <main id="workspace" tabindex="-1">
+      <header class="topbar"><span id="breadcrumb">Workspace / Retained results</span><span class="local-label">LOCAL · ONE OPERATOR</span></header>
+      <section class="heading"><div><p class="eyebrow">EVIDENCE IN CONTEXT</p><h1 id="page-title">Retained results</h1><p id="page-description">Open an original result and follow its evidence, attempts and provenance.</p></div><span id="session-state" class="session-state">Connecting</span></section>
+      <section class="selection-panel" aria-label="Selected research context">
+        <label class="field context-field">Engine &amp; storage context<select id="context" disabled><option>Loading selected contexts…</option></select></label>
+        <label class="field kind-field">Retained object<select id="kind"><option value="rc">RC development wave</option><option value="execution">Execution records</option><option value="sci02d">SCI02-D retained wave</option><option value="analysis">Analysis package</option><option value="matrix">Matrix programme</option><option value="presentation">Registered findings</option><option value="continuing.session">Continuing source history</option><option value="continuing.operation">Finite source operation</option></select></label>
+        <label id="panel-field" class="field" hidden>Installed presentation<select id="panel"><option value="">Select a presentation…</option></select></label>
+        <label class="field path-field">Original directory<input id="directory" autocomplete="off" spellcheck="false" placeholder="Absolute path to the retained object"></label>
+        <button id="open" class="primary">Open result <span aria-hidden="true">↗</span></button>
+        <div id="source-window-fields" class="source-fields" hidden>
+          <label class="field">First event segment<input id="first-segment" type="number" min="1" value="1"></label>
+          <label class="field">Event segments to read<input id="segment-count" type="number" min="1" max="16" value="1"></label>
+          <label class="field">First actor or session boundary<input id="first-boundary" type="number" min="1" value="1"></label>
+          <label class="field">Boundaries to read<input id="boundary-count" type="number" min="1" max="16" value="16"></label>
+        </div>
+        <label id="source-request-field" class="field source-fields" hidden>Original finite request ID<input id="source-request" autocomplete="off" spellcheck="false" maxlength="512"></label>
+      </section>
+      <div id="message" class="message" role="status" aria-live="polite" hidden></div>
+      <div id="error" class="error" role="alert" hidden></div>
+      <section id="result" aria-label="Research result">
+        <div class="empty"><div class="empty-mark" aria-hidden="true">◎</div><h2>Start with the original record</h2><p>Select an engine context and a retained directory.<br>Each read checks the original custody and current access.</p><div class="empty-steps"><span>01 &nbsp; Select</span><span>02 &nbsp; Authenticate</span><span>03 &nbsp; Inspect</span></div></div>
+      </section>
+      <footer class="workspace-footer"><span id="read-stamp">No scientific object is open.</span><span>Execution completion and scientific findings have separate meanings.</span></footer>
+    </main>
+    <aside id="inspector" class="inspector" aria-label="Exact record inspector" hidden><div class="inspector-top"><p class="eyebrow">ORIGINAL VALUES</p><button id="close-inspector" class="icon-button" aria-label="Close exact record inspector">×</button></div><h2 id="inspector-title">Record</h2><p id="inspector-note">Values keep their original record revision and exact representation.</p><pre id="inspector-value" tabindex="0"></pre></aside>
+  </div>
+</body>
+</html>

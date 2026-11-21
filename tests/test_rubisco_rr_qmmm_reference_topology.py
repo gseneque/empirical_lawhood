@@ -11,10 +11,8 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.physical.rubisco_kinetics import rr_qmmm_reference_topology as m
-from empirical_lawhood.adapters.physical.rubisco_kinetics.rr_coupled_preparation import (
-    BoundaryCapV1, CoreAtomV1, PreparedAtomV1,
-)
+from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import reference_topology as m
+from empirical_lawhood.domains.rubisco.kinetics.rr_coupled_preparation import BoundaryCapV1, CoreAtomV1, PreparedAtomV1
 
 
 def prepared(i, name, element="C", component="KCX", position=191, chain="A"):
@@ -213,7 +211,7 @@ class NoNative(importlib.abc.MetaPathFinder):
             raise AssertionError(fullname)
 sys.meta_path.insert(0, NoNative())
 subprocess.Popen = lambda *a, **k: (_ for _ in ()).throw(AssertionError('native effect'))
-from empirical_lawhood.adapters.physical.rubisco_kinetics import rr_qmmm_reference_topology
+from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import reference_topology as rr_qmmm_reference_topology
 assert rr_qmmm_reference_topology.PLAN_ID.endswith('v1')
 """
     env = dict(os.environ)

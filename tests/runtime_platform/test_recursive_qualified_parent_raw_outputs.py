@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Issued raw-dependency replay uses synthetic custody, never real qualification."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from hashlib import sha256
@@ -7,21 +8,21 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_artifact_manifest
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.execution import RunnerResult, TaskOutputPayload
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.execution import RunnerResult, TaskOutputPayload
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform import test_recursive_prospective_workflow as workflow
 from tests.runtime_platform.test_recursive_prospective_parents import _authenticate, _parent_inputs
 
 
 @pytest.fixture(scope='module')
 def raw_parent_fixture(tmp_path_factory):
-    from empirical_lawhood.adapters.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
+    from empirical_lawhood.domains.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
 
     positive = replace(REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE,
         fixture_id='fixture.synthetic-raw-parent-supported', scientific_status=ScientificStatus.SUPPORTED,
@@ -89,7 +90,7 @@ def test_issued_parent_replays_raw_dependency_without_canonical_codec(raw_parent
     receipt, logical, physical, path = _raw_dependency(fixture)
     sidecar = path.with_name(path.name + '.manifest.json')
     original = sidecar.read_bytes()
-    manifest = decode_artifact_manifest(original)
+    manifest = resolve_artifact_sidecar_bytes(fixture.plane, original)
     assert manifest.publication is not None
     assert logical.profile is ArtifactProfile.MATRIX_ARRAY_NPZ
     assert MATRIX_ARRAY_SCHEMA not in fixture.handoff.compilation.output_codecs
@@ -132,8 +133,8 @@ def test_changed_raw_dependency_refuses_before_qualified_product_read(raw_parent
 
 
 def test_raw_dependency_still_requires_prior_reveal_before_stream_validation(raw_parent_fixture, monkeypatch):
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-    from empirical_lawhood.runtime import artifacts
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.storage.contracts import artifacts
 
     fixture = raw_parent_fixture
     original = ExternalStudyOperationAuthorityStore.load
@@ -150,11 +151,17 @@ def test_raw_dependency_still_requires_prior_reveal_before_stream_validation(raw
         _authenticate(fixture)
 
 
-def test_raw_dependency_does_not_relax_canonical_output_codecs(raw_parent_fixture):
-    from empirical_lawhood.api.recursive_qualified_parents import authenticate_recursive_qualified_parents
+def test_raw_dependency_does_not_relax_canonical_output_codecs(raw_parent_fixture, monkeypatch):
+    from empirical_lawhood.api import recursive_qualified_parents as owner
+    from empirical_lawhood.storage.contracts.record_codecs import UnsupportedRecordRevision
 
     fixture = raw_parent_fixture
     draft, registrations, binding = _parent_inputs(fixture)
-    with pytest.raises(PermissionError, match='installed typed scientific codec'):
-        authenticate_recursive_qualified_parents(spec_bindings=(binding,), draft=draft,
+    task, schema = next((task, output.payload_schema) for task in fixture.execution_plan.tasks
+        for output in task.outputs if output.profile is ArtifactProfile.CANONICAL_JSON)
+    monkeypatch.setattr(owner, '_output_payload', lambda *args: pytest.fail('qualified product read before codec selection'))
+    with pytest.raises(UnsupportedRecordRevision, match='requires the exact codec binding') as error:
+        owner.authenticate_recursive_qualified_parents(spec_bindings=(binding,), draft=draft,
             artifact_writer=fixture.plane, registrations=registrations, output_codecs={})
+    assert f'output {schema} requires the exact codec binding of {task.capability.capability_key}@{task.capability.capability_version}' in str(error.value)
+    assert fixture.executor.invocations == 5

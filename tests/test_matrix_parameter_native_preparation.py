@@ -7,16 +7,12 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_parameter_history import (
-    chunked_operation_bindings as chunked,
-    compact_operation_bindings as compact,
-    operation_bindings as legacy,
-)
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.execution import TaskContext, WorkerIsolationProfile
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.infrastructure.execution import _prepare_native_work
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_parameter_history import chunked_operation_bindings as chunked, compact_operation_bindings as compact, operation_bindings as legacy
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.execution import TaskContext, WorkerIsolationProfile
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.local.execution import _prepare_native_work
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.runtime_platform.test_native_subwork import _plane
 from tests.test_matrix_parameter_history import context as legacy_context, object_id, provider, source
 from tests.test_matrix_parameter_compact_history import context as compact_context, selected
@@ -73,7 +69,7 @@ def test_repeated_preparation_retains_exact_original_initial_definition_and_no_c
 @pytest.mark.parametrize('owner', (legacy, compact, chunked), ids=('original', 'compact', 'chunked'))
 def test_preparation_refuses_incomplete_original_stream_census_without_entry(tmp_path, owner):
     _, _, context, _, factory, parent = _case(tmp_path, owner)
-    from empirical_lawhood.adapters.methods.matrix_history_analysis.records import MatrixHistorySeed
+    from empirical_lawhood.domains.matrix.matrix_history_analysis.records import MatrixHistorySeed
     omitted = next(port for port in context.input_ports if port.payload_schema == MatrixHistorySeed.SCHEMA)
     from dataclasses import replace
     remaining = tuple(port for port in context.input_ports if port is not omitted)
@@ -85,7 +81,7 @@ def test_preparation_refuses_incomplete_original_stream_census_without_entry(tmp
 
 
 def test_all_five_parameter_native_operations_use_declared_preparation_and_pure_phases_do_not():
-    from empirical_lawhood.adapters.methods.matrix_parameter_response import operation_bindings, paired_operation_bindings
+    from empirical_lawhood.domains.matrix.matrix_parameter_response import operation_bindings, paired_operation_bindings
     owners = (legacy, compact, chunked, operation_bindings, paired_operation_bindings)
     native = []
     for owner in owners:

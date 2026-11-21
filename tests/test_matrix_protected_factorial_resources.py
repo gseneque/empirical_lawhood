@@ -7,23 +7,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_resources import (
-    ProtectedFactorialResourceSelection, bind_protected_factorial_resources,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_entry import (
-    ExecutableStudyDefinition, ProposedStudyExtension, ProposedStudyExtensionSet,
-)
-from empirical_lawhood.runtime.candidate_compiler import bind_standard_candidate_extensions, compile_study_candidate
-from empirical_lawhood.runtime.compiler import ProtocolCompilationError, compile_preissue_run_plan
-from empirical_lawhood.runtime.execution_envelope import (
-    ChildResourceTokenLimit, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec,
-    NonTimeResourceBudget, RosterCapacityBranchSpec,
-)
-from empirical_lawhood.runtime.study_extensions import StudyExtensionMaterializationReceipt
-from empirical_lawhood.runtime.study_issue import StudyExtensionDecoderRegistration, project_standard_study_extensions
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_resources import ProtectedFactorialResourceSelection, bind_protected_factorial_resources
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_entry import ExecutableStudyDefinition, ProposedStudyExtension, ProposedStudyExtensionSet
+from empirical_lawhood.execution.candidate_compiler import bind_standard_candidate_extensions, compile_study_candidate
+from empirical_lawhood.execution.compiler import ProtocolCompilationError, compile_preissue_run_plan
+from empirical_lawhood.execution.execution_envelope import ChildResourceTokenLimit, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec, NonTimeResourceBudget, RosterCapacityBranchSpec
+from empirical_lawhood.execution.study_extensions import StudyExtensionMaterializationReceipt
+from empirical_lawhood.execution.study_issue import StudyExtensionDecoderRegistration, project_standard_study_extensions
 from tests.runtime_platform.test_candidate_compiler import _materialization
 from tests.runtime_platform.test_recursive_compiler import Config
 from tests.runtime_platform.test_standard_formal_candidate import _standard_fixture

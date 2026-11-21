@@ -10,34 +10,25 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_assay_bridge import (
-    KineticAssayBridgeResult, assess_joint_kinetic_target, execute_kinetic_assay_bridge,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.gas_contrast import (
-    BUDGET, CAPABILITY, MEDIA, GasContrastAssessment, GasContrastConfig, GasContrastRunner,
-    assess_gas_contrast, operation_declaration,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.gas_contrast_translation import (
-    gas_contrast_draft, gas_contrast_input_origins,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.operation_bindings import design, scope
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.recursive_translation import kinetic_join_draft
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_supply import JointKineticSupply, KineticTargetComparison
-from empirical_lawhood.adapters.simulators.rubisco_assay.records import AssayQuery
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A, ContributionRole
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.scientific_contributions import ContributionManifest, ContributionProduct
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, CanonicalTaskReceipt, ExternalRootContract
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort,
-)
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_assay_bridge import KineticAssayBridgeResult, assess_joint_kinetic_target, execute_kinetic_assay_bridge
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.gas_contrast import BUDGET, CAPABILITY, MEDIA, GasContrastAssessment, GasContrastConfig, GasContrastRunner, assess_gas_contrast, operation_declaration
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.gas_contrast_translation import gas_contrast_draft, gas_contrast_input_origins
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.operation_bindings import design, scope
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.recursive_translation import kinetic_join_draft
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_supply import JointKineticSupply, KineticTargetComparison
+from empirical_lawhood.domains.rubisco.assay.records import AssayQuery
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A, ContributionRole
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, CanonicalTaskReceipt, ExternalRootContract
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRegistry
+from empirical_lawhood.execution.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE = ROOT / "programmes/biology/photosynthesis/workflows/rubisco-kinetic-join"
@@ -191,9 +182,10 @@ def test_worker_preserves_pair_and_refuses_wrong_producing_artifact():
 
 
 def _real_plane(path):
+    from tests.numerical_provenance_fixtures import selected_test_mount
+    mounted = selected_test_mount(path)
     path.mkdir()
     resolved = path.resolve()
-    mounted = next(value for value in (resolved, *resolved.parents) if value.is_mount())
     contract = ExternalRootContract("rubisco-gas-contrast-exposed-development", "Declared local software-conformance custody",
         str(resolved), str(mounted), "empirical-lawhood/testing/rubisco-gas-contrast", 1)
     # The actual inspector establishes mount identity, free bytes and write access.

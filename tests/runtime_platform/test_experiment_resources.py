@@ -7,12 +7,10 @@ import inspect
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_resources import (
-    ProtectedFactorialResourceSelection, bind_protected_factorial_resources,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.runtime.compiler import ProtocolCompilationError
-from empirical_lawhood.runtime.experiment_resources import ExecutionResourceSelection, bind_execution_resources
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_resources import ProtectedFactorialResourceSelection, bind_protected_factorial_resources
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.execution.compiler import ProtocolCompilationError
+from empirical_lawhood.execution.experiment_resources import ExecutionResourceSelection, bind_execution_resources
 from tests import test_matrix_protected_factorial_resources as fixtures
 
 
@@ -36,7 +34,7 @@ def shared(selection):
 def test_preserved_e4_schema_constructor_bytes_and_closed_decoder(projected):
     original = projected.selection
     assert type(original) is ProtectedFactorialResourceSelection
-    assert original.__class__.__module__ == "empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_resources"
+    assert original.__class__.__module__ == "empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_resources"
     assert tuple(row.name for row in fields(original)) == RESOURCE_FIELDS
     assert tuple(inspect.signature(ProtectedFactorialResourceSelection).parameters) == RESOURCE_FIELDS
     assert original.VERSION == "1.0.0"
@@ -74,7 +72,7 @@ def test_binding_keeps_exact_owning_selection_types(projected, selection_kind):
 @pytest.mark.parametrize("supplied", (None, {}, "identity"))
 def test_generic_binding_refuses_placeholder_extension_records(projected, supplied):
     if supplied == "identity":
-        from empirical_lawhood.kernel.provenance import ObjectIdentity
+        from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
         supplied = ObjectIdentity.from_record(projected.extensions.issued_extension_set_id, projected.extensions)
     with pytest.raises(TypeError, match="actual typed extension set"):

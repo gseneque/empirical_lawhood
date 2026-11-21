@@ -1,0 +1,101 @@
+{
+  "project": "PySCF",
+  "upstream_version": "2.14.0",
+  "upstream_repository": "https://github.com/pyscf/pyscf",
+  "license": "Apache-2.0",
+  "modified_by": "Empirical Lawhood project",
+  "modification_date": "2026-10-29",
+  "scope": "PROJECT_LOCAL_DERIVATIVES_AND_EXACT_SOURCE_PRIVATE_CVHF_BUILD; MEMORY_CONTROLS_SEPARATE_FROM_FULL_ENZYME_QUALIFICATION",
+  "files": [
+    {
+      "original_path": "mm_mole.py",
+      "upstream_url": "https://github.com/pyscf/pyscf/blob/v2.14.0/pyscf/qmmm/pbc/mm_mole.py",
+      "original_bytes": 17147,
+      "original_sha256": "06cf121f9c1955d7e3065f8e2e99e76274069a4017b5403d0f4753579db0d84b",
+      "local_path": "pyscf_periodic_mm_mole.py",
+      "local_sha256": "c6f92d4c1e9e4f3fd0a0e51106743ab9295572a6a9141fad66ed684af197cc36",
+      "modifications": "Complete MM blocking and refusal of a nonpositive real-space work-array budget. Recalculate integral and Ewald blocks from current RSS, RLIMIT_AS/VmSize and cgroup headroom; release previous temporary arrays before the next block. Slice the complete QM self-term tensor consistently for partial QM blocks."
+    },
+    {
+      "original_path": "itrf.py",
+      "upstream_url": "https://github.com/pyscf/pyscf/blob/v2.14.0/pyscf/qmmm/pbc/itrf.py",
+      "original_bytes": 47211,
+      "original_sha256": "ea7cc308bd7fdab5be331fea86963d543005bd8acb90446c0fd5b991e936d16e",
+      "local_path": "pyscf_periodic_electronic.py",
+      "local_sha256": "917381c0b74ef5d4963ee1dbeb81c8efc29a46c974cbbe2457f7b95bfd65dfc6",
+      "modifications": "Complete MM blocking, total spin density, charged Ewald background, and local MM-module import. Recalculate integral and Ewald blocks from current RSS, RLIMIT_AS/VmSize and cgroup headroom; release previous temporary arrays before the next block. Contract the full MM electronic derivative before charge scaling to avoid a duplicate integral tensor. Observe entry and return for the direct core Hamiltonian, Ewald potential and complete effective potential. Preserve the uncoupled potential metadata for cached electronic energies and incremental direct Coulomb/exchange contractions; no density or numerical setting is changed."
+    },
+    {
+      "original_path": "grad/rks.py",
+      "upstream_url": "https://github.com/pyscf/pyscf/blob/v2.14.0/pyscf/grad/rks.py",
+      "original_bytes": 30032,
+      "original_sha256": "cffc3e9efa10cf1b547d757e9d165c1000377e9159c794f87464a79c8c93ab46",
+      "additional_original_sources": [
+        {
+          "original_path": "grad/uks.py",
+          "upstream_url": "https://github.com/pyscf/pyscf/blob/v2.14.0/pyscf/grad/uks.py",
+          "original_bytes": 10992,
+          "original_sha256": "57ba4d9528be5d5dbd1eadb7f91e539e03008b74b28ebfbbb9a33f50b841484a"
+        },
+        {
+          "original_path": "dft/numint.py",
+          "upstream_url": "https://github.com/pyscf/pyscf/blob/v2.14.0/pyscf/dft/numint.py",
+          "original_bytes": 124127,
+          "original_sha256": "ff7384551c7a6b80ff8a5ffcd915eb8bfbf6ca4b8f987f912aa82a1d6edda7e8"
+        }
+      ],
+      "local_path": "pyscf_periodic_dft.py",
+      "local_sha256": "02c445198a0605d796bc332a7e4d0a0345eacaf81145d24640b5547e6fa963a1",
+      "modifications": "Instance-local NumInt selects aligned AO blocks from actual memory headroom. Complete GGA RKS/UKS grid response partitions each atomic grid before atom-pair derivative and AO allocations, preserving weights, coordinate response, spin-density contractions, hybrid/range-separated J/K and grid-force tags. Unsupported functionals and partitions refuse. Installed PySCF modules remain unchanged."
+    },
+    {
+      "original_path": "lib/vhf/nr_direct.c",
+      "upstream_url": "https://github.com/pyscf/pyscf/blob/v2.14.0/pyscf/lib/vhf/nr_direct.c",
+      "original_bytes": 27202,
+      "original_sha256": "9c181daa8ce689e312e548694f47a2935105094fab1e685e82b4bf485e0639c4",
+      "local_path": "pyscf_cvhf_allocation.py",
+      "local_sha256": "878722b7708bffabf9d3078f9487bc9d28f146b75b5d3bb15667ce91393676bf",
+      "modifications": "Pure exact-source transform bounds each JKArray cache by its complete output elements and retains all possible tile keys, including partial edges. Original contractions, integral screening, block partitions and flush thresholds are unchanged. A separate private environment records compiler and binary provenance; original environment remains unchanged.",
+      "corrected_c_sha256": "9075547f10c395c87dc55df95bbe6e616c5f5adfe63ab1f0c8db685378b009cf"
+    },
+    {
+      "original_path": "lib/diis.py",
+      "upstream_url": "https://github.com/pyscf/pyscf/blob/v2.14.0/pyscf/lib/diis.py",
+      "original_bytes": 12075,
+      "original_sha256": "05f3c932125c9253b9ed6dc44ebeafe918db69bc52a9007938091cb808eca464",
+      "local_path": "pyscf_periodic_diis.py",
+      "local_sha256": "19950e908cbc25392869669dcce18bba640f9d712dddc60a3dae2f6076fc0727",
+      "modifications": "Instance-local subclass preserves normal DIIS. Only the reported LAPACK Internal Error uses symmetric QR on the same recorded finite Hermitian matrix, with eigenpair residual and orthogonality checks. Original dependence threshold, coefficient calculation and blockwise mixing remain intact. No cycle or native attempt replay."
+    }
+  ],
+  "upstream_notices": [
+    {
+      "path": "pyscf-periodic-LICENSE.txt",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "pyscf-periodic-NOTICE.txt",
+      "sha256": "10b87562de7f230776061516b13c0ad6531fb8bb365fbae20390da0c22b6739e"
+    }
+  ],
+  "preceding_control_sources": [
+    {
+      "path": "/media/chevre/EL/empirical-lawhood/rubisco-rf00-rf04/scratch/periodic-spin-charge-code-01/itrf.py",
+      "sha256": "fdd14d1b336779389b933f81769f3117529f8ad4a96b927b372c048084a7247b"
+    },
+    {
+      "path": "/media/chevre/EL/empirical-lawhood/rubisco-rf00-rf04/scratch/periodic-memory-guard-code-01/mm_mole.py",
+      "sha256": "afd6e84b28faec3b8939c57aeaf59252d8291538d9d4de0ff32851597438703e"
+    }
+  ],
+  "qualification": "No enzyme, dynamics, rate, or biological qualification follows from source reuse.",
+  "project_memory_helper": {
+    "path": "periodic_memory.py",
+    "sha256": "37cad96574cd07c2591482cf2aab5bce76abd8261fa517e6f5b6fb29c729c9dc"
+  },
+  "project_jk_helper": {
+    "path": "pyscf_periodic_jk.py",
+    "sha256": "706800390cd6ddf27a5311b294c91a9e933ddf1bc9e1fc2e6d51b67660ec64ef",
+    "scope": "Instance-local energy and three-component gradient calls preserve complete inputs and results, require the corrected allocator, and select concurrency from current memory headroom within the original CPU count."
+  }
+}

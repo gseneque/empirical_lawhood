@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import json
+from hashlib import sha256
 import math
 import subprocess
 from importlib import resources
 from pathlib import Path
 
-from .contracts import Brian2LIFNativeConfig
+from empirical_lawhood.domains.biology.neuron_current_response.contracts import Brian2LIFNativeConfig
 
 _RUNTIME = "cpython-3.11.14-brian2-2.9.0-numpy-1.26.4"
 _FIELDS = (
@@ -25,6 +26,13 @@ _FIELDS = (
 )
 
 
+NATIVE_WORKER_SOURCE_PATHS = (
+    "adapters/simulators/brian2_neuron_current_response/worker.py",
+    "domains/biology/neuron_current_response/numerics.py",
+    "execution/native_time_grid.py",
+)
+
+
 def run_native_development_check(
     config: Brian2LIFNativeConfig, *, native_python: Path
 ) -> dict[str, object]:
@@ -32,6 +40,9 @@ def run_native_development_check(
 
     admission = config.operational_admission()
     worker = resources.files(__package__).joinpath("worker.py")
+    package = resources.files("empirical_lawhood")
+    source_bindings = tuple((path, sha256(package.joinpath(path).read_bytes()).hexdigest())
+        for path in NATIVE_WORKER_SOURCE_PATHS)
     inputs: dict[str, object] = {name: str(getattr(config, name)) for name in _FIELDS}
     inputs["sample_count"] = admission.sample_count
     process = subprocess.run(
@@ -44,6 +55,8 @@ def run_native_development_check(
     )
     if process.returncode:
         raise RuntimeError(process.stderr.strip()[-1200:] or "native worker stopped")
+    if any(sha256(package.joinpath(path).read_bytes()).hexdigest() != digest for path, digest in source_bindings):
+        raise RuntimeError("Brian2 worker source changed during the development check")
     native = json.loads(process.stdout)
     if not isinstance(native, dict) or native.get("native_runtime") != _RUNTIME:
         raise ValueError("Brian2 worker returned another runtime contract")
@@ -89,6 +102,7 @@ def run_native_development_check(
         "independent_unit_id": config.independent_unit_id,
         "independent_units": 1,
         "native": native,
+        "source_bindings": source_bindings,
         "campaign_candidate_compiled": False,
         "campaign_issued": False,
     }

@@ -6,10 +6,10 @@ from pathlib import Path
 import json
 
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
-from empirical_lawhood.infrastructure import bounded_io
-from empirical_lawhood.kernel.experimental_design import UnitAllocation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+from empirical_lawhood.storage import bounded_io
+from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
 from tests.test_matrix_experiment_methods import fixture, selected_input_records
 from tests.test_matrix_experiment_specification import PROTOCOL, execution
 

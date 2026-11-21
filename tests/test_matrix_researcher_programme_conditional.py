@@ -7,10 +7,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as records
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_science as reduction_owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as scientific
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import PHASES, MatrixProgrammeObservation, programme_frontier
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as records
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_science as reduction_owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as scientific
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import PHASES, MatrixProgrammeObservation, programme_frontier
 from empirical_lawhood.api import matrix_researcher_programme_e4_lineage as lineage
 from tests.test_matrix_selected_e4_methods import declaration
 from tests.test_matrix_selected_revision_native import (  # noqa: F401
@@ -95,7 +95,7 @@ def test_e6_frontier_does_not_require_successful_e5_confirmation():
 @pytest.fixture(scope='module', params=('NOMINATED', 'NONDISCRIMINATING_OPPORTUNITY', 'UNEVALUABLE_OPPORTUNITY'))
 def actual_e5_nomination(opportunity, request):  # noqa: F811
     from tests.test_matrix_selected_opportunity import literal_observations
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity as science
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity as science
     observations = literal_observations(opportunity,
         hold_error=Decimal('.01') if request.param == 'NONDISCRIMINATING_OPPORTUNITY' else Decimal('.9'))
     if request.param == 'UNEVALUABLE_OPPORTUNITY':
@@ -110,8 +110,8 @@ def actual_e5_nomination(opportunity, request):  # noqa: F811
 def _disclosed_read(result, account):
     """Literal read/locator seam around actual math; no publication or authority."""
     from empirical_lawhood.api import matrix_researcher_programme_prepared_lineage as prepared
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
     from tests.test_matrix_selected_e4_methods import pin
     from tests.test_matrix_selected_opportunity import unpublished
     functional = result if account == 'ORIGINAL_E3' else result.functional
@@ -166,7 +166,7 @@ def test_actual_e5_nomination_and_complete_custody_determine_conf_nonentry(actua
 
 
 def test_revision_e5_negative_keeps_the_actual_assigned_census(revision_case, monkeypatch):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_results import assess_revision_programme
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_results import assess_revision_programme
     _, result = assess_revision_programme(revision_case.programme, {}, result_id='assessment.disclosed-frontier.revision-missing')
     assert result.functional.disposition == 'UNEVALUABLE_OPPORTUNITY'
     assert len(result.cases) == len(revision_case.programme.roster.cases)
@@ -310,7 +310,7 @@ def test_current_conf_reader_returns_record_and_locator_within_the_same_live_cal
 @pytest.mark.parametrize('branch', ('NOT_TRIGGERED', 'UNEVALUABLE'))
 def test_revision_account_nonentry_uses_actual_original_revision_decision(selected_revision, branch):  # noqa: F811
     nomination, frozen = _decision_products(selected_revision, branch)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4PublicRevisionDecision
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4PublicRevisionDecision
     actual = SelectedE4PublicRevisionDecision.from_products(selected_revision.programme, nomination, frozen,
         record_id='decision.disclosed-frontier.' + branch.lower())
     observed = {'e4.revision': MatrixProgrammeObservation('e4.revision', {}, True, actual.trigger_disposition)}

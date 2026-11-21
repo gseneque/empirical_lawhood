@@ -10,9 +10,9 @@ import zlib
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_arrays as codec
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_arrays as codec
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 
 
 def declaration(raw, *, shape=None, dtype='<f8', itemsize=8, role='all_ys'):

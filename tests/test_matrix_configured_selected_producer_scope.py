@@ -50,7 +50,7 @@ def test_native_bank_model_pins_refuse_configured_legacy_bank_fit_owner(selected
 
 
 def test_configured_public_projection_reconstructs_exact_full_family(selected):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
     from empirical_lawhood.api.matrix_selected_runtime import reconstruct_selected_package
     from tests.test_matrix_selected_package import package as legacy_package
 

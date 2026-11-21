@@ -10,10 +10,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.composition.finite_response_law.assignment import FiniteResponseLawCohortAssignment, assigned_native_seed_ids
-from empirical_lawhood.adapters.composition.finite_response_law.native_input import FiniteResponseLawCalibrationInput, check_finite_calibration_input
-from empirical_lawhood.adapters.methods.finite_response_law.science import FiniteResponseLawScienceSpec
-from empirical_lawhood.adapters.simulators.finite_response_law.randomness import FiniteResponseLawCalibrationRNGStream, FiniteResponseLawEvaluationRNGStream, native_rng
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment import FiniteResponseLawCohortAssignment, assigned_native_seed_ids
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.native_input import FiniteResponseLawCalibrationInput
+from empirical_lawhood.adapters.composition.finite_response_law.native_input import check_finite_calibration_input
+from empirical_lawhood.domains.matrix.finite_response_law.science import FiniteResponseLawScienceSpec
+from empirical_lawhood.domains.matrix.finite_response_law.randomness import FiniteResponseLawCalibrationRNGStream, FiniteResponseLawEvaluationRNGStream, native_rng
 from empirical_lawhood.api.codecs import load_registered_authoring
 
 ROOT = Path(__file__).parents[1]

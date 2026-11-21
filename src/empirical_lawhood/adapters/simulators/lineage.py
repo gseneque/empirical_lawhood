@@ -6,19 +6,12 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import ClassVar
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_ids,
-    require_sorted_unique_strings,
-    validate_relative_locator,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.dataset_manifests import DatasetDirectorySelectorManifest
-from empirical_lawhood.planning.datasets import DatasetMaterialization
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_ids, require_sorted_unique_strings, validate_relative_locator, validate_sha256, validate_stable_id
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.dataset_manifests import DatasetDirectorySelectorManifest
+from empirical_lawhood.design.datasets import DatasetMaterialization
 
 
 class SimulatorGenerationKind(StrEnum):

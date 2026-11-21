@@ -24,7 +24,7 @@ def test_candidate_gate_invokes_suite_once_and_preserves_precommit_attribution(t
     packet = tmp_path / "evidence"
     monkeypatch.setattr(gate, "ROOT", root)
     monkeypatch.setattr(gate, "candidate_inventory", lambda r, **kwargs: [{"path": "uv.lock", "mode": "100644", "sha256": "1"*64, "size_bytes": 14}])
-    monkeypatch.setattr(gate, "release_input_paths", lambda r: ("uv.lock",))
+    monkeypatch.setattr(gate, "release_input_paths", lambda r, *, require_exportable: ("uv.lock",))
     monkeypatch.setattr(gate, "release_source_disclosure", lambda *args: {"observed_checkout_clean": False})
     def output(command, **kwargs):
         if "--others" in command:
@@ -73,7 +73,7 @@ def test_candidate_gate_invokes_suite_once_and_preserves_precommit_attribution(t
     assert retained["full_suite_invocations"] == 1
     assert retained["test_environment_policy"] == gate.portable_test_environment_policy(packet, root)
     expected_command = ["uv", "run", "--no-sync", "python", "-m", "coverage", "run", "-m", "pytest",
-                        "-q", "-ra", "--fail-on-skip", *gate.retained_test_options(packet),
+                            "-q", "-ra", "--fail-on-skip", "-p", "scripts.test_purposes", *gate.retained_test_options(packet),
                         "tests", "-m", "not native and not held"]
     assert suites[0] == expected_command
     assert "not a clean-commit" in retained["attribution"]
@@ -88,7 +88,7 @@ def test_candidate_gate_invokes_suite_once_and_preserves_precommit_attribution(t
         assert retained["failure_type"] == "KeyboardInterrupt"
 
 
-@pytest.mark.parametrize("generator", ("integration_examples", "matrix_experiment_examples"))
+@pytest.mark.parametrize("generator", ("extension_projections", "integration_examples", "matrix_experiment_examples", "rubisco_response_experiment"))
 def test_stale_shipped_examples_stop_before_the_full_suite(tmp_path, monkeypatch, generator):
     root = tmp_path / "source"
     root.mkdir()
@@ -98,7 +98,7 @@ def test_stale_shipped_examples_stop_before_the_full_suite(tmp_path, monkeypatch
     monkeypatch.setattr(gate, "ROOT", root)
     inventory = [{"path": "uv.lock", "mode": "100644", "sha256": "1" * 64, "size_bytes": 14}]
     monkeypatch.setattr(gate, "candidate_inventory", lambda r, **kwargs: inventory)
-    monkeypatch.setattr(gate, "release_input_paths", lambda r: ("uv.lock",))
+    monkeypatch.setattr(gate, "release_input_paths", lambda r, *, require_exportable: ("uv.lock",))
     monkeypatch.setattr(gate, "release_source_disclosure", lambda *args: {"observed_checkout_clean": False})
     monkeypatch.setattr(gate.subprocess, "check_output", lambda command, **kwargs:
                         b"" if "--others" in command else "unchanged-candidate\n")

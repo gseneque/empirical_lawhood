@@ -95,7 +95,7 @@ The selected output is
 `/tmp/empirical-lawhood-rubisco-20261009/retained-execution/paired-composition-v1`.
 This is a direct exposed analytical computation, with **zero recursive task
 receipts**, rather than another installed registered operation. The maintained
-[numerical owner](../../../../src/empirical_lawhood/adapters/methods/rubisco_prediction/paired_response.py)
+[numerical owner](../../../../src/empirical_lawhood/domains/rubisco/rubisco_prediction/paired_response.py)
 uses cold optional imports, explicit fifty-digit Decimal projection/metric
 arithmetic and training-only float64 RMS scaling without centering. Every
 response model preserves the exact no-edit anchor.

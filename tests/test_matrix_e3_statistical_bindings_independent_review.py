@@ -14,16 +14,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as science
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_statistical_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.execution import WorkerInputPort
-from empirical_lawhood.runtime.input_access import validated_scientific_input_edges
-from empirical_lawhood.runtime.plans import ScientificInputRole
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as science
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_statistical_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.execution import WorkerInputPort
+from empirical_lawhood.execution.input_access import validated_scientific_input_edges
+from empirical_lawhood.execution.plans import ScientificInputRole
 from tests.test_matrix_e3_protected_methods import causal, outcome
 from tests.test_matrix_e3_protected_prefix_science import forbid_native as forbid_native  # noqa: F401
 from tests.test_matrix_e3_statistical_bindings import (

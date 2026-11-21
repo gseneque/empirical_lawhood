@@ -22,7 +22,7 @@ from empirical_lawhood.cli.entry import require_single_thread_bootstrap
 assert require_single_thread_bootstrap()["OPENBLAS_NUM_THREADS"] == "1"
 from scripts.operator_records import read_record
 from empirical_lawhood.api.composition import create_cli_api
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 profile = read_record(Path(os.environ["PROFILE"]), OperatorStorageProfile)
 assert profile.authority_granted is False
 try:

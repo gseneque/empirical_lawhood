@@ -9,16 +9,16 @@ import struct
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, science as selected_science
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import preparation_contracts as pc
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_contracts as sc, segmented_science as ss
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import source_derived_preparation as derived
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, science as selected_science
+from empirical_lawhood.domains.battery.battery_refined_inquiry import preparation_contracts as pc
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_contracts as sc, segmented_science as ss
+from empirical_lawhood.domains.battery.battery_refined_inquiry import source_derived_preparation as derived
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
 from tests.test_battery_initial_preparation import _prepared_fixture
 from tests.test_battery_refined_inquiry import selected as exposed_selection
 from tests.runtime_platform.test_native_subwork import _plane
@@ -127,7 +127,7 @@ def test_exact_source_ulp_clocks_are_preserved_in_compact_summary(prepared):
 
 
 def _segment_fixture(prepared, tmp_path, *, index=1, start=D(0), previous=None):
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_native as native
+    from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as native
     config, protocol, _, layout, requested, initial = prepared
     first = start if start == 0 else D(str(math.nextafter(float(start), math.inf)))
     last = D(str(float(start) + 60.0))

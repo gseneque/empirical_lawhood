@@ -9,7 +9,7 @@ from typing import Any
 
 import numpy as np
 
-from .contracts import NativeToraxAction, NativeToraxEpisodeDisposition, NativeToraxEpisode, NativeToraxPreparation, NativeToraxTrajectory, NativeToraxView
+from empirical_lawhood.domains.fusion.torax_native.contracts import NativeToraxAction, NativeToraxEpisodeDisposition, NativeToraxEpisode, NativeToraxPreparation, NativeToraxTrajectory, NativeToraxView
 
 
 def _profile(

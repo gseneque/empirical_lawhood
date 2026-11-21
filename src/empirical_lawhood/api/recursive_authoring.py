@@ -6,20 +6,19 @@ import json
 from pathlib import Path
 
 from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
-from empirical_lawhood.infrastructure.numerical_provenance import observe_implementation_source
-from empirical_lawhood.api.recursive_operations import operation_catalog
-from empirical_lawhood.runtime.artifacts import artifact_custody_limits
-from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256, read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_json_bytes
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactProfile, ArtifactStreamWriteRequest, ArtifactWriteRequest, is_canonical_json_media_type,
-)
-from empirical_lawhood.runtime.recursive_storage_codecs import resolve_storage_codec, storage_codec_census
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveImplementationBinding, RecursiveWaveMember
+from empirical_lawhood.storage.numerical_provenance import observe_implementation_source
+from empirical_lawhood.api.recursive_operations import operation_catalog_for_draft, operation_catalog
+from empirical_lawhood.storage.contracts.artifacts import artifact_custody_limits
+from empirical_lawhood.storage.bounded_io import bounded_file_sha256, read_bounded_bytes
+from empirical_lawhood.storage.recursive_control_read import decode_authored_control
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactStreamWriteRequest, ArtifactWriteRequest, is_canonical_json_media_type
+from empirical_lawhood.storage.contracts.recursive_storage_codecs import resolve_storage_codec, storage_codec_census
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveImplementationBinding, RecursiveWaveMember
 
 MAX_DRAFT_BYTES = None
 MAX_PACKET_BYTES = None
@@ -27,7 +26,8 @@ MAX_PACKET_BYTES = None
 
 def _external_storage_contract(*, payload_schema, media_type, storage_codecs=None):
     if storage_codecs is None:
-        storage_codecs = storage_codec_census(operation_catalog()[0])
+        from empirical_lawhood.api.recursive_operations import operation_storage_codecs
+        storage_codecs = operation_storage_codecs()
     codec = resolve_storage_codec(storage_codecs, payload_schema=payload_schema, media_type=media_type)
     if codec is not None:
         return codec.profile, codec.filename_suffix
@@ -44,7 +44,7 @@ def _published_source_manifest_preflight(*, selected_inputs, bindings, artifact_
     independently retained typed source census includes operational selections;
     body identity and actual committed publication metadata bind every sibling.
     """
-    from empirical_lawhood.runtime.artifacts import ArtifactManifest, artifact_publication_member
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, artifact_publication_member
 
     root = Path(artifact_writer.root.contract.canonical_path)
     known_records = {}
@@ -185,7 +185,7 @@ def load_recursive_draft(path):
 
 
 def explain_recursive_draft(draft):
-    from empirical_lawhood.planning.recursive_authoring import explain_recursive_draft as explain
+    from empirical_lawhood.design.recursive_authoring import explain_recursive_draft as explain
 
     return {**explain(draft), "native_contact": "none", "scientific_execution_performed": False,
             "scientific_authority": "NONE", "qualification": "NOT_ESTABLISHED"}
@@ -199,9 +199,10 @@ def implementation_binding(project_root, *, _admitted_source=None):
 
 def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, input_bindings=(), contribution_dir=None, contribution_dirs=None, origins=None,
                          experiment_specification=None, experiment_allocation=None, experiment_design_records=(),
-                         _input_access_guard=None, _original_input_access=None, _source_custody_records=()):
+                         _input_access_guard=None, _original_input_access=None, _source_custody_records=(),
+                         expected_implementation_sha256=None):
     """Freeze a selected bounded wave; never acquire data or grant authority."""
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
     if _input_access_guard is not None and not callable(_input_access_guard):
         raise TypeError("authoring input access guard must be callable")
@@ -220,9 +221,11 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
     check_access()
     destination = preflight_authoring_output_directory(directory=Path(output_dir),
         repo_root=Path(project_root), artifact_writer=artifact_writer)
-    registrations, registry, codecs = operation_catalog()
+    registrations, registry, codecs = operation_catalog_for_draft(draft, catalog=operation_catalog)
     storage_codecs = storage_codec_census(registrations)
     source = implementation_binding(project_root)
+    if expected_implementation_sha256 is not None and source.fingerprint() != expected_implementation_sha256:
+        raise PermissionError("authoring implementation differs from the reviewed preparation")
     run_inputs = (draft.fingerprint(), source.code_sources_sha256, source.dependency_lock_sha256, registry.fingerprint())
     if origins is not None:
         origins.validate_draft(draft)
@@ -232,7 +235,7 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
     supplied_bindings = tuple(input_bindings)
     if draft.contribution_parents or contribution_dir is not None or contribution_dirs is not None:
         from empirical_lawhood.api.recursive_contributions import authenticate_recursive_parents, _contribution_input_bindings
-        from empirical_lawhood.runtime.recursive_handoff import RecursiveParentClosureBinding, RecursiveParentClosuresBinding
+        from empirical_lawhood.execution.recursive_handoff import RecursiveParentClosureBinding, RecursiveParentClosuresBinding
         parents = authenticate_recursive_parents(draft=draft, artifact_writer=artifact_writer,
             directory=contribution_dir, directories=contribution_dirs)
         supplied_bindings += _contribution_input_bindings(authenticated=parents, draft=draft, origins=origins)
@@ -256,8 +259,8 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
                "graph-preservation.json": compilation.proof, "registry.json": compilation.registry,
                "resource-ceiling.json": draft.campaign.budget}
     if experiment_specification is not None or experiment_allocation is not None or experiment_design_records:
-        from empirical_lawhood.kernel.experimental_design import UnitAllocation
-        from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
+        from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+        from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
         if not isinstance(experiment_specification, CanonicalRecord) or type(experiment_allocation) is not UnitAllocation:
             raise TypeError("experiment authoring must retain both selected specification and allocation")
         from empirical_lawhood.api.experiment_preparation import experiment_protocols
@@ -272,14 +275,14 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
             raise ValueError("authored experiment repeats or reorders original design bindings")
         references = []
         for key, record in experiment_design_records:
-            from empirical_lawhood.kernel.serialization import validate_stable_id
+            from empirical_lawhood.science.records.serialization import validate_stable_id
             validate_stable_id(key)
             if type(record) not in owners[0].input_record_types:
                 raise ValueError("authored experiment original source lacks its declared exact codec")
             name = "experiment-source-" + sha256(key.encode()).hexdigest() + ".json"
             records[name] = record
             references.append(ObjectIdentity.from_record(key, record))
-        from .experiment_runtime_bindings import authenticate_experiment_instance
+        from empirical_lawhood.api.experiment_runtime_bindings import authenticate_experiment_instance
         authenticate_experiment_instance(declaration=owners[0], specification=experiment_specification,
             allocation=experiment_allocation, draft=draft, source_records=experiment_design_records,
             artifact_writer=artifact_writer)
@@ -303,7 +306,7 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
             previous = graph_parents.setdefault(parent.identity, parent)
             if previous != parent:
                 raise ValueError('authored configuration graph changes one original parent custody')
-    from empirical_lawhood.runtime.artifacts import lineage_parent_sort_key
+    from empirical_lawhood.storage.contracts.artifacts import lineage_parent_sort_key
     graph_parents = tuple(sorted(graph_parents.values(), key=lineage_parent_sort_key))
     if origins is not None:
         records["origins.json"] = origins
@@ -329,7 +332,7 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
         if draft.development_study.access_pair[0] is OutcomeAccess.EVALUATION_REVEALED:
             allowed.add(draft.development_study.access_pair)
         if _original_input_access is not None:
-            from empirical_lawhood.runtime.plans import derived_development_custody
+            from empirical_lawhood.execution.plans import derived_development_custody
             allowed.add(derived_development_custody(OutcomeAccess.DEVELOPMENT_VISIBLE,
                 VisibilityCeiling.DEVELOPMENT_ONLY,
                 tuple(value.outcome_access for value in _original_input_access.parents),
@@ -341,7 +344,7 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
         storage_codec = resolve_storage_codec(storage_codecs, payload_schema=external.payload_schema,
             profile=profile, media_type=external.media_type)
         binary = profile is not ArtifactProfile.CANONICAL_JSON
-        from empirical_lawhood.runtime.recursive_record_codecs import requires_declared_input_record
+        from empirical_lawhood.storage.contracts.recursive_record_codecs import requires_declared_input_record
         if binary and requires_declared_input_record(draft=draft, external=external, registrations=registrations):
             raise ValueError("declared canonical input record cannot substitute a binary storage contract")
         name = "external-" + sha256(external.input_id.encode()).hexdigest()[:24] + suffix
@@ -402,7 +405,7 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
             size, digest = len(raw), sha256(raw).hexdigest()
             if digest != external.expected_content_sha256:
                 raise ValueError("external scientific input differs from its exact selected digest")
-            from empirical_lawhood.runtime.recursive_record_codecs import resolve_recursive_input_codec
+            from empirical_lawhood.storage.contracts.recursive_record_codecs import resolve_recursive_input_codec
             codec = resolve_recursive_input_codec(draft=draft, external=external,
                 registrations=registrations, fallback_codecs=codecs, payload=raw)
             operand = decode_canonical_bytes(raw, codec, maximum_bytes=external.maximum_size_bytes)
@@ -421,7 +424,7 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
                 raise PermissionError('authored external input changes its actual original-parent custody projection')
         external_sources[name] = (Path(bindings[external.input_id]), RecursiveWaveMember(name, key, size), profile,
                                   external.media_type, external.outcome_access, external.visibility_ceiling, parents)
-    from empirical_lawhood.infrastructure.recursive_control_read import CONTROL_VIEWS, normalized_plan_views
+    from empirical_lawhood.storage.recursive_control_read import CONTROL_VIEWS, normalized_plan_views
     views = normalized_plan_views(records, custody_limits=artifact_custody_limits(artifact_writer))
     view_sources = {view_name: name for name, view_name in CONTROL_VIEWS.items() if view_name in views}
     records.update(views)
@@ -440,7 +443,7 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
     destination.mkdir(parents=True)
     root = Path(artifact_writer.root.contract.canonical_path)
     relative = destination.relative_to(root).as_posix()
-    from empirical_lawhood.infrastructure.recursive_custody import iter_exact_custody_file_chunks
+    from empirical_lawhood.storage.recursive_custody import iter_exact_custody_file_chunks
 
     def guarded_chunks(path, member):
         chunks = iter(iter_exact_custody_file_chunks(path, size_bytes=member.size_bytes,
@@ -485,7 +488,7 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
                         if previous != value:
                             raise ValueError('authored scientific graph changes one original parent custody')
                     parents = tuple(sorted(inherited.values(), key=lineage_parent_sort_key))
-                from empirical_lawhood.runtime.plans import derived_development_custody
+                from empirical_lawhood.execution.plans import derived_development_custody
                 if name in config_custody:
                     # Publication uses the exact finalized compiler contract, including
                     # revealed analysis whose new effect still has its declared stage.
@@ -503,7 +506,7 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
                     record.SCHEMA, ArtifactProfile.CANONICAL_JSON, "application/json", packet.packet_id,
                     relative, record.canonical_bytes(), visibility,
                     tuple(value.visibility_ceiling for value in parents), access, lineage_parents=parents)
-    from empirical_lawhood.infrastructure.recursive_input_publication import publish_recursive_metadata
+    from empirical_lawhood.storage.recursive_input_publication import publish_recursive_metadata
     configuration_ids = {packet.packet_id + '.' + name.removesuffix('.json') for name in config_custody}
     publish_recursive_metadata(artifact_writer, publication_requests(), require_current=check_access,
         before_member=source_member_guard,
@@ -518,9 +521,18 @@ def author_recursive_wave(*, draft, project_root, artifact_writer, output_dir, i
 def load_authored_wave(*, directory, artifact_writer, lazy_payloads=False, require_initial_experiment=False,
         read_access=None):
     """Authenticate exact retained members before their typed consumer reads."""
+    from empirical_lawhood.api.recursive_contributions import recursive_contribution_read_context
+    with recursive_contribution_read_context():
+        return _load_authored_wave(directory=directory, artifact_writer=artifact_writer,
+            lazy_payloads=lazy_payloads, require_initial_experiment=require_initial_experiment,
+            read_access=read_access)
+
+
+def _load_authored_wave(*, directory, artifact_writer, lazy_payloads=False, require_initial_experiment=False,
+        read_access=None):
     if type(require_initial_experiment) is not bool:
         raise TypeError("initial experiment scope requires an exact boolean")
-    from empirical_lawhood.infrastructure.recursive_custody import read_exposed_recursive_payload
+    from empirical_lawhood.storage.recursive_custody import read_exposed_recursive_payload
 
     directory = Path(directory)
     if any(path.is_symlink() for path in (directory, *directory.parents)) or ".." in directory.parts:
@@ -541,7 +553,7 @@ def load_authored_wave(*, directory, artifact_writer, lazy_payloads=False, requi
             raise ValueError("recursive member manifest changes its exact selected path")
         manifests[name] = manifest
         return read_exposed_recursive_payload(artifact_writer, manifest, maximum_bytes=bound)
-    from empirical_lawhood.infrastructure.recursive_custody import read_recursive_bootstrap_record
+    from empirical_lawhood.storage.recursive_custody import read_recursive_bootstrap_record
     packet_relative = (directory / 'authored-wave.json').relative_to(root).as_posix()
     packet = read_recursive_bootstrap_record(artifact_writer, packet_relative, AuthoredRecursiveWave)
     by_name = {member.filename: member for member in packet.members}
@@ -552,11 +564,11 @@ def load_authored_wave(*, directory, artifact_writer, lazy_payloads=False, requi
         relative = (directory / name).relative_to(root).as_posix()
         return read_recursive_bootstrap_record(artifact_writer, relative, kind,
             maximum_bytes=member.size_bytes, expected=member)
-    from .experiment_runtime_bindings import bootstrap_authored_development_inputs
+    from empirical_lawhood.api.experiment_runtime_bindings import bootstrap_authored_development_inputs
     original_input_access = bootstrap_authored_development_inputs(directory=directory,
         artifact_writer=artifact_writer, packet=packet, read_record=read_record, read_access=read_access)
     if lazy_payloads or original_input_access is not None:
-        from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads
+        from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads
         payloads = AuthenticatedRecursivePayloads(plane=artifact_writer, directory=directory,
             members=packet.members, original_input_access=original_input_access)
         lazy_payloads = True
@@ -576,8 +588,8 @@ def load_authored_wave(*, directory, artifact_writer, lazy_payloads=False, requi
                 if (document.get("schema"), document.get("version")) != (member.identity.object_schema, member.identity.object_version):
                     raise ValueError("authored wave member changes its record schema or revision")
             payloads[member.filename] = raw
-    draft = decode_canonical_bytes(payloads["draft.json"], RecursiveStudyDraft, maximum_bytes=MAX_DRAFT_BYTES)
-    source = decode_canonical_bytes(payloads["implementation.json"], RecursiveImplementationBinding, maximum_bytes=None)
+    draft = decode_authored_control(payloads, "draft.json", RecursiveStudyDraft, maximum_bytes=MAX_DRAFT_BYTES)
+    source = decode_authored_control(payloads, "implementation.json", RecursiveImplementationBinding)
     if require_initial_experiment:
         if ("experiment-instance.json" not in payloads or "experiment-specification.json" not in payloads
                 or type(draft) is not RecursiveStudyDraft or draft.development_study is None
@@ -606,7 +618,7 @@ def _authenticate_authored_wave_roots(*, packet, draft, source, payloads, artifa
     repeat every source/parent/origin/publication and direct FILE check before
     products. This helper accepts no cross-invocation verification token.
     """
-    registrations, _, _ = operation_catalog()
+    registrations, _, _ = operation_catalog_for_draft(draft, catalog=operation_catalog)
     storage_codecs = storage_codec_census(registrations)
     external_roles = {}
     selected_external_ids = {link.external_input_id for link in draft.links
@@ -643,8 +655,8 @@ def _authenticate_authored_wave_roots(*, packet, draft, source, payloads, artifa
     if len(parents) > 1 and "origins.json" not in payloads:
         raise ValueError("multiple portable parents require retained exact input origins")
     if "origins.json" in payloads:
-        from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigins
-        origins = decode_canonical_bytes(payloads["origins.json"], RecursiveInputOrigins, maximum_bytes=MAX_DRAFT_BYTES)
+        from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigins
+        origins = decode_authored_control(payloads, "origins.json", RecursiveInputOrigins, maximum_bytes=MAX_DRAFT_BYTES)
         origins.validate_draft(draft)
         externals = {value.input_id: value for value in draft.external_inputs}
         def operand_name(input_id):
@@ -681,18 +693,18 @@ def _authenticate_experiment_instance(*, payloads, draft, artifact_writer=None):
     if present != names:
         raise ValueError("authored experiment omits a selected design member")
     from empirical_lawhood.api.experiment_preparation import experiment_protocols
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-    instance = decode_canonical_bytes(payloads["experiment-instance.json"], ExperimentInstanceBinding, maximum_bytes=None)
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+    instance = decode_authored_control(payloads, "experiment-instance.json", ExperimentInstanceBinding)
     owners = {(value.specification_type.SCHEMA, value.specification_type.VERSION): value.specification_type for value in experiment_protocols()}
     codec = owners.get((instance.specification.object_schema, instance.specification.object_version))
     if codec is None:
         raise ValueError("authored experiment specification has no installed exact codec")
-    specification = decode_canonical_bytes(payloads["experiment-specification.json"], codec, maximum_bytes=None)
-    allocation = decode_canonical_bytes(payloads["experiment-allocation.json"], UnitAllocation, maximum_bytes=None)
+    specification = decode_authored_control(payloads, "experiment-specification.json", codec)
+    allocation = decode_authored_control(payloads, "experiment-allocation.json", UnitAllocation)
     raw_projection = payloads["scientific-projection.json"]
     projection = json.loads(raw_projection)
-    from empirical_lawhood.runtime.recursive_compiler import derive_recursive_scientific_selection
+    from empirical_lawhood.execution.recursive_compiler import derive_recursive_scientific_selection
     expected_projection = derive_recursive_scientific_selection(draft)
     if (specification.identity != instance.specification or allocation.identity != instance.allocation
             or ObjectIdentity.from_record(draft.draft_id, draft) != instance.draft
@@ -718,11 +730,11 @@ def _authenticate_experiment_instance(*, payloads, draft, artifact_writer=None):
         if source_codec is None:
             raise ValueError("authored experiment original source changes its registered codec/revision")
         name = "experiment-source-" + sha256(reference.object_id.encode()).hexdigest() + ".json"
-        record = decode_canonical_bytes(payloads[name], source_codec, maximum_bytes=None)
+        record = decode_authored_control(payloads, name, source_codec)
         if ObjectIdentity.from_record(reference.object_id, record) != reference:
             raise ValueError("authored experiment original source changes its selected exact bytes")
         sources.append((reference.object_id, record))
-    from .experiment_runtime_bindings import authenticate_experiment_instance
+    from empirical_lawhood.api.experiment_runtime_bindings import authenticate_experiment_instance
     authenticate_experiment_instance(declaration=declaration, specification=specification,
         allocation=allocation, draft=draft, source_records=tuple(sources), artifact_writer=artifact_writer)
     return instance

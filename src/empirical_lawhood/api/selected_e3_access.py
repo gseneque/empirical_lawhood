@@ -9,15 +9,13 @@ from contextlib import contextmanager, nullcontext
 from contextvars import ContextVar
 from dataclasses import dataclass, replace
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import (
-    produced_access, produced_record_parents, validate_produced_input_parents,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactManifest, lineage_parent_sort_key
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access, produced_record_parents, validate_produced_input_parents
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactManifest, lineage_parent_sort_key
 
 
 _ORIGINAL_AUTHORITY_READING = ContextVar('original_e3_authority_reading', default=None)
@@ -27,7 +25,7 @@ _STOCK_AUTHORITY_LOAD = ExternalStudyOperationAuthorityStore.load
 
 def _current_authority_reader(writer):
     """Select only this operation's live, separate immutable grant closure."""
-    from empirical_lawhood.infrastructure.artifacts import _has_stock_manifest_reads
+    from empirical_lawhood.storage.artifacts import _has_stock_manifest_reads
 
     from threading import get_ident
     reading = _ORIGINAL_AUTHORITY_READING.get()
@@ -51,7 +49,7 @@ def original_e3_authority_read_context(writer):
     freshly checked and UTC is sampled at each access. No scientific preflight
     or permission verdict enters this lifetime. Custom policies stay eager.
     """
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, _has_stock_manifest_reads
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, _has_stock_manifest_reads
     from threading import get_ident
 
     if _current_authority_reader(writer) is not None or not _has_stock_manifest_reads(writer):
@@ -85,6 +83,10 @@ def _original_roster(originals):
 class SelectedE3CurrentAccess:
     """Select replacement reveals without changing any original scientific byte."""
     originals: tuple[MatrixSelectedOriginalProduct, ...]
+
+    @property
+    def selected_records(self):
+        return self.originals
 
     def __post_init__(self):
         _original_roster(self.originals)
@@ -138,11 +140,8 @@ class SelectedE3OriginalInputAccess:
         return original_e3_authority_read_context(self.writer)
 
     def require_current(self, *, artifact_writer=None):
-        from empirical_lawhood.api.recursive_qualified_parents import (
-            _load_parent_authorities_in_scope, _require_parent_authorities_current,
-            _validate_parent_authorities_now,
-        )
-        from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, _ScopedArtifactPlane
+        from empirical_lawhood.api.recursive_qualified_parents import _load_parent_authorities_in_scope, _require_parent_authorities_current, _validate_parent_authorities_now
+        from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, _ScopedArtifactPlane
 
         writer = self.writer if artifact_writer is None else artifact_writer
         if writer.root.contract != self.writer.root.contract:
@@ -204,10 +203,8 @@ def original_input_access(*, artifact_writer, evidence, read_access=None):
     """Authenticate exact producer metadata and historical plans without outcomes."""
     from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
     from empirical_lawhood.api.matrix_sampling_runtime import _original_product_metadata
-    from empirical_lawhood.infrastructure.artifacts import _has_stock_manifest_reads
-    from empirical_lawhood.infrastructure.study_issue import (
-        ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID,
-    )
+    from empirical_lawhood.storage.artifacts import _has_stock_manifest_reads
+    from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID
 
     if type(evidence) is not SelectedE3E4Evidence:
         raise TypeError('original E3 bootstrap requires its exact current locator evidence')
@@ -220,7 +217,7 @@ def original_input_access(*, artifact_writer, evidence, read_access=None):
         issued_context = (publisher.read_context() if _has_stock_manifest_reads(artifact_writer)
             else nullcontext(None))
         with issued_context as issued_reader:
-            from .retained_e3_evidence import current_e3_evidence
+            from empirical_lawhood.api.retained_e3_evidence import current_e3_evidence
             retained = current_e3_evidence(writer)
             reader = CurrentResultPlanReader(writer) if retained is None else retained.reader
             for original in originals:
@@ -251,7 +248,7 @@ def original_input_access(*, artifact_writer, evidence, read_access=None):
 def bootstrap_development_input_access(*, directory, artifact_writer, specification, instance,
         packet, read_member, read_access=None):
     """Use only the specification/instance-pinned current locator companion."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4ExperimentSpecification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4ExperimentSpecification
 
     if type(specification) is not SelectedE3E4ExperimentSpecification:
         raise TypeError('original E3 bootstrap requires its exact current DEV specification')
@@ -267,10 +264,8 @@ def bootstrap_development_input_access(*, directory, artifact_writer, specificat
 def bootstrap_selected_input_access(*, specification, selection, read_locator,
         artifact_writer, read_access=None, selection_path=None):
     """Authenticate only the exact selected locator before model or FILE reads."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import (
-        PROTOCOL_ID, SelectedE3E4ExperimentSpecification,
-    )
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputSelection
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import PROTOCOL_ID, SelectedE3E4ExperimentSpecification
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputSelection
 
     if type(specification) is not SelectedE3E4ExperimentSpecification:
         raise TypeError('original E3 selected inputs require their exact current DEV specification')
@@ -291,7 +286,7 @@ def bootstrap_selected_input_access(*, specification, selection, read_locator,
 
 
 def bootstrap_authoring_input_access(*, preparation, artifact_writer, read_access=None):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4ExperimentSpecification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4ExperimentSpecification
 
     specification = preparation.specification_record
     if type(specification) is not SelectedE3E4ExperimentSpecification:

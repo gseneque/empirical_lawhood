@@ -1,0 +1,796 @@
+"""Single-writer append-only implementation of the compact catalog port."""
+
+from __future__ import annotations
+
+import threading
+from itertools import chain, islice
+from collections.abc import Mapping
+from contextlib import contextmanager
+from dataclasses import dataclass
+from decimal import Decimal
+from typing import Any
+
+from sqlalchemy import Connection, Engine, alias, exists, func, or_, select
+from sqlalchemy.exc import IntegrityError, NoResultFound, OperationalError
+
+from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.storage.contracts.catalog import ArtifactLocatorRecord, CatalogArtifactQuery, CatalogArtifactQueryPage, CatalogArtifactQueryRow, CatalogSnapshot, CatalogVerificationStatus, ExplorationAttemptRecord, KnowledgeEdgeRecord, LogicalArtifactRecord, MetricDefinitionRecord, MetricObservationRecord, ReceiptLocatorRecord, ScientificObjectKind, ScientificObjectRecord, StorageRootRecord
+
+from empirical_lawhood.storage.sql.database import schema_audit
+from empirical_lawhood.storage.sql.schema import artifact, exploration_attempt, exploration_attempt_artifact, exploration_attempt_reason, knowledge_edge, logical_artifact, metric_definition, metric_observation, projection_tables, receipt, scientific_object, storage_root
+
+
+class CatalogWriteConflict(RuntimeError):
+    pass
+
+
+class CatalogWriterViolation(RuntimeError):
+    pass
+
+
+DEFAULT_CATALOG_MATCH_COUNT_LIMIT = 1_000
+MAX_CATALOG_MATCH_COUNT_LIMIT = 10_000
+DEFAULT_CATALOG_QUERY_WORK_LIMIT = 100_000
+MAX_CATALOG_QUERY_WORK_LIMIT = 1_000_000
+_SQLITE_PROGRESS_INTERVAL = 100
+
+
+class CatalogQueryWorkLimitExceeded(RuntimeError):
+    """Raised when SQLite exhausts the repository-owned VM instruction budget."""
+
+    def __init__(self, *, work_limit: int, work_steps: int) -> None:
+        self.work_limit = work_limit
+        self.work_steps = work_steps
+        super().__init__(
+            f"catalog query exceeded its SQLite work limit of {work_limit} instructions"
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogObjectQuery:
+    object_id: str | None = None
+    kind: str | None = None
+    categorical_status: str | None = None
+    relation_id: str | None = None
+    denominator_gauge_id: str | None = None
+    response_gauge_id: str | None = None
+    horizon_id: str | None = None
+    native_unit: str | None = None
+    knowledge_edge_relation: str | None = None
+    knowledge_edge_scope_id: str | None = None
+    lineage_object_id: str | None = None
+    after_object_id: str | None = None
+    limit: int = 100
+    match_count_limit: int = DEFAULT_CATALOG_MATCH_COUNT_LIMIT
+
+    def __post_init__(self) -> None:
+        if self.limit <= 0 or self.limit > 1_000:
+            raise ValueError("catalog query limit must be in [1, 1000]")
+        if self.match_count_limit <= 0 or self.match_count_limit > MAX_CATALOG_MATCH_COUNT_LIMIT:
+            raise ValueError(
+                f"catalog match count limit must be in [1, {MAX_CATALOG_MATCH_COUNT_LIMIT}]"
+            )
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogObjectQueryRow:
+    object_id: str
+    kind: str
+    object_schema: str
+    object_fingerprint: str
+    visibility_ceiling: str
+    categorical_status: str
+    artifact_materialization_id: str | None
+    receipt_id: str | None
+    storage_root_id: str | None
+    external_relative_path: str | None
+    external_identity_kind: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogObjectQueryPage:
+    matched_count: int
+    match_count_limit: int
+    matched_count_truncated: bool
+    rows: tuple[CatalogObjectQueryRow, ...]
+    has_more: bool
+    next_after_object_id: str | None
+    query_work_limit: int
+    query_work_steps: int
+
+
+def _digest(value: str) -> bytes:
+    return bytes.fromhex(value)
+
+
+def _hex(value: bytes) -> str:
+    return value.hex()
+
+
+def _row_mapping(row: Any) -> Mapping[str, Any]:
+    return row._mapping  # type: ignore[no-any-return]
+
+
+_CATALOG_BATCH_ROWS = 256
+
+
+def _insert_many(connection, table, rows):
+    """Use the existing transaction with bounded DBAPI parameter batches."""
+    iterator = iter(rows)
+    while batch := list(islice(iterator, _CATALOG_BATCH_ROWS)):
+        connection.execute(table.insert(), batch)
+
+
+def _primary_keys(connection, table, id_column, identifiers):
+    """Resolve this operation's exact foreign-key census in bounded queries."""
+    keys = sorted({value for value in identifiers if value is not None})
+    result = {}
+    for offset in range(0, len(keys), _CATALOG_BATCH_ROWS):
+        selected = keys[offset:offset + _CATALOG_BATCH_ROWS]
+        result.update(connection.execute(select(id_column, table.c.pk).where(id_column.in_(selected))).all())
+    if len(result) != len(keys):
+        raise NoResultFound('catalog append references a missing ' + table.name + ' identity')
+    return result
+
+
+class SQLiteCatalogRepository:
+    """One owner-thread writer; all persisted scientific rows are append-only."""
+
+    def __init__(
+        self,
+        engine: Engine,
+        *,
+        query_work_limit: int = DEFAULT_CATALOG_QUERY_WORK_LIMIT,
+    ) -> None:
+        if query_work_limit <= 0 or query_work_limit > MAX_CATALOG_QUERY_WORK_LIMIT:
+            raise ValueError(
+                f"catalog query work limit must be in [1, {MAX_CATALOG_QUERY_WORK_LIMIT}]"
+            )
+        self.engine = engine
+        self.query_work_limit = query_work_limit
+        self._writer_thread = threading.get_ident()
+
+    def _assert_writer(self) -> None:
+        if threading.get_ident() != self._writer_thread:
+            raise CatalogWriterViolation("catalog writes are restricted to the owner thread")
+
+    @contextmanager
+    def _bounded_query_connection(self):
+        """Share the existing SQLite instruction guard across query surfaces."""
+        work = {"steps": 0, "exhausted": False}
+
+        def enforce_work_limit():
+            work["steps"] += _SQLITE_PROGRESS_INTERVAL
+            if work["steps"] > self.query_work_limit:
+                work["exhausted"] = True
+                return 1
+            return 0
+
+        with self.engine.connect() as connection:
+            set_progress_handler = getattr(connection.connection.driver_connection, "set_progress_handler", None)
+            if set_progress_handler is None:
+                raise RuntimeError("catalog query backend cannot enforce a SQLite work limit")
+            set_progress_handler(enforce_work_limit, _SQLITE_PROGRESS_INTERVAL)
+            try:
+                yield connection, work
+            except OperationalError as error:
+                if work["exhausted"]:
+                    raise CatalogQueryWorkLimitExceeded(
+                        work_limit=self.query_work_limit, work_steps=work["steps"]) from error
+                raise
+            finally:
+                set_progress_handler(None, 0)
+
+    def query_artifacts(self, query: CatalogArtifactQuery) -> CatalogArtifactQueryPage:
+        """Return bounded physical locations without materializing a catalog snapshot."""
+        if type(query) is not CatalogArtifactQuery:
+            raise TypeError("catalog artifact query requires its exact typed selection")
+        query.__post_init__()
+        predicates = [storage_root.c.storage_root_id == query.storage_root_id,
+            logical_artifact.c.payload_schema == query.payload_schema,
+            artifact.c.relative_path.startswith(query.relative_prefix + "/", autoescape=True)]
+        if query.after_materialization_id is not None:
+            predicates.append(artifact.c.materialization_id > query.after_materialization_id)
+        columns = tuple(column.label(prefix + column.name) for prefix, table in (
+            ("root_", storage_root), ("logical_", logical_artifact), ("artifact_", artifact))
+            for column in table.c)
+        statement = (select(*columns).select_from(artifact.join(logical_artifact,
+            artifact.c.logical_artifact_pk == logical_artifact.c.pk).join(storage_root,
+            artifact.c.storage_root_pk == storage_root.c.pk)).where(*predicates)
+            .order_by(artifact.c.materialization_id).limit(query.limit + 1))
+        with self._bounded_query_connection() as (connection, work):
+            raw = tuple(map(_row_mapping, connection.execute(statement)))
+        rows = []
+        for row in raw[:query.limit]:
+            root = StorageRootRecord(row["root_storage_root_id"], row["root_logical_name"],
+                row["root_canonical_path"], row["root_mount_contract_schema"],
+                CatalogVerificationStatus(row["root_verification_status"]))
+            logical = LogicalArtifactRecord(row["logical_logical_artifact_id"], _hex(row["logical_content_sha256"]),
+                row["logical_payload_schema"], ArtifactProfile(row["logical_profile"]), row["logical_media_type"],
+                VisibilityCeiling(row["logical_visibility_ceiling"]))
+            locator = ArtifactLocatorRecord(row["artifact_materialization_id"], logical.logical_artifact_id,
+                root.storage_root_id, row["artifact_relative_path"], _hex(row["artifact_physical_sha256"]),
+                row["artifact_size_bytes"], row["artifact_compression"], row["artifact_partition_selector"],
+                CatalogVerificationStatus(row["artifact_verification_status"]))
+            rows.append(CatalogArtifactQueryRow(root, logical, locator))
+        more = len(raw) > query.limit
+        return CatalogArtifactQueryPage(tuple(rows), more,
+            rows[-1].locator.materialization_id if more else None, self.query_work_limit, work["steps"])
+
+    def append_snapshot(self, snapshot: CatalogSnapshot) -> None:
+        self._assert_writer()
+        try:
+            with self.engine.begin() as connection:
+                self._insert_roots(connection, snapshot)
+                self._insert_artifacts(connection, snapshot)
+                self._insert_receipts(connection, snapshot)
+                self._insert_scientific_objects(connection, snapshot)
+                self._insert_edges_and_metrics(connection, snapshot)
+                self._insert_exploration_attempts(connection, snapshot)
+        except IntegrityError as error:
+            raise CatalogWriteConflict("append-only catalog identity already exists") from error
+
+    def _insert_roots(self, connection: Connection, snapshot: CatalogSnapshot) -> None:
+        _insert_many(connection, storage_root, (dict(
+            storage_root_id=row.storage_root_id, logical_name=row.logical_name,
+            canonical_path=row.canonical_path, mount_contract_schema=row.mount_contract_schema,
+            verification_status=row.verification_status.value) for row in snapshot.storage_roots))
+
+    def _insert_artifacts(self, connection: Connection, snapshot: CatalogSnapshot) -> None:
+        _insert_many(connection, logical_artifact, (dict(
+            logical_artifact_id=row.logical_artifact_id, content_sha256=_digest(row.content_sha256),
+            payload_schema=row.payload_schema, profile=row.profile.value, media_type=row.media_type,
+            visibility_ceiling=row.visibility_ceiling.value) for row in snapshot.logical_artifacts))
+        logical = _primary_keys(connection, logical_artifact, logical_artifact.c.logical_artifact_id,
+            (row.logical_artifact_id for row in snapshot.artifact_locators))
+        roots = _primary_keys(connection, storage_root, storage_root.c.storage_root_id,
+            (row.storage_root_id for row in snapshot.artifact_locators))
+        _insert_many(connection, artifact, (dict(
+            materialization_id=row.materialization_id, logical_artifact_pk=logical[row.logical_artifact_id],
+            storage_root_pk=roots[row.storage_root_id], relative_path=row.relative_path,
+            physical_sha256=_digest(row.physical_sha256), size_bytes=row.size_bytes,
+            compression=row.compression, partition_selector=row.partition_selector,
+            verification_status=row.verification_status.value) for row in snapshot.artifact_locators))
+
+    def _insert_receipts(self, connection: Connection, snapshot: CatalogSnapshot) -> None:
+        roots = _primary_keys(connection, storage_root, storage_root.c.storage_root_id,
+            (row.storage_root_id for row in snapshot.receipts))
+        _insert_many(connection, receipt, (dict(
+            receipt_id=row.receipt_id, run_id=row.run_id, storage_root_pk=roots[row.storage_root_id],
+            relative_path=row.relative_path, sha256=_digest(row.sha256), receipt_schema=row.receipt_schema,
+            verification_status=row.verification_status.value) for row in snapshot.receipts))
+
+    def _insert_scientific_objects(self, connection: Connection, snapshot: CatalogSnapshot) -> None:
+        artifacts = _primary_keys(connection, artifact, artifact.c.materialization_id,
+            (row.artifact_materialization_id for row in snapshot.scientific_objects))
+        receipts = _primary_keys(connection, receipt, receipt.c.receipt_id,
+            (row.receipt_id for row in snapshot.scientific_objects))
+        _insert_many(connection, scientific_object, (dict(
+            scientific_object_id=row.scientific_object_id, kind=row.kind.value,
+            object_schema=row.object_schema, fingerprint=_digest(row.object_sha256),
+            visibility_ceiling=row.visibility_ceiling.value, categorical_status=row.categorical_status,
+            artifact_pk=artifacts.get(row.artifact_materialization_id), receipt_pk=receipts.get(row.receipt_id))
+            for row in snapshot.scientific_objects))
+        objects = _primary_keys(connection, scientific_object, scientific_object.c.scientific_object_id,
+            (row.scientific_object_id for row in snapshot.scientific_objects))
+        projections = {}
+        for row in snapshot.scientific_objects:
+            projections.setdefault(row.kind.value.lower(), []).append(
+                dict(scientific_object_pk=objects[row.scientific_object_id]))
+        for kind, rows in projections.items():
+            _insert_many(connection, projection_tables[kind], rows)
+
+    def _insert_edges_and_metrics(self, connection: Connection, snapshot: CatalogSnapshot) -> None:
+        references = (value for row in snapshot.knowledge_edges
+            for value in (row.source_object_id, row.target_object_id, row.evidence_object_id))
+        objects = _primary_keys(connection, scientific_object, scientific_object.c.scientific_object_id,
+            chain(references, (row.scientific_object_id for row in snapshot.metric_observations)))
+        _insert_many(connection, knowledge_edge, (dict(
+            edge_id=row.edge_id, relation=row.relation, source_object_pk=objects[row.source_object_id],
+            target_object_pk=objects[row.target_object_id], evidence_object_pk=objects.get(row.evidence_object_id),
+            scope_id=row.scope_id) for row in snapshot.knowledge_edges))
+        _insert_many(connection, metric_definition, (dict(
+            metric_definition_id=row.metric_definition_id, metric_name=row.metric_name,
+            dataset_version_id=row.dataset_version_id, relation_id=row.relation_id,
+            denominator_gauge_id=row.denominator_gauge_id, response_gauge_id=row.response_gauge_id,
+            horizon_id=row.horizon_id, native_unit=row.native_unit, aggregation=row.aggregation,
+            direction=row.direction) for row in snapshot.metric_definitions))
+        definitions = _primary_keys(connection, metric_definition, metric_definition.c.metric_definition_id,
+            (row.metric_definition_id for row in snapshot.metric_observations))
+        _insert_many(connection, metric_observation, (dict(
+            metric_observation_id=row.metric_observation_id,
+            metric_definition_pk=definitions[row.metric_definition_id],
+            scientific_object_pk=objects[row.scientific_object_id], point_decimal=str(row.point),
+            lower_decimal=None if row.lower is None else str(row.lower),
+            upper_decimal=None if row.upper is None else str(row.upper),
+            physical_independent_unit_count=row.physical_independent_unit_count,
+            numerical_view_count=row.numerical_view_count) for row in snapshot.metric_observations))
+
+    def _insert_exploration_attempts(self, connection: Connection, snapshot: CatalogSnapshot) -> None:
+        objects = _primary_keys(connection, scientific_object, scientific_object.c.scientific_object_id,
+            (row.analysis_spec_object_id for row in snapshot.exploration_attempts))
+        artifacts = _primary_keys(connection, artifact, artifact.c.materialization_id,
+            (value for row in snapshot.exploration_attempts for value in row.artifact_materialization_ids))
+        _insert_many(connection, exploration_attempt, (dict(
+            attempt_id=row.attempt_id, analysis_spec_object_pk=objects[row.analysis_spec_object_id],
+            disposition=row.disposition) for row in snapshot.exploration_attempts))
+        attempts = _primary_keys(connection, exploration_attempt, exploration_attempt.c.attempt_id,
+            (row.attempt_id for row in snapshot.exploration_attempts))
+        _insert_many(connection, exploration_attempt_reason, (dict(
+            attempt_pk=attempts[row.attempt_id], ordinal=ordinal, reason_code=reason)
+            for row in snapshot.exploration_attempts for ordinal, reason in enumerate(row.reason_codes)))
+        _insert_many(connection, exploration_attempt_artifact, (dict(
+            attempt_pk=attempts[row.attempt_id], artifact_pk=artifacts[value])
+            for row in snapshot.exploration_attempts for value in row.artifact_materialization_ids))
+
+    @staticmethod
+    def _object_query_predicates(query: CatalogObjectQuery) -> tuple[Any, ...]:
+        predicates: list[Any] = []
+        if query.object_id is not None:
+            predicates.append(scientific_object.c.scientific_object_id == query.object_id)
+        if query.kind is not None:
+            predicates.append(scientific_object.c.kind == query.kind)
+        if query.categorical_status is not None:
+            predicates.append(scientific_object.c.categorical_status == query.categorical_status)
+
+        metric_filters = tuple(
+            predicate
+            for value, predicate in (
+                (query.relation_id, metric_definition.c.relation_id == query.relation_id),
+                (
+                    query.denominator_gauge_id,
+                    metric_definition.c.denominator_gauge_id == query.denominator_gauge_id,
+                ),
+                (
+                    query.response_gauge_id,
+                    metric_definition.c.response_gauge_id == query.response_gauge_id,
+                ),
+                (query.horizon_id, metric_definition.c.horizon_id == query.horizon_id),
+                (query.native_unit, metric_definition.c.native_unit == query.native_unit),
+            )
+            if value is not None
+        )
+        if metric_filters:
+            predicates.append(
+                exists(
+                    select(1)
+                    .select_from(
+                        metric_observation.join(
+                            metric_definition,
+                            metric_observation.c.metric_definition_pk == metric_definition.c.pk,
+                        )
+                    )
+                    .where(
+                        metric_observation.c.scientific_object_pk == scientific_object.c.pk,
+                        *metric_filters,
+                    )
+                ).correlate(scientific_object)
+            )
+
+        has_edge_filters = any(
+            value is not None
+            for value in (
+                query.knowledge_edge_relation,
+                query.knowledge_edge_scope_id,
+                query.lineage_object_id,
+            )
+        )
+        if has_edge_filters:
+            edge_filters: list[Any] = []
+            if query.knowledge_edge_relation is not None:
+                edge_filters.append(knowledge_edge.c.relation == query.knowledge_edge_relation)
+            if query.knowledge_edge_scope_id is not None:
+                edge_filters.append(knowledge_edge.c.scope_id == query.knowledge_edge_scope_id)
+            participation = or_(
+                knowledge_edge.c.source_object_pk == scientific_object.c.pk,
+                knowledge_edge.c.target_object_pk == scientific_object.c.pk,
+                knowledge_edge.c.evidence_object_pk == scientific_object.c.pk,
+            )
+            if query.lineage_object_id is not None:
+                lineage_object = alias(scientific_object, name="lineage_object")
+                lineage_pk = (
+                    select(lineage_object.c.pk)
+                    .where(lineage_object.c.scientific_object_id == query.lineage_object_id)
+                    .scalar_subquery()
+                )
+                edge_filters.extend(
+                    (
+                        or_(
+                            knowledge_edge.c.source_object_pk == lineage_pk,
+                            knowledge_edge.c.target_object_pk == lineage_pk,
+                            knowledge_edge.c.evidence_object_pk == lineage_pk,
+                        ),
+                        scientific_object.c.scientific_object_id != query.lineage_object_id,
+                    )
+                )
+            predicates.append(
+                exists(
+                    select(1)
+                    .select_from(knowledge_edge)
+                    .where(
+                        participation,
+                        *edge_filters,
+                    )
+                ).correlate(scientific_object)
+            )
+        return tuple(predicates)
+
+    def query_objects(self, query: CatalogObjectQuery) -> CatalogObjectQueryPage:
+        """Execute two row-capped SQL statements; never materialize a snapshot."""
+
+        artifact_alias = alias(artifact, name="query_artifact")
+        artifact_root = alias(storage_root, name="query_artifact_root")
+        receipt_alias = alias(receipt, name="query_receipt")
+        receipt_root = alias(storage_root, name="query_receipt_root")
+        predicates = self._object_query_predicates(query)
+        page_predicates = list(predicates)
+        if query.after_object_id is not None:
+            page_predicates.append(scientific_object.c.scientific_object_id > query.after_object_id)
+        statement = (
+            select(
+                scientific_object.c.scientific_object_id,
+                scientific_object.c.kind,
+                scientific_object.c.object_schema,
+                scientific_object.c.fingerprint,
+                scientific_object.c.visibility_ceiling,
+                scientific_object.c.categorical_status,
+                artifact_alias.c.materialization_id.label("artifact_materialization_id"),
+                artifact_alias.c.relative_path.label("artifact_relative_path"),
+                artifact_root.c.storage_root_id.label("artifact_storage_root_id"),
+                receipt_alias.c.receipt_id,
+                receipt_alias.c.relative_path.label("receipt_relative_path"),
+                receipt_root.c.storage_root_id.label("receipt_storage_root_id"),
+            )
+            .outerjoin(
+                artifact_alias,
+                scientific_object.c.artifact_pk == artifact_alias.c.pk,
+            )
+            .outerjoin(
+                artifact_root,
+                artifact_alias.c.storage_root_pk == artifact_root.c.pk,
+            )
+            .outerjoin(
+                receipt_alias,
+                scientific_object.c.receipt_pk == receipt_alias.c.pk,
+            )
+            .outerjoin(
+                receipt_root,
+                receipt_alias.c.storage_root_pk == receipt_root.c.pk,
+            )
+            .where(*page_predicates)
+            .order_by(scientific_object.c.scientific_object_id)
+            .limit(query.limit + 1)
+        )
+        count_probe = (
+            select(scientific_object.c.pk)
+            .where(*predicates)
+            .limit(query.match_count_limit + 1)
+            .subquery("bounded_catalog_match_probe")
+        )
+        count_statement = select(func.count()).select_from(count_probe)
+        with self._bounded_query_connection() as (connection, work):
+            probed_count = int(connection.execute(count_statement).scalar_one())
+            raw_rows = tuple(map(_row_mapping, connection.execute(statement)))
+        work_steps = work["steps"]
+        matched_count_truncated = probed_count > query.match_count_limit
+        matched_count = min(probed_count, query.match_count_limit)
+        has_more = len(raw_rows) > query.limit
+        page_rows = raw_rows[: query.limit]
+        rows = []
+        for row in page_rows:
+            has_artifact = row["artifact_materialization_id"] is not None
+            rows.append(
+                CatalogObjectQueryRow(
+                    object_id=row["scientific_object_id"],
+                    kind=row["kind"],
+                    object_schema=row["object_schema"],
+                    object_fingerprint=_hex(row["fingerprint"]),
+                    visibility_ceiling=row["visibility_ceiling"],
+                    categorical_status=row["categorical_status"],
+                    artifact_materialization_id=row["artifact_materialization_id"],
+                    receipt_id=row["receipt_id"],
+                    storage_root_id=(
+                        row["artifact_storage_root_id"]
+                        if has_artifact
+                        else row["receipt_storage_root_id"]
+                    ),
+                    external_relative_path=(
+                        row["artifact_relative_path"]
+                        if has_artifact
+                        else row["receipt_relative_path"]
+                    ),
+                    external_identity_kind=("ARTIFACT" if has_artifact else "RECEIPT"),
+                )
+            )
+        return CatalogObjectQueryPage(
+            matched_count=matched_count,
+            match_count_limit=query.match_count_limit,
+            matched_count_truncated=matched_count_truncated,
+            rows=tuple(rows),
+            has_more=has_more,
+            next_after_object_id=(rows[-1].object_id if has_more and rows else None),
+            query_work_limit=self.query_work_limit,
+            query_work_steps=work_steps,
+        )
+
+    def snapshot(self) -> CatalogSnapshot:
+        with self.engine.connect() as connection:
+            return CatalogSnapshot(
+                storage_roots=self._read_roots(connection),
+                logical_artifacts=self._read_logical_artifacts(connection),
+                artifact_locators=self._read_artifacts(connection),
+                receipts=self._read_receipts(connection),
+                scientific_objects=self._read_scientific_objects(connection),
+                knowledge_edges=self._read_edges(connection),
+                metric_definitions=self._read_metric_definitions(connection),
+                metric_observations=self._read_metric_observations(connection),
+                exploration_attempts=self._read_attempts(connection),
+            )
+
+    @staticmethod
+    def _read_roots(connection: Connection) -> tuple[StorageRootRecord, ...]:
+        rows = connection.execute(select(storage_root).order_by(storage_root.c.storage_root_id))
+        return tuple(
+            StorageRootRecord(
+                storage_root_id=row["storage_root_id"],
+                logical_name=row["logical_name"],
+                canonical_path=row["canonical_path"],
+                mount_contract_schema=row["mount_contract_schema"],
+                verification_status=CatalogVerificationStatus(row["verification_status"]),
+            )
+            for row in map(_row_mapping, rows)
+        )
+
+    @staticmethod
+    def _read_logical_artifacts(connection: Connection) -> tuple[LogicalArtifactRecord, ...]:
+        rows = connection.execute(
+            select(logical_artifact).order_by(logical_artifact.c.logical_artifact_id)
+        )
+        return tuple(
+            LogicalArtifactRecord(
+                logical_artifact_id=row["logical_artifact_id"],
+                content_sha256=_hex(row["content_sha256"]),
+                payload_schema=row["payload_schema"],
+                profile=ArtifactProfile(row["profile"]),
+                media_type=row["media_type"],
+                visibility_ceiling=VisibilityCeiling(row["visibility_ceiling"]),
+            )
+            for row in map(_row_mapping, rows)
+        )
+
+    @staticmethod
+    def _read_artifacts(connection: Connection) -> tuple[ArtifactLocatorRecord, ...]:
+        statement = (
+            select(
+                artifact,
+                logical_artifact.c.logical_artifact_id,
+                storage_root.c.storage_root_id,
+            )
+            .join(logical_artifact, artifact.c.logical_artifact_pk == logical_artifact.c.pk)
+            .join(storage_root, artifact.c.storage_root_pk == storage_root.c.pk)
+            .order_by(artifact.c.materialization_id)
+        )
+        return tuple(
+            ArtifactLocatorRecord(
+                materialization_id=row["materialization_id"],
+                logical_artifact_id=row["logical_artifact_id"],
+                storage_root_id=row["storage_root_id"],
+                relative_path=row["relative_path"],
+                physical_sha256=_hex(row["physical_sha256"]),
+                size_bytes=int(row["size_bytes"]),
+                compression=row["compression"],
+                partition_selector=row["partition_selector"],
+                verification_status=CatalogVerificationStatus(row["verification_status"]),
+            )
+            for row in map(_row_mapping, connection.execute(statement))
+        )
+
+    @staticmethod
+    def _read_receipts(connection: Connection) -> tuple[ReceiptLocatorRecord, ...]:
+        statement = (
+            select(receipt, storage_root.c.storage_root_id)
+            .join(storage_root, receipt.c.storage_root_pk == storage_root.c.pk)
+            .order_by(receipt.c.receipt_id)
+        )
+        return tuple(
+            ReceiptLocatorRecord(
+                receipt_id=row["receipt_id"],
+                run_id=row["run_id"],
+                storage_root_id=row["storage_root_id"],
+                relative_path=row["relative_path"],
+                sha256=_hex(row["sha256"]),
+                receipt_schema=row["receipt_schema"],
+                verification_status=CatalogVerificationStatus(row["verification_status"]),
+            )
+            for row in map(_row_mapping, connection.execute(statement))
+        )
+
+    @staticmethod
+    def _read_scientific_objects(
+        connection: Connection,
+    ) -> tuple[ScientificObjectRecord, ...]:
+        artifact_alias = alias(artifact, name="object_artifact")
+        receipt_alias = alias(receipt, name="object_receipt")
+        statement = (
+            select(
+                scientific_object,
+                artifact_alias.c.materialization_id,
+                receipt_alias.c.receipt_id,
+            )
+            .outerjoin(artifact_alias, scientific_object.c.artifact_pk == artifact_alias.c.pk)
+            .outerjoin(receipt_alias, scientific_object.c.receipt_pk == receipt_alias.c.pk)
+            .order_by(scientific_object.c.scientific_object_id)
+        )
+        return tuple(
+            ScientificObjectRecord(
+                scientific_object_id=row["scientific_object_id"],
+                kind=ScientificObjectKind(row["kind"]),
+                object_schema=row["object_schema"],
+                object_sha256=_hex(row["fingerprint"]),
+                visibility_ceiling=VisibilityCeiling(row["visibility_ceiling"]),
+                categorical_status=row["categorical_status"],
+                artifact_materialization_id=row["materialization_id"],
+                receipt_id=row["receipt_id"],
+            )
+            for row in map(_row_mapping, connection.execute(statement))
+        )
+
+    @staticmethod
+    def _read_edges(connection: Connection) -> tuple[KnowledgeEdgeRecord, ...]:
+        source = alias(scientific_object, name="source_object")
+        target = alias(scientific_object, name="target_object")
+        evidence = alias(scientific_object, name="evidence_object")
+        statement = (
+            select(
+                knowledge_edge,
+                source.c.scientific_object_id.label("source_id"),
+                target.c.scientific_object_id.label("target_id"),
+                evidence.c.scientific_object_id.label("evidence_id"),
+            )
+            .join(source, knowledge_edge.c.source_object_pk == source.c.pk)
+            .join(target, knowledge_edge.c.target_object_pk == target.c.pk)
+            .outerjoin(evidence, knowledge_edge.c.evidence_object_pk == evidence.c.pk)
+            .order_by(knowledge_edge.c.edge_id)
+        )
+        return tuple(
+            KnowledgeEdgeRecord(
+                edge_id=row["edge_id"],
+                relation=row["relation"],
+                source_object_id=row["source_id"],
+                target_object_id=row["target_id"],
+                evidence_object_id=row["evidence_id"],
+                scope_id=row["scope_id"],
+            )
+            for row in map(_row_mapping, connection.execute(statement))
+        )
+
+    @staticmethod
+    def _read_metric_definitions(
+        connection: Connection,
+    ) -> tuple[MetricDefinitionRecord, ...]:
+        rows = connection.execute(
+            select(metric_definition).order_by(metric_definition.c.metric_definition_id)
+        )
+        return tuple(
+            MetricDefinitionRecord(
+                metric_definition_id=row["metric_definition_id"],
+                metric_name=row["metric_name"],
+                dataset_version_id=row["dataset_version_id"],
+                relation_id=row["relation_id"],
+                denominator_gauge_id=row["denominator_gauge_id"],
+                response_gauge_id=row["response_gauge_id"],
+                horizon_id=row["horizon_id"],
+                native_unit=row["native_unit"],
+                aggregation=row["aggregation"],
+                direction=row["direction"],
+            )
+            for row in map(_row_mapping, rows)
+        )
+
+    @staticmethod
+    def _read_metric_observations(
+        connection: Connection,
+    ) -> tuple[MetricObservationRecord, ...]:
+        definition = alias(metric_definition, name="observation_definition")
+        object_alias = alias(scientific_object, name="observation_object")
+        statement = (
+            select(
+                metric_observation,
+                definition.c.metric_definition_id,
+                object_alias.c.scientific_object_id,
+            )
+            .join(definition, metric_observation.c.metric_definition_pk == definition.c.pk)
+            .join(object_alias, metric_observation.c.scientific_object_pk == object_alias.c.pk)
+            .order_by(metric_observation.c.metric_observation_id)
+        )
+        return tuple(
+            MetricObservationRecord(
+                metric_observation_id=row["metric_observation_id"],
+                metric_definition_id=row["metric_definition_id"],
+                scientific_object_id=row["scientific_object_id"],
+                point=Decimal(row["point_decimal"]),
+                lower=None if row["lower_decimal"] is None else Decimal(row["lower_decimal"]),
+                upper=None if row["upper_decimal"] is None else Decimal(row["upper_decimal"]),
+                physical_independent_unit_count=int(row["physical_independent_unit_count"]),
+                numerical_view_count=int(row["numerical_view_count"]),
+            )
+            for row in map(_row_mapping, connection.execute(statement))
+        )
+
+    @staticmethod
+    def _read_attempts(connection: Connection) -> tuple[ExplorationAttemptRecord, ...]:
+        analysis = alias(scientific_object, name="attempt_analysis")
+        statement = (
+            select(
+                exploration_attempt,
+                analysis.c.scientific_object_id.label("analysis_id"),
+            )
+            .join(analysis, exploration_attempt.c.analysis_spec_object_pk == analysis.c.pk)
+            .order_by(exploration_attempt.c.attempt_id)
+        )
+        records: list[ExplorationAttemptRecord] = []
+        for row in map(_row_mapping, connection.execute(statement)):
+            attempt_pk = int(row["pk"])
+            reasons = tuple(
+                connection.execute(
+                    select(exploration_attempt_reason.c.reason_code)
+                    .where(exploration_attempt_reason.c.attempt_pk == attempt_pk)
+                    .order_by(exploration_attempt_reason.c.ordinal)
+                ).scalars()
+            )
+            artifacts = tuple(
+                connection.execute(
+                    select(artifact.c.materialization_id)
+                    .join(
+                        exploration_attempt_artifact,
+                        exploration_attempt_artifact.c.artifact_pk == artifact.c.pk,
+                    )
+                    .where(exploration_attempt_artifact.c.attempt_pk == attempt_pk)
+                    .order_by(artifact.c.materialization_id)
+                ).scalars()
+            )
+            records.append(
+                ExplorationAttemptRecord(
+                    attempt_id=row["attempt_id"],
+                    analysis_spec_object_id=row["analysis_id"],
+                    disposition=row["disposition"],
+                    reason_codes=tuple(sorted(reasons)),
+                    artifact_materialization_ids=artifacts,
+                )
+            )
+        return tuple(records)
+
+    def integrity_check(self) -> tuple[str, ...]:
+        reasons: list[str] = []
+        audit = schema_audit(self.engine)
+        if not audit.passed:
+            reasons.append("schema-audit-failed")
+        with self.engine.connect() as connection:
+            for kind, projection in projection_tables.items():
+                expected = connection.execute(
+                    select(scientific_object.c.pk).where(scientific_object.c.kind == kind.upper())
+                ).scalars()
+                projected = set(
+                    connection.execute(select(projection.c.scientific_object_pk)).scalars()
+                )
+                if not set(expected).issubset(projected):
+                    reasons.append("projection-row-missing")
+                    break
+        return tuple(sorted(set(reasons)))
+
+    def scientific_object(self, object_id: str) -> ScientificObjectRecord | None:
+        page = self.query_objects(CatalogObjectQuery(object_id=object_id, limit=1))
+        if not page.rows:
+            return None
+        row = page.rows[0]
+        return ScientificObjectRecord(
+            scientific_object_id=row.object_id,
+            kind=ScientificObjectKind(row.kind),
+            object_schema=row.object_schema,
+            object_sha256=row.object_fingerprint,
+            visibility_ceiling=VisibilityCeiling(row.visibility_ceiling),
+            categorical_status=row.categorical_status,
+            artifact_materialization_id=row.artifact_materialization_id,
+            receipt_id=row.receipt_id,
+        )

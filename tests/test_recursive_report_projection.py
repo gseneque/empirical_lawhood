@@ -7,18 +7,18 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.analytic_material_inquiry import science
-from empirical_lawhood.adapters.methods.analytic_material_inquiry.recursive_translation import supply_draft
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.native_quickstart import UniformElectronGasAnalyticReferenceConfig
+from empirical_lawhood.domains.materials.analytic_material_inquiry import science
+from empirical_lawhood.domains.materials.analytic_material_inquiry.recursive_translation import supply_draft
+from empirical_lawhood.domains.materials.electron_gas.native_quickstart import UniformElectronGasAnalyticReferenceConfig
 from empirical_lawhood.api import numerical_provenance as provenance_owner
 from empirical_lawhood.api import recursive_authoring as author
 from empirical_lawhood.api import recursive_execution as execution
 from empirical_lawhood.api import recursive_inquiry as inquiry
-from empirical_lawhood.infrastructure.execution import LocalExecutionResourceAdmitter, LocalProcessExecutor
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_inquiry import InquirySuccessorIntent, identity
-from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
-from empirical_lawhood.runtime.recursive_inquiry import InquirySuccessorAdmission
+from empirical_lawhood.execution.local.execution import LocalExecutionResourceAdmitter, LocalProcessExecutor
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquirySuccessorIntent, identity
+from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
+from empirical_lawhood.execution.recursive_inquiry import InquirySuccessorAdmission
 from tests.test_recursive_inquiry import episode as episode
 from tests.test_recursive_public_service import _plane
 from tests.runtime_platform.test_native_effect_facts import selected as selected
@@ -35,11 +35,11 @@ def test_public_report_serializes_primary_native_facts_beside_unchanged_history(
     and a real inspected native census; it asserts no native lineage for that
     PURE wave and creates no invocation or scientific completion facts.
     """
-    from empirical_lawhood.infrastructure import recursive_custody
-    from empirical_lawhood.infrastructure.native_parent_finalization import inspect_native_parent_return
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
-    from empirical_lawhood.runtime.execution import TaskBlockReason
-    from empirical_lawhood.runtime.native_subwork import invoke_native_subwork
+    from empirical_lawhood.storage import recursive_custody
+    from empirical_lawhood.storage.native_parent_finalization import inspect_native_parent_return
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
+    from empirical_lawhood.execution.execution import TaskBlockReason
+    from empirical_lawhood.execution.native_subwork import invoke_native_subwork
     from tests.runtime_platform.test_native_effect_facts import _snapshot
 
     store, definitions, _bundle, _context, contract = selected
@@ -157,7 +157,7 @@ def test_real_pure_documents_default_and_references_have_identical_authenticated
 
 
 def test_reference_projection_keeps_internal_products_and_only_projects_terminal_outputs(wave, monkeypatch):
-    from empirical_lawhood.adapters.methods.rubisco_historical.recursive_translation import historical_recursive_draft
+    from empirical_lawhood.domains.rubisco.rubisco_historical.recursive_translation import historical_recursive_draft
     from tests.test_rubisco_historical_recursive import _inputs
 
     model, slices = _inputs()
@@ -193,7 +193,7 @@ def test_reference_projection_keeps_internal_products_and_only_projects_terminal
 
 
 def test_compact_streams_exact_custody_and_defers_scientific_projection(wave, monkeypatch):
-    from empirical_lawhood.infrastructure import recursive_custody
+    from empirical_lawhood.storage import recursive_custody
     from empirical_lawhood.api.recursive_operations import operation_catalog
 
     documents, full, _, _ = execution.read_recursive_wave(
@@ -228,7 +228,7 @@ def test_compact_streams_exact_custody_and_defers_scientific_projection(wave, mo
 
 
 def test_lazy_authored_members_preserve_exact_eager_inputs(wave):
-    from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads
+    from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads
 
     eager = author.load_authored_wave(directory=wave.directory, artifact_writer=wave.plane)
     lazy = author.load_authored_wave(directory=wave.directory, artifact_writer=wave.plane, lazy_payloads=True)
@@ -238,7 +238,7 @@ def test_lazy_authored_members_preserve_exact_eager_inputs(wave):
 
 
 def test_compact_execution_streams_external_operands_without_whole_payload_reads(wave, monkeypatch):
-    from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads
+    from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads
 
     draft = supply_draft(wave.source, draft_id="draft.report-projection.streamed-input")
     origins = RecursiveInputOrigins(tuple(RecursiveInputOrigin(value.input_id, RecursiveInputOriginKind.SOURCE,
@@ -354,11 +354,10 @@ def test_invalid_report_format_refuses_before_custody_or_execution(monkeypatch, 
         inquiry.run_inquiry_successor(directory=None, project_root=None, artifact_writer=None, terminal_product_format=mode)
 
 
-@pytest.mark.parametrize('workers,explicit_capacity',((1,False),(2,False),(2,True)))
-def test_successor_propagates_report_format_after_existing_exact_intent_join(wave, monkeypatch, episode,
-                                                                          workers, explicit_capacity):
-    # This wiring test substitutes only the persisted decision reader. The wave,
-    # configuration, origin record and full runner/read path remain actual custody.
+@pytest.fixture
+def admitted_wave(wave, monkeypatch, episode):
+    # This wiring fixture substitutes only the persisted decision reader. The
+    # wave, configuration, origin and full runner/read path remain real custody.
     packet, draft, source, _ = author.load_authored_wave(directory=wave.directory, artifact_writer=wave.plane)
     operation = draft.operations[0]
     key = identity(packet, packet.packet_id)
@@ -367,7 +366,7 @@ def test_successor_propagates_report_format_after_existing_exact_intent_join(wav
         science.scope(wave.source),
         operation.selection.selection_id)
     admission = InquirySuccessorAdmission("decision-fixture", key, identity(intent, intent.intent_id), key)
-    from empirical_lawhood.planning.recursive_inquiry import choose_inquiry
+    from empirical_lawhood.design.recursive_inquiry import choose_inquiry
 
     selected = replace(episode["menu"].alternatives[0], successor_draft=intent.draft,
         successor_config=intent.configuration, input_origins=intent.input_origins,
@@ -380,7 +379,15 @@ def test_successor_propagates_report_format_after_existing_exact_intent_join(wav
         "state.json": operands["state"], "policy.json": operands["policy"],
         "specification.json": operands["specification"]}
     monkeypatch.setattr(inquiry, "_read", lambda *args: admission)
-    monkeypatch.setattr(inquiry, "read_inquiry_decision", lambda **kwargs: (packet, records))
+    monkeypatch.setattr(inquiry, "_read_inquiry_decision", lambda **kwargs: (packet, records))
+    return SimpleNamespace(wave=wave, packet=packet, draft=draft, admission=admission,
+        records=records, operands=operands)
+
+
+@pytest.mark.parametrize('workers,explicit_capacity',((1,False),(2,False),(2,True)))
+def test_successor_propagates_report_format_after_existing_exact_intent_join(admitted_wave, monkeypatch,
+                                                                          workers, explicit_capacity):
+    wave, records, operands = admitted_wave.wave, admitted_wave.records, admitted_wave.operands
     capacity = LocalExecutionResourceAdmitter.detect_capacity() if explicit_capacity else None
     calls = []
     def selected(**kwargs):
@@ -403,7 +410,7 @@ def test_successor_propagates_report_format_after_existing_exact_intent_join(wav
 
 @pytest.mark.parametrize("automatic", (False, True))
 def test_author_only_partial_read_preserves_pending_census_without_execution_publication(tmp_path, monkeypatch, automatic):
-    from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256
+    from empirical_lawhood.storage.bounded_io import bounded_file_sha256
     plane = _plane(tmp_path / "author-only")
     source = decode_canonical_bytes((ROOT / "programmes/materials/superconductivity/workflows/electron-gas-response/config.json").read_bytes(),
         UniformElectronGasAnalyticReferenceConfig, maximum_bytes=None)
@@ -485,7 +492,7 @@ def test_public_read_marks_exact_custody_with_deferred_binary_consumer_join(wave
     The existing wave has canonical outputs. This explicit seam tests report
     propagation of the owner's binary state; it is not binary/native acceptance.
     """
-    from empirical_lawhood.infrastructure import recursive_custody
+    from empirical_lawhood.storage import recursive_custody
     actual = recursive_custody.read_recursive_products
     calls = []
     state = recursive_custody.RAW_BYTES_CONSUMER_JOIN_DEFERRED

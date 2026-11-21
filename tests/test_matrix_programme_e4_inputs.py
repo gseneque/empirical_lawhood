@@ -6,13 +6,13 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.e4_inputs import compose_programme_e4_banks
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.e4_inputs import compose_programme_e4_banks
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
 from empirical_lawhood.api import matrix_programme_e4_inputs as api
 from empirical_lawhood.api.recursive_authoring import implementation_binding
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_matrix_finite_dt_source_assembly import c_backed_source_case, selected_request  # noqa: F401
 
 ROOT=Path(__file__).parents[1]
@@ -20,7 +20,7 @@ ROOT=Path(__file__).parents[1]
 
 def test_current_e4_banks_reuse_all_original_c_sources_panels_and_phase_denominators(c_backed_source_case,monkeypatch):  # noqa: F811
     case=c_backed_source_case
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_bank_recipe as recipes
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_bank_recipe as recipes
     monkeypatch.setattr(recipes,'recipe_allocation',lambda *_a,**_kw:pytest.fail('C-backed E4 replayed seed material'))
     original=case.committed.commitments.canonical_bytes()
     result=compose_programme_e4_banks(case.committed,original_e3=case.public,criterion_publication=case.criterion_publication)
@@ -125,8 +125,9 @@ def test_original_fit_refuses_another_valid_train_allocation_before_opening_bank
             training_specification=case.training.specification,training_request=case.training.request,writer=case.plane)
 
 
+@pytest.mark.parametrize('reconstruction', ('off', 'full'))
 @pytest.mark.parametrize('mutation', ('none', 'current-c', 'original-preparation', 'access-revoked'))
-def test_shared_e4_context_guards_actual_originals_through_dependent_publication(c_backed_source_case, monkeypatch, mutation):  # noqa: F811
+def test_shared_e4_context_guards_actual_originals_through_dependent_publication(c_backed_source_case, monkeypatch, mutation, reconstruction):  # noqa: F811
     """Actual C/custody/bytes, disclosed original producer I/O; no native work."""
     import sys
 
@@ -148,7 +149,10 @@ def test_shared_e4_context_guards_actual_originals_through_dependent_publication
     monkeypatch.setattr(api, 'load_authored_wave', lambda **_: (packet, object(), object(), object()))
     monkeypatch.setattr(api, '_retained_plans', lambda *_: (SimpleNamespace(run_plan_id=locator.run_id), plan, object()))
     monkeypatch.setattr(api, '_read_instance', lambda *_: (case.training.specification, case.training.request, object()))
-    monkeypatch.setattr(api, '_recorded_training_operands', lambda *_: (case.training.specification, case.training.request))
+    def disclosed_training(_writer, selected_locator):
+        assert selected_locator == locator
+        return case.training.specification, case.training.request
+    monkeypatch.setattr(api, '_recorded_training_operands', disclosed_training)
     monkeypatch.setattr(api, 'authenticate_selected_e3_public_package', lambda **_: None)
     monkeypatch.setattr(api, 'authenticate_selected_e3_training_banks', lambda **_: None)
     monkeypatch.setattr(api, 'authenticate_selected_e3_assay', lambda **_: case.criterion_publication)
@@ -167,7 +171,8 @@ def test_shared_e4_context_guards_actual_originals_through_dependent_publication
     original = path.read_bytes()
     completed = []
     def consume():
-        with api.authenticated_programme_e4_banks(artifact_writer=case.plane, input_commitments=request.input_commitments,
+        from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
+        with scientific_reconstruction_operation(reconstruction), api.authenticated_programme_e4_banks(artifact_writer=case.plane, input_commitments=request.input_commitments,
                 original_e3=request.original_e3, original_preparation=request.original_preparation,
                 original_assay=request.original_assay, original_products=request.original_products,
                 native_training_locator=locator, maximum_source_bytes=request.source_budget.source_scan_bytes) as resolved:
@@ -202,7 +207,7 @@ def test_shared_e4_context_guards_actual_originals_through_dependent_publication
 def test_bank_publication_keeps_original_operands_in_their_live_read(c_backed_source_case, monkeypatch, mutation):  # noqa: F811
     """Actual C, bank publication and byte guards; disclosed E3/TRAIN producers."""
     from collections import Counter
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
     case = c_backed_source_case
     request = selected_request(case)
     reads, observed, live = Counter(), {}, {'allowed': True}
@@ -292,10 +297,10 @@ def test_original_current_access_refuses_before_any_export_body_read(c_backed_so
 @pytest.mark.parametrize('foreign', (False, True))
 def test_original_export_metadata_requires_the_complete_exact_producer_lineage(c_backed_source_case, monkeypatch, foreign):  # noqa: F811
     """Actual literal publication; disclosed metadata seam creates no authority."""
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, lineage_parent_sort_key
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, lineage_parent_sort_key
     from empirical_lawhood.api.matrix_source_input_assembly import publish_source_input_record
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammeProducedInput
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammeProducedInput
     case = c_backed_source_case
     package, issued, reveal = object(), object(), object()
     metadata = SimpleNamespace(visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY,

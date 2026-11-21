@@ -10,15 +10,13 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.api.native_training_read_scope import (
-    NativeTrainingReadScope, _Metadata, authenticated_native_training_read_scope,
-)
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore, NativeSubworkMetadata
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.api.native_training_read_scope import NativeTrainingReadScope, _Metadata, authenticated_native_training_read_scope
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.storage.artifact_validation import ArtifactIdentityConflict
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore, NativeSubworkMetadata
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 from tests.runtime_platform.test_native_subwork import _complete, _publish, _selected
 from tests.test_experiment_selected_input_bootstrap import Model
 
@@ -140,7 +138,7 @@ def test_control_bootstrap_rejects_foreign_custody_or_codec_before_body(tmp_path
     with store.plane.verification_scope() as plane:
         kind=Model
         if damage=='wrong-codec':
-            from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion
+            from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion
             kind=NativeSubworkCompletion
         with pytest.raises(PermissionError,match='published bytes|codec'):
             _Metadata(plane).control(publication.materialization.relative_path,kind)
@@ -157,8 +155,8 @@ def test_public_train_scope_refuses_nonlocator_before_any_read(tmp_path,monkeypa
 @pytest.mark.parametrize('selected_name',('scientific-feature.json','draft.json'))
 def test_packet_json_profile_and_identity_do_not_make_a_scientific_body_readable(tmp_path,monkeypatch,selected_name):
     from empirical_lawhood.api.native_training_read_scope import _Packet
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave,RecursiveWaveMember
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
     store,_,_=_finished(tmp_path)
     # Deliberately invalid TRAIN premises: a real canonical software body has
     # exact bytes/pins, but neither a scientific filename nor a control filename

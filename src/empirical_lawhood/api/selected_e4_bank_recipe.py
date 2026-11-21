@@ -9,23 +9,23 @@ from pathlib import Path
 from hashlib import sha256
 import re
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_bank_recipe as domain
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_bank_recipe as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
 from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
 from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
-from .matrix_selected_e3_e4_runtime import authenticate_selected_e3_public_package, authenticate_selected_e3_assay
-from empirical_lawhood.infrastructure.numerical_provenance import observe_implementation_source
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.source_closure import capture_admitted_target_source, capture_target_closure, require_admitted_target_source_current
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactPublicationCommit, ArtifactPublicationIntent, ArtifactPublicationScope, ArtifactWriteRequest, ArtifactWriteResult, artifact_custody_limits
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExecutionSelection, ExperimentDependency
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.api.matrix_selected_e3_e4_runtime import authenticate_selected_e3_public_package, authenticate_selected_e3_assay
+from empirical_lawhood.storage.numerical_provenance import observe_implementation_source
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.source_closure import capture_admitted_target_source, capture_target_closure, require_admitted_target_source_current
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactPublicationCommit, ArtifactPublicationIntent, ArtifactPublicationScope, ArtifactWriteRequest, ArtifactWriteResult, artifact_custody_limits
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection, ExperimentDependency
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 
 
 def _current_selection(*, project_root, artifact_writer, execution, _admitted_source=None):
@@ -48,7 +48,7 @@ def _current_selection(*, project_root, artifact_writer, execution, _admitted_so
         if execution.source_snapshot != ObjectIdentity.from_record("recursive-member.implementation", binding):
             raise ValueError("selected E4 recipe changes its current declared implementation source")
     else:
-        from .prospective_experiment import _selected_source_closure
+        from empirical_lawhood.api.prospective_experiment import _selected_source_closure
         captured = capture_target_closure(root, "selected-e4.bank-recipe.current-source", _admitted_source=admitted)
         _selected_source_closure(captured.closure, execution.source_snapshot)
         require_admitted_target_source_current(root, admitted)
@@ -165,7 +165,7 @@ def _metadata_namespace(*, inputs, writer, directory):
         raise PermissionError("selected E4 recipe metadata includes another publication scope")
     if not selected.exists():
         return
-    from .recursive_qualified_parents import MAX_PARENT_BYTES
+    from empirical_lawhood.api.recursive_qualified_parents import MAX_PARENT_BYTES
     count = 0
     for path in selected.iterdir():
         count += 1
@@ -217,8 +217,8 @@ def _selected_metadata_directory(*, inputs, writer, project_root, metadata_direc
 
 def _publication_from_manifest(writer, manifest):
     """Current read observation; never rewrite retained embedded created flags."""
-    from empirical_lawhood.runtime.artifacts import ArtifactManifest
-    from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
+    from empirical_lawhood.execution.execution import VerifiedArtifactInput
     if type(manifest) not in (ArtifactManifest, VerifiedArtifactInput):
         raise TypeError("publication replay requires its exact manifest or verified input")
     relative = manifest.materialization.relative_path + ".manifest.json"
@@ -253,7 +253,7 @@ def _metadata_record_size(writer, size_bytes, *, maximum_bytes=None):
 def _read_exact_record(writer, publication, kind, *, maximum_bytes=None):
     # Publication authentication refreshes body, sidecar and commit marker.
     # Parent grant metadata has a separate role and supplies no record ceiling.
-    from empirical_lawhood.infrastructure.publication_metadata import read_published_canonical_record
+    from empirical_lawhood.storage.publication_metadata import read_published_canonical_record
     _metadata_record_size(writer, publication.materialization.size_bytes, maximum_bytes=maximum_bytes)
     record = read_published_canonical_record(writer, publication, kind,
         maximum_bytes=publication.materialization.size_bytes)
@@ -406,10 +406,8 @@ def publish_selected_e4_bank_recipe(*, inputs, project_root, artifact_writer, me
         # retain only original compact subjects and the complete source census.
         descriptors, responses = domain.recipe_responses(inputs, reservation, specification, provenance, phase)
         response_publication = publish(phase + ".responses", responses)
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import (
-            SelectedE3E4DevelopmentBank, SelectedE3E4ForecastDesign, selected_e3_fit_target,
-        )
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseBank
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4DevelopmentBank, SelectedE3E4ForecastDesign, selected_e3_fit_target
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseBank
         design = SelectedE3E4ForecastDesign("forecast-design." + inputs.recipe.record_id, inputs.original_public_package,
             old.identity(allocation), inputs.original_preparation.mathematical_protocol, criterion,
             fit_target=selected_e3_fit_target(inputs.original_public_package))

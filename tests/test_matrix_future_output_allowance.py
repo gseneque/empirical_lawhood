@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import source_continuation as domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixResearchProgrammeSpecification
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import source_continuation as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixResearchProgrammeSpecification
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_matrix_programme_source_continuation import _plans, metadata_case  # noqa: F401
 from tests.test_matrix_completed_e4_continuation import _pin
 
@@ -87,12 +87,12 @@ def test_ordinary_continuation_retains_exact_original_operations(selections):
 
 @pytest.mark.parametrize('native_continuation', (False, True))
 def test_completed_output_record_reopens_both_original_terminal_contracts(metadata_case, native_continuation):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding
     from empirical_lawhood.api.matrix_programme_completed_continuation import read_source_continuation
     from empirical_lawhood.api.matrix_researcher_programme import _publish
-    from empirical_lawhood.runtime.development_controller_repair import DevelopmentControllerRepairTerminalEvent
-    from empirical_lawhood.runtime.native_continuation_execution import DevelopmentNativeContinuationTerminalEvent
-    from empirical_lawhood.runtime.recovery import RunRecoveryTerminalEvent, DevelopmentRunRecoveryTerminalEvent
+    from empirical_lawhood.execution.development_controller_repair import DevelopmentControllerRepairTerminalEvent
+    from empirical_lawhood.execution.native_continuation_execution import DevelopmentNativeContinuationTerminalEvent
+    from empirical_lawhood.execution.recovery import RunRecoveryTerminalEvent, DevelopmentRunRecoveryTerminalEvent
     original, request, target = _plans(metadata_case)
     selected = domain.MatrixProgrammeOutputContinuationSpecification(request.specification_id,
         request.predecessor, request.directory, 256 * 1024**2)

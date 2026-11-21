@@ -10,50 +10,29 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.api.codecs import load_authoring
-from empirical_lawhood.api.execution import (
-    _CatalogSemanticReplayBudget,
-    CampaignCapabilityError,
-    CampaignExecutionService,
-    CampaignRevealAuthorityError,
-)
+from empirical_lawhood.api.execution import _CatalogSemanticReplayBudget, CampaignCapabilityError, CampaignExecutionService, CampaignRevealAuthorityError
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
 from empirical_lawhood.api.models import IssuedCampaignPackage, assemble_issued_campaign_package
-from empirical_lawhood.api.results import (
-    CompileCampaignRequest,
-    OperationStatus,
-    RunCampaignRequest,
-)
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.execution import LocalScheduler
-from empirical_lawhood.infrastructure.recovery import decode_run_recovery_index
-from empirical_lawhood.kernel.authority import AuthorityAction, SourceAccessClass
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalizationError
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.approval import (
-    ApprovalCheckerRegistry,
-    AttestationResult,
-    CompleteApprovalService,
-    issue_approval_gate_attestation,
-)
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, StudyOperationAuthority
-from empirical_lawhood.runtime.compiler import compile_run_plan, lower_run_plan
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactGenericValidation,
-    ArtifactMaterialization,
-    CanonicalTaskReceipt,
-    ExternalRootContract,
-    LogicalArtifactIdentity,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, CandidateExecutionPlan, ExecutionTask, CandidateRunPlan
-from empirical_lawhood.runtime.study_issue import build_study_approval_proposal, prepare_draft_candidate_issue
-from empirical_lawhood.runtime.scientific_graph_preservation import prove_scientific_graph_parity
-from empirical_lawhood.runtime.recovery import CandidateRunRecoveryIndex, build_run_recovery_index
-from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
+from empirical_lawhood.api.results import CompileCampaignRequest, OperationStatus, RunCampaignRequest
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.execution.local.execution import LocalScheduler
+from empirical_lawhood.storage.recovery import decode_run_recovery_index
+from empirical_lawhood.science.identity.authority import AuthorityAction, SourceAccessClass
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalizationError
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.approval import ApprovalCheckerRegistry, AttestationResult, CompleteApprovalService, issue_approval_gate_attestation
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, StudyOperationAuthority
+from empirical_lawhood.execution.compiler import compile_run_plan, lower_run_plan
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactMaterialization, CanonicalTaskReceipt, ExternalRootContract, LogicalArtifactIdentity, ReceiptCheck
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, CandidateExecutionPlan, ExecutionTask, CandidateRunPlan
+from empirical_lawhood.execution.study_issue import build_study_approval_proposal, prepare_draft_candidate_issue
+from empirical_lawhood.execution.scientific_graph_preservation import prove_scientific_graph_parity
+from empirical_lawhood.execution.recovery import CandidateRunRecoveryIndex, build_run_recovery_index
+from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
 from tests.approval_support import FixedDecisionClock, deterministic_approval_signer
 from tests.runtime_platform.test_study_approval import _AttestationStore, _AuthorizationStore, _StudyProposalStore, _checker_registrations, _published_issue
 from tests.runtime_platform.test_study_issue import _Inspector

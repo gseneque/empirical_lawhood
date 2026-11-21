@@ -16,11 +16,11 @@ from html.parser import HTMLParser
 import re
 from typing import ClassVar
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256, validate_stable_id
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256, validate_stable_id
 
-from .genbank import NativeTeParentConstructV1
-from .records import ReportedSubstitutionV1
+from empirical_lawhood.adapters.physical.rubisco_kinetics.genbank import NativeTeParentConstructV1
+from empirical_lawhood.domains.rubisco.kinetics.records import ReportedSubstitutionV1
 
 DOI = "10.1074/jbc.M117.810861"
 SOURCE_SHA256 = "102a96a551bf11104b7ca7563572010adf8dc540a937165c671f23c618a24316"

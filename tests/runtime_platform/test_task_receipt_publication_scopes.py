@@ -1,12 +1,13 @@
 # SPDX-License-Identifier: MPL-2.0
 """Actual software custody under a bounded control directory; no fresh science."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 from dataclasses import replace
 from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
+from empirical_lawhood.science.records.status import OperationalStatus
+
 from tests.runtime_platform.test_execution_scheduler import _runtime
 
 
@@ -50,7 +51,7 @@ def test_new_receipts_do_not_exhaust_one_shared_control_directory(tmp_path, prot
         assert not refused and len(result.receipts) == 6 and len(set(observed)) == 6
         for receipt in result.receipts:
             relative = store._relative_path(receipt.run_id, receipt.task_id, receipt.attempt_id)
-            manifest = decode_artifact_manifest((tmp_path / (relative + '.manifest.json')).read_bytes())
+            manifest = resolve_artifact_sidecar_bytes(plane, (tmp_path / (relative + '.manifest.json')).read_bytes())
             assert manifest.publication.publication_scope.relative_root == _scope_for(receipt)
             assert manifest.logical.content_sha256 == receipt.fingerprint()
             assert (tmp_path / relative).read_bytes() == receipt.canonical_bytes()
@@ -73,7 +74,7 @@ def test_committed_receipts_retain_exact_original_scope_and_bytes(tmp_path, prot
         before = _inventory(root)
         for receipt in result.receipts:
             relative = store._relative_path(receipt.run_id, receipt.task_id, receipt.attempt_id)
-            manifest = decode_artifact_manifest((tmp_path / (relative + '.manifest.json')).read_bytes())
+            manifest = resolve_artifact_sidecar_bytes(store.plane, (tmp_path / (relative + '.manifest.json')).read_bytes())
             committed = store.commit(receipt, visibility_ceiling=manifest.logical.visibility_ceiling,
                                      outcome_access=manifest.logical.outcome_access)
             assert committed.created is False
@@ -92,7 +93,7 @@ def test_interrupted_receipt_intent_keeps_its_original_scope(tmp_path, protocol_
         result = scheduler.execute(protocol_fixture.run_plan.run_plan_id, protocol_fixture.execution_plan)
         receipt = result.receipts[0]
         relative = store._relative_path(receipt.run_id, receipt.task_id, receipt.attempt_id)
-        manifest = decode_artifact_manifest((tmp_path / (relative + '.manifest.json')).read_bytes())
+        manifest = resolve_artifact_sidecar_bytes(plane, (tmp_path / (relative + '.manifest.json')).read_bytes())
         # Remove only this disposable fixture receipt's publication. Original
         # output custody remains authentic; no provider is called by commit.
         (tmp_path / relative).unlink()
@@ -120,7 +121,7 @@ def test_interrupted_receipt_intent_keeps_its_original_scope(tmp_path, protocol_
         committed = store.commit(receipt, visibility_ceiling=manifest.logical.visibility_ceiling,
                                  outcome_access=manifest.logical.outcome_access)
         assert committed.created is True
-        received = decode_artifact_manifest((tmp_path / (relative + '.manifest.json')).read_bytes())
+        received = resolve_artifact_sidecar_bytes(plane, (tmp_path / (relative + '.manifest.json')).read_bytes())
         expected = _scope_for(receipt).rsplit('/', 1)[0] if legacy else _scope_for(receipt)
         assert received.publication.publication_scope.relative_root == expected
         assert store.read(receipt.run_id, receipt.task_id, receipt.attempt_id) == receipt

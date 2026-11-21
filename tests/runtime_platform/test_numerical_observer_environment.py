@@ -17,12 +17,12 @@ from types import MappingProxyType
 
 import pytest
 
-from empirical_lawhood.infrastructure.isolated_native_subwork import selected_environment_sha256
-from empirical_lawhood.infrastructure.numerical_provenance import numerical_observer_environment, selected_worker_environment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.isolated_native_subwork import IsolatedNativeEntrySelection
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedNativeWork, PreparedWorkerEnvironment
+from empirical_lawhood.execution.local.isolated_native_subwork import selected_environment_sha256
+from empirical_lawhood.storage.numerical_provenance import numerical_observer_environment, selected_worker_environment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.isolated_native_subwork import IsolatedNativeEntrySelection
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.prepared_native_invocation import PreparedNativeWork, PreparedWorkerEnvironment
 
 
 KMP = "KMP_DUPLICATE_LIB_OK"
@@ -178,8 +178,8 @@ def test_import_default_selection_does_not_weaken_existing_exact_full_environmen
 
 
 def test_runtime_pool_order_does_not_change_identity_or_drop_observations(monkeypatch):
-    from empirical_lawhood.infrastructure.numerical_provenance import numerical_runtime_observation
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.storage.numerical_provenance import numerical_runtime_observation
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
 
     # Distinct paths sharing a backend, an unknown field and an exact duplicate
     # all remain part of the census; only list order is nonsemantic.
@@ -212,8 +212,8 @@ else:
 # Compare the same loaded engines after the two different entry sequences.
 import scipy.linalg
 from empirical_lawhood.api.matrix_programme_e2 import assemble_programme_e2
-from empirical_lawhood.infrastructure.numerical_provenance import numerical_runtime_observation
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.storage.numerical_provenance import numerical_runtime_observation
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from threadpoolctl import threadpool_info
 observed = canonical_json_bytes(numerical_runtime_observation()).decode()
 print(json.dumps({"observation": observed, "actual_pools": threadpool_info()}))

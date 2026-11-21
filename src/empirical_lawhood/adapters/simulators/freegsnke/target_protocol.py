@@ -7,60 +7,24 @@ from dataclasses import fields
 from hashlib import sha256
 from typing import Final
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.candidate_compiler import (
-    CandidateGraphEdge,
-    CandidateGraphExternalInput,
-    CandidateGraphNode,
-    CandidateScientificGraph,
-    ContentIdentityPolicy,
-    ScientificInputRole,
-)
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityRegistration
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-)
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.candidate_compiler import CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ScientificInputRole
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityRegistration
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, CampaignRuntimeProvider, ExternalInputPayload
 
-from .contracts import FreeGsnkePhase, FreeGsnkeProcessRequest, FreeGsnkeSourceBinding, FreeGsnkeTargetProcessResponse
-from .design import FreeGsnkeActionDesign, FreeGsnkePhaseRequestRoster
-from .generation_protocol import (
-    FREEGSNKE_SOURCE_ARTIFACT_ID,
-    FreeGsnkeEpisodeExecutor,
-    build_freegsnke_generation_protocol,
-    freegsnke_generation_registry,
-    freegsnke_generation_runners,
-)
-from .registry import (
-    FREEGSNKE_CAPABILITY_VERSION,
-    FREEGSNKE_DEVELOPMENT_CAPABILITY_KEY,
-    FREEGSNKE_EVALUATION_CAPABILITY_KEY,
-)
-from .target_analysis import FreeGsnkePhaseReduction, FreeGsnkeTargetReductionConfig, reduce_freegsnke_phase_panel
+from empirical_lawhood.domains.fusion.freegsnke.contracts import FreeGsnkePhase, FreeGsnkeProcessRequest, FreeGsnkeSourceBinding, FreeGsnkeTargetProcessResponse
+from empirical_lawhood.domains.fusion.freegsnke.design import FreeGsnkeActionDesign, FreeGsnkePhaseRequestRoster
+from empirical_lawhood.adapters.simulators.freegsnke.generation_protocol import FREEGSNKE_SOURCE_ARTIFACT_ID, FreeGsnkeEpisodeExecutor, build_freegsnke_generation_protocol, freegsnke_generation_registry, freegsnke_generation_runners
+from empirical_lawhood.adapters.simulators.freegsnke.registry import FREEGSNKE_CAPABILITY_VERSION, FREEGSNKE_DEVELOPMENT_CAPABILITY_KEY, FREEGSNKE_EVALUATION_CAPABILITY_KEY
+from empirical_lawhood.domains.fusion.freegsnke.target_analysis import FreeGsnkePhaseReduction, FreeGsnkeTargetReductionConfig, reduce_freegsnke_phase_panel
 
 
 FREEGSNKE_DEVELOPMENT_REDUCTION_KEY: Final = "freegsnke.reduce-development-panel"

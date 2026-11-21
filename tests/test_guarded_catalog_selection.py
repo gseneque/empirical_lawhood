@@ -8,9 +8,9 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
-from empirical_lawhood.infrastructure.artifacts import ExternalRootUnavailable, FilesystemState, GuardedExternalRoot
-from empirical_lawhood.infrastructure.guarded_catalog import GuardedCatalogAccess, select_operator_catalog
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
+from empirical_lawhood.storage.artifacts import ExternalRootUnavailable, FilesystemState, GuardedExternalRoot
+from empirical_lawhood.storage.guarded_catalog import GuardedCatalogAccess, select_operator_catalog
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
 
 
 @pytest.fixture
@@ -142,8 +142,8 @@ def test_sqlite_uri_characters_remain_literal_selected_filename(selected):
 
 
 def test_trusted_dataset_view_uses_selected_guard_without_deriving_new_trust(selected):
-    from empirical_lawhood.infrastructure.dataset_catalog_access import DatasetCatalogReadSessionProvider
-    from empirical_lawhood.runtime.datasets import DatasetCatalogSnapshot
+    from empirical_lawhood.storage.dataset_catalog_access import DatasetCatalogReadSessionProvider
+    from empirical_lawhood.execution.datasets import DatasetCatalogSnapshot
     from tests.infrastructure.test_dataset_catalog_access import _projection_anchor
 
     access, state = selected
@@ -160,8 +160,8 @@ def test_trusted_dataset_view_uses_selected_guard_without_deriving_new_trust(sel
 
 
 def test_trusted_dataset_owner_refuses_a_different_path(selected):
-    from empirical_lawhood.infrastructure.dataset_catalog_access import DatasetCatalogReadSessionProvider
-    from empirical_lawhood.runtime.datasets import DatasetCatalogSnapshot
+    from empirical_lawhood.storage.dataset_catalog_access import DatasetCatalogReadSessionProvider
+    from empirical_lawhood.execution.datasets import DatasetCatalogSnapshot
     from tests.infrastructure.test_dataset_catalog_access import _projection_anchor
 
     access, _ = selected
@@ -193,8 +193,8 @@ def test_persisted_wal_header_refuses_without_creating_neighbors(selected):
 @pytest.mark.parametrize("read_only_supplied", (False, True))
 def test_selected_service_owner_replaces_foreign_or_omitted_factories(selected, read_only_supplied):
     from empirical_lawhood.api.execution import CampaignExecutionService
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-    from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
 
     access, _ = selected
 

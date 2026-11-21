@@ -9,9 +9,10 @@ import numpy as np
 
 from empirical_lawhood.api.authoring_handoff import write_exclusive_record
 from empirical_lawhood.api.authoring_output import report_incomplete_output
-from empirical_lawhood.api.finite_operands import saved_matrix_arrays_import, saved_matrix_arrays_export, preparation_bridge_fits
-from empirical_lawhood.adapters.methods.finite_response_law.retained_entry_readiness.current_input import current_readiness
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.finite_response_law.current_preparation import preparation_bridge_fits
+from empirical_lawhood.api.finite_operands import saved_matrix_arrays_import, saved_matrix_arrays_export
+from empirical_lawhood.domains.matrix.finite_response_law.retained_entry_readiness.current_input import current_readiness
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def _json_value(value):
@@ -34,9 +35,9 @@ def current_preparation_readiness(*, manifest_path: Path, arrays_path: Path,
     if output_dir.exists() or output_dir.is_symlink():
         raise FileExistsError("readiness output must use a fresh directory")
     from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance, preflight_matrix_output_directory
-    from empirical_lawhood.infrastructure.retained_analysis import publish_retained_analysis
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.runtime.retained_analysis import RetainedAnalysisMember
+    from empirical_lawhood.storage.retained_analysis import publish_retained_analysis
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.execution.retained_analysis import RetainedAnalysisMember
     from hashlib import sha256
     preflight_matrix_output_directory(directory=output_dir, artifact_writer=artifact_writer, project_root=project_root)
     provenance = capture_matrix_provenance(project_root=project_root)

@@ -10,12 +10,12 @@ import sys
 import pytest
 
 from empirical_lawhood.api import codecs
-from empirical_lawhood.infrastructure import bounded_io, dataset_io, repository_identity
-from empirical_lawhood.infrastructure.artifacts import GuardedExternalRoot
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.dataset_authority import DatasetStorageScope
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.storage import bounded_io, dataset_io, repository_identity
+from empirical_lawhood.storage.artifacts import GuardedExternalRoot
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.dataset_authority import DatasetStorageScope
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 
 
 EXPECTED = b"authenticated original bytes\n"

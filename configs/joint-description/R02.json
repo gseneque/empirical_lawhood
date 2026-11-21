@@ -1,0 +1,172 @@
+{
+  "actions": [
+    0.0,
+    0.5,
+    1.0
+  ],
+  "calibration_unit_ids": [
+    "unit.r02.calibration.0000",
+    "unit.r02.calibration.0001",
+    "unit.r02.calibration.0002",
+    "unit.r02.calibration.0003",
+    "unit.r02.calibration.0004",
+    "unit.r02.calibration.0005",
+    "unit.r02.calibration.0006",
+    "unit.r02.calibration.0007",
+    "unit.r02.calibration.0008",
+    "unit.r02.calibration.0009",
+    "unit.r02.calibration.0010",
+    "unit.r02.calibration.0011",
+    "unit.r02.calibration.0012",
+    "unit.r02.calibration.0013",
+    "unit.r02.calibration.0014",
+    "unit.r02.calibration.0015"
+  ],
+  "descriptions": [
+    {
+      "features": [
+        "joint_prediction"
+      ],
+      "forecast_work_basis": "Authored conservative per-receiver/horizon dense-work proxy:100*(8+2)^3 forced flow +100*8^3*1 preparation/history flows +20*8^2*8 projection +20*max(8,8)*min(8,8)^2 least-squares reconstruction. No sharing credit; not an operation-count proof or runtime measurement.",
+      "forecast_work_unit": "authored-scalar-operation",
+      "forecast_work_units": 171680,
+      "id": "joint",
+      "interface_dimension": 0,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "fixed",
+      "rationale": "All eight present voltages, with frozen component metrology.",
+      "state_dimension": 8
+    },
+    {
+      "features": [
+        "partition_prediction"
+      ],
+      "forecast_work_basis": "Authored conservative per-receiver/horizon dense-work proxy:100*(8+2)^3 forced flow +100*8^3*1 preparation/history flows +20*8^2*2 projection +20*max(8,2)*min(8,2)^2 least-squares reconstruction. No sharing credit; not an operation-count proof or runtime measurement.",
+      "forecast_work_unit": "authored-scalar-operation",
+      "forecast_work_units": 154400,
+      "id": "partitioned",
+      "interface_dimension": 0,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "fixed",
+      "rationale": "Two local charge-weighted mean voltages; no hidden within-partition contrast.",
+      "state_dimension": 2
+    },
+    {
+      "features": [
+        "interface_prediction"
+      ],
+      "forecast_work_basis": "Authored conservative per-receiver/horizon dense-work proxy:100*(8+2)^3 forced flow +100*8^3*1 preparation/history flows +20*8^2*4 projection +20*max(8,4)*min(8,4)^2 least-squares reconstruction. No sharing credit; not an operation-count proof or runtime measurement.",
+      "forecast_work_unit": "authored-scalar-operation",
+      "forecast_work_units": 158880,
+      "id": "interface",
+      "interface_dimension": 2,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "fixed",
+      "rationale": "Local means plus the two physical interface endpoint voltages.",
+      "state_dimension": 2
+    },
+    {
+      "features": [
+        "memory_prediction"
+      ],
+      "forecast_work_basis": "Authored conservative per-receiver/horizon dense-work proxy:100*(8+2)^3 forced flow +100*8^3*6 preparation/history flows +20*8^2*12 projection +20*max(8,12)*min(8,12)^2 least-squares reconstruction. No sharing credit; not an operation-count proof or runtime measurement.",
+      "forecast_work_unit": "authored-scalar-operation",
+      "forecast_work_units": 437920,
+      "id": "memory",
+      "interface_dimension": 0,
+      "memory_dimension": 2,
+      "memory_samples": 5,
+      "model": "fixed",
+      "rationale": "Local means plus five pre-decision lagged observations; rank and conditioning are reported.",
+      "state_dimension": 2
+    }
+  ],
+  "economics": {
+    "accounting_unit": "authored-cost-unit",
+    "action_price": "0",
+    "compute_price": "0.0001",
+    "interface_price": "0.001",
+    "maximum_control_regret": "1",
+    "memory_price": "0.001",
+    "minimum_coverage": "0.9",
+    "missing_penalty": "1000000",
+    "reuse_count": 1,
+    "ridge_penalty": "0.001",
+    "safety_penalty": "1000000",
+    "state_price": "0.001"
+  },
+  "evaluation_unit_ids": [
+    "unit.r02.evaluation.0000",
+    "unit.r02.evaluation.0001",
+    "unit.r02.evaluation.0002",
+    "unit.r02.evaluation.0003",
+    "unit.r02.evaluation.0004",
+    "unit.r02.evaluation.0005",
+    "unit.r02.evaluation.0006",
+    "unit.r02.evaluation.0007",
+    "unit.r02.evaluation.0008",
+    "unit.r02.evaluation.0009",
+    "unit.r02.evaluation.0010",
+    "unit.r02.evaluation.0011",
+    "unit.r02.evaluation.0012",
+    "unit.r02.evaluation.0013",
+    "unit.r02.evaluation.0014",
+    "unit.r02.evaluation.0015",
+    "unit.r02.evaluation.0016",
+    "unit.r02.evaluation.0017",
+    "unit.r02.evaluation.0018",
+    "unit.r02.evaluation.0019",
+    "unit.r02.evaluation.0020",
+    "unit.r02.evaluation.0021",
+    "unit.r02.evaluation.0022",
+    "unit.r02.evaluation.0023",
+    "unit.r02.evaluation.0024",
+    "unit.r02.evaluation.0025",
+    "unit.r02.evaluation.0026",
+    "unit.r02.evaluation.0027",
+    "unit.r02.evaluation.0028",
+    "unit.r02.evaluation.0029",
+    "unit.r02.evaluation.0030",
+    "unit.r02.evaluation.0031"
+  ],
+  "family_id": "R02",
+  "horizons": [
+    0.25,
+    1.0,
+    3.0
+  ],
+  "parameters": {
+    "component_spread": 0.35,
+    "history_depth": 6,
+    "history_lag_s": 0.1,
+    "initial_voltage_max_v": 1.0,
+    "initial_voltage_min_v": 0.0,
+    "n_cells": 8,
+    "partitions": 2
+  },
+  "question": "For coupled RC preparations, which finite information descriptions meet receiver accuracy and control utility at each horizon?",
+  "receiver_policies": {
+    "mean_voltage": {
+      "max_abs_error": 0.03,
+      "safety_lower": 0.0,
+      "safety_upper": 1.25,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "V",
+      "weight": 1.0
+    },
+    "terminal_voltage": {
+      "max_abs_error": 0.03,
+      "safety_lower": 0.0,
+      "safety_upper": 1.25,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "V",
+      "weight": 1.0
+    }
+  },
+  "seed": 20261114
+}

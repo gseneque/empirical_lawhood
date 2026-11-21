@@ -10,23 +10,14 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.api.execution import (
-    CampaignCapabilityError,
-    CampaignExecutionService,
-    CampaignValidationError,
-    _provider_input_location,
-)
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ArtifactPlaneError
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ArtifactStreamWriteRequest,
-)
-from empirical_lawhood.runtime.plans import ExternalInputSpec
-from empirical_lawhood.runtime.providers import ExternalInputPayload
+from empirical_lawhood.api.execution import CampaignCapabilityError, CampaignExecutionService, CampaignValidationError, _provider_input_location
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ArtifactPlaneError
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactStreamWriteRequest
+from empirical_lawhood.execution.plans import ExternalInputSpec
+from empirical_lawhood.execution.providers import ExternalInputPayload
 from tests.runtime_platform.test_execution_scheduler import _plane
 
 RUN = 'run.input-layout'

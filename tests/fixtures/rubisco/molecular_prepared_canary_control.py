@@ -5,12 +5,12 @@ The root selects the guarded plane, actual interpreter/stock and ordinary
 contact. This composition performs no native effect and adds no launcher.
 """
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_contracts import DurableRawFileCensus, DurableUnitReturn
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_roster import json_output, raw_output
-from empirical_lawhood.adapters.methods.rubisco_insilico_free_energy.raw_coupled_return import CoupledEvaluationRequest, return_outputs
-from empirical_lawhood.infrastructure.prepared_native_invocation import NativeInputPublication, prepare_native_invocation, validate_prepared_native_invocation
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_contracts import DurableRawFileCensus, DurableUnitReturn
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_roster import json_output, raw_output
+from empirical_lawhood.domains.rubisco.rubisco_insilico_free_energy.raw_coupled_return import CoupledEvaluationRequest, return_outputs
+from empirical_lawhood.storage.prepared_native_invocation import NativeInputPublication, prepare_native_invocation, validate_prepared_native_invocation
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.execution.native_effects import NativeEffectContact
 
 
 def prepare_control(plane, selected, provenance, *, run_id, task_id, contact_id,

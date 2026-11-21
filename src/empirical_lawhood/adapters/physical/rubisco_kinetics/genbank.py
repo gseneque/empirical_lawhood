@@ -11,7 +11,7 @@ from hashlib import sha256
 import re
 from typing import ClassVar
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256
 
 MG000148_SOURCE_SHA256 = "62f8c50c51ba007b4d6b99273b9c397ceea85d97985449f6c0bcef376e51b305"
 MAX_GENBANK_BYTES = 128 * 1024

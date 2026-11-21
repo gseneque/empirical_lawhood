@@ -12,7 +12,7 @@ from typer.testing import CliRunner
 
 from empirical_lawhood.adapters.simulators.gym_torax_native.native_quickstart import GymToraxNativeQuickstart
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "programmes/energy/fusion/workflows/tokamak-control-response/config.json"

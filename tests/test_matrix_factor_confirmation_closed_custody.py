@@ -10,25 +10,19 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import (
-    compact_bindings as owner, compact_preparation as domain, compact_records as r,
-    compact_science as science,
-)
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_bindings as owner, compact_preparation as domain, compact_records as r, compact_science as science
 from empirical_lawhood.api import matrix_factor_confirmation_compact_read as reader
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.compiler import compile_run_plan, lower_run_plan
-from empirical_lawhood.runtime.execution import OperationalFailureClass
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.plans import ExecutionPlan
-from empirical_lawhood.runtime.prospective_experiment import SPECIFICATION_FILENAME, source_filename
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.recovery import (
-    OperationalFailureDiagnostic, RecoveryTerminalAttempt, RecoveryTerminalDisposition,
-    RunRecoveryIndex, RunRecoveryTerminalEvent, TaskRecoveryDisposition, TaskRecoveryEvent,
-)
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.compiler import compile_run_plan, lower_run_plan
+from empirical_lawhood.execution.execution import OperationalFailureClass
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.plans import ExecutionPlan
+from empirical_lawhood.execution.prospective_experiment import SPECIFICATION_FILENAME, source_filename
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.recovery import OperationalFailureDiagnostic, RecoveryTerminalAttempt, RecoveryTerminalDisposition, RunRecoveryIndex, RunRecoveryTerminalEvent, TaskRecoveryDisposition, TaskRecoveryEvent
 from tests.test_matrix_factor_confirmation_compact_core import compact_products
 from tests.test_matrix_factor_confirmation_compact_declarative import _case
 from tests.test_matrix_factor_confirmation_eligibility import provenance, stock  # noqa: F401
@@ -149,8 +143,8 @@ def closed(case, *, complete=(), kind='failed', publish=False):
             store.append_event(index, event)
         # Publication uses the same immutable terminal contract as the runtime;
         # the original store owns serialization, paths and member manifests.
-        from empirical_lawhood.runtime.execution import OperationalAttempt, TaskAttemptDisposition
-        from empirical_lawhood.kernel.status import OperationalStatus
+        from empirical_lawhood.execution.execution import OperationalAttempt, TaskAttemptDisposition
+        from empirical_lawhood.science.records.status import OperationalStatus
         attempts = tuple(OperationalAttempt(row.attempt_id, index.run_id, row.task_id, row.ordinal,
             TaskAttemptDisposition(row.disposition.value), row.reason_code, None, None) for row in summaries)
         store.record_terminal(index, status=OperationalStatus(terminal.operational_status), attempts=attempts, receipts=())
@@ -206,12 +200,10 @@ def test_closed_population_refuses_changed_custody_and_thinned_denominators(case
 @pytest.mark.parametrize('damage', (None, 'foreign-input', 'missing-dependency', 'revoked'))
 def test_unreceipted_contact_rechecks_actual_frozen_input_members_before_dispatch(case,monkeypatch,damage):
     """Actual guarded members; the dependency receipt and dispatch are test metadata."""
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.artifacts import (
-        ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt,
-    )
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
     task=next(row for row in case.plan.tasks if row.task_id==r.NAMESPACE+'.'+case.sources[0].root_id+'.history')
     _,_,records=domain._derive(case.spec,case.selected)
     operands={record.fingerprint():record for _,record in records}
@@ -352,7 +344,7 @@ def test_public_closed_read_refuses_missing_changed_and_late_custody(case,monkey
         original=science.reduce_closed_population
         def changed(*args,**kwargs):
             value=original(*args,**kwargs)
-            from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
+            from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
             relative=ExternalNativeEffectContactStore._path(case.index.run_id,r.NAMESPACE+'.'+case.sources[0].root_id+'.history')
             path=case.plane.root.resolve(relative,for_write=False)
             path.parent.mkdir(parents=True,exist_ok=True)

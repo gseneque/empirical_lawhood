@@ -7,23 +7,21 @@ import pytest
 
 from empirical_lawhood.api import recursive_execution as api
 from empirical_lawhood.api.matrix_native_read_custody import _expected_contact
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_bindings as bindings
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as records
-from empirical_lawhood.infrastructure.execution import LocalScheduler
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import (ArtifactGenericValidation, ArtifactMaterialization,
-    CanonicalTaskReceipt, LogicalArtifactIdentity)
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import (OperationalAttempt, TaskAttemptDisposition,
-    VerifiedArtifactInput, dependency_artifact_inputs)
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, ExecutionTask, ProtocolExecutionTask
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_bindings as bindings
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as records
+from empirical_lawhood.execution.local.execution import LocalScheduler
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactMaterialization, CanonicalTaskReceipt, LogicalArtifactIdentity
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import OperationalAttempt, TaskAttemptDisposition, VerifiedArtifactInput, dependency_artifact_inputs
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, ExecutionTask, ProtocolExecutionTask
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_matrix_native_utility import utility_case
 
 

@@ -11,21 +11,21 @@ from dataclasses import replace
 from functools import partial
 from hashlib import sha256
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
-from empirical_lawhood.adapters.methods.matrix_source_evidence import MatrixSourcePipelineEvidence, reference, source_declarations
-from .recursive_qualified_parents import _authenticate_prior_execution
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.metatheory import MetatheoryApplicability
-from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceGateEvidence, ScientificSourceQualificationResult, ScientificSourceQualificationSpec
-from empirical_lawhood.planning.source_pipelines import SourcePipelineQualificationReceipt
-from empirical_lawhood.planning.study_authoring import StudyDraft
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteResult
-from empirical_lawhood.runtime.source_pipelines import plan_source_pipeline_resume
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
+from empirical_lawhood.domains.matrix.matrix_source_evidence import MatrixSourcePipelineEvidence, reference, source_declarations
+from empirical_lawhood.api.recursive_qualified_parents import _authenticate_prior_execution
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.structural_claims import MetatheoryApplicability
+from empirical_lawhood.design.scientific_source_qualification import ScientificSourceGateEvidence, ScientificSourceQualificationResult, ScientificSourceQualificationSpec
+from empirical_lawhood.design.source_pipelines import SourcePipelineQualificationReceipt
+from empirical_lawhood.design.study_authoring import StudyDraft
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteResult
+from empirical_lawhood.execution.source_pipelines import plan_source_pipeline_resume
 
 
 def _genuine_context(package, execution_plan, units):
@@ -66,7 +66,7 @@ def _owner_scope(*, parent_evidence, binding, package, execution_plan, writer):
     # Issued lowering retains exact schema/digest but may omit these optional
     # static fields. Authenticate the actual input with the complete bounded
     # blind/prospective contract, rather than infer its lane from omissions.
-    from .matrix_selected_runtime import _published_input
+    from empirical_lawhood.api.matrix_selected_runtime import _published_input
     strict=replace(external,expected_size_bytes=len(config.canonical_bytes()),expected_media_type="application/json",
         expected_outcome_access=OutcomeAccess.OUTCOME_BLIND,expected_visibility_ceiling=VisibilityCeiling.PROSPECTIVE)
     if _published_input(writer,binding.run_id,strict,type(config)) != config:
@@ -127,8 +127,8 @@ def retained_source_publications(*, writer, package, plan, selection, evidence, 
     Explicit retained metadata needs no whole-plan input scan. Missing handles
     use only matching original external inputs, once per logical input.
     """
-    from .selected_e4_bank_recipe import _publication_from_manifest
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
 
     expected = matrix_source_publication_references(evidence.qualification_config.specification, result, evidence)
     selected = dict(selection.metadata_publications)
@@ -192,10 +192,7 @@ def authenticate_matrix_source_qualification(*, writer, specification, result, p
             or any(value.physical_unit_count != len(spec.physical_unit_ids) for value in receipt.edge_accounting)):
         raise PermissionError("Matrix source qualification substitutes its actual profile/source/materialization/observation/cutoff or complete units")
     owned = prepared_source_custody is not None or prepared_source_selection is not None
-    from .prepared_source_replay import (
-        authenticated_prepared_source_replay, is_prepared_source_result,
-        partition_prepared_source_publications,
-    )
+    from empirical_lawhood.api.prepared_source_replay import authenticated_prepared_source_replay, is_prepared_source_result, partition_prepared_source_publications
     if is_prepared_source_result(result) and not owned:
         if consumer_programme is None:
             raise PermissionError("prepared source consumer replay requires its actual downstream programme")
@@ -203,8 +200,8 @@ def authenticate_matrix_source_qualification(*, writer, specification, result, p
         with authenticated_prepared_source_replay(writer=writer, executions=executions,
                 bootstrap_publications=bootstrap, codecs=codecs,
                 current_access=prepared_source_current_access) as original:
-            from .matrix_prepared_source_runtime import _validate_consumer_programme
-            from .matrix_prepared_source_experiment import pipeline_evidence
+            from empirical_lawhood.api.matrix_prepared_source_runtime import _validate_consumer_programme
+            from empirical_lawhood.api.matrix_prepared_source_experiment import pipeline_evidence
             _validate_consumer_programme(original.selection.bank, consumer_programme)
             actual_pipeline, actual_result = pipeline_evidence(original.selection)
             if (actual_pipeline != pipeline or actual_result != result
@@ -220,9 +217,8 @@ def authenticate_matrix_source_qualification(*, writer, specification, result, p
             original.original_input_access.require_current()
         return
     if owned:
-        from .matrix_prepared_source_runtime import (
-            _prepared_gate_product_context, validate_prepared_gate_product, validate_prepared_terminal_product)
-        from .current_task_custody import CurrentIssuedTaskCustody
+        from empirical_lawhood.api.matrix_prepared_source_runtime import _prepared_gate_product_context, validate_prepared_gate_product, validate_prepared_terminal_product
+        from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
         if (type(prepared_source_custody) is not CurrentIssuedTaskCustody
                 or prepared_source_custody._current_package_plan is None or consumer_programme is not None):
             raise PermissionError("prepared source owning replay requires its paired live original context")
@@ -237,9 +233,12 @@ def authenticate_matrix_source_qualification(*, writer, specification, result, p
         raise PermissionError("Matrix source qualification loses its complete original pipeline, qualification and gate producers")
     declarations = source_declarations()
     by_ref = {value.record: value for value in executions}
-    codecs = {**codecs, SourcePipelineQualificationReceipt.SCHEMA: SourcePipelineQualificationReceipt,
-        ScientificSourceQualificationResult.SCHEMA: ScientificSourceQualificationResult,
-        ScientificSourceGateEvidence.SCHEMA: ScientificSourceGateEvidence}
+    from empirical_lawhood.storage.contracts.record_codecs import RecordCodecCatalog
+    source_types = (SourcePipelineQualificationReceipt, ScientificSourceQualificationResult, ScientificSourceGateEvidence)
+    if isinstance(codecs, RecordCodecCatalog):
+        codecs = codecs.with_record_types(source_types)
+    else:
+        codecs = {**codecs, **{kind.SCHEMA: kind for kind in source_types}}
     for selected_config, product, declaration, field in ((config, receipt, declarations[0], "receipt_id"),
             (qualification, result, declarations[1], "result_id")):
         authenticated = _authenticate_prior_execution(by_ref[reference(product, field)], writer, codecs,
@@ -271,11 +270,11 @@ def authenticate_matrix_source_qualification(*, writer, specification, result, p
             publications=publications, read_scope=read_scope)
     if any(gate.method.capability_key.startswith("matrix-source.prepared-finite-dt.") for gate in result.gate_evidence):
         if owned:
-            from .matrix_prepared_source_runtime import authenticate_owning_prepared_source_prerequisite
+            from empirical_lawhood.api.matrix_prepared_source_runtime import authenticate_owning_prepared_source_prerequisite
             authenticate_owning_prepared_source_prerequisite(writer=writer, selection=prepared_source_selection,
                 result=result, pipeline=pipeline, read_scope=read_scope, product_custody=prepared_source_custody)
         else:
-            from .matrix_prepared_source_runtime import authenticate_installed_prepared_source_prerequisite
+            from empirical_lawhood.api.matrix_prepared_source_runtime import authenticate_installed_prepared_source_prerequisite
             authenticate_installed_prepared_source_prerequisite(writer=writer, result=result, pipeline=pipeline,
                 publications=publications, read_scope=read_scope, consumer_programme=consumer_programme)
     if owned:

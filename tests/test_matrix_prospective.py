@@ -8,24 +8,22 @@ import shutil
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_prospective import science
-from empirical_lawhood.adapters.methods.matrix_prospective.example import example_source
-from empirical_lawhood.adapters.methods.matrix_prospective.records import (
-    BRANCHES, MatrixProgrammeRole, identity,
-)
-from empirical_lawhood.adapters.methods.matrix_prospective.recursive_translation import prospective_draft
+from empirical_lawhood.domains.matrix.matrix_prospective import science
+from empirical_lawhood.domains.matrix.matrix_prospective.example import example_source
+from empirical_lawhood.domains.matrix.matrix_prospective.records import BRANCHES, MatrixProgrammeRole, identity
+from empirical_lawhood.domains.matrix.matrix_prospective.recursive_translation import prospective_draft
 from empirical_lawhood.api import matrix_numerical_provenance as provenance_owner
 from empirical_lawhood.api import recursive_authoring as author
 from empirical_lawhood.api import recursive_execution as execution
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
 from tests.test_recursive_public_service import _plane as _standard_plane
 
 def _plane(root):
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
 
     plane = _standard_plane(root)
     plane.validators = ArtifactProfileValidatorRegistry(binary_codecs=MATRIX_STORAGE_CODECS)
@@ -65,7 +63,7 @@ def prepare(tmp_path, selected_source):
 
 
 def contact_store(plane, plan):
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
     return ExternalNativeEffectContactStore(plane=plane,
         execution_plan=ObjectIdentity.from_record(plan.execution_plan_id, plan),
         visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY, outcome_access=OutcomeAccess.DEVELOPMENT_VISIBLE)
@@ -93,9 +91,9 @@ def retain_selected_fixture(plane, name):
 
 def test_installed_origin_commitment_branches_independent_negative_and_portable_recovery(
         tmp_path, monkeypatch, selected_source):
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-    from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixIndependentAssessment
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixIndependentAssessment
 
     plane, draft, bindings, directory = prepare(tmp_path, selected_source)
     authored = author.author_recursive_wave(draft=draft, project_root=ROOT, artifact_writer=plane,
@@ -153,8 +151,8 @@ def test_installed_origin_commitment_branches_independent_negative_and_portable_
 
 def test_terminal_persistence_failure_recovers_all_native_receipts_after_relocation(
         tmp_path, monkeypatch, selected_source):
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
     plane, draft, bindings, directory = prepare(tmp_path, selected_source)
     author.author_recursive_wave(draft=draft, project_root=ROOT, artifact_writer=plane,
         output_dir=directory, input_bindings=bindings)
@@ -185,8 +183,8 @@ def test_terminal_persistence_failure_recovers_all_native_receipts_after_relocat
 
 def test_first_branch_receipt_and_unentered_second_branch_survive_failed_parent_without_replay(
         tmp_path, monkeypatch, selected_source):
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
     plane, draft, bindings, directory = prepare(tmp_path, selected_source)
     author.author_recursive_wave(draft=draft, project_root=ROOT, artifact_writer=plane,
         output_dir=directory, input_bindings=bindings)
@@ -290,7 +288,7 @@ def test_protocol_refuses_role_scope_and_numerical_substitution(defect):
                                                        root_ids=protocol.preparation_scope.root_ids))
         elif defect.startswith("calibration-"):
             from decimal import Decimal
-            from empirical_lawhood.kernel.time import CausalPhase
+            from empirical_lawhood.science.models.time import CausalPhase
             cutoff = protocol.calibration_scope.information_cutoff
             changes = {"calibration-phase": {"phase": CausalPhase.POST_OUTCOME},
                        "calibration-coordinate": {"coordinate": Decimal(100)},
@@ -334,8 +332,8 @@ def test_scoped_reader_preserves_real_prospective_assessment_and_complete_refusa
     from hashlib import sha256
     import json
     import tracemalloc
-    from empirical_lawhood.adapters.methods.matrix_prospective.operation_bindings import _consume_array
-    from empirical_lawhood.infrastructure import matrix_array_io
+    from empirical_lawhood.domains.matrix.matrix_prospective.operation_bindings import _consume_array
+    from empirical_lawhood.adapters.matrix_storage import matrix_array_io
     from tests.test_matrix_dataset_readers import real_port
 
     original = example_source()

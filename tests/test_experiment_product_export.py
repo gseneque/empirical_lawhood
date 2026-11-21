@@ -6,13 +6,14 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_acquisition import PROTOCOL_ID
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_exports import NativeTrainingBankExportSelection
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_records import NativeTrainingAcquisitionSpecification
+from empirical_lawhood.domains.matrix.matrix_factor_response.extension import EXTENSION as _extension_owner_1
+EXPERIMENT_PROTOCOL_DECLARATIONS = _extension_owner_1.protocols
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_acquisition import PROTOCOL_ID
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_exports import NativeTrainingBankExportSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_records import NativeTrainingAcquisitionSpecification
 from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding, validate_experiment_runtime_binding
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
 
 
 def protocol():
@@ -62,7 +63,7 @@ def test_installed_export_only_composition_keeps_common_development_lifecycle():
 def test_installed_binding_index_validates_each_exact_tuple_once_and_keeps_context_checks(monkeypatch):
     from empirical_lawhood.api import experiment_runtime_bindings as owner
     from empirical_lawhood.api import generated_experiment_runtime_bindings as installed
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+    from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 
     selected = protocol()
     rows = installed.EXPERIMENT_RUNTIME_BINDINGS
@@ -103,7 +104,7 @@ def test_public_export_selection_is_registered_configuration_without_task_loweri
 
 
 def test_export_shape_cannot_be_used_as_an_acquisition_request():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_acquisition import bind_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_acquisition import bind_inputs
     selected=NativeTrainingBankExportSelection('export.disclosed-training','banks.disclosed-training','exports/disclosed-training')
     with pytest.raises(TypeError,match='exact acquisition request'):
         bind_inputs(object(),{'request':selected})

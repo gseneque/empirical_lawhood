@@ -1,0 +1,13 @@
+{
+  "schema": "el-v1/removed-forwarding-apis/1",
+  "removals": [
+    {
+      "module": "empirical_lawhood.api.domain_composition.matrix_configured_protected_response",
+      "symbol": "materialize_configured_protected_e3_inputs",
+      "reason": "Inherited forwarding function referred to a nonexistent derivation function; no source or documentation consumer remained. Removed instead of creating a backwards compatibility shim.",
+      "current_owner": "empirical_lawhood.api.domain_composition.matrix_configured_protected_response.derivation",
+      "current_api": "derive_input_selection",
+      "validation": "AST checked; exact current protocol points to derive_input_selection."
+    }
+  ]
+}

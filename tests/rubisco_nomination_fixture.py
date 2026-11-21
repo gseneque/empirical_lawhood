@@ -11,24 +11,11 @@ import json
 from pathlib import Path
 import tarfile
 
-from empirical_lawhood.adapters.methods.rubisco_cycle_constraints import (
-    assessment as cycle_assessment,
-    contracts,
-    recursive_translation as cycle_drafts,
-)
-from empirical_lawhood.adapters.methods.rubisco_nomination_preparation import (
-    contracts as nomination,
-    science as nomination_science,
-)
-from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry import science
-from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.source_manifest import (
-    INITIAL_CANDIDATE_IDS,
-    SOURCE_MANIFEST,
-)
-from empirical_lawhood.kernel.decoding import (
-    decode_canonical_bytes,
-    decode_canonical_record,
-)
+from empirical_lawhood.domains.rubisco.rubisco_cycle_constraints import assessment as cycle_assessment, contracts, recursive_translation as cycle_drafts
+from empirical_lawhood.domains.rubisco.rubisco_nomination_preparation import contracts as nomination, science as nomination_science
+from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry import science
+from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry.source_manifest import INITIAL_CANDIDATE_IDS, SOURCE_MANIFEST
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
 
 
 def source_operands():
@@ -120,9 +107,7 @@ def nominee():
 
 
 def mechanistic_source(macro, dossier):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_mechanism import (
-        science as mechanism,
-    )
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_mechanism import science as mechanism
 
     operands = source_operands()
     return mechanism.source_from_bytes(
@@ -133,9 +118,7 @@ def mechanistic_source(macro, dossier):
 
 
 def structural_source():
-    from empirical_lawhood.adapters.methods.rubisco_insilico_structure import (
-        contracts as structural,
-    )
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import contracts as structural
 
     operands = source_operands()
     document = json.loads(operands["structural-selection.json"])

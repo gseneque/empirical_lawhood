@@ -1,0 +1,553 @@
+{
+  "$defs": {
+    "Description_84e87835386f": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/joint-description/description"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "description_id": {
+              "description": "description id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "features": {
+              "description": "features; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "forecast_work_basis": {
+              "description": "forecast work basis; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "forecast_work_unit": {
+              "description": "forecast work unit; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "forecast_work_units": {
+              "additionalProperties": false,
+              "description": "forecast work units; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "interface_dimension": {
+              "description": "interface dimension; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "memory_dimension": {
+              "description": "memory dimension; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "memory_samples": {
+              "description": "memory samples; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "model": {
+              "description": "model; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "rationale": {
+              "description": "rationale; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "state_dimension": {
+              "description": "state dimension; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "description_id",
+            "features",
+            "model",
+            "state_dimension",
+            "interface_dimension",
+            "memory_dimension",
+            "memory_samples",
+            "rationale",
+            "forecast_work_units",
+            "forecast_work_unit",
+            "forecast_work_basis"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "Economics_40e0e733465d": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/joint-description/economics"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "accounting_unit": {
+              "description": "accounting unit; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "action_price": {
+              "additionalProperties": false,
+              "description": "action price; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "compute_price": {
+              "additionalProperties": false,
+              "description": "compute price; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "interface_price": {
+              "additionalProperties": false,
+              "description": "interface price; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "maximum_control_regret": {
+              "additionalProperties": false,
+              "description": "maximum control regret; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "memory_price": {
+              "additionalProperties": false,
+              "description": "memory price; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "minimum_coverage": {
+              "additionalProperties": false,
+              "description": "minimum coverage; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "missing_penalty": {
+              "additionalProperties": false,
+              "description": "missing penalty; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "reuse_count": {
+              "description": "reuse count; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "ridge_penalty": {
+              "additionalProperties": false,
+              "description": "ridge penalty; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "safety_penalty": {
+              "additionalProperties": false,
+              "description": "safety penalty; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "state_price": {
+              "additionalProperties": false,
+              "description": "state price; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "accounting_unit",
+            "state_price",
+            "interface_price",
+            "memory_price",
+            "compute_price",
+            "action_price",
+            "reuse_count",
+            "missing_penalty",
+            "safety_penalty",
+            "minimum_coverage",
+            "maximum_control_regret",
+            "ridge_penalty"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "JointSpecification_84ee769e115b": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/joint-description/specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "actions": {
+              "description": "actions; constructor checks semantics and units.",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "decimal": {
+                    "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "decimal"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "calibration_unit_ids": {
+              "description": "calibration unit ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "descriptions": {
+              "description": "descriptions; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/Description_84e87835386f"
+              },
+              "type": "array"
+            },
+            "economics": {
+              "$ref": "#/$defs/Economics_40e0e733465d",
+              "description": "economics; constructor checks semantics and units."
+            },
+            "evaluation_unit_ids": {
+              "description": "evaluation unit ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "family_id": {
+              "description": "family id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "horizons": {
+              "description": "horizons; constructor checks semantics and units.",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "decimal": {
+                    "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "decimal"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "parameters_json": {
+              "description": "parameters json; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "question": {
+              "description": "question; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "receivers": {
+              "description": "receivers; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ReceiverPolicy_fb5aea08e361"
+              },
+              "type": "array"
+            },
+            "seed": {
+              "description": "seed; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "specification_id",
+            "family_id",
+            "question",
+            "seed",
+            "calibration_unit_ids",
+            "evaluation_unit_ids",
+            "actions",
+            "horizons",
+            "receivers",
+            "descriptions",
+            "parameters_json",
+            "economics"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ReceiverPolicy_fb5aea08e361": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/joint-description/receiver-policy"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "max_abs_error": {
+              "additionalProperties": false,
+              "description": "max abs error; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "receiver_id": {
+              "description": "receiver id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "safety_lower": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "safety lower; constructor checks semantics and units."
+            },
+            "safety_upper": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "safety upper; constructor checks semantics and units."
+            },
+            "scale": {
+              "additionalProperties": false,
+              "description": "scale; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "target": {
+              "additionalProperties": false,
+              "description": "target; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "units": {
+              "description": "units; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "weight": {
+              "additionalProperties": false,
+              "description": "weight; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "receiver_id",
+            "units",
+            "target",
+            "scale",
+            "max_abs_error",
+            "weight",
+            "safety_lower",
+            "safety_upper"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:joint-description-experiment",
+  "$ref": "#/$defs/JointSpecification_84ee769e115b",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Joint Description Experiment",
+  "x-consumer": "joint-description-experiment",
+  "x-consumer-maximum-bytes": 67108864,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

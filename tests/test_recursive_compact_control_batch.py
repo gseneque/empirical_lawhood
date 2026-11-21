@@ -10,11 +10,11 @@ import pytest
 
 from empirical_lawhood.api import recursive_authoring as author
 from empirical_lawhood.api import recursive_execution as execution
-from empirical_lawhood.infrastructure import artifacts, recursive_custody as owner
-from empirical_lawhood.infrastructure import recovery as recovery_owner, task_receipts as receipt_owner
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.runtime.execution import TaskBlockReason
-from empirical_lawhood.runtime.recovery import RecoveryTerminalDisposition
+from empirical_lawhood.storage import artifacts, recursive_custody as owner
+from empirical_lawhood.storage import recovery as recovery_owner, task_receipts as receipt_owner
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.execution.execution import TaskBlockReason
+from empirical_lawhood.execution.recovery import RecoveryTerminalDisposition
 from tests.test_recursive_compact_output_bulk import compact_wave as compact_wave  # noqa: F401
 from tests.test_recursive_report_projection import ROOT, wave as wave  # noqa: F401
 from tests.test_artifact_read_context import _work
@@ -47,7 +47,7 @@ def test_complete_control_batch_uses_actual_installed_codecs_without_api_singlet
     """Match the actual C25 plane composition; no native/scientific evidence."""
     from empirical_lawhood.api.integration_artifact_profiles import INTEGRATION_ARTIFACT_PROFILE_VALIDATORS
     from empirical_lawhood.api.recursive_operations import operation_storage_codecs
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
 
     original = control_case.selected.plane
     validators = ArtifactProfileValidatorRegistry(binary_codecs=operation_storage_codecs())
@@ -289,7 +289,7 @@ def test_terminal_identity_refuses_before_any_batch_or_control_read(control_case
 @pytest.fixture(scope="module")
 def failed_control_case(compact_wave):
     """New PURE metadata fixture, all worker bodies explicitly refused; no native fixture."""
-    from empirical_lawhood.adapters.methods.rubisco_historical.recursive_translation import historical_recursive_draft
+    from empirical_lawhood.domains.rubisco.rubisco_historical.recursive_translation import historical_recursive_draft
     from tests.test_rubisco_historical_recursive import _inputs
     model, slices = _inputs()
     root = compact_wave.directory.parent
@@ -362,8 +362,8 @@ def test_initially_absent_control_pair_cannot_appear_during_batch(failed_control
 def test_actual_receipt_owner_semantic_checks_survive_shared_body(control_case, tmp_path, damage, route):
     # Exact disclosed software receipt bytes are published under a new test
     # root. This is a refusal control, never historical/scientific custody.
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
     selected = control_case.selected
     receipt = next(iter(selected.compact[1]["attempt_receipts"].values()))
     index = control_case.index
@@ -400,8 +400,8 @@ def test_actual_receipt_owner_semantic_checks_survive_shared_body(control_case, 
 @pytest.mark.parametrize("damage", ("index", "run", "path", "schema"))
 @pytest.mark.parametrize("route", ("serial", "plural"))
 def test_actual_event_owner_semantic_checks_survive_shared_body(control_case, tmp_path, damage, route):
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
     selected, index = control_case.selected, control_case.index
     relative = index.tasks[0].attempts[0].event_relative_path
     event = recovery_owner.ExternalRunRecoveryStore(selected.plane).read_event(index, relative)
@@ -537,8 +537,8 @@ def test_original_control_complete_small_and_doubled_rosters_have_linear_custody
     recovery index and event publications. Its full declared control roster is
     consumed, rather than relabelling a partial original scientific report.
     """
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
     counts = {}
     for task_count in (2, 4):

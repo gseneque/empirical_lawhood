@@ -9,36 +9,25 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.disclosed_examples import DisclosedAssumption
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.experiment_inputs import (
-    bind_kinetic_experiment_inputs,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.experiment_preparation import (
-    prepare_kinetic_experiment, validate_kinetic_experiment_instance,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.experiment_specification import (
-    PROTOCOL_ID, RubiscoKineticExperimentSpecification, kinetic_experiment_specification,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.operation_bindings import (
-    KineticJoinConfig, UNIT,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_supply import JointKineticSupply, KineticTargetComparison
-from empirical_lawhood.adapters.simulators.rubisco_assay.records import AssayQuery
-from empirical_lawhood.api.experiment_preparation import (
-    author_prepared_experiment, experiment_preparation_report, experiment_protocols,
-    load_experiment_inputs, load_experiment_specification, prepare_experiment,
-)
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.disclosed_examples import DisclosedAssumption
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.experiment_inputs import bind_kinetic_experiment_inputs
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.experiment_preparation import prepare_kinetic_experiment, validate_kinetic_experiment_instance
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.experiment_specification import PROTOCOL_ID, RubiscoKineticExperimentSpecification, kinetic_experiment_specification
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.operation_bindings import KineticJoinConfig, UNIT
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_supply import JointKineticSupply, KineticTargetComparison
+from empirical_lawhood.domains.rubisco.assay.records import AssayQuery
+from empirical_lawhood.api.experiment_preparation import author_prepared_experiment, experiment_preparation_report, experiment_protocols, load_experiment_inputs, load_experiment_specification, prepare_experiment
 from empirical_lawhood.api.configuration import validate_configuration
 from empirical_lawhood.api.recursive_authoring import implementation_binding, load_authored_wave
 from empirical_lawhood.api.recursive_operations import operation_catalog
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExecutionSelection
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -151,8 +140,7 @@ def test_missing_preparation_reports_all_original_inputs_and_execution_selection
         for key in ("campaign", "material", "supply", "query", "comparison")}
     expected.update({"rubisco.kinetic.environment": DependencyKind.ENVIRONMENT,
         "rubisco.kinetic.source-snapshot": DependencyKind.ENVIRONMENT,
-        "rubisco.kinetic.output-root": DependencyKind.STORAGE,
-        "experiment.workers": DependencyKind.ENVIRONMENT})
+        "rubisco.kinetic.output-root": DependencyKind.STORAGE})
     assert {row.code: row.kind for row in preparation.dependencies} == expected
     assert dict(preparation.census.role_counts)["supported-members"] == 3
     assert dict(preparation.census.resolved_role_counts)["supported-members"] == 0

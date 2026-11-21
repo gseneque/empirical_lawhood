@@ -4,28 +4,25 @@ Existing guarded publications supply custody. NPZ transports use the existing
 uninterpreted ZIP custody profile; the bounded no-pickle matrix reader, not that
 profile, authenticates their complete scientific array contract.
 """
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import (
-    EXPOSED, HISTORY_FAMILIES, HISTORY_TRANSPORT_SCHEMA,
-    PUBLIC_HISTORY_MASTER_SEED, MatrixHistoryAllocation, MatrixHistoryAnalysisConfig,
-    MatrixHistoryAnalysisReceipt, MatrixHistoryAnalysisRoot, MatrixHistoryArrayInput,
-    MatrixHistoryEnvironment, MatrixHistoryProtocol, MatrixHistorySourceConfig, MatrixHistorySourceReceipt,
-    matrix_history_numeric_roots, matrix_known_exposed_effective_seeds,
-)
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays, decode_matrix_arrays
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, validate_relative_locator
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+from empirical_lawhood.domains.matrix.matrix_history_analysis.reductions import family_medians, decimal_metrics as _decimal_metrics
+
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import EXPOSED, HISTORY_TRANSPORT_SCHEMA, PUBLIC_HISTORY_MASTER_SEED, MatrixHistoryAllocation, MatrixHistoryAnalysisConfig, MatrixHistoryAnalysisReceipt, MatrixHistoryAnalysisRoot, MatrixHistoryArrayInput, MatrixHistoryEnvironment, MatrixHistoryProtocol, MatrixHistorySourceConfig, MatrixHistorySourceReceipt, matrix_history_numeric_roots, matrix_known_exposed_effective_seeds
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays, decode_matrix_arrays
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, validate_relative_locator
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
 
 MAX_HISTORY_CONTROL_BYTES = 8 * 1024**2
 def matrix_history_code_sources_sha256():
@@ -100,7 +97,7 @@ def _publish(writer, *, name, path, relative_root, payload, schema, arrays=False
 def _read_publication(writer, publication, *, maximum_bytes):
     if publication.materialization.size_bytes > maximum_bytes:
         raise ValueError("History publication exceeds its consuming byte bound")
-    manifest = decode_artifact_manifest(read_bounded_bytes(writer.root.resolve(publication.manifest_materialization.relative_path, for_write=False), maximum_bytes=1024**2))
+    manifest = read_artifact_sidecar(writer, (writer.root.resolve(publication.manifest_materialization.relative_path, for_write=False)).relative_to(writer.root.contract.canonical_path).as_posix(), maximum_bytes=1024 ** 2)
     writer.verify(publication.manifest_materialization)
     if manifest.logical != publication.logical or manifest.materialization != publication.materialization or manifest.logical.visibility_ceiling is not VisibilityCeiling.DEVELOPMENT_ONLY or manifest.logical.outcome_access is not OutcomeAccess.DEVELOPMENT_VISIBLE:
         raise ValueError("History current publication/manifest/evidence access differs")
@@ -116,7 +113,7 @@ def _read_record_path(writer, relative, kind):
         raise TypeError("History replay requires its actual guarded external artifact plane")
     validate_relative_locator(relative)
     writer.root.verify(for_write=False)
-    manifest = decode_artifact_manifest(read_bounded_bytes(writer.root.resolve(relative + ".manifest.json", for_write=False), maximum_bytes=1024**2))
+    manifest = read_artifact_sidecar(writer, (writer.root.resolve(relative + '.manifest.json', for_write=False)).relative_to(writer.root.contract.canonical_path).as_posix(), maximum_bytes=1024 ** 2)
     if manifest.materialization.relative_path != relative or manifest.logical.payload_schema != kind.SCHEMA or manifest.logical.profile is not ArtifactProfile.CANONICAL_JSON or manifest.logical.visibility_ceiling is not VisibilityCeiling.DEVELOPMENT_ONLY or manifest.logical.outcome_access is not OutcomeAccess.DEVELOPMENT_VISIBLE or manifest.materialization.size_bytes > MAX_HISTORY_CONTROL_BYTES:
         raise ValueError("History retained record path/type/access differs")
     port = writer.open(VerifiedArtifactInput(manifest.logical, manifest.materialization), maximum_bytes=MAX_HISTORY_CONTROL_BYTES)
@@ -151,7 +148,7 @@ def _publish_matrix_history_arrays(*, config, allocation, root_index, arrays, wr
     _check_exposure(allocation)
     env = _environment(config, repo_root) if environment is None else environment
     root = allocation.roots[root_index]
-    from empirical_lawhood.adapters.simulators.six_matrix_response.history_source import validate_history_arrays
+    from empirical_lawhood.domains.matrix.six_matrix_response.history_source import validate_history_arrays
     validate_history_arrays(arrays, root, complete=disposition == "COMPLETE")
     source_publication, allocation_publication = _publish_inputs(writer, config, allocation, relative_root)
     operand, publication, operand_publication = _publish_arrays(writer, root=root, source=config.identity,
@@ -189,7 +186,7 @@ def _authenticate_source(receipt, writer):
     if decode_canonical_bytes(raw_operand, MatrixHistoryArrayInput, maximum_bytes=MAX_HISTORY_CONTROL_BYTES) != receipt.arrays:
         raise ValueError("History supplied array record differs from actual published bytes")
     arrays = decode_matrix_arrays(_read_publication(writer, receipt.arrays_publication, maximum_bytes=64 * 1024**2), receipt.arrays)
-    from empirical_lawhood.adapters.simulators.six_matrix_response.history_source import validate_history_arrays
+    from empirical_lawhood.domains.matrix.six_matrix_response.history_source import validate_history_arrays
     validate_history_arrays(arrays, receipt.root, complete=receipt.disposition == "COMPLETE")
     return arrays
 
@@ -225,7 +222,7 @@ def export_matrix_history_arrays(*, destination: Path, config, allocation, root_
     """Explicit bounded editable-file delivery; native validity is not attested."""
     import numpy as np
     from empirical_lawhood.api.configuration import _write_new_file
-    from empirical_lawhood.adapters.simulators.six_matrix_response.history_source import validate_history_arrays
+    from empirical_lawhood.domains.matrix.six_matrix_response.history_source import validate_history_arrays
     destination = Path(destination)
     if ".." in destination.parts or any(p.is_symlink() for p in (destination, *destination.parents)) or not destination.is_dir():
         raise ValueError("History array export requires an explicitly selected existing real directory")
@@ -288,7 +285,7 @@ def produce_matrix_histories(*, config, allocation, writer, relative_root, repo_
     if not pending:
         return tuple(sorted(completed, key=lambda r: r.root.history_index))
     env = _environment(config, repo_root)
-    from empirical_lawhood.adapters.simulators.six_matrix_response.history_source import acquire_history
+    from empirical_lawhood.domains.matrix.six_matrix_response.history_source import acquire_history
     for index in pending:
         # Bind full numeric inputs before the first native effect in this root.
         _publish_inputs(writer, config, allocation, f"{relative_root}/h{index:03d}")
@@ -302,12 +299,6 @@ def produce_matrix_histories(*, config, allocation, writer, relative_root, repo_
     return tuple(sorted(completed, key=lambda r: r.root.history_index))
 
 
-def _decimal_metrics(metrics):
-    from decimal import Decimal
-    import math
-    return tuple(sorted((name, Decimal(str(float(value))) if value is not None and math.isfinite(value) else None) for name, value in metrics.items()))
-
-
 def _authenticate_analysis_root(root, config, writer):
     if root.arrays is None:
         return
@@ -318,7 +309,7 @@ def _authenticate_analysis_root(root, config, writer):
         raise ValueError("History analysis actual operand publication differs")
     _require_array_publication(operand, root.arrays_publication)
     arrays = decode_matrix_arrays(_read_publication(writer, root.arrays_publication, maximum_bytes=64 * 1024**2), operand)
-    from empirical_lawhood.adapters.methods.matrix_history_analysis.analysis import validate_analysis_arrays
+    from empirical_lawhood.domains.matrix.matrix_history_analysis.analysis import validate_analysis_arrays
     validate_analysis_arrays(arrays, operand.root, mode=config.mode,
         compare_commutant_altered=config.compare_commutant_altered)
 
@@ -354,7 +345,7 @@ def analyze_matrix_histories(*, config: MatrixHistoryAnalysisConfig, allocation,
         sources[source.root.history_index] = source
         source_paths[source.root.history_index] = path
     config_publication, allocation_publication = _publish_inputs(writer, config, allocation, relative_root)
-    from empirical_lawhood.adapters.methods.matrix_history_analysis.analysis import algebra_history, passive_history, algebra_sample_indices, passive_cells
+    from empirical_lawhood.domains.matrix.matrix_history_analysis.analysis import algebra_history, passive_history, algebra_sample_indices, passive_cells
     roots = []
     for root in allocation.roots:
         relative = f"{relative_root}/h{root.history_index:03d}"
@@ -396,16 +387,7 @@ def analyze_matrix_histories(*, config: MatrixHistoryAnalysisConfig, allocation,
         _publish(writer, name=config.config_id + f".h{root.history_index:03d}.result", path=relative + "/result.json",
             relative_root=relative, payload=result.canonical_bytes(), schema=result.SCHEMA)
         roots.append(result)
-    medians = []
-    from statistics import median
-    for index, family in enumerate(HISTORY_FAMILIES):
-        group = roots[index * 64:(index + 1) * 64]
-        names = sorted({name for r in group for name, _ in r.metrics})
-        values = []
-        for name in names:
-            sample = [dict(r.metrics).get(name) for r in group]
-            values.append((name, median(sample) if all(r.disposition == "COMPLETE" for r in group) and all(v is not None for v in sample) else None))
-        medians.append((family, tuple(values)))
+    medians = family_medians(roots)
     columns = _publish(writer, name=config.config_id + ".columns", path=relative_root + "/columns.json", relative_root=relative_root,
         payload=canonical_json_bytes(_column_document(config.mode)), schema="empirical-lawhood/matrix-history-analysis/column-contract")
     receipt = MatrixHistoryAnalysisReceipt(config.config_id + ".receipt", config, allocation.identity, env,
@@ -442,7 +424,7 @@ def read_matrix_history_analysis(*, writer, relative_path, config=None):
 
 
 def _column_document(mode):
-    from empirical_lawhood.adapters.methods.matrix_history_analysis.analysis import result_column_contract
+    from empirical_lawhood.domains.matrix.matrix_history_analysis.analysis import result_column_contract
     return {"schema": "empirical-lawhood/matrix-history-analysis/column-contract", "version": "1.0.0", "value": result_column_contract(mode)}
 
 

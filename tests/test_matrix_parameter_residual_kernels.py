@@ -7,10 +7,10 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_parameter_history import chunked_science, independent
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history_segments import segment_intervals
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.matrix.matrix_parameter_history import chunked_science, independent
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history_segments import segment_intervals
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_matrix_parameter_native import REGIMES, coordinate
 
 

@@ -11,10 +11,12 @@ from typing import ClassVar
 import h5py
 import numpy as np
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
 
-from .material_control_raw import RAW_ARCHIVE_DATASET, RAW_ARCHIVE_SCHEMA, RAW_ARCHIVE_VERSION
-from .material_control_solver import MATERIAL_CONTROL_WORKFLOW_PROFILES, WorkflowKind, WorkflowSource, resolve_material_control_workflow_profile
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_raw import RAW_ARCHIVE_DATASET, RAW_ARCHIVE_SCHEMA, RAW_ARCHIVE_VERSION
+from empirical_lawhood.domains.materials.superconductivity.workflow_profiles import MATERIAL_CONTROL_WORKFLOW_PROFILES
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_solver import resolve_material_control_workflow_profile
+from empirical_lawhood.domains.materials.superconductivity.workflow_contracts import WorkflowKind, WorkflowSource
 
 MAXIMUM_RAW_ARCHIVE_BYTES = 64 * 1024**3
 MAXIMUM_TAR_ARCHIVE_BYTES = 32 * 1024**3

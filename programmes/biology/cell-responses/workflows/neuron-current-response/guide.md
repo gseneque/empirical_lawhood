@@ -52,7 +52,7 @@ Edit the copied JSON before running it. Retain schema
 `empirical-lawhood/simulators/brian2-neuron-current-response/brian2-lif-native-config`,
 version `1.0.0` and the `value` envelope. Decimal fields use tagged strings such as
 `{"decimal":"0.1"}`, never bare fractional JSON numbers. The
-[strict config](../../../../../src/empirical_lawhood/adapters/simulators/brian2_neuron_current_response/contracts.py)
+[strict config](../../../../../src/empirical_lawhood/domains/biology/neuron_current_response/contracts.py)
 permits these development edits:
 
 | Fields inside `value` | Required relation |
@@ -68,7 +68,7 @@ voltage/spike receivers remain the check's fixed structure. A different permitte
 input is another exposed development check; the shipped seven-spike result below
 does not predict its result.
 
-The [operational admission owner](../../../../../src/empirical_lawhood/adapters/simulators/_native_admission.py)
+The [operational admission owner](../../../../../src/empirical_lawhood/execution/native_time_grid.py)
 checks exact tick counts before worker launch and repeats the check in the
 standalone worker before Brian2 import or array allocation. The estimated
 history allowance is 128 bytes per update, capped at 16 MiB per arm, covering
@@ -89,7 +89,7 @@ uv run --no-sync python - "$NEURON_DEV/config.json" <<'PY'
 from pathlib import Path
 import sys
 from empirical_lawhood.api.codecs import load_registered_authoring
-from empirical_lawhood.adapters.simulators.brian2_neuron_current_response.contracts import Brian2LIFNativeConfig
+from empirical_lawhood.domains.biology.neuron_current_response.contracts import Brian2LIFNativeConfig
 
 path = Path(sys.argv[1])
 config = load_registered_authoring(

@@ -18,34 +18,31 @@ from pathlib import Path
 from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader, authenticate_current_execution_plan, authenticate_task_dispatch_authority
 from empirical_lawhood.api.models import ExperimentPackage
 from empirical_lawhood.api.recursive_qualified_parents import _actual_package
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.study_issue import (
-    ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore,
-    PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_ISSUE_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID,
-)
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import validate_stable_id
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, require_study_authority
-from empirical_lawhood.runtime.adjudication import MAX_ADJUDICATION_BYTES, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
-from empirical_lawhood.runtime.artifacts import artifact_custody_limits, most_restrictive_outcome_access
-from empirical_lawhood.runtime.execution import TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerOutputPort
-from empirical_lawhood.runtime.plans import BarrierKind
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_ISSUE_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import validate_stable_id
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, require_study_authority
+from empirical_lawhood.execution.adjudication import MAX_ADJUDICATION_BYTES, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import artifact_custody_limits, most_restrictive_outcome_access
+from empirical_lawhood.execution.execution import TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerOutputPort
+from empirical_lawhood.execution.plans import BarrierKind
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract
 
-from .development_task_reads import DevelopmentTaskReadScopes, development_read_call
+from empirical_lawhood.api.development_task_reads import DevelopmentTaskReadScopes, development_read_call
 
 
 def _provider_input_specs(plan):
     """Complete pinned external census, independent of caller-selected sidecars."""
-    from empirical_lawhood.runtime.plans import ExecutionPlan, ExternalInputSpec
-    from empirical_lawhood.runtime.input_access import validated_task_scientific_input_edges
+    from empirical_lawhood.execution.plans import ExecutionPlan, ExternalInputSpec
+    from empirical_lawhood.execution.input_access import validated_task_scientific_input_edges
     if type(plan) is not ExecutionPlan:
         raise TypeError("issued provider inputs require their actual frozen execution plan")
     result = {}
@@ -74,7 +71,7 @@ def _provider_input_specs(plan):
 
 def _require_provider_input_manifest(writer, run_id, spec, manifest, *, authenticated_size_bytes):
     """Authenticate metadata and durable publication before opening copy bytes."""
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, artifact_publication_member
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, artifact_publication_member
     # This width comes only from the closed payload/persisted-copy join or the
     # actual reader's registered receipt closure, never a selected sidecar.
     if (type(authenticated_size_bytes) is not int or authenticated_size_bytes <= 0
@@ -215,7 +212,7 @@ class CurrentIssuedTaskCustody:
     def bind_current_run(self, run_id, *, package=None, source_plan=None, execution_plan=None,
             package_name="campaign-package", source_plan_name="run-plan", provider_reconstruction=None,
             require_current_source=None):
-        from empirical_lawhood.runtime.plans import RunPlan, ExecutionPlan
+        from empirical_lawhood.execution.plans import RunPlan, ExecutionPlan
         self.require_original_input_access()
         validate_stable_id(run_id)
         if self._current_run_id not in (None, run_id):
@@ -262,7 +259,7 @@ class CurrentIssuedTaskCustody:
         Payload metadata remains immutable after its source is closed; no chunk
         iterator is reopened. These are input facts, never a permission verdict.
         """
-        from empirical_lawhood.runtime.providers import ExternalInputPayload
+        from empirical_lawhood.execution.providers import ExternalInputPayload
         if not self._original_input_accesses:
             return
         with self._preparation_lock:
@@ -420,7 +417,7 @@ class CurrentIssuedTaskCustody:
     def _admit_run_control_metadata(self, writer):
         """Exact already-admitted runtime records, before their first body hash."""
         from empirical_lawhood.api.execution import CampaignExecutionService
-        from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, lineage_parent_sort_key
+        from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, lineage_parent_sort_key
         if self._prepared_run_records is None:
             return
         package, source, plan, reconstruction = self._prepared_run_records
@@ -480,7 +477,7 @@ class CurrentIssuedTaskCustody:
         package, plan = self._current_package_plan
         self._require_current_issued_identity(package)
         expected_index = self._control_reader.original_recovery_index(package=package, execution_plan=plan)
-        from .retained_e3_control_repair import selected_repair_index
+        from empirical_lawhood.api.retained_e3_control_repair import selected_repair_index
         expected_index = selected_repair_index(writer=self._control_reader.writer,
             plan=plan, predecessor=expected_index)
         if index != expected_index:
@@ -535,7 +532,7 @@ class CurrentIssuedTaskCustody:
         self.require_original_input_access()
         if (type(self.writer) is not ExternalArtifactPlane
                 or any(name in vars(self.writer) for name in (
-                    "write","write_stream","write_batch","write_compact_batch"))):
+                    "write","write_stream","write_batch"))):
             if self._original_control_scopes:
                 raise PermissionError('issued original control scopes require ordinary guarded custody')
             yield self
@@ -745,7 +742,7 @@ class CurrentIssuedTaskCustody:
     @_serialized_custody_call
     def task_inputs(self, context, task):
         """Join current ports to actual persisted controls without consuming them."""
-        from empirical_lawhood.infrastructure.execution import LocalScheduler
+        from empirical_lawhood.execution.local.execution import LocalScheduler
         by_task, dependencies = {}, {}
         if self._original_input_accesses and self._current_package_plan is None:
             raise PermissionError("issued inputs lack their actual current task/plan authentication")
@@ -865,7 +862,7 @@ def current_issued_task_control_scope(api_or_service):
 
 def current_issued_task_custodies(api_or_service):
     """Select only actual typed supplier custody owners, holding strong references."""
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
     execution = getattr(api_or_service, "_execution_service", api_or_service)
     suppliers = ((execution,) if isinstance(execution, CurrentIssuedTaskCustodySupplier) else
         tuple(platform.port.supplier for platform in getattr(execution, "executable_platform_ports", ())
@@ -896,9 +893,9 @@ def _development_receipt_output_metadata(*, writer, plan, index, inputs, task_id
     external publication census. Ordinary development custody and the closed
     native TRAIN metadata scope both use this same validator.
     """
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, lineage_parent_sort_key
-    from empirical_lawhood.infrastructure.execution import LocalScheduler
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, lineage_parent_sort_key
+    from empirical_lawhood.execution.local.execution import LocalScheduler
 
     task = plan.task(task_id)
     if task_id in _ancestors:
@@ -963,15 +960,12 @@ class CurrentDevelopmentTaskCustody(DevelopmentTaskReadScopes):
     """
 
     def __init__(self, *, writer, directory, plan, original_input_access=None, read_access=None, payloads=None):
-        from empirical_lawhood.api.recursive_authoring import (
-            AuthoredRecursiveWave, MAX_DRAFT_BYTES, RecursiveImplementationBinding, RecursiveStudyDraft,
-            _authenticate_authored_wave_roots, load_authored_wave,
-        )
+        from empirical_lawhood.api.recursive_authoring import AuthoredRecursiveWave, MAX_DRAFT_BYTES, RecursiveImplementationBinding, RecursiveStudyDraft, _authenticate_authored_wave_roots, load_authored_wave
         from empirical_lawhood.api.recursive_execution import _external_inputs, _retained_plans
-        from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads, read_exposed_recursive_payload
-        from empirical_lawhood.runtime.input_access import derive_original_parent_input_contracts
-        from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
-        from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input, project_recursive_config_inputs
+        from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads, read_exposed_recursive_payload
+        from empirical_lawhood.execution.input_access import derive_original_parent_input_contracts
+        from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
+        from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input, project_recursive_config_inputs
         from empirical_lawhood.api.recursive_operations import operation_catalog
 
         if type(plan) is not DevelopmentExecutionPlan:
@@ -1009,10 +1003,10 @@ class CurrentDevelopmentTaskCustody(DevelopmentTaskReadScopes):
         self.run, actual, self.index = _retained_plans(payloads, self.draft)
         if actual != plan or self.draft.development_study is None or self.draft.prospective_draft is not None:
             raise PermissionError("development custody substitutes its actual authored development root or plan")
-        from empirical_lawhood.runtime.native_continuation_execution import DevelopmentNativeContinuationRecoveryIndex
+        from empirical_lawhood.execution.native_continuation_execution import DevelopmentNativeContinuationRecoveryIndex
         self._native_continuation_entry_guard = None
         if type(self.index) is DevelopmentNativeContinuationRecoveryIndex:
-            from .native_continuation_execution import current_native_entry_guard
+            from empirical_lawhood.api.native_continuation_execution import current_native_entry_guard
             self._native_continuation_entry_guard = current_native_entry_guard(self.index)
         self.plan = actual
         self.access_pair = self.draft.development_study.access_pair
@@ -1113,7 +1107,7 @@ class CurrentDevelopmentTaskCustody(DevelopmentTaskReadScopes):
         if len(tasks) != 1:
             raise PermissionError("development preparation loses its exact original task")
         task, = tasks
-        from empirical_lawhood.runtime.development_output_repair import DevelopmentOutputRepairRecoveryIndex
+        from empirical_lawhood.execution.development_output_repair import DevelopmentOutputRepairRecoveryIndex
         dispatched = self.index.repair.task(task) if isinstance(self.index, DevelopmentOutputRepairRecoveryIndex) else task
         if (context.run_id != self.run.run_plan_id
                 or (task.capability.capability_key, task.capability.capability_version, task.capability_implementation_sha256) !=
@@ -1135,7 +1129,7 @@ class CurrentDevelopmentTaskCustody(DevelopmentTaskReadScopes):
     @development_read_call
     def _receipt_outputs(self, task_id, receipt, *, _metadata_only=False, _ancestors=()):
         """Authenticate actual successful output metadata against its frozen owner."""
-        from empirical_lawhood.runtime.artifacts import ArtifactManifest
+        from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
         state = self._task_read()
         result = _development_receipt_output_metadata(writer=self.writer, plan=self.plan,
             index=self.index, inputs=self.inputs, task_id=task_id, receipt=receipt, _ancestors=_ancestors,
@@ -1152,13 +1146,13 @@ class CurrentDevelopmentTaskCustody(DevelopmentTaskReadScopes):
     @development_read_call
     def require_original_input_access(self, task, value):
         """Fresh original grants after exact frozen task, receipt and input joins."""
-        from empirical_lawhood.runtime.plans import ExternalInputSpec
+        from empirical_lawhood.execution.plans import ExternalInputSpec
 
         try:
             actual = self.plan.task(task.task_id)
         except KeyError:
             actual = None
-        from empirical_lawhood.runtime.development_output_repair import DevelopmentOutputRepairRecoveryIndex
+        from empirical_lawhood.execution.development_output_repair import DevelopmentOutputRepairRecoveryIndex
         if (actual is not None and isinstance(self.index, DevelopmentOutputRepairRecoveryIndex)
                 and task == self.index.repair.task(actual)):
             task = actual
@@ -1171,7 +1165,7 @@ class CurrentDevelopmentTaskCustody(DevelopmentTaskReadScopes):
         if type(spec) is ExternalInputSpec:
             if self.inputs.get(spec.logical_artifact_id) != value:
                 raise PermissionError("development input substitutes its authored original configuration")
-            from empirical_lawhood.runtime.artifacts import ArtifactManifest
+            from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
             self._manifest(value.materialization.relative_path, expected=ArtifactManifest(value.logical, value.materialization))
         else:
             store = ExternalTaskReceiptStore(self.writer)
@@ -1186,7 +1180,7 @@ class CurrentDevelopmentTaskCustody(DevelopmentTaskReadScopes):
 
     @development_read_call
     def require_native_entry(self, context, runner, *, prepared_contract):
-        from empirical_lawhood.runtime.development_output_repair import DevelopmentOutputRepairRecoveryIndex
+        from empirical_lawhood.execution.development_output_repair import DevelopmentOutputRepairRecoveryIndex
         if type(self.index) is DevelopmentOutputRepairRecoveryIndex:
             raise PermissionError("development output repair cannot enter native acquisition")
         if type(prepared_contract) is not PreparedInvocationContract or prepared_contract.native_effect is not True:
@@ -1207,7 +1201,7 @@ class CurrentDevelopmentTaskCustody(DevelopmentTaskReadScopes):
 
     @development_read_call
     def task_inputs(self, context, task):
-        from empirical_lawhood.infrastructure.execution import LocalScheduler
+        from empirical_lawhood.execution.local.execution import LocalScheduler
 
         store, by_task, dependencies = ExternalTaskReceiptStore(self.writer), {}, {}
         for header in context.dependency_receipts:
@@ -1228,7 +1222,7 @@ class CurrentDevelopmentTaskCustody(DevelopmentTaskReadScopes):
             value = self.inputs.get(spec.logical_artifact_id)
             if value is None:
                 raise PermissionError("development preparation adds an unauthored external input")
-            from empirical_lawhood.runtime.artifacts import ArtifactManifest
+            from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
             manifest = self._manifest(value.materialization.relative_path,
                 expected=ArtifactManifest(value.logical, value.materialization))
             if (manifest.logical != value.logical or manifest.materialization != value.materialization
@@ -1253,7 +1247,7 @@ class CurrentDevelopmentTaskCustody(DevelopmentTaskReadScopes):
                     or pair[0] is not OutcomeAccess.EVALUATION_SEALED):
                 raise PermissionError("development control changes its exact original input custody")
             self._require_current_original_access()
-        from empirical_lawhood.runtime.artifacts import ArtifactManifest
+        from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
         self._manifest(manifest.materialization.relative_path,
             expected=ArtifactManifest(manifest.logical, manifest.materialization))
         self._require_current_original_access()

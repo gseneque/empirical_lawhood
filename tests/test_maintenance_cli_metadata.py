@@ -14,10 +14,7 @@ from typer.main import get_command
 from empirical_lawhood.cli.app import app
 from empirical_lawhood.cli.introspection import canonical_click_tree
 from empirical_lawhood.cli.metadata import COMMAND_METADATA, GROUP_METADATA
-from empirical_lawhood.cli.reference_contract import (
-    CliReferenceContractError,
-    join_command_metadata,
-)
+from empirical_lawhood.cli.reference_contract import CliReferenceContractError, join_command_metadata
 from scripts.generate_cli_reference import render
 
 

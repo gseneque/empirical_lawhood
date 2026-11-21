@@ -9,13 +9,13 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import recursive_qualified_parents as owner
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.recovery import RecoveryTerminalDisposition
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.recovery import RecoveryTerminalDisposition
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
 from tests.runtime_platform.test_recursive_compiler import Config
 from tests.runtime_platform.test_recursive_prospective_parents import (
     _authenticate, _parent_inputs, parent_fixture as parent_fixture,
@@ -31,12 +31,12 @@ def sealed_parent_fixture(tmp_path_factory):
     declared evaluation unit and the original blind source, with no native work.
     """
     from tests.runtime_platform import test_recursive_prospective_workflow as workflow
-    from empirical_lawhood.planning.recursive_authoring import RecursiveInputLink, RecursiveOperationSpec
-    from empirical_lawhood.planning.study_authoring import CapabilitySelection
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile
-    from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityPermission
-    from empirical_lawhood.runtime.plans import BarrierKind, OutputTemplate, ScientificStage
-    from empirical_lawhood.runtime.recursive_compiler import RecursiveOperationRegistration, RecursivePortContract, compile_recursive_wave
+    from empirical_lawhood.design.recursive_authoring import RecursiveInputLink, RecursiveOperationSpec
+    from empirical_lawhood.design.study_authoring import CapabilitySelection
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+    from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityPermission
+    from empirical_lawhood.execution.plans import BarrierKind, OutputTemplate, ScientificStage
+    from empirical_lawhood.execution.recursive_compiler import RecursiveOperationRegistration, RecursivePortContract, compile_recursive_wave
     from tests.experiment_entry_support import standard_authoring_for_draft
 
     original_compile, original_registrations = workflow.prospective_fixture, workflow._registrations
@@ -106,13 +106,13 @@ def sealed_parent_fixture(tmp_path_factory):
         from empirical_lawhood.api.facade import EmpiricalLawhoodApi
         from empirical_lawhood.api.results import RunCampaignRequest
         from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY
-        from empirical_lawhood.infrastructure.execution import DurableExecutionResourceEnvelopeCoordinator
-        from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
-        from empirical_lawhood.infrastructure.study_issue import ExternalIssuedExtensionPayloadSource, ExternalIssuedStudyPublisher
-        from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog
-        from empirical_lawhood.runtime.executable_bindings import LayeredCampaignRuntimeProviderResolver
-        from empirical_lawhood.runtime.issued_extension_payloads import IssuedExtensionPayloadResolver
-        from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
+        from empirical_lawhood.execution.local.execution import DurableExecutionResourceEnvelopeCoordinator
+        from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+        from empirical_lawhood.storage.study_issue import ExternalIssuedExtensionPayloadSource, ExternalIssuedStudyPublisher
+        from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog
+        from empirical_lawhood.execution.executable_bindings import LayeredCampaignRuntimeProviderResolver
+        from empirical_lawhood.execution.issued_extension_payloads import IssuedExtensionPayloadResolver
+        from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
         from tests.execution_support import EnforcingTestTaskExecutor
         from tests.runtime_platform.test_study_issue import _PassthroughSourceInspector
         directory = handoff.directory.parent
@@ -191,7 +191,7 @@ def _replay(fixture, binding, *, scope=None, parent=None):
 
 
 def _block_protected_streams(monkeypatch):
-    from empirical_lawhood.runtime import artifacts
+    from empirical_lawhood.storage.contracts import artifacts
     def blocked(*args, **kwargs):
         pytest.fail('protected prior artifact stream before exact scope and complete retained custody')
     monkeypatch.setattr(artifacts, 'verify_artifact_manifests', blocked)
@@ -257,7 +257,7 @@ def test_unknown_contact_terminal_cannot_become_complete_receipt_custody(prior_f
 
 
 def test_partial_original_receipt_pair_refuses_before_protected_stream(prior_fixture, monkeypatch, tmp_path):
-    from empirical_lawhood.infrastructure.artifacts import ArtifactPlaneError
+    from empirical_lawhood.storage.artifacts import ArtifactPlaneError
     fixture, locator, *_ = prior_fixture
     run = fixture.package.run_plan_id
     sidecar = fixture.plane.root.resolve(f'runs/{run}/receipts/prepare/{run}.prepare.attempt-001.json.manifest.json',
@@ -292,9 +292,10 @@ def test_pure_scope_validator_refuses_before_complete_receipt_artifact_stream(pr
 def test_missing_or_uninstalled_prior_codec_refuses_before_protected_stream(prior_fixture, monkeypatch):
     fixture, locator, *_ = prior_fixture
     _block_protected_streams(monkeypatch)
-    with pytest.raises(PermissionError, match='installed sealed'):
+    with pytest.raises(PermissionError, match='prior execution lacks its exact installed record revision') as error:
         owner._authenticate_prior_execution(locator, fixture.plane, {}, scope_validator=lambda **kwargs: None,
             parent_evidence=None)
+    assert f'{locator.record.object_schema}@{locator.record.object_version}; installed revisions: none' in str(error.value)
     assert fixture.executor.invocations == 6
 
 

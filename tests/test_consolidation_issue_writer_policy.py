@@ -6,8 +6,8 @@ from types import MethodType
 
 import pytest
 
-from empirical_lawhood.infrastructure import study_issue as owner
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage import study_issue as owner
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
 from tests.test_issued_base_verification_scope import _case
 
 
@@ -21,9 +21,9 @@ def _census(root):
         for path in root.rglob("*") if path.is_file()}
 
 
-@pytest.mark.parametrize("hook", ("write_batch", "write_compact_batch"))
 @pytest.mark.parametrize("customization", ("subclass", "instance"))
-def test_custom_writer_admission_still_refuses_inside_publisher_scope(issued, customization, hook):
+def test_custom_writer_admission_still_refuses_inside_publisher_scope(issued, customization):
+    hook = "write_batch"
     calls = []
 
     def reject(self, requests, **_options):

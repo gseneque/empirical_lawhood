@@ -20,6 +20,7 @@ class CommandMetadata:
 
 
 GROUP_METADATA = (
+    CommandMetadata("deployment", "installed", "operational preparation and original-byte transfer", "local preparation and verification; no provider contact", "explicit paths", "no", "none", "docs/using/accelerated-compute.md"),
     CommandMetadata("progress", "installed", "advisory operational status", "read-only", "selected status file only", "no", "none", "docs/using/results-and-failures.md"),
     CommandMetadata("workflow", "installed", "static researcher task discovery", "read-only", "no", "no", "no", "docs/reference/workflows.md"),
     CommandMetadata("config", "installed", "consumer-specific editable input tooling", "validation/schema are read-only; preparation writes one explicitly new file", "no", "no", "no", "docs/using/configuration.md"),
@@ -167,6 +168,9 @@ GROUP_METADATA = (
 
 
 RETAINED_ATTEMPT_OPTIONS = {
+    'campaign matrix-retained-refresh': '--attempt-dir',
+    'campaign matrix-retained-refresh-assess': '--attempt-dir',
+    'campaign matrix-retained-matched': '--attempt-dir',
     "campaign recursive-inquiry-author": "--attempt-dir",
     "campaign recursive-inquiry-decide": "--attempt-dir",
     "campaign recursive-inquiry-result": "--attempt-dir",
@@ -187,6 +191,7 @@ RETAINED_ATTEMPT_OPTIONS = {
     "campaign recursive-author": "--attempt-dir",
     "campaign recursive-development-run": "--attempt-dir",
     "campaign recursive-development-result": "--attempt-dir",
+    "campaign recursive-execution": "--attempt-dir",
     "campaign recursive-contribution": "--attempt-dir",
     "campaign matrix-geometry-bind-qualification": "--attempt-dir",
     "campaign matrix-geometry-prepare": "--attempt-dir",
@@ -283,6 +288,36 @@ RETAINED_ATTEMPT_OPTIONS = {
 
 
 COMMAND_METADATA = (
+    CommandMetadata('campaign matrix-retained-matched', 'three retained SCI01 analyses',
+        'exposed development; no molecular admission',
+        'exports signed arrays and assesses matched reversals, error alignment and post-checkpoint representation',
+        'explicit guarded profile', 'no; actual source and lock retained',
+        'current original input access and exact completed calculation/assessment; no acquisition authority',
+        'programmes/foundations/emergent-structure/workflows/matrix-retained-refresh/guide.md',
+        native_software='locked NumPy and SciPy', native_status='zero acquisition, fits, new bases or additional updates'),
+    CommandMetadata('campaign matrix-retained-refresh', 'retained SCI01 calculation',
+        'exposed development; no molecular admission',
+        'publishes a separate protocol and closed calculation in the selected new directory',
+        'explicit guarded profile', 'no; exact producing source and lock retained',
+        'current original input access; no new acquisition authority',
+        'programmes/foundations/emergent-structure/workflows/matrix-retained-refresh/guide.md',
+        native_software='locked NumPy and SciPy', native_status='zero new native acquisition or statistical fits'),
+    CommandMetadata('campaign matrix-retained-refresh-assess', 'independent SCI01 assessment',
+        'exposed development; no molecular admission',
+        'reopens original custody and publishes separate equation checks, all cases and finite pairs',
+        'explicit guarded profile', 'no; actual assessment source and lock retained',
+        'current original input access; no new acquisition authority',
+        'programmes/foundations/emergent-structure/workflows/matrix-retained-refresh/guide.md',
+        native_software='locked NumPy and SciPy', native_status='independent affine-map reconstruction; no native acquisition'),
+    CommandMetadata("deployment prepare", "installed", "prepared operational selection; no execution authority", "writes one new local deployment package; no launch", "explicit payload and output paths", "no", "none", "docs/using/accelerated-compute.md", native_software="none", native_status="offline single-machine task preparation"),
+    CommandMetadata("deployment prepare-files", "installed", "closed transport census; primary receipts unchanged", "streams a reusable archive, verifies original members and writes a complete manifest", "explicit root and new output directory paths", "no", "none", "docs/using/capacity-and-transfer.md", native_software="none", native_status="generic input and evidence transport; observed sizes with optional operator budgets"),
+    CommandMetadata("deployment seal-files", "installed", "closed transport census; primary receipts unchanged", "reads selected files and writes one new manifest", "explicit root and manifest paths", "no", "none", "docs/using/accelerated-compute.md", native_software="none", native_status="bounded original-byte transfer"),
+    CommandMetadata("deployment verify-files", "installed", "complete byte comparison; no native completion inference", "reads original files against an independently retained digest", "explicit root and manifest paths", "no", "none", "docs/using/accelerated-compute.md", native_software="none", native_status="bounded original-byte verification"),
+    CommandMetadata("deployment archive-originals", "installed", "closed original-tree transport; primary receipts unchanged", "writes a fresh bounded archive and type census without following links", "explicit original and archive paths", "no", "none", "docs/using/accelerated-compute.md", native_software="none", native_status="no scientific completion inference"),
+    CommandMetadata("deployment verify-originals", "installed", "complete original-member comparison; no extraction", "authenticates the transfer and every original archive member", "explicit package and manifest paths", "no", "none", "docs/using/accelerated-compute.md", native_software="none", native_status="original domain reader still required"),
+    CommandMetadata("deployment observe-budget", "installed", "resource-filtered original billing and conservative accounting", "makes bounded Runpod GET requests and retains original responses", "explicit allocation and output paths", "no", "actual provider read access", "docs/using/accelerated-compute.md", native_software="none", native_status="no financial or scientific action"),
+    CommandMetadata("deployment watch-budget", "installed", "explicit owner-authorized allocation and monetary policy", "observes billing and uses the pinned upstream controller for financial cancellation or compute retirement", "explicit original authorization, allocation and supervision paths", "no", "owner authorization and actual provider access", "docs/using/accelerated-compute.md", native_software="pinned SkyPilot controller", native_status="no launch, scientific dispatch, replay or network-volume deletion"),
+    CommandMetadata("deployment restore-environment", "installed", "exact sealed installation inputs; no engine admission", "copies to a fresh worker prefix and installs the selected engine wheel offline", "explicit payload, environment and output paths", "no", "local installation access", "docs/using/accelerated-compute.md", native_software="selected Python and offline installer", native_status="original environment preserved; domain admission remains required"),
     CommandMetadata("campaign recursive-inquiry-decide", "recursive inquiry", "exposed bounded inquiry decision; no authority", "authenticates selected inputs and persists a decision before optional export", "explicit guarded profile", "no", "none", "docs/using/recursive-inquiry.md", native_software="no native contact", native_status="scope, complete costs, finite alternatives and decision-right joins"),
     CommandMetadata("campaign recursive-inquiry-result", "recursive inquiry", "authenticated exposed decision and alternatives", "reads and revalidates exact retained inquiry members and inputs", "explicit guarded profile", "no", "none", "docs/using/recursive-inquiry.md", native_software="no native contact", native_status="retained decision, menu, cost census and successor intent"),
     CommandMetadata("campaign recursive-inquiry-author", "recursive inquiry", "exact selected ACT draft; no authority", "writes a fresh guarded authoring directory after exact decision and origin joins", "explicit guarded profile", "no", "none", "docs/using/recursive-inquiry.md", native_software="no native contact", native_status="initial selection or existing registered successor builder"),
@@ -291,6 +326,7 @@ COMMAND_METADATA = (
     CommandMetadata("campaign recursive-author", "recursive inquiry", "frozen bounded wave; no authority", "writes a new explicitly selected guarded authoring directory", "explicit guarded profile", "no", "none; prospective authority remains separate", "docs/using/recursive-inquiry.md", native_software="no native contact", native_status="candidate, source, resources and plan correspondence"),
     CommandMetadata("campaign recursive-development-run", "recursive inquiry", "EXPOSED_NUMERICAL_DEVELOPMENT_NONPROMOTABLE", "registered tasks through LocalScheduler; guarded receipts and conservative native contact recovery", "explicit guarded profile", "no; actual source and lock retained", "none; development execution grants no qualification", "docs/using/recursive-inquiry.md", native_software="selected locked base or battery-recursion profile", native_status="explicit numerical acquisition and registered analysis"),
     CommandMetadata("campaign recursive-development-result", "recursive inquiry", "authenticated exposed development findings", "reads exact completed receipts without native acquisition", "explicit guarded profile", "no", "none", "docs/using/recursive-inquiry.md", native_software="no native contact", native_status="complete retained scientific and operational census"),
+    CommandMetadata("campaign recursive-execution", "recursive inquiry", "authenticated original execution records", "reads original task and attempt census with paginated failure diagnostics", "explicit guarded profile", "no", "none", "docs/using/recursive-inquiry.md", native_software="no native contact", native_status="execution records only; scientific result validation is deferred"),
     CommandMetadata("campaign recursive-contribution", "recursive inquiry", "authenticated scientific content with its original evidence role", "reads or explicitly exports a portable contribution", "explicit guarded profile", "no", "none; imported development results remain non-promotable", "docs/using/recursive-inquiry.md", native_software="no native contact", native_status="exact-version contribution inspection and binding"),
     CommandMetadata("campaign rc-chain-prove", "numerical development", "closed RC-M/RC-P/RC-J design; no observations", "read-only; optional separate operational attempt", "no", "no", "none; no issue or qualification", "programmes/foundations/measurement-and-response/workflows/rc-prerequisite-chain/guide.md", native_software="no native contact at this verb", native_status="static complete design and numerical work census"),
     CommandMetadata("campaign rc-chain-run", "numerical development", "EXPOSED_NUMERICAL_DEVELOPMENT_NONPROMOTABLE", "bounded native calculation and guarded per-unit receipts; completed units reused; optional separate operational attempt", "explicit guarded profile", "no; actual source/lock/runtime recorded", "none; no issue, execution or reveal grant", "programmes/foundations/measurement-and-response/workflows/rc-prerequisite-chain/guide.md", native_software="locked base NumPy 2.4.6 / SciPy 1.17.1", native_status="supplied eleven deterministic preparations with nested controls and solver views"),
@@ -1420,8 +1456,12 @@ COMMAND_METADATA = (*COMMAND_METADATA,
 )
 
 _INVOCATION_GROUPS = (
+    (InvocationContract('selected source', 'profile', 'JSON report. No --format', 'invalid-2'),
+        ('campaign matrix-retained-refresh', 'campaign matrix-retained-refresh-assess', 'campaign matrix-retained-matched')),
+    (InvocationContract("none", "explicit local paths", "JSON report. No --format", "invalid-2"), ("deployment prepare", "deployment prepare-files", "deployment seal-files", "deployment verify-files", "deployment archive-originals", "deployment verify-originals", "deployment observe-budget", "deployment restore-environment")),
+    (InvocationContract("none", "explicit authorization, allocation and output paths", "JSON event stream and final report. No --format", "invalid-2"), ("deployment watch-budget",)),
     (InvocationContract("selected checkout via --source-checkout", "none", "JSON report. No --format", "refusal-3"), ("campaign gym-torax-native-check",)),
-    (InvocationContract("none for completed-result reads", "read-only profile", "JSON report. No --format", "invalid-2"), ('campaign recursive-development-result', 'campaign rc-chain-result', 'campaign matrix-geometry-result', 'campaign selected-events-result')),
+    (InvocationContract("none for completed-result reads", "read-only profile", "JSON report. No --format", "invalid-2"), ('campaign recursive-development-result', 'campaign recursive-execution', 'campaign rc-chain-result', 'campaign matrix-geometry-result', 'campaign selected-events-result')),
     (InvocationContract("selected source for prospective phases; none for development-only reads", "profile and retained catalog for prospective phases", "JSON report. No --format", "invalid-2"), ("campaign experiment-read",)),
     (InvocationContract("none", "none", "Text status, or JSON with --json. No --format", "invalid-2"), ("progress",)),
     (InvocationContract("selected source", "profile", "JSON report. No --format", "invalid-2"), ("campaign experiment-derive-inputs", "campaign experiment-export-products", "campaign experiment-author", "campaign experiment-run", "campaign matrix-continue", "campaign experiment-recover", "campaign experiment-prepare-native-continuation", "campaign experiment-continue-native", "campaign experiment-repair-structure")),

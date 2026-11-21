@@ -7,26 +7,23 @@ therefore binds exactly one phase at a time; it never searches for an upstream
 
 from __future__ import annotations
 
-from empirical_lawhood.adapters.history_budget_scientific_inputs import HistoryBudgetUnitScientificInput
+from empirical_lawhood.domains.history.history_budget_scientific_inputs import HistoryBudgetUnitScientificInput
 
 from dataclasses import dataclass
 from hashlib import sha256
 from typing import Mapping
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256, validate_stable_id
-from empirical_lawhood.planning.formal_analysis import (
-    FormalGapSourceCapabilityInventory,
-    FormalMethodCatalog,
-)
-from empirical_lawhood.planning.formal_gaps import FormalGapRegister
-from empirical_lawhood.planning.study_authoring import DesignInputRecord
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityCatalog
-from empirical_lawhood.runtime.source_resolution import CandidateCapabilityConfigDecoder
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256, validate_stable_id
+from empirical_lawhood.design.formal_analysis import FormalGapSourceCapabilityInventory, FormalMethodCatalog
+from empirical_lawhood.design.formal_gaps import FormalGapRegister
+from empirical_lawhood.design.study_authoring import DesignInputRecord
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog
+from empirical_lawhood.execution.source_resolution import CandidateCapabilityConfigDecoder
 
-from .authoring import SplitCohortHistoryBudgetExternalRecord, config_decoders
-from .contracts import SplitCohortHistoryBudgetConfig
-from .study_authoring import SplitCohortHistoryBudgetStandardAuthoringBundle, build_split_cohort_history_budget_standard_authoring_bundle
-from .runtime_provider import SplitCohortHistoryBudgetCampaignRuntimeProvider, implementation_closures
+from empirical_lawhood.domains.history.split_cohort_history_budget.authoring import SplitCohortHistoryBudgetExternalRecord, config_decoders
+from empirical_lawhood.domains.history.split_cohort_history_budget.contracts import SplitCohortHistoryBudgetConfig
+from empirical_lawhood.domains.history.split_cohort_history_budget.study_authoring import SplitCohortHistoryBudgetStandardAuthoringBundle, build_split_cohort_history_budget_standard_authoring_bundle
+from empirical_lawhood.adapters.split_cohort_history_budget.runtime_provider import SplitCohortHistoryBudgetCampaignRuntimeProvider, implementation_closures
 
 
 @dataclass(frozen=True, slots=True)

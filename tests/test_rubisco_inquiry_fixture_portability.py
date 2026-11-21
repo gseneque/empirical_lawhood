@@ -53,7 +53,7 @@ from tests.rubisco_inquiry_source_fixtures import (
     finalist_source_operands, successor_source_operands,
 )
 from tests.rubisco_candidate_programme_fixture import programme_report
-from empirical_lawhood.adapters.methods.rubisco_combinations.source_binding import (
+from empirical_lawhood.domains.rubisco.rubisco_combinations.source_binding import (
     WilsonArticleInputV1, TeParentGenbankInputV1,
     WILSON_SOURCE_SHA256, GENBANK_SOURCE_SHA256,
 )

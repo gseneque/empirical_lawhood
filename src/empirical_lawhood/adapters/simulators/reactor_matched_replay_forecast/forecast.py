@@ -5,11 +5,11 @@ from decimal import Decimal as D
 from typing import cast
 import numpy as np
 
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_trace import ReactorBatchTrace
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.forecast import ReferenceObserverReactorForecast
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.bridge import _decimal
-from .design import ReactorBatchSource, PULSE_ONSET, RECOVERY_END
-from .trace import ReactorHistoryForecast, ResponseRow, pulse_command, tape_digest
+from empirical_lawhood.domains.reactor.reactor_prefix_response.batch_trace import ReactorBatchTrace
+from empirical_lawhood.domains.reactor.reactor_prefix_response.reference_forecast import ReferenceObserverReactorForecast
+from empirical_lawhood.domains.reactor.reactor_prefix_response.numeric_values import _decimal
+from empirical_lawhood.domains.reactor.reactor_matched_replay_forecast.design import ReactorBatchSource, PULSE_ONSET, RECOVERY_END
+from empirical_lawhood.domains.reactor.reactor_matched_replay_forecast.trace import ReactorHistoryForecast, ResponseRow, pulse_command, tape_digest
 
 
 def forecast_history(

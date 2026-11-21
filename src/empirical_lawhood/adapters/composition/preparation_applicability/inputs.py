@@ -2,8 +2,8 @@
 
 from dataclasses import dataclass, field, replace
 
-from empirical_lawhood.adapters.composition.record_provider import RecordCampaignProvider
-from empirical_lawhood.runtime.providers import ExternalInputPayload
+from empirical_lawhood.execution.record_provider import RecordCampaignProvider
+from empirical_lawhood.execution.providers import ExternalInputPayload
 
 
 @dataclass(slots=True)

@@ -5,6 +5,7 @@ All contacts, source pins and completion labels are explicit exposed software
 fixtures. Only their actual stored bytes and custody joins are tested. No issue,
 source qualification or scientific authority follows from these declarations.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from hashlib import sha256
@@ -14,28 +15,22 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import recursive_qualified_parents as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactPlaneError
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_artifact_manifest
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityPermission, CapabilityRequirement
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import (
-    NativeSubworkBegin, NativeSubworkCompletion, NativeSubworkContact, NativeSubworkDefinition,
-    NativeSubworkOutput, NativeSubworkRoster, NativeSubworkState, NativeSubworkUncertainContact,
-)
-from empirical_lawhood.runtime.plans import (
-    ArtifactOutputSpec, BarrierKind, ExecutionPlan, ExecutionTask, ExternalInputSpec, PlanLane,
-    ScientificInputRole, ScientificInputSpec, ScientificStage,
-)
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding, RecursivePriorNativeBinding
+from empirical_lawhood.storage.artifacts import ArtifactPlaneError
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityPermission, CapabilityRequirement
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkBegin, NativeSubworkCompletion, NativeSubworkContact, NativeSubworkDefinition, NativeSubworkOutput, NativeSubworkRoster, NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionPlan, ExecutionTask, ExternalInputSpec, PlanLane, ScientificInputRole, ScientificInputSpec, ScientificStage
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding, RecursivePriorNativeBinding
 from tests.runtime_platform.test_native_subwork import ExposedInput, _plane
 
 BUDGET = ResourceBudget(1, 1_000_000, 0, 1, 4096, 8192)
@@ -47,8 +42,7 @@ def _pin(key, schema):
 
 
 def _manifest(plane, written):
-    return decode_artifact_manifest(plane.root.resolve(written.materialization.relative_path+'.manifest.json',
-        for_write=False).read_bytes())
+    return resolve_artifact_sidecar_bytes(plane, plane.root.resolve(written.materialization.relative_path + '.manifest.json', for_write=False).read_bytes())
 
 
 def _record(plane, record, key, *, sealed=False):
@@ -63,7 +57,7 @@ def _blocked_progress(monkeypatch):
     monkeypatch.setattr(ExternalNativeEffectContactStore, 'begin', blocked)
     for method in ('begin', 'contact', 'freeze_roster', 'complete', 'publish_output'):
         monkeypatch.setattr(ExternalNativeSubworkStore, method, blocked)
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     monkeypatch.setattr(LocalProcessExecutor, 'execute_deadline_free', blocked)
 
 
@@ -319,7 +313,7 @@ def test_recovered_mathematical_configuration_matches_actual_task_configuration(
     def blocked(*args, **kwargs):
         pytest.fail('foreign native configuration reached recovery or protected native output verification')
     monkeypatch.setattr(ExternalNativeSubworkStore, 'recover', blocked)
-    from empirical_lawhood.runtime import artifacts
+    from empirical_lawhood.storage.contracts import artifacts
     monkeypatch.setattr(artifacts, 'verify_artifact_manifests', blocked)
     with pytest.raises(PermissionError, match='config'):
         _replay(fixture)

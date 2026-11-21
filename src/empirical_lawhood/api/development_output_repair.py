@@ -2,16 +2,16 @@
 """Derive and authenticate a PURE output-budget repair from primary custody."""
 from hashlib import sha256
 
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, validate_stable_id
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.development_output_repair import DevelopmentOutputBudgetRepair, DevelopmentOutputRepairRecoveryIndex
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.execution.development_output_repair import DevelopmentOutputBudgetRepair, DevelopmentOutputRepairRecoveryIndex
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
 
-from .retained_e3_control_repair import _read_record, observe_frozen_repair_worker, observe_frozen_worker_package_root
+from empirical_lawhood.api.retained_e3_control_repair import _read_record, observe_frozen_repair_worker, observe_frozen_worker_package_root
 
 
 def repair_relative_path(run_id):
@@ -24,21 +24,16 @@ def _pin(value, field):
 
 
 def _require_scientific_source(worker, controller):
-    """All domain and kernel bytes, plus the lock, remain the original bytes."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import require_numerical_source_continuity
-    require_numerical_source_continuity(worker, controller)
-    for prefix in ('adapters/', 'kernel/'):
-        old = {key: value for key, value in worker.package_sources if key.startswith(prefix)}
-        new = {key: value for key, value in controller.package_sources if key.startswith(prefix)}
-        if not old or old != new:
-            raise PermissionError('development output repair changes original scientific source: ' + prefix)
+    """Authenticate the original worker's scientific sources and dependency lock."""
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import require_development_repair_source
+    require_development_repair_source(worker, controller)
 
 
 def _original_census(*, writer, plan, predecessor, require_absent):
     """No replacement roster: derive all sets from the complete old terminal."""
-    from .recursive_operations import operation_catalog
-    from empirical_lawhood.runtime.recovery import TaskRecoveryDisposition
-    from empirical_lawhood.runtime.execution import OperationalFailureClass
+    from empirical_lawhood.api.recursive_operations import operation_catalog
+    from empirical_lawhood.execution.recovery import TaskRecoveryDisposition
+    from empirical_lawhood.execution.execution import OperationalFailureClass
 
     if type(predecessor) is not DevelopmentRunRecoveryIndex:
         raise PermissionError('development output repair accepts only an original development wave')
@@ -66,7 +61,7 @@ def _original_census(*, writer, plan, predecessor, require_absent):
         raise PermissionError('development output repair cannot identify an original capability')
     if any(registration(task).native_effect and task.task_id not in receipts for task in plan.tasks):
         raise PermissionError('development output repair requires every original native task to have completed')
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
     contacts = ExternalNativeEffectContactStore(plane=writer, execution_plan=_pin(plan, 'execution_plan_id'),
         visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY, outcome_access=OutcomeAccess.DEVELOPMENT_VISIBLE)
     refused, unstarted = [], []
@@ -104,17 +99,27 @@ def _original_census(*, writer, plan, predecessor, require_absent):
     return terminal, tuple(sorted(refused)), completed, tuple(sorted(unstarted))
 
 
-def select_development_output_repair(*, writer, plan, predecessor):
+def select_development_output_repair(*, writer, plan, predecessor, retained_registry=None):
     """Read the additive repair without changing any original publication."""
-    from .native_continuation_execution import select_native_continuation
-    continued = select_native_continuation(writer=writer, plan=plan, predecessor=predecessor)
+    from empirical_lawhood.api.development_scratch_repair import select_development_scratch_repair
+    scratch = select_development_scratch_repair(writer=writer, plan=plan, predecessor=predecessor)
+    if scratch is not predecessor:
+        from empirical_lawhood.api.development_controller_repair import repair_relative_path as controller_path
+        from empirical_lawhood.api.native_continuation_execution import continuation_relative_path
+        if any(writer.root.resolve(path(predecessor.run_id), for_write=False).exists()
+                for path in (repair_relative_path, controller_path, continuation_relative_path)):
+            raise PermissionError('development repair cannot select multiple replacement controllers')
+        return scratch
+    from empirical_lawhood.api.native_continuation_execution import select_native_continuation
+    continued = select_native_continuation(writer=writer, plan=plan, predecessor=predecessor,
+        retained_registry=retained_registry)
     if continued is not predecessor:
         return continued
     repair = _read_record(writer, repair_relative_path(predecessor.run_id), DevelopmentOutputBudgetRepair)
     if repair is None:
-        from .development_controller_repair import select_development_controller_repair
+        from empirical_lawhood.api.development_controller_repair import select_development_controller_repair
         return select_development_controller_repair(writer=writer, plan=plan, predecessor=predecessor)
-    from .development_controller_repair import repair_relative_path as controller_path
+    from empirical_lawhood.api.development_controller_repair import repair_relative_path as controller_path
     if writer.root.resolve(controller_path(predecessor.run_id), for_write=False).exists():
         raise PermissionError('development repair cannot select two replacement controllers')
     index = DevelopmentOutputRepairRecoveryIndex.derive(plan, predecessor, repair)
@@ -143,7 +148,7 @@ def derive_development_output_repair(*, writer, plan, predecessor, original_sour
     repair = DevelopmentOutputBudgetRepair('repair.development-output.' + token[:24], owner_instruction_sha256,
         _pin(plan, 'execution_plan_id'), _pin(predecessor, 'recovery_index_id'), _pin(terminal, 'terminal_event_id'),
         refused, completed, unstarted, output_bytes, controller, worker, environment, str(worker_source_root))
-    from .recursive_operations import operation_catalog
+    from empirical_lawhood.api.recursive_operations import operation_catalog
     registrations, _, _ = operation_catalog()
     ceilings = {(row.selection.capability_key, row.selection.capability_version): row.resource_ceiling for row in registrations}
     for task_id, _ in refused:
@@ -166,13 +171,17 @@ def publish_development_output_repair(*, writer, repair, index):
 
 
 def authenticate_repair_controller(*, index, source, controller):
-    from empirical_lawhood.runtime.native_continuation_execution import DevelopmentNativeContinuationRecoveryIndex
-    if type(index) is DevelopmentNativeContinuationRecoveryIndex:
-        from .native_continuation_execution import authenticate_controller
+    from empirical_lawhood.execution.development_scratch_repair import DevelopmentScratchRepairRecoveryIndex
+    if type(index) is DevelopmentScratchRepairRecoveryIndex:
+        from empirical_lawhood.api.development_scratch_repair import authenticate_controller
         return authenticate_controller(index=index, source=source, controller=controller)
-    from empirical_lawhood.runtime.development_controller_repair import DevelopmentControllerRepairRecoveryIndex
+    from empirical_lawhood.execution.native_continuation_execution import DevelopmentNativeContinuationRecoveryIndex
+    if type(index) is DevelopmentNativeContinuationRecoveryIndex:
+        from empirical_lawhood.api.native_continuation_execution import authenticate_controller
+        return authenticate_controller(index=index, source=source, controller=controller)
+    from empirical_lawhood.execution.development_controller_repair import DevelopmentControllerRepairRecoveryIndex
     if type(index) is DevelopmentControllerRepairRecoveryIndex:
-        from .development_controller_repair import authenticate_controller
+        from empirical_lawhood.api.development_controller_repair import authenticate_controller
         return authenticate_controller(index=index, source=source, controller=controller)
     if type(index) is not DevelopmentOutputRepairRecoveryIndex:
         raise TypeError('development output repair requires its typed selected recovery index')
@@ -188,13 +197,17 @@ def authenticate_repair_controller(*, index, source, controller):
 
 
 def repair_report(index):
-    from empirical_lawhood.runtime.native_continuation_execution import DevelopmentNativeContinuationRecoveryIndex
+    from empirical_lawhood.execution.development_scratch_repair import DevelopmentScratchRepairRecoveryIndex
+    if type(index) is DevelopmentScratchRepairRecoveryIndex:
+        from empirical_lawhood.api.development_scratch_repair import repair_report as scratch_report
+        return scratch_report(index)
+    from empirical_lawhood.execution.native_continuation_execution import DevelopmentNativeContinuationRecoveryIndex
     if type(index) is DevelopmentNativeContinuationRecoveryIndex:
-        from .native_continuation_execution import repair_report as continuation_report
+        from empirical_lawhood.api.native_continuation_execution import repair_report as continuation_report
         return continuation_report(index)
-    from empirical_lawhood.runtime.development_controller_repair import DevelopmentControllerRepairRecoveryIndex
+    from empirical_lawhood.execution.development_controller_repair import DevelopmentControllerRepairRecoveryIndex
     if type(index) is DevelopmentControllerRepairRecoveryIndex:
-        from .development_controller_repair import repair_report as controller_report
+        from empirical_lawhood.api.development_controller_repair import repair_report as controller_report
         return controller_report(index)
     if type(index) is not DevelopmentOutputRepairRecoveryIndex:
         return {}
@@ -211,11 +224,11 @@ def recover_development_output_budget(*, service, directory, run_id, output_byte
         owner_instruction_sha256, worker_interpreter, worker_source_root,
         maximum_parallel_tasks, read_access=None):
     """Public recovery owner; preparation cannot overlap the original run."""
-    from .recursive_authoring import implementation_binding, load_authored_wave
-    from .recursive_execution import _retained_plans, run_recursive_wave
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.run_source_admission import _capture_source
-    from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
+    from empirical_lawhood.api.recursive_authoring import implementation_binding, load_authored_wave
+    from empirical_lawhood.api.recursive_execution import _retained_plans, run_recursive_wave
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.run_source_admission import _capture_source
+    from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
 
     writer = service.artifact_writer
     _, draft, source, payloads = load_authored_wave(directory=directory, artifact_writer=writer,

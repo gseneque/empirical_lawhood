@@ -9,9 +9,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.input_access import validated_task_scientific_input_edges
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionTask, ScientificInputRole
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.execution.input_access import validated_task_scientific_input_edges
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionTask, ScientificInputRole
 from tests.runtime_platform.test_recursive_graph_indexes import _compile
 
 

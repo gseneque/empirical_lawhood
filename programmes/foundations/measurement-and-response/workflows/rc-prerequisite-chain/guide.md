@@ -207,8 +207,8 @@ The [existing RC model workflow](../rc-ladder-response/guide.md) retains its sep
 
 ## References and research
 
-The [protocol](protocol.md) and [strict records](../../../../../src/empirical_lawhood/adapters/methods/rc_prerequisite_chain/contracts.py) own this bounded design.
-The [scientific evaluator](../../../../../src/empirical_lawhood/adapters/methods/rc_prerequisite_chain/science.py) owns its numerical execution and retained reduction.
+The [protocol](protocol.md) and [strict records](../../../../../src/empirical_lawhood/domains/circuits/rc_prerequisite_chain/contracts.py) own this bounded design.
+The [scientific evaluator](../../../../../src/empirical_lawhood/domains/circuits/rc_prerequisite_chain/science.py) owns its numerical execution and retained reduction.
 The [API](../../../../../src/empirical_lawhood/api/rc_prerequisite_chain.py) composes its execution, source observation and receipt recovery.
 For maintainers, [generate_integration_examples.py](../../../../../scripts/generate_integration_examples.py) projects the supplied canonical input from the typed default owner.
 The [independent scientific checks](../../../../../tests/test_rc_prerequisite_chain_falsifiers.py) and [workflow checks](../../../../../tests/test_rc_chain_workflow.py) test their declared software boundaries.

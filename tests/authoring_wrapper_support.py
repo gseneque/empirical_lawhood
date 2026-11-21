@@ -11,11 +11,11 @@ import json
 from pathlib import Path
 
 from empirical_lawhood.api.codecs import load_registered_authoring
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 from tests.prospective_source_capture_fixture import install_historical_source_capture
 
 
@@ -32,6 +32,8 @@ MODULES = {
 # test freezes this external dependency identity; normal authoring still reads
 # and binds the current checkout's actual lock bytes.
 MATRIX_BASELINE_LOCK_SHA256 = "5f0da9affb34be4e56cdb37e219af85fb81e9094b1eed18de2ad472e6510f494"
+# The inspection records the exact authoring-module bytes of the producer.
+MATRIX_BASELINE_INSPECTOR_SHA256 = "cb57849e12e861769d72c36ddf77cf5acc6bba769b2751dacf0aad5df3723a03"
 
 
 class FrozenDatetime(datetime):
@@ -40,7 +42,7 @@ class FrozenDatetime(datetime):
         return cls(2026, 10, 6, 0, 0, 0, tzinfo=UTC)
 
 
-def export_wrapper(family, directory, monkeypatch, *, module=None, persist=True, frozen_matrix_lock=False):
+def export_wrapper(family, directory, monkeypatch, *, module=None, persist=True, frozen_matrix_producer=False):
     module = module or importlib.import_module(MODULES[family])
     output = directory / "export"
     experiment_id = f"maintenance.wrapper.{family}"
@@ -63,11 +65,14 @@ def export_wrapper(family, directory, monkeypatch, *, module=None, persist=True,
         config = decode_canonical_bytes((ROOT / "programmes/materials/superconductivity/workflows/lattice-pairing-method/authoring.json").read_bytes(), module.SyntheticMaterialResponseMethodConfig, maximum_bytes=128 * 1024)
         summary = module.author_synthetic_material_response(root=ROOT, config=config, experiment_id=experiment_id, output_dir=output, artifact_writer=plane)
     else:
+        from empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring import PreparedResponseNativeAuthoringInput
+
         preparation = importlib.import_module("empirical_lawhood.adapters.composition.prepared_response.native_authoring")
         monkeypatch.setattr(preparation, "_implementation_digest", lambda root: "b" * 64)
         monkeypatch.setattr(preparation, "datetime", FrozenDatetime)
-        if frozen_matrix_lock:
+        if frozen_matrix_producer:
             source_spec = preparation.PreparedNativeSpec
+            source_inspection = preparation.PreparedExposureInspection
 
             def original_producing_spec(*args, **kwargs):
                 observed = source_spec(*args, **kwargs)
@@ -75,7 +80,15 @@ def export_wrapper(family, directory, monkeypatch, *, module=None, persist=True,
                 return replace(observed, dependency_lock_sha256=MATRIX_BASELINE_LOCK_SHA256)
 
             monkeypatch.setattr(preparation, "PreparedNativeSpec", original_producing_spec)
-        config = load_registered_authoring(ROOT / "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-source-qualification-author.json", root_schemas={preparation.PreparedResponseNativeAuthoringInput.SCHEMA: preparation.PreparedResponseNativeAuthoringInput}, maximum_bytes=16 * 1024)
+
+            def original_inspection(*args, **kwargs):
+                observed = source_inspection(*args, **kwargs)
+                assert observed.inspection_implementation_sha256 == hashlib.sha256(Path(preparation.__file__).read_bytes()).hexdigest()
+                return replace(observed, inspection_implementation_sha256=MATRIX_BASELINE_INSPECTOR_SHA256)
+
+            original_inspection.SCHEMA = source_inspection.SCHEMA
+            monkeypatch.setattr(preparation, "PreparedExposureInspection", original_inspection)
+        config = load_registered_authoring(ROOT / "programmes/foundations/emergent-structure/workflows/prepared-response/prepared-source-qualification-author.json", root_schemas={PreparedResponseNativeAuthoringInput.SCHEMA: PreparedResponseNativeAuthoringInput}, maximum_bytes=16 * 1024)
         held = directory / "held"
         held.mkdir(parents=True)
         prior = held / "inspection.json"

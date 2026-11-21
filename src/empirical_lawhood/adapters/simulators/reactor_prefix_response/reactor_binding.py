@@ -7,22 +7,16 @@ from hashlib import sha256
 from pathlib import Path
 from typing import ClassVar, Protocol
 
-from empirical_lawhood.adapters.composition.generated_executable_bindings import (
-    EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY,
-)
-from empirical_lawhood.adapters.composition.generated_extension_bundles import (
-    GENERATED_EXTENSION_BUNDLE_AGGREGATE,
-)
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.providers import ExternalInputPayload
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.providers import ExternalInputPayload
 
-from .batch_design import ReactorBatchSource
-from .batch_input import _ReactorSourceSnapshot
-from empirical_lawhood.adapters.methods.reactor_causal_response.native_benchmark import EmpiricalNativeEnvironment
+from empirical_lawhood.domains.reactor.reactor_prefix_response.batch_design import ReactorBatchSource
+from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_input import _ReactorSourceSnapshot
+from empirical_lawhood.domains.reactor.reactor_causal_response.native_benchmark import EmpiricalNativeEnvironment
 
 _BINDINGS = {
     "batch": "binding.terminal-bench-science-batch.reactor-batch",
@@ -49,6 +43,8 @@ _SOURCE_PORTS = {
 
 def required_upstream_port_keys(route: str) -> tuple[str, ...]:
     """Use the installed factory roster, excluding only its source input port."""
+    from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
+
 
     if route not in _BINDINGS or route in ("batch", "matched-replay-history"):
         raise ValueError("REACTOR_UPSTREAM_ROUTE_INVALID")
@@ -121,8 +117,8 @@ def _study_source_payload(
 ) -> ExternalInputPayload:
     """Rebuild the declared source schema from bounded authenticated source bytes."""
 
-    from empirical_lawhood.adapters.methods.reactor_causal_response.campaign_records import EmpiricalComparatorSources, EmpiricalStudySource
-    from empirical_lawhood.adapters.methods.reactor_causal_response.config import COMPARATOR_SOURCES
+    from empirical_lawhood.domains.reactor.reactor_causal_response.campaign_records import EmpiricalComparatorSources, EmpiricalStudySource
+    from empirical_lawhood.domains.reactor.reactor_causal_response.config import COMPARATOR_SOURCES
 
     if type(environment) is not EmpiricalNativeEnvironment:
         raise ValueError("REACTOR_NATIVE_ENVIRONMENT_REQUIRED")
@@ -168,6 +164,9 @@ def inspect_reactor_binding(
     _snapshot: _ReactorSourceSnapshot | None = None,
 ) -> dict[str, object]:
     """Construct a provider only when its actual closed port roster is present."""
+    from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
+    from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+
 
     binding_id = _BINDINGS[route]
     factories = EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY

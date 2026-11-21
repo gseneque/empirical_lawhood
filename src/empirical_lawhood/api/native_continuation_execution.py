@@ -5,26 +5,24 @@ from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, validate_stable_id
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import OperationalFailureClass
-from empirical_lawhood.runtime.native_continuation_execution import (
-    DevelopmentNativeContinuation, DevelopmentNativeContinuationRecoveryIndex,
-)
-from empirical_lawhood.runtime.native_continuation_proposal import DevelopmentNativeContinuationProposal
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex, TaskRecoveryDisposition
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import OperationalFailureClass
+from empirical_lawhood.execution.native_continuation_execution import DevelopmentNativeContinuation, DevelopmentNativeContinuationRecoveryIndex
+from empirical_lawhood.execution.native_continuation_proposal import DevelopmentNativeContinuationProposal
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex, TaskRecoveryDisposition
 
-from .development_controller_repair import _contacts, require_scientific_source
-from .development_output_repair import _pin
-from .native_continuation_preparation import _candidate_controls, _inspect_original, _original_controls
-from .retained_e3_control_repair import _read_record, observe_frozen_repair_worker, observe_frozen_worker_package_root
+from empirical_lawhood.api.development_controller_repair import _contacts, require_scientific_source
+from empirical_lawhood.api.development_output_repair import _pin
+from empirical_lawhood.api.native_continuation_preparation import _candidate_controls, _inspect_original, _original_controls
+from empirical_lawhood.api.retained_e3_control_repair import _read_record, observe_frozen_repair_worker, observe_frozen_worker_package_root
 
 
 SUPPORTED_NATIVE_CAPABILITIES = frozenset((
@@ -38,18 +36,19 @@ def continuation_relative_path(run_id):
 
 
 def _require_no_other_repair(writer, run_id):
-    from .development_controller_repair import repair_relative_path as controller_path
-    from .development_output_repair import repair_relative_path as output_path
+    from empirical_lawhood.api.development_controller_repair import repair_relative_path as controller_path
+    from empirical_lawhood.api.development_output_repair import repair_relative_path as output_path
     for relative in (controller_path(run_id), output_path(run_id)):
         if any(writer.root.resolve(path, for_write=False).exists() for path in (relative, relative + '.manifest.json')):
             raise PermissionError('native continuation cannot replace another selected development repair')
 
 
-def _census(*, writer, plan, predecessor, proposal, require_absent, continuation_index=None):
+def _census(*, writer, plan, predecessor, proposal, require_absent, continuation_index=None,
+        retained_registry=None):
     """All original candidates stay original; exactly named contacts get a new namespace."""
-    from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog, SQLiteOperationalRepository
-    from .recursive_execution import _custody_control_pins
-    from .recursive_operations import operation_catalog
+    from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog, SQLiteOperationalRepository
+    from empirical_lawhood.api.recursive_execution import _custody_control_pins
+    from empirical_lawhood.api.recursive_operations import operation_catalog
     if type(predecessor) is not DevelopmentRunRecoveryIndex:
         raise PermissionError('native continuation requires the unreplaced original recovery index')
     predecessor.validate_plan(plan)
@@ -69,8 +68,27 @@ def _census(*, writer, plan, predecessor, proposal, require_absent, continuation
     if pins != proposal.completed_receipts:
         raise PermissionError('native continuation changes its reviewed completed work')
     declarations, registry, _ = operation_catalog()
-    if registry.fingerprint() != plan.registry_sha256:
-        raise PermissionError('native continuation changes the frozen capability registry')
+    if retained_registry is None:
+        if registry.fingerprint() != plan.registry_sha256:
+            raise PermissionError('native continuation changes the frozen capability registry')
+    else:
+        # A historical read uses the registry already authenticated with its
+        # authored graph. Unrelated new operations cannot invalidate old custody.
+        # Every selected manifest, including its implementation, must stay exact.
+        from empirical_lawhood.execution.capabilities import CapabilityRegistry
+        if (require_absent or type(retained_registry) is not CapabilityRegistry
+                or retained_registry.fingerprint() != plan.registry_sha256):
+            raise PermissionError('native continuation read changes its retained registry')
+        for task in plan.tasks:
+            key = task.capability.capability_key, task.capability.capability_version
+            try:
+                original_manifest = retained_registry.resolve(*key)
+                current_manifest = registry.resolve(*key)
+            except (KeyError, ValueError) as error:
+                raise PermissionError('native continuation read loses an original capability') from error
+            if (current_manifest != original_manifest
+                    or original_manifest.implementation_sha256 != task.capability_implementation_sha256):
+                raise PermissionError('native continuation read changes an original capability')
     by_key = {(row.selection.capability_key, row.selection.capability_version): row for row in declarations}
     def registration(task):
         try:
@@ -207,7 +225,7 @@ def derive_native_continuation(*, writer, plan, predecessor, proposal, proposal_
     return proof, index
 
 
-def select_native_continuation(*, writer, plan, predecessor):
+def select_native_continuation(*, writer, plan, predecessor, retained_registry=None):
     proof = _read_record(writer, continuation_relative_path(predecessor.run_id), DevelopmentNativeContinuation)
     if proof is None:
         return predecessor
@@ -217,7 +235,7 @@ def select_native_continuation(*, writer, plan, predecessor):
     require_scientific_source(proof.worker, proof.controller)
     index = DevelopmentNativeContinuationRecoveryIndex.derive(plan, predecessor, proof)
     census = _census(writer=writer, plan=plan, predecessor=predecessor, proposal=proof.proposal,
-        require_absent=False, continuation_index=index)
+        require_absent=False, continuation_index=index, retained_registry=retained_registry)
     if any(getattr(proof, key) != value for key, value in census.items()):
         raise PermissionError('native continuation changes its complete original census')
     _require_original_controls(writer=writer, plan=plan, index=index)
@@ -333,11 +351,11 @@ def repair_report(index):
 
 def continue_native(*, service, directory, run_id, proposal_path, owner_instruction_sha256,
         maximum_parallel_tasks, confirmed, read_access=None):
-    from .recursive_authoring import implementation_binding, load_authored_wave
-    from .recursive_execution import _external_inputs, _retained_plans, run_recursive_wave
-    from .selected_e3_access import original_e3_authority_read_context
-    from empirical_lawhood.infrastructure.run_source_admission import _capture_source
-    from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
+    from empirical_lawhood.api.recursive_authoring import implementation_binding, load_authored_wave
+    from empirical_lawhood.api.recursive_execution import _external_inputs, _retained_plans, run_recursive_wave
+    from empirical_lawhood.api.selected_e3_access import original_e3_authority_read_context
+    from empirical_lawhood.storage.run_source_admission import _capture_source
+    from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
     writer = service.artifact_writer
     relative = Path(proposal_path).resolve().relative_to(writer.root.contract.canonical_path).as_posix()
     admission = _capture_source(service.project_root)

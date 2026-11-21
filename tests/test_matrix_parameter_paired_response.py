@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Exposed paired response and declared nine-setting conformance, never qualification."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from decimal import Decimal as D
@@ -11,18 +12,15 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
 
-from empirical_lawhood.adapters.methods.matrix_parameter_response import science as original_science
-from empirical_lawhood.adapters.methods.matrix_parameter_response import paired_science as science
-from empirical_lawhood.adapters.methods.matrix_parameter_response import paired_independent as independent
-from empirical_lawhood.adapters.methods.matrix_parameter_response.paired_records import (
-    DISPOSITION_WITHOUT_STANDARD, MatrixPairedNumericalStandard, MatrixParameterPairedDesign,
-    MatrixPairedFunctionalDiscrepancy, identity, source_for,
-)
-from empirical_lawhood.adapters.methods.matrix_parameter_response.paired_grid import declare_grid
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.domains.matrix.matrix_parameter_response import science as original_science
+from empirical_lawhood.domains.matrix.matrix_parameter_response import paired_science as science
+from empirical_lawhood.domains.matrix.matrix_parameter_response import paired_independent as independent
+from empirical_lawhood.domains.matrix.matrix_parameter_response.paired_records import DISPOSITION_WITHOUT_STANDARD, MatrixPairedNumericalStandard, MatrixParameterPairedDesign, MatrixPairedFunctionalDiscrepancy, identity, source_for
+from empirical_lawhood.domains.matrix.matrix_parameter_response.paired_grid import declare_grid
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
 from tests.test_matrix_parameter_response import retained as original_retained, selected_case, templates
 from tests.test_matrix_parameter_factor import absent_case
 
@@ -127,8 +125,8 @@ def test_numerical_standard_is_required_and_outcomes_remain_distinct(paired_case
 def test_retained_paired_assessment_refuses_census_substitution_without_native(defect):
     """Admission changes only: re-use an immutable completed exposed assessment."""
     import json
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.adapters.methods.matrix_parameter_response.paired_records import MatrixParameterPairedAssessment
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.matrix.matrix_parameter_response.paired_records import MatrixParameterPairedAssessment
     selected = os.environ.get('MATRIX_PARAMETER_PAIRED_COMPLETED_FIXTURE')
     if not selected:
         pytest.skip('exact completed paired fixture required; this test never acquires one')
@@ -267,9 +265,9 @@ def test_grid_protected_actual_transfer_regime_requires_separate_settings():
 
 @pytest.mark.held
 def test_paired_factories_compiler_committed_roles_and_sourcefree_config(paired_case):
-    from empirical_lawhood.adapters.methods.matrix_parameter_response import paired_operation_bindings as binding
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.domains.matrix.matrix_parameter_response import paired_operation_bindings as binding
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     case = paired_case[0];source = case[0]
     factories = binding.operation_factories()
     assert len(factories) == 4 and sum(f.registration.native_effect for f in factories) == 1
@@ -307,22 +305,18 @@ def _cold_completed_paired(root,tmp_path,monkeypatch):
     import json
     import shutil
     from hashlib import sha256
-    from empirical_lawhood.adapters.methods.matrix_parameter_response import paired_operation_bindings as binding
-    from empirical_lawhood.adapters.methods.matrix_parameter_response.paired_records import (
-        MatrixParameterPairedSource,MatrixParameterPairedForecast,MatrixParameterPairedNative,MatrixParameterPairedAssessment,
-    )
-    from empirical_lawhood.adapters.methods.matrix_parameter_response.records import MatrixParameterResponseSource
-    from empirical_lawhood.adapters.methods.matrix_parameter_history.records import MatrixParameterHistorySource
-    from empirical_lawhood.adapters.methods.matrix_parameter_factor.records import (
-        MatrixParameterFactorSupply,MatrixParameterFactorSource,MatrixParameterFactorProduct,MatrixParameterFactorAssessment,
-    )
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-    from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+    from empirical_lawhood.domains.matrix.matrix_parameter_response import paired_operation_bindings as binding
+    from empirical_lawhood.domains.matrix.matrix_parameter_response.paired_records import MatrixParameterPairedSource, MatrixParameterPairedForecast, MatrixParameterPairedNative, MatrixParameterPairedAssessment
+    from empirical_lawhood.domains.matrix.matrix_parameter_response.records import MatrixParameterResponseSource
+    from empirical_lawhood.domains.matrix.matrix_parameter_history.records import MatrixParameterHistorySource
+    from empirical_lawhood.domains.matrix.matrix_parameter_factor.records import MatrixParameterFactorSupply, MatrixParameterFactorSource, MatrixParameterFactorProduct, MatrixParameterFactorAssessment
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+    from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+    from empirical_lawhood.execution.native_subwork import NativeSubworkState
     from tests.runtime_platform.test_native_subwork import _plane
     def input_record(cls):
         for path in (root/'inputs').glob('*.json'):
@@ -400,23 +394,23 @@ def test_actual_four_phase48_child_receipts_independent_and_portable(paired_case
     import resource
     import time
     from hashlib import sha256
-    from empirical_lawhood.adapters.methods.matrix_parameter_response import paired_operation_bindings as binding
+    from empirical_lawhood.domains.matrix.matrix_parameter_response import paired_operation_bindings as binding
     from empirical_lawhood.api.execution import _StaticInputResolver
-    from empirical_lawhood.infrastructure.execution import DirectTaskExecutor,LocalScheduler
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository,create_catalog_engine,upgrade_catalog
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore,decode_artifact_manifest
-    from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile,ArtifactWriteRequest
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile,RunnerRegistry,VerifiedArtifactInput
-    from empirical_lawhood.runtime.plans import PlanLane
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+    from empirical_lawhood.execution.local.execution import DirectTaskExecutor, LocalScheduler
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry, VerifiedArtifactInput
+    from empirical_lawhood.execution.plans import PlanLane
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
     from tests.runtime_platform.test_native_subwork import _plane
     case,history_raw,factor_raw,origin_raw,*_ = paired_case
     source = case[0]
@@ -440,7 +434,7 @@ def test_actual_four_phase48_child_receipts_independent_and_portable(paired_case
             spec.expected_payload_schema,ArtifactProfile.MATRIX_ARRAY_NPZ if array else ArtifactProfile.CANONICAL_JSON,
             spec.expected_media_type,'software.parameter-paired.fixture','inputs',raw,
             VisibilityCeiling.DEVELOPMENT_ONLY,(),OutcomeAccess.DEVELOPMENT_VISIBLE))
-        manifest = decode_artifact_manifest(plane.root.resolve(published.manifest_materialization.relative_path,for_write=False).read_bytes())
+        manifest = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(published.manifest_materialization.relative_path, for_write=False).read_bytes())
         inputs.append(VerifiedArtifactInput(manifest.logical,manifest.materialization))
     runners = RunnerRegistry(tuple(sorted((f.runner_factory() for f in factories),key=lambda r:r.manifest.registry_id)),
         registry_sha256=compiled.registry.fingerprint())

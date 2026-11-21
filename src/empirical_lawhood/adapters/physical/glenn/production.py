@@ -6,41 +6,18 @@ from dataclasses import dataclass
 import hashlib
 from typing import ClassVar, Final
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_ids,
-    validate_relative_locator,
-    validate_semantic_version,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.planning.dataset_authority import (
-    DATASET_EXTERNAL_ROOT_CONTRACT_SCHEMA,
-)
-from empirical_lawhood.planning.dataset_manifests import (
-    DatasetRegistrationManifest,
-    DatasetTransformationManifest,
-)
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    ImplementationSourceClosure,
-)
-from empirical_lawhood.runtime.datasets import DatasetImplementationRegistry
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_ids, validate_relative_locator, validate_semantic_version, validate_sha256, validate_stable_id
+from empirical_lawhood.design.dataset_authority import DATASET_EXTERNAL_ROOT_CONTRACT_SCHEMA
+from empirical_lawhood.design.dataset_manifests import DatasetRegistrationManifest, DatasetTransformationManifest
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, ImplementationSourceClosure
+from empirical_lawhood.execution.datasets import DatasetImplementationRegistry
 
-from .contracts import GLENN_2026_PROFILE
-from .manifests import GlennRetainedComparisonInputs, GLENN_ARCHIVE_RELATIVE_LOCATOR, GLENN_ARCHIVE_SHA256, GLENN_ARCHIVE_SIZE_BYTES, GLENN_HISTORICAL_OBSERVATIONS_RELATIVE_LOCATOR, GLENN_HISTORICAL_OBSERVATIONS_SIZE_BYTES, build_glenn_registration_manifest, build_glenn_transformation_manifest
-from .registry import (
-    GLENN_CONFIG_REGISTRY_KEY,
-    GLENN_ENVIRONMENT_REGISTRY_KEY,
-    GLENN_RUNTIME_REGISTRY_KEY,
-    GlennDatasetRegistryProfile,
-    build_glenn_dataset_registry_profile,
-    compose_glenn_registration_manifest_dependencies,
-    compose_glenn_transformation_manifest_dependencies,
-)
-from .transform import GLENN_PARQUET_PROFILE_ID
+from empirical_lawhood.adapters.physical.glenn.contracts import GLENN_2026_PROFILE
+from empirical_lawhood.adapters.physical.glenn.manifests import GlennRetainedComparisonInputs, GLENN_ARCHIVE_RELATIVE_LOCATOR, GLENN_ARCHIVE_SHA256, GLENN_ARCHIVE_SIZE_BYTES, GLENN_HISTORICAL_OBSERVATIONS_RELATIVE_LOCATOR, GLENN_HISTORICAL_OBSERVATIONS_SIZE_BYTES, build_glenn_registration_manifest, build_glenn_transformation_manifest
+from empirical_lawhood.adapters.physical.glenn.registry import GLENN_CONFIG_REGISTRY_KEY, GLENN_ENVIRONMENT_REGISTRY_KEY, GLENN_RUNTIME_REGISTRY_KEY, GlennDatasetRegistryProfile, build_glenn_dataset_registry_profile, compose_glenn_registration_manifest_dependencies, compose_glenn_transformation_manifest_dependencies
+from empirical_lawhood.adapters.physical.glenn.transform import GLENN_PARQUET_PROFILE_ID
 
 
 GLENN_PRODUCTION_PROFILE_ID: Final = "glenn-reproduction-ready"

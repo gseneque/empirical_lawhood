@@ -8,18 +8,18 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_specification as records
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_bindings as bindings
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_inputs as inputs_owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_preparation as preparation_owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import experiment_methods as science
-from empirical_lawhood.adapters.methods.matrix_factor_response import e3_numerical_methods as numerical
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import MatrixParameterCoordinate
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_specification as records
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_bindings as bindings
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_inputs as inputs_owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_preparation as preparation_owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import experiment_methods as science
+from empirical_lawhood.domains.matrix.matrix_factor_response import e3_numerical_methods as numerical
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import MatrixParameterCoordinate
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, load_experiment_specification, prepare_experiment
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
 from tests.test_matrix_experiment_methods import fixture, bank, selected_input_records, run_methods
 from tests.test_matrix_experiment_specification import execution
 
@@ -102,7 +102,7 @@ def test_complete_lowering_and_cold_validation_freeze_original_coordinate_and_bu
     preparation_owner.validate_matrix_response_instance(specification=specification, allocation=prepared.allocation,
         draft=prepared.draft, source_records=prepared.design_records)
     registrations = {row.registration().selection.selection_id: row.registration() for row in bindings.operation_declarations()}
-    from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+    from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
     for operation in prepared.draft.operations:
         config = decode_recursive_config_input(operation, registrations[operation.selection.selection_id]).record
         assert config.resource_budget == operation.resource_budget == selected["resources"].budget(config.operation)
@@ -157,7 +157,7 @@ def test_actual_public_v2_author_workers_cold_read_and_zero_entry_recovery(tmp_p
     from empirical_lawhood.api.experiment_preparation import author_prepared_experiment
     from empirical_lawhood.api.configuration import validate_configuration
     from empirical_lawhood.api.recursive_operations import operation_factories
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     from tests.test_recursive_public_service import _plane
 
     specification, selected = configured_case()
@@ -229,7 +229,7 @@ def test_missing_selections_and_foreign_coordinate_sources_refuse_before_lowerin
 
 def test_installed_v2_operations_require_finite_reservations_without_sidecar_shortcuts():
     _, _, prepared, _ = prepared_case()
-    from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+    from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
     operation = prepared.draft.operations[0]
     registration = next(row.registration() for row in bindings.operation_declarations()
         if row.registration().selection == operation.selection)
@@ -273,7 +273,7 @@ def test_explicit_intercept_penalty_changes_actual_fit_and_rejects_nonboolean():
     penalized = science.fit_models(penalized_spec, prepared.allocation, bank(methods, "features", "train"),
         bank(methods, "outcomes", "train"), record_id="models.penalized-intercept")
     assert penalized.models[2].ridge_parameters != unpenalized.models[2].ridge_parameters
-    from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURE_BLOCKS
+    from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURE_BLOCKS
     assert specification.methods[0].feature_count == sum(len(FEATURE_BLOCKS[block])
         for block in specification.methods[0].feature_blocks)
     with pytest.raises(ValueError):
@@ -325,7 +325,7 @@ def test_all_configured_integer_resource_operands_refuse_boolean(field):
 
 
 def test_paired15_registered_fixed_geometry_preserves_historical_measurement_bytes():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_specification import MatrixResponseMeasurementSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_specification import MatrixResponseMeasurementSelection
 
     specification, _ = configured_case()
     selected = specification.protocol.measurement
@@ -383,7 +383,7 @@ def test_public_explain_and_config_schema_distinguish_fixed_and_selectable_geome
 
 
 def test_supported_measurement_edits_reach_real_lowered_configs_and_cold_readback():
-    from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+    from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
 
     specification, selected = configured_case()
     measurement = specification.protocol.measurement

@@ -13,12 +13,11 @@ from tests.prepared_seed_fixtures import fixture_seed_census
 import pytest
 
 from empirical_lawhood.adapters import _bounded_files
-from empirical_lawhood.adapters.composition.finite_response_law.native_input import (
-    FiniteResponseLawCalibrationInput,
-    check_finite_calibration_input,
-)
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.native_input import FiniteResponseLawCalibrationInput
+from empirical_lawhood.adapters.composition.finite_response_law.native_input import check_finite_calibration_input
 from empirical_lawhood.adapters.composition.prepared_response import native_authoring
-from empirical_lawhood.adapters.methods.finite_response_law import science
+import empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring as native_authoring_owner_0
+from empirical_lawhood.domains.matrix.finite_response_law import science
 
 
 def test_response_external_read_exact_bound_and_empty_file(tmp_path: Path) -> None:
@@ -104,7 +103,7 @@ def _external_call(route: str, held: Path, prior: Path) -> None:
         plan = held / "plan.txt"
         plan.write_text("exposed development input; no scientific claim\n")
         native_application.author_matrix_response(
-            native_authoring.PreparedResponseNativeAuthoringInput(
+            native_authoring_owner_0.PreparedResponseNativeAuthoringInput(
                 "empirical-lawhood-prepared-response-integrity-test",
                 "source-qualification",
                 "empirical-lawhood.prepared-response.integrity-test",
@@ -258,7 +257,7 @@ def test_model_bank_duplicate_refuses_through_authoring_before_target_import(
     }[field]
     bank = tmp_path / "bank.json"
     bank.write_text(raw)
-    config = native_authoring.PreparedResponseNativeAuthoringInput(
+    config = native_authoring_owner_0.PreparedResponseNativeAuthoringInput(
         f"empirical-lawhood-{route}-response-integrity",
         {"information": "information-prediction", "causal": "causal-response-prediction"}[route],
         f"empirical-lawhood.{route}-response.integrity",
@@ -288,9 +287,7 @@ def test_public_input_seam_refuses_collisions_before_compilation_or_native_conta
     """Use actual retained roster identities, without running any native task."""
     from hashlib import sha256
     from empirical_lawhood.adapters.composition.finite_response_law import native_input
-    from empirical_lawhood.adapters.composition.finite_response_law.exposure import (
-        native_seed_ids,
-    )
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.exposure import native_seed_ids
 
     def forbidden(*args, **kwargs):
         pytest.fail("colliding ledger reached authoring or native task enumeration")

@@ -4,18 +4,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import ClassVar
 
-from empirical_lawhood.adapters.simulators.rc_ladder_response.contracts import ResistorCapacitorLadderStudyConfig
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.planning.experiment_entry import ExecutableStudyDefinition
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure
+from empirical_lawhood.domains.circuits.rc_ladder.contracts import ResistorCapacitorLadderStudyConfig
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256, validate_stable_id
+from empirical_lawhood.design.experiment_entry import ExecutableStudyDefinition
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure
 
-from .authoring import RCLadderResponseAuthoringBundle, build_rc_authoring
+from empirical_lawhood.domains.circuits.rc_ladder.authoring.authoring import RCLadderResponseAuthoringBundle, build_rc_authoring
 
 _MAX_STUDY_BYTES = 128 * 1024
 _MAX_PACKET_BYTES = 16 * 1024 * 1024

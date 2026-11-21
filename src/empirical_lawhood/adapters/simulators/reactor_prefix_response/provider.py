@@ -4,32 +4,19 @@ from collections.abc import Callable
 from dataclasses import fields
 from decimal import Decimal
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskProgressEmitter,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskProgressEmitter, TaskRunner
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .extension_bundle import CAPABILITY
-from .panel import ReactorPrefixConfig, ReactorPrefixPanel, ReactorSourceBundle, acquire_prefix_branch, native_task_id
+from empirical_lawhood.adapters.simulators.reactor_prefix_response.extension import CAPABILITY
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_panel import ReactorPrefixConfig, ReactorPrefixPanel, ReactorSourceBundle, native_task_id
+from empirical_lawhood.adapters.simulators.reactor_prefix_response.panel import acquire_prefix_branch
 
 
 class ReactorPrefixRunner:

@@ -6,14 +6,16 @@ committed inquiry packets. This service derives a current readout from those
 owners; it stores no authority verdict, replacement journal or scheduler state.
 """
 
+from empirical_lawhood.execution.progress import progress_operation
+
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
-from .experiment_runtime_bindings import experiment_runtime_binding
+from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding
 
 
 def _phase_progress(report, plan):
@@ -50,26 +52,26 @@ class ExperimentProgrammeService:
     operator_artifact_root_contract: object | None = field(default=None, kw_only=True)
 
     def _composite_programme(self, *, directory=None, preparation=None):
-        from .composite_experiment_programme import selected_composite_programme_service
+        from empirical_lawhood.api.composite_experiment_programme import selected_composite_programme_service
 
         return selected_composite_programme_service(service=self, directory=directory, preparation=preparation)
 
     def _selected_workers(self, requested):
-        from empirical_lawhood.runtime.experiment_preparation import select_experiment_workers
+        from empirical_lawhood.execution.experiment_preparation import select_experiment_workers
 
         return select_experiment_workers(requested,
             profile_maximum=getattr(self.storage_profile, "maximum_parallel_tasks", None))
 
     def _prospective_context(self, directory, *, maximum_parallel_tasks=None, reveal_authority_id=None,
             lifecycle="run", recovery_run_id=None, read_access=None):
-        from .prospective_experiment import RetainedProspectiveExperiment, load_prepared_prospective_experiment, load_retained_prospective_experiment
+        from empirical_lawhood.api.prospective_experiment import RetainedProspectiveExperiment, load_prepared_prospective_experiment, load_retained_prospective_experiment
         from empirical_lawhood.api.composition import create_api
-        from empirical_lawhood.runtime.prospective_experiment import PreparedProspectiveExperimentHandoff
+        from empirical_lawhood.execution.prospective_experiment import PreparedProspectiveExperimentHandoff
 
         if self.operator_artifact_root_contract is not None and self.prospective_api_factory is not None:
             raise ValueError("selected external root cannot replace an injected programme API")
         maximum_parallel_tasks = self._selected_workers(maximum_parallel_tasks)
-        from .recursive_execution import validate_recursive_worker_controls
+        from empirical_lawhood.api.recursive_execution import validate_recursive_worker_controls
         validate_recursive_worker_controls(maximum_parallel_tasks, None)
         if self.storage_profile is None:
             raise ValueError("prospective programme requires its selected operator storage profile")
@@ -115,7 +117,7 @@ class ExperimentProgrammeService:
 
     @staticmethod
     def _prospective_report(result, selected):
-        from .prospective_experiment import RetainedProspectiveExperiment
+        from empirical_lawhood.api.prospective_experiment import RetainedProspectiveExperiment
 
         projection = selected.projection if type(selected) is RetainedProspectiveExperiment else selected.handoff.projection
         return {**result.to_mapping(), "programme": {
@@ -128,12 +130,13 @@ class ExperimentProgrammeService:
     def _is_prospective(directory):
         return (Path(directory) / "experiment" / "experiment-association.json").exists()
 
+    @progress_operation("experiment.prepare")
     def prepare(self, specification, *, scientific_inputs=None, execution=None,
                 protocol_bytes=None, method_inputs=None):
         """Derive the installed design; execution selections remain explicit."""
-        from .experiment_preparation import prepare_experiment
+        from empirical_lawhood.api.experiment_preparation import prepare_experiment
 
-        from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+        from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
         if execution is not None and type(execution) is not ExecutionSelection:
             raise TypeError("experiment execution requires its typed operational selection")
@@ -141,7 +144,7 @@ class ExperimentProgrammeService:
         execution = replace(execution, workers=self._selected_workers(execution.workers))
         preparation = prepare_experiment(specification, scientific_inputs=scientific_inputs,
             execution=execution, protocol_bytes=protocol_bytes, method_inputs=method_inputs)
-        from .experiment_preparation import _protocol
+        from empirical_lawhood.api.experiment_preparation import _protocol
         binding = experiment_runtime_binding(_protocol(specification))
         if binding is not None and binding.programme_service_factory is not None:
             composite = binding.programme_service_factory(service=self, descriptor=None)
@@ -150,7 +153,7 @@ class ExperimentProgrammeService:
 
     def _refine_preparation(self, preparation, composite):
         """Reuse the same installed owner projection before prepare/author."""
-        from empirical_lawhood.runtime.experiment_preparation import ExperimentPreparation
+        from empirical_lawhood.execution.experiment_preparation import ExperimentPreparation
         from dataclasses import fields
         refine = getattr(composite, "refine_preparation", None)
         if not callable(refine):
@@ -165,25 +168,25 @@ class ExperimentProgrammeService:
             raise ValueError("Programme preparation refinement changes its original selection, inputs or execution")
         return refined
 
+    @progress_operation("experiment.continue-matrix")
     def continue_matrix(self, *, predecessor_directory, output_dir, confirmed=False, maximum_parallel_tasks=None,
             pure_output_bytes=None):
         """Prepare, derive, author and execute a repaired Matrix continuation."""
-        from .matrix_programme_continue import continue_matrix_programme
+        from empirical_lawhood.api.matrix_programme_continue import continue_matrix_programme
         return continue_matrix_programme(self, predecessor_directory=predecessor_directory,
             output_dir=output_dir, confirmed=confirmed, maximum_parallel_tasks=maximum_parallel_tasks,
             **({} if pure_output_bytes is None else {'pure_output_bytes': pure_output_bytes}))
 
+    @progress_operation("experiment.derive-inputs")
     def derive_inputs(self, *, specification_path, source_selection_path, metadata_directory,
             output_selection_path, execution, read_access=None):
         """Publish selected current metadata through its installed domain owner."""
-        from .experiment_preparation import derive_experiment_inputs
-        from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+        from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs
+        from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
         if type(execution) is not ExecutionSelection:
             raise TypeError("input derivation requires its explicit execution selection")
         execution = replace(execution, workers=self._selected_workers(execution.workers))
-        from .experiment_preparation import (
-            _protocol, _validate_experiment_input_derivation_result, load_experiment_specification,
-        )
+        from empirical_lawhood.api.experiment_preparation import _protocol, _validate_experiment_input_derivation_result, load_experiment_specification
         specification = load_experiment_specification(Path(specification_path))
         protocol = _protocol(specification)
         binding = experiment_runtime_binding(protocol)
@@ -213,8 +216,10 @@ class ExperimentProgrammeService:
             output_selection_path=output_selection_path, execution=execution,
             **({} if read_access is None else {'read_access': read_access}))
 
+    @progress_operation("experiment.export-products")
     def export_products(self, *, directory, selection_path, read_access=None, programme_request_path=None):
         """Invoke the retained protocol's declared postprocessing, never native work."""
+        from empirical_lawhood.execution.experiment_ports import require_experiment_report
         composite = self._composite_programme(directory=directory)
         if composite is not None:
             if read_access is not None:
@@ -223,15 +228,16 @@ class ExperimentProgrammeService:
             if not callable(export):
                 raise ValueError("selected programme has no installed component product export transition")
             options = {} if programme_request_path is None else {'programme_request_path': programme_request_path}
-            return export(directory=directory, selection_path=selection_path, **options)
+            return require_experiment_report(export(directory=directory, selection_path=selection_path, **options),
+                hook="programme.export_products")
         if programme_request_path is not None:
             raise ValueError('Composite product export selection requires a registered retained programme')
         from empirical_lawhood.api.recursive_authoring import load_authored_wave
-        from .experiment_preparation import experiment_protocols
+        from empirical_lawhood.api.experiment_preparation import experiment_protocols
         if self._is_prospective(directory):
             if read_access is not None:
                 raise ValueError('Prospective product export requires its own typed authority selection')
-            from .prospective_experiment import RetainedProspectiveExperiment, load_retained_prospective_experiment
+            from empirical_lawhood.api.prospective_experiment import RetainedProspectiveExperiment, load_retained_prospective_experiment
 
             loader = self.prospective_experiment_loader or load_retained_prospective_experiment
             selected = loader(directory=directory, project_root=self.project_root,
@@ -247,10 +253,11 @@ class ExperimentProgrammeService:
             binding = experiment_runtime_binding(declarations[0])
             if binding is None or not callable(binding.export_products):
                 raise ValueError("selected protocol has no installed product export transition")
-            return binding.export_products(directory=directory, selected=selected, project_root=self.project_root,
-                artifact_writer=self.artifact_writer, selection_path=selection_path)
-        from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-        from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
+            return require_experiment_report(binding.export_products(directory=directory, selected=selected,
+                project_root=self.project_root, artifact_writer=self.artifact_writer, selection_path=selection_path),
+                hook="export_products")
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+        from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
         import json
         _, _, _, payloads = load_authored_wave(directory=directory,artifact_writer=self.artifact_writer,lazy_payloads=True,
             **({} if read_access is None else {'read_access': read_access}))
@@ -277,15 +284,17 @@ class ExperimentProgrammeService:
             selection_path=selection_path, **({} if read_access is None else {'read_access': read_access}))
         if original_access is not None:
             original_access.require_current()
-        return report
+        return require_experiment_report(report, hook="export_products")
 
+    @progress_operation("experiment.explain")
     def explain(self, preparation):
-        from .experiment_preparation import experiment_preparation_report
+        from empirical_lawhood.api.experiment_preparation import experiment_preparation_report
 
         return experiment_preparation_report(preparation)
 
+    @progress_operation("experiment.author")
     def author(self, *, preparation, output_dir, read_access=None):
-        from .experiment_preparation import author_prepared_experiment
+        from empirical_lawhood.api.experiment_preparation import author_prepared_experiment
 
         if preparation.execution is None or preparation.execution.workers is None:
             raise ValueError("experiment authoring requires explicitly selected worker concurrency")
@@ -310,10 +319,11 @@ class ExperimentProgrammeService:
             artifact_writer=self.artifact_writer, output_dir=output_dir,
             **({} if read_access is None else {'read_access': read_access}))
 
+    @progress_operation("experiment.run")
     def run(self, *, directory, maximum_parallel_tasks=None, inquiry_successor=False, request=None,
             programme_request_path=None, confirmed=False, read_access=None, result_read_scope="FULL"):
         """Execute the retained wave, replaying any original inquiry admission."""
-        from .recursive_execution import run_recursive_wave, validate_recursive_worker_controls
+        from empirical_lawhood.api.recursive_execution import run_recursive_wave, validate_recursive_worker_controls
         from empirical_lawhood.api.recursive_inquiry import run_inquiry_successor
 
         if type(confirmed) is not bool:
@@ -328,7 +338,7 @@ class ExperimentProgrammeService:
             if request is not None or inquiry_successor is not False or read_access is not None:
                 raise ValueError("Composite programme refuses single-campaign or inquiry options")
             workers = self._selected_workers(maximum_parallel_tasks)
-            from .recursive_execution import validate_recursive_worker_controls
+            from empirical_lawhood.api.recursive_execution import validate_recursive_worker_controls
 
             validate_recursive_worker_controls(workers, None)
             return composite.run(directory=directory, maximum_parallel_tasks=workers,
@@ -368,13 +378,14 @@ class ExperimentProgrammeService:
                      artifact_writer=self.artifact_writer, maximum_parallel_tasks=maximum_parallel_tasks,
                      **owner_options)
 
+    @progress_operation("experiment.repair-development-structure")
     def repair_development_structure(self, *, directory, repair_instruction_path,
             maximum_parallel_tasks=None, confirmed=False, read_access=None):
         """Execute one separate PURE child with the complete failed original retained."""
         from hashlib import sha256
-        from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-        from .development_structure_repair import repair_development_structure
-        from .recursive_execution import validate_recursive_worker_controls
+        from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+        from empirical_lawhood.api.development_structure_repair import repair_development_structure
+        from empirical_lawhood.api.recursive_execution import validate_recursive_worker_controls
         if confirmed is not True:
             raise ValueError('structural repair requires the explicit --yes selection')
         instruction = read_bounded_bytes(Path(repair_instruction_path), maximum_bytes=1024 * 1024)
@@ -386,16 +397,17 @@ class ExperimentProgrammeService:
             owner_instruction_sha256=sha256(instruction).hexdigest(), maximum_parallel_tasks=workers,
             read_access=read_access)
 
+    @progress_operation("experiment.prepare-native-continuation")
     def prepare_native_continuation(self, *, directory, run_id, output_dir,
             preparation_instruction_path, worker_interpreter, worker_source_root,
             pure_output_bytes, read_access=None):
         """Prepare an exact incomplete-native proposal without execution authority."""
         from hashlib import sha256
-        from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-        from empirical_lawhood.kernel.serialization import validate_stable_id
-        from .native_continuation_preparation import prepare_native_continuation
+        from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+        from empirical_lawhood.science.records.serialization import validate_stable_id
+        from empirical_lawhood.api.native_continuation_preparation import prepare_native_continuation
         validate_stable_id(run_id)
-        if type(pure_output_bytes) is not int or not 0 < pure_output_bytes <= 256 * 1024**2:
+        if type(pure_output_bytes) is not int or not pure_output_bytes > 0:
             raise ValueError('native continuation preparation requires its bounded PURE output proposal')
         instruction = read_bounded_bytes(Path(preparation_instruction_path), maximum_bytes=1024 * 1024)
         if not instruction.strip():
@@ -405,14 +417,15 @@ class ExperimentProgrammeService:
             worker_interpreter=worker_interpreter, worker_source_root=worker_source_root,
             pure_output_bytes=pure_output_bytes, read_access=read_access)
 
+    @progress_operation("experiment.continue-native")
     def continue_native(self, *, directory, run_id, proposal_path, execution_instruction_path,
             maximum_parallel_tasks=None, confirmed=False, read_access=None):
         """Validate a separate native selection; dispatch only on explicit confirmation."""
         from hashlib import sha256
-        from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-        from empirical_lawhood.kernel.serialization import validate_stable_id
-        from .native_continuation_execution import continue_native
-        from .recursive_execution import validate_recursive_worker_controls
+        from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+        from empirical_lawhood.science.records.serialization import validate_stable_id
+        from empirical_lawhood.api.native_continuation_execution import continue_native
+        from empirical_lawhood.api.recursive_execution import validate_recursive_worker_controls
         validate_stable_id(run_id)
         if type(confirmed) is not bool:
             raise TypeError('native continuation confirmation must be an explicit boolean')
@@ -425,22 +438,46 @@ class ExperimentProgrammeService:
             owner_instruction_sha256=sha256(instruction).hexdigest(), maximum_parallel_tasks=workers,
             confirmed=confirmed, read_access=read_access)
 
+    @progress_operation("experiment.recover")
     def recover(self, *, directory, maximum_parallel_tasks=None, inquiry_successor=False, request=None,
             programme_request_path=None, confirmed=False, custody_only=False, read_access=None, result_read_scope="FULL",
             repair_retained_e3=False, repair_development_output_bytes=None,
-            repair_development_controller=False,
+            repair_development_controller=False, repair_development_scratch=False,
             worker_interpreter=None, worker_source_root=None, repair_instruction_path=None):
         """Reuse completed custody; the native owner still refuses UNKNOWN retry."""
         if type(repair_retained_e3) is not bool:
             raise TypeError('Retained E3 repair selection must be an explicit boolean')
         if type(repair_development_controller) is not bool:
             raise TypeError('Development controller repair selection must be an explicit boolean')
+        if type(repair_development_scratch) is not bool:
+            raise TypeError('Development scratch repair selection must be an explicit boolean')
+        if repair_development_scratch:
+            from empirical_lawhood.api.results import ResumeCampaignRequest
+            if (repair_retained_e3 or repair_development_controller or repair_development_output_bytes is not None
+                    or programme_request_path is not None or confirmed or custody_only or inquiry_successor
+                    or result_read_scope != 'FULL' or type(request) is not ResumeCampaignRequest
+                    or request.confirmed is not True or request.reconcile_only or request.reveal_authority_id is not None
+                    or request.parent_record_path is not None or request.parent_input_binding_paths
+                    or worker_interpreter is None or worker_source_root is None or repair_instruction_path is None):
+                raise ValueError('scratch repair requires one confirmed development run, frozen worker and owner instruction')
+            from hashlib import sha256
+            from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+            from empirical_lawhood.api.development_scratch_repair import recover_development_scratch
+            from empirical_lawhood.api.recursive_execution import validate_recursive_worker_controls
+            instruction = read_bounded_bytes(Path(repair_instruction_path), maximum_bytes=1024 * 1024)
+            if not instruction.strip():
+                raise ValueError('scratch repair instruction is empty')
+            workers = self._selected_workers(maximum_parallel_tasks)
+            validate_recursive_worker_controls(workers, None)
+            return recover_development_scratch(service=self, directory=directory, run_id=request.run_id,
+                owner_instruction_sha256=sha256(instruction).hexdigest(), worker_interpreter=worker_interpreter,
+                worker_source_root=worker_source_root, maximum_parallel_tasks=workers, read_access=read_access)
         if repair_development_controller and repair_development_output_bytes is None:
             raise ValueError('development controller repair requires its explicit PURE output allowance')
         if repair_development_output_bytes is not None:
-            from .results import ResumeCampaignRequest
+            from empirical_lawhood.api.results import ResumeCampaignRequest
             if (type(repair_development_output_bytes) is not int
-                    or not 0 < repair_development_output_bytes <= 256 * 1024**2
+                    or not repair_development_output_bytes > 0
                     or repair_retained_e3 or programme_request_path is not None or confirmed
                     or custody_only or inquiry_successor or result_read_scope != 'FULL'
                     or type(request) is not ResumeCampaignRequest or request.confirmed is not True
@@ -449,10 +486,10 @@ class ExperimentProgrammeService:
                     or worker_interpreter is None or worker_source_root is None or repair_instruction_path is None):
                 raise ValueError('development output repair requires one confirmed development run, a bounded output allowance, frozen worker and owner instruction')
             from hashlib import sha256
-            from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-            from .development_output_repair import recover_development_output_budget
-            from .development_controller_repair import recover_development_controller
-            from .recursive_execution import validate_recursive_worker_controls
+            from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+            from empirical_lawhood.api.development_output_repair import recover_development_output_budget
+            from empirical_lawhood.api.development_controller_repair import recover_development_controller
+            from empirical_lawhood.api.recursive_execution import validate_recursive_worker_controls
             instruction = read_bounded_bytes(Path(repair_instruction_path), maximum_bytes=1024 * 1024)
             if not instruction.strip():
                 raise ValueError('development output repair instruction is empty')
@@ -470,7 +507,7 @@ class ExperimentProgrammeService:
                     or worker_source_root is None or repair_instruction_path is None):
                 raise ValueError('retained E3 repair requires a single run, frozen worker and owner instruction')
             from hashlib import sha256
-            from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
+            from empirical_lawhood.storage.bounded_io import read_bounded_bytes
             instruction = read_bounded_bytes(Path(repair_instruction_path), maximum_bytes=1024 * 1024)
             if not instruction.strip():
                 raise ValueError('retained E3 repair instruction is empty')
@@ -492,7 +529,7 @@ class ExperimentProgrammeService:
             if (maximum_parallel_tasks is not None or inquiry_successor is not False or request is not None
                     or programme_request_path is not None or confirmed or read_access is not None):
                 raise ValueError("Custody-only recovery requires an initial development wave without execution or authority options")
-            from .recursive_execution import recover_recursive_custody
+            from empirical_lawhood.api.recursive_execution import recover_recursive_custody
 
             return recover_recursive_custody(directory=directory, project_root=self.project_root,
                 artifact_writer=self.artifact_writer)
@@ -503,7 +540,7 @@ class ExperimentProgrammeService:
             if request is not None or inquiry_successor is not False or read_access is not None:
                 raise ValueError("Composite programme refuses single-campaign or inquiry options")
             workers = self._selected_workers(maximum_parallel_tasks)
-            from .recursive_execution import validate_recursive_worker_controls
+            from empirical_lawhood.api.recursive_execution import validate_recursive_worker_controls
 
             validate_recursive_worker_controls(workers, None)
             return composite.recover(directory=directory, maximum_parallel_tasks=workers,
@@ -513,7 +550,7 @@ class ExperimentProgrammeService:
             raise ValueError("Composite programme options require a registered retained programme")
         if request is not None or self._is_prospective(directory):
             from empirical_lawhood.api.results import ResumeCampaignRequest
-            from .recursive_execution import validate_recursive_worker_controls
+            from empirical_lawhood.api.recursive_execution import validate_recursive_worker_controls
 
             maximum_parallel_tasks = self._selected_workers(maximum_parallel_tasks)
             validate_recursive_worker_controls(maximum_parallel_tasks, None)
@@ -526,7 +563,7 @@ class ExperimentProgrammeService:
             from empirical_lawhood.api.current_task_custody import current_issued_task_control_scope
             from contextlib import nullcontext
             from copy import copy
-            from .execution import CampaignExecutionService
+            from empirical_lawhood.api.execution import CampaignExecutionService
 
             execution = getattr(api, "_execution_service", None)
             scope = (execution._reconciliation_package_read_scope(request.run_id)
@@ -548,6 +585,7 @@ class ExperimentProgrammeService:
                         **({} if result_read_scope == "FULL" else {"result_read_scope": result_read_scope}),
                         **({} if read_access is None else {"read_access": read_access}))
 
+    @progress_operation("experiment.repair-retained-e3")
     def repair_retained_e3(self, *, directory, request, owner_instruction_sha256,
             worker_interpreter, worker_source_root, maximum_parallel_tasks=None, execute=True,
             repair_id=None, read_access=None):
@@ -559,20 +597,13 @@ class ExperimentProgrammeService:
         from primary custody. A matching controller resumes its existing wave;
         it does not obtain another attempt by repeating the command.
         """
-        from .results import ResumeCampaignRequest
-        from .current_task_custody import current_issued_task_control_scope
-        from .recursive_authoring import implementation_binding
-        from .retained_e3_control_repair import (
-            derive_retained_e3_control_repair, publish_retained_e3_control_repair,
-            retained_e3_control_repair,
-        )
-        from .retained_e3_repair_continuation import (
-            derive_repair_continuation, publish_repair_continuation, selected_controller,
-        )
-        from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-        from empirical_lawhood.runtime.retained_e3_repair import (
-            RetainedE3RepairRecoveryIndex, RetainedE3ContinuedRepairRecoveryIndex,
-        )
+        from empirical_lawhood.api.results import ResumeCampaignRequest
+        from empirical_lawhood.api.current_task_custody import current_issued_task_control_scope
+        from empirical_lawhood.api.recursive_authoring import implementation_binding
+        from empirical_lawhood.api.retained_e3_control_repair import derive_retained_e3_control_repair, publish_retained_e3_control_repair, retained_e3_control_repair
+        from empirical_lawhood.api.retained_e3_repair_continuation import derive_repair_continuation, publish_repair_continuation, selected_controller
+        from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+        from empirical_lawhood.execution.retained_e3_repair import RetainedE3RepairRecoveryIndex, RetainedE3ContinuedRepairRecoveryIndex
         if (type(request) is not ResumeCampaignRequest or request.confirmed is not True
                 or request.reconcile_only or type(execute) is not bool):
             raise ValueError('retained E3 repair requires an explicit run and --yes')
@@ -625,10 +656,11 @@ class ExperimentProgrammeService:
                 result = api.resume_campaign(request, expected_candidate=selected.association.candidate)
                 return self._prospective_report(result, selected)
 
+    @progress_operation("experiment.read-execution")
     def read_execution(self, *, directory, request=None, reveal_authority_id=None, read_access=None,
             expected_specification_bytes=None, programme_request_path=None):
         """Inspect authenticated execution records without a scientific report."""
-        from .experiment_execution_read import read_development_execution, read_prospective_execution
+        from empirical_lawhood.api.experiment_execution_read import read_development_execution, read_prospective_execution
         composite = self._composite_programme(directory=directory)
         if composite is not None:
             if request is not None or reveal_authority_id is not None or read_access is not None or expected_specification_bytes is not None:
@@ -640,7 +672,7 @@ class ExperimentProgrammeService:
         if programme_request_path is not None:
             raise ValueError('programme request requires a retained composite')
         if request is not None or self._is_prospective(directory):
-            from .results import CampaignStatusRequest
+            from empirical_lawhood.api.results import CampaignStatusRequest
             if type(request) is not CampaignStatusRequest or expected_specification_bytes is not None:
                 raise TypeError('issued execution inspection requires its actual campaign status request')
             selected, _ = self._prospective_context(directory, lifecycle='read', read_access=read_access)
@@ -651,6 +683,7 @@ class ExperimentProgrammeService:
         return read_development_execution(directory=directory, artifact_writer=self.artifact_writer,
             expected_specification_bytes=expected_specification_bytes, read_access=read_access)
 
+    @progress_operation("experiment.read")
     def read(self, *, directory, allow_partial=False, decision_directories=(), request=None, reveal_authority_id=None,
             programme_request_path=None, assess_incomplete=False, read_access=None,
             expected_specification_bytes=None, allow_unexecuted=False):
@@ -663,7 +696,7 @@ class ExperimentProgrammeService:
         Each owning reader retains its targeted verification lifetime; unrelated
         publication batches do not accumulate in one mutable snapshot here.
         """
-        from .recursive_execution import read_recursive_wave
+        from empirical_lawhood.api.recursive_execution import read_recursive_wave
         from empirical_lawhood.api.recursive_inquiry import read_inquiry_decision
 
         if type(allow_partial) is not bool:
@@ -692,7 +725,7 @@ class ExperimentProgrammeService:
 
             if type(request) is not CampaignStatusRequest or decision_directories:
                 raise TypeError("prospective programme read requires its existing typed campaign status request")
-            from .experiment_scientific_read import read_prepared_experiment_science
+            from empirical_lawhood.api.experiment_scientific_read import read_prepared_experiment_science
 
             selected, api = self._prospective_context(directory, lifecycle="read", read_access=read_access)
             result = api.campaign_status(request, expected_candidate=selected.association.candidate)
@@ -745,10 +778,11 @@ class ExperimentProgrammeService:
                          else "COMMITTED_INQUIRY_DECISION" if decisions else "ASSESS_PRODUCTS_AND_DECLARE_NEXT_INQUIRY",
         }}
 
+    @progress_operation("experiment.decide")
     def decide(self, *, request, output_dir):
         """Commit the declared current policy through its existing authority owner."""
         from empirical_lawhood.api.recursive_inquiry import commit_inquiry_decision
-        from empirical_lawhood.runtime.recursive_inquiry import InquiryDecisionRequest, WorkBoundInquiryDecisionRequest
+        from empirical_lawhood.execution.recursive_inquiry import InquiryDecisionRequest, WorkBoundInquiryDecisionRequest
 
         if type(request) not in (InquiryDecisionRequest, WorkBoundInquiryDecisionRequest):
             raise TypeError("programme decision requires its current typed inquiry request")
@@ -760,6 +794,7 @@ class ExperimentProgrammeService:
         return commit_inquiry_decision(**arguments, project_root=self.project_root,
                                        artifact_writer=self.artifact_writer, output_dir=output_dir)
 
+    @progress_operation("experiment.advance")
     def advance(self, *, decision_directory, supplier_directory, origins, output_dir, input_bindings=()):
         """Derive a successor through its installed domain builder and admission."""
         from empirical_lawhood.api.recursive_inquiry import author_inquiry_successor

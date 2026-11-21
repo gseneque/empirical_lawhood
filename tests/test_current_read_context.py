@@ -7,9 +7,9 @@ import sys
 import pytest
 
 from empirical_lawhood.api import recursive_qualified_parents as owner
-from empirical_lawhood.kernel import decoding
+from empirical_lawhood.science.records import decoding
 from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_issued_base_verification_scope import _case
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 from tests.runtime_platform.test_recursive_prospective_parents import _parent_inputs, parent_fixture as parent_fixture

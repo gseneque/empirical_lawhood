@@ -1,0 +1,145 @@
+{
+  "label": "Exposure-matched formation and causal response; timing with equal sector exposure",
+  "roots": [
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700601
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700602
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700603
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700604
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700605
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700606
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700607
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700608
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700609
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700610
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700611
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700612
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700613
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700614
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700615
+    },
+    {
+      "modules": [
+        "M1",
+        "M3"
+      ],
+      "role": "development",
+      "seed": 1700616
+    }
+  ],
+  "schema": "model-free-matrix-definition.v1",
+  "settings": {
+    "formation": {
+      "exposure_matched_recipes": [
+        "x-first-exposure-matched",
+        "y-first-exposure-matched"
+      ]
+    },
+    "response": {
+      "selection_tick": 32
+    }
+  }
+}

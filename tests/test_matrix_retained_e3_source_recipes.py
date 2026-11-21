@@ -5,12 +5,12 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_assembly as finite
-from empirical_lawhood.adapters.methods import matrix_prepared_source_assembly as prepared
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_assembly as finite
+from empirical_lawhood.domains.matrix import matrix_prepared_source_assembly as prepared
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, load_experiment_specification
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 
 
 @pytest.mark.parametrize('family', ('finite', 'prepared'))

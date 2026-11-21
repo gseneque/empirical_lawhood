@@ -9,7 +9,7 @@ import pytest
 from empirical_lawhood.api import matrix_researcher_programme as outer
 from empirical_lawhood.api import matrix_programme_e4_phases as projections
 from empirical_lawhood.api import selected_e4_programme_service as e4
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_recursive_public_service import _plane
 
 
@@ -56,7 +56,7 @@ def test_authored_frontier_does_not_require_future_wave_products(tmp_path, monke
 
 @pytest.mark.parametrize('phase', ('e4.calibration', 'e4.confirmation'))
 def test_existing_structure_without_actual_wave_custody_still_refuses(tmp_path, monkeypatch, phase):
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
     owner, context, directory = _unexecuted_phase(tmp_path, monkeypatch, phase, True)
     (directory / 'structure' / 'analysis').mkdir(parents=True)
     with pytest.raises(ArtifactIdentityConflict, match='artifact sidecar metadata is invalid'):

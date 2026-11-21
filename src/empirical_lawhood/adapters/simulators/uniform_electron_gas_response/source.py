@@ -7,7 +7,7 @@ from decimal import Decimal
 import json
 from typing import Any, BinaryIO, Mapping, Sequence
 
-from .contracts import ActionCurrentRow, BranchInput, ClosureDiagnosticInput, EvidenceLane, GaugeControlRow, MAXIMUM_PANEL_BYTES, UniformElectronGasTransverseScreenConfig, TransversePanel, Vector3
+from empirical_lawhood.domains.materials.electron_gas.contracts import ActionCurrentRow, BranchInput, ClosureDiagnosticInput, EvidenceLane, GaugeControlRow, MAXIMUM_PANEL_BYTES, UniformElectronGasTransverseScreenConfig, TransversePanel, Vector3
 
 
 def _keys(value: Mapping[str, object], expected: Sequence[str], *, field_name: str) -> None:

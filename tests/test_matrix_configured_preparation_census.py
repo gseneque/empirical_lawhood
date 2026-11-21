@@ -6,11 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_specification import matched_e3_estimators
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.scientific_design import MatrixProgrammeScientificDesign
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_specification import matched_e3_estimators
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.scientific_design import MatrixProgrammeScientificDesign
 from empirical_lawhood.api.experiment_preparation import load_experiment_specification, prepare_experiment
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
 
 EXPERIMENTS = Path(__file__).parents[1] / 'programmes/foundations/emergent-structure/workflows'

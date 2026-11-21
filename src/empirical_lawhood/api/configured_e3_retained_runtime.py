@@ -2,14 +2,14 @@
 """Hold original E3 custody through the continued public execution lifetime."""
 from contextlib import contextmanager
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_bindings import ConfiguredE3RetainedTaskRunner, retained_input_id
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import ConfiguredE3RetainedTaskConfig
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection, ConfiguredE3UnfinishedPreparationSelection, ConfiguredE3ClosedPreparationSelection
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.runtime.input_access import validated_task_scientific_input_edges
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_bindings import ConfiguredE3RetainedTaskRunner, retained_input_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import ConfiguredE3RetainedTaskConfig
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection, ConfiguredE3UnfinishedPreparationSelection, ConfiguredE3ClosedPreparationSelection
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.execution.input_access import validated_task_scientific_input_edges
 
-from .configured_e3_retained_custody import _active_original_reads, read_original_partial_e3
-from .matrix_selected_runtime import _issued_configuration_lane
+from empirical_lawhood.api.configured_e3_retained_custody import _active_original_reads, read_original_partial_e3
+from empirical_lawhood.api.matrix_selected_runtime import _issued_configuration_lane
 
 
 class RetainedE3ExecutionScope:
@@ -56,14 +56,14 @@ class RetainedE3ExecutionScope:
         @contextmanager
         def original_scope():
             if type(self.selection) is ConfiguredE3ClosedPreparationSelection:
-                from .configured_e3_closeout_custody import read_closed_e3
+                from empirical_lawhood.api.configured_e3_closeout_custody import read_closed_e3
                 scope = self.selection.closeout
                 with read_closed_e3(artifact_writer=self.writer, directory=scope.predecessor_authoring_directory,
                         run_id=scope.predecessor_run_id,
                         reveal_authority_id=scope.predecessor_reveal_authority.object_id) as original:
                     yield original
             elif type(self.selection) is ConfiguredE3UnfinishedPreparationSelection:
-                from .configured_e3_unfinished_custody import read_unfinished_e3
+                from empirical_lawhood.api.configured_e3_unfinished_custody import read_unfinished_e3
                 scope = self.selection.unfinished
                 with read_unfinished_e3(artifact_writer=self.writer, directory=scope.predecessor_authoring_directory,
                         run_id=scope.predecessor_run_id,
@@ -121,8 +121,8 @@ class RetainedE3ExecutionScope:
 
 def retained_e3_execution_scope(service, run_id):
     """Select the retained control owner from the actual installed input ports."""
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
-    from .domain_composition.matrix_configured_protected_response.runtime import ProtectedE3RuntimeInputSupplier
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.runtime import ProtectedE3RuntimeInputSupplier
     selected = []
     for platform in service.executable_platform_ports:
         if type(platform.port) is not RecursiveOperationInputPort:

@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Receipt-only custody controls; synthetic software inputs, no real workers."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from decimal import Decimal
@@ -11,24 +12,24 @@ from types import SimpleNamespace
 import pytest
 from sqlalchemy.exc import NoResultFound
 
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore, RunRecoveryError
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
-from empirical_lawhood.runtime.execution_envelope import RunExecutionResourceEnvelopeMachine
-from empirical_lawhood.runtime.execution import OperationalAttempt, TaskAttemptDisposition
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition, NativeSubworkOutput, NativeSubworkRoster
-from empirical_lawhood.runtime.recovery import RunRecoveryIndex
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore, RunRecoveryError
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
+from empirical_lawhood.execution.execution_envelope import RunExecutionResourceEnvelopeMachine
+from empirical_lawhood.execution.execution import OperationalAttempt, TaskAttemptDisposition
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition, NativeSubworkOutput, NativeSubworkRoster
+from empirical_lawhood.execution.recovery import RunRecoveryIndex
 from tests.recovery_support import _identity, case as case
 from tests.recovery_support import _Inspector, _repository
 
@@ -111,7 +112,7 @@ def test_completed_closure_rebuilds_private_catalog_without_primary_changes(hist
 
 @pytest.mark.parametrize('changed_member', ('json', 'journal'))
 def test_repeated_resource_load_reuses_replay_but_rehashes_same_stamp_bytes(history, monkeypatch, changed_member):
-    from empirical_lawhood.infrastructure import execution_resource_envelopes as owner
+    from empirical_lawhood.execution.resources import execution_resource_envelopes as owner
     envelope = history.retained_envelope
     task = history.unused
     attempt = history.index.task(task.task_id).attempts[0]
@@ -327,9 +328,8 @@ def _seed_native_subwork(monkeypatch, *, unknown_sibling=False):
                 "software-native-inputs/" + identity.object_id + ".json", record.SCHEMA,
                 ArtifactProfile.CANONICAL_JSON, "application/json", "software.native-inputs", "software-native-inputs",
                 record.canonical_bytes(), contacts.visibility_ceiling, (), contacts.outcome_access))
-            from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-            inputs.append(decode_artifact_manifest(contacts.plane.root.resolve(
-                written.materialization.relative_path + ".manifest.json", for_write=False).read_bytes()))
+
+            inputs.append(resolve_artifact_sidecar_bytes(contacts.plane, contacts.plane.root.resolve(written.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()))
         definition = NativeSubworkDefinition("software.leaf-completed", "software.operation", parent,
             ObjectIdentity.from_record(configuration.selected_id, configuration), (provenance.identity,),
             provenance.code_sources_sha256, provenance.dependency_lock_sha256,

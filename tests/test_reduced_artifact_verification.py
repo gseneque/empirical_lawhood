@@ -9,13 +9,13 @@ import sys
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-from empirical_lawhood.infrastructure.artifact_verification import artifact_verification_operation
-from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256
-from empirical_lawhood.infrastructure.publication_metadata import checkpoint_publication_access
-from empirical_lawhood.runtime.operational_configuration import ArtifactVerificationMode
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+from empirical_lawhood.storage.artifact_verification import artifact_verification_operation
+from empirical_lawhood.storage.bounded_io import bounded_file_sha256
+from empirical_lawhood.storage.publication_metadata import checkpoint_publication_access
+from empirical_lawhood.execution.operational_configuration import ArtifactVerificationMode
+from empirical_lawhood.execution.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 
 
@@ -104,7 +104,7 @@ def test_invocation_reuses_exact_format_proofs_across_separate_scopes(tmp_path, 
 
 @pytest.mark.parametrize('count', (4, 32))
 def test_format_proofs_do_not_rehash_the_shared_publication_per_manifest(tmp_path, monkeypatch, count):
-    from empirical_lawhood.runtime.artifacts import ArtifactManifest
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
     plane, manifests = _case(tmp_path, count=count)
     monkeypatch.setattr(ArtifactManifest, 'fingerprint',
         lambda _self: pytest.fail('format proof rehashed an entire sibling publication roster'))
@@ -157,8 +157,8 @@ def test_forced_boundaries_detect_bytes_even_when_all_stat_fields_are_preserved(
 
 
 def test_parallel_final_guard_hashes_every_byte_despite_reduced_parent(tmp_path, monkeypatch):
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest
     plane, _ = _case(tmp_path, count=1, workers=2)
     manifest = plane.read_manifest('outputs/member-0.json')
     logical = manifest.logical
@@ -209,7 +209,7 @@ def test_new_validator_registry_and_changed_manifest_cannot_reuse_proofs(tmp_pat
 
 
 def test_cache_limits_fall_back_without_retaining_payload_or_access(tmp_path, monkeypatch):
-    from empirical_lawhood.infrastructure import artifact_verification as cache
+    from empirical_lawhood.storage import artifact_verification as cache
     monkeypatch.setattr(cache, 'MAX_VERIFICATION_PROOFS', 1)
     plane, manifests = _case(tmp_path, count=4)
     with artifact_verification_operation() as ledger:

@@ -6,6 +6,21 @@ This guide gives instructions for contributions of code, scientific procedures a
 It gives the required checks, evidence limits and license for a proposed change.
 Use it to prepare a change for review.
 
+## Choose your contribution
+
+The three routine jobs have complete public recipes:
+
+| Contribution | Guide |
+| --- | --- |
+| Scientific investigation | [Define, prepare, execute and inspect](docs/v1.0/define-investigation.md) |
+| Reusable method | [Calculation and one extension declaration](docs/v1.0/add-method.md) |
+| Domain or native substrate | [Representations and optional native contracts](docs/v1.0/add-domain.md) |
+
+Use the [public API reference](docs/v1.0/public-api.md) and [package ownership rules](docs/v1.0/architecture.md).
+Shared infrastructure changes follow [framework maintenance](docs/v1.0/framework-maintenance.md).
+Retired Python paths are removed in v1.0; do not add aliases or compatibility wrappers.
+Historical scientific records retain their versioned readers and original identities.
+
 ## Documentation policy
 
 The technical writing standard is [ASD-STE100 Issue 9](https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf), dated 15 January 2025.
@@ -116,10 +131,38 @@ A software aid does not establish compliance with the specification.
 
 ## Development and release checks
 
+Choose the [contributor guide](docs/v1.0/README.md) for the change and run its focused checks. The release maintainer runs the [portable and installed checks](docs/release/release-artifacts.md) on the selected source.
+
+### Contributor checklist
+
+Use the documentation URL in your installed distribution's metadata.
+It identifies the instructions at that distribution's exact source commit.
+For a source contribution, select that checkout and its locked environment.
+Use the [supported interfaces](docs/development/compatibility.md#four-supported-surfaces).
+Implement repository extensions through the [extension recipe](docs/development/extending-the-engine.md).
+
+1. Declare the scientific contract, independent unit, cutoff, units and falsifier.
+2. Keep observations, views and arms within their actual independent units.
+3. State source, input, resource, execution and reveal prerequisites at their owning boundaries.
+4. Select a documented route and explicit external output paths.
+5. Run affected checks and retain their exact source and results.
+6. Run the affected tests and select the [CI or extended profile](docs/development/ci.md) for the change.
+7. Prepare the guide with the [authoring template](#authoring-template).
+8. Record unresolved scientific and software findings beside their claims.
+9. Submit the guide to the release documentation maintainer for final language review.
+
+The release documentation maintainer owns final ASD-STE100 review and its external review record.
+The author supplies scientific definitions and exact commands for that review.
+An automated documentation check does not replace that review.
+The release coordinator verifies acceptance before selecting a release.
+
+### Supported repository route
+
 Use the [programme index](programmes/README.md), [workflow catalogue](docs/reference/workflows.md), [configuration guide](docs/using/configuration.md)
 and [results guide](docs/using/results-and-failures.md) as the public contributor conventions.
 The root [agent instructions](AGENTS.md) give the same source map and preservation rules.
-For a small adapter or method change, follow the [worked RC recipe](docs/development/extending-the-engine.md#worked-rc-extension).
+For a routine calculation, follow the [method recipe](docs/v1.0/add-method.md).
+For a domain or native adapter, follow the [domain recipe](docs/v1.0/add-domain.md).
 Keep local results and the additional issued-provider work distinct.
 For a descriptive analysis route, reuse bounded source and array contracts with its own declared protocol and complete result census.
 Retain source/environment identities, failures and independent scientific falsifiers.
@@ -164,6 +207,7 @@ uv run --no-sync python scripts/generate_config_schemas.py --check
 uv run --no-sync python scripts/generate_integration_examples.py --check
 uv run --no-sync python scripts/generate_recursive_examples.py --check
 uv run --no-sync python scripts/generate_matrix_experiment_examples.py --check
+uv run --no-sync python scripts/generate_rubisco_response_experiment.py --check
 uv run --no-sync python scripts/check_documentation.py
 ```
 
@@ -184,8 +228,7 @@ An empty Git status is not a prerequisite.
 Preserve any existing local plans in their declared custody.
 Select new check, release and environment destinations outside the checkout.
 Verify their actual filesystem, write access and capacity before the gate.
-The [local consolidation guide](docs/development/maintainer-environment.md#storage-and-retained-evidence)
-records the maintainer's EL disk; it is not a required path for other contributors.
+Use the [environment and storage guide](docs/using/environments.md#select-storage-and-reuse-an-environment) when selecting those destinations.
 
 ```sh
 uv run --no-sync python scripts/release_check.py --profile portable \

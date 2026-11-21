@@ -12,18 +12,8 @@ from decimal import Decimal
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.contracts import (
-    ARM_IDS,
-    EVIDENCE_ROLE,
-    VARIANT_IDS,
-)
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.science import (
-    decide_preparation,
-    default_chain_config,
-    evaluate_unit,
-    summarize_chain,
-    verify_unit_result,
-)
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.contracts import ARM_IDS, EVIDENCE_ROLE, VARIANT_IDS
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.science import decide_preparation, default_chain_config, evaluate_unit, summarize_chain, verify_unit_result
 
 
 @pytest.fixture(scope="module")
@@ -293,7 +283,7 @@ def test_matching_labels_cannot_redefine_the_frozen_consumer(chain, requirement_
 
 
 def test_all_choices_commit_before_any_development_oracle_assessment(monkeypatch):
-    from empirical_lawhood.adapters.methods.rc_prerequisite_chain import science
+    from empirical_lawhood.domains.circuits.rc_prerequisite_chain import science
 
     config = default_chain_config()
     config = replace(config, units=(config.units[7],))
@@ -322,7 +312,7 @@ def test_all_choices_commit_before_any_development_oracle_assessment(monkeypatch
 
 
 def test_retained_verification_uses_evidence_without_native_reexecution(chain, monkeypatch):
-    from empirical_lawhood.adapters.methods.rc_prerequisite_chain import science
+    from empirical_lawhood.domains.circuits.rc_prerequisite_chain import science
 
     config, results = chain
 
@@ -351,7 +341,7 @@ def test_retained_verification_uses_evidence_without_native_reexecution(chain, m
 
 
 def test_failed_source_conformance_retains_native_evidence_and_every_claim(monkeypatch):
-    from empirical_lawhood.adapters.methods.rc_prerequisite_chain import science
+    from empirical_lawhood.domains.circuits.rc_prerequisite_chain import science
 
     config = default_chain_config()
     config = replace(config, units=(config.units[7],), protocol=replace(

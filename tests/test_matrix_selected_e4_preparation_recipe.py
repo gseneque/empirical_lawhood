@@ -4,9 +4,9 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import initial_parameter_state
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import initial_parameter_state
 from tests.matrix_selected_e4_preparation_recipe import SelectedE4ReleasePreparationRecipe
 from tests.test_matrix_selected_protected import transfer  # noqa: F401
 from tests.test_matrix_selected_point import selected_design

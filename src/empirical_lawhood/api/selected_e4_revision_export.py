@@ -17,9 +17,9 @@ def derive_selected_e4_revision_request(*, service, directory, programme_request
     fields empty. This read derives their exact package and producer locators;
     ordinary declarative derivation reauthenticates them and derives exclusions.
     """
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_prepared_choices as scientific_choices
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as domain
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as preparation
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_prepared_choices as scientific_choices
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as domain
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as preparation
     from empirical_lawhood.api.results import CampaignStatusRequest
     from empirical_lawhood.api.selected_e4_programme_service import SelectedE4ProgrammeService, _codecs, _locator
     from empirical_lawhood.api.selected_e4_native_read import _read_selected_e4_component, read_selected_e4_programme
@@ -75,13 +75,13 @@ def derive_selected_e4_revision_request(*, service, directory, programme_request
 
 def _revision_entry(*, writer, package, plan, entry, receipts, products, reveal, confirmation, specification, request, collection):
     """Project within the original reader's live complete-payload mutation guard."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as native
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4DownstreamNomination
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as native
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4DownstreamNomination
     from empirical_lawhood.api.matrix_selected_runtime import _published_input
     from empirical_lawhood.api.selected_e4_method_runtime import validate_selected_e4_downstream_producer
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
 
     pin = ObjectIdentity.from_record
     if (entry.declaration != confirmation.declaration or entry.evidence != confirmation.evidence.identity
@@ -129,12 +129,12 @@ def _revision_entry(*, writer, package, plan, entry, receipts, products, reveal,
 def _project_revision_request(*, specification, request, revision, nomination, revision_fit,
         revision_freeze, calibration_product, downstream_nomination, reference_package=None):
     """Pure projection after original custody; this creates no authority."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as domain
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_entry import MatrixRevisionEntryEvidence, validate_entry_evidence
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import MatrixRevisionSelectedPackage
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4DownstreamNomination
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4RevisionExport
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as domain
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_entry import MatrixRevisionEntryEvidence, validate_entry_evidence
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import MatrixRevisionSelectedPackage
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4DownstreamNomination
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4RevisionExport
 
     if type(nomination) is not SelectedE4DownstreamNomination or type(revision) is not SelectedE4RevisionExport:
         raise TypeError("selected E4 projection requires exact original scientific products")

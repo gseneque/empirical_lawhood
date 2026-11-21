@@ -1,197 +1,36 @@
 """Receipt-first truth-known conformance protocol, runners and runtime provider for transverse receiver screen."""
 
 from __future__ import annotations
+from empirical_lawhood.domains.materials.electron_gas.protocol import ADJUDICATION_SCOPE_ID as _ueg_ADJUDICATION_SCOPE_ID, ADMISSION_STEP as _ueg_ADMISSION_STEP, CONFIG_ARTIFACT_ID as _ueg_CONFIG_ARTIFACT_ID, EVALUATOR_STEP as _ueg_EVALUATOR_STEP, MEDIUM_ARTIFACT_ID as _ueg_MEDIUM_ARTIFACT_ID, METHOD_STEP as _ueg_METHOD_STEP, TRUTH_INPUT_STEP as _ueg_TRUTH_INPUT_STEP, TRUTH_ORACLE_STEP as _ueg_TRUTH_ORACLE_STEP, _RecordT
 
 from dataclasses import fields
-from hashlib import sha256
-from typing import Any, TypeVar, cast
+from typing import Any, cast
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.planning.study_issue import StudyOperationAuthority
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-    encode_scientific_adjudication,
-)
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityManifest,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.design.study_issue import StudyOperationAuthority
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord, encode_scientific_adjudication
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, CampaignRuntimeProvider, ExternalInputPayload
 
-from .contracts import ADMISSION_CAPABILITY_KEY, ADJUDICATION_SCHEMA, CAPABILITY_VERSION, CONFIG_SCHEMA, CONFIG_VERSION, EVALUATOR_CAPABILITY_KEY, METHOD_CAPABILITY_KEY, SOURCE_CAPABILITY_KEY, MethodConformanceResult, SourceStopResult, UniformElectronGasTransverseScreenConfig, TruthInputBatch, TruthLawBatch, TruthOracleBatch, TruthScreenBatch, decode_config_bytes
-from .reference_world import adjudicate_truth_batch, build_truth_batches, evaluate_truth_batches, identify_truth_batch
-from .system import task_budget
+from empirical_lawhood.domains.materials.electron_gas.contracts import ADJUDICATION_SCHEMA, CAPABILITY_VERSION, CONFIG_SCHEMA, CONFIG_VERSION, EVALUATOR_CAPABILITY_KEY, MethodConformanceResult, SourceStopResult, UniformElectronGasTransverseScreenConfig, TruthInputBatch, TruthLawBatch, TruthOracleBatch, TruthScreenBatch
+from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.configuration import decode_config_bytes
+from empirical_lawhood.domains.materials.electron_gas.reference_world import adjudicate_truth_batch, build_truth_batches, evaluate_truth_batches, identify_truth_batch
 
 
-CONFIG_ARTIFACT_ID = "config-artifact.uniform-electron-gas-transverse-screen"
-MEDIUM_ARTIFACT_ID = "prepared-medium.uniform-electron-gas-transverse-screen"
-CONFIG_SOURCE_ID = "source.uniform-electron-gas-transverse-screen-config"
-ADJUDICATION_SCOPE_ID = "uniform-electron-gas-transverse-screen-conformance"
-
-TRUTH_INPUT_STEP = "truth-input-source"
-TRUTH_ORACLE_STEP = "truth-oracle-custody"
-METHOD_STEP = "method-identify"
-ADMISSION_STEP = "admission-intersect"
-EVALUATOR_STEP = "evaluator-reveal"
 
 
-def config_ref(config: UniformElectronGasTransverseScreenConfig) -> CapabilityConfigRef:
-    return CapabilityConfigRef(
-        config_id="config.uniform-electron-gas-transverse-screen",
-        config_schema=CONFIG_SCHEMA,
-        config_schema_sha256=sha256(CONFIG_SCHEMA.encode()).hexdigest(),
-        content_sha256=config.payload_sha256,
-        artifact_id=CONFIG_ARTIFACT_ID,
-    )
 
 
-def uniform_electron_gas_transverse_screen_protocol(*, registry: CapabilityRegistry, config: UniformElectronGasTransverseScreenConfig) -> ProtocolTemplate:
-    reference = config_ref(config)
-
-    def step(
-        *,
-        step_id: str,
-        stage: ScientificStage,
-        capability_key: str,
-        dependencies: tuple[str, ...],
-        outputs: tuple[tuple[str, str], ...],
-        outcome_access: OutcomeAccess,
-        visibility: VisibilityCeiling,
-        barrier: BarrierKind,
-        obligations: tuple[str, ...],
-    ) -> ProtocolStepTemplate:
-        manifest = registry.resolve(capability_key, CAPABILITY_VERSION)
-        return ProtocolStepTemplate(
-            step_id=step_id,
-            stage=stage,
-            capability_key=capability_key,
-            capability_version=CAPABILITY_VERSION,
-            config=reference,
-            dependency_step_ids=dependencies,
-            outputs=tuple(
-                sorted(
-                    (
-                        OutputTemplate(
-                            output_id=output_id,
-                            payload_schema=payload_schema,
-                            profile=ArtifactProfile.CANONICAL_JSON,
-                            media_type="application/json",
-                            filename_suffix=".json",
-                        )
-                        for output_id, payload_schema in outputs
-                    ),
-                    key=lambda value: value.output_id,
-                )
-            ),
-            required_permissions=manifest.permissions,
-            requested_outcome_access=outcome_access,
-            visibility_ceiling=visibility,
-            resource_budget=task_budget(config),
-            resource_lock_ids=(f"uniform-electron-gas-transverse-screen-{step_id}",),
-            barrier=barrier,
-            maximum_attempts=2,
-            obligation_ids=tuple(sorted(obligations)),
-        )
-
-    steps = (
-        step(
-            step_id=ADMISSION_STEP,
-            stage=ScientificStage.ADMISSION,
-            capability_key=ADMISSION_CAPABILITY_KEY,
-            dependencies=(METHOD_STEP, TRUTH_INPUT_STEP),
-            outputs=(("truth-screens", TruthScreenBatch.SCHEMA),),
-            outcome_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
-            visibility=VisibilityCeiling.DEVELOPMENT_ONLY,
-            barrier=BarrierKind.FREEZE,
-            obligations=("transverse-screen-admission-nine-gate-contract",),
-        ),
-        step(
-            step_id=EVALUATOR_STEP,
-            stage=ScientificStage.EVALUATE,
-            capability_key=EVALUATOR_CAPABILITY_KEY,
-            dependencies=(ADMISSION_STEP, TRUTH_ORACLE_STEP),
-            outputs=(
-                ("method-conformance", MethodConformanceResult.SCHEMA),
-                ("scientific-adjudication", ADJUDICATION_SCHEMA),
-                ("source-stop", SourceStopResult.SCHEMA),
-            ),
-            outcome_access=OutcomeAccess.EVALUATOR_REVEAL,
-            visibility=VisibilityCeiling.PRIVILEGED_TRUTH,
-            barrier=BarrierKind.REVEAL,
-            obligations=(
-                *(f"formal-obligation.{gap_id}" for gap_id in config.reference_conformance_gaps),
-                "transverse-screen-evaluator-exact-classification-contract",
-                "transverse-screen-source-stop-nonattempt-contract",
-            ),
-        ),
-        step(
-            step_id=METHOD_STEP,
-            stage=ScientificStage.DEVELOP,
-            capability_key=METHOD_CAPABILITY_KEY,
-            dependencies=(TRUTH_INPUT_STEP,),
-            outputs=(("truth-laws", TruthLawBatch.SCHEMA),),
-            outcome_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
-            visibility=VisibilityCeiling.DEVELOPMENT_ONLY,
-            barrier=BarrierKind.FREEZE,
-            obligations=("transverse-screen-method-measurement-through-law-freeze-contract",),
-        ),
-        step(
-            step_id=TRUTH_INPUT_STEP,
-            stage=ScientificStage.ACQUIRE,
-            capability_key=SOURCE_CAPABILITY_KEY,
-            dependencies=(),
-            outputs=(("truth-inputs", TruthInputBatch.SCHEMA),),
-            outcome_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
-            visibility=VisibilityCeiling.DEVELOPMENT_ONLY,
-            barrier=BarrierKind.NONE,
-            obligations=("transverse-screen-truth-input-roster-contract",),
-        ),
-        step(
-            step_id=TRUTH_ORACLE_STEP,
-            stage=ScientificStage.ACQUIRE,
-            capability_key=SOURCE_CAPABILITY_KEY,
-            dependencies=(),
-            outputs=(("truth-oracles", TruthOracleBatch.SCHEMA),),
-            outcome_access=OutcomeAccess.PRIVILEGED_TRUTH,
-            visibility=VisibilityCeiling.PRIVILEGED_TRUTH,
-            barrier=BarrierKind.NONE,
-            obligations=("transverse-screen-privileged-oracle-custody-contract",),
-        ),
-    )
-    return ProtocolTemplate(
-        template_id="protocol.uniform-electron-gas-transverse-screen-conformance",
-        template_version=CAPABILITY_VERSION,
-        steps=tuple(sorted(steps, key=lambda value: value.step_id)),
-        requires_model_set=True,
-        requests_controller=False,
-        nonactuating=True,
-    )
 
 
-_RecordT = TypeVar("_RecordT", bound=CanonicalRecord)
+
 
 
 def _one(records: tuple[CanonicalRecord, ...], record_type: type[_RecordT]) -> _RecordT:
@@ -358,17 +197,17 @@ class UniformElectronGasTransverseScreenRunner:
         self.execution_count += 1
         records = self._read(context)
         outputs: dict[str, CanonicalRecord | bytes]
-        if context.task_id == TRUTH_INPUT_STEP:
+        if context.task_id == _ueg_TRUTH_INPUT_STEP:
             inputs, _oracles = build_truth_batches(self.config)
             outputs = {"truth-inputs": inputs}
-        elif context.task_id == TRUTH_ORACLE_STEP:
+        elif context.task_id == _ueg_TRUTH_ORACLE_STEP:
             _inputs, oracles = build_truth_batches(self.config)
             outputs = {"truth-oracles": oracles}
-        elif context.task_id == METHOD_STEP:
+        elif context.task_id == _ueg_METHOD_STEP:
             outputs = {
                 "truth-laws": identify_truth_batch(_one(records, TruthInputBatch), self.config)
             }
-        elif context.task_id == ADMISSION_STEP:
+        elif context.task_id == _ueg_ADMISSION_STEP:
             outputs = {
                 "truth-screens": adjudicate_truth_batch(
                     _one(records, TruthInputBatch),
@@ -376,7 +215,7 @@ class UniformElectronGasTransverseScreenRunner:
                     self.config,
                 )
             }
-        elif context.task_id == EVALUATOR_STEP:
+        elif context.task_id == _ueg_EVALUATOR_STEP:
             conformance = evaluate_truth_batches(
                 _one(records, TruthScreenBatch),
                 _one(records, TruthOracleBatch),
@@ -480,7 +319,7 @@ class UniformElectronGasTransverseScreenRuntimeProvider(CampaignRuntimeProvider)
             for task in plan.tasks
             for value in task.external_inputs
         }
-        expected_ids = {CONFIG_ARTIFACT_ID, MEDIUM_ARTIFACT_ID}
+        expected_ids = {_ueg_CONFIG_ARTIFACT_ID, _ueg_MEDIUM_ARTIFACT_ID}
         unknown = set(specs) - expected_ids
         if unknown:
             raise ValueError(f"uniform electron gas plan requests unknown external inputs: {sorted(unknown)}")
@@ -515,8 +354,8 @@ class UniformElectronGasTransverseScreenRuntimeProvider(CampaignRuntimeProvider)
             )
 
         return (
-            payload(CONFIG_ARTIFACT_ID),
-            payload(MEDIUM_ARTIFACT_ID),
+            payload(_ueg_CONFIG_ARTIFACT_ID),
+            payload(_ueg_MEDIUM_ARTIFACT_ID),
         )
 
     def output_semantic_contracts(
@@ -559,25 +398,15 @@ class UniformElectronGasTransverseScreenRuntimeProvider(CampaignRuntimeProvider)
         return ScientificAdjudicationOutputContract(
             capability_key=EVALUATOR_CAPABILITY_KEY,
             capability_version=CAPABILITY_VERSION,
-            output_id=f"{EVALUATOR_STEP}.scientific-adjudication",
+            output_id=f"{_ueg_EVALUATOR_STEP}.scientific-adjudication",
             payload_schema=ADJUDICATION_SCHEMA,
             maximum_bytes=128 * 1024,
-            fixture_scope_id=ADJUDICATION_SCOPE_ID,
+            fixture_scope_id=_ueg_ADJUDICATION_SCOPE_ID,
             plumbing_only=True,
         )
 
 
 __all__ = [
-    "ADJUDICATION_SCOPE_ID",
-    "ADMISSION_STEP",
-    "CONFIG_ARTIFACT_ID",
-    "CONFIG_SOURCE_ID",
     "UniformElectronGasTransverseScreenRunner",
     "UniformElectronGasTransverseScreenRuntimeProvider",
-    "EVALUATOR_STEP",
-    "METHOD_STEP",
-    "TRUTH_INPUT_STEP",
-    "TRUTH_ORACLE_STEP",
-    "config_ref",
-    "uniform_electron_gas_transverse_screen_protocol",
 ]

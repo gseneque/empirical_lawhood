@@ -1,120 +1,38 @@
-"""Actual prepared-owner delivery, with one bounded causal second decision."""
+"""Native acquisition, external-format translation and custody integration."""
 
 from dataclasses import dataclass, field
-from functools import lru_cache, partial
-from typing import Any, Callable, ClassVar
-
+from functools import partial
+from typing import Any, Callable
 import numpy as np
-
-from empirical_lawhood.adapters.control.finite_campaign import finite_control_services
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.config import FIRST, ZERO, Request
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.law_terminal import ClassicalLaws
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.prospective_lock import ClassicalFrozenRoot, ClassicalFrozenStage, freeze_stage
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.prospective_plan import ReactorStagedPulseResponseProspectivePlan
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.records import ClassicalContext, ClassicalNativeWindow, ClassicalPreparation, ClassicalPrivate
-from empirical_lawhood.adapters.methods.reactor_causal_response.controller import EmpiricalNonattempt
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.prospective_lock import UndeliverableSession
-from empirical_lawhood.adapters.methods.reactor_local_domain_qualification.records import LocalArrayPayload
-from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import NativeEpisode, TapeController, acquire_episode, acquire_with_progress
-from empirical_lawhood.adapters.simulators.reactor_regime_response.committed_branch import WatchedPreparedTape
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_design import ReactorBatchSource
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.contracts import ReactorDelivery, ReactorFinalDelivery
+from empirical_lawhood.methods.control.finite_campaign import finite_control_services
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.config import FIRST, ZERO
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.law_terminal import ClassicalLaws
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.frozen_records import ClassicalFrozenRoot, ClassicalFrozenStage
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.prospective_lock import freeze_stage
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.prospective_plan import ReactorStagedPulseResponseProspectivePlan
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.records import ClassicalContext, ClassicalPreparation, ClassicalPrivate
+from empirical_lawhood.domains.reactor.reactor_causal_response.controller import EmpiricalNonattempt
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.frozen_records import UndeliverableSession
+from empirical_lawhood.domains.reactor.reactor_local_domain_qualification.records import LocalArrayPayload
+from empirical_lawhood.domains.reactor.reactor_causal_response.measurements import NativeEpisode, TapeController
+from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import acquire_episode, acquire_with_progress
+from empirical_lawhood.domains.reactor.reactor_regime_response.prepared_tape import WatchedPreparedTape
+from empirical_lawhood.domains.reactor.reactor_prefix_response.batch_design import ReactorBatchSource
+from empirical_lawhood.domains.reactor.reactor_prefix_response.contracts import ReactorDelivery, ReactorFinalDelivery
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.finite_callback import FiniteCommittedBranchOwner
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.finite_words import overlay_feed_tape
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.controller_study import ImplementationRole
-from empirical_lawhood.runtime.canonical_record_archive import CanonicalRecordArchive
-from empirical_lawhood.runtime.controller_runtime import DeliveryControllerTickReceipt, TickDisposition
-from .acquisition import donors, native_window
-from .words import ClassicalPulseDeliveryPort
+from empirical_lawhood.domains.reactor.reactor_prefix_response.finite_words import overlay_feed_tape
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.controller_study import ImplementationRole
+from empirical_lawhood.storage.contracts.canonical_record_archive import CanonicalRecordArchive
+from empirical_lawhood.execution.controller_runtime import DeliveryControllerTickReceipt, TickDisposition
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.native_measurements import donors, native_window
+from empirical_lawhood.adapters.simulators.reactor_staged_pulse_response.words import ClassicalPulseDeliveryPort
 
-
-@dataclass(frozen=True, slots=True)
-class ClassicalNativeStage(CanonicalRecord):
-    SCHEMA: ClassVar[str] = 'empirical-lawhood/simulators/reactor-staged-pulse-response/classical-native-stage'
-    frozen: CanonicalRecordArchive
-    tick: DeliveryControllerTickReceipt | None
-    deliveries: tuple[ReactorDelivery, ...]
-
-    @lru_cache(maxsize=32)
-    def unpack(self) -> ClassicalFrozenStage:
-        # Measurement, sealing and reveal consume the same immutable child.
-        # Key by the whole stage, including its tick and actual deliveries, so
-        # another owner/receipt still traverses the validation below.
-        value = decode_canonical_bytes(
-            self.frozen.unpack(), ClassicalFrozenStage, maximum_bytes=self.frozen.decoded_bytes
-        )
-        if (
-            self.frozen.subject != ObjectIdentity.from_record(value.record_id, value)
-            or (self.tick is not None and self.tick.commitment != value.commitment)
-            or (self.deliveries and (self.tick is None or not value.admitted))
-        ):
-            raise ValueError("actual native stage substitutes its frozen owner")
-        return value
-
-
-@dataclass(frozen=True, slots=True)
-class ClassicalNativeUse(CanonicalRecord):
-    SCHEMA: ClassVar[str] = 'empirical-lawhood/simulators/reactor-staged-pulse-response/classical-native-use'
-    policy: str
-    request: Request
-    stages: tuple[ClassicalNativeStage, ...]
-    windows: tuple[ClassicalNativeWindow, ...]
-    native_calls: int
-    failures: tuple[str, ...]
-    known_unsafe: bool
-
-    def __post_init__(self) -> None:
-        if (
-            self.native_calls not in (0, 1, 2)
-            or not 1 <= len(self.stages) <= 2
-            or any(
-                (s.unpack().policy, s.unpack().request) != (self.policy, self.request)
-                for s in self.stages
-            )
-            or (not self.native_calls and (self.windows or any(s.deliveries for s in self.stages)))
-        ):
-            raise ValueError("native use changes its actual decision/view census")
-        if len(self.stages) == 2 and (
-            self.stages[0].tick is None
-            or self.stages[1].unpack().causal.predecessor
-            != ObjectIdentity.from_record(self.stages[0].tick.tick_id, self.stages[0].tick)
-        ):
-            raise ValueError("second native stage substitutes its actual predecessor")
-
-
-@dataclass(frozen=True, slots=True)
-class ClassicalNativeRoot(CanonicalRecord):
-    SCHEMA: ClassVar[str] = 'empirical-lawhood/simulators/reactor-staged-pulse-response/classical-native-root'
-    root: str
-    frozen: ObjectIdentity
-    scenario: ObjectIdentity
-    uses: tuple[ClassicalNativeUse, ...]
-    references: tuple[ClassicalNativeWindow, ...]
-    reference_calls: int
-
-    def __post_init__(self) -> None:
-        if (
-            self.frozen.object_schema != ClassicalFrozenRoot.SCHEMA
-            or self.scenario.object_id != self.root
-            or self.reference_calls not in range(5)
-            or len({(u.policy, u.request.request_id) for u in self.uses}) != len(self.uses)
-            or any(s.unpack().causal.root != self.root for u in self.uses for s in u.stages)
-        ):
-            raise ValueError(
-                "prospective native result changes its assigned root or reference budget"
-            )
-
-    @property
-    def native_calls(self) -> int:
-        return self.reference_calls + sum(u.native_calls for u in self.uses)
-
-    @property
-    def record_id(self) -> str:
-        return f"{self.root}.native-observation"
-
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.native_acquisition_records import (
+    ClassicalNativeRoot as _science_ClassicalNativeRoot,
+    ClassicalNativeStage as _science_ClassicalNativeStage,
+    ClassicalNativeUse as _science_ClassicalNativeUse,
+)
 
 @dataclass
 class RestoredStage:
@@ -129,7 +47,6 @@ class RestoredStage:
         publisher.publish_record(tick.tick_id, tick)
         return tick
 
-
 def restore(stage: ClassicalFrozenStage) -> RestoredStage:
     assert stage.compiled is not None and stage.projection is not None and stage.lock is not None
     evaluation = stage.lock.evaluation_for(stage.compiled)
@@ -142,7 +59,6 @@ def restore(stage: ClassicalFrozenStage) -> RestoredStage:
         stage, delivery, finite_control_services(stage.compiled.study, evaluation, delivery)
     )
 
-
 class DecisionTape(WatchedPreparedTape):
     def __init__(self, tape: np.ndarray, owner: 'ClassicalSequenceOwner') -> None:
         super().__init__(tape)
@@ -152,7 +68,6 @@ class DecisionTape(WatchedPreparedTape):
         self.latest = (t_s, y["t_reactor_k"], y["t_jacket_k"], y["dosed_kg"])
         self.owner.observe(self, int(t_s / 10))
         return TapeController.step(self, t_s, y, dt_s)
-
 
 @dataclass
 class ClassicalSequenceOwner:
@@ -262,7 +177,6 @@ class ClassicalSequenceOwner:
             )
         return raw
 
-
 def acquire_prospective(
     *,
     source: ReactorBatchSource,
@@ -276,7 +190,7 @@ def acquire_prospective(
     control: Any,
     acquire: Callable[..., NativeEpisode] = acquire_episode,
     progress: Callable[[int], None] | None = None,
-) -> ClassicalNativeRoot:
+) -> _science_ClassicalNativeRoot:
     if (
         frozen.preparation != ObjectIdentity.from_record(preparation.record_id, preparation)
         or frozen.plan != ObjectIdentity.from_record(plan.record_id, plan)
@@ -291,11 +205,11 @@ def acquire_prospective(
     for initial in stages:
         if not initial.admitted:
             tick = None if initial.compiled is None else restore(initial).deliver(publisher)
-            actual = ClassicalNativeStage(
+            actual = _science_ClassicalNativeStage(
                 CanonicalRecordArchive.pack(initial.record_id, initial), tick, ()
             )
             uses.append(
-                ClassicalNativeUse(
+                _science_ClassicalNativeUse(
                     initial.policy, initial.request, (actual,), (), 0, initial.reasons, False
                 )
             )
@@ -411,7 +325,7 @@ def acquire_prospective(
                     )
                 )
         actual_stages = tuple(
-            ClassicalNativeStage(
+            _science_ClassicalNativeStage(
                 CanonicalRecordArchive.pack(s.record_id, s),
                 None if i >= len(owner.owners) else owner.owners[i].tick,
                 ()
@@ -426,7 +340,7 @@ def acquire_prospective(
             for e in episodes
         )
         uses.append(
-            ClassicalNativeUse(
+            _science_ClassicalNativeUse(
                 initial.policy,
                 initial.request,
                 actual_stages,
@@ -474,7 +388,7 @@ def acquire_prospective(
                 )
                 references.append(native_window(donor, episode, k, rates, tape, name))
                 reference_calls += 1
-    return ClassicalNativeRoot(
+    return _science_ClassicalNativeRoot(
         preparation.root,
         ObjectIdentity.from_record(frozen.record_id, frozen),
         ObjectIdentity.from_record(preparation.root, private.scenario),

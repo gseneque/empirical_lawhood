@@ -8,7 +8,7 @@ Use it to locate a file owner and the limit on its advertised operation.
 
 ## Selected identities
 
-Package metadata owns the software version, currently 0.3.0.
+Package metadata selects software version 1.0.0 for the release candidate.
 The first public schema baseline is 1.0.0.
 The selected published preprint edition is 0.60.
 These identities have separate meanings.
@@ -25,13 +25,13 @@ Final review, any separately selected fresh qualification and software publicati
 | Surface | Shipped owner | Operation and limit |
 |---|---|---|
 | Distribution | [pyproject.toml](../../pyproject.toml), [uv.lock](../../uv.lock) | One installed command, `empirical-lawhood`. Selected artifacts require their exact manifest hashes |
-| Scientific engine | [src/empirical_lawhood](../../src/empirical_lawhood) | Scientific records, planning, runtime, adapters, infrastructure, API and CLI. Retained code does not certify every route |
+| Scientific engine | [src/empirical_lawhood](../../src/empirical_lawhood) | Science, design, methods, domains, adapters, execution, storage, API, CLI, workbench and package data. Retained code does not certify every route |
 | Installed CLI | [Generated reference](../reference/cli.md) | Exact names, formats, effects and refusal conventions derive from command metadata and actual behavior |
-| Static registries | [Extension aggregate](../../src/empirical_lawhood/adapters/composition/generated_extension_bundles.py), [binding aggregate](../../src/empirical_lawhood/adapters/composition/generated_executable_bindings.py) | Static capability discovery is distinct from provider reconstruction, source qualification and authority |
+| Static registries | [Extension aggregate](../../src/empirical_lawhood/execution/generated_extension_bundles.py), [binding aggregate](../../src/empirical_lawhood/adapters/composition/generated_executable_bindings.py) | Static capability discovery is distinct from provider reconstruction, source qualification and authority |
 | Package resources | [Package notices](../../src/empirical_lawhood/PACKAGE-NOTICES.md) | Three pinned public reactor inputs, upstream notices, finite-law specification, migration template and typing marker |
 | Scientific programmes and workflow inputs | [programmes](../../programmes/README.md) | Scientific records, guides and colocated editable inputs grouped by research question. Development examples carry no standing authority |
 | Shared deployment templates | [configs](../../configs) | Operator/storage selections and provenance template. Programme source declarations live with their workflows. No private keys or held outcomes |
-| Worked example | [Reactor guide](../../programmes/foundations/measurement-and-response/workflows/reactor-response/guide.md) | Twenty numerical branches and forty observed decisions. Unqualified local measurement, without campaign issue |
+| Public starters | [Three contributor jobs](../v1.0/README.md) | Exposed recursive mass-balance lifecycle, independently callable pure calculation and a domain transformation. No scientific qualification |
 | Maintainer tooling | [Contributing](../../CONTRIBUTING.md) | Registry/reference generators, operator launcher and exact-source release runner. No additional installed command |
 | Paper | [Published preprint](../../paper/editions/v0.60-deposit/Empirical_Lawhood_Manuscript_v0.60.pdf), [supplied manuscript](../../paper/manuscript.md), [revision and evidence notes](../../paper/revision-and-evidence-notes.md), [source register](../../paper/SOURCES.md) | Published edition 0.60 PDF, separately supplied manuscript and companion Markdown/PDF inputs, three figures in six PDF/PNG assets, summary operands and preservation tools |
 | Evidence template | [evidence-provenance.yaml](../../configs/templates/evidence-provenance.yaml) | Template only. Historical native trajectories, receipts and adjudications are not deposited |

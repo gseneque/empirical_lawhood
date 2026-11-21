@@ -8,21 +8,10 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.quantities import QuantitySpec
-from empirical_lawhood.kernel.serialization import (
-    MAX_RELATIVE_LOCATOR_BYTES,
-    MAX_RELATIVE_LOCATOR_SEGMENT_BYTES,
-    MAX_RELATIVE_LOCATOR_SEGMENTS,
-    CanonicalizationError,
-    CanonicalRecord,
-    canonical_json_bytes,
-    validate_document_shape,
-    validate_relative_locator,
-    validate_schema,
-    validate_stable_id,
-)
-from empirical_lawhood.kernel.systems import SystemSpec
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.models.quantities import QuantitySpec
+from empirical_lawhood.science.records.serialization import MAX_RELATIVE_LOCATOR_BYTES, MAX_RELATIVE_LOCATOR_SEGMENT_BYTES, MAX_RELATIVE_LOCATOR_SEGMENTS, CanonicalizationError, CanonicalRecord, canonical_json_bytes, validate_document_shape, validate_relative_locator, validate_schema, validate_stable_id
+from empirical_lawhood.science.models.systems import SystemSpec
 
 
 @dataclass(frozen=True, slots=True)
@@ -263,7 +252,7 @@ def test_recursive_encoding_matches_established_json_for_shared_records() -> Non
     from decimal import Decimal
     import json
     from typing import ClassVar
-    from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_value
+    from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_value
 
     @dataclass(frozen=True)
     class Sample(CanonicalRecord):
@@ -285,7 +274,7 @@ def test_frozen_record_does_not_cache_through_mutable_mapping() -> None:
     from hashlib import sha256
     from types import MappingProxyType
     from typing import ClassVar
-    from empirical_lawhood.kernel.serialization import CanonicalRecord
+    from empirical_lawhood.science.records.serialization import CanonicalRecord
 
     @dataclass(frozen=True)
     class Sample(CanonicalRecord):

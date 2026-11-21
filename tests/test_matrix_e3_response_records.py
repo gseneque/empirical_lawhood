@@ -14,27 +14,27 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import experiment_methods as old
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_inputs as inputs
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as methods
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_records as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_source_records as sources
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as sr, response_records as rr
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_forecast import array_product, forecast_response_arrays
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledResponseSelection
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history, parameter_history_segments, parameter_source
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.matrix_inputs import MatrixArrayMember
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.study_authoring import MaterializationQualificationReceipt, SourceAccessDisposition
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion
+from empirical_lawhood.domains.matrix.matrix_factor_response import experiment_methods as old
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_inputs as inputs
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as methods
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_records as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_source_records as sources
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as sr, response_records as rr
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_forecast import array_product, forecast_response_arrays
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledResponseSelection
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history, parameter_history_segments, parameter_source
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.domains.matrix.input_contracts import MatrixArrayMember
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.study_authoring import MaterializationQualificationReceipt, SourceAccessDisposition
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion
 from tests.test_matrix_e3_prefix_records import current_case
 from tests.test_matrix_e3_protected_methods import reference
 from tests.test_matrix_e3_protected_source_records import response_fixture
@@ -402,7 +402,7 @@ def test_native_metadata_ordinary_alias_requires_independent_cold_bytes(case):
     assert response.validate_source(case.native_config, **args) is case.source
     assert len(response.arrays.members) == 48 * 5 + 2 * 3 == 246
     assert response.arrays.array_artifact.artifact_id != response.native[0].receipt.task_id + ".output.arrays"
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_bindings import unpack_native
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_bindings import unpack_native
     with pytest.raises(Exception):
         unpack_native(raw, case.protocol, case.panels)
 

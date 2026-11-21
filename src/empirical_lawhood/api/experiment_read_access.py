@@ -6,14 +6,14 @@ their immutable origin and reloads current grants at each access boundary.
 """
 from pathlib import Path
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.execution.experiment_ports import require_read_access_selection
 
 
 def _read_access_owners(protocol_id):
-    from .generated_experiment_runtime_bindings import EXPERIMENT_RUNTIME_BINDINGS
+    from empirical_lawhood.api.generated_experiment_runtime_bindings import EXPERIMENT_RUNTIME_BINDINGS
 
-    from empirical_lawhood.kernel.serialization import validate_stable_id
+    from empirical_lawhood.science.records.serialization import validate_stable_id
 
     validate_stable_id(protocol_id)
     bindings = EXPERIMENT_RUNTIME_BINDINGS
@@ -58,7 +58,7 @@ def load_experiment_read_access(paths, *, protocol_id):
     accepting another root schema, revision, Python import or permission body.
     No artifact or authority store is opened here.
     """
-    from .codecs import load_registered_authoring
+    from empirical_lawhood.api.codecs import load_registered_authoring
 
     if type(paths) not in (tuple, list) or not paths:
         raise ValueError('current access requires an explicit nonempty locator file selection')
@@ -74,16 +74,12 @@ def load_experiment_read_access(paths, *, protocol_id):
         if all(type(record) in kinds for record in records))
     if len(matching) != 1:
         raise ValueError('current access locators mix or ambiguously select installed owners')
-    selected = matching[0](records)
-    if (selected is None or type(selected) in (bool, int, float, str, bytes, tuple, list, dict, set)
-            or isinstance(selected, CanonicalRecord)):
-        raise TypeError('current access projection must return its operation-local selection, not a permission result')
-    return selected
+    return require_read_access_selection(matching[0](records), records)
 
 
 def _protocol_for_specification_pin(pin):
     from empirical_lawhood.api.generated_experiment_runtime_bindings import EXPERIMENT_SPECIFICATION_PROTOCOLS
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
     if type(pin) is not ObjectIdentity:
         raise TypeError('current access requires an exact specification identity')
@@ -117,24 +113,21 @@ def experiment_read_access_protocol(*, specification_path=None, directory=None, 
     exact intrinsic packet, instance and association metadata and their pins;
     the actual lifecycle still authenticates all scientific bytes and grants.
     """
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-    from empirical_lawhood.runtime.prospective_experiment import (
-        ASSOCIATION_FILENAME, INSTANCE_FILENAME, SPECIFICATION_FILENAME,
-        ProspectiveExperimentAssociation, instance_identity,
-    )
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+    from empirical_lawhood.execution.prospective_experiment import ASSOCIATION_FILENAME, INSTANCE_FILENAME, SPECIFICATION_FILENAME, ProspectiveExperimentAssociation, instance_identity
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
 
     if (specification_path is None) == (directory is None):
         raise ValueError('current access requires exactly one selected specification or retained directory')
     if specification_path is not None:
-        from .experiment_preparation import _protocol, load_experiment_specification
+        from empirical_lawhood.api.experiment_preparation import _protocol, load_experiment_specification
         protocol_id = _protocol(load_experiment_specification(Path(specification_path))).protocol_id
     else:
         if artifact_writer is None:
             raise ValueError('retained current access requires the actual selected artifact plane')
-        from .prospective_experiment import _directory, _read_prospective_locator
-        from empirical_lawhood.infrastructure.recursive_custody import read_recursive_bootstrap_record
+        from empirical_lawhood.api.prospective_experiment import _directory, _read_prospective_locator
+        from empirical_lawhood.storage.recursive_custody import read_recursive_bootstrap_record
 
         selected = _directory(directory, artifact_writer)
         association_path = selected / 'experiment' / ASSOCIATION_FILENAME

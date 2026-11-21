@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: MPL-2.0
 """Lazy retained native E2 consumer; ordinary DEV author/run/recovery owners."""
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_acquisition import PROTOCOL_ID
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_records import NativeUtilitySpecification
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_acquisition import PROTOCOL_ID
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_records import NativeUtilitySpecification
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 
 
 def read_development_result(**kwargs):

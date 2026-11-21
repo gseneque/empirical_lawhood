@@ -8,8 +8,8 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
 
 @dataclass(frozen=True, slots=True)
@@ -64,7 +64,7 @@ def test_repeated_large_child_has_one_retained_encoding():
 
 
 def test_encoding_and_exact_comparison_hash_only_requested_record_identities(monkeypatch):
-    from empirical_lawhood.kernel import serialization
+    from empirical_lawhood.science.records import serialization
 
     leaf = Nested('x' * (128 * 1024), ())
     records = [leaf]
@@ -93,7 +93,7 @@ def test_encoding_and_exact_comparison_hash_only_requested_record_identities(mon
 
 
 def test_fragment_size_and_exact_comparison_do_not_flatten(monkeypatch):
-    from empirical_lawhood.kernel import serialization
+    from empirical_lawhood.science.records import serialization
 
     leaf = Nested('x' * (256 * 1024), ())
     root = Nested('root', (leaf,) * 8)

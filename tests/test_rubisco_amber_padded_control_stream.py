@@ -5,9 +5,7 @@ from decimal import Decimal
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.amber_parameters import (
-    assigned_census, read_prmtop, read_prmtop_lines,
-)
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.amber_parameters import assigned_census, read_prmtop, read_prmtop_lines
 from tests.test_rubisco_preparation_integrity import amber_text, topology
 
 

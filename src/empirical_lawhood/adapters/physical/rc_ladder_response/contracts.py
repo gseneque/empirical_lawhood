@@ -7,17 +7,8 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import ClassVar
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_ids,
-    require_sorted_unique_strings,
-    validate_decimal,
-    validate_nonempty,
-    validate_relative_locator,
-    validate_sha256,
-    validate_stable_id,
-)
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_ids, require_sorted_unique_strings, validate_decimal, validate_nonempty, validate_relative_locator, validate_sha256, validate_stable_id
 
 
 class RcLadderResponseActionDeliveryStatus(StrEnum):

@@ -9,16 +9,18 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from empirical_lawhood.adapters.simulators.gym_torax_native.action_word import GYM_TORAX_LOWER_IP_ACTION_WORD_ID, build_gym_torax_action_word, build_gym_torax_native_schedule
-from empirical_lawhood.adapters.simulators.gym_torax_native.diagnostic_contracts import GymToraxObservationDisposition, GymToraxPreparation, GymToraxSourceDisposition, encode_gym_torax_float64_block as encode_gym_torax_diagnostic_float64_block, gym_torax_numerical_members
-from empirical_lawhood.adapters.simulators.gym_torax_native.field_metadata_contracts import GymToraxFieldMetadataEpisodeRequest, GymToraxRequestRole, encode_gym_torax_float64_block
-from empirical_lawhood.adapters.simulators.gym_torax_native.extraction_manifest import GymToraxBoundedExtractionManifest, build_gym_torax_extraction_manifest
-from empirical_lawhood.adapters.simulators.gym_torax_native.field_metadata import GymToraxFieldMetadataManifest, build_gym_torax_field_metadata_manifest
-from empirical_lawhood.adapters.simulators.gym_torax_native.metadata_barrier import GymToraxNativeMetadataCanaryDisposition, adjudicate_gym_torax_native_metadata_canary
-from empirical_lawhood.adapters.simulators.gym_torax_native.runtime import GymToraxNativeActionCodec, GymToraxRuntimePreflightError, GymToraxRuntimeProbe, acquire_gym_torax_episode
-from empirical_lawhood.adapters.simulators.gym_torax_native.source_qualification import GymToraxNativeSourceQualificationDisposition, qualify_gym_torax_native_source
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.fusion.gym_torax_native.action_word import GYM_TORAX_LOWER_IP_ACTION_WORD_ID, build_gym_torax_action_word, build_gym_torax_native_schedule
+from empirical_lawhood.domains.fusion.gym_torax_native.diagnostic_contracts import GymToraxObservationDisposition, GymToraxPreparation, GymToraxSourceDisposition, encode_gym_torax_float64_block as encode_gym_torax_diagnostic_float64_block, gym_torax_numerical_members
+from empirical_lawhood.domains.fusion.gym_torax_native.field_metadata_contracts import GymToraxFieldMetadataEpisodeRequest, GymToraxRequestRole, encode_gym_torax_float64_block
+from empirical_lawhood.domains.fusion.gym_torax_native.extraction_manifest import GymToraxBoundedExtractionManifest
+from empirical_lawhood.adapters.simulators.gym_torax_native.extraction_manifest import build_gym_torax_extraction_manifest
+from empirical_lawhood.domains.fusion.gym_torax_native.field_metadata import GymToraxFieldMetadataManifest, build_gym_torax_field_metadata_manifest
+from empirical_lawhood.domains.fusion.gym_torax_native.metadata_barrier import GymToraxNativeMetadataCanaryDisposition, adjudicate_gym_torax_native_metadata_canary
+from empirical_lawhood.adapters.simulators.gym_torax_native.runtime import GymToraxNativeActionCodec, acquire_gym_torax_episode
+from empirical_lawhood.domains.fusion.gym_torax_native.native_episode import GymToraxRuntimePreflightError, GymToraxRuntimeProbe
+from empirical_lawhood.domains.fusion.gym_torax_native.source_qualification import GymToraxNativeSourceQualificationDisposition, qualify_gym_torax_native_source
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def _probe() -> GymToraxRuntimeProbe:
@@ -392,4 +394,55 @@ def test_diagnostic_unspecified_block_is_not_a_valid_metadata_block() -> None:
             dimension_ids=("state-clock", "rho_norm"),
             values=diagnostic_block.array(),
             clock_values=(0,),
+        )
+
+
+def test_pure_finalization_preserves_unevaluable_precontact_census() -> None:
+    from empirical_lawhood.domains.fusion.gym_torax_native.diagnostic_contracts import GymToraxNumericalDisposition, GymToraxDeliveryDisposition
+    from empirical_lawhood.domains.fusion.gym_torax_native.native_episode import finalize_gym_torax_episode
+    request, extraction, fields = _request()
+    episode = finalize_gym_torax_episode(
+        request=request, extraction_manifest=extraction, field_metadata_manifest=fields,
+        runtime_probe=_probe(), source_reset_attempted=False, state_clocks=(), captures=(),
+        deliveries=(), operator_snapshots=(), operator_api_exposed=False,
+        reason_codes=('TECHNICAL_INITIALIZATION_VALUEERROR',), termination=False, truncation=False,
+        runtime_seconds=Decimal(0), peak_rss_bytes=0,
+        initial_numerical_disposition=GymToraxNumericalDisposition.UNEVALUABLE,
+        initial_observation_disposition=GymToraxObservationDisposition.UNEVALUABLE,
+    )
+    assert episode.missing_required_state_clocks == tuple(range(121))
+    assert episode.numerical_disposition is GymToraxNumericalDisposition.UNEVALUABLE
+    assert episode.observation_disposition is GymToraxObservationDisposition.UNEVALUABLE
+    assert episode.source_disposition is GymToraxSourceDisposition.SOURCE_UNAVAILABLE
+    assert episode.delivery_disposition is GymToraxDeliveryDisposition.PARTIAL
+    assert not episode.source_reset_attempted and not episode.blocks and not episode.deliveries
+    assert 'TECHNICAL_INITIALIZATION_VALUEERROR' in episode.reason_codes
+    assert episode.outcome_access is OutcomeAccess.OUTCOME_BLIND
+    from empirical_lawhood.domains.fusion.gym_torax_native.projection import GymToraxProjectionView, project_gym_torax_episode
+    view = GymToraxProjectionView(
+        view_id='view.finalization-control', acquisition_group_id='acquisition.finalization-control',
+        physical_independent_unit_id=request.preparation.physical_independent_unit_id,
+        native_preparation_id=request.preparation.preparation_id,
+        action_word_id=request.schedule.action_word.word_id,
+        numerical_member_id=request.numerical_member.member_id,
+        receiver_ids=('receiver.control',), clock_ids=('clock.control',),
+    )
+    projected = project_gym_torax_episode(view, episode)
+    assert projected.numerical_disposition is GymToraxNumericalDisposition.UNEVALUABLE
+    assert projected.source_disposition is GymToraxSourceDisposition.SOURCE_UNAVAILABLE
+    with pytest.raises(ValueError, match='acquisition/view lineage'):
+        project_gym_torax_episode(replace(view, action_word_id='word.substituted'), episode)
+
+
+@pytest.mark.parametrize('clocks, reason', [((1,0), 'state clocks are not exact'), ((0,), 'captures differ from state clocks')])
+def test_pure_finalization_rejects_inconsistent_capture_ledger(clocks, reason) -> None:
+    from empirical_lawhood.domains.fusion.gym_torax_native.native_episode import finalize_gym_torax_episode
+    request, extraction, fields = _request()
+    with pytest.raises(ValueError, match=reason):
+        finalize_gym_torax_episode(
+            request=request, extraction_manifest=extraction, field_metadata_manifest=fields,
+            runtime_probe=_probe(), source_reset_attempted=True, state_clocks=clocks, captures=(),
+            deliveries=(), operator_snapshots=(), operator_api_exposed=False,
+            reason_codes=(), termination=False, truncation=False,
+            runtime_seconds=Decimal(0), peak_rss_bytes=0,
         )

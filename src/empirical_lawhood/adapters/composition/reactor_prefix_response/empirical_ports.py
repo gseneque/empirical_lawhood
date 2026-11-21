@@ -4,36 +4,24 @@
 
 Only composition and I/O live here. Scientific meanings stay in registered owners.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.reactor_causal_response.control_services import EmpiricalControllerBindingConfig
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.canonical_record_archive import (
-    ExternalCanonicalRecordArchive,
-)
-from empirical_lawhood.infrastructure.dependency_manifests import (
-    DependencyManifestReader,
-)
-from empirical_lawhood.infrastructure.prepared_execution_events import (
-    ExternalPreparedExecutionEventStore,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.canonical_record_archive import CanonicalRecordArchive
-from empirical_lawhood.runtime.controller_evaluation_trajectory import TrajectoryCallbackLink
-from empirical_lawhood.runtime.execution import (
-    TaskContext,
-    WorkerInputBinding,
-    WorkerInputKind,
-)
+from empirical_lawhood.domains.reactor.reactor_causal_response.control_services import EmpiricalControllerBindingConfig
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.canonical_record_archive import ExternalCanonicalRecordArchive
+from empirical_lawhood.storage.dependency_manifests import DependencyManifestReader
+from empirical_lawhood.execution.local.prepared_execution_events import ExternalPreparedExecutionEventStore
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, CanonicalTaskReceipt
+from empirical_lawhood.storage.contracts.canonical_record_archive import CanonicalRecordArchive
+from empirical_lawhood.execution.controller_evaluation_trajectory import TrajectoryCallbackLink
+from empirical_lawhood.execution.execution import TaskContext, WorkerInputBinding, WorkerInputKind
 
-from .custody_ports import ReactorCustodyPorts
+from empirical_lawhood.adapters.composition.reactor_prefix_response.custody_ports import ReactorCustodyPorts
 
 
 @dataclass(frozen=True)
@@ -73,7 +61,7 @@ class EmpiricalControlCustodyPorts:
     minimum_free_bytes: int = 100 * 1024**3
 
     def __post_init__(self) -> None:
-        from empirical_lawhood.kernel.serialization import validate_stable_id
+        from empirical_lawhood.science.records.serialization import validate_stable_id
 
         validate_stable_id(self.run_id)
         # Callers supply replayed operation authority and the issued execution
@@ -193,9 +181,7 @@ class EmpiricalArchiveAllocation:
         manifest_path = Path(str(path) + ".manifest.json")
         commit_key = str(path) + "::publication-commit"
         if manifest_path.exists():
-            from empirical_lawhood.infrastructure.task_receipts import (
-                decode_artifact_manifest,
-            )
+
 
             guarded_manifest = self.root.resolve(
                 str(manifest_path.relative_to(Path(self.root.contract.canonical_path))),
@@ -203,7 +189,7 @@ class EmpiricalArchiveAllocation:
             )
             if guarded_manifest.stat().st_size > unit:
                 raise ValueError("prepared manifest exceeds its allocation proof")
-            manifest = decode_artifact_manifest(guarded_manifest.read_bytes())
+            manifest = resolve_artifact_sidecar_bytes(ExternalArtifactPlane(self.root), guarded_manifest.read_bytes())
             if manifest.publication is None:
                 raise ValueError(
                     "prepared manifest lacks production publication custody"

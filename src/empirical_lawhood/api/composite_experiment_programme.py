@@ -3,14 +3,12 @@
 
 from pathlib import Path
 
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experiment_programme import (
-    MAX_PROGRAMME_DESCRIPTOR_BYTES, PROGRAMME_DESCRIPTOR_FILENAME, ExperimentProgrammeDescriptor,
-)
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experiment_programme import MAX_PROGRAMME_DESCRIPTOR_BYTES, PROGRAMME_DESCRIPTOR_FILENAME, ExperimentProgrammeDescriptor
 
-from .experiment_runtime_bindings import experiment_runtime_binding
+from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding
 
 
 def _descriptor_path(service, directory, *, for_write):
@@ -44,7 +42,7 @@ def _programme_factory(declaration):
 
 
 def _protocol_for_descriptor(descriptor):
-    from .experiment_preparation import experiment_protocols
+    from empirical_lawhood.api.experiment_preparation import experiment_protocols
 
     declarations = tuple(value for value in experiment_protocols() if value.protocol_id == descriptor.protocol_id)
     if len(declarations) != 1:
@@ -68,7 +66,7 @@ def selected_composite_programme_service(*, service, directory=None, preparation
         raise TypeError("Select one preparation or retained programme directory")
     descriptor = None
     if preparation is not None:
-        from .experiment_preparation import _protocol
+        from empirical_lawhood.api.experiment_preparation import _protocol
 
         preparation.__post_init__()
         if preparation.programme is None:
@@ -80,14 +78,9 @@ def selected_composite_programme_service(*, service, directory=None, preparation
     else:
         # Absence selects the existing single-run route. A present malformed or
         # linked descriptor refuses; it must never fall back to another route.
-        candidate = Path(directory) / PROGRAMME_DESCRIPTOR_FILENAME
-        if not candidate.exists() and not candidate.is_symlink():
+        descriptor = read_experiment_programme_descriptor(service=service, directory=directory)
+        if descriptor is None:
             return None
-        path = _descriptor_path(service, directory, for_write=False)
-        raw = read_bounded_bytes(path, maximum_bytes=MAX_PROGRAMME_DESCRIPTOR_BYTES)
-        descriptor = decode_canonical_bytes(raw, ExperimentProgrammeDescriptor, maximum_bytes=MAX_PROGRAMME_DESCRIPTOR_BYTES)
-        if raw != descriptor.canonical_bytes():
-            raise ValueError("Programme descriptor requires exact canonical bytes")
         declaration = _protocol_for_descriptor(descriptor)
     selected = _programme_factory(declaration)(service=service, descriptor=descriptor)
     if any(not callable(getattr(selected, name, None)) for name in ("author", "run", "read", "recover")):
@@ -95,10 +88,24 @@ def selected_composite_programme_service(*, service, directory=None, preparation
     return selected
 
 
+def read_experiment_programme_descriptor(*, service, directory):
+    """Read the exact registered selector without constructing or entering its owner."""
+    candidate = Path(directory) / PROGRAMME_DESCRIPTOR_FILENAME
+    if not candidate.exists() and not candidate.is_symlink():
+        return None
+    path = _descriptor_path(service, directory, for_write=False)
+    raw = read_bounded_bytes(path, maximum_bytes=MAX_PROGRAMME_DESCRIPTOR_BYTES)
+    descriptor = decode_canonical_bytes(raw, ExperimentProgrammeDescriptor, maximum_bytes=MAX_PROGRAMME_DESCRIPTOR_BYTES)
+    if raw != descriptor.canonical_bytes():
+        raise ValueError("Programme descriptor requires exact canonical bytes")
+    _protocol_for_descriptor(descriptor)
+    return descriptor
+
+
 def require_programme_source(project_root, snapshot, *, _admitted_source=None):
     """Authenticate operational parent selection; no issue or closure authority."""
     from empirical_lawhood.api.recursive_authoring import implementation_binding
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+    from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
     if (type(snapshot) is not ObjectIdentity or (snapshot.object_schema, snapshot.object_version) !=
             (RecursiveImplementationBinding.SCHEMA, RecursiveImplementationBinding.VERSION)):
         raise ValueError("new prospective component authoring requires its current operational implementation binding; retained common closures remain read-only")
@@ -111,9 +118,7 @@ def require_programme_source(project_root, snapshot, *, _admitted_source=None):
 
 def preflight_programme_source(project_root, snapshot):
     """Refuse inadmissible selected source before any new programme publication."""
-    from empirical_lawhood.infrastructure.source_closure import (
-        capture_admitted_target_source, require_admitted_target_source_current,
-    )
+    from empirical_lawhood.storage.source_closure import capture_admitted_target_source, require_admitted_target_source_current
     admitted = capture_admitted_target_source(Path(project_root))
     parent = require_programme_source(project_root, snapshot, _admitted_source=admitted)
     require_admitted_target_source_current(Path(project_root), admitted)
@@ -125,9 +130,7 @@ def preflight_programme_source(project_root, snapshot):
 
 def component_source_snapshot(project_root, snapshot, prospective_spec_id, *, _admitted_source=None):
     """Capture the exact child closure expected by the existing prospective owner."""
-    from empirical_lawhood.infrastructure.source_closure import (
-        capture_admitted_target_source, capture_target_closure, require_admitted_target_source_current,
-    )
+    from empirical_lawhood.storage.source_closure import capture_admitted_target_source, capture_target_closure, require_admitted_target_source_current
     if _admitted_source is None:
         admitted = capture_admitted_target_source(Path(project_root))
     else:
@@ -145,9 +148,9 @@ def component_source_snapshot(project_root, snapshot, prospective_spec_id, *, _a
 
 def prepared_component_source_snapshot(project_root, preparation):
     """Use the actual prospective design owner; never infer its ID from a phase."""
-    from .experiment_preparation import _protocol
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentPreparation
-    from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveDesignInputs
+    from empirical_lawhood.api.experiment_preparation import _protocol
+    from empirical_lawhood.execution.experiment_preparation import ExperimentPreparation
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveDesignInputs
 
     if type(preparation) is not ExperimentPreparation:
         raise TypeError("component source requires its exact typed preparation")

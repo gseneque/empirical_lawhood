@@ -10,16 +10,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_native_body
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_future_custody
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_response_science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_bindings, response_science
-from empirical_lawhood.infrastructure.execution import _DirectProgressEmitter
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.kernel.time import validate_utc_timestamp
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as preparation_science_owner_0
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_native_body
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_future_custody
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_response_science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_bindings, response_science
+from empirical_lawhood.execution.local.execution import _DirectProgressEmitter
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.science.models.time import validate_utc_timestamp
 from tests import test_matrix_coupling_preparation as preparation_fixture
 from tests import test_matrix_prepared_response_method as response_fixture
 
@@ -42,12 +42,12 @@ def test_preparation_actual_paired_work_preserves_every_array_and_rng_bytes(tmp_
     source, raw, coarse, bridge, _ = preparation_fixture.selected.__wrapped__(metadata)
     counts = []
     if seeded:
-        original = preparation_science.acquire_preparation(source, raw)
-        observed = preparation_science.acquire_preparation(source, raw, on_step=counts.append)
+        original = preparation_science_owner_0.acquire_preparation(source, raw)
+        observed = preparation_science_owner_0.acquire_preparation(source, raw, on_step=counts.append)
     else:
-        original = preparation_science.propagate_preparation(source, raw,
+        original = preparation_science_owner_0.propagate_preparation(source, raw,
             coarse_innovations=coarse, bridge_innovations=bridge)
-        observed = preparation_science.propagate_preparation(source, raw,
+        observed = preparation_science_owner_0.propagate_preparation(source, raw,
             coarse_innovations=coarse, bridge_innovations=bridge, on_step=counts.append)
     exact_arrays(original, observed)
     assert counts == [3 * step for step in range(1, source.total_ticks + 1)]

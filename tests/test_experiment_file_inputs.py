@@ -10,28 +10,24 @@ import os
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_PYTHON_SOURCE_CODEC
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_PYTHON_SOURCE_CODEC
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.planning.experiment_inputs import (
-    ExperimentFileInputBinding, ExperimentFileInputSelection,
-)
-from empirical_lawhood.runtime.experiment_preparation import (
-    ExecutionSelection, ExperimentCensus, ExperimentPreparation, PreparedExperimentFile, PreparedExperimentInputs,
-)
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, ExperimentCensus, ExperimentPreparation, PreparedExperimentFile, PreparedExperimentInputs
 from tests.test_experiment_preparation_public import _other_input_scope
 from tests.runtime_platform.test_recursive_compiler import fixture
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.infrastructure.artifact_stream_primitives import ArtifactIdentityConflict
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+from empirical_lawhood.storage.artifact_stream_primitives import ArtifactIdentityConflict
 
 
 def _mixed(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
 
     specification, records, original, path, calls, _ = _other_input_scope(tmp_path, monkeypatch)
     payload = b'values = (3, 5, 8)\n'
@@ -66,7 +62,7 @@ def test_original_python_file_loads_as_a_streamed_handle_without_copy_or_reinter
 
 @pytest.mark.parametrize('mutation', ('digest', 'size', 'revision', 'media', 'schema', 'undeclared', 'uninstalled'))
 def test_file_substitutions_refuse_before_the_domain_callback(tmp_path, monkeypatch, mutation):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
 
     specification, _, selection, path, calls, member = _mixed(tmp_path, monkeypatch)
     binding, = selection.files
@@ -93,7 +89,7 @@ def test_file_substitutions_refuse_before_the_domain_callback(tmp_path, monkeypa
 
 
 def test_known_oversize_refuses_before_bulk_read_even_with_a_broad_operational_allowance(tmp_path, monkeypatch):
-    from empirical_lawhood.infrastructure import bounded_io
+    from empirical_lawhood.storage import bounded_io
 
     specification, _, selection, path, calls, member = _mixed(tmp_path, monkeypatch)
     binding = replace(selection.files[0], maximum_bytes=1024 * 1024)

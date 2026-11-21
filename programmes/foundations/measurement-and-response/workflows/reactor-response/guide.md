@@ -454,17 +454,17 @@ action-stage refusal, and tests the exact 64-root one-sided qualification
 gate. These checks do not execute the remaining full native contracts.
 ## Independent retained arithmetic
 
-Use the [full-batch trace diagnostics](../../../../../src/empirical_lawhood/adapters/methods/reactor_prefix_response/posthoc_metrics.py)
+Use the [full-batch trace diagnostics](../../../../../src/empirical_lawhood/domains/reactor/reactor_prefix_response/posthoc_metrics.py)
 for the original 28,800 s trace, exact interval peaks and assigned 32-calibration/
-10-held-out sensitivity census. Use the [empirical diagnostics](../../../../../src/empirical_lawhood/adapters/methods/reactor_causal_response/posthoc.py) for the distinct 24-root discovery chart.
+10-held-out sensitivity census. Use the [empirical diagnostics](../../../../../src/empirical_lawhood/domains/reactor/reactor_causal_response/posthoc.py) for the distinct 24-root discovery chart.
 The chart has 16 fit roots and eight nomination roots.
 It has five episodes and two nested views. Nominal RMSE and maximum error over both
 views have different denominators. Intervention audits retain the original
 shared-prefix, exposure-contact and native K/conversion checks.
 
-The regime [fit verifier](../../../../../src/empirical_lawhood/adapters/methods/reactor_regime_response/fit_verification.py)
+The regime [fit verifier](../../../../../src/empirical_lawhood/domains/reactor/reactor_regime_response/fit_verification.py)
 independently reconstructs saved root-weighted affine, radial-basis and local
-coefficients. The [qualification verifier](../../../../../src/empirical_lawhood/adapters/methods/reactor_regime_response/qualification_verification.py)
+coefficients. The [qualification verifier](../../../../../src/empirical_lawhood/domains/reactor/reactor_regime_response/qualification_verification.py)
 validates supplied precision, matched-root contrasts and declared saved-input edges.
 It retains both native views, all 64 assigned roots, the 48-contact minimum and
 fixed 99 percent one-sided bootstrap limits. It emits no scientific adjudication.
@@ -483,7 +483,7 @@ receipt ancestry. Its complete evidence denominator is 292 tasks, including the
 Supply authenticated records keyed by `(task_id, schema)`, the successful
 receipts and the frozen terminal configuration publication operands.
 
-The [saved service verifier](../../../../../src/empirical_lawhood/adapters/methods/reactor_regime_response/independent_prospective_check.py)
+The [saved service verifier](../../../../../src/empirical_lawhood/domains/reactor/reactor_regime_response/independent_prospective_check.py)
 provides `verify_saved_service` for the distinct 64-root prospective contract.
 It preserves nonentry, both native views, exact word delivery, the installed
 owner's task and probe gates, and all-assigned A/J/C/F counts and bounds. Its
@@ -492,9 +492,9 @@ caller to authenticate canonical payloads, publication markers, successful
 receipts, frozen source and exposure, and separate reveal/analysis authority.
 Supplying typed records or task names alone does not establish those proofs.
 
-For retained feasibility work, the [chart and fold reductions](../../../../../src/empirical_lawhood/adapters/methods/reactor_regime_response/retained_feasibility.py)
+For retained feasibility work, the [chart and fold reductions](../../../../../src/empirical_lawhood/domains/reactor/reactor_regime_response/retained_feasibility.py)
 keep delivered-mass and peak/cooling measurements, shared-prefix checks and
-whole-root current/history comparisons. The [root sensitivity](../../../../../src/empirical_lawhood/adapters/methods/reactor_regime_response/retained_sensitivity.py)
+whole-root current/history comparisons. The [root sensitivity](../../../../../src/empirical_lawhood/domains/reactor/reactor_regime_response/retained_sensitivity.py)
 keeps the original 5,000 descriptive resamples. These exposed-data calculations
 cannot supply missing delayed-probe labels, fresh power or admission.
 

@@ -9,29 +9,12 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.experimental_design import (
-    IndependentUnit,
-    UnitAllocation,
-    UnitRoleAssignment,
-    require_disjoint_allocations,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
-from empirical_lawhood.runtime.experiment_preparation import (
-    DependencyKind,
-    ExecutionSelection,
-    ExperimentCensus,
-    ExperimentDependency,
-    ExperimentPreparation,
-)
-from empirical_lawhood.runtime.experimental_statistics import (
-    binomial_minimum_successes,
-    binomial_upper_tail,
-    calibration_rank,
-    raw_median,
-    split_upper_calibration,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment, require_disjoint_allocations
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection, ExperimentCensus, ExperimentDependency, ExperimentPreparation
+from empirical_lawhood.methods.statistics.experimental_statistics import binomial_minimum_successes, binomial_upper_tail, calibration_rank, raw_median, split_upper_calibration
 
 
 D = Decimal

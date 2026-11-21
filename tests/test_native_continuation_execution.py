@@ -10,24 +10,25 @@ import pytest
 
 from empirical_lawhood.api import native_continuation_execution as owner
 from empirical_lawhood.api.native_continuation_preparation import _inspect_original
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, LocalScheduler
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore, decode_run_recovery_index, decode_run_recovery_terminal_event
-from empirical_lawhood.infrastructure.recursive_custody import read_recursive_products
-from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, RunnerRegistry
-from empirical_lawhood.runtime.native_continuation_execution import DevelopmentNativeContinuation, native_continuation_scopes
-from empirical_lawhood.runtime.native_continuation_proposal import DevelopmentNativeContinuationProposal
-from empirical_lawhood.runtime.native_effects import NativeEntryRefused
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, PlanLane
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, LocalScheduler
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore, decode_run_recovery_index, decode_run_recovery_terminal_event
+from empirical_lawhood.storage.recursive_custody import read_recursive_products
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry
+from empirical_lawhood.execution.native_continuation_execution import DevelopmentNativeContinuation, native_continuation_scopes
+from empirical_lawhood.execution.native_continuation_proposal import DevelopmentNativeContinuationProposal
+from empirical_lawhood.execution.native_effects import NativeEntryRefused
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, PlanLane
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
 from tests.runtime_platform.test_execution_scheduler import FixedClock, StaticExternalInputResolver
 from tests.runtime_platform.test_native_parent_finalization_scheduler import CurrentParentRunner, _prepared_work
 from tests.runtime_platform.test_native_subwork import ExposedInput
@@ -70,14 +71,16 @@ def case(tmp_path, monkeypatch):
                 relative_path='runs/exposed.run/outputs/' + key + '/' + row.relative_path)
                 for row in contract.execution_task_record.outputs))
         tasks.append(task)
+    registry = CapabilityRegistry('exposed.operations',
+        tuple(sorted((native.manifest, pure.manifest), key=lambda value: value.registry_id)))
     plan = DevelopmentExecutionPlan('exposed.continuation', PlanLane.DEVELOPMENT,
         ObjectIdentity('exposed.run', 'empirical-lawhood/runtime/development-run-plan', '1.0.0', 'b' * 64),
-        'a' * 64, contract.implementation.observed_git_head, tuple(tasks), True)
+        registry.fingerprint(), contract.implementation.observed_git_head, tuple(tasks), True)
     index = DevelopmentRunRecoveryIndex.from_execution_plan(plan, run_id='exposed.run', wave_id='exposed.original')
     recovery, receipts = ExternalRunRecoveryStore(plane), ExternalTaskReceiptStore(plane)
     state = SimpleNamespace(plane=plane, bundle=bundle, plan=plan, index=index, recovery=recovery, receipts=receipts,
         original=contract.implementation, controller=replace(contract.implementation, observed_git_head='2' * 40),
-        root=Path(plane.root.contract.canonical_path), entered=[], checks=[], revoked=False)
+        root=Path(plane.root.contract.canonical_path), entered=[], checks=[], revoked=False, registry=registry)
     def scheduler(selected, *, original=False):
         engine = create_catalog_engine('sqlite+pysqlite:///:memory:')
         upgrade_catalog(engine)
@@ -129,7 +132,7 @@ def case(tmp_path, monkeypatch):
         native_effect=task.task_id != 'b.output-refused', resource_ceiling=native.manifest.resource_ceiling)
         for task in (plan.tasks[0], plan.tasks[1]))
     monkeypatch.setattr(recursive_operations, 'operation_catalog', lambda: (
-        registrations, SimpleNamespace(fingerprint=lambda: plan.registry_sha256), {}))
+        registrations, registry, {}))
     monkeypatch.setattr(owner, 'SUPPORTED_NATIVE_CAPABILITIES', frozenset((native.manifest.capability_key,)))
     monkeypatch.setattr(owner, 'observe_frozen_repair_worker', lambda **k: (state.original, state.environment))
     values = _inspect_original(writer=plane, plan=plan, index=index,
@@ -153,6 +156,33 @@ def _derive(state, **changes):
         proposal_relative_path=state.relative, original_source=state.original, controller=state.controller,
         owner_instruction_sha256='c' * 64, external_inputs=state.bundle.verified_inputs, require_access=lambda: None)
     return owner.derive_native_continuation(**{**options, **changes})
+
+
+def test_historical_continuation_read_accepts_only_unrelated_catalogue_changes(case, monkeypatch):
+    from empirical_lawhood.api import recursive_operations
+    proof, index = _derive(case)
+    owner.publish_native_continuation(writer=case.plane, plan=case.plan, proof=proof, index=index)
+    registrations, _, codecs = recursive_operations.operation_catalog()
+    extra = replace(case.registry.capabilities[0], capability_key='unrelated.new-operation')
+    newer = replace(case.registry, capabilities=tuple(sorted(
+        (*case.registry.capabilities, extra), key=lambda value: value.registry_id)))
+    monkeypatch.setattr(recursive_operations, 'operation_catalog', lambda: (registrations, newer, codecs))
+    before = _files(case.root)
+    assert owner.select_native_continuation(writer=case.plane, plan=case.plan,
+        predecessor=case.index, retained_registry=case.registry) == index
+    assert _files(case.root) == before
+    with pytest.raises(PermissionError, match='frozen capability registry'):
+        owner.select_native_continuation(writer=case.plane, plan=case.plan, predecessor=case.index)
+    with pytest.raises(PermissionError, match='original operation registry'):
+        _derive(case)
+    with pytest.raises(PermissionError, match='retained registry'):
+        owner.select_native_continuation(writer=case.plane, plan=case.plan,
+            predecessor=case.index, retained_registry=newer)
+    changed = replace(case.registry.capabilities[0], implementation_sha256='f' * 64)
+    newer = replace(case.registry, capabilities=(changed, *case.registry.capabilities[1:]))
+    with pytest.raises(PermissionError, match='original capability'):
+        owner.select_native_continuation(writer=case.plane, plan=case.plan,
+            predecessor=case.index, retained_registry=case.registry)
 
 
 def test_separate_continuation_preserves_old_uncertainty_and_completed_work_through_execution_and_read(case, monkeypatch):
@@ -254,7 +284,7 @@ def test_current_entry_still_refuses_revocation_and_original_nested_mutation(cas
 
 def _public(case, tmp_path, monkeypatch, *, access=lambda: None):
     from empirical_lawhood.api import recursive_authoring, recursive_execution
-    from empirical_lawhood.infrastructure import run_source_admission, source_closure
+    from empirical_lawhood.storage import run_source_admission, source_closure
     monkeypatch.setattr(run_source_admission, '_capture_source', lambda _: object())
     monkeypatch.setattr(recursive_authoring, 'implementation_binding', lambda *a, **k: case.controller)
     monkeypatch.setattr(source_closure, 'require_admitted_target_source_current', lambda *a: None)
@@ -308,7 +338,7 @@ def test_public_continuation_keeps_original_permission_lock_and_source_boundarie
     from contextlib import nullcontext
     from empirical_lawhood.api import recursive_execution
     from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
-    from empirical_lawhood.infrastructure import source_closure
+    from empirical_lawhood.storage import source_closure
     def access():
         if boundary == 'access':
             raise PermissionError('disclosed revoked access')

@@ -6,7 +6,7 @@ import sys
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifacts, publication_metadata
+from empirical_lawhood.storage import artifacts, publication_metadata
 from tests.test_matrix_programme_binding_batch import _case
 
 

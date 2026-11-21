@@ -6,12 +6,9 @@ from dataclasses import replace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import (
-    compact_records as compact, programme_composition as composition,
-    programme_qualification as qualification, programme_records as records,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import compact_records as compact, programme_composition as composition, programme_qualification as qualification, programme_records as records
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_scheduled_calibration import TEST_BUDGET
 from tests.test_matrix_scheduled_compact_graph import (
     bank as bank, calibration64_bank, provenance as provenance, response_bank as response_bank,
@@ -35,10 +32,10 @@ def compile_wave(programme, bank, templates, wave):
 
 
 def test_full576_programme_compiles_bounded_whole_group_waves_and_refuses_substitution(response_bank, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_prediction
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast, response_science
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments, parameter_source
-    from empirical_lawhood.runtime.recursive_prospective import recursive_selection_decoder_registration
+    from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_prediction
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast, response_science
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments, parameter_source
+    from empirical_lawhood.execution.recursive_prospective import recursive_selection_decoder_registration
 
     def blocked(*args, **kwargs):
         pytest.fail('programme declaration conformance entered native science or fitting')
@@ -85,7 +82,7 @@ def test_full576_programme_compiles_bounded_whole_group_waves_and_refuses_substi
     assert len({plan.global_commitment for plan in plans}) == 1
     assert len({plan.model_parents for plan in plans}) == 1
     assert tuple(sorted(root for plan in plans for root in plan.wave.root_ids)) == tuple(case.root_id for case in programme.cases)
-    assert recursive_selection_decoder_registration(implementation_sha256='a'*64).maximum_payload_bytes == 16*1024**2
+    assert recursive_selection_decoder_registration(implementation_sha256='a'*64).maximum_payload_bytes is None
 
     plan = plans[0]
     # Mutations preserve enough record shape to exercise exact conformance;

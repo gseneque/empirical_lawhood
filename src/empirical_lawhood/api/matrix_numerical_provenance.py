@@ -7,11 +7,7 @@ selected domain numerical predicate and historical producing bytes.
 
 from pathlib import Path
 
-from empirical_lawhood.api.numerical_provenance import (
-    authenticate_recorded_numerical_provenance, capture_numerical_provenance,
-    numerical_package_code_sha256, numerical_package_sources,
-    numerical_runtime_observation, selected_dependency_lock_sha256,
-)
+from empirical_lawhood.api.numerical_provenance import authenticate_recorded_numerical_provenance, capture_numerical_provenance, numerical_package_code_sha256, numerical_package_sources, numerical_runtime_observation, selected_dependency_lock_sha256
 
 # Retained imports for named Matrix consumers, not a second implementation.
 __all__ = ("authenticate_recorded_matrix_provenance", "capture_matrix_provenance",
@@ -22,7 +18,7 @@ __all__ = ("authenticate_recorded_matrix_provenance", "capture_matrix_provenance
 
 def matrix_native_runtime_observation():
     from empirical_lawhood.api.matrix_native_custody import MatrixNativeRuntimeObservation
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
 
     observation = numerical_runtime_observation()
     MatrixNativeRuntimeObservation(canonical_json_bytes(observation).decode())

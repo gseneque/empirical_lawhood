@@ -6,6 +6,7 @@ operands. They are not promoted from the retained negative prefix assessment.
 The paired future is actually integrated, receipted, independently assessed and
 recovered. No source qualification, fresh experiment or issue authority follows.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from hashlib import sha256
@@ -16,20 +17,20 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_response_records import project_protected_e3_response_numerics
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast, science as prefix_science
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history, parameter_history_segments, parameter_source
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_response_records import project_protected_e3_response_numerics
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast, science as prefix_science
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history, parameter_history_segments, parameter_source
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
 from tests.test_matrix_e3_response_preparation import (
     case as case, error_operands, forbid_native as forbid_native,
     original_case as original_case, prepared,
@@ -111,8 +112,7 @@ def test_actual_complete_paired_future_independent_score_and_recovery_preserve_a
             (parameter_source, "acquire_parameter_history"), (parameter_history, "advance_parameter_pair")):
         monkeypatch.setattr(module, name, blocked)
     selected = prepared(available)
-    manifests = tuple(decode_artifact_manifest(selected.plane.root.resolve(row.materialization.relative_path + ".manifest.json",
-        for_write=False).read_bytes()) for row in selected.verified)
+    manifests = tuple(resolve_artifact_sidecar_bytes(selected.plane, selected.plane.root.resolve(row.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()) for row in selected.verified)
     contacts = ExternalNativeEffectContactStore(plane=selected.plane, execution_plan=selected.parent.execution_plan,
         visibility_ceiling=Visibility.DEVELOPMENT_ONLY, outcome_access=Access.EVALUATION_SEALED)
     contacts.begin(selected.parent)
@@ -134,7 +134,7 @@ def test_actual_complete_paired_future_independent_score_and_recovery_preserve_a
     updated.response_raw, updated.response = payloads["arrays"], responses
     score_worker = prepared(updated, "response-score")
     available.response_lifecycle_counter = updated.response_lifecycle_counter
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_bindings, response_science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_bindings, response_science
     for module, names in ((response_science, ("native_responses", "panel_innovations")),
             (response_bindings, ("native_responses",)), (response_forecast, ("_hessian",)),
             (np.random, ("Generator", "PCG64DXSM", "default_rng")), (np.linalg, ("eigh", "eigvalsh")),

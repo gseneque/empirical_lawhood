@@ -10,14 +10,12 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_package import (
-    MatrixSelectedFrozenPackage, predict_selected_points, validate_selected_package_calibration,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as science
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_statistical_bindings import statistical_task_id
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_package import MatrixSelectedFrozenPackage, predict_selected_points, validate_selected_package_calibration
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as science
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_statistical_bindings import statistical_task_id
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
 from tests.test_matrix_configured_protected_e3 import actual_join, causal, paired_outcome
 from tests.test_matrix_configured_protected_statistical import _native_bank_context, case as configured_statistical_case
 from tests.test_matrix_e3_original_publications import case as original_case  # noqa: F401
@@ -83,10 +81,10 @@ def test_configured_selected_package_preserves_exact_fitted_records_and_bounded_
 
 
 def test_configured_selected_package_enters_existing_e4_forecast_contract_without_v1_relabel(original_case):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4ForecastDesign
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4OriginalCalibrationSummary
+    from empirical_lawhood.domains.matrix.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4ForecastDesign
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4OriginalCalibrationSummary
 
     full = configured_package(original_case)
     public = ConfiguredMatrixSelectedPublicPackage.from_package(full)
@@ -105,7 +103,7 @@ def test_configured_selected_package_enters_existing_e4_forecast_contract_withou
     assert provenance["feature_bank"] == full.models.training_features.to_document()
     assert provenance["units"] == list(full.allocation.unit_ids("train"))
     old = legacy_package()
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import MatrixSelectedPublicPackage
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import MatrixSelectedPublicPackage
     legacy = original_comparator_training(MatrixSelectedPublicPackage.from_package(old))
     assert legacy["bank_edition"] == "LEGACY_BANKS"
     assert legacy["data_origin"] == "NOT_REESTABLISHED_BY_THIS_READ"

@@ -13,9 +13,9 @@ from empirical_lawhood.api import matrix_full_factor_custody as full_custody
 from empirical_lawhood.api import protected_e3_read_custody as e3
 from empirical_lawhood.api import matrix_selected_e3_e4_read as selected
 from empirical_lawhood.api import recursive_qualified_parents as parent
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 
 

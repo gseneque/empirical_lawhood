@@ -10,12 +10,9 @@ from tests.test_response_parent_custody import _fixture
 
 from empirical_lawhood.adapters.composition.response_parent_custody import import_response_parent_custody
 from empirical_lawhood.adapters.composition.response_parent_store import ResponseExternalParentAuthorityStore
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 
 
 def test_real_target_store_replay_and_forged_locator_refusal(tmp_path: Path) -> None:

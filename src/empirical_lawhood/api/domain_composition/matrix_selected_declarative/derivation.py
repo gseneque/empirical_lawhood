@@ -4,15 +4,13 @@ from dataclasses import replace
 from functools import partial
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as domain
-from empirical_lawhood.infrastructure.source_origin import require_selected_implementation
-from empirical_lawhood.infrastructure.source_closure import (
-    capture_admitted_target_source, require_admitted_target_source_current,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as domain
+from empirical_lawhood.storage.source_origin import require_selected_implementation
+from empirical_lawhood.storage.source_closure import capture_admitted_target_source, require_admitted_target_source_current
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 
 
 def selected_produced_input_parents(writer, *, originals, development=(),read_access=None):
@@ -48,8 +46,7 @@ def require_produced_input_parents(writer, request, *,read_access=None):
 
 def require_evidence_produced_input_parents(writer, parents, evidence, *,read_access=None):
     """Fresh actual producer comparison at ordinary worker/source boundaries."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import (
-        MatrixRevisionEntryEvidenceV2, MatrixSelectedEntryEvidenceV3, MatrixSelectedOpportunityEvidenceV2)
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixRevisionEntryEvidenceV2, MatrixSelectedEntryEvidenceV3, MatrixSelectedOpportunityEvidenceV2
     if type(evidence) is MatrixRevisionEntryEvidenceV2:
         originals = (evidence.downstream_nomination, evidence.calibration)
         development = (evidence.revision_fit, evidence.revision_freeze,
@@ -67,10 +64,10 @@ def require_evidence_produced_input_parents(writer, parents, evidence, *,read_ac
 def original_e3_package(writer, request, codecs, *,read_access=None):
     """Read four actual issued products under their original current grants."""
     from empirical_lawhood.api.matrix_selected_e3_family import selected_e3_product_family
-    from ...matrix_sampling_runtime import _original_products
+    from empirical_lawhood.api.matrix_sampling_runtime import _original_products
     from empirical_lawhood.api.matrix_selected_producer_scope import validate_selected_e3_original_product
-    from ...matrix_selected_runtime import reconstruct_selected_package
-    from ...recursive_qualified_parents import MAX_PARENT_BYTES
+    from empirical_lawhood.api.matrix_selected_runtime import reconstruct_selected_package
+    from empirical_lawhood.api.recursive_qualified_parents import MAX_PARENT_BYTES
 
     public = request.original_e3
     if public is None: raise ValueError("select the exact original public E3 package")
@@ -102,10 +99,8 @@ def derive_authenticated_selection(specification, request, *, writer, project_ro
     """Authenticate all selected scientific original operands before publication."""
     from empirical_lawhood.api.recursive_operations import operation_catalog
     from empirical_lawhood.api.matrix_selected_revision_runtime import authenticate_revision_source_custody, revision_original_operands
-    from ...matrix_selected_runtime import _authenticate_entry
-    from ...matrix_selected_opportunity_runtime import (
-        reconstruct_opportunity_programme, authenticate_selected_development_nomination,
-    )
+    from empirical_lawhood.api.matrix_selected_runtime import _authenticate_entry
+    from empirical_lawhood.api.matrix_selected_opportunity_runtime import reconstruct_opportunity_programme, authenticate_selected_development_nomination
     if type(request) not in domain.committed_request_types():
         domain.require_original_commitments(None)
     require_produced_input_parents(writer, request,read_access=read_access)
@@ -133,7 +128,7 @@ def derive_authenticated_selection(specification, request, *, writer, project_ro
         package = original_e3_package(writer, request, codecs,read_access=read_access)
         nomination = None
         if specification.phase == "E5_CONFIRMATION":
-            from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry_v2 import MatrixSelectedEntryEvidenceV2
+            from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry_v2 import MatrixSelectedEntryEvidenceV2
             original = request.original_e3_source
             if (type(original) not in (MatrixSelectedEntryEvidenceV2, domain.MatrixSelectedEntryEvidenceV3)
                     or original.development_nomination is None or request.original_e3_nomination is None):
@@ -141,7 +136,7 @@ def derive_authenticated_selection(specification, request, *, writer, project_ro
             selected = request.original_e3_nomination
             nomination = authenticate_selected_development_nomination(writer, original.development_nomination,
                 package=package, criterion=specification.criterion, nomination_pin=selected.original_nomination,read_access=read_access)
-            from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import MatrixSelectedNominationSelection
+            from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import MatrixSelectedNominationSelection
             if MatrixSelectedNominationSelection.from_nomination(nomination[0]) != selected:
                 raise PermissionError("selected CONF declaration changes its actual original DEV recipe/criterion")
         programme, evidence = domain.make_programme(specification, request, e3_package=package, nomination=nomination)
@@ -157,7 +152,7 @@ def derive_authenticated_selection(specification, request, *, writer, project_ro
             _authenticate_entry(writer, programme, evidence, codecs,
                 source_scan_bytes=dict(request.phase_resources.phase_budgets)["entry"].source_scan_bytes,
                 transport_policy=getattr(request, "transport_policy", None),current_access=read_access)
-    from ...matrix_prepared_original_commitments import authenticate_prepared_original_commitments
+    from empirical_lawhood.api.matrix_prepared_original_commitments import authenticate_prepared_original_commitments
     if specification.account == "REVISION" or specification.phase == "E5_OPPORTUNITY":
         authenticate_prepared_original_commitments(writer=writer, programme=programme, evidence=evidence,
             source_scan_bytes=dict(request.phase_resources.phase_budgets)["entry" if specification.account == "REVISION" else "design"].source_scan_bytes,
@@ -165,7 +160,7 @@ def derive_authenticated_selection(specification, request, *, writer, project_ro
     extra = {}
     kind = domain.SelectedPreparedDerivedSelectionV4
     if type(request) is domain.SelectedPreparedDerivationRequestV3:
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.e6_transport_science import project_e6_frozen_calibration
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.e6_transport_science import project_e6_frozen_calibration
         if specification.account != "ORIGINAL_E3" or specification.phase != "E6_TRANSFER":
             raise ValueError("the transport policy belongs only to expanded original-E3 E6")
         extra["transport_calibration"] = project_e6_frozen_calibration(request.transport_policy, package,
@@ -182,10 +177,10 @@ def plan_current_metadata(specification, selection, *, relative, files):
     """Validate every typed input and derive access coordinates before effects."""
     from hashlib import sha256
     from empirical_lawhood.api.derived_metadata_access import _semantic_access
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_NPZ_CODEC
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_NPZ_CODEC
     from empirical_lawhood.api.derived_array_access import validate_matrix_array_input_bytes
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_history_parents
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_history_parents
     if specification.phase == "E5_OPPORTUNITY":
         return selection, ()
     lowered = domain.lower(specification, selection)
@@ -241,11 +236,9 @@ def plan_current_metadata(specification, selection, *, relative, files):
 def _authenticate_produced_history_publication(*, writer, publication, record, external, parents,
         root, source_profile, require_current=None):
     """Authenticate retained exact bytes and ancestry without source qualification."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_history_parents
-    from empirical_lawhood.api.derived_metadata_access import (
-        _require_canonical_metadata_binding, _read_canonical_metadata_binding,
-    )
-    from empirical_lawhood.infrastructure.publication_metadata import authenticate_published_materialization
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_history_parents
+    from empirical_lawhood.api.derived_metadata_access import _require_canonical_metadata_binding, _read_canonical_metadata_binding
+    from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization
     selected = produced_history_parents(external, record, parents)
     if not selected:
         raise ValueError("retained publication lacks its exact produced HISTORY ancestry")
@@ -271,10 +264,8 @@ def publish_current_metadata(specification, selection, *, writer, planned, requi
     profile = None if root is None else selection.evidence.pipeline.pipeline_config.profile
     expected_configs = {value.source_id: value for value in selection.request.source_configs}
     expected_qualifications = {value.source_id: value for value in selection.request.qualifications}
-    from empirical_lawhood.api.derived_array_access import (
-        DerivedInputAccess, derive_matrix_input_access_batch, supports_derived_input_access_batch,
-    )
-    from empirical_lawhood.infrastructure.publication_metadata import checkpoint_publication_access
+    from empirical_lawhood.api.derived_array_access import DerivedInputAccess, derive_matrix_input_access_batch, supports_derived_input_access_batch
+    from empirical_lawhood.storage.publication_metadata import checkpoint_publication_access
     publications = []
     batch_access = supports_derived_input_access_batch(writer, len(planned))
     pending = []
@@ -324,7 +315,7 @@ def validate_current_metadata(specification, selection):
     qualifications = {value.source_id: value for value in selection.request.qualifications}
     arrays = {value.initial.array_artifact: value.initial for _, value in domain.source_arms(specification, selection.programme.sources)}
     arrays[selection.programme.assay.template_artifact] = selection.programme.assay
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_history_parents
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_history_parents
     source_ids = {value.input_id for value in lowered.draft.external_inputs if value.scientific_role != "HISTORY"}
     if set(configs) != source_ids or set(qualifications) != source_ids:
         raise PermissionError("selected ordinary access roster differs from exact physical SOURCE inputs")
@@ -348,10 +339,10 @@ def validate_current_metadata(specification, selection):
 def _derive_inputs(*, specification, source_selection_path, project_root, artifact_writer,
         metadata_directory, output_selection_path, execution, read_access=None):
     """The existing generic command publishes new current metadata, no authority."""
-    from ...experiment_preparation import _protocol, load_experiment_inputs, prepare_experiment
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+    from empirical_lawhood.api.experiment_preparation import _protocol, load_experiment_inputs, prepare_experiment
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
     source, output, metadata = Path(source_selection_path), Path(output_selection_path), Path(metadata_directory)
     root = Path(project_root).resolve(strict=True)
@@ -426,8 +417,8 @@ def _derive_inputs(*, specification, source_selection_path, project_root, artifa
                 "source_key": value.source_key} for value in preparation.dependencies],
             "scientific_authority": "NONE", "native_contact": "NONE"}})
     def publication_request(identifier, relative, schema, raw, *, produced=False):
-        from empirical_lawhood.runtime.artifacts import derived_outcome_access
-        from empirical_lawhood.kernel.evidence import inherited_visibility
+        from empirical_lawhood.storage.contracts.artifacts import derived_outcome_access
+        from empirical_lawhood.science.evidence.evidence import inherited_visibility
         parents = selected_request.produced_input_parents if produced else ()
         access = derived_outcome_access(OutcomeAccess.DEVELOPMENT_VISIBLE if produced else OutcomeAccess.OUTCOME_BLIND,
             *(value.outcome_access for value in parents))
@@ -488,9 +479,9 @@ def derive_inputs(*, specification, source_selection_path, project_root, artifac
 def prepare_authoring(preparation, *, project_root, artifact_writer, output_dir,read_access=None,original_input_access=None):
     """Bind only the actual candidate resources; preserve all scientific inputs."""
     from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
-    from ...prospective_experiment import preview_prepared_prospective_experiment_candidate
-    from empirical_lawhood.runtime.experiment_resources import bind_execution_resources
-    from empirical_lawhood.runtime.experiment_preparation import DependencyKind
+    from empirical_lawhood.api.prospective_experiment import preview_prepared_prospective_experiment_candidate
+    from empirical_lawhood.execution.experiment_resources import bind_execution_resources
+    from empirical_lawhood.execution.experiment_preparation import DependencyKind
     selection, = (value for _, value in preparation.design_records if type(value) in domain.derived_selection_types())
     if preparation.specification_record.phase == "E5_OPPORTUNITY":
         expected = derive_authenticated_selection(preparation.specification_record, selection.request,

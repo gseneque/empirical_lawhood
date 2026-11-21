@@ -16,19 +16,19 @@ import sys
 
 import empirical_lawhood
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as c
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as c
 from empirical_lawhood.api.recursive_authoring import author_recursive_wave, implementation_binding
 from empirical_lawhood.api.recursive_execution import read_recursive_wave, run_recursive_wave
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, prepare_worker_invocation
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.numerical_provenance import capture_numerical_provenance
-from empirical_lawhood.infrastructure.prepared_native_invocation import NativeInputPublication, prepare_native_invocation
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ExternalRootContract
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.runtime.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, prepare_worker_invocation
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.numerical_provenance import capture_numerical_provenance
+from empirical_lawhood.storage.prepared_native_invocation import NativeInputPublication, prepare_native_invocation
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ExternalRootContract
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
 from tests.runtime_platform.test_worker_preflight import _original_task
 from tests.test_rubisco_geometry_reuse import original as original  # noqa: F401
 from tests.test_rubisco_closed_raw_model_admission import closed as closed, known_derived as known_derived  # noqa: F401
@@ -44,9 +44,9 @@ VISIBILITY = VisibilityCeiling.DEVELOPMENT_ONLY
 def _plane(path):
     from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
     path.mkdir()
+    mount = next(parent for parent in (path, *path.parents) if parent.is_mount())
     return ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
-        "rubisco-exposed-negative-custody", "Actual exposed no-contact software control", str(path),
-        str(next(parent for parent in (path, *path.parents) if parent.is_mount())),
+        "rubisco-exposed-negative-custody", "Actual exposed no-contact software control", str(path), str(mount),
         "empirical-lawhood/testing/recursive-custody", 0)),
         validators=integration_artifact_profile_validators())
 
@@ -101,8 +101,10 @@ def _public_refusal(tmp_path, draft, records, *, expected_code):
     assert report["producing_code_sha256"] == expected_code
     assert report["scientific_authority"] == "NONE" and report["qualification"] == "NOT_ESTABLISHED"
     assert report["terminal_products"] == {}
-    assert read_recursive_wave(directory=directory, artifact_writer=plane, terminal_product_format="compact") == report
-    retained, _, _, plan = read_recursive_wave(directory=directory, artifact_writer=plane, include_products=True, terminal_product_format="compact")
+    read_options = dict(terminal_product_format="compact", allow_partial=True)
+    assert read_recursive_wave(directory=directory, artifact_writer=plane, **read_options) == report
+    retained, _, _, plan = read_recursive_wave(directory=directory, artifact_writer=plane,
+        include_products=True, **read_options)
     assert retained == report
     contacts = ExternalNativeEffectContactStore(plane=plane,
         execution_plan=ObjectIdentity.from_record(plan.execution_plan_id, plan),
@@ -117,7 +119,7 @@ def _retained_public_task_diagnostic(directory, plane, tmp_path):
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_execution import _retained_plans, _external_inputs
     from empirical_lawhood.api.recursive_operations import operation_catalog, operation_runners
-    from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind
+    from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind
 
     _, draft, source, payloads = load_authored_wave(directory=directory, artifact_writer=plane, lazy_payloads=True)
     run, plan, _ = _retained_plans(payloads, draft)
@@ -160,8 +162,8 @@ def _retained_public_task_diagnostic(directory, plane, tmp_path):
 
 
 def test_actual_public_durable_control_reaches_selected_child_and_refuses_original_incomplete_stock(tmp_path, original):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import durable_operation_bindings as ob
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_recursive_translation import preparation_control_draft
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import durable_operation_bindings as ob
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_recursive_translation import preparation_control_draft
     observed = capture_numerical_provenance(project_root=ROOT)
     source = _source(original, "durable")
     plan = _selected_plan(original, source, observed, name="durable")
@@ -176,8 +178,8 @@ def test_actual_public_durable_control_reaches_selected_child_and_refuses_origin
 
 
 def test_actual_public_geometry_control_preserves_original_suppliers_and_refuses_stock(tmp_path, original):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.geometry_operation_bindings import GeometryReuseConfig, NODE
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.geometry_recursive_translation import geometry_reuse_draft
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.geometry_operation_bindings import GeometryReuseConfig, NODE
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.geometry_recursive_translation import geometry_reuse_draft
     from tests.test_rubisco_geometry_reuse import fresh
     observed = capture_numerical_provenance(project_root=ROOT)
     source, plan = fresh(original)
@@ -202,8 +204,8 @@ def test_actual_public_geometry_control_preserves_original_suppliers_and_refuses
 
 
 def test_actual_installed_ordinary_worker_reports_stock_refusal_without_inventing_parent_contributions(tmp_path, original):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import operation_bindings as ob
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.ordinary_preparation import prepare_native_work
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import operation_bindings as ob
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.ordinary_preparation import prepare_native_work
     observed = capture_numerical_provenance(project_root=ROOT)
     source = _source(original, "ordinary")
     operands = tuple(sorted((c.identity(row) for row in (source, original.nomination, original.inventory, original.coordinates)),
@@ -245,7 +247,7 @@ def test_actual_installed_ordinary_worker_reports_stock_refusal_without_inventin
 
 
 def _sampling_config(plan, source, operation, tmp_path):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.operation_bindings import SamplingOperationConfig
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.operation_bindings import SamplingOperationConfig
     environment = dict(_environment(), OPENMM_PLUGIN_DIR=str(tmp_path / "explicit-unavailable-plugins"))
     return SamplingOperationConfig("config.rubisco-insilico-sampling." + operation, operation,
         plan.canonical_bytes().decode(), source, str(ROOT), str(tmp_path / "selected-invocation.json"),
@@ -253,8 +255,8 @@ def _sampling_config(plan, source, operation, tmp_path):
 
 
 def test_actual_public_chemical14_keeps_instance_custody_and_refuses_unavailable_stock(tmp_path, closed):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.closed_raw_model_admission import ordinary_instance_records
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.recursive_translation import sampling_control_draft
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.closed_raw_model_admission import ordinary_instance_records
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.recursive_translation import sampling_control_draft
     from tests.test_rubisco_closed_raw_model_admission import operands
     observed = capture_numerical_provenance(project_root=ROOT)
     plan, source, inputs, _, _, assets, _ = operands(closed)
@@ -276,7 +278,7 @@ def test_actual_public_chemical14_keeps_instance_custody_and_refuses_unavailable
 
 
 def test_actual_public_nve12_preserves_old_chemical_and_refuses_unavailable_selected_interpreter(tmp_path, admitted):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.recursive_translation import sampling_control_draft
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.recursive_translation import sampling_control_draft
     observed = capture_numerical_provenance(project_root=ROOT)
     chemical = admitted.plan.chemical_controls
     old = chemical.canonical_bytes()

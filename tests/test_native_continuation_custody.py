@@ -7,12 +7,12 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.native_continuation_execution import DevelopmentNativeContinuation, NativeContinuationCustodyScope
-from empirical_lawhood.runtime.native_subwork import NativeSubworkRoster, NativeSubworkState
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.native_continuation_execution import DevelopmentNativeContinuation, NativeContinuationCustodyScope
+from empirical_lawhood.execution.native_subwork import NativeSubworkRoster, NativeSubworkState
 from tests.runtime_platform.test_native_subwork import _selected, _publish, _complete
 
 

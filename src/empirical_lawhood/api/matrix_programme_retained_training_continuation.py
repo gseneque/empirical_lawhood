@@ -5,31 +5,29 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from time import monotonic
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import retained_training_continuation as domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import source_continuation as source_domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import PHASES
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import (
-    CONTINUED_PROTOCOL_ID, MatrixContinuedProgrammeSpecification, MatrixResearchProgrammePlan,
-)
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticated_programme_inputs
-from empirical_lawhood.infrastructure.matrix_retained_training import read_retained_training_source
-from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
-from empirical_lawhood.runtime.native_training_export import NativeTrainingExportAdoptionSelection
-from .matrix_researcher_programme_lineage import read_published_record
-from .matrix_programme_source_continuation import _pin
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import retained_training_continuation as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import source_continuation as source_domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import PHASES
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import CONTINUED_PROTOCOL_ID, MatrixContinuedProgrammeSpecification, MatrixResearchProgrammePlan
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticated_programme_inputs
+from empirical_lawhood.adapters.matrix_storage.matrix_retained_training import read_retained_training_source
+from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.execution.native_training_export import NativeTrainingExportAdoptionSelection
+from empirical_lawhood.api.matrix_researcher_programme_lineage import read_published_record
+from empirical_lawhood.api.matrix_programme_source_continuation import _pin
 
 
 def _predecessor(service, specification):
-    from .matrix_researcher_programme import MatrixResearchProgrammeService, PLAN_FILENAME
-    from .selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService, PLAN_FILENAME
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
     selected, writer = specification.predecessor, service.artifact_writer
     plan = read_published_record(writer, selected.publication.materialization.relative_path,
         MatrixResearchProgrammePlan, selected.publication.materialization.size_bytes)
@@ -73,8 +71,8 @@ class _CompletedCustody:
 @contextmanager
 def _completed_custody(owner, context):
     """Original inherited reads remain live; authenticate the remaining census."""
-    from .recursive_execution import _custody_control_pins
-    from empirical_lawhood.runtime.experiment_programme import MAX_PROGRAMME_DESCRIPTOR_BYTES, PROGRAMME_DESCRIPTOR_FILENAME
+    from empirical_lawhood.api.recursive_execution import _custody_control_pins
+    from empirical_lawhood.execution.experiment_programme import MAX_PROGRAMME_DESCRIPTOR_BYTES, PROGRAMME_DESCRIPTOR_FILENAME
     with context.writer.read_context() as writer:
         service = replace(context.service, artifact_writer=writer)
         current = replace(context, service=service)
@@ -100,7 +98,7 @@ def _completed_custody(owner, context):
         try:
             require_current()
             for phase in domain.RETAINED_PHASES:
-                from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding
+                from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding
                 origin = current.phase_origins.get(phase, current)
                 relative = (origin.directory / 'bindings' / (phase + '.json')).relative_to(
                     writer.root.contract.canonical_path).as_posix()
@@ -130,10 +128,10 @@ def _completed_custody(owner, context):
 
 def _training_source(context, specification, provenance):
     """Derive the untrusted adoption locator from original authored publications."""
-    from .native_training_banks import _read_instance
-    from .recursive_authoring import load_authored_wave
-    from .recursive_execution import _retained_plans
-    from .selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.api.native_training_banks import _read_instance
+    from empirical_lawhood.api.recursive_authoring import load_authored_wave
+    from empirical_lawhood.api.recursive_execution import _retained_plans
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
     packet, draft, source, payloads = load_authored_wave(directory=context.child_directory('train'),
         artifact_writer=context.writer, lazy_payloads=True)
     run, plan, _ = _retained_plans(payloads, draft)
@@ -189,8 +187,8 @@ def continued_context(owner, context, record):
 @contextmanager
 def authenticated_e3_continuation(*, project_root, artifact_writer, selected, execution):
     """Open the published handoff through its ordinary programme owner."""
-    from .experiment_programme import ExperimentProgrammeService
-    from .selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
     if type(selected) is not MatrixProgrammePublishedInput:
         raise TypeError('continued E3 requires its exact published retained TRAIN handoff')
     selected.require_kind(domain.MatrixProgrammeRetainedTrainingContinuation)
@@ -233,7 +231,7 @@ def continued_e3_future(context, *, assembly_request, training_request, scientif
 
 
 def _publish_inputs(original, provenance, retained, support, publish, *, record_id):
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.input_records import validate_programme_input_records
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.input_records import validate_programme_input_records
     provenance_publication = publish('producing-provenance', provenance, identity=provenance.identity)
     phases, handles = [], []
     for phase in original.phases:
@@ -259,12 +257,12 @@ def _publish_inputs(original, provenance, retained, support, publish, *, record_
 
 def derive_inputs(*, specification, source_selection_path, project_root, artifact_writer,
         metadata_directory, output_selection_path, execution, read_access=None):
-    from .experiment_preparation import load_experiment_inputs, prepare_experiment
-    from .experiment_programme import ExperimentProgrammeService
-    from .matrix_numerical_provenance import capture_matrix_provenance
-    from .matrix_programme_allocations import _require_memory
-    from .matrix_researcher_programme import _publish
-    from .selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest
+    from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
+    from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
+    from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
+    from empirical_lawhood.api.matrix_programme_allocations import _require_memory
+    from empirical_lawhood.api.matrix_researcher_programme import _publish
+    from empirical_lawhood.api.selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest
     if type(specification) is not domain.MatrixProgrammeRetainedTrainingContinuationSpecification or read_access is not None:
         raise TypeError('retained TRAIN continuation requires its exact ordinary metadata specification')
     started = monotonic()

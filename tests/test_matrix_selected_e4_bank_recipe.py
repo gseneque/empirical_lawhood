@@ -12,21 +12,21 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import MatrixSelectedPublicPackage
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_bank_recipe as domain
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_streams import SelectedE4StreamRecipe, STREAM_RULE
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseProtocol
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Design
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import MatrixParameterCoordinate
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import MatrixSelectedPublicPackage
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_bank_recipe as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_streams import SelectedE4StreamRecipe, STREAM_RULE
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseProtocol
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Design
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import MatrixParameterCoordinate
 from empirical_lawhood.api import matrix_selected_e3_e4_runtime as owner
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_selected_package import package as literal_package
 from tests.test_matrix_sampling_follow_on import prior_product
 
@@ -171,11 +171,11 @@ def test_recipe_publisher_refuses_missing_original_custody_before_any_new_public
 @pytest.fixture(scope="module")
 def literal_recipe_source_inputs(tmp_path_factory):
     """Actual typed/guarded metadata, with disclosed unissued producer locators."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as e3
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_experiment_inputs import ProtectedE3PreFitJoin
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_package import adapt_e3_frozen_package
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.runtime.experimental_statistics import split_upper_calibration
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as e3
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_experiment_inputs import ProtectedE3PreFitJoin
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_package import adapt_e3_frozen_package
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.methods.statistics.experimental_statistics import split_upper_calibration
     from tests.test_matrix_e3_protected_public_lowering import prepared_case
     from tests.test_matrix_factor_confirmation_eligibility import publish
 
@@ -350,9 +350,7 @@ def test_foreign_metadata_path_refuses_before_any_new_publication(metadata_publi
 
 @pytest.mark.parametrize("changed", ("prefix", "full"))
 def test_selected_original_projection_refuses_changed_factor_math(literal_recipe_source_inputs, changed):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import (
-        selected_original_factor_rule, validate_selected_prefix_projection,
-    )
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import selected_original_factor_rule, validate_selected_prefix_projection
     inputs = literal_recipe_source_inputs.inputs
     criterion = inputs.original_preparation.mathematical_protocol
     policy = inputs.assay.public_source.policy
@@ -396,8 +394,8 @@ def test_standalone_recipe_reuses_actual_source_once_for_publish_load_and_exact_
     control proves no original E3 authority, native result or qualification.
     """
     from empirical_lawhood.api import recursive_authoring, selected_e4_bank_recipe as api
-    from empirical_lawhood.infrastructure import numerical_provenance, source_closure
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.storage import numerical_provenance, source_closure
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
     f=literal_recipe_source_inputs
     root=Path(__file__).resolve().parents[1]
@@ -413,19 +411,19 @@ def test_standalone_recipe_reuses_actual_source_once_for_publish_load_and_exact_
     monkeypatch.setattr(api,"authenticate_selected_e3_assay",lambda **_:None)
     monkeypatch.setattr(api,"authenticate_publication",lambda *_a,**_kw:None)
     captured,archives=[],[]
-    actual_capture,actual_git=source_closure.capture_admitted_target_source,source_closure._git
+    actual_capture,actual_archive=source_closure.capture_admitted_target_source,source_closure._git_archive_census
     def capture(*args,**kwargs):
         actual=actual_capture(*args,**kwargs)
         captured.append(actual)
         return actual
-    def git(root,*args):
-        if args[0]=="archive":archives.append(args)
-        return actual_git(root,*args)
+    def archive(root,tree):
+        archives.append(root)
+        return actual_archive(root,tree)
     def raw_inventory(*_a,**_kw):
         pytest.fail("recipe rebuilt an already admitted numerical source inventory")
     monkeypatch.setattr(source_closure,"capture_admitted_target_source",capture)
     monkeypatch.setattr(api,"capture_admitted_target_source",capture)
-    monkeypatch.setattr(source_closure,"_git",git)
+    monkeypatch.setattr(source_closure,"_git_archive_census",archive)
     monkeypatch.setattr(numerical_provenance,"numerical_package_sources",raw_inventory)
     monkeypatch.setattr(numerical_provenance,"selected_dependency_lock_sha256",raw_inventory)
     arguments=dict(inputs=f.inputs,project_root=root,artifact_writer=f.case.plane,execution=execution,

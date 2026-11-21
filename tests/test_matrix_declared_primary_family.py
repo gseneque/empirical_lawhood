@@ -5,9 +5,9 @@ from decimal import Decimal
 from fractions import Fraction
 
 import pytest
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_specification import ConfiguredE3Assessment
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial import FAMILY_IDS
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_specification import ConfiguredE3Assessment
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial import FAMILY_IDS
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_matrix_later_programme import criterion
 
 

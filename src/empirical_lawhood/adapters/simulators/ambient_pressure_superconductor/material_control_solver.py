@@ -1,219 +1,46 @@
-'Fixed-profile QE/PH/EPW execution and bounded material control output extraction.\n\nThe scientific configuration selects one of a closed set of workflow profile\nidentities.  It never supplies argv, shell, import, path, or callable values.\nEach profile consumes exact source bytes already qualified by ``ap4_source``,\nruns without network access, and emits a deterministic raw-output archive plus\ntyped native-unit operands.  The executor does not adjudicate a material\nclass or authorize a science freeze.\n'
+"""Native acquisition and external-format binding for the domain science."""
 
 from __future__ import annotations
-
 import os
 import re
 import subprocess
 import tarfile
 import time
 from collections.abc import Iterator
-from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
-from enum import StrEnum
 from gzip import GzipFile
 from hashlib import sha256
 from pathlib import Path, PurePosixPath
 from typing import Final
-
-from empirical_lawhood._required_inputs import (
-    required_external_path,
-    required_external_sha256,
+from empirical_lawhood._required_inputs import required_external_path, required_external_sha256
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_raw import encode_raw_archive_hdf5
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_source import CONTROL_INPUT_ARCHIVE, DOCKER_EXECUTABLE, ENVIRONMENT_IMAGE, TUTORIAL_ARCHIVE, TUTORIAL_ARCHIVE_SHA256, _binary_sha256s, _external_path
+from empirical_lawhood.domains.materials.superconductivity.workflow_contracts import (
+    MaterialControlWorkflowOperands as _science_MaterialControlWorkflowOperands,
+    MaterialControlWorkflowProfile as _science_MaterialControlWorkflowProfile,
+    MaterialControlWorkflowRequest as _science_MaterialControlWorkflowRequest,
+    WorkflowKind as _science_WorkflowKind,
+    WorkflowSource as _science_WorkflowSource,
 )
 
-from .material_control_contracts import ControlClass
-from .material_control_raw import encode_raw_archive_hdf5
-from .material_control_source import CONTROL_INPUT_ARCHIVE, DOCKER_EXECUTABLE, ENVIRONMENT_IMAGE, TUTORIAL_ARCHIVE, TUTORIAL_ARCHIVE_SHA256, _binary_sha256s, _external_path
+from empirical_lawhood.domains.materials.superconductivity.workflow_profiles import (
+    _PROFILE_BY_ID,
+)
 
 MAXIMUM_LOG_BYTES: Final = 32 * 1024**2
+
+
 MATERIAL_CONTROL_CONTAINER_RUN_LABEL: Final = 'empirical-lawhood.material-control-run-scope'
+
+
 MATERIAL_CONTROL_CONTAINER_TASK_LABEL: Final = 'empirical-lawhood.material-control-task-scope'
 
 
-class WorkflowKind(StrEnum):
-    POSITIVE = "POSITIVE"
-    PHONON_STABILITY = "PHONON_STABILITY"
-    SCF_CLASS = "SCF_CLASS"
-
-
-class WorkflowSource(StrEnum):
-    EPW_SUPERCONDUCTING_REFERENCE = "EPW_SUPERCONDUCTING_REFERENCE"
-    SSSP_CONTROL = "SSSP_CONTROL"
-
-
-@dataclass(frozen=True, slots=True)
-class MaterialControlWorkflowProfile:
-    profile_id: str
-    source: WorkflowSource
-    structure_id: str
-    view_id: str
-    control_class: ControlClass
-    kind: WorkflowKind
-    source_root: str
-    prefix: str
-    cpu_cores: int
-    memory_bytes: int
-
-
-def _profile(
-    profile_id: str,
-    *,
-    source: WorkflowSource,
-    structure_id: str,
-    view_id: str,
-    control_class: ControlClass,
-    kind: WorkflowKind,
-    source_root: str,
-    prefix: str,
-) -> MaterialControlWorkflowProfile:
-    return MaterialControlWorkflowProfile(
-        profile_id=profile_id,
-        source=source,
-        structure_id=structure_id,
-        view_id=view_id,
-        control_class=control_class,
-        kind=kind,
-        source_root=source_root,
-        prefix=prefix,
-        cpu_cores=8,
-        memory_bytes=24 * 1024**3,
-    )
-
-
-_TUTORIAL_PROFILES: Final = (
-    _profile(
-        'workflow.material-control-tutorial04-mgb2',
-        source=WorkflowSource.EPW_SUPERCONDUCTING_REFERENCE,
-        structure_id='structure.calibration-mgb2-alb2',
-        view_id="view.epw-tutorial04-pbe-pseudodojo-workflow-reference",
-        control_class=ControlClass.POSITIVE_ANISOTROPIC,
-        kind=WorkflowKind.POSITIVE,
-        source_root="tutorial04",
-        prefix="mgb2",
-    ),
-    _profile(
-        'workflow.material-control-tutorial04-pb',
-        source=WorkflowSource.EPW_SUPERCONDUCTING_REFERENCE,
-        structure_id='structure.calibration-pb-fcc',
-        view_id="view.epw-tutorial04-pbe-pseudodojo-workflow-reference",
-        control_class=ControlClass.POSITIVE_ISOTROPIC,
-        kind=WorkflowKind.POSITIVE,
-        source_root="tutorial04",
-        prefix="pb",
-    ),
-)
-
-
-def _science_profiles() -> tuple[MaterialControlWorkflowProfile, ...]:
-    rows = (
-        (
-            'calibration-c-diamond',
-            'structure.calibration-c-diamond',
-            ControlClass.INSULATOR,
-            WorkflowKind.SCF_CLASS,
-            "diamond",
-        ),
-        (
-            'calibration-cu-fcc',
-            'structure.calibration-cu-fcc',
-            ControlClass.NORMAL_METAL,
-            WorkflowKind.SCF_CLASS,
-            "cu",
-        ),
-        (
-            'calibration-mgb2-alb2',
-            'structure.calibration-mgb2-alb2',
-            ControlClass.POSITIVE_ANISOTROPIC,
-            WorkflowKind.POSITIVE,
-            "mgb2",
-        ),
-        (
-            'calibration-pb-fcc',
-            'structure.calibration-pb-fcc',
-            ControlClass.POSITIVE_ISOTROPIC,
-            WorkflowKind.POSITIVE,
-            "pb",
-        ),
-        (
-            'calibration-pb-sc-compressed',
-            'structure.calibration-pb-sc-compressed',
-            ControlClass.DYNAMICALLY_UNSTABLE,
-            WorkflowKind.PHONON_STABILITY,
-            "pbsc",
-        ),
-    )
-    result: list[MaterialControlWorkflowProfile] = []
-    for view_id in ("view.pbe-efficiency-base", "view.pbe-precision-refined"):
-        view_name = view_id.removeprefix("view.")
-        for case, structure_id, control_class, kind, prefix in rows:
-            result.append(
-                _profile(
-                    f'workflow.material-control-{view_name}-{case}',
-                    source=WorkflowSource.SSSP_CONTROL,
-                    structure_id=structure_id,
-                    view_id=view_id,
-                    control_class=control_class,
-                    kind=kind,
-                    source_root=f'material-control-control-inputs/{view_name}/{case}',
-                    prefix=prefix,
-                )
-            )
-    return tuple(result)
-
-
-MATERIAL_CONTROL_WORKFLOW_PROFILES: Final = tuple(
-    sorted(_TUTORIAL_PROFILES + _science_profiles(), key=lambda value: value.profile_id)
-)
-_PROFILE_BY_ID: Final = {value.profile_id: value for value in MATERIAL_CONTROL_WORKFLOW_PROFILES}
-
-
-def resolve_material_control_workflow_profile(profile_id: str) -> MaterialControlWorkflowProfile:
+def resolve_material_control_workflow_profile(profile_id: str) -> _science_MaterialControlWorkflowProfile:
     try:
         return _PROFILE_BY_ID[profile_id]
     except KeyError as error:
         raise ValueError('unknown material control workflow profile') from error
-
-
-@dataclass(frozen=True, slots=True)
-class MaterialControlWorkflowRequest:
-    request_id: str
-    run_id: str
-    task_id: str
-    profile_id: str
-    wall_time_seconds: int
-    output_bytes: int
-
-
-@dataclass(frozen=True, slots=True)
-class MaterialControlWorkflowOperands:
-    exit_code: int
-    timed_out: bool
-    terminal_step_id: str
-    wall_time_seconds: Decimal
-    peak_scratch_bytes: int
-    scf_completed: bool
-    scf_converged: bool
-    total_energy_Ry: Decimal
-    scf_accuracy_Ry: Decimal
-    scf_repeat_evaluable: bool
-    scf_repeat_residual_Ry: Decimal
-    fermi_evaluable: bool
-    fermi_energy_eV: Decimal
-    band_gap_eV: Decimal
-    phonon_evaluable: bool
-    minimum_phonon_frequency_cm1: Decimal
-    epw_evaluable: bool
-    electron_phonon_lambda: Decimal
-    tc_estimate_K: Decimal
-    gap_min_meV: Decimal
-    gap_max_meV: Decimal
-    raw_archive_path: Path
-    raw_archive_sha256: str
-    raw_archive_bytes: int
-    raw_hdf5_path: Path
-    raw_hdf5_sha256: str
-    raw_hdf5_bytes: int
-    reason_codes: tuple[str, ...]
 
 
 class FileTaskOutputSource:
@@ -325,7 +152,7 @@ def _workspace() -> Path:
     return workspace
 
 
-def cleanup_material_control_workflow_scratch(operands: MaterialControlWorkflowOperands) -> None:
+def cleanup_material_control_workflow_scratch(operands: _science_MaterialControlWorkflowOperands) -> None:
     """Remove one completed generated workflow tree after its HDF stream is copied."""
 
     workspace = _workspace()
@@ -379,15 +206,15 @@ def _prune_workflow_to_archive(run_root: Path, archive_path: Path) -> None:
             path.rmdir()
 
 
-def _verify_science_repeat_inputs(source_root: Path, profile: MaterialControlWorkflowProfile) -> None:
+def _verify_science_repeat_inputs(source_root: Path, profile: _science_MaterialControlWorkflowProfile) -> None:
     """Prove that the two SCF executions share exact prepared input bytes."""
 
-    if profile.source is not WorkflowSource.SSSP_CONTROL:
+    if profile.source is not _science_WorkflowSource.SSSP_CONTROL:
         return
     profile_root = source_root / profile.source_root
-    if profile.kind is WorkflowKind.SCF_CLASS:
+    if profile.kind is _science_WorkflowKind.SCF_CLASS:
         paths = (profile_root / "scf/scf.in", profile_root / "scf/scf.in")
-    elif profile.kind is WorkflowKind.PHONON_STABILITY:
+    elif profile.kind is _science_WorkflowKind.PHONON_STABILITY:
         paths = (profile_root / "scf/scf.in", profile_root / "phonon/scf.in")
     else:
         paths = (profile_root / "phonon/scf.in", profile_root / "epw/scf.in")
@@ -408,7 +235,7 @@ def _tree_bytes(root: Path) -> int:
     return total
 
 
-def _tutorial_script(profile: MaterialControlWorkflowProfile) -> str:
+def _tutorial_script(profile: _science_MaterialControlWorkflowProfile) -> str:
     if profile.prefix == "pb":
         return r"""
 cd /workspace/source/tutorial04/exercise1/phonon
@@ -439,15 +266,15 @@ run epw epw-fsr epw1.in
     raise ValueError("unsupported tutorial workflow profile")
 
 
-def _science_script(profile: MaterialControlWorkflowProfile) -> str:
+def _science_script(profile: _science_MaterialControlWorkflowProfile) -> str:
     root = f'/workspace/source/{profile.source_root}'
-    if profile.kind is WorkflowKind.SCF_CLASS:
+    if profile.kind is _science_WorkflowKind.SCF_CLASS:
         return f'\ncd {root}/scf\nmkdir -p out\nrun pw scf scf.in\nmv out out-first\nmkdir out\nrun pw scf-repeat scf.in\n'.strip()
     standalone_scf = f'\ncd {root}/scf\nmkdir -p out\nrun pw class-scf scf.in\n'.strip()
     phonon = f"""\ncd {root}/phonon\nmkdir -p out\nrun pw phonon-scf scf.in\nrun ph phonon-ph ph.in\nstage_phonon_tree {profile.prefix}\nprintf '{profile.prefix}\\n' | "$python" "$pp" > pp.stdout 2> pp.stderr\nunstage_phonon_tree {profile.prefix}\nrun_aux q2r phonon-q2r q2r.in\nrun_aux matdyn phonon-matdyn matdyn.in\n""".strip()
-    if profile.kind is WorkflowKind.PHONON_STABILITY:
+    if profile.kind is _science_WorkflowKind.PHONON_STABILITY:
         return standalone_scf + "\n" + phonon
-    if profile.kind is WorkflowKind.POSITIVE:
+    if profile.kind is _science_WorkflowKind.POSITIVE:
         return (
             phonon
             + f'\n\ncd {root}/epw\nmkdir -p out\nrun pw epw-scf scf.in\nrun pw epw-nscf nscf.in\nrun epw epw-coarse epw1.in\nrun epw epw-eliashberg epw2.in\n'
@@ -455,10 +282,10 @@ def _science_script(profile: MaterialControlWorkflowProfile) -> str:
     raise ValueError("unsupported SSSP workflow kind")
 
 
-def _container_script(profile: MaterialControlWorkflowProfile) -> str:
+def _container_script(profile: _science_MaterialControlWorkflowProfile) -> str:
     workflow = (
         _tutorial_script(profile)
-        if profile.source is WorkflowSource.EPW_SUPERCONDUCTING_REFERENCE
+        if profile.source is _science_WorkflowSource.EPW_SUPERCONDUCTING_REFERENCE
         else _science_script(profile)
     )
     script = (
@@ -535,14 +362,24 @@ def _number(value: bytes) -> Decimal:
 
 
 _ENERGY = re.compile(rb"!\s+total energy\s+=\s+([-+0-9.EeDd]+)\s+Ry")
+
+
 _ACCURACY = re.compile(rb"estimated scf accuracy\s+<\s+([-+0-9.EeDd]+)\s+Ry")
+
+
 _CONVERGED = re.compile(rb"convergence has been achieved")
+
+
 _FERMI = re.compile(rb"the Fermi energy is\s+([-+0-9.EeDd]+)\s+ev", re.IGNORECASE)
+
+
 _GAP = re.compile(
     rb"highest occupied, lowest unoccupied level \(ev\):\s+"
     rb"([-+0-9.EeDd]+)\s+([-+0-9.EeDd]+)",
     re.IGNORECASE,
 )
+
+
 _FREQUENCY = re.compile(
     rb"freq\s*\([^)]*\)\s*=\s*[-+0-9.EeDd]+\s*\[THz\]\s*=\s*"
     rb"([-+0-9.EeDd]+)\s*\[cm-1\]",
@@ -812,7 +649,7 @@ class FixedMaterialControlWorkflowExecutor:
 
     executor_implementation_id = 'executor.ambient-pressure-superconductor-material-control-qe76-epw61'
 
-    def execute(self, request: MaterialControlWorkflowRequest) -> MaterialControlWorkflowOperands:
+    def execute(self, request: _science_MaterialControlWorkflowRequest) -> _science_MaterialControlWorkflowOperands:
         profile = resolve_material_control_workflow_profile(request.profile_id)
         if request.wall_time_seconds <= 0 or request.output_bytes <= 0:
             raise ValueError('material control workflow request requires positive bounded resources')
@@ -829,12 +666,12 @@ class FixedMaterialControlWorkflowExecutor:
         source_root = run_root / "source"
         source_archive = (
             _external_path(TUTORIAL_ARCHIVE)
-            if profile.source is WorkflowSource.EPW_SUPERCONDUCTING_REFERENCE
+            if profile.source is _science_WorkflowSource.EPW_SUPERCONDUCTING_REFERENCE
             else _external_path(CONTROL_INPUT_ARCHIVE)
         )
         expected_source_sha = (
             TUTORIAL_ARCHIVE_SHA256
-            if profile.source is WorkflowSource.EPW_SUPERCONDUCTING_REFERENCE
+            if profile.source is _science_WorkflowSource.EPW_SUPERCONDUCTING_REFERENCE
             else required_external_sha256('EMPIRICAL_LAWHOOD_MATERIAL_CONTROL_CONTROL_INPUT_ARCHIVE_SHA256')
         )
         if not source_archive.is_file() or source_archive.is_symlink():
@@ -988,9 +825,9 @@ class FixedMaterialControlWorkflowExecutor:
             reasons.append("reason.scf-accuracy-missing")
         if not scf_repeat_evaluable:
             reasons.append("reason.scf-repeat-operands-missing")
-        if profile.kind is not WorkflowKind.SCF_CLASS and not frequencies:
+        if profile.kind is not _science_WorkflowKind.SCF_CLASS and not frequencies:
             reasons.append("reason.phonon-frequency-operands-missing")
-        if profile.kind is WorkflowKind.POSITIVE and gap_max <= 0:
+        if profile.kind is _science_WorkflowKind.POSITIVE and gap_max <= 0:
             reasons.append("reason.epw-pairing-operands-missing")
 
         band_gap = Decimal(0)
@@ -1015,7 +852,7 @@ class FixedMaterialControlWorkflowExecutor:
         peak = max(peak, _tree_bytes(run_root))
         scf_completed = b"JOB DONE." in logs and bool(energies)
         scf_converged = _CONVERGED.search(logs) is not None
-        return MaterialControlWorkflowOperands(
+        return _science_MaterialControlWorkflowOperands(
             exit_code=exit_code,
             timed_out=timed_out,
             terminal_step_id=terminal_step_id,
@@ -1045,18 +882,3 @@ class FixedMaterialControlWorkflowExecutor:
             raw_hdf5_bytes=raw_hdf5_size,
             reason_codes=tuple(sorted(set(reasons))),
         )
-
-
-__all__ = [
-    "MATERIAL_CONTROL_WORKFLOW_PROFILES",
-    'MaterialControlWorkflowOperands',
-    'MaterialControlWorkflowProfile',
-    'MaterialControlWorkflowRequest',
-    "FileTaskOutputSource",
-    "FixedMaterialControlWorkflowExecutor",
-    "WorkflowKind",
-    "WorkflowSource",
-    'cleanup_material_control_workflow_scratch',
-    "parse_epw_a2f_integrated_lambda",
-    'resolve_material_control_workflow_profile',
-]

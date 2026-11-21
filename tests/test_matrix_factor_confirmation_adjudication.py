@@ -8,27 +8,24 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import records as r, science
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.operation_bindings import (
-    BUDGET, KEY, NAMESPACE, E1AdjudicationConfig, E1Adjudicator, confirmation_draft,
-    cutoffs, operation_factories, source_operands,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import FactorObservation
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import lifetime
-from empirical_lawhood.adapters.methods.matrix_parameter_factor.records import METHODS, MatrixParameterFactorControl, expected_members
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.status import OperationalStatus, ScientificStatus
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.study_authoring import DesignInputRecord, DesignInputRole, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationContext, ScientificAdjudicationRecord
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, CanonicalTaskReceipt
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRegistry
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import records as r, science
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.operation_bindings import BUDGET, KEY, NAMESPACE, E1AdjudicationConfig, E1Adjudicator, confirmation_draft, cutoffs, operation_factories, source_operands
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import FactorObservation
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import lifetime
+from empirical_lawhood.domains.matrix.matrix_parameter_factor.records import METHODS, MatrixParameterFactorControl, expected_members
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.status import OperationalStatus, ScientificStatus
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationContext, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, CanonicalTaskReceipt
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRegistry
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform.test_candidate_compiler import _fixture
 from tests.test_matrix_factor_confirmation_eligibility import publish
 from tests.test_matrix_factor_confirmation_eligibility import provenance as provenance
@@ -47,7 +44,7 @@ def products(sources, *, flags=None, numerical=True):
         artifact = ArtifactIdentity('synthetic.diagnostic.'+source.root_id, 'hypothetical-e1-reduction-control',
             'empirical-lawhood/matrix-array/npz', sha256(raw).hexdigest(), 'application/x-npz', len(raw))
         # Use the actual matrix codec schema, independent of fixture labels.
-        from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
+        from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
         artifact = replace(artifact, payload_schema=MATRIX_ARRAY_SCHEMA)
         history = ObjectIdentity('history.'+source.root_id, r.E1NativeHistory.SCHEMA, '1.0.0', '1'*64)
         native = ArtifactIdentity('native.'+source.root_id, 'hypothetical-software-control', MATRIX_ARRAY_SCHEMA, '2'*64, 'application/x-npz', 1)
@@ -211,12 +208,12 @@ def test_full_population_rejects_thinned_or_changed_independent_witness_protocol
 
 def context(config, p, a, *, plane, defect=None, selected_owner=None, manifest_record=None, resource_budget=BUDGET):
     """Real typed task/prepared metadata for disclosed, unissued reducer inputs."""
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation import operation_bindings
-    from empirical_lawhood.infrastructure.execution import prepare_worker_invocation
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest
-    from empirical_lawhood.runtime.capabilities import CapabilityRequirement
-    from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation import operation_bindings
+    from empirical_lawhood.execution.local.execution import prepare_worker_invocation
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest
+    from empirical_lawhood.execution.capabilities import CapabilityRequirement
+    from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+    from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
     from tests.worker_configuration_support import freeze_worker_configuration
 
     selected_owner = operation_bindings if selected_owner is None else selected_owner
@@ -309,7 +306,7 @@ def context(config, p, a, *, plane, defect=None, selected_owner=None, manifest_r
 @pytest.mark.parametrize('compact', (False, True))
 @pytest.mark.parametrize('defect', (None, 'missing-authority', 'sealed-task', 'wrong-world', 'fixture-authority', 'external-outcome', 'exposed-outcome', 'wrong-receipt'))
 def test_actual_evaluator_requires_reveal_context_and_original_dependency_receipts(e1, defect, compact):
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_bindings
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_bindings
     from tests.test_matrix_factor_confirmation_compact_core import compact_case, compact_products
     _, sources, _ = e1
     if compact:
@@ -337,8 +334,8 @@ def test_actual_evaluator_requires_reveal_context_and_original_dependency_receip
 @pytest.mark.parametrize('compact', (False, True))
 @pytest.mark.parametrize('damage', ('missing', 'substituted'))
 def test_adjudicator_authenticates_actual_config_edge_before_any_operand_body(e1, monkeypatch, compact, damage):
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_bindings
-    from empirical_lawhood.runtime.plans import ScientificInputRole
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_bindings
+    from empirical_lawhood.execution.plans import ScientificInputRole
     from tests.test_matrix_factor_confirmation_compact_core import compact_case, compact_products
     if compact:
         manifest, sources = compact_case(e1);p, a = compact_products(e1[1], sources)

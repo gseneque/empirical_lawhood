@@ -6,13 +6,13 @@ import weakref
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic import science, native, operation_bindings as owner
-from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic.contracts import DiagnosticSource, DiagnosticResult
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import BatteryInquirySupply
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.runtime.execution import WorkerInputKind
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
+from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic import science, native, operation_bindings as owner
+from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic.contracts import DiagnosticSource, DiagnosticResult
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquirySupply
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.execution.execution import WorkerInputKind
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
 from tests.test_battery_dfn_precision_diagnostic import config_rows, exposed
 
 
@@ -83,7 +83,7 @@ def test_exposed_runner_releases_validated_decoded_history_before_native(monkeyp
                         profile=ArtifactProfile.CANONICAL_JSON, media_type="application/json"),))
     result = runner.execute(context)
     assert tuple(calls) == config_rows()
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     record = decode_canonical_bytes(result.outputs[0].payload, DiagnosticResult, maximum_bytes=None)
     assert record.prior_supply == prior_identity
     assert len(record.traces) == len(record.checks) == 12 and len(record.comparisons) == 9

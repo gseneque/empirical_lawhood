@@ -3,20 +3,20 @@
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.records import E1HistoryRoot
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import e1_allocation as domain
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.records import E1HistoryRoot
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import e1_allocation as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import coordinate_identity
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
 from empirical_lawhood.api.matrix_programme_allocations import _body_size, _process_rss_bytes, _require_memory
 from empirical_lawhood.api.selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
 
 def _admit_allocation(request, census, source_bytes):

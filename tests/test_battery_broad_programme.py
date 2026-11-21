@@ -8,8 +8,8 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry import recursive_translation as drafts
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import BatteryInquirySource
+from empirical_lawhood.domains.battery.battery_thermal_inquiry import recursive_translation as drafts
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquirySource
 from tests.battery_source_stock_fixtures import stock_distribution, unpack_source_stock
 from tests.test_battery_thermal_inquiry_binding import episode as _episode, _products
 
@@ -103,7 +103,8 @@ def test_three_actual_product_steps_act_before_export_exact_prior_and_shared_cos
 
 
 def test_negative_supplier_is_committed_stop_without_export_or_unentered_native_use(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry import native, science
+    from empirical_lawhood.adapters.battery.battery_thermal_inquiry import native
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry import science
     from tests.test_battery_thermal_inquiry import _exposed_trace
     monkeypatch.setattr(native, 'acquire', lambda config: _exposed_trace(config, technical=config.model_view == 'oregan-dfn-refined'))
     supplier = science.supply(BatteryInquirySource())
@@ -135,7 +136,7 @@ def test_complete_original_source_intake_copies_exact_installed_bytes_without_na
     import builtins
     import importlib.metadata
     from hashlib import sha256
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import SOURCE_MEMBERS
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import SOURCE_MEMBERS
     stock = unpack_source_stock(tmp_path / 'exposed-stock')
     # Only the metadata port is exposed. Every supplied provider byte is genuine
     # retained stock; this test does not claim an installed scientific engine.

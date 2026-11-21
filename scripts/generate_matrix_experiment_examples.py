@@ -9,9 +9,7 @@ from decimal import Decimal
 import json
 from matrix_example_handles import example_input_bytes
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_specification import (
-    selected_deanneal_specification,
-)
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_specification import selected_deanneal_specification
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,10 +25,10 @@ def generated_configured_examples():
     all scientific parameter values and placeholder source references persist.
     This offline example generator is not a historical runtime decoder.
     """
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_specification as owner
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_specification import PopulationSelection
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_specification as owner
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_specification import PopulationSelection
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
     kinds = (owner.ConfiguredMatrixResponseErrorSpecification, ConfiguredProtectedE3Specification,
         owner.ConfiguredE3Protocol, owner.ConfiguredE3Measurement, owner.ConfiguredE3Estimator,
         owner.ConfiguredE3Assessment, PopulationSelection, ObjectIdentity)
@@ -72,12 +70,9 @@ def generated_examples():
 
 def generated_configured_assembly_examples():
     """Project the current editable request without historical study scaffolds."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_assembly import (
-        PROTOCOL_ID, ConfiguredProtectedE3AssemblyRequest,
-        ConfiguredProtectedE3AssemblySpecification,
-    )
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_assembly import PROTOCOL_ID, ConfiguredProtectedE3AssemblyRequest, ConfiguredProtectedE3AssemblySpecification
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 
     request_name = 'configured-scientific-assembly.request.example.json'
     raw = example_input_bytes(DESTINATION / request_name)
@@ -94,15 +89,13 @@ def generated_configured_assembly_examples():
 
 def generated_native_assembly_examples():
     """Project the operational request and the existing unwritten C handle."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_assembly import (
-        PROTOCOL_ID, NativeTrainingAssemblyRequest, NativeTrainingAssemblySpecification,
-    )
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_assembly import PROTOCOL_ID, NativeTrainingAssemblyRequest, NativeTrainingAssemblySpecification
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_assembly import MatrixFiniteDtSourceAssemblyRequest
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_assembly import MatrixFiniteDtSourceAssemblyRequest
 
     request_name = 'native-training-request.example.json'
     raw = example_input_bytes(DESTINATION / request_name)
@@ -121,11 +114,9 @@ def generated_native_assembly_examples():
 
 def generated_finite_dt_source_assembly_examples():
     """Project only the current C-backed source request and exact copied pins."""
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_assembly import (
-        PROTOCOL_ID, MatrixFiniteDtSourceAssemblyRequest, MatrixFiniteDtSourceAssemblySpecification,
-    )
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_assembly import PROTOCOL_ID, MatrixFiniteDtSourceAssemblyRequest, MatrixFiniteDtSourceAssemblySpecification
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 
     request_name = 'finite-dt-source-request.example.json'
     raw = example_input_bytes(DESTINATION / request_name)
@@ -139,7 +130,7 @@ def generated_finite_dt_source_assembly_examples():
 
 def generated_initialization_examples():
     """Missing-input scaffolding; no invented original draw or native receipt."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_initialization import example_inputs
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_initialization import example_inputs
     specification, sources = example_inputs()
     return {"initialization.example.json": specification.canonical_bytes(),
         "initialization.sources.example.json": sources.canonical_bytes()}
@@ -147,11 +138,9 @@ def generated_initialization_examples():
 
 def generated_prepared_source_assembly_examples():
     """Project the current direct-C request and its exact copied input pins."""
-    from empirical_lawhood.adapters.methods.matrix_prepared_source_assembly import (
-        PROTOCOL_ID, MatrixPreparedSourceAssemblyRequest, MatrixPreparedSourceAssemblySpecification,
-    )
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.domains.matrix.matrix_prepared_source_assembly import PROTOCOL_ID, MatrixPreparedSourceAssemblyRequest, MatrixPreparedSourceAssemblySpecification
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 
     request_name = 'prepared-source-assembly-request.example.json'
     raw = example_input_bytes(DESTINATION / request_name)
@@ -165,17 +154,16 @@ def generated_prepared_source_assembly_examples():
 
 def generated_e1_allocation_examples():
     """Exposed prospective mathematics without a placeholder allocation pin."""
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation.compact_records import E1CompactCriterionChoices, E1FamilySize
-    from empirical_lawhood.adapters.methods.matrix_factor_response.eligibility import MatrixFactorExposureCensus
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.e1_allocation import (
-        PROTOCOL_ID, MatrixProgrammeE1AllocationRequest, MatrixProgrammeE1AllocationSpecification)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import coordinate_identity, identity
-    from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-    from empirical_lawhood.kernel.authority import ResourceBudget
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation.compact_records import E1CompactCriterionChoices, E1FamilySize
+    from empirical_lawhood.domains.matrix.matrix_factor_response.eligibility import MatrixFactorExposureCensus
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.e1_allocation import PROTOCOL_ID, MatrixProgrammeE1AllocationRequest, MatrixProgrammeE1AllocationSpecification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import coordinate_identity, identity
+    from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+    from empirical_lawhood.science.identity.authority import ResourceBudget
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 
     def read(name, kind):
         raw = (DESTINATION / name).read_bytes()
@@ -218,20 +206,18 @@ def generated_e1_allocation_examples():
 
 def generated_e4_revision_example():
     """Current matched DEV16 scaffold; original acquisitions remain required."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_contract import CURVE_RELATION_LOSS_RULE
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import (
-        E4MatchedRelationSelection, E4MatchedRelationTarget,
-    )
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4RevisionExperimentSpecification
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4DevelopmentProgramme
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_revision_transition import SelectedE4RevisionAcquisitionSpecification
-    from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import MatrixParameterCoordinate
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.experimental_selection import WholeUnitFold
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_contract import CURVE_RELATION_LOSS_RULE
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import E4MatchedRelationSelection, E4MatchedRelationTarget
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4RevisionExperimentSpecification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4DevelopmentProgramme
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_revision_transition import SelectedE4RevisionAcquisitionSpecification
+    from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import MatrixParameterCoordinate
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.experiments.experimental_selection import WholeUnitFold
     nominal = decode_canonical_bytes((ROOT / 'programmes/foundations/emergent-structure/records/matrix-e2-e3-candidate/matrix.e3.deanneal.nominal.canonical.json').read_bytes(),
         MatrixParameterCoordinate, maximum_bytes=None)
-    from empirical_lawhood.adapters.methods.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol
+    from empirical_lawhood.domains.matrix.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol
     criterion = ObjectIdentity('example.original-criterion', MatrixResponseFrontierProtocol.SCHEMA,
         MatrixResponseFrontierProtocol.VERSION, '0' * 64)
     selection = E4MatchedRelationSelection('example.selected-e4.relation', nominal.primary_view.bath_temperature,
@@ -248,15 +234,13 @@ def generated_e4_revision_example():
 
 def generated_matched_prepared_examples():
     """Current DEV16/transfer64 mathematical scaffolds; no authentic sources."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_contract import CURVE_TRANSFER_PROCEDURE
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import MatrixCouplingRecipe, original_schedule_recipe
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.records import MatrixFunctionalCriterion
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_prepared_choices import (
-        SelectedPreparedDevelopmentSpecification, SelectedPreparedProtectedSpecification,
-    )
-    from empirical_lawhood.adapters.methods.matrix_primary_family import AMENDED_PRIMARY_FAMILY
-    from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import MatrixParameterCoordinate
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_contract import CURVE_TRANSFER_PROCEDURE
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixCouplingRecipe, original_schedule_recipe
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.records import MatrixFunctionalCriterion
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedDevelopmentSpecification, SelectedPreparedProtectedSpecification
+    from empirical_lawhood.domains.matrix.matrix_primary_family import AMENDED_PRIMARY_FAMILY
+    from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import MatrixParameterCoordinate
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     nominal = decode_canonical_bytes((ROOT / 'programmes/foundations/emergent-structure/records/matrix-e2-e3-candidate/matrix.e3.deanneal.nominal.canonical.json').read_bytes(),
         MatrixParameterCoordinate, maximum_bytes=None)
     baseline = original_schedule_recipe(nominal, 256, recipe_id='recipe.copied.original-ramp', effort_unit='effort.declared-coupling-integral')

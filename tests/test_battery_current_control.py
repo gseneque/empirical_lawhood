@@ -6,16 +6,16 @@ from decimal import Decimal as D
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_current_control.composition import implementation_payloads
-from empirical_lawhood.adapters.methods.battery_current_control.contracts import PROTOCOL_SHA256, current_recipe
-from empirical_lawhood.adapters.methods.battery_current_control.delivery import BatteryCurrentReceiptDelivery, from_authenticated_product, project_current_stages
-from empirical_lawhood.adapters.methods.battery_current_control.words import current_word
-from empirical_lawhood.adapters.methods.battery_thermal_service.contracts import BatteryThermalConfig, BatteryThermalTrace, EVENTS
-from empirical_lawhood.kernel.control import OperationalDeliveryState, ScientificCommitmentKind
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.controller_study import ImplementationRole
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactManifest, ArtifactMaterialization, ArtifactProfile, CanonicalTaskReceipt, LogicalArtifactIdentity, ReceiptCheck
+from empirical_lawhood.domains.battery.battery_current_control.composition import implementation_payloads
+from empirical_lawhood.domains.battery.battery_current_control.contracts import PROTOCOL_SHA256, current_recipe
+from empirical_lawhood.domains.battery.battery_current_control.delivery import BatteryCurrentReceiptDelivery, from_authenticated_product, project_current_stages
+from empirical_lawhood.domains.battery.battery_current_control.words import current_word
+from empirical_lawhood.domains.battery.battery_thermal_service.contracts import BatteryThermalConfig, BatteryThermalTrace, EVENTS
+from empirical_lawhood.science.response.control import OperationalDeliveryState, ScientificCommitmentKind
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.controller_study import ImplementationRole
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactManifest, ArtifactMaterialization, ArtifactProfile, CanonicalTaskReceipt, LogicalArtifactIdentity, ReceiptCheck
 
 
 def exposed_controller(*, hold=False, supported_hold=True, causal_valid=True):
@@ -26,28 +26,28 @@ def exposed_controller(*, hold=False, supported_hold=True, causal_valid=True):
     these are not observed physical battery units (the thermal source has zero). Their typed
     proof grammar exercises the installed compiler, not empirical battery law.
     """
-    from empirical_lawhood.adapters.control.reference import build_current_reference_controller_study, _evidence
-    from empirical_lawhood.adapters.control.finite_campaign import finite_control_study
-    from empirical_lawhood.adapters.control.finite_response_corpus import finite_interval_corpus
-    from empirical_lawhood.adapters.control.finite_gates import bounded_response_gate
-    from empirical_lawhood.adapters.control.controller_authoring import DeliveryControllerAuthoringRequest
-    from empirical_lawhood.adapters.methods.battery_current_control.composition import author_battery_controller, battery_control_services
-    from empirical_lawhood.adapters.methods.law_evaluation import LawEvaluationRequest, LawEvaluationResult, LawEvaluationValue, LawEvaluationDisposition, LawEvaluationKind, LawEvaluationMode
-    from empirical_lawhood.kernel.action_contracts import ActionDeliveryStage
-    from empirical_lawhood.kernel.admission import AdmissionGateKind
-    from empirical_lawhood.kernel.causal_contracts import ActionStageReceiverTransport, ReceiverInterval
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling
-    from empirical_lawhood.kernel.laws import LawRepresentationKind
-    from empirical_lawhood.kernel.models import ModelSetSpec, ModelMemberLawBinding, ModelIntersectionSemantics
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.references import ArtifactIdentity, NamedDecimal
-    from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff, HorizonSpec
-    from empirical_lawhood.planning.controller_study import FrozenFeedbackConsumer
-    from empirical_lawhood.planning.evidence_geometry import ReceiptAdmissionActionFibre, ReceiptAdmissionSupportCell, ReceiptAdmissionPlannedCoordinate, ReceiptAdmissionReceiptProductionPlan
-    from empirical_lawhood.planning.finite_action_support import support_map_for_plan
-    from empirical_lawhood.planning.finite_response_geometry import FiniteReadoutKind, FiniteResponseCoordinate, FiniteTargetInterval
-    from empirical_lawhood.adapters.methods.battery_current_control.words import coordinate
-    from empirical_lawhood.runtime.controller_runtime import RuntimeObservation
+    from empirical_lawhood.domains.reference_worlds.control.reference import build_current_reference_controller_study, _evidence
+    from empirical_lawhood.methods.control.finite_campaign import finite_control_study
+    from empirical_lawhood.methods.control.finite_response_corpus import finite_interval_corpus
+    from empirical_lawhood.methods.control.finite_gates import bounded_response_gate
+    from empirical_lawhood.methods.control.controller_authoring import DeliveryControllerAuthoringRequest
+    from empirical_lawhood.domains.battery.battery_current_control.composition import author_battery_controller, battery_control_services
+    from empirical_lawhood.methods.law_evaluation import LawEvaluationRequest, LawEvaluationResult, LawEvaluationValue, LawEvaluationDisposition, LawEvaluationKind, LawEvaluationMode
+    from empirical_lawhood.science.response.action_contracts import ActionDeliveryStage
+    from empirical_lawhood.science.evidence.admission import AdmissionGateKind
+    from empirical_lawhood.science.response.causal_contracts import ActionStageReceiverTransport, ReceiverInterval
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling
+    from empirical_lawhood.science.response.laws import LawRepresentationKind
+    from empirical_lawhood.science.models.models import ModelSetSpec, ModelMemberLawBinding, ModelIntersectionSemantics
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.references import ArtifactIdentity, NamedDecimal
+    from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff, HorizonSpec
+    from empirical_lawhood.design.controller_study import FrozenFeedbackConsumer
+    from empirical_lawhood.design.evidence_geometry import ReceiptAdmissionActionFibre, ReceiptAdmissionSupportCell, ReceiptAdmissionPlannedCoordinate, ReceiptAdmissionReceiptProductionPlan
+    from empirical_lawhood.design.finite_action_support import support_map_for_plan
+    from empirical_lawhood.design.finite_response_geometry import FiniteReadoutKind, FiniteResponseCoordinate, FiniteTargetInterval
+    from empirical_lawhood.domains.battery.battery_current_control.words import coordinate
+    from empirical_lawhood.execution.controller_runtime import RuntimeObservation
 
     configuration = config(hold=hold)
     original = build_current_reference_controller_study()
@@ -111,14 +111,14 @@ def exposed_controller(*, hold=False, supported_hold=True, causal_valid=True):
 
 
 def _exposed_hold_request(configuration, system, corpus, action, bindings, observation, recipe, link, supported_hold):
-    from empirical_lawhood.adapters.control.controller_authoring import DeliveryControllerAuthoringRequest
-    from empirical_lawhood.adapters.methods.battery_current_control.composition import author_battery_controller, battery_control_services
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.references import NamedDecimal
-    from empirical_lawhood.planning.controller_study import AdmissionMeasuredHoldFibre, ActHoldActionCandidate, ActHoldActionCandidateChart, ActHoldControllerSynthesisPlan, NativeCandidateKind, CandidatePriorityOrientation, ControllerInstanceBinding, DeliveryEquivalenceSpec, OnlineSupportMonitorSpec, ReidentificationTriggerSpec
-    from empirical_lawhood.planning.evidence_geometry import ReceiptAdmissionAdmissionCandidateCell
-    from empirical_lawhood.planning.finite_admission import FiniteCertificateAdmissionSpec, FiniteCertificateReachabilitySpec, derive_finite_certificate_admission_comparison, derive_finite_certificate_reachability_comparison
+    from empirical_lawhood.methods.control.controller_authoring import DeliveryControllerAuthoringRequest
+    from empirical_lawhood.domains.battery.battery_current_control.composition import author_battery_controller, battery_control_services
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.references import NamedDecimal
+    from empirical_lawhood.design.controller_study import AdmissionMeasuredHoldFibre, ActHoldActionCandidate, ActHoldActionCandidateChart, ActHoldControllerSynthesisPlan, NativeCandidateKind, CandidatePriorityOrientation, ControllerInstanceBinding, DeliveryEquivalenceSpec, OnlineSupportMonitorSpec, ReidentificationTriggerSpec
+    from empirical_lawhood.design.evidence_geometry import ReceiptAdmissionAdmissionCandidateCell
+    from empirical_lawhood.design.finite_admission import FiniteCertificateAdmissionSpec, FiniteCertificateReachabilitySpec, derive_finite_certificate_admission_comparison, derive_finite_certificate_reachability_comparison
     plan = corpus.plan
     fibre, support = plan.action_fibres[0], plan.support_cells[0]
     cell = ReceiptAdmissionAdmissionCandidateCell("exposed-hold-admission-cell", ObjectIdentity.from_record(fibre.action_binding_id, fibre), ObjectIdentity.from_record(support.cell_id, support), (plan.coordinates[0].coordinate_id,))
@@ -144,9 +144,9 @@ def _exposed_hold_request(configuration, system, corpus, action, bindings, obser
 
 
 def test_registered_act_compiles_and_recovery_reuses_exact_receipt():
-    from empirical_lawhood.adapters.methods.battery_current_control.words import coordinate
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.runtime.controller_runtime import DeliveryControllerTickReceipt
+    from empirical_lawhood.domains.battery.battery_current_control.words import coordinate
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.execution.controller_runtime import DeliveryControllerTickReceipt
     study, services, observation, port = exposed_controller()
     compiled = services.compile(study)
     tick = services.tick(compiled, observation, commitment_coordinate=coordinate(D(0)))
@@ -159,7 +159,7 @@ def test_registered_act_compiles_and_recovery_reuses_exact_receipt():
 
 
 def test_independently_supported_hold_and_unsupported_hold_nonattempt():
-    from empirical_lawhood.adapters.methods.battery_current_control.words import coordinate
+    from empirical_lawhood.domains.battery.battery_current_control.words import coordinate
     study, services, observation, port = exposed_controller(hold=True)
     tick = services.tick(services.compile(study), observation, commitment_coordinate=coordinate(D(0)))
     assert tick.delivery_trace.commitment_kind is ScientificCommitmentKind.MEASURED_HOLD
@@ -173,7 +173,7 @@ def test_independently_supported_hold_and_unsupported_hold_nonattempt():
 
 
 def test_missing_stage_wrong_word_stale_observation_and_nonattempt_zero_calls():
-    from empirical_lawhood.adapters.methods.battery_current_control.words import coordinate
+    from empirical_lawhood.domains.battery.battery_current_control.words import coordinate
     study, services, observation, port = exposed_controller()
     compiled = services.compile(study)
     original = port.evidence
@@ -266,7 +266,7 @@ def test_exact_logical_physical_receipt_join_and_stale_clock():
 
 
 def test_exposed_fixture_cannot_upgrade_native_exposure_or_substitute_recipe():
-    from empirical_lawhood.adapters.methods.battery_current_control.composition import battery_control_services
+    from empirical_lawhood.domains.battery.battery_current_control.composition import battery_control_services
     source = recorded_source(config())
     word = current_word(source.config, implementation_payloads()[0][0].reference)
     receipt, manifest = exposed_custody(source)

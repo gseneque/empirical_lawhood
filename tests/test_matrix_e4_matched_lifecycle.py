@@ -11,19 +11,19 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_primary_family import AMENDED_PRIMARY_FAMILY
-from empirical_lawhood.adapters.methods.matrix_factor_response.curve_contract import CURVE_RELATION_LOSS_RULE, MECHANISM_FEATURES
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_science as dev
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as p
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as method
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as native
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import e4_structural_prediction as relation
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseScore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.experimental_selection import WholeUnitFold
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experimental_factorial import PairInteractionScale
+from empirical_lawhood.domains.matrix.matrix_primary_family import AMENDED_PRIMARY_FAMILY
+from empirical_lawhood.domains.matrix.matrix_factor_response.curve_contract import CURVE_RELATION_LOSS_RULE, MECHANISM_FEATURES
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_science as dev
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as p
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as method
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as native
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import e4_structural_prediction as relation
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseScore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.experiments.experimental_selection import WholeUnitFold
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experimental_factorial import PairInteractionScale
 from tests.test_matrix_e4_matched_relation import causal
 from tests.test_matrix_matched_protected_e3 import original_case, matched_e3_products  # noqa: F401
 from tests.test_matrix_selected_e3_e4_bridge import build_selected_bridge, transfer  # noqa: F401
@@ -41,8 +41,8 @@ def causal_values(factors, family, *, curve_primary):
 
 @pytest.fixture(scope='module')
 def populations(matched_e3_products, transfer, tmp_path_factory):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
     f = matched_e3_products
     package = ConfiguredMatrixSelectedFrozenPackage('test.e4.original-e3', f.specification, f.allocation, f.joined,
         f.models, f.frozen, f.calibration, f.sealed,
@@ -136,12 +136,12 @@ def test_completed_export_reads_original_fit_and_freeze_without_dev_replay(fitte
     from empirical_lawhood.api import matrix_researcher_programme_e4_lineage as lineage
     from empirical_lawhood.api import selected_e4_native_runtime
     from empirical_lawhood.api.matrix_programme_structural_prediction import programme_structural_prediction
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import MatrixProgrammeObservation
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest, ArtifactProfile, CanonicalTaskReceipt
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import MatrixProgrammeObservation
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactProfile, CanonicalTaskReceipt
     from tests.test_recursive_public_service import ROOT, _plane
 
     plane = _plane(tmp_path / 'saved-revision')
@@ -248,8 +248,8 @@ def test_actual_matched_public_fit_calibration_confirmation_and_fixed_downstream
     downstream = method.nominate_downstream(spec, result, f.export, public_cal, record_id='test.e4.downstream')
     assert downstream.selected == 'REVISION' and downstream.frozen_revision == f.frozen.identity
     assert downstream.calibration == calibrated.identity and downstream.frozen_product.relation_fit == f.nomination.relation_fit.identity
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import MatrixRevisionSelectedPackage
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import MatrixRevisionSelectedPackage
     payload = SelectedE4PointModels.from_models(f.export.models, record_id='test.e4.downstream-models')
     package = MatrixRevisionSelectedPackage('test.e4.downstream-package', payload, downstream.identity, calibrated.identity,
         public_cal, populations.development_bank.forecast_design.package)
@@ -295,7 +295,7 @@ def test_actual_matched_public_fit_calibration_confirmation_and_fixed_downstream
 
 
 def test_required_absent_model_is_prerequisite_failure_and_never_fallback(fitted):
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import MatrixProgrammeObservation, programme_frontier
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import MatrixProgrammeObservation, programme_frontier
     f = fitted
     missing = f.populations.development.group_ids[:5]
     reduction, data, _ = observations(f.populations.development, f.populations.development_bank, missing_groups=missing)

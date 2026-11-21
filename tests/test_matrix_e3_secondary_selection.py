@@ -7,17 +7,17 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_preparation as preparation
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_secondary_readout as domain
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_preparation as preparation
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_secondary_readout as domain
 from empirical_lawhood.api import configured_e3_secondary_target as owner
 from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs, load_experiment_inputs, load_experiment_specification
-from empirical_lawhood.infrastructure import source_closure
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding, ExperimentFileInputBinding
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.storage import source_closure
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding, ExperimentFileInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_matrix_configured_protected_public_preparation import prepared_case
 
 ROOT = Path(__file__).parents[1]
@@ -174,8 +174,8 @@ def test_public_loader_derive_and_replay_freeze_direct_target_before_authoring(o
 
 
 def test_existing_e4_recipe_accepts_current_pin_and_preserves_family_refusals(originals):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_bank_recipe import SelectedE4BankRecipe
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_bank_recipe import SelectedE4BankRecipe
     from tests.test_matrix_selected_e4_bank_recipe import recipe, reference
     _, current = current_selection(originals)
     target = target_for(originals, "e4-join")

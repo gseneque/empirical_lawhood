@@ -10,14 +10,17 @@ from pathlib import Path
 
 
 def main() -> None:
-    # Load only the colocated stdlib admission primitive, without importing the
+    # Load only the execution-owned stdlib admission primitive, without importing the
     # main package or its NumPy pin into this separate native environment.
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    from _native_admission import (
+    sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "execution"))
+    from native_time_grid import (
         BRIAN2_ESTIMATED_BYTES_PER_UPDATE,
         BRIAN2_MAX_ESTIMATED_HISTORY_BYTES,
         admit_native_time_grid,
     )
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "domains" / "biology" / "neuron_current_response"))
+    from numerics import accept_current, summarize_post_step
 
     config = json.load(sys.stdin)
     admission = admit_native_time_grid(
@@ -48,7 +51,7 @@ def main() -> None:
     maximum = float(config["maximum_accepted_pa"])
     results = []
     for arm, command in (("hold", 0.0), ("step", requested)):
-        accepted = min(max(command, 0.0), maximum)
+        accepted = accept_current(command, maximum)
         b.start_scope()
         b.prefs.codegen.target = "numpy"
         b.defaultclock.dt = dt * b.ms
@@ -75,8 +78,8 @@ def main() -> None:
         spikes = b.SpikeMonitor(group)
         b.run((baseline + horizon) * b.ms)
         times_ms = np.asarray(voltage.t / b.ms)
-        post = np.asarray(voltage.v[0] / b.mV)[times_ms >= baseline]
         spike_times = np.asarray(spikes.t / b.ms)
+        mean_voltage, spike_count = summarize_post_step(times_ms, np.asarray(voltage.v[0] / b.mV), spike_times, baseline)
         realized = float(stimulus((baseline + dt) * b.ms) / b.pA)
         results.append({
             "arm": arm,
@@ -84,8 +87,8 @@ def main() -> None:
             "accepted_pa": accepted,
             "applied_pa": accepted,
             "realized_pa": realized,
-            "post_step_mean_mv": float(np.mean(post)),
-            "spike_count": int(np.count_nonzero(spike_times >= baseline)),
+            "post_step_mean_mv": mean_voltage,
+            "spike_count": spike_count,
             "receiver_horizon_ms": horizon,
         })
     print(json.dumps({"arms": results, "native_runtime": "cpython-3.11.14-brian2-2.9.0-numpy-1.26.4"}, sort_keys=True))

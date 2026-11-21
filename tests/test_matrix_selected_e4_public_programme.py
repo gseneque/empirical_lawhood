@@ -19,12 +19,12 @@ import pytest
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.prospective_experiment import load_prepared_prospective_experiment
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
 from tests.matrix_selected_e4_public_fixture import (
     ROOT, DISCLOSURE, authenticate_originals, authored_plan, development_inputs, execution_selection,
     held_selection, method_products, protected_plan, retained_census, revision_inputs,
@@ -96,7 +96,7 @@ class IssuedProgrammeService(ExperimentProgrammeService):
 
 
 def observed_development(monkeypatch, writer, output, operation, *args, **kwargs):
-    import empirical_lawhood.infrastructure.execution as execution
+    import empirical_lawhood.execution.local.execution as execution
     observers = []
     def create(*, scratch_root):
         observer = _ObservedProcessExecutor(scratch_root, output / ("worker-ready-" + str(len(observers))))
@@ -132,10 +132,9 @@ def authoring_size_checkpoint(*, directory, writer):
     It creates no reusable custody verdict or arbitrary generic plan-size gate.
     """
     from empirical_lawhood.api.recursive_authoring import MAX_DRAFT_BYTES, MAX_PACKET_BYTES
-    from empirical_lawhood.infrastructure.bounded_io import MAX_RUNTIME_PLAN_JSON_BYTES
-    from empirical_lawhood.infrastructure.development_native_custody import read_development_native_payload
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
-    from empirical_lawhood.planning.recursive_authoring import MAX_RECURSIVE_CONFIG_BYTES
+    from empirical_lawhood.storage.development_native_custody import read_development_native_payload
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
+    from empirical_lawhood.design.recursive_authoring import MAX_RECURSIVE_CONFIG_BYTES
 
     directory = Path(directory)
     root = Path(writer.root.contract.canonical_path)
@@ -157,14 +156,14 @@ def authoring_size_checkpoint(*, directory, writer):
         "packet_header_sha256": sha256(raw).hexdigest(), "members": rows,
         "largest_config_bytes": max(row["payload_bytes"] for row in rows if row["filename"].startswith("config-")),
         "owner_bounds": {"development_draft": MAX_DRAFT_BYTES, "development_packet": MAX_PACKET_BYTES,
-            "recursive_configuration": MAX_RECURSIVE_CONFIG_BYTES, "generic_runtime_plan": MAX_RUNTIME_PLAN_JSON_BYTES},
+            "recursive_configuration": MAX_RECURSIVE_CONFIG_BYTES, "generic_runtime_plan": None},
         "bound_applicability": "DEVELOPMENT_USES_ITS_ACTUAL_EXACT_MEMBER_OWNER_NOT_AN_INVENTED_GENERIC_PLAN_LIMIT",
         "native_contact": "NONE_AT_THIS_CHECKPOINT", "qualification": "NOT_ESTABLISHED"}
 
 
 def issue_component(*, originals, profile, directory, output, namespace, selected, monkeypatch):
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
-    from empirical_lawhood.adapters.composition.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+    from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
     loaded = load_prepared_prospective_experiment(directory=directory, project_root=ROOT,
         storage_profile=profile, artifact_writer=originals.writer)
     output.mkdir(parents=True, exist_ok=False)
@@ -196,7 +195,7 @@ def component_request(plan, component_id, control, writer):
 
 
 def wave_locator(plan, wave, control):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as native
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as native
     actual = control.service._load_status_execution_plan(control.package.run_plan_id)
     return native.SelectedE4WaveLocator(wave.wave_id, control.package.run_plan_id,
         ObjectIdentity.from_record(control.package.package_id, control.package),
@@ -208,7 +207,7 @@ def wave_locator(plan, wave, control):
 
 def _wave_observation_records(draft, records, observations):
     """Reuse freshly authenticated observations for exact produced-input admission."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4WaveObservation
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4WaveObservation
     by_id={value.identity.object_id:value for value in observations}
     if len(by_id)!=len(observations):
         raise PermissionError("selected E4 observation admissions duplicate an actual wave")
@@ -228,8 +227,8 @@ def _wave_observation_records(draft, records, observations):
 
 
 def collection_selection(originals, plan, directory, controls):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as native
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as public
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as native
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as public
     from empirical_lawhood.api.selected_e4_native_read import read_selected_e4_programme
     from empirical_lawhood.api.recursive_operations import operation_catalog
     from tests.matrix_selected_original_public_fixture import actual_publication
@@ -272,7 +271,7 @@ def assessment_products(report):
 
 
 def original_calibration_product(control, result, writer):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
     plan = control.service._load_status_execution_plan(control.package.run_plan_id)
     task, = (value for value in plan.tasks if value.capability.capability_key == "matrix-selected-e4.revision-calibrate")
     root = Path(writer.root.contract.canonical_path)
@@ -298,7 +297,7 @@ def original_calibration_product(control, result, writer):
 
 def execute_phase(originals, populations, selected, products, *, label, predecessor, directory, output,
         monkeypatch, measurements, public_calibration=None, calibration_product=None):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as public
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as public
     from empirical_lawhood.api.selected_e4_programme_service import SelectedE4ProgrammeRequest
     plan, expected_publication = protected_plan(originals, populations, selected, label=label,
         products=products, predecessor=predecessor, directory=directory,
@@ -486,7 +485,7 @@ def test_selected_e4_public_native_dev_revision_cal_conf_read_completed_recovery
     assert products.nomination.specification.programme == populations.programmes["DEV"].identity
     assert products.frozen.programme == populations.programmes["DEV"].identity
     revision_proof = observer_proof(revision_observers[0], (task.task_id for task in products.plan.tasks))
-    import empirical_lawhood.infrastructure.execution as execution
+    import empirical_lawhood.execution.local.execution as execution
     never = []
     def no_entry(*, scratch_root):
         value = NeverExecute(scratch_root)
@@ -508,8 +507,8 @@ def test_selected_e4_public_native_dev_revision_cal_conf_read_completed_recovery
         "numerical_threads": selected.numerical_threads, "qualification": "NOT_ESTABLISHED",
         "DEV": dev_proof, "revision": revision_proof, "read": revision_read, "recover": recovery,
         "actual_nomination": products.nomination.identity.to_document(), "actual_freeze": products.frozen.identity.to_document()})
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as public_records
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as scientific
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as public_records
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as scientific
     public_calibration = calibration_product = None
     if products.nomination.trigger_disposition == "TRIGGERED":
         predecessor = source_predecessors["CAL"]

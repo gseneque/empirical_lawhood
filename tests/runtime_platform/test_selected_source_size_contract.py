@@ -14,13 +14,13 @@ import pytest
 
 from empirical_lawhood.api import authoring_handoff as handoff
 from empirical_lawhood.api import recursive_prospective_authoring as owner
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.infrastructure.source_closure import TrackedSourceMember
-from empirical_lawhood.infrastructure.source_policy import CheckoutSourceAdmission
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.study_issue import SelectedSourceManifestMember
-from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+from empirical_lawhood.storage.source_closure import TrackedSourceMember
+from empirical_lawhood.storage.source_policy import CheckoutSourceAdmission
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.study_issue import SelectedSourceManifestMember
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits
+from empirical_lawhood.execution.plans import CandidateExecutionPlan
 from tests.prospective_source_capture_fixture import synthetic_capture
 from tests.runtime_plan_capacity_fixture import expanded_plan_metadata
 from tests.test_authoring_selected_source_migration import plane
@@ -133,7 +133,7 @@ def test_plan_producer_has_no_implicit_64_mib_ceiling():
         exact = SimpleNamespace(custody_limits=ArtifactCustodyLimits(control_record_bytes=size))
         owner._require_prospective_public_member_capacity(name, size, artifact_writer=exact)
         smaller = SimpleNamespace(custody_limits=ArtifactCustodyLimits(control_record_bytes=size - 1))
-        with pytest.raises(ValueError, match="selected custody runtime-plan byte allowance"):
+        with pytest.raises(ValueError, match=name + " exceeds its selected custody byte allowance control_record_bytes"):
             owner._require_prospective_public_member_capacity(name, size, artifact_writer=smaller)
 
 
@@ -148,7 +148,7 @@ def test_authoring_projection_above_old_ceiling_uses_selected_budget_and_exact_d
     owner._require_prospective_public_member_capacity("preissue-execution-plan.json", len(raw), artifact_writer=selected)
     assert handoff.load_authoring_execution_projection(tmp_path, artifact_writer=selected) == plan
     selected.custody_limits = ArtifactCustodyLimits(control_record_bytes=len(raw) - 1)
-    with pytest.raises(ValueError, match="selected custody runtime-plan byte allowance"):
+    with pytest.raises(ValueError, match="preissue-execution-plan.json exceeds its selected custody byte allowance control_record_bytes"):
         owner._require_prospective_public_member_capacity("preissue-execution-plan.json", len(raw), artifact_writer=selected)
     monkeypatch.setattr(handoff, "decode_canonical_bytes",
         lambda *_args, **_kwargs: pytest.fail("selected budget refusal reached decoder allocation"))

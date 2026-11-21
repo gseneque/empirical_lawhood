@@ -8,25 +8,15 @@ import struct
 
 import pytest
 
-from empirical_lawhood.adapters.simulators.grid2op_response.contracts import (
-    Grid2OpChronicBinding, Grid2OpNativeStep, Grid2OpSourceBinding,
-)
-from empirical_lawhood.adapters.simulators.grid2op_response.independent_reliability import independently_check_grid_reliability
-from empirical_lawhood.adapters.simulators.grid2op_response.reliability import (
-    assess_grid_reliability_panel, assess_grid_saved_episode,
-)
-from empirical_lawhood.adapters.simulators.grid2op_response.reliability_contracts import (
-    GridDeliveredEnergyReceiver, GridEpisodeRole, GridEpisodeTermination,
-    GridOperatingEpisodeContext, GridReliabilityDisposition, GridReliabilityRequirement,
-    GridSavedOperatingEpisode, GridServiceInterval,
-)
-from empirical_lawhood.adapters.simulators.grid2op_response.reliability_dataset import (
-    DATASET_MEMBERS, EVENT_MEMBERS, VALUE_MEMBERS, GridServiceDatasetSelection, assess_grid_service_dataset,
-)
-from empirical_lawhood.infrastructure.dataset_readers import ArrayDatasetReader
-from empirical_lawhood.kernel.datasets import ArrayDatasetManifest, ArrayDatasetMember
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.energy.grid2op.contracts import Grid2OpChronicBinding, Grid2OpNativeStep, Grid2OpSourceBinding
+from empirical_lawhood.domains.energy.grid2op.independent_reliability import independently_check_grid_reliability
+from empirical_lawhood.domains.energy.grid2op.reliability import assess_grid_reliability_panel, assess_grid_saved_episode
+from empirical_lawhood.domains.energy.grid2op.reliability_contracts import GridDeliveredEnergyReceiver, GridEpisodeRole, GridEpisodeTermination, GridOperatingEpisodeContext, GridReliabilityDisposition, GridReliabilityRequirement, GridSavedOperatingEpisode, GridServiceInterval
+from empirical_lawhood.adapters.simulators.grid2op_response.reliability_dataset import DATASET_MEMBERS, EVENT_MEMBERS, VALUE_MEMBERS, GridServiceDatasetSelection, assess_grid_service_dataset
+from empirical_lawhood.storage.dataset_readers import ArrayDatasetReader
+from empirical_lawhood.science.models.datasets import ArrayDatasetManifest, ArrayDatasetMember
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def ref(name):
@@ -211,7 +201,7 @@ def test_independent_falsifier_detects_altered_report_without_calling_the_produc
     source, receiver, criterion = operands()
     original = episode(source, receiver)
     result = assess_grid_saved_episode(source=source, receiver=receiver, requirement=criterion, episode=original)
-    from empirical_lawhood.adapters.simulators.grid2op_response import reliability
+    import empirical_lawhood.domains.energy.grid2op.reliability as reliability
     monkeypatch.setattr(reliability, "assess_grid_saved_episode", lambda **_: pytest.fail("implementation oracle called"))
     field, value = {"energy": ("delivered_energy_mwh", D(3)), "denominator": ("expected_intervals", 4),
         "event": ("fallback_intervals", 1), "status": ("disposition", GridReliabilityDisposition.FAILED)}[damage]

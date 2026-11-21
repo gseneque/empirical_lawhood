@@ -10,11 +10,11 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api.codecs import load_authoring, load_registered_authoring
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalizationError
-from empirical_lawhood.planning import approval, response_algebra
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalizationError
+from empirical_lawhood.design import approval, response_algebra
 from tests.approval_support import (
     FixedDecisionClock, approval_service_for_package, checker_registry_for_attestations,
     deterministic_approval_signer, empty_approval_service,

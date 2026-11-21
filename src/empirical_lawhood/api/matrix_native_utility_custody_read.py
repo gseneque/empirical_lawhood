@@ -1,22 +1,18 @@
 # SPDX-License-Identifier: MPL-2.0
 """Fresh owner-authenticated scientific projection of closed, incomplete E2 custody."""
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as r
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_custody_records import (
-    NativeUtilityCustodyGap, NativeUtilityMissingRoot,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_custody_science import assess_closed_custody
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_science import amended_primary_report
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as r
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_custody_records import NativeUtilityCustodyGap, NativeUtilityMissingRoot
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_custody_science import assess_closed_custody
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_science import amended_primary_report
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 from empirical_lawhood.api.matrix_native_read_custody import _expected_contact
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.recovery import (
-    DevelopmentRunRecoveryIndex, DevelopmentRunRecoveryTerminalEvent, RecoveryTerminalDisposition,
-)
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex, DevelopmentRunRecoveryTerminalEvent, RecoveryTerminalDisposition
 
 
 def _closed_context(*, artifact_writer, report, products, plan):

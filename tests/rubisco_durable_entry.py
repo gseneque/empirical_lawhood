@@ -5,11 +5,11 @@ import json
 import os
 from pathlib import Path
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_contracts import DurablePreparationPlan
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_preparation import DurableCallLedger, complete_unit
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_roster import freeze
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_contracts import DurablePreparationPlan
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_preparation import DurableCallLedger, complete_unit
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_roster import freeze
 
 
 def exposed_child(progress, invocation):

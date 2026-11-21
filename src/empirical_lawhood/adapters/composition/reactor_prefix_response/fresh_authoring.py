@@ -10,22 +10,15 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import ClassVar
 
-from empirical_lawhood.adapters.composition.reactor_prefix_response.authoring import ReactorAuthoringBundle, build_reactor_authoring
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.assigned import ReactorPrefixAssignment, ReactorPrefixPriorCensus
+from empirical_lawhood.domains.reactor.reactor_prefix_response.authoring.authoring import ReactorAuthoringBundle, build_reactor_authoring
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_assigned import ReactorPrefixAssignment, ReactorPrefixPriorCensus
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.packaged_source import load_packaged_reactor_source
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.planning.experiment_entry import ExecutableStudyDefinition
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256, validate_stable_id
+from empirical_lawhood.design.experiment_entry import ExecutableStudyDefinition
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure
 
-_MAX_PROFILE_BYTES = 64 * 1024**2
-_MAX_AUTHORING_BYTES = 128 * 1024**2
-_MAX_ARCHIVE_BYTES = 256 * 1024 * 1024
 
 
 @dataclass(frozen=True, slots=True)
@@ -61,7 +54,7 @@ class AssignedReactorAuthoringProfile(FreshReactorAuthoringProfile):
 
 
 def load_fresh_reactor_profile(path: Path) -> FreshReactorAuthoringProfile:
-    raw = read_bounded_bytes(path, maximum_bytes=_MAX_PROFILE_BYTES)
+    raw = read_bounded_bytes(path, maximum_bytes=None)
     document = json.loads(raw)
     if not isinstance(document, dict):
         raise ValueError("REACTOR_AUTHORING_PROFILE_DOCUMENT_INVALID")
@@ -74,7 +67,7 @@ def load_fresh_reactor_profile(path: Path) -> FreshReactorAuthoringProfile:
     }.get(schema)
     if record_type is None:
         raise ValueError("REACTOR_AUTHORING_PROFILE_SCHEMA_UNSUPPORTED")
-    return decode_canonical_bytes(raw, record_type, maximum_bytes=_MAX_PROFILE_BYTES)
+    return decode_canonical_bytes(raw, record_type, maximum_bytes=None)
 
 
 def fresh_assignment_status(
@@ -104,17 +97,17 @@ def load_fresh_reactor_bundle(directory: Path) -> ReactorAuthoringBundle:
     profile = load_fresh_reactor_profile(directory / "profile.json")
     closure = decode_canonical_bytes(
         read_bounded_bytes(
-            directory / "source-closure.json", maximum_bytes=_MAX_PROFILE_BYTES
+            directory / "source-closure.json", maximum_bytes=None
         ),
         ImplementationSourceClosure,
-        maximum_bytes=_MAX_PROFILE_BYTES,
+        maximum_bytes=None,
     )
     expected = decode_canonical_bytes(
         read_bounded_bytes(
-            directory / "authoring.json", maximum_bytes=_MAX_AUTHORING_BYTES
+            directory / "authoring.json", maximum_bytes=None
         ),
         ExecutableStudyDefinition,
-        maximum_bytes=_MAX_AUTHORING_BYTES,
+        maximum_bytes=None,
     )
     source = load_packaged_reactor_source()
     if source.fingerprint() != profile.public_source_sha256:

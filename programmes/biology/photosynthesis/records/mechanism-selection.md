@@ -208,7 +208,7 @@ missing; inhibitor-exchange half-lives cannot supply a productive-cycle fraction
 The separate [retained six-context construction](rr-coupled-initial-geometry-result-v1.md)
 now independently verifies all chemical inventories and retains **0/6 geometry
 passes** under the unchanged initial screen. A [maintained charge-field
-owner](../../../../src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_coupled_embedding.py)
+owner](../../../../src/empirical_lawhood/domains/rubisco/rubisco_insilico_structure/embedding.py)
 derives complete mutation-sensitive source-charge fields, retaining exact
 boundary transfers and their common approximately −0.50709849 e capped-fragment
 offset. These completed components supply explicit inputs and refusals for

@@ -1,89 +1,25 @@
-"""Native batches, causal anchor nomination and matched-input local action assays."""
+"""Native acquisition, external-format translation and custody integration."""
 
 from __future__ import annotations
-
-from empirical_lawhood.adapters.methods.reactor_causal_response.numerical import EXPLORATION_EPISODES, EXPLORATION_ARRAY_STEMS
+from empirical_lawhood.domains.reactor.reactor_causal_response.numerical import EXPLORATION_EPISODES, EXPLORATION_ARRAY_STEMS
 from hashlib import sha256
 from typing import Callable
-
 import numpy as np
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.domains.reactor.reactor_causal_response.development_readout import episode_validity
+from empirical_lawhood.domains.reactor.reactor_local_domain_qualification.config import LocalQualificationDesign, ROOTS
+from empirical_lawhood.domains.reactor.reactor_local_domain_qualification.records import LocalRootEvidence, LocalArrayPayload
+from empirical_lawhood.domains.reactor.reactor_causal_response.measurements import NativeEpisode, ExplorationController, TapeController
+from empirical_lawhood.domains.reactor.native_ports import NativeController
+from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import acquire_episode
+from empirical_lawhood.domains.reactor.reactor_causal_response.design import draw_scenario
+from empirical_lawhood.domains.reactor.reactor_causal_response.actuator import measured_labels
+from empirical_lawhood.domains.reactor.reactor_prefix_response.batch_design import ReactorBatchSource
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.adapters.methods.reactor_causal_response.numerical import CausalFeatures, Observation
-from empirical_lawhood.adapters.methods.reactor_causal_response.development_readout import episode_validity
-from empirical_lawhood.adapters.methods.reactor_local_domain_qualification.config import LocalQualificationDesign, ROOTS
-from empirical_lawhood.adapters.methods.reactor_local_domain_qualification.records import LocalRootEvidence, LocalArrayPayload
-from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import NativeEpisode, NativeController, acquire_episode, ExplorationController, TapeController
-from empirical_lawhood.adapters.simulators.reactor_causal_response.design import draw_scenario
-from empirical_lawhood.adapters.simulators.reactor_causal_response.interface import Actuator, measured_labels
-from empirical_lawhood.adapters.simulators.reactor_causal_response.projection import project_episode
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_design import ReactorBatchSource
-
-
-def candidate_features(episode: NativeEpisode, callback: int) -> tuple[np.ndarray, np.ndarray]:
-    """Causal prefix only; no native concentrations or post-run truth read here."""
-    state = CausalFeatures()
-    for row in episode.observations[: callback + 1]:
-        state.append(Observation(*map(float, row)))
-    previous = (
-        (0.0, 316.0) if callback == 0 else tuple(map(float, episode.stages[callback - 1, 2:]))
-    )
-    observation = Observation(*map(float, episode.observations[callback]))
-    projections = Actuator().project(observation, (previous[0], previous[1]))
-    return np.asarray([state.features(previous[1], p) for p in projections]), np.asarray(
-        [p.requested for p in projections]
-    )
-
-
-def assay_anchors(
-    design: LocalQualificationDesign,
-    donors: tuple[NativeEpisode, ...],
-) -> tuple[tuple[str, int | None, int | None, tuple[int, ...]], ...]:
-    """Choose earliest causal encounter; same-clock tie uses policy 0, 1, 2."""
-    projected: list[tuple[np.ndarray, np.ndarray] | None] = []
-    for episode in donors:
-        if not episode.complete:
-            projected.append(None)
-        else:
-            projected.append(
-                project_episode(
-                    tuple(Observation(*map(float, r)) for r in episode.observations),
-                    tuple((float(r[0]), float(r[1])) for r in episode.requests),
-                )
-            )
-    result: list[tuple[str, int | None, int | None, tuple[int, ...]]] = []
-    for domain in design.atlas.candidates:
-        encounters = []
-        for policy, projection in enumerate(projected):
-            if projection is None:
-                continue
-            x, actions = projection
-            eligible = np.flatnonzero(domain.proposed_support(x, actions))
-            # Prefer a real intervention opportunity. This predicate uses only
-            # causal observations and known actuator delivery, never responses.
-            for callback in eligible:
-                # Partition/support coordinates exclude the candidate action.
-                # The eligible donor therefore shares its causal context with
-                # all measured words; no quadratic prefix reconstruction.
-                actions_here = domain.actions
-                observation = Observation(*map(float, donors[policy].observations[callback]))
-                previous = (
-                    (0.0, 316.0)
-                    if callback == 0
-                    else tuple(map(float, donors[policy].stages[callback - 1, 2:]))
-                )
-                projections = Actuator().project(observation, (previous[0], previous[1]))
-                if len({projections[a].delivery_key for a in actions_here}) < 2:
-                    continue
-                encounters.append((int(callback), policy, actions_here))
-                break
-        if encounters:
-            chosen_callback, chosen_policy, chosen_actions = min(encounters)
-            result.append((domain.domain_id, chosen_policy, chosen_callback, chosen_actions))
-        else:
-            result.append((domain.domain_id, None, None, ()))
-    return tuple(result)
-
+from empirical_lawhood.domains.reactor.reactor_local_domain_qualification.native_features import (
+    assay_anchors as _science_assay_anchors,
+    candidate_features as _science_candidate_features,
+)
 
 def acquire_local_root(
     design: LocalQualificationDesign,
@@ -148,12 +84,12 @@ def acquire_local_root(
             retain_donor(refined, f"{EXPLORATION_ARRAY_STEMS[donor_policy]}_v1")
         else:
             failures.append((f"{EXPLORATION_ARRAY_STEMS[donor_policy]}_v1", "NOMINAL_DONOR_INCOMPLETE"))
-    assays = assay_anchors(design, tuple(donors))
+    assays = _science_assay_anchors(design, tuple(donors))
     for domain, policy, callback, actions in assays:
         if policy is None or callback is None:
             continue
         donor = donors[policy]
-        features, requests = candidate_features(donor, callback)
+        features, requests = _science_candidate_features(donor, callback)
         model = next(d for d in design.atlas.candidates if d.domain_id == domain)
         if not model.proposed_support(features[list(actions)], np.asarray(actions)).all():
             raise ValueError("anchor candidate context differs from its eligible donor")

@@ -6,10 +6,10 @@ import pytest
 from scipy.integrate import solve_ivp
 from scipy.linalg import expm
 
-from empirical_lawhood.adapters.methods.matrix_history_analysis import algebra as a, passive as p
-from empirical_lawhood.adapters.methods.matrix_history_analysis.analysis import algebra_sample_indices, passive_cells
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import MatrixHistoryProtocol
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import su2_generators
+from empirical_lawhood.domains.matrix.matrix_history_analysis import algebra as a, passive as p
+from empirical_lawhood.domains.matrix.matrix_history_analysis.analysis import algebra_sample_indices, passive_cells
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import MatrixHistoryProtocol
+from empirical_lawhood.domains.matrix.six_matrix_response.model import su2_generators
 from empirical_lawhood.api.matrix_history_analysis import prepare_matrix_history_allocation
 
 
@@ -52,8 +52,9 @@ def test_invariant_spectra_products_and_constructive_factor():
         np.testing.assert_allclose(np.linalg.eigvalsh(field), [-.5, -.5, .5, .5], atol=1e-14)
 
 
+@pytest.mark.numerical(oracle='Explicit Kronecker adjoint Laplacian projected onto an independent basis')
 def test_positive_gram_matches_independent_kronecker_oracle():
-    from empirical_lawhood.adapters.simulators.six_matrix_response.spectral import adjoint_laplacian_explicit
+    from empirical_lawhood.domains.matrix.six_matrix_response.spectral import adjoint_laplacian_explicit
     triplet = a.RIGHT + .17 * a.LEFT
     basis = np.column_stack([field.reshape(16, order="F") for field in a.BASIS])
     independent = basis.conj().T @ adjoint_laplacian_explicit(triplet) @ basis
@@ -61,9 +62,10 @@ def test_positive_gram_matches_independent_kronecker_oracle():
     assert not a.sector(1e-11*a.RIGHT)["identifiable"]
 
 
+@pytest.mark.numerical(oracle='Independent eigenspectrum of the explicit Kronecker operator')
 def test_band_ratio_is_third_over_fourth_and_public_columns_preserve_it():
-    from empirical_lawhood.adapters.methods.matrix_history_analysis.analysis import ALGEBRA_METRICS, algebra_history
-    from empirical_lawhood.adapters.simulators.six_matrix_response.spectral import adjoint_laplacian_explicit
+    from empirical_lawhood.domains.matrix.matrix_history_analysis.analysis import ALGEBRA_METRICS, algebra_history
+    from empirical_lawhood.domains.matrix.six_matrix_response.spectral import adjoint_laplacian_explicit
 
     rng = np.random.default_rng(912)
     raw = rng.normal(size=(2, 3, 4, 4)) + 1j * rng.normal(size=(2, 3, 4, 4))
@@ -86,6 +88,7 @@ def test_band_ratio_is_third_over_fourth_and_public_columns_preserve_it():
         np.testing.assert_allclose(public["metrics"][:, ALGEBRA_METRICS.index(sector + ".band_ratio")], ratio, atol=1e-14)
 
 
+@pytest.mark.numerical(oracle='Matrix exponential of a time-independent generator')
 def test_constant_generator_rk4_and_nochange_reference():
     path = np.repeat(a.RIGHT[None], 33, axis=0)
     actual, rates, integrals = p.propagators(path, .001, (1.,))
@@ -100,6 +103,7 @@ def test_constant_generator_rk4_and_nochange_reference():
     assert evaluated["increment_unresolved"]
 
 
+@pytest.mark.numerical(oracle='DOP853 solution of the full noncommuting matrix ODE')
 def test_noncommuting_midpoint_in_y_against_independent_ode():
     rng = np.random.default_rng(27)
     unitary, _ = np.linalg.qr(rng.normal(size=(4, 4)) + 1j * rng.normal(size=(4, 4)))

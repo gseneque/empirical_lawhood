@@ -7,8 +7,8 @@ import pytest
 
 from scripts.operator_records import export_record, make_assigned_reactor_profile, make_storage_profile, read_record
 from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import AssignedReactorAuthoringProfile, fresh_assignment_status
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
 
 
 def profile(**changes):

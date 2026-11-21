@@ -9,169 +9,80 @@ from importlib import import_module
 from pathlib import Path
 
 from empirical_lawhood.api.authoring_handoff import load_authoring_execution_projection, resolve_authoring_directory
-from empirical_lawhood.adapters.composition.generated_extension_bundles import (
-    GENERATED_EXTENSION_BUNDLE_AGGREGATE,
-)
-from empirical_lawhood.adapters.composition.rc_ladder_response.authoring import ResistorCapacitorCandidateContextProvider
+from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+from empirical_lawhood.domains.circuits.rc_ladder.authoring.authoring import ResistorCapacitorCandidateContextProvider
 from empirical_lawhood.adapters.composition.rc_ladder_response.fresh_authoring import load_fresh_rc_bundle
-from empirical_lawhood.adapters.composition.reactor_prefix_response.authoring import ReactorPrefixResponseCandidateContextProvider
+from empirical_lawhood.domains.reactor.reactor_prefix_response.authoring.authoring import ReactorPrefixResponseCandidateContextProvider
 from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import load_fresh_reactor_bundle
 from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_runtime import fresh_reactor_platform_ports
-from empirical_lawhood.adapters.control.study_bridge import NestedAdmissionControllerBridge, BoundActionAwareControllerBridge, PreparedPolicyControllerBridge
-from empirical_lawhood.adapters.control.composition import ControllerStudyComposition
-from empirical_lawhood.adapters.physical.mast_archive.fresh_source import (
-    FairMastPublicSourceService,
-)
-from empirical_lawhood.adapters.prospective.workflow import (
-    RegisteredProspectiveWorkflow,
-)
+from empirical_lawhood.methods.control.study_bridge import NestedAdmissionControllerBridge, BoundActionAwareControllerBridge, PreparedPolicyControllerBridge
+from empirical_lawhood.methods.control.composition import ControllerStudyComposition
+from empirical_lawhood.adapters.physical.mast_archive.fresh_source import FairMastPublicSourceService
+from empirical_lawhood.domains.reference_worlds.prospective.workflow import RegisteredProspectiveWorkflow
 from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.synthetic_material_method_authoring import SyntheticMaterialResponseMethodCandidateContextProvider
 from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.synthetic_material_method_packet import load_synthetic_material_response_bundle
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.analytic_authoring import UniformElectronGasAnalyticCandidateContextProvider
+from empirical_lawhood.domains.materials.electron_gas.analytic_authoring import UniformElectronGasAnalyticCandidateContextProvider
 from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.analytic_fresh_authoring import load_uniform_electron_gas_analytic_authoring_bundle
-from empirical_lawhood.infrastructure.artifacts import (
-    ArtifactProfileValidatorRegistry,
-    ExternalArtifactPlane,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.authority import ExternalApprovalGateAttestationStore, ExternalAuthorizationRecordStore, ExternalFrozenApprovalProposalStore, ExternalFrozenStudyApprovalProposalStore, load_owner_installed_approval_checker_registry
-from empirical_lawhood.infrastructure.bounded_process import (
-    BoundedProcessError,
-    run_bounded_command,
-)
-from empirical_lawhood.infrastructure.dataset_binding import (
-    AuthenticatedDatasetCampaignBindingResolver,
-)
-from empirical_lawhood.infrastructure.dataset_catalog_access import (
-    DatasetCatalogReadSessionProvider,
-    load_local_dataset_projection_receipt_reference,
-)
-from empirical_lawhood.infrastructure.dataset_catalog_authority import (
-    ExternalDatasetCatalogAuthorityLoader,
-)
-from empirical_lawhood.infrastructure.dataset_operations import (
-    MAX_DATASET_AUTHORITY_RECORD_BYTES,
-)
-from empirical_lawhood.infrastructure.dataset_projection import (
-    MAX_UNIFIED_CATALOG_PROJECTION_BYTES,
-)
-from empirical_lawhood.infrastructure.execution import DurableExecutionResourceEnvelopeCoordinator, DurableExecutionResourceEnvelopeStore, LocalProcessExecutor
-from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
-from empirical_lawhood.infrastructure.production_storage import (
-    PRODUCTION_ARTIFACT_PROFILE_VALIDATORS,
-)
-from empirical_lawhood.infrastructure.study_issue import PROGRAMME_ISSUE_GRANTEE_ID, ExternalIssuedExtensionPayloadSource, ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, GitStudySourceClosureInspector, StudyOperationAuthorityStore
-from empirical_lawhood.infrastructure.public_source_acquisition import (
-    BoundedPublicHttpsFetcher,
-    ExternalPublicSourceCustody,
-)
-from empirical_lawhood.infrastructure.source_origin import (
-    require_selected_implementation,
-)
-from empirical_lawhood.infrastructure.guarded_catalog import select_operator_catalog
-from empirical_lawhood.infrastructure.sql import (
-    create_read_only_catalog_engine,
-    initialize_production_catalog,
-    production_catalog_path,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.approval import ApprovalCheckerRegistry, ApprovalGateAttestation, CompleteApprovalService, DecisionClock, DurableAuthorizationRecord, FrozenApprovalProposal, FrozenIssuedStudyApprovalProposal, SystemDecisionClock
-from empirical_lawhood.planning.dataset_authority import (
-    DatasetOperationPolicy,
-    DatasetOperationRequest,
-)
-from empirical_lawhood.planning.dataset_manifests import DatasetTransformationManifest
-from empirical_lawhood.planning.datasets import (
-    DatasetEvidenceClass,
-    DatasetMaterializationClass,
-)
-from empirical_lawhood.planning.linked_campaign import LinkedCampaignProfile
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure as ProgrammeImplementationSourceClosure
-from empirical_lawhood.planning.source_pipelines import SourcePipelineProfile
-from empirical_lawhood.runtime.candidate_compiler import CandidateCompilationContext
-from empirical_lawhood.runtime.candidate_composition import (
-    CandidateCapabilityCatalog,
-    CandidateContextProvider,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.conditional_children import ConditionalChildResolver
-from empirical_lawhood.runtime.controller_compiler import AtlasAdmissionDeriverPort, ReceiptAdmissionDeriverPort, FiniteCertificateAdmissionDeriverPort, AtlasReachabilityDeriverPort, ReceiptReachabilityDeriverPort, FiniteCertificateReachabilityDeriverPort
-from empirical_lawhood.runtime.controller_evaluation import ControllerUseEvaluator
-from empirical_lawhood.runtime.controller_evaluation_nested import (
-    ActionAwareNestedControllerUseEvaluator,
-    NestedControllerUseEvaluator,
-    ProspectiveEvaluationBindingCoordinator,
-)
-from empirical_lawhood.runtime.controller_runtime import NativeDeliveryPort, ObserverPort, AtlasLiveGateEvaluatorPort, AdmissionLiveGateEvaluatorPort, NumericalViewLiveGateEvaluatorPort
-from empirical_lawhood.runtime.dataset_binding import DatasetCampaignBindingResolver
-from empirical_lawhood.runtime.dataset_operations import (
-    DatasetOperationPreviewService,
-    compose_dataset_operation_policy,
-    compose_dataset_operation_request,
-)
-from empirical_lawhood.runtime.dataset_rebuild import (
-    DatasetProjectionRebuildInstallerPort,
-)
-from empirical_lawhood.runtime.dataset_registration import (
-    DatasetRegistrationInstallerPort,
-)
-from empirical_lawhood.runtime.datasets import (
-    DatasetCapabilityRegistry,
-    DatasetCatalogWorkLimit,
-)
-from empirical_lawhood.runtime.evidence_profiles import EvidenceProfileRegistryResolver
-from empirical_lawhood.runtime.executable_bindings import ExecutableBindingRole, ExecutableCapabilityProviderFactoryRegistry, ExecutableLinkedCampaignCoordinatorFactory, ExecutablePlatformPort, ExecutableProfileCompilerFactory, GeneratedExecutableBindingAggregate, LayeredCampaignRuntimeProviderResolver
-from empirical_lawhood.runtime.issued_extension_payloads import IssuedExtensionPayloadResolver
-from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignProvider, build_linked_campaign_protocol
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import (
-    OperatorStorageAccessMode,
-    OperatorStorageProfile,
-    resolve_external_root_contract,
-    resolve_scientific_scratch_contract,
-)
-from empirical_lawhood.runtime.plans import ProtocolTemplate
-from empirical_lawhood.runtime.profile_compilation import LinkedCampaignProfileCompiler, SourceProfileCompilerBinding, SourceProfileCompilerRegistry
-from empirical_lawhood.runtime.study_issue import StudySourceClosureInspector
-from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
-from empirical_lawhood.runtime.resource_envelope_conformance import PublicRouteComposition, PublicRouteConformanceGraph, standard_resource_envelope_route_composition, standard_resource_envelope_route_conformance_graph
-from empirical_lawhood.runtime.public_source_acquisition import (
-    PublicSourceAcquisitionService,
-)
-from empirical_lawhood.runtime.source_pipelines import SourcePipelineCompilation, compile_source_pipeline
-from empirical_lawhood.runtime.sources import SourceCapabilityManifest
-from empirical_lawhood.runtime.static_codecs import CanonicalRecordCodecRegistry
+from empirical_lawhood.storage.artifacts import ArtifactProfileValidatorRegistry, ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.authority import ExternalApprovalGateAttestationStore, ExternalAuthorizationRecordStore, ExternalFrozenApprovalProposalStore, ExternalFrozenStudyApprovalProposalStore, load_owner_installed_approval_checker_registry
+from empirical_lawhood.execution.local.bounded_process import BoundedProcessError, run_bounded_command
+from empirical_lawhood.storage.dataset_binding import AuthenticatedDatasetCampaignBindingResolver
+from empirical_lawhood.storage.dataset_catalog_access import DatasetCatalogReadSessionProvider, load_local_dataset_projection_receipt_reference
+from empirical_lawhood.storage.dataset_catalog_authority import ExternalDatasetCatalogAuthorityLoader
+from empirical_lawhood.storage.dataset_operations import MAX_DATASET_AUTHORITY_RECORD_BYTES
+from empirical_lawhood.storage.dataset_projection import MAX_UNIFIED_CATALOG_PROJECTION_BYTES
+from empirical_lawhood.execution.local.execution import DurableExecutionResourceEnvelopeCoordinator, DurableExecutionResourceEnvelopeStore, LocalProcessExecutor
+from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+from empirical_lawhood.storage.production_storage import PRODUCTION_ARTIFACT_PROFILE_VALIDATORS
+from empirical_lawhood.storage.study_issue import PROGRAMME_ISSUE_GRANTEE_ID, ExternalIssuedExtensionPayloadSource, ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, GitStudySourceClosureInspector, StudyOperationAuthorityStore
+from empirical_lawhood.adapters.http.public_source import BoundedPublicHttpsFetcher
+from empirical_lawhood.storage.public_source_acquisition import ExternalPublicSourceCustody
+from empirical_lawhood.storage.source_origin import require_selected_implementation
+from empirical_lawhood.storage.guarded_catalog import select_operator_catalog
+from empirical_lawhood.storage.sql import create_read_only_catalog_engine, initialize_production_catalog, production_catalog_path
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.approval import ApprovalCheckerRegistry, ApprovalGateAttestation, CompleteApprovalService, DecisionClock, DurableAuthorizationRecord, FrozenApprovalProposal, FrozenIssuedStudyApprovalProposal, SystemDecisionClock
+from empirical_lawhood.design.dataset_authority import DatasetOperationPolicy, DatasetOperationRequest
+from empirical_lawhood.design.dataset_manifests import DatasetTransformationManifest
+from empirical_lawhood.design.datasets import DatasetEvidenceClass, DatasetMaterializationClass
+from empirical_lawhood.design.linked_campaign import LinkedCampaignProfile
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure as ProgrammeImplementationSourceClosure
+from empirical_lawhood.design.source_pipelines import SourcePipelineProfile
+from empirical_lawhood.execution.candidate_compiler import CandidateCompilationContext
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog, CandidateContextProvider
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.conditional_children import ConditionalChildResolver
+from empirical_lawhood.execution.controller_compiler import AtlasAdmissionDeriverPort, ReceiptAdmissionDeriverPort, FiniteCertificateAdmissionDeriverPort, AtlasReachabilityDeriverPort, ReceiptReachabilityDeriverPort, FiniteCertificateReachabilityDeriverPort
+from empirical_lawhood.execution.controller_evaluation import ControllerUseEvaluator
+from empirical_lawhood.execution.controller_evaluation_nested import ActionAwareNestedControllerUseEvaluator, NestedControllerUseEvaluator, ProspectiveEvaluationBindingCoordinator
+from empirical_lawhood.execution.controller_runtime import NativeDeliveryPort, ObserverPort, AtlasLiveGateEvaluatorPort, AdmissionLiveGateEvaluatorPort, NumericalViewLiveGateEvaluatorPort
+from empirical_lawhood.execution.dataset_binding import DatasetCampaignBindingResolver
+from empirical_lawhood.execution.dataset_operations import DatasetOperationPreviewService, compose_dataset_operation_policy, compose_dataset_operation_request
+from empirical_lawhood.execution.dataset_rebuild import DatasetProjectionRebuildInstallerPort
+from empirical_lawhood.execution.dataset_registration import DatasetRegistrationInstallerPort
+from empirical_lawhood.execution.datasets import DatasetCapabilityRegistry, DatasetCatalogWorkLimit
+from empirical_lawhood.execution.evidence_profiles import EvidenceProfileRegistryResolver
+from empirical_lawhood.execution.executable_bindings import ExecutableBindingRole, ExecutableCapabilityProviderFactoryRegistry, ExecutableLinkedCampaignCoordinatorFactory, ExecutablePlatformPort, ExecutableProfileCompilerFactory, LayeredCampaignRuntimeProviderResolver
+from empirical_lawhood.execution.issued_extension_payloads import IssuedExtensionPayloadResolver
+from empirical_lawhood.execution.linked_campaigns import LinkedCampaignProvider, build_linked_campaign_protocol
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, resolve_external_root_contract, resolve_scientific_scratch_contract
+from empirical_lawhood.execution.plans import ProtocolTemplate
+from empirical_lawhood.execution.profile_compilation import LinkedCampaignProfileCompiler, SourceProfileCompilerBinding, SourceProfileCompilerRegistry
+from empirical_lawhood.execution.study_issue import StudySourceClosureInspector
+from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
+from empirical_lawhood.execution.resource_envelope_conformance import PublicRouteComposition, PublicRouteConformanceGraph, standard_resource_envelope_route_composition, standard_resource_envelope_route_conformance_graph
+from empirical_lawhood.execution.public_source_acquisition import PublicSourceAcquisitionService
+from empirical_lawhood.execution.source_pipelines import SourcePipelineCompilation, compile_source_pipeline
+from empirical_lawhood.execution.sources import SourceCapabilityManifest
+from empirical_lawhood.execution.static_codecs import CanonicalRecordCodecRegistry
 
-from .codecs import AuthoringCodecError, loads_authoring
-from .execution import CampaignExecutionService, ExperimentContractEvidenceProvider, IssuedExperimentContractEvidenceProvider
-from .facade import EmpiricalLawhoodApi
-from .ports import DatasetCatalogSessionProvider
-
-
-def _generated_executable_factory_registry() -> (
-    ExecutableCapabilityProviderFactoryRegistry
-):
-    """Load the code-owned generated executable root, never a config-selected import."""
-
-    generated = import_module(
-        "empirical_lawhood.adapters.composition.generated_executable_bindings"
-    )
-    aggregate = generated.GENERATED_EXECUTABLE_BINDING_AGGREGATE
-    if not isinstance(aggregate, GeneratedExecutableBindingAggregate):
-        raise TypeError("generated executable aggregate has another record type")
-    factories = generated.EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
-    if not isinstance(factories, ExecutableCapabilityProviderFactoryRegistry):
-        raise TypeError("generated executable factory root has another registry type")
-    if factories.aggregate != aggregate:
-        raise ValueError("generated executable factories differ from their aggregate")
-    expected_discovery = ObjectIdentity.from_record(
-        GENERATED_EXTENSION_BUNDLE_AGGREGATE.aggregate_id,
-        GENERATED_EXTENSION_BUNDLE_AGGREGATE,
-    )
-    if aggregate.discovery_aggregate != expected_discovery:
-        raise ValueError("generated executable root binds another discovery aggregate")
-    return factories
+from empirical_lawhood.api.codecs import AuthoringCodecError, loads_authoring
+from empirical_lawhood.api.execution import CampaignExecutionService, ExperimentContractEvidenceProvider, IssuedExperimentContractEvidenceProvider
+from empirical_lawhood.api.facade import EmpiricalLawhoodApi
+from empirical_lawhood.api.inspection import create_inspection_api, load_installed_executable_factories
+from empirical_lawhood.api.ports import DatasetCatalogSessionProvider
 
 
 def _generated_executable_codec_registry() -> CanonicalRecordCodecRegistry:
@@ -664,7 +575,7 @@ def create_api(
         else repo_root.resolve(strict=True)
     )
     require_selected_implementation(root)
-    installed_factories = _generated_executable_factory_registry()
+    installed_factories = load_installed_executable_factories()
     installed_executable_codecs = _generated_executable_codec_registry()
     factories = executable_factory_registry or installed_factories
     expected_aggregate = installed_factories.aggregate
@@ -715,16 +626,16 @@ def create_api(
     )
     if (
         operator_storage_profile is not None
-        and maximum_parallel_tasks != operator_storage_profile.maximum_parallel_tasks
+        and maximum_parallel_tasks > operator_storage_profile.maximum_parallel_tasks
     ):
-        raise ValueError("operator profile and execution concurrency differ")
+        raise ValueError("execution concurrency exceeds the selected operator profile maximum")
     catalog_access = select_operator_catalog(profile=operator_storage_profile,
         project_root=root, catalog_relative_path=catalog_relative_path)
     if execution_service is not None and catalog_access is not None:
         raise ValueError("catalog_relative_path cannot replace an injected execution service catalog")
     service = execution_service
     if artifact_verification is not None:
-        from empirical_lawhood.runtime.operational_configuration import ArtifactVerificationMode
+        from empirical_lawhood.execution.operational_configuration import ArtifactVerificationMode
         artifact_verification = ArtifactVerificationMode(artifact_verification)
         if service is not None and artifact_verification != service.artifact_plane.artifact_verification:
             raise ValueError('artifact_verification cannot replace an explicit execution service policy')
@@ -937,50 +848,6 @@ def create_api(
         source_profile_compiler=composed_source_compiler,
         linked_profile_compiler=composed_linked_compiler,
         external_root=service_external_root,
-    )
-
-
-def create_inspection_api(
-    *,
-    repo_root: Path | None = None,
-    operator_storage_profile: OperatorStorageProfile | None = None,
-    operator_artifact_root_contract: ExternalRootContract | None = None,
-    catalog_relative_path: str | None = None,
-) -> EmpiricalLawhoodApi:
-    """Compose static discovery and local validation without a storage plane."""
-    if operator_artifact_root_contract is not None and operator_storage_profile is None:
-        raise ValueError("selected inspection root requires its operator profile")
-
-    root = Path.cwd().resolve() if repo_root is None else repo_root.resolve(strict=True)
-    factories = _generated_executable_factory_registry()
-    storage = (
-        None
-        if operator_storage_profile is None
-        else GuardedExternalRoot(
-            resolve_external_root_contract(
-                operator_storage_profile,
-                repo_root=root,
-                home_root=Path.home(),
-                for_write=False,
-                selected_contract=operator_artifact_root_contract,
-            )
-        )
-    )
-    return EmpiricalLawhoodApi(
-        repo_root=root,
-        project_configured=repo_root is not None,
-        catalog_access=select_operator_catalog(profile=operator_storage_profile,
-            project_root=root, catalog_relative_path=catalog_relative_path),
-        external_root=None if storage is None else Path(storage.contract.canonical_path),
-        inspection_storage_root=storage,
-        inspection_storage_read_only=(
-            operator_storage_profile is not None
-            and operator_storage_profile.access_mode is OperatorStorageAccessMode.READ_ONLY
-        ),
-        fair_mast_source_service=FairMastPublicSourceService(),
-        extension_bundle_aggregate=GENERATED_EXTENSION_BUNDLE_AGGREGATE,
-        executable_binding_aggregate=factories.aggregate,
-        executable_factory_registry=factories,
     )
 
 

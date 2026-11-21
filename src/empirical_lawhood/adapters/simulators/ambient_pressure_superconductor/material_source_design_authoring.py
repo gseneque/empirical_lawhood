@@ -4,45 +4,33 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from empirical_lawhood.kernel.authority import AuthorityAction
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experiments import ExperimentSpec
-from empirical_lawhood.kernel.models import ModelIntersectionSemantics, ViewModelSetSpec
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import LifecycleStatus, ReadinessStatus
-from empirical_lawhood.kernel.systems import SystemSpec
-from empirical_lawhood.kernel.worlds import EvidenceUnitScope
-from empirical_lawhood.planning.campaigns import (
-    CampaignLane,
-    CampaignNode,
-    CampaignNodeKind,
-    CampaignSpec,
-    DecisionRight,
-)
-from empirical_lawhood.planning.experiment_entry import ExperimentEntryChecklist, ExperimentEntryPackage, ExperimentEntryRequirement, ExperimentEntryRequirementBinding, ExperimentEntryTransition, ExperimentTerminalClass, StudyDefinition
-from empirical_lawhood.planning.formal_analysis import FormalGapSourceCapabilityInventory
-from empirical_lawhood.planning.formal_gaps import (
-    FormalGapApplicability,
-    FormalGapCoverage,
-    FormalGapCoverageAssignment,
-    FormalGapCoverageDisposition,
-    FormalGapEvidenceWorld,
-    FormalGapRegister,
-)
-from empirical_lawhood.planning.study_authoring import CapabilitySelection, DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, MaterializationQualificationReceipt, StudyDraft, StudyDraftLifecycle, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
-from empirical_lawhood.runtime.candidate_compiler import CandidateCompilationContext, StudyTemplate
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityCatalog
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.plans import ProtocolTemplate
-from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig, SourceReadMode
+from empirical_lawhood.science.identity.authority import AuthorityAction
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experiments import ExperimentSpec
+from empirical_lawhood.science.models.models import ModelIntersectionSemantics, ViewModelSetSpec
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import LifecycleStatus, ReadinessStatus
+from empirical_lawhood.science.models.systems import SystemSpec
+from empirical_lawhood.science.models.worlds import EvidenceUnitScope
+from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
+from empirical_lawhood.design.experiment_entry import ExperimentEntryChecklist, ExperimentEntryPackage, ExperimentEntryRequirement, ExperimentEntryRequirementBinding, ExperimentEntryTransition, ExperimentTerminalClass, StudyDefinition
+from empirical_lawhood.design.formal_analysis import FormalGapSourceCapabilityInventory
+from empirical_lawhood.design.formal_gaps import FormalGapApplicability, FormalGapCoverage, FormalGapCoverageAssignment, FormalGapCoverageDisposition, FormalGapEvidenceWorld, FormalGapRegister
+from empirical_lawhood.design.study_authoring import CapabilitySelection, DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, MaterializationQualificationReceipt, StudyDraft, StudyDraftLifecycle, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
+from empirical_lawhood.execution.candidate_compiler import CandidateCompilationContext, StudyTemplate
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.plans import ProtocolTemplate
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
 
-from .material_source_design_candidate import material_source_design_candidate_catalog, material_source_design_template
-from .material_source_design_contracts import MaterialSourceDesignConfig, MaterialSourceDesignSourceQualification, SplitPartition
-from .material_source_design_design import build_material_roster
-from .material_source_design_registration import material_source_design_registry
-from .material_source_design_runtime import SOURCE_CONTRACT_ARTIFACT_ID, material_source_design_protocol
-from .material_source_design_source import expected_material_source_design_source_qualification
-from .material_source_design_system import material_source_design_experiment, material_source_design_system, study_budget
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_candidate import material_source_design_candidate_catalog, material_source_design_template
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_contracts import MaterialSourceDesignConfig, MaterialSourceDesignSourceQualification, SplitPartition
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_design import build_material_roster
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_source_design_registration import material_source_design_registry
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_stages import SOURCE_CONTRACT_ARTIFACT_ID
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_source_design_runtime import material_source_design_protocol
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_source_design_source import expected_material_source_design_source_qualification
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_system import material_source_design_experiment, material_source_design_system, study_budget
 
 
 def material_source_design_model_set(system: SystemSpec, experiment: ExperimentSpec) -> ViewModelSetSpec:

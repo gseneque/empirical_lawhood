@@ -6,10 +6,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_statistical_bindings as statistics
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_original_publications import ORIGINAL_PUBLICATION_REQUIREMENT
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_statistical_bindings as statistics
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_original_publications import ORIGINAL_PUBLICATION_REQUIREMENT
 from empirical_lawhood.api.recursive_publications import authenticate_draft_publications
-from empirical_lawhood.planning.recursive_authoring import RecursiveOperationSpec
+from empirical_lawhood.design.recursive_authoring import RecursiveOperationSpec
 from tests.test_matrix_e3_original_publications import case as case  # noqa: F401
 from tests.test_matrix_e3_statistical_bindings import config, exposed_root, response_task
 

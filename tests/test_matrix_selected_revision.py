@@ -6,9 +6,9 @@ from decimal import Decimal
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision as selected
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_calibration import calibrate_revision
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision as selected
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_calibration import calibrate_revision
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_matrix_programme_selection import exposed  # noqa: F401
 from tests.test_matrix_revision_calibration import calibrated  # noqa: F401
 

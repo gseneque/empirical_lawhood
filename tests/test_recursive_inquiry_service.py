@@ -7,10 +7,10 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import recursive_inquiry as service
-from empirical_lawhood.kernel.recursive_inquiry import InquiryOutcomeChoice, identity
-from empirical_lawhood.planning.recursive_inquiry import InquiryAction
-from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigins
-from empirical_lawhood.runtime.recursive_inquiry import InquiryStateSources, InquiryWaveSource
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryOutcomeChoice, identity
+from empirical_lawhood.design.recursive_inquiry import InquiryAction
+from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigins
+from empirical_lawhood.execution.recursive_inquiry import InquiryStateSources, InquiryWaveSource
 from tests.test_recursive_inquiry import episode as episode, obj
 from tests.test_recursive_public_service import _plane
 
@@ -71,7 +71,7 @@ def test_zero_product_failure_uses_selected_domain_projector(tmp_path, monkeypat
 
 
 def test_runtime_intent_join_rechecks_origins_configuration_and_capability():
-    from empirical_lawhood.planning.study_authoring import CapabilitySelection
+    from empirical_lawhood.design.study_authoring import CapabilitySelection
 
     origins = RecursiveInputOrigins(())
     selection = CapabilitySelection("rubisco-inquiry.use", "1.0.0", "a" * 64)
@@ -98,10 +98,10 @@ def test_runtime_intent_join_rechecks_origins_configuration_and_capability():
 
 
 def test_actual_versioned_capability_selection_survives_decision_and_intent_join(episode):
-    from empirical_lawhood.planning.recursive_inquiry import choose_inquiry, make_successor_intent
-    from empirical_lawhood.planning.study_authoring import CapabilitySelection
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.recursive_inquiry import InquirySuccessorIntent
+    from empirical_lawhood.design.recursive_inquiry import choose_inquiry, make_successor_intent
+    from empirical_lawhood.design.study_authoring import CapabilitySelection
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.inquiry.recursive_inquiry import InquirySuccessorIntent
 
     selection = CapabilitySelection("rubisco-inquiry.use", "1.0.0", "a" * 64)
     menu = replace(episode["menu"], alternatives=tuple(
@@ -122,8 +122,8 @@ def test_actual_versioned_capability_selection_survives_decision_and_intent_join
 @pytest.fixture
 def multi_operation_intent(episode):
     """Real canonical RC graph/intent; no authoring or scientific execution."""
-    from empirical_lawhood.kernel.recursive_inquiry import InquirySuccessorIntent
-    from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind
+    from empirical_lawhood.science.inquiry.recursive_inquiry import InquirySuccessorIntent
+    from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind
     from tests.test_recursive_public_service import _draft
 
     draft = _draft()
@@ -139,8 +139,8 @@ def multi_operation_intent(episode):
 
 
 def test_multi_operation_intent_preserves_exact_canonical_record(multi_operation_intent):
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.recursive_inquiry import InquirySuccessorIntent
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.inquiry.recursive_inquiry import InquirySuccessorIntent
 
     draft, origins, intent = multi_operation_intent
     assert len(draft.selected_operation_ids) > 1
@@ -173,7 +173,7 @@ def test_multi_operation_intent_refuses_selection_and_whole_graph_substitution(m
         draft = replace(draft, operations=(changed, *draft.operations[1:]))
         assert draft.operations[-1].config_identity == intent.configuration
     else:
-        from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind
+        from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind
         origins = replace(origins, inputs=(RecursiveInputOrigin("external.substituted",
             RecursiveInputOriginKind.SOURCE, "b" * 64, "SOURCE"),))
     with pytest.raises(ValueError, match="intent substitutes"):

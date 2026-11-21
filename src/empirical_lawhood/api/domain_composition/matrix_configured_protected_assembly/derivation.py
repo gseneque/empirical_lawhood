@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: MPL-2.0
 """Actual copied configured E3 transition; no human/scientific permission inference."""
 from pathlib import Path
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_assembly import ConfiguredProtectedE3AssemblyInputs
-from empirical_lawhood.api.experiment_preparation import load_experiment_inputs,prepare_experiment
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile,ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_assembly import ConfiguredProtectedE3AssemblyInputs
+from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
 
 def derive_input_selection(*,specification,source_selection_path,project_root,artifact_writer,metadata_directory,output_selection_path,execution, read_access=None):
@@ -27,7 +27,7 @@ def derive_input_selection(*,specification,source_selection_path,project_root,ar
 
 def _derive_selected(*, specification, selected, project_root, artifact_writer, metadata_directory,
         output_selection_path, execution, read_access, continued_context):
-    from .assembly import assemble_configured_e3_inputs
+    from empirical_lawhood.api.domain_composition.matrix_configured_protected_assembly.assembly import assemble_configured_e3_inputs
     target,selector,target_path,publications=assemble_configured_e3_inputs(assembly_specification=specification,
         assembly_request=selected.request,scientific_protocol=selected.scientific_protocol,primary_amendment=selected.primary_amendment,request_path=selected.request_path,project_root=project_root,artifact_writer=artifact_writer,
         metadata_directory=metadata_directory,output_selection_path=output_selection_path,execution=execution,

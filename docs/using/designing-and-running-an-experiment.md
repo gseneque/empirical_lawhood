@@ -2,7 +2,11 @@
 
 SPDX-License-Identifier: CC-BY-4.0
 
-This guide gives instructions for scientific design, candidate construction and the separately authorized experiment lifecycle.
+Start with [the question-to-investigation route](../v1.0/from-question-to-investigation.md)
+and [public investigation authoring](../v1.0/define-investigation.md).
+They own the canonical researcher lifecycle. This guide gives the additional
+scientific design, candidate construction and separately authorized study procedure
+for a selected family that actually requires those contracts.
 It applies to the checked family boundaries in the route register.
 Use it to select a route and identify its first missing input.
 

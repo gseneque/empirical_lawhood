@@ -6,9 +6,13 @@ This guide gives installation procedures and the tested native environments.
 It distinguishes dependency installation from source qualification and scientific authority.
 Use it to select the required profile before a documented command.
 
-For consolidation, use the [environment reuse procedure](../development/maintainer-environment.md).
-It covers shared dependencies, the sole development checkout and external storage.
-Create another environment only when the selected profile or release procedure requires one.
+## Select storage and reuse an environment
+
+Select the checkout and environment for the operation. Run subsequent commands with `uv run --no-sync`. Keep the environment fixed while active attempts depend on it. For installed-artifact verification use the environment selected by the [release procedure](../release/release-artifacts.md).
+
+Select an explicit storage profile and verify the actual mount, access and capacity before writing. Reopen historical evidence through its authenticated access selection. The [configuration guide](configuration.md#retained-storage-access-selections) explains how to select relocated evidence and the [capacity guide](capacity-and-transfer.md) explains how to size a new run.
+
+## Supported release host
 
 The supported release-check host is **Linux x86-64, CPython 3.11.14, CPU**.
 The package uses POSIX file descriptors, `fcntl`, `pwd`, Linux process inspection
@@ -29,6 +33,7 @@ is not a numerical qualification.
 | Gym–TORAX, TORAX, PyBaMM | `open-simulators`: Gymtorax 1.1.1, TORAX 1.4.2, JAX/JAXlib 0.10.2, NumPy 2.4.6, SciPy 1.17.1, xarray 2026.7.0, PyBaMM 26.6.2.0 | Optional bounded native checks. No general campaign qualification |
 | Recursive battery inquiry | `battery-recursion`: PyBaMM 26.6.2.0, NumPy 2.4.6, SciPy 1.17.1, locked CasADi and PyBaMM solvers | Registered exposed SPMe/Chen2020 acquisition and continuation assessments. No physical metrology or qualification |
 | Rubisco plant prediction precursor | `rubisco-prediction`: RapidFuzz 3.14.3, NumPy 2.4.6, SciPy 1.17.1, CPython 3.11.14 | Exposed source-bound nearest-neighbour assessment under its [frozen protocol](../../programmes/biology/photosynthesis/records/plant-prediction-protocol-v1.md). No candidate qualification or EL comparison |
+| Rubisco common-parent and initial-model construction | `rubisco-construction`: PDBFixer 1.11.0, OpenMM 8.3.1, NumPy 2.4.6, SciPy 1.17.1; CPython 3.11.14 | Repository-local Python libraries and separately pinned Amber native closure. Follow the [installation procedure](rubisco-construction-environment.md) and independent molecular assessments |
 | Rubisco reduced-enolate electronic pilot | `rubisco-electronic`: PySCF 2.14.0, NumPy 2.4.6, SciPy 1.17.1, h5py 3.14.0, CPython 3.11.14; Linux x86-64 CPU | Eight fixed-geometry jobs under the [frozen successor protocol](../../programmes/biology/photosynthesis/records/enolate-electronic-protocol-v2.md); [actual result](../../programmes/biology/photosynthesis/records/enolate-electronic-result-v2.md). Electronic-method assessment; no mutation-to-kinetics or nomination authority |
 | Cantera and FiPy | `reaction-response-simulators`: Cantera 3.2.0, FiPy 4.0.3 | Bounded development contracts |
 | Grid2Op | `grid2op-held`: Grid2Op 1.12.5, LightSim2Grid 0.13.1 | Also needs an explicitly held offline chronic. Dependency presence alone is insufficient |
@@ -36,7 +41,14 @@ is not a numerical qualification.
 | Release packaging | `dev`, `build`, `reactor-example`. Hatchling 1.32.4 and its transitive dependencies in `uv.lock` | Builds and tests software artifacts. No scientific requalification |
 | Paper preservation and optional derivatives | Separate locked `paper` group, CPython 3.11.14; PyMuPDF and the declared plotting/document dependencies | Validates original selected publication assets. Pandoc, XeLaTeX and fonts are additional prerequisites only for a separately selected derivative; see [paper validation](../development/paper-build.md) |
 
+## Optional accelerated environments
+
+Optional GPU work uses the separate [accelerated compute environments](accelerated-compute.md#select-the-environments).
+The controller and worker have separate locked dependency sets.
+Keep the original CPU reference environment unchanged.
+
 ## Frozen RC numerical input profile
+
 
 The retained RC reproduction uses NumPy `X86_V3` dispatch and the OpenBLAS Haswell kernel.
 A different CPU dispatch can change exact descriptor bytes with the same dependency versions.
@@ -67,6 +79,11 @@ Neither installed packages nor writable storage establish an eligible cohort, qu
 An editable installation's stale distribution metadata is a local mismatch, not proof that a selected wheel is defective.
 Read [results and failures](results-and-failures.md) for the separate operational/scientific states.
 
+Use [selected-workflow installation](workflow-installation.md) for exact controller and worker requirements.
+It supplies `doctor --workflow ID`, optional `--assert-prerequisites` and wheel requirements export before installation.
+The assertion concerns required software only.
+Default doctor inspection and scientific admission retain their separate meanings.
+
 The Rubisco precursor uses an explicitly selected separate environment.
 Replace the example path with your chosen external environment destination.
 From the checkout, select it once and use `--no-sync` thereafter:
@@ -77,9 +94,10 @@ uv sync --locked --python 3.11.14 --no-default-groups --group dev --group rubisc
 uv run --no-sync python -c 'from importlib.metadata import version; print(version("rapidfuzz"))'
 ```
 
-This profile has no new doctor route. Dependency presence establishes software
-readiness, while the protocol and exact source admissions determine the assessment's
-meaning. Keep the numerical thread limits from [testing](../development/testing.md) when executing it.
+Inspect this profile's versions with `doctor --route rubisco-prediction`.
+This route observes packages only.
+The protocol and exact source admissions determine the assessment's meaning.
+Keep the numerical thread limits from [testing](../development/testing.md) when executing it.
 
 The electronic pilot selects its own optional group and declared two-thread
 profile. The native solver is imported only when the calculation is selected;
@@ -100,6 +118,34 @@ account for native scratch explicitly: PySCF creates an empty temporary
 checkpoint during solver construction even when checkpoint content is disabled.
 This group adds no doctor route or registered recursive operation.
 
+### Complete periodic PySCF forces on Linux x86-64
+
+The periodic CPU force operator uses a source correction to PySCF 2.14.0's
+J/K workspace allocation. Start with the locked `rubisco-construction` and
+`rubisco-electronic` groups in a selected repository environment. Use an
+environment free of active jobs. Download the original wheel identified
+by the URL and SHA-256 in the [native source manifest](../../configs/native/pyscf-cvhf-2.14.0-linux-x86_64.json).
+
+Select the original wheel, an existing scratch directory and a fresh build
+destination under the environment's `native` directory. The builder uses
+the upstream C sources, the EL allocation correction, a local GNU C compiler
+and the wheel's own BLAS, integral and OpenMP libraries. Its output includes
+a locally versioned wheel with its license and notices, and a receipt binding
+the original wheel, compiler, patched source, linked libraries and final wheel.
+
+```sh
+uv run --no-sync python scripts/build_periodic_pyscf_wheel.py \
+    --upstream-wheel "$upstream_wheel" --scratch "$scratch" \
+    --destination "$environment/native/pyscf-cvhf-2.14.0"
+uv pip install --offline --no-deps --reinstall --python "$environment/bin/python" \
+    "$environment/native/pyscf-cvhf-2.14.0/pyscf-2.14.0+el.cvhf.1-py3-none-linux_x86_64.whl"
+```
+
+Create a new periodic numerical engine record from the installed files and
+interpreter. Run the selected study with `uv run --no-sync`. For a native
+installation check, run the complete energy/gradient and memory controls in
+`tests/test_rubisco_periodic_density_reuse.py` and `tests/test_rubisco_periodic_jk.py`.
+The finite-cluster electronic pilot uses the upstream wheel selected above.
 
 ## Editable checkout
 
@@ -122,8 +168,10 @@ uv sync --locked --python 3.11.14 --group reactor-example --group open-simulator
 uv run --no-sync empirical-lawhood doctor --route open-simulators --format json
 ```
 
-`doctor --route` accepts `reactor`, `prepared-response`, `open-simulators`, `reaction-response`, or
-`grid2op`, `rc-challenges`, `finite-response-law`, or `preparation-applicability`. It reads distribution metadata and reports `installed_version`,
+`doctor --route` selects an [adapter-declared environment](../development/discovery-facets.md).
+Existing routes include `reactor`, `prepared-response`, `open-simulators`, `reaction-response`,
+`grid2op`, `rc-challenges`, `finite-response-law`, `preparation-applicability` and `mass-balance`.
+It reads distribution metadata and reports `installed_version`,
 `required_version`, `available` and `version_matches`. Absence and version drift
 are distinct reason codes. It does not import/initialize a simulator to perform
 this check, authenticate source data, verify a fitted bank, or grant authority.
@@ -137,6 +185,9 @@ uv run --project programmes/biology/cell-responses/workflows/neuron-current-resp
 ```
 
 ## Selected wheel
+
+For exact task installation, use the wheel export and selected assertion in [workflow installation](workflow-installation.md).
+The wheel's manifest binds the matching source and each controller or worker requirement set.
 
 Dependency groups are checkout tooling, not wheel extras. To run the demo from
 a selected wheel, create a fresh environment with the exact Python patch and

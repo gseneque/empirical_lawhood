@@ -11,26 +11,24 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import (
-    MatrixRevisionSelectedPackage, MatrixRevisionPreparedProgramme,
-)
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_entry import MatrixRevisionEntryEvidence
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_results import assess_revision_programme
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_workers import SelectedRevisionWorker
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_operational_resources import MatrixSelectedOperationalResources
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as e4
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels, SelectedE4RevisionPoint, POINT_ONLY
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4DevelopmentProduct
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import MatrixRevisionSelectedPackage, MatrixRevisionPreparedProgramme
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_entry import MatrixRevisionEntryEvidence
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_results import assess_revision_programme
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_workers import SelectedRevisionWorker
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_operational_resources import MatrixSelectedOperationalResources
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as e4
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels, SelectedE4RevisionPoint, POINT_ONLY
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4DevelopmentProduct
 from empirical_lawhood.api import matrix_selected_revision_runtime as runtime
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import PREDICTORS
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import PREDICTORS
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
 from tests.test_matrix_selected_e4_methods import selected_calibrated, selected_revision, selected_e4_populations, selected_bridge, transfer, confirmation_products, pin  # noqa: F401
 from tests.test_matrix_selected_opportunity import opportunity, literal_observations, unpublished, campaign_fixture  # noqa: F401
 from tests.test_matrix_sampling_follow_on import prior_product
@@ -212,7 +210,7 @@ def test_graph_has_actual_revision_point_before_every_native_future_and_no_forec
                 owner.phase_inputs(phase)
     for declaration in declarations:
         if declaration.runner_factory().phase == "entry":
-            from empirical_lawhood.kernel.experimental_design import UnitAllocation
+            from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
             assert next(row for row in declaration.outputs if row.output_id == "original-allocation").payload_schema == UnitAllocation.SCHEMA
         if declaration.capability_key.endswith(".direct-inputs"):
             phase = declaration.runner_factory().phase
@@ -229,7 +227,7 @@ def test_graph_has_actual_revision_point_before_every_native_future_and_no_forec
 
 def test_fresh_current_admission_refusal_precedes_original_science_or_native_contact(tmp_path, monkeypatch):
     from empirical_lawhood.api import recursive_authoring
-    from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads
+    from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads
     from tests.test_recursive_public_service import _plane
 
     calls = []
@@ -271,8 +269,8 @@ def test_fresh_current_admission_refusal_precedes_original_science_or_native_con
 
 
 def test_revision_point_package_and_evidence_mismatch_refuse_before_any_native_body(revision_case, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_entry import validate_entry_evidence
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_native_body
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_entry import validate_entry_evidence
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_native_body
     monkeypatch.setattr(prepared_native_body, "_execute_future_native", lambda *args, **kwargs: pytest.fail("native entry"))
     changed = replace(revision_case.evidence, programme=replace(revision_case.programme.identity, object_fingerprint="f" * 64))
     with pytest.raises(ValueError, match="original model freeze"):
@@ -286,8 +284,9 @@ def test_revision_point_package_and_evidence_mismatch_refuse_before_any_native_b
 
 
 def test_resource_consumer_and_runtime_lifecycles_are_exact_installed_selections():
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as public
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as public
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.extension import EXTENSION as _extension_owner_1
+    EXPERIMENT_PROTOCOL_DECLARATIONS = _extension_owner_1.protocols
     from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding
     protocols = tuple(row for row in EXPERIMENT_PROTOCOL_DECLARATIONS
         if row.protocol_id in (public.DEVELOPMENT_PROTOCOL_ID, public.PROTECTED_PROTOCOL_ID))
@@ -304,8 +303,8 @@ def test_resource_consumer_and_runtime_lifecycles_are_exact_installed_selections
 
 def _relabelled_revision_transfer(case):
     """Disclosed typed metadata only; this does not authenticate a reservation."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as original
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as original
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
     old = case.transfer
     semantic = old.point_design.package.allocation
     nearby = set(semantic.unit_ids("transfer_nearby"))
@@ -353,8 +352,8 @@ def test_revision_transfer_refuses_absent_or_incomplete_original_role_partition(
 
 
 def test_revision_transfer_allocation_edge_requires_actual_entry_producer(revision_case):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import entry_seal
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_workers import _dependencies
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import entry_seal
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_workers import _dependencies
     f = revision_case
     configs, _, links, _, _ = committed_graph(f)
     node, config = next((node, config) for node, config in configs if config.phase == "assess-programme")

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -14,7 +15,36 @@ from rich.text import Text
 from typer.testing import CliRunner
 
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
+
+
+@pytest.mark.parametrize("arguments", (("doctor", "--route", "reactor"), ("capability", "list", "--limit", "5")))
+def test_cold_diagnostics_and_discovery_use_only_their_declarations(tmp_path, arguments):
+    from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+
+    code = """
+import sys
+class ForbidExecutableImports:
+    def find_spec(self, name, path=None, target=None):
+        if name in {"h5py", "scipy", "empirical_lawhood.api.composition",
+                    "empirical_lawhood.adapters.composition.generated_executable_bindings"}:
+            raise AssertionError("doctor imported " + name)
+        return None
+sys.meta_path.insert(0, ForbidExecutableImports())
+from empirical_lawhood.cli.entry import main
+main()
+"""
+    result = subprocess.run([sys.executable, "-c", code, *arguments, "--format", "json"],
+                            cwd=tmp_path, capture_output=True, text=True, check=True, timeout=120)
+    payload = json.loads(result.stdout)["payload"]
+    if arguments[0] == "capability":
+        page = payload["value"]
+        assert page["returned_count"] == len(page["registrations"]) == len(page["execution_availability"]) == 5
+        return
+    catalog = GENERATED_EXTENSION_BUNDLE_AGGREGATE.candidate_capability_catalog
+    assert payload["capability_count"] == len(catalog.registrations)
+    assert payload["repository_root"] == "" and payload["capability_registry_fingerprint"] is None
+    assert payload["optional_dependencies"]
 
 
 def _profile(root: Path) -> OperatorStorageProfile:
@@ -132,3 +162,28 @@ def test_profile_containment_is_checked_before_mount_inspection(tmp_path: Path) 
     result = _invoke(tmp_path, profile.canonical_bytes())
     assert result.exit_code == 2
     assert "forbidden local root" in result.output
+
+
+def test_explicit_local_policy_admits_selected_home_child_but_preserves_exclusions(tmp_path):
+    from empirical_lawhood.execution.operator_profile import resolve_external_root_contract
+    home, temporary = tmp_path / 'home', tmp_path / 'temporary'
+    project = home / 'checkout'
+    for path in (home, temporary, project): path.mkdir(exist_ok=True)
+    selected = home / 'selected-study'
+    profile = replace(_profile(selected), containment_policy_key='explicit-local-contained-no-symlink',
+        required_mount_path='/', allowed_filesystem_types=())
+    resolve = lambda value: resolve_external_root_contract(value, repo_root=project,
+        home_root=home, temporary_root=temporary)
+    assert resolve(profile).canonical_path == str(selected / 'artifacts')
+    for excluded in (home, project, project / 'artifacts', temporary / 'study'):
+        with pytest.raises(ValueError, match='forbidden local root'):
+            resolve(replace(profile, external_root_locator=str(excluded)))
+    with pytest.raises(ValueError, match='filesystem root'):
+        replace(profile, external_root_locator='/')
+    strict = replace(profile, containment_policy_key='strict-mount-contained-no-symlink',
+        required_mount_path=str(home))
+    with pytest.raises(ValueError, match='forbidden local root'): resolve(strict)
+    alias = home / 'alias'
+    alias.symlink_to(project, target_is_directory=True)
+    with pytest.raises(ValueError, match='forbidden local root'):
+        resolve(replace(profile, external_root_locator=str(alias)))

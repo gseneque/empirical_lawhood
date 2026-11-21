@@ -5,6 +5,8 @@ SPDX-License-Identifier: CC-BY-4.0
 This guide explains development reports, operational attempts and issued scientific outcomes.
 It keeps their identities and evidence limits distinct.
 Start with the readable report, then inspect its exact inputs and outcome pointers.
+The [local research workbench](research-workbench.md) provides retained execution
+inspection and bounded RC findings through the same owning readers.
 
 ## Find the output
 
@@ -190,11 +192,36 @@ The selected PURE output allowance also covers unfinished calculations of the sa
 The separate repair index and result readout retain all original successes and refused attempts.
 Current source, resource, execution and input-access prerequisites remain mandatory.
 
+### Repair a PURE attempt refused by retained scratch
+
+A machine interruption can leave an empty attempt directory without a completion receipt.
+The executor refuses that directory and preserves the original attempt identity.
+Inspect the complete operational report before selecting another recovery operation.
+A retained `BLOCKED` terminal returns unchanged under ordinary recovery.
+
+Use `campaign experiment-recover --repair-development-scratch` for an entirely PURE development graph.
+Select the original run, owner instruction, worker interpreter and preserved worker source.
+The command requires `--run`, `--yes`, `--worker-interpreter`, `--worker-source-root` and `--repair-instruction`.
+Use a separately selected controller with unchanged scientific source, capability registry and dependency lock.
+The worker can use its exact original editable checkout or installed source distribution.
+
+The [repair owner](../../src/empirical_lawhood/api/development_scratch_repair.py) authenticates the complete original terminal, events and successful receipts.
+Each refused task must have its original resource-refusal event and an empty guarded attempt directory.
+Partial outputs, native effects, native contacts and unrelated failures refuse this transition.
+The repair preserves the old directories and derives one distinct additional attempt per refused computation.
+Dependent tasks receive their first execution through the unchanged graph.
+Scientific definitions, seed rosters, input edges and resource limits remain unchanged.
+
+Repeated selection resumes the same repair and grants no further attempt.
+The result retains the original terminal and refused attempts beside the new completion or refusal.
+Repeated computation supplies no additional independent unit or scientific qualification.
+The [focused controls](../../tests/test_development_scratch_repair.py) exercise receipt reuse, original-custody mutation and source and effect refusals.
+
 A controller-only interruption stops new dispatch while admitted tasks drain.
-The scheduler must continue renewing their same owned leases during that wait;
-worker threads cannot renew the coordinator's leases. Current native-entry
-permission and lease ownership still apply at every later leaf. A drained process
-exit does not establish completed task receipts. Inspect the actual nested
+The scheduler retains its exclusive run claim throughout that wait.
+Current native-entry permission and the original running attempt remain mandatory at every later leaf.
+Catalog lease timestamps impose no native execution deadline.
+A drained process exit does not establish completed task receipts. Inspect the actual nested
 contact, return and output census before selecting recovery. Missing outputs or
 an uncertain contact cannot be repaired by repeating the original native attempt.
 
@@ -259,45 +286,24 @@ phases stay visible.
 
 ## Monitor an operation
 
-The shared `campaign experiment-*` commands accept an optional `--progress-file`.
-Select a new file with an existing parent, outside scientific and operational attempt packages.
-Keep it outside any explicit `--output-root` selection as well.
-For example, add `--progress-file /absolute/operational/e3-progress.json` to the selected experiment command.
-Read that file from another terminal:
+All CLI operations display progress on stderr by default. The optional global
+`--progress-file` selects the same advisory JSON snapshot for another terminal or
+UI. Put it **before the command group**. Use `--no-progress` to suppress progress messages on stderr.
+Error diagnostics remain on stderr. Select this option to parse a JSON error envelope.
+
+The [shared progress guide](progress.md) explains phase and workflow counters,
+unknown denominators, heartbeat versus native advancement, retained step timings,
+Python composition and third-party callback exceptions.
 
 ```sh
-uv run --no-sync empirical-lawhood progress --file /absolute/operational/e3-progress.json
-uv run --no-sync empirical-lawhood progress --file /absolute/operational/e3-progress.json --json
+uv run --no-sync empirical-lawhood progress --file /absolute/operational/progress.json
+uv run --no-sync empirical-lawhood progress --file /absolute/operational/progress.json --json
 ```
 
-The view shows the current phase, processed items, known total, percentage and operational failures.
-Unknown totals have no percentage. Each phase has its own denominator. There is no estimated overall percentage.
-Updates replace the advisory JSON atomically, normally at most once per second.
-Phase changes and terminal states force an update. A long item can leave the timestamp unchanged until its next counter update.
-Use a terminal monitor such as `watch` to repeat the read command.
-
-The status `RETURNED` means the invocation returned. A blocked return can have an incomplete task count.
-Task counts include authenticated recovered successes and actual terminal failures. Unattempted blocked tasks remain incomplete.
-A failed status write disables further updates and reports one stderr warning. The underlying operation continues.
-An interrupted process can leave a stale `RUNNING` snapshot. The view does not infer process liveness.
-Use actual processes and receipt custody to determine completion and recovery.
-
-Python callers can use the same reporter around an existing operation:
-
-```python
-from pathlib import Path
-from empirical_lawhood.infrastructure.progress import JsonProgressReporter
-
-with JsonProgressReporter(Path("/absolute/operational/job-progress.json"), operation="job") as progress:
-    progress.update(phase="validate_inputs", done=0, total=len(inputs))
-    for done, item in enumerate(inputs, 1):
-        validate(item)
-        progress.update(phase="validate_inputs", done=done, total=len(inputs))
-```
-
-Installed preparation, input publication, artifact validation and execution hooks use that invocation's reporter.
-The reporter retains no scientific values, authority or completion evidence. Scientific results retain their existing readers and receipts.
-Omitting the option creates no progress file. An already running job retains its original implementation.
+`RETURNED` means the invocation returned, including a possible blocked result.
+A heartbeat proves only that the monitoring owner ran. A killed process can leave
+a stale `RUNNING` observation. Use original processes, reports and receipt custody
+to determine completion and recovery; telemetry grants no scientific authority.
 
 ## Retain a development attempt
 
@@ -382,8 +388,12 @@ A closed authoring `--output-dir` or analysis `--output` is separate from its op
 
 For a prepared worker, the native no-progress interval starts after parent
 admission permits execution. Process startup and source/input checks do not
-count as native progress or consume that interval. The campaign elapsed limit,
-attempt lease and non-time resource limits retain their separate checks.
+count as native progress or consume that interval. Selected campaign elapsed
+and non-time resource limits retain their separate checks. Native execution
+has no lease-expiration deadline. The exclusive run lock remains held through
+preparation, execution and publication. Current permission and the original
+running attempt are checked before each native entry. Catalog lease timestamps
+do not stop native work or delay receipt-only recovery after that lock releases.
 A qualified stall retains its operational failure even when retries are forbidden.
 A new reservation still requires its declared retry reason and remaining budget.
 
@@ -617,8 +627,7 @@ uncertain attempts; this location record does not relocate them.
   `declared-exclusion-draft-fd64ba2f01/receipt.json` records an incomplete
   conservative draft, not complete exclusions, actual consumption or freshness.
 
-The [storage guidance](../development/maintainer-environment.md#storage-and-retained-evidence)
-keeps original EL and SEMIOS locations distinct. The [paper source register](../../paper/SOURCES.md)
+Use the [retained-access procedure](configuration.md#retained-storage-access-selections) to reopen evidence in its original custody. The [paper source register](../../paper/SOURCES.md)
 and [preservation receipt](../../paper/source/source-preservation.json) own paper
 asset locations, exact selected bytes and availability limits.
 

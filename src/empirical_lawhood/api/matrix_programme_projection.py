@@ -5,14 +5,12 @@ from dataclasses import dataclass, field, replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling, inherited_visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.experiment_inputs import (
-    ExperimentFileInputSelection, ExperimentInputBinding,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, derived_outcome_access, lineage_parent_sort_key
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, ExperimentInputDerivationResult
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling, inherited_visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, derived_outcome_access, lineage_parent_sort_key
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, ExperimentInputDerivationResult
 
 
 class MatrixProgrammePrerequisite(ValueError):
@@ -24,8 +22,8 @@ class MatrixProgrammePrerequisite(ValueError):
 
 def record_identity(record):
     """Use actual current owner identifiers, never a substituted source hash."""
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation
-    from empirical_lawhood.planning.campaigns import CampaignSpec
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+    from empirical_lawhood.design.campaigns import CampaignSpec
     if type(record) is CampaignSpec:
         return ObjectIdentity.from_record(record.campaign_id, record)
     if type(record) is UnitAllocation:
@@ -67,7 +65,7 @@ def _original_e3_selection_binding(selected):
     Noncanonical/custom companions keep their original object comparison.
     """
     from empirical_lawhood.api.prospective_experiment import RetainedProspectiveExperiment
-    from empirical_lawhood.kernel.serialization import CanonicalRecord
+    from empirical_lawhood.science.records.serialization import CanonicalRecord
 
     if type(selected) is not RetainedProspectiveExperiment:
         return selected
@@ -141,7 +139,7 @@ class MatrixProgrammeProjectionContext:
     def metadata_directory(self, phase):
         if phase in self.phase_origins:
             return self.phase_origins[phase].metadata_directory(phase)
-        from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import PHASES
+        from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import PHASES
         if phase not in PHASES:
             raise ValueError('unsupported current Matrix phase')
         return self.directory / 'derived' / phase
@@ -170,8 +168,8 @@ class MatrixProgrammeProjectionContext:
         return authenticate_phase_binding(self.phase_origins.get(binding.phase, self), binding)
 
     def native_training_locator(self):
-        from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
-        from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+        from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+        from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
         from empirical_lawhood.api.recursive_authoring import load_authored_wave
         from empirical_lawhood.api.recursive_execution import _retained_plans
         from empirical_lawhood.api.native_training_banks import _read_instance
@@ -236,15 +234,15 @@ class MatrixProgrammeProjectionContext:
     @contextmanager
     def programme_e3_products(self):
         """Keep original evidence distinct from optional numerical reconstruction."""
-        from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+        from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
         if scientific_reconstruction_enabled():
             selected, _, authority, package, run, _ = self.authority('e3')
             with self.original_e3_products(selected=selected, package=package,
                     run_id=run.run_plan_id, reveal_authority_id=authority.reveal_authority_id) as read:
                 yield read
             return
-        from .recorded_e3_products import recorded_programme_e3_products
-        from .matrix_researcher_programme_lineage import retained_run_binding
+        from empirical_lawhood.api.recorded_e3_products import recorded_programme_e3_products
+        from empirical_lawhood.api.matrix_researcher_programme_lineage import retained_run_binding
         origin = self.phase_origins.get('e3', self)
         binding = ('RECORDED', retained_run_binding(origin, 'e3'), self.operation)
         if self._read_lifetime is None:
@@ -309,7 +307,7 @@ class MatrixProgrammeProjectionContext:
         Existing members keep their original closed publication contracts.
         Custom writers keep each original single-record call and guard.
         """
-        from empirical_lawhood.infrastructure.artifacts import supports_closed_batch_writes
+        from empirical_lawhood.storage.artifacts import supports_closed_batch_writes
         if not records:
             raise ValueError('programme record publication requires a nonempty group')
         if not supports_closed_batch_writes(self.writer):
@@ -328,8 +326,8 @@ class MatrixProgrammeProjectionContext:
             existing = any(path.exists() or path.is_symlink() for path in selected.values())
         same_batch = False
         if existing:
-            from empirical_lawhood.runtime.artifacts import artifact_publication_intent_relative_path
-            publication = self.writer._preflight_publication(requests, compact_manifests=True).publication
+            from empirical_lawhood.storage.contracts.artifacts import artifact_publication_intent_relative_path
+            publication = self.writer._preflight_publication(requests).publication
             with self.writer.root.read_paths((publication.commit_marker_relative_path,
                     artifact_publication_intent_relative_path(publication.publication_scope,
                         publication.publication_batch_id))) as controls:
@@ -341,7 +339,7 @@ class MatrixProgrammeProjectionContext:
         if require_current is not None:
             require_current()
         try:
-            return self.writer.write_compact_batch(requests)
+            return self.writer.write_batch(requests)
         finally:
             if require_current is not None:
                 require_current()

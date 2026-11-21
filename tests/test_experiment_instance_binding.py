@@ -5,6 +5,7 @@ All published inputs are disclosed software fixtures. Rebuilding their packet,
 manifests and commit markers tests scientific association beyond byte integrity;
 it supplies no issue, execution, reveal or qualification authority.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import dataclass, replace
 from decimal import Decimal
@@ -15,20 +16,20 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.adapters.simulators.rubisco_assay.records import AssayQuery
+from empirical_lawhood.domains.rubisco.assay.records import AssayQuery
 from empirical_lawhood.api import experiment_preparation as experiments
 from empirical_lawhood.api import recursive_authoring as author
 from empirical_lawhood.api.recursive_operations import operation_catalog
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, ExperimentInstanceBinding
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, ExperimentInstanceBinding
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
 from tests.test_recursive_public_service import _plane
 from tests.test_rubisco_experiment_preparation import _records, _specification
 
@@ -41,9 +42,7 @@ def _forbidden(*_args, **_kwargs):
 
 
 def _prepare(specification, records, plane):
-    from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.experiment_inputs import (
-        bind_kinetic_experiment_inputs,
-    )
+    from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.experiment_inputs import bind_kinetic_experiment_inputs
 
     resolved = bind_kinetic_experiment_inputs(specification, records)
     source = author.implementation_binding(ROOT)
@@ -114,7 +113,7 @@ def _rebuild_byte_custody(tmp_path, original_packet, payloads):
     plane.write_batch(requests)
     # Every physical manifest/commit authenticates; refusal must come from the
     # selected instance association, rather than stale digests or fake custody.
-    manifests = tuple(decode_artifact_manifest((directory / (name + ".manifest.json")).read_bytes(), maximum_bytes=None)
+    manifests = tuple(resolve_artifact_sidecar_bytes(plane, (directory / (name + '.manifest.json')).read_bytes(), maximum_bytes=None)
         for name in rows)
     plane.verify_manifests(manifests)
     return plane, directory
@@ -169,7 +168,7 @@ def test_author_refuses_a_decoupled_valid_draft_or_original_source_before_public
 
 @pytest.mark.parametrize("result", (True, False, 0, (), {}))
 def test_registered_instance_callback_must_return_exact_none_before_publication(tmp_path, monkeypatch, result):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
 
     plane = _plane(tmp_path / "unentered-custody")
     original, _ = _pair(plane)
@@ -186,7 +185,7 @@ def test_registered_instance_callback_must_return_exact_none_before_publication(
 
 
 def test_registered_instance_validator_is_required_at_authoring_and_retained_read(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
 
     plane = _plane(tmp_path / "original-custody")
     original, _ = _pair(plane)
@@ -204,7 +203,7 @@ def test_registered_instance_validator_is_required_at_authoring_and_retained_rea
 
 
 def test_retained_instance_callback_false_result_cannot_approve_a_valid_package(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
 
     plane = _plane(tmp_path / "original-custody")
     original, _ = _pair(plane)

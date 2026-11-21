@@ -5,6 +5,7 @@ receipt. Its retained bytes are read, never regenerated or relabelled fresh.
 The historical-custody checks are held and optional; the portable gate keeps
 the pure missing-source, compiler, provider and algebra controls.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from decimal import Decimal as D
@@ -19,40 +20,31 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import FactorEventSpec, FactorLifetime, ScalarClosureSpec
-from empirical_lawhood.adapters.methods.matrix_parameter_factor import independent, science
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-from empirical_lawhood.adapters.methods.matrix_parameter_factor.operation_bindings import (
-    BUDGET, NAMESPACE, MatrixParameterFactorConfig, development_draft, operation_factories,
-    operation_registrations, operands, output_codecs,
-)
-from empirical_lawhood.adapters.methods.matrix_parameter_factor.records import (
-    MatrixParameterFactorAssessment, MatrixParameterFactorNumericalDesign, MatrixParameterFactorProduct,
-    MatrixParameterFactorSource, MatrixParameterFactorSupply, MatrixParameterScalarContrastSpec,
-    MatrixParameterScalarDefinition, allocation_scopes, identity, prefix,
-)
-from empirical_lawhood.adapters.methods.matrix_parameter_history import science as history_science
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import (
-    MatrixParameterHistoryProduct, MatrixParameterHistorySource, MatrixParameterNativeHistory, coordinate_identity,
-)
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.infrastructure.execution import LocalScheduler
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind, WorkerOutputPort
-from empirical_lawhood.runtime.native_subwork import NativeSubworkBegin, NativeSubworkCompletion, NativeSubworkContact, NativeSubworkDefinition
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import FactorEventSpec, FactorLifetime, ScalarClosureSpec
+from empirical_lawhood.domains.matrix.matrix_parameter_factor import independent, science
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.domains.matrix.matrix_parameter_factor.operation_bindings import BUDGET, NAMESPACE, MatrixParameterFactorConfig, development_draft, operation_factories, operation_registrations, operands, output_codecs
+from empirical_lawhood.domains.matrix.matrix_parameter_factor.records import MatrixParameterFactorAssessment, MatrixParameterFactorNumericalDesign, MatrixParameterFactorProduct, MatrixParameterFactorSource, MatrixParameterFactorSupply, MatrixParameterScalarContrastSpec, MatrixParameterScalarDefinition, allocation_scopes, identity, prefix
+from empirical_lawhood.domains.matrix.matrix_parameter_history import science as history_science
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import MatrixParameterHistoryProduct, MatrixParameterHistorySource, MatrixParameterNativeHistory, coordinate_identity
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.execution.local.execution import LocalScheduler
+from empirical_lawhood.storage.task_receipts import decode_artifact_manifest
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind, WorkerOutputPort
+from empirical_lawhood.execution.native_subwork import NativeSubworkBegin, NativeSubworkCompletion, NativeSubworkContact, NativeSubworkDefinition
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 from tests.runtime_platform.test_native_subwork import _plane
 from tests.test_matrix_parameter_history import source as parameter_source
 
@@ -70,7 +62,7 @@ def case(parameter, supply):
     contrast = MatrixParameterScalarContrastSpec('test.e4.factor.scalar.'+parameter.root_id,coordinate_identity(c),
         ObjectIdentity.from_record(c.member.member_id,c.member),artifact(definition),c.member.beta_rule,c.clock_id)
     design = MatrixParameterFactorNumericalDesign('test.e4.factor.numerical',D('1e-9'),D('1e-9'),D('1e-9'),D('1e-9'),D('1e-9'),D('1e-9'))
-    directory = Path(__file__).parents[1]/'src/empirical_lawhood/adapters/methods/matrix_parameter_factor'
+    directory = Path(__file__).parents[1]/'src/empirical_lawhood/domains/matrix/matrix_parameter_factor'
     packages = tuple(sorted((p.relative_to(Path(__file__).parents[1]/'src/empirical_lawhood').as_posix(),sha256(p.read_bytes()).hexdigest()) for p in directory.glob('*.py')))
     provenance = NumericalProducingProvenance(parameter.provenance.runtime_observation_json,parameter.provenance.dependency_lock_sha256,
         packages,sha256(canonical_json_bytes(packages)).hexdigest(),parameter.provenance.observed_git_head,False)
@@ -106,7 +98,7 @@ def retained():
     # Explicit newly authored software postprocessing record from authenticated
     # original native child bytes, not a claim that an original ordinary task
     # published a product or completed. Original native/provenance stay exact.
-    from empirical_lawhood.adapters.methods.matrix_parameter_history.operation_bindings import _retained_values
+    from empirical_lawhood.domains.matrix.matrix_parameter_history.operation_bindings import _retained_values
     values = _retained_values(parameter,raw)
     _,operand = history_science.array_product(parameter,values,artifact_id=manifest.logical.logical_artifact_id,raw=raw)
     history = MatrixParameterHistoryProduct('history.exposed-retained-native-child',ObjectIdentity.from_record(parameter.source_id,parameter),
@@ -217,11 +209,11 @@ def test_cold_independent_read_with_all_producers_rng_eigensolvers_blocked(score
     def blocked(*args,**kwargs):
         pytest.fail('cold retained factor reading entered a producer/eigensolver/RNG')
     monkeypatch.setattr(science,'measure',blocked)
-    monkeypatch.setattr('empirical_lawhood.adapters.methods.matrix_parameter_factor.scalar.measure',blocked)
-    monkeypatch.setattr('empirical_lawhood.adapters.methods.matrix_factor_lifetime.science.measure_trace',blocked)
-    monkeypatch.setattr('empirical_lawhood.adapters.methods.matrix_factor_lifetime.science.measure_sector',blocked)
-    monkeypatch.setattr('empirical_lawhood.adapters.simulators.six_matrix_response.parameter_source.acquire_parameter_history',blocked)
-    monkeypatch.setattr('empirical_lawhood.adapters.simulators.six_matrix_response.simulation.baoab_step_with_hermitian_noise',blocked)
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.matrix_parameter_factor.scalar.measure',blocked)
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.matrix_factor_lifetime.science.measure_trace',blocked)
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.matrix_factor_lifetime.science.measure_sector',blocked)
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.six_matrix_response.parameter_source.acquire_parameter_history',blocked)
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.six_matrix_response.simulation.baoab_step_with_hermitian_noise',blocked)
     monkeypatch.setattr(np.linalg,'eigh',blocked)
     monkeypatch.setattr(np.linalg,'eigvalsh',blocked)
     monkeypatch.setattr(np.random,'Generator',blocked)
@@ -306,7 +298,7 @@ def worker_context(plane,selected,role,native,*,product=None,diagnostic=None):
             original = Path(os.environ['MATRIX_PARAMETER_FACTOR_EXPOSED_HISTORY'])
             original_plane = _plane(original, binary_codecs=MATRIX_STORAGE_CODECS)
             manifest_path = next((original/'runs/test.e4.run/native-subwork').rglob('outputs/arrays.manifest.json'))
-            m = decode_artifact_manifest(manifest_path.read_bytes())
+            m = resolve_artifact_sidecar_bytes(plane, manifest_path.read_bytes())
             assert m.logical.logical_artifact_id==name and m.logical.content_sha256==sha256(raw).hexdigest()
             ports.append(original_plane.open(m,binding=WorkerInputBinding(name,m.materialization.materialization_id,schema,m.logical.media_type,
                 len(raw),VisibilityCeiling.DEVELOPMENT_ONLY,OutcomeAccess.DEVELOPMENT_VISIBLE,WorkerInputKind.EXTERNAL),maximum_bytes=len(raw)))
@@ -315,7 +307,7 @@ def worker_context(plane,selected,role,native,*,product=None,diagnostic=None):
             ArtifactProfile.MATRIX_ARRAY_NPZ if is_array else ArtifactProfile.CANONICAL_JSON,
             'application/x-npz' if is_array else 'application/json','test.factor-software','factor-inputs',raw,
             VisibilityCeiling.DEVELOPMENT_ONLY,(),OutcomeAccess.DEVELOPMENT_VISIBLE))
-        m = decode_artifact_manifest(plane.root.resolve(publication.materialization.relative_path+'.manifest.json',for_write=False).read_bytes())
+        m = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(publication.materialization.relative_path + '.manifest.json', for_write=False).read_bytes())
         ports.append(plane.open(m,binding=WorkerInputBinding(name,m.materialization.materialization_id,schema,m.logical.media_type,
             len(raw),VisibilityCeiling.DEVELOPMENT_ONLY,OutcomeAccess.DEVELOPMENT_VISIBLE,WorkerInputKind.EXTERNAL),maximum_bytes=len(raw)))
     factory = next(f for f in operation_factories() if f.manifest.capability_key.endswith('.'+role))
@@ -432,7 +424,7 @@ def test_root_census_refuses_duplicate_traces_and_rewritten_lifetime(scored):
 
 
 def test_literal_pauli_guard_rejects_orthonormal_nonfactor_chart():
-    from empirical_lawhood.adapters.methods.matrix_history_analysis.algebra import BASIS, LEFT
+    from empirical_lawhood.domains.matrix.matrix_history_analysis.algebra import BASIS, LEFT
     unitary,_ = np.linalg.qr(np.asarray([[1,2j,3,4],[2,4,1j,3],[3j,1,4,2],[4,3,2,1j]],dtype='<c16'))
     assert independent.pauli_residual(unitary@LEFT@unitary.conj().T)<1e-12
     assert np.allclose(np.einsum('iab,jab->ij',BASIS[:3].conj(),BASIS[:3]),np.eye(3))

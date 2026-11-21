@@ -9,12 +9,10 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.infrastructure.recursive_control_read import (
-    CONTROL_VIEWS, decode_authored_control, normalized_plan_views,
-)
-from empirical_lawhood.kernel import decoding
-from empirical_lawhood.kernel.normalized_control import NormalizedCanonicalControl, _content_tree, _document, _json
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.storage.recursive_control_read import CONTROL_VIEWS, decode_authored_control, normalized_plan_views
+from empirical_lawhood.science.records import decoding
+from empirical_lawhood.science.response.normalized_control import NormalizedCanonicalControl, _content_tree, _document, _json
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,7 +133,7 @@ def test_small_controls_keep_original_only_representation():
 
 
 def test_normalized_selection_keeps_smaller_custody_policy_and_avoids_unique_graph_work(monkeypatch):
-    from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits
     record = _case()
     for limits in (ArtifactCustodyLimits(control_record_bytes=1), ArtifactCustodyLimits(in_memory_payload_bytes=1),
             ArtifactCustodyLimits(canonical_json_token_bytes=1024), ArtifactCustodyLimits(canonical_json_depth=32)):
@@ -165,9 +163,9 @@ def test_reserved_literal_keys_and_exponential_expansion_are_not_ambiguous():
 
 @pytest.mark.parametrize('damage', ('original', 'view', 'revoked', 'final-view'))
 def test_normalized_reader_keeps_both_publications_current_and_complete(tmp_path, damage):
-    from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveWaveMember
+    from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.recursive_handoff import RecursiveWaveMember
     from tests.test_artifact_publication_admission import _plane, _requests
     plane = _plane(tmp_path / 'custody')
     record = _case()
@@ -203,8 +201,8 @@ def test_normalized_reader_keeps_both_publications_current_and_complete(tmp_path
 
 
 def _public_draft():
-    from empirical_lawhood.adapters.methods.rc_prerequisite_chain.contracts import RCPrerequisiteChainConfig
-    from empirical_lawhood.adapters.methods.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
+    from empirical_lawhood.domains.circuits.rc_prerequisite_chain.contracts import RCPrerequisiteChainConfig
+    from empirical_lawhood.domains.circuits.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
     from tests.test_recursive_public_service import ROOT
     config = decoding.decode_canonical_bytes((ROOT / 'programmes/foundations/measurement-and-response/workflows/rc-prerequisite-chain/input.json').read_bytes(),
         RCPrerequisiteChainConfig, maximum_bytes=8 * 1024**2)
@@ -213,7 +211,7 @@ def _public_draft():
 
 def test_actual_compiled_plan_view_size_and_exact_reconstruction(record_property):
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     registrations, registry, codecs = operation_catalog()
     compiled = compile_recursive_wave(draft=_public_draft(), registrations=registrations, registry=registry,
         implementation_commit='a' * 40, run_plan_id='software.normalized-plan', output_codecs=codecs)
@@ -231,8 +229,8 @@ def test_public_author_and_control_readers_keep_exact_originals_and_normalized_m
     from empirical_lawhood.api import recursive_authoring as author, recursive_execution as execution
     from empirical_lawhood.api import experiment_execution_read as observation
     from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
-    from empirical_lawhood.infrastructure import recursive_control_read as controls
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.storage import recursive_control_read as controls
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     from tests.test_artifact_publication_admission import _census, _plane
     from tests.test_recursive_public_service import ROOT, _draft
     # Force optional views for this small public fixture. Production selection

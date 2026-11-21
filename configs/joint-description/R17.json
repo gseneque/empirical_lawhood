@@ -1,0 +1,178 @@
+{
+  "actions": [
+    -0.05,
+    0.0,
+    0.05
+  ],
+  "calibration_unit_ids": [
+    "unit.r17.calibration.0000",
+    "unit.r17.calibration.0001",
+    "unit.r17.calibration.0002",
+    "unit.r17.calibration.0003",
+    "unit.r17.calibration.0004",
+    "unit.r17.calibration.0005",
+    "unit.r17.calibration.0006",
+    "unit.r17.calibration.0007",
+    "unit.r17.calibration.0008",
+    "unit.r17.calibration.0009",
+    "unit.r17.calibration.0010",
+    "unit.r17.calibration.0011"
+  ],
+  "descriptions": [
+    {
+      "features": [
+        "action",
+        "horizon",
+        "temperature_scale"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 3 coordinate accesses, 3 coordinate conversions, 0 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 6.0,
+      "id": "minimal",
+      "interface_dimension": 0,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "ridge",
+      "rationale": "Test whether one instantaneous state coordinate supports this action/receiver family.",
+      "state_dimension": 1
+    },
+    {
+      "features": [
+        "action",
+        "horizon",
+        "bootstrap_multiplier",
+        "density_nbar",
+        "inner_transport_scale",
+        "temperature_scale"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 6 coordinate accesses, 6 coordinate conversions, 0 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 12.0,
+      "id": "additive",
+      "interface_dimension": 0,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "ridge",
+      "rationale": "Separate additive preparation and retained-history coordinates; no multiplicative interface.",
+      "state_dimension": 4
+    },
+    {
+      "features": [
+        "action",
+        "horizon",
+        "bootstrap_multiplier",
+        "density_nbar",
+        "inner_transport_scale",
+        "temperature_scale",
+        "action_x_state",
+        "action_x_context"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 8 coordinate accesses, 8 coordinate conversions, 2 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 18.0,
+      "id": "interface",
+      "interface_dimension": 2,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "ridge",
+      "rationale": "Pay for explicit action/state and action/history interface dependence.",
+      "state_dimension": 4
+    },
+    {
+      "features": [
+        "action",
+        "horizon",
+        "bootstrap_multiplier",
+        "density_nbar",
+        "inner_transport_scale",
+        "temperature_scale",
+        "action_x_state",
+        "action_x_context",
+        "state_x_context"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 9 coordinate accesses, 9 coordinate conversions, 3 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 21.0,
+      "id": "joint",
+      "interface_dimension": 3,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "ridge",
+      "rationale": "Joint second-order description is an authored candidate, not an assertion of global minimality.",
+      "state_dimension": 4
+    }
+  ],
+  "economics": {
+    "accounting_unit": "authored-cost-unit",
+    "action_price": "0",
+    "compute_price": "0.0001",
+    "interface_price": "0.001",
+    "maximum_control_regret": "1",
+    "memory_price": "0.001",
+    "minimum_coverage": "0.9",
+    "missing_penalty": "1000000",
+    "reuse_count": 1,
+    "ridge_penalty": "0.001",
+    "safety_penalty": "1000000",
+    "state_price": "0.001"
+  },
+  "evaluation_unit_ids": [
+    "unit.r17.evaluation.0000",
+    "unit.r17.evaluation.0001",
+    "unit.r17.evaluation.0002",
+    "unit.r17.evaluation.0003",
+    "unit.r17.evaluation.0004",
+    "unit.r17.evaluation.0005"
+  ],
+  "family_id": "R17",
+  "horizons": [
+    2.0,
+    4.0
+  ],
+  "parameters": {
+    "bootstrap_multiplier_range": [
+      0.99,
+      1.005
+    ],
+    "corrector_steps": 10,
+    "density_nbar_range": [
+      0.848,
+      0.852
+    ],
+    "ecrh_location": 0.35,
+    "ecrh_power_w": 20000000.0,
+    "ecrh_width": 0.05,
+    "expected_versions": {
+      "gymtorax": "1.1.1",
+      "jax": "0.10.2",
+      "jaxlib": "0.10.2",
+      "torax": "1.4.2"
+    },
+    "inner_transport_scale_range": [
+      0.99,
+      1.01
+    ],
+    "internal_timestep_s": 1.0,
+    "nbi_location": 0.25,
+    "nbi_power_w": 30000000.0,
+    "nbi_width": 0.25,
+    "plasma_current_a": 12500000.0,
+    "radial_cells": 25,
+    "temperature_scale_range": [
+      0.99,
+      1.02
+    ]
+  },
+  "question": "How much coupled preparation information is needed to forecast and select effective heating actions in Gym-TORAX?",
+  "receiver_policies": {
+    "fusion_gain": {
+      "max_abs_error": 1,
+      "safety_lower": 0,
+      "scale": 10,
+      "target": 10,
+      "units": "dimensionless",
+      "weight": 1.0
+    }
+  },
+  "seed": 20261114
+}

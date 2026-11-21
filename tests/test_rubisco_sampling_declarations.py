@@ -10,18 +10,16 @@ import json
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import (
-    executable_binding as dynamics, operation_bindings as original)
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_runner import DurablePreparationWorker
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.geometry_reuse import GeometryReusePlan, GeometryReuseRunner
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.geometry_runner import GeometryReuseWorker
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.ordinary_preparation import check_preparation_only_root
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import operation_bindings as sampling
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_preparation_admission import (
-    ReusedGeometryChemicalForcePlan, SerializedDurableChemicalForcePlan)
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_runner import ChemicalForceRunner
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.nve_runner import NVEControlRunner
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.operation_runner import SamplingOperationWorker
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import extension as dynamics, operation_bindings as original
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_runner import DurablePreparationWorker
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.geometry_reuse import GeometryReusePlan, GeometryReuseRunner
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.geometry_runner import GeometryReuseWorker
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.ordinary_preparation import check_preparation_only_root
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import operation_bindings as sampling
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_preparation_admission import ReusedGeometryChemicalForcePlan, SerializedDurableChemicalForcePlan
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_runner import ChemicalForceRunner
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.nve_runner import NVEControlRunner
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.operation_runner import SamplingOperationWorker
 from tests.runtime_platform.test_worker_preflight import _case
 from tests.runtime_platform.test_native_subwork import ExposedInput
 
@@ -35,16 +33,16 @@ def test_original_individual_descriptors_preserve_issued_identity():
             "dafe20e09384241020e883cef4f45c52a8800fc0a49f4ff8975273a1bea4d75a",
             "eb8011a65ad651eee85e2a9805a22c91859df7712ab3cdd9c61e10360751f5d1"),
     }
-    factories = {row.binding.capability_key: row for row in dynamics.EXECUTABLE_BINDING_FACTORIES}
+    factories = {row.binding.capability_key: row for row in dynamics.EXTENSION.factories}
     for declaration in original.operation_declarations():
         manifest = declaration.manifest()
         assert (manifest.fingerprint(), factories[manifest.capability_key].binding.fingerprint()) == expected[manifest.capability_key]
 
 
 def test_current_routes_have_explicit_native_preparers_and_closed_historical_inputs():
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.geometry_operation_bindings import operation_declarations
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.closed_raw_model_admission import InstanceChemicalForcePlan
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.serialized_nve_custody import SerializedCustodyNVEControlPlan
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.geometry_operation_bindings import operation_declarations
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.closed_raw_model_admission import InstanceChemicalForcePlan
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.serialized_nve_custody import SerializedCustodyNVEControlPlan
     declarations = (*original.operation_declarations(), *operation_declarations(), *sampling.operation_declarations())
     for declaration in declarations:
         registration = declaration.registration()
@@ -109,7 +107,7 @@ def test_same_sealed_input_can_be_rechecked_after_live_loader_consumption(tmp_pa
 
 
 def test_durable_invocation_canonical_encoder_preserves_original_record_and_definition_arrays(tmp_path):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_runner import _invocation_bytes
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_runner import _invocation_bytes
     _, bundle, _, _, contract, _ = _case(tmp_path, native=True)
     try:
         records = {name: ExposedInput("exposed." + name, "exact original exposed control")
@@ -145,16 +143,16 @@ class NoScience(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in {'numpy','scipy','openmm','parmed','pdbfixer','pybamm','flint'}:
             raise AssertionError('descriptor entered science: '+fullname)
 sys.meta_path.insert(0,NoScience())
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.executable_binding import EXECUTABLE_BINDING_FACTORIES as d
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.executable_binding import EXECUTABLE_BINDING_FACTORIES as s
-assert len(d)==4 and len(s)==2
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.extension import EXTENSION as dynamics
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.extension import EXTENSION as sampling
+assert len(dynamics.factories)==4 and len(sampling.factories)==2
 assert not any(name.endswith(('.native','.control_native_entry','.nve_native_entry','.ordinary_native_entry')) for name in sys.modules)
 '''
     result = subprocess.run((sys.executable, "-B", "-c", script), env=dict(os.environ), cwd=tmp_path,
         capture_output=True, text=True, check=False)
     assert result.returncode == 0, result.stderr
     refused = subprocess.run((sys.executable, "-B", "-m",
-        "empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.native",
+        "empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics.native",
         "--selected-preparation", str(tmp_path / "never-created")), env=dict(os.environ), cwd=tmp_path,
         capture_output=True, text=True, check=False)
     assert refused.returncode != 0

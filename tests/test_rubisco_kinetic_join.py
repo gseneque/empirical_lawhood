@@ -10,27 +10,20 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_assay_bridge import (
-    KineticAssayBridgeResult, KineticJointTargetAssessment,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.executable_binding import EXECUTABLE_BINDING_FACTORIES
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.operation_bindings import (
-    BUDGET, MEDIA, NAMESPACE, PHASES, KineticJoinConfig, KineticJoinRunner,
-    operation_manifests, operation_registrations, output_codecs,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.recursive_translation import kinetic_join_draft, scientific_work
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_supply import JointKineticSupply, KineticSupportInterval
-from empirical_lawhood.adapters.simulators.rubisco_assay.records import AssayQuery
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind,
-    WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort,
-)
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_assay_bridge import KineticAssayBridgeResult, KineticJointTargetAssessment
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.extension import EXTENSION as _extension_owner_1
+EXECUTABLE_BINDING_FACTORIES = _extension_owner_1.factories
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.operation_bindings import BUDGET, MEDIA, NAMESPACE, PHASES, KineticJoinConfig, KineticJoinRunner, operation_manifests, operation_registrations, output_codecs
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.recursive_translation import kinetic_join_draft, scientific_work
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_supply import JointKineticSupply, KineticSupportInterval
+from empirical_lawhood.domains.rubisco.assay.records import AssayQuery
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRegistry
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_rubisco_kinetic_supply import comparison, supply
 
 
@@ -143,7 +136,7 @@ def test_worker_refuses_stale_configuration_before_solver_and_closes_ports(monke
     runner, context, readers = worker("assay", science, [(science.supply.object_id, source), (science.query.object_id, query)])
     def forbidden(*args, **kwargs):
         raise AssertionError("bad configuration entered numerical work")
-    from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join import operation_bindings
+    from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join import operation_bindings
     monkeypatch.setattr(operation_bindings, "execute_kinetic_assay_bridge", forbidden)
     with pytest.raises(ValueError, match="immutable"):
         runner.execute(replace(context, config=replace(context.config, content_sha256="0" * 64)))
@@ -179,19 +172,23 @@ def test_unidentified_kinetics_stay_unentered_through_registered_consumers():
 
 def test_cold_descriptor_import_does_not_initialize_numerical_or_molecular_engines():
     code = (
-        "import sys; import empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.executable_binding; "
+        "import sys; import empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.extension; "
         "assert not {'numpy','scipy','openmm','pyscf','ash','pybamm'} & set(sys.modules)"
     )
     result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=False)
     assert result.returncode == 0, result.stderr
 
 
-def test_existing_composition_exports_resolve_to_the_same_explicit_owner():
+def test_scientific_composition_has_one_explicit_owner_without_adapter_facades():
     import empirical_lawhood.adapters.composition as compositions
-    from empirical_lawhood.adapters.composition import acquisition_recurrence_margin_contracts as owner
-    assert all(getattr(compositions, name) is getattr(owner, name) for name in compositions.__all__)
-    with pytest.raises(AttributeError):
-        compositions.unregistered_export
+    from empirical_lawhood.domains.reference_worlds.registration import acquisition_recurrence_margin_contracts as owner
+    assert owner.AcquisitionRecurrenceMarginContractRegistry.__module__ == owner.__name__
+    assert owner.build_acquisition_recurrence_margin_contract_registry.__module__ == owner.__name__
+    for removed in ("AcquisitionRecurrenceMarginContractRegistry",
+                    "build_acquisition_recurrence_margin_contract_registry",
+                    "acquisition_recurrence_margin_contracts"):
+        with pytest.raises(AttributeError):
+            getattr(compositions, removed)
 
 
 def test_source_canonical_identity_remains_exact_and_nonpromotable():

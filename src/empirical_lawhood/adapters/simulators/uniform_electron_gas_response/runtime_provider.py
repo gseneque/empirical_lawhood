@@ -1,40 +1,27 @@
-"""Selected synthetic uniform electron gas source provider; science stays in the adapter."""
+"""Selected synthetic uniform electron gas source provider; scientific construction and assessment use domain owners."""
+
+from empirical_lawhood.domains.materials.electron_gas.analytic_design import native_task_id as _ueg_native_task_id
 
 from dataclasses import fields
 from decimal import Decimal
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskProgressEmitter,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskProgressEmitter, TaskRunner
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .analytic_contracts import UniformElectronGasAnalyticPanel
-from .analytic_science import generate_analytic_panel
-from .extension_bundle import CAPABILITY
-from .native_quickstart import UniformElectronGasAnalyticReferenceConfig
+from empirical_lawhood.domains.materials.electron_gas.analytic_contracts import UniformElectronGasAnalyticPanel
+from empirical_lawhood.domains.materials.electron_gas.analytic_science import generate_analytic_panel
+from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.extension import CAPABILITY
+from empirical_lawhood.domains.materials.electron_gas.native_quickstart import UniformElectronGasAnalyticReferenceConfig
 
 
-def native_task_id(config: UniformElectronGasAnalyticReferenceConfig) -> str:
-    return f"{config.config_id}.native-panel"
+
 
 
 class UniformElectronGasAnalyticSourceRunner:
@@ -45,7 +32,7 @@ class UniformElectronGasAnalyticSourceRunner:
 
     def execute(self, context: TaskContext) -> RunnerResult:
         if (
-            context.task_id != native_task_id(self.config)
+            context.task_id != _ueg_native_task_id(self.config)
             or context.config.content_sha256 != self.config.fingerprint()
             or context.permissions != CAPABILITY.permissions
             or context.outcome_access is not OutcomeAccess.EVALUATION_SEALED
@@ -131,7 +118,7 @@ class UniformElectronGasAnalyticSourceProvider(CampaignRuntimeProvider):
         )
         if (
             len(tasks) != 1
-            or tasks[0].task_id != native_task_id(self.config)
+            or tasks[0].task_id != _ueg_native_task_id(self.config)
             or len(tasks[0].external_inputs) != 2
         ):
             raise ValueError(
@@ -188,4 +175,4 @@ class UniformElectronGasAnalyticSourceProvider(CampaignRuntimeProvider):
         self._check(registry)
 
 
-__all__ = ['UniformElectronGasAnalyticSourceProvider', "native_task_id"]
+__all__ = ['UniformElectronGasAnalyticSourceProvider']

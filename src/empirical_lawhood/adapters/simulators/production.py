@@ -6,27 +6,15 @@ from dataclasses import dataclass
 import hashlib
 from typing import ClassVar, Final
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
-from empirical_lawhood.planning.dataset_authority import DATASET_EXTERNAL_ROOT_CONTRACT_SCHEMA
-from empirical_lawhood.planning.dataset_manifests import DatasetRegistrationManifest
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, ImplementationSourceClosure
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.design.dataset_authority import DATASET_EXTERNAL_ROOT_CONTRACT_SCHEMA
+from empirical_lawhood.design.dataset_manifests import DatasetRegistrationManifest
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, ImplementationSourceClosure
 
-from .manifests import (
-    SimulatorHeldRegistrationDefinition,
-    SimulatorRegistrationManifestDependencies,
-    build_simulator_held_registration_manifest,
-)
-from .registry import (
-    SIMULATOR_DATASET_CONFIG_KEY,
-    SIMULATOR_DATASET_ENVIRONMENT_KEY,
-    SIMULATOR_DATASET_RUNTIME_KEY,
-    SIMULATOR_DIRECTORY_FORMAT_PROFILE_ID,
-    SimulatorDatasetRegistryProfile,
-    build_simulator_dataset_registry_profile,
-    simulator_dataset_capability_bindings,
-)
+from empirical_lawhood.adapters.simulators.manifests import SimulatorHeldRegistrationDefinition, SimulatorRegistrationManifestDependencies, build_simulator_held_registration_manifest
+from empirical_lawhood.adapters.simulators.registry import SIMULATOR_DATASET_CONFIG_KEY, SIMULATOR_DATASET_ENVIRONMENT_KEY, SIMULATOR_DATASET_RUNTIME_KEY, SIMULATOR_DIRECTORY_FORMAT_PROFILE_ID, SimulatorDatasetRegistryProfile, build_simulator_dataset_registry_profile, simulator_dataset_capability_bindings
 
 
 SIMULATOR_DATASET_PRODUCTION_PROFILE_ID: Final = "simulator-directory-registration"

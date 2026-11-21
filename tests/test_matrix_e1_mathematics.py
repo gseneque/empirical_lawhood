@@ -8,14 +8,12 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.products import _independent_leakage
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import (
-    causal_observations, lifetime, measure_sector, validate_trace,
-)
-from empirical_lawhood.adapters.methods.matrix_history_analysis import algebra
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_derivatives
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import su2_generators
-from empirical_lawhood.adapters.simulators.six_matrix_response.simulation import hermitian_noise
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.products import _independent_leakage
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import causal_observations, lifetime, measure_sector, validate_trace
+from empirical_lawhood.domains.matrix.matrix_history_analysis import algebra
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_derivatives
+from empirical_lawhood.domains.matrix.six_matrix_response.model import su2_generators
+from empirical_lawhood.domains.matrix.six_matrix_response.simulation import hermitian_noise
 from tests.test_matrix_factor_lifetime import spec
 from tests.test_matrix_parameter_native import REGIMES, coordinate, corpus
 

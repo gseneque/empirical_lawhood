@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-from empirical_lawhood._required_inputs import (
-    required_external_path,
-    required_external_sha256,
-)
+from empirical_lawhood._required_inputs import required_external_path, required_external_sha256
 
 from hashlib import sha256
 import json
@@ -15,9 +12,9 @@ import subprocess
 import tarfile
 from typing import Final
 
-from .material_source_design_contracts import SourceAssetLock, SourceMemberLock, SourceOutcomeRole
-from .material_source_design_source import _tar_inventory
-from .material_control_contracts import MaterialControlControlBundleQualification
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_contracts import SourceAssetLock, SourceMemberLock, SourceOutcomeRole
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_source_design_source import _tar_inventory
+from empirical_lawhood.domains.materials.superconductivity.material_control_contracts import MaterialControlControlBundleQualification
 
 
 TUTORIAL_ARCHIVE: Final = Path(

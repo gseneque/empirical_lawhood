@@ -8,23 +8,64 @@ import pytest
 
 from empirical_lawhood.api import development_output_repair as owner
 from empirical_lawhood.api.recursive_execution import _custody_control_pins, _external_inputs
-from empirical_lawhood.infrastructure.execution import DirectTaskExecutor, LocalScheduler, _return_nonstreaming_result
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore, decode_run_recovery_index, decode_run_recovery_terminal_event
-from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.development_output_repair import DevelopmentOutputBudgetRepair, DevelopmentOutputRepairRecoveryIndex
-from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, RunnerRegistry
-from empirical_lawhood.runtime.plans import PlanLane
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedWorkerEnvironment
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex, TaskRecoveryEvent
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.execution.local.execution import DirectTaskExecutor, LocalScheduler, _return_nonstreaming_result
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore, decode_run_recovery_index, decode_run_recovery_terminal_event
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.development_output_repair import DevelopmentOutputBudgetRepair, DevelopmentOutputRepairRecoveryIndex
+from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry
+from empirical_lawhood.execution.plans import PlanLane
+from empirical_lawhood.execution.prepared_native_invocation import PreparedWorkerEnvironment
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex, TaskRecoveryEvent
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.runtime_platform.test_execution_scheduler import StaticExternalInputResolver
 from tests.runtime_platform.test_recursive_compiler import Config, UseConfig, fixture
 from tests.runtime_platform.test_unlimited_recursive_execution import _ExposedOperandRunner
 from tests.test_recursive_public_service import ROOT, _plane
+
+
+class _IndexedRoster:
+    """Instrument sorted immutable facts without a hidden precomputed index."""
+
+    def __init__(self, rows):
+        self.rows = tuple(rows)
+        self.reads = 0
+
+    def __len__(self):
+        return len(self.rows)
+
+    def __getitem__(self, index):
+        self.reads += 1
+        return self.rows[index]
+
+    def __iter__(self):
+        raise AssertionError('a per-task repair lookup must not scan the whole roster')
+
+
+@pytest.mark.parametrize('size', (16, 4096))
+def test_repair_event_ownership_uses_bounded_roster_lookups(size):
+    # Full record and receipt authentication is covered by the lifecycle cases
+    # below. This disclosed projection isolates the per-event cost boundary.
+    rows = _IndexedRoster((f'task.{i:06d}', object()) for i in range(size))
+    predecessor = object()
+    selected = SimpleNamespace(repair=SimpleNamespace(completed_receipts=rows), predecessor=predecessor)
+    for task_id, expected_owner in ((f'task.{0:06d}', predecessor), (f'task.{size - 1:06d}', predecessor),
+                           ('task.999999', selected), ('task.-00001', selected)):
+        rows.reads = 0
+        assert DevelopmentOutputRepairRecoveryIndex.event_owner(selected, task_id) is expected_owner
+        assert rows.reads <= size.bit_length() + 1
+
+
+@pytest.mark.parametrize('size', (16, 4096))
+def test_output_repair_nonselected_tasks_do_not_rebuild_refusal_roster(size):
+    rows = _IndexedRoster((f'task.{i:06d}', object()) for i in range(size))
+    selected = SimpleNamespace(refused_tasks=rows)
+    original = SimpleNamespace(task_id='task.999999')
+    assert DevelopmentOutputBudgetRepair.task(selected, original) is original
+    assert rows.reads <= size.bit_length() + 1
 
 
 class _OutputBoundaryExecutor(DirectTaskExecutor):
@@ -37,16 +78,36 @@ class _OutputBoundaryExecutor(DirectTaskExecutor):
 
 class _DualOutputRunner(_ExposedOperandRunner):
     def execute(self, context):
-        from empirical_lawhood.runtime.execution import TaskOutputPayload
+        from empirical_lawhood.execution.execution import TaskOutputPayload
         result = super().execute(context)
         payload = result.outputs[0].payload
         return replace(result, outputs=tuple(TaskOutputPayload(port.output_id, payload) for port in context.output_ports))
 
 
+class _ScratchChainRunner(_ExposedOperandRunner):
+    def execute(self, context):
+        from empirical_lawhood.execution.execution import RunnerResult, TaskOutputPayload, WorkerInputKind
+        from empirical_lawhood.storage.contracts.artifacts import ReceiptCheck
+        self.calls += 1
+        values = [decode_canonical_bytes(port.read(), Config, maximum_bytes=None)
+            for port in context.input_ports if port.kind is WorkerInputKind.DEPENDENCY]
+        if context.task_id == 'source':
+            assert not values
+            scalar = 3
+        else:
+            operand, = values
+            assert operand.scalar == (3 if context.task_id == 'use' else 4)
+            scalar = operand.scalar + 1
+        raw = Config('product.' + context.task_id, scalar).canonical_bytes()
+        return RunnerResult(tuple(TaskOutputPayload(port.output_id, raw) for port in context.output_ports),
+            (ReceiptCheck('exposed-scratch-chain', True, ()),))
+
+
 def _sources():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import NUMERICAL_OWNER_PREFIXES
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import NUMERICAL_OWNER_PREFIXES
     names = tuple(sorted({*(prefix + 'exposed.py' if prefix.endswith(('/', '_')) else prefix
-        for prefix in NUMERICAL_OWNER_PREFIXES), 'kernel/exposed.py', 'api/exposed.py'}))
+        for prefix in NUMERICAL_OWNER_PREFIXES), 'science/exposed.py', 'methods/exposed.py', 'api/exposed.py',
+        'domains/matrix/matrix_scheduled_history/full_factor_science.py', 'domains/matrix/matrix_parameter_factor/science.py'}))
     def source(head):
         rows = tuple((name, head * 64 if name == 'api/exposed.py' else 'a' * 64) for name in names)
         return RecursiveImplementationBinding(rows, sha256(canonical_json_bytes(rows)).hexdigest(), 'b' * 64, head * 40, True)
@@ -62,8 +123,8 @@ def blocked_case(tmp_path, monkeypatch, request):
     declaration = registrations[1]
     registrations = (registrations[0], replace(declaration,
         outputs=(*declaration.outputs, replace(declaration.outputs[0], output_id='second'))))
-    if mode in ('dependent', 'native-dependent'):
-        from empirical_lawhood.planning.recursive_authoring import RecursiveOperationSpec
+    if mode in ('dependent', 'native-dependent', 'scratch-dependent'):
+        from empirical_lawhood.design.recursive_authoring import RecursiveOperationSpec
         required = replace(draft.requirements[0], requirement_id='requirement.tail',
             consumer_operation_id='tail', assessment_operation_id='tail')
         connection = replace(draft.connections[0], connection_id='connection.tail',
@@ -84,8 +145,10 @@ def blocked_case(tmp_path, monkeypatch, request):
         draft = replace(draft, requirements=(*draft.requirements, required), connections=(*draft.connections, connection),
             links=(*draft.links, link), operations=tuple(sorted((*draft.operations, operation), key=lambda row: row.node_id)),
             selected_operation_ids=('source', 'tail', 'use'))
-    draft = replace(draft, operations=tuple(replace(row, resource_budget=replace(row.resource_budget, output_bytes=160))
-        if row.node_id == 'use' else row for row in draft.operations))
+    scratch_mode = mode in ('scratch', 'scratch-legacy', 'scratch-dependent')
+    if not scratch_mode:
+        draft = replace(draft, operations=tuple(replace(row, resource_budget=replace(row.resource_budget, output_bytes=160))
+            if row.node_id == 'use' else row for row in draft.operations))
     original, controller = _sources()
     from empirical_lawhood.api import recursive_authoring as author
     from empirical_lawhood.api.recursive_execution import _retained_plans
@@ -104,13 +167,30 @@ def blocked_case(tmp_path, monkeypatch, request):
     index = DevelopmentRunRecoveryIndex.from_execution_plan(plan, run_id=run.run_plan_id,
         wave_id='wave.development', authority_identities=())
     recovery, receipts = ExternalRunRecoveryStore(plane), ExternalTaskReceiptStore(plane)
-    runners = tuple(_DualOutputRunner(manifest) for manifest in registry.capabilities)
+    runner_type = _ScratchChainRunner if scratch_mode else _DualOutputRunner
+    runners = tuple(runner_type(manifest) for manifest in registry.capabilities)
     native_keys = tuple(sorted(row.selection.capability_key for row in registrations if row.native_effect))
     if native_keys:
         from empirical_lawhood.api.development_controller_repair import _contacts
         contacts = _contacts(plane, plan)
     else:
         contacts = None
+    class ScratchBoundaryExecutor(DirectTaskExecutor):
+        def execute(self, runner, context, *, timeout_seconds):
+            from empirical_lawhood.execution.local.execution import LocalProcessExecutor, ResourceAdmissionError, TaskScratchIdentityConflict
+            relative = f'scratch/task-execution/{context.run_id}/{context.attempt_id}'
+            if plane.root.resolve(relative, for_write=False).exists():
+                try:
+                    return LocalProcessExecutor(scratch_root=plane.root).execute(runner, context,
+                        timeout_seconds=timeout_seconds)
+                except TaskScratchIdentityConflict as error:
+                    if mode == 'scratch-legacy':
+                        raise ResourceAdmissionError(str(error)) from error
+                    raise
+            return super().execute(runner, context, timeout_seconds=timeout_seconds)
+    if scratch_mode:
+        candidate, = index.task('use').attempts
+        plane.root.resolve(f'scratch/task-execution/{run.run_plan_id}/{candidate.attempt_id}', for_write=True).mkdir(parents=True)
     def scheduler(selected):
         engine = create_catalog_engine('sqlite+pysqlite:///:memory:')
         upgrade_catalog(engine)
@@ -118,7 +198,7 @@ def blocked_case(tmp_path, monkeypatch, request):
             receipt_store=receipts, recovery_index=selected, recovery_store=recovery,
             runner_registry=RunnerRegistry(runners, registry_sha256=registry.fingerprint()),
             implementation_commit='1' * 40, external_input_resolver=StaticExternalInputResolver(inputs),
-            executor=_OutputBoundaryExecutor(), input_port_factory=plane, lane=PlanLane.DEVELOPMENT,
+            executor=ScratchBoundaryExecutor() if scratch_mode else _OutputBoundaryExecutor(), input_port_factory=plane, lane=PlanLane.DEVELOPMENT,
             authorized_barriers=(), assurance_profile=ExecutionAssuranceProfile.TRUSTED_LOCAL,
             native_effect_contact_store=contacts, native_effect_capability_keys=native_keys)
     engine, original_scheduler = scheduler(index)
@@ -129,7 +209,7 @@ def blocked_case(tmp_path, monkeypatch, request):
     assert result.status is OperationalStatus.BLOCKED
     assert result.completed_task_ids == ('source',)
     terminal = recovery.read_terminal(index)
-    assert terminal.blocked_task_ids == (('tail', 'use') if mode in ('dependent', 'native-dependent') else ('use',))
+    assert terminal.blocked_task_ids == (('tail', 'use') if mode in ('dependent', 'native-dependent', 'scratch-dependent') else ('use',))
     environment = PreparedWorkerEnvironment('/disclosed/python', 'c' * 64, '/disclosed/environment', ())
     monkeypatch.setattr(owner, 'observe_frozen_repair_worker', lambda **kwargs: (original, environment))
     return SimpleNamespace(plan=plan, run=run, plane=plane, index=index, recovery=recovery, receipts=receipts,
@@ -189,6 +269,56 @@ def test_pure_output_repair_completes_without_repeating_source_or_replacing_fail
     assert all(pins[path] == (size, digest) for path, size, digest in before)
 
 
+@pytest.mark.parametrize('damage', (None, 'retained-receipt', 'new-event'))
+def test_repaired_terminal_batches_original_and_new_owners_with_final_guards(blocked_case, monkeypatch, damage):
+    from empirical_lawhood.storage import recovery as recovery_owner
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+    case = blocked_case
+    proof, index = _derive(case)
+    owner.publish_development_output_repair(writer=case.plane, repair=proof, index=index)
+    engine, scheduler = case.scheduler(index)
+    try:
+        result = scheduler.execute(case.run.run_plan_id, case.plan)
+        assert result.status is OperationalStatus.SUCCEEDED
+    finally:
+        engine.dispose()
+    terminal = case.recovery.read_terminal(index)
+
+    def read(recovery, receipts):
+        return recovery._reconcile_terminal(index=index, plan=case.plan, terminal=terminal,
+            repository=None, receipt_store=receipts, existing={},
+            candidate_count=sum(len(row.attempts) for row in index.tasks))
+
+    expected = read(case.recovery, case.receipts)
+    original = recovery_owner._RecoveryControlBatch.receipt_event
+    calls = []
+
+    def observe(controls, receipt):
+        event = original(controls, receipt)
+        expected_owner = case.index if receipt.task_id == 'source' else index
+        assert event.recovery_index == owner._pin(expected_owner, 'recovery_index_id')
+        calls.append(receipt.task_id)
+        if damage is not None and len(calls) == 1:
+            relative = (case.index.task('source').attempts[0].receipt_relative_path
+                        if damage == 'retained-receipt' else index.task('use').attempts[0].event_relative_path)
+            path = case.plane.root.resolve(relative, for_write=True)
+            path.write_bytes(path.read_bytes() + b' ')
+        return event
+
+    monkeypatch.setattr(recovery_owner._RecoveryControlBatch, 'receipt_event', observe)
+    if damage is None:
+        with case.plane.read_context() as plane:
+            actual = read(ExternalRunRecoveryStore(plane), ExternalTaskReceiptStore(plane))
+        assert actual == expected
+        assert calls == ['source', 'use']
+    else:
+        with pytest.raises((recovery_owner.RunRecoveryError, ArtifactIdentityConflict)):
+            with case.plane.read_context() as plane:
+                read(ExternalRunRecoveryStore(plane), ExternalTaskReceiptStore(plane))
+        assert calls
+    assert [runner.calls for runner in case.runners] == [1, 2]
+
+
 @pytest.mark.parametrize('damage', ('ceiling', 'no-increase', 'lock', 'science', 'worker', 'native', 'contact', 'output'))
 def test_pure_output_repair_refuses_changed_or_uncertain_work(blocked_case, monkeypatch, damage):
     case = blocked_case
@@ -200,7 +330,7 @@ def test_pure_output_repair_refuses_changed_or_uncertain_work(blocked_case, monk
     elif damage == 'lock':
         changes['controller'] = replace(case.controller, dependency_lock_sha256='e' * 64)
     elif damage == 'science':
-        rows = tuple((name, 'e' * 64 if name.startswith('kernel/') else digest)
+        rows = tuple((name, 'e' * 64 if name.startswith('science/') else digest)
             for name, digest in case.controller.package_sources)
         changes['controller'] = replace(case.controller, package_sources=rows,
             code_sources_sha256=sha256(canonical_json_bytes(rows)).hexdigest())
@@ -211,7 +341,7 @@ def test_pure_output_repair_refuses_changed_or_uncertain_work(blocked_case, monk
             for row in case.registrations)
         monkeypatch.setattr('empirical_lawhood.api.recursive_operations.operation_catalog', lambda: (rows, case.registry, {}))
     elif damage == 'contact':
-        monkeypatch.setattr('empirical_lawhood.infrastructure.native_effect_custody.ExternalNativeEffectContactStore.read',
+        monkeypatch.setattr('empirical_lawhood.storage.native_effect_custody.ExternalNativeEffectContactStore.read',
             lambda *args: object())
     else:
         path = case.plane.root.resolve(case.plan.task('use').outputs[0].relative_path, for_write=True)
@@ -222,16 +352,17 @@ def test_pure_output_repair_refuses_changed_or_uncertain_work(blocked_case, monk
     assert not case.plane.root.resolve(owner.repair_relative_path(case.index.run_id), for_write=False).exists()
 
 
-@pytest.mark.parametrize('limit', (0, -1, True, 256 * 1024**2 + 1))
-def test_output_repair_requires_positive_finite_allowance(blocked_case, limit):
-    with pytest.raises(ValueError):
+@pytest.mark.parametrize('limit,error', ((0, ValueError), (-1, ValueError), (True, ValueError),
+    (256 * 1024**2 + 1, PermissionError)))
+def test_output_repair_requires_positive_finite_allowance(blocked_case, limit, error):
+    with pytest.raises(error):
         _derive(blocked_case, output_bytes=limit)
 
 
 @pytest.mark.parametrize('blocked_case', ('dependent',), indirect=True)
 def test_repair_runs_previously_unstarted_dependency_once(blocked_case, monkeypatch):
-    from empirical_lawhood.runtime.artifacts import ReceiptCheck
-    from empirical_lawhood.runtime.execution import RunnerResult, TaskOutputPayload, WorkerInputKind
+    from empirical_lawhood.storage.contracts.artifacts import ReceiptCheck
+    from empirical_lawhood.execution.execution import RunnerResult, TaskOutputPayload, WorkerInputKind
     case = blocked_case
     proof, index = _derive(case)
     assert proof.unstarted_task_ids == ('tail',)

@@ -11,11 +11,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import exposure as owner
-from empirical_lawhood.adapters.simulators.six_matrix_response.contracts import BetaCouplingRule
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_response import exposure as owner
+from empirical_lawhood.domains.matrix.six_matrix_response.contracts import BetaCouplingRule
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -38,12 +38,12 @@ def census():
 def test_mandatory_floor_exactly_equals_independent_existing_effective_seed_union():
     modules_before = set(sys.modules)
     source = ROOT / 'src/empirical_lawhood'
-    original = literal_assignment(source / 'adapters/simulators/six_matrix_response/observation_order_scientific_inputs.py', '_STREAM_ROWS')
+    original = literal_assignment(source / 'domains/matrix/six_matrix_response/observation_order_scientific_inputs.py', '_STREAM_ROWS')
     observation = {int(digest[:32], 16) for block in original for _, _, digest in block}
     public_history = {int(sha256(b'empirical-lawhood/history/numeric/v1\0' + (706256).to_bytes(32, 'big')
         + index.to_bytes(2, 'big') + bytes([purpose])).hexdigest()[:32], 16)
         for index in range(256) for purpose in range(4)}
-    purposes = literal_assignment(source / 'kernel/matrix_inputs.py', 'MATRIX_NATIVE_PURPOSES')
+    purposes = literal_assignment(source / 'domains/matrix/input_contracts.py', 'MATRIX_NATIVE_PURPOSES')
     example = {*range(101, 101 + len(purposes)), 10001 >> 128}
     expected = observation | public_history | example
     assert (len(observation), len(public_history), len(example), len(expected)) == (1040, 1024, 10, 2074)
@@ -76,8 +76,8 @@ def test_current_census_roundtrip_uses_only_immutable_floor_and_explicit_facts(m
         pytest.fail('current census tried to load a historical package, example or file')
     monkeypatch.setattr(owner, 'files', forbidden)
     for name, attribute in (
-            ('empirical_lawhood.adapters.methods.matrix_prospective.example', 'example_source'),
-            ('empirical_lawhood.adapters.methods.matrix_history_analysis.records', 'matrix_known_exposed_effective_seeds')):
+            ('empirical_lawhood.domains.matrix.matrix_prospective.example', 'example_source'),
+            ('empirical_lawhood.domains.matrix.matrix_history_analysis.records', 'matrix_known_exposed_effective_seeds')):
         if name in sys.modules:
             monkeypatch.setattr(sys.modules[name], attribute, forbidden)
     value = census()
@@ -85,8 +85,8 @@ def test_current_census_roundtrip_uses_only_immutable_floor_and_explicit_facts(m
     assert decode_canonical_bytes(raw, owner.MatrixFactorExposureCensus, maximum_bytes=len(raw)) == value
     assert set(field.name for field in fields(value)).isdisjoint({
         'historical_bank', 'public_history_allocation', 'prior_allocations', 'prior_regimes', 'audit'})
-    assert not {'empirical_lawhood.adapters.methods.matrix_prospective.example',
-        'empirical_lawhood.adapters.methods.matrix_history_analysis.records'} & (set(sys.modules) - modules_before)
+    assert not {'empirical_lawhood.domains.matrix.matrix_prospective.example',
+        'empirical_lawhood.domains.matrix.matrix_history_analysis.records'} & (set(sys.modules) - modules_before)
 
 
 @pytest.mark.parametrize('damage', ('omitted', 'substituted-floor', 'duplicate', 'boolean', 'negative', 'too-wide', 'reordered'))
@@ -159,13 +159,9 @@ def test_physical_exclusion_is_unchanged_by_labels_and_refined_physical_clock():
 
 
 def test_current_support_is_one_exact_current_census_publication_without_historical_bodies():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import (
-        ScheduledExposureAudit, exposure_census_publication, exposure_support,
-    )
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import (
-        ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteResult, LogicalArtifactIdentity,
-    )
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import ScheduledExposureAudit, exposure_census_publication, exposure_support
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteResult, LogicalArtifactIdentity
     value = census()
     logical = LogicalArtifactIdentity('census.literal.current-publication', value.fingerprint(), value.SCHEMA,
         ArtifactProfile.CANONICAL_JSON, 'application/json', VisibilityCeiling.PROSPECTIVE, (), OutcomeAccess.OUTCOME_BLIND,

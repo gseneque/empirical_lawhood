@@ -1,0 +1,71 @@
+{
+  "schema": "el-v1/scientific-module-extraction/1",
+  "full_modules": {
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.authoring": "empirical_lawhood.domains.materials.electron_gas.authoring",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.analytic_authoring": "empirical_lawhood.domains.materials.electron_gas.analytic_authoring",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.candidate": "empirical_lawhood.domains.materials.electron_gas.candidate"
+  },
+  "symbols": {
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime:ADJUDICATION_SCOPE_ID": "empirical_lawhood.domains.materials.electron_gas.protocol:ADJUDICATION_SCOPE_ID",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime:CONFIG_ARTIFACT_ID": "empirical_lawhood.domains.materials.electron_gas.protocol:CONFIG_ARTIFACT_ID",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime:TRUTH_INPUT_STEP": "empirical_lawhood.domains.materials.electron_gas.protocol:TRUTH_INPUT_STEP",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime:uniform_electron_gas_transverse_screen_protocol": "empirical_lawhood.domains.materials.electron_gas.protocol:uniform_electron_gas_transverse_screen_protocol",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime:METHOD_STEP": "empirical_lawhood.domains.materials.electron_gas.protocol:METHOD_STEP",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime:EVALUATOR_STEP": "empirical_lawhood.domains.materials.electron_gas.protocol:EVALUATOR_STEP",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime:_RecordT": "empirical_lawhood.domains.materials.electron_gas.protocol:_RecordT",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime:ADMISSION_STEP": "empirical_lawhood.domains.materials.electron_gas.protocol:ADMISSION_STEP",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime:TRUTH_ORACLE_STEP": "empirical_lawhood.domains.materials.electron_gas.protocol:TRUTH_ORACLE_STEP",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime:CONFIG_SOURCE_ID": "empirical_lawhood.domains.materials.electron_gas.protocol:CONFIG_SOURCE_ID",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime:MEDIUM_ARTIFACT_ID": "empirical_lawhood.domains.materials.electron_gas.protocol:MEDIUM_ARTIFACT_ID",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime:config_ref": "empirical_lawhood.domains.materials.electron_gas.protocol:config_ref",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime_provider:native_task_id": "empirical_lawhood.domains.materials.electron_gas.analytic_design:native_task_id",
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.analytic_fresh_authoring:UniformElectronGasAnalyticAuthoringProfile": "empirical_lawhood.domains.materials.electron_gas.authoring_profile:UniformElectronGasAnalyticAuthoringProfile"
+  },
+  "partial_modules": {
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime": {
+      "scientific_owners": [
+        "empirical_lawhood.domains.materials.electron_gas.protocol"
+      ],
+      "symbols": [
+        "ADJUDICATION_SCOPE_ID",
+        "ADMISSION_STEP",
+        "CONFIG_ARTIFACT_ID",
+        "CONFIG_SOURCE_ID",
+        "EVALUATOR_STEP",
+        "MEDIUM_ARTIFACT_ID",
+        "METHOD_STEP",
+        "TRUTH_INPUT_STEP",
+        "TRUTH_ORACLE_STEP",
+        "_RecordT",
+        "config_ref",
+        "uniform_electron_gas_transverse_screen_protocol"
+      ]
+    },
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.runtime_provider": {
+      "scientific_owners": [
+        "empirical_lawhood.domains.materials.electron_gas.analytic_design"
+      ],
+      "symbols": [
+        "native_task_id"
+      ]
+    },
+    "empirical_lawhood.adapters.simulators.uniform_electron_gas_response.analytic_fresh_authoring": {
+      "scientific_owners": [
+        "empirical_lawhood.domains.materials.electron_gas.authoring_profile"
+      ],
+      "symbols": [
+        "UniformElectronGasAnalyticAuthoringProfile"
+      ]
+    }
+  },
+  "reference_updates": [
+    "src/empirical_lawhood/adapters/simulators/uniform_electron_gas_response/analytic_fresh_authoring.py",
+    "src/empirical_lawhood/api/composition.py",
+    "src/empirical_lawhood/api/uniform_electron_gas_authoring.py",
+    "src/empirical_lawhood/domains/materials/electron_gas/analytic_authoring.py",
+    "src/empirical_lawhood/domains/materials/electron_gas/authoring.py",
+    "src/empirical_lawhood/domains/materials/electron_gas/candidate.py",
+    "tests/test_uniform_electron_gas_candidate.py"
+  ],
+  "preservation": "All scientific protocol steps, visibility, barriers, schema strings, resources and derived identifiers unchanged. Native input decoding/loading and actual runtime effects remain adapters. No old whole-module bridge or scientific facade export retained."
+}

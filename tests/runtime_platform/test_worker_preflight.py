@@ -8,33 +8,29 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.composition.discovery import manifest
-from empirical_lawhood.adapters.methods.native_subwork_conformance import ExposedNativeSubworkRunner
-from empirical_lawhood.infrastructure.artifact_stream_primitives import (
-    _anonymous_input_descriptor, _PreopenedBoundedReader, _seal_anonymous_input,
-)
-from empirical_lawhood.infrastructure.execution import (
-    LocalProcessExecutor, TaskProcessError, WorkerPreflightError, prepare_worker_invocation,
-)
-from empirical_lawhood.infrastructure import execution as execution_owner
-from empirical_lawhood.infrastructure.numerical_provenance import capture_numerical_provenance
-from empirical_lawhood.infrastructure.prepared_native_invocation import NativeInputPublication, prepare_native_invocation
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationContext
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityPermission, CapabilityRequirement
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, RunnerResult, TaskContext, TaskOutputPayload, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkOutput, NativeSubworkRoster, NativeSubworkState
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ProtocolExecutionTask, ScientificInputRole, ScientificInputSpec, ScientificStage
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, PreparedNativeWork
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.execution.declaration_helpers import manifest
+from empirical_lawhood.methods.native_subwork_conformance import ExposedNativeSubworkRunner
+from empirical_lawhood.storage.artifact_stream_primitives import _anonymous_input_descriptor, _PreopenedBoundedReader, _seal_anonymous_input
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, TaskProcessError, WorkerPreflightError, prepare_worker_invocation
+from empirical_lawhood.execution.local import execution as execution_owner
+from empirical_lawhood.storage.numerical_provenance import capture_numerical_provenance
+from empirical_lawhood.storage.prepared_native_invocation import NativeInputPublication, prepare_native_invocation
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationContext
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityPermission, CapabilityRequirement
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, RunnerResult, TaskContext, TaskOutputPayload, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkOutput, NativeSubworkRoster, NativeSubworkState
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ProtocolExecutionTask, ScientificInputRole, ScientificInputSpec, ScientificStage
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, PreparedNativeWork
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.runtime_platform.test_native_subwork import ExposedInput, _plane, _store
 
 
@@ -582,6 +578,153 @@ def test_mutable_descriptor_cannot_mint_preflight_cursor(tmp_path):
         reader.close()
 
 
+def _typed_input(record):
+    raw = record.canonical_bytes()
+    descriptor = _anonymous_input_descriptor()
+    os.write(descriptor, raw)
+    _seal_anonymous_input(descriptor)
+    return _PreopenedBoundedReader(descriptor, maximum_bytes=len(raw)), raw
+
+
+def _typed_cursor(parent, kind, maximum):
+    cursor = parent.cursor()
+    try:
+        record = cursor.decode_canonical_record(kind, maximum_bytes=maximum)
+        assert cursor.bytes_read == maximum
+        return record
+    finally:
+        cursor.close()
+
+
+def test_typed_sealed_cursors_read_every_byte_and_release_the_owned_value(monkeypatch):
+    import gc
+    from weakref import ref
+    from empirical_lawhood.science.records import decoding
+    original = ObjectIdentity('exposed.typed-input', 'empirical-lawhood/tests/typed-input', '1.0.0', '1' * 64)
+    parent, raw = _typed_input(original)
+    decode = decoding.decode_canonical_bytes
+    calls = []
+    def measured(*args, **kwargs):
+        calls.append(len(args[0]))
+        return decode(*args, **kwargs)
+    monkeypatch.setattr(decoding, 'decode_canonical_bytes', measured)
+    try:
+        values = [_typed_cursor(parent, ObjectIdentity, len(raw)) for _ in range(3)]
+        assert values[0] is values[1] is values[2]
+        assert values[0] == original and calls == [len(raw)]
+        assert parent.bytes_read == 0
+        retained = ref(values[0])
+        del values
+        gc.collect()
+        assert retained() is not None
+    finally:
+        parent.close()
+    gc.collect()
+    assert retained() is None
+
+
+@pytest.mark.parametrize('boundary', ('decimal', 'validator', 'environment', 'library-threads'))
+def test_typed_input_reuse_invalidates_changed_validation_context(monkeypatch, boundary):
+    from contextlib import ExitStack
+    from decimal import localcontext
+    original = ObjectIdentity('exposed.typed-context', 'empirical-lawhood/tests/typed-input', '1.0.0', '2' * 64)
+    parent, raw = _typed_input(original)
+    try:
+        first = _typed_cursor(parent, ObjectIdentity, len(raw))
+        with ExitStack() as stack:
+            if boundary == 'decimal':
+                stack.enter_context(localcontext()).prec += 1
+            elif boundary == 'validator':
+                def reject(record):
+                    raise ValueError('changed original validator')
+                monkeypatch.setattr(ObjectIdentity, '__post_init__', reject)
+            elif boundary == 'environment':
+                monkeypatch.setenv('OMP_NUM_THREADS', '3')
+            else:
+                import numpy  # noqa: F401 -- Load the actual numerical library before changing its setting.
+                from threadpoolctl import threadpool_limits
+                stack.enter_context(threadpool_limits(limits=3))
+            if boundary == 'validator':
+                with pytest.raises(ValueError, match='changed original validator'):
+                    _typed_cursor(parent, ObjectIdentity, len(raw))
+                assert parent._decoded_owner['record'] is None
+            else:
+                assert _typed_cursor(parent, ObjectIdentity, len(raw)) == first
+                assert _typed_cursor(parent, ObjectIdentity, len(raw)) is not first
+    finally:
+        parent.close()
+
+
+def test_typed_input_thread_and_serialized_consumers_obtain_fresh_lifetimes():
+    from concurrent.futures import ThreadPoolExecutor
+    from contextvars import copy_context
+    import pickle
+    original = ObjectIdentity('exposed.typed-lifetimes', 'empirical-lawhood/tests/typed-input', '1.0.0', '3' * 64)
+    parent, raw = _typed_input(original)
+    try:
+        first = _typed_cursor(parent, ObjectIdentity, len(raw))
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            other = pool.submit(copy_context().run, _typed_cursor, parent, ObjectIdentity, len(raw)).result()
+        assert other == first and other is not first
+        assert _typed_cursor(parent, ObjectIdentity, len(raw)) is first
+        serialized = pickle.dumps(parent)
+        assert len(serialized) < 4096
+        restored = pickle.loads(serialized)
+        try:
+            assert restored._decoded_owner is None
+            decoded = _typed_cursor(restored, ObjectIdentity, len(raw))
+            assert decoded == first and decoded is not first
+        finally:
+            restored.close()
+        escaped = parent.cursor()
+        parent.close()
+        try:
+            decoded = escaped.decode_canonical_record(ObjectIdentity, maximum_bytes=len(raw))
+            assert decoded == first and decoded is not first
+        finally:
+            escaped.close()
+    finally:
+        parent.close()
+
+
+def test_typed_input_custom_mutable_records_and_unsealed_bytes_are_never_reused(tmp_path):
+    from tests.test_shared_decoded_record_store import Mutable
+    from empirical_lawhood.science.records.serialization import CanonicalizationError
+    parent, raw = _typed_input(Mutable({'value': 1}))
+    try:
+        for _ in range(2):
+            with pytest.raises(CanonicalizationError, match='unsupported canonical type'):
+                _typed_cursor(parent, Mutable, len(raw))
+        assert parent._decoded_owner['record'] is None
+        with pytest.raises(RuntimeError, match='byte allowance'):
+            _typed_cursor(parent, Mutable, len(raw) - 1)
+    finally:
+        parent.close()
+    class Custom(ExposedInput):
+        def canonical_bytes(self):
+            return super().canonical_bytes()
+    parent, raw = _typed_input(Custom('exposed.custom', 'one'))
+    try:
+        first = _typed_cursor(parent, Custom, len(raw))
+        second = _typed_cursor(parent, Custom, len(raw))
+        assert first == second and first is not second
+        assert parent._decoded_owner['record'] is None
+    finally:
+        parent.close()
+    path = tmp_path / 'mutable-canonical'
+    first, second = ExposedInput('exposed.input', 'one'), ExposedInput('exposed.input', 'two')
+    path.write_bytes(first.canonical_bytes())
+    reader = _PreopenedBoundedReader(os.open(path, os.O_RDONLY), maximum_bytes=path.stat().st_size)
+    try:
+        assert reader.decode_canonical_record(ExposedInput, maximum_bytes=path.stat().st_size) == first
+        path.write_bytes(second.canonical_bytes())
+        reader.seek(0)
+        assert reader.decode_canonical_record(ExposedInput, maximum_bytes=path.stat().st_size) == second
+        assert reader._decoded_owner is None
+    finally:
+        reader.close()
+
+
 def test_actual_worker_stop_reports_source_environment_and_leaves_inputs_unconsumed(tmp_path):
     plane, bundle, runner, context, contract, parent = _case(tmp_path, actual=True)
     try:
@@ -848,4 +991,26 @@ def test_actual_worker_additional_paths_refuse_context_source_or_real_byte_subst
         executor.close_run_workers()
         if substituted is not None:
             substituted.close()
+        bundle.close()
+
+
+def test_parent_reclaims_unused_preparation_pages_before_contact_and_proceed(tmp_path, monkeypatch):
+    from empirical_lawhood.execution.resources import process_memory
+    _, bundle, _, context, contract, parent = _case(tmp_path, native=True, nested=False)
+    connection = _Acknowledgements()
+    events = []
+    def release():
+        assert not connection.sent
+        events.append('unused-pages-returned')
+    def enter():
+        assert events == ['unused-pages-returned'] and not connection.sent
+        events.append('original-contact')
+        return parent, None
+    monkeypatch.setattr(process_memory, 'release_unused_process_memory', release)
+    try:
+        LocalProcessExecutor._admit_worker(_literal_readiness(contract), contract, connection,
+            context, tmp_path, enter, None)
+        assert events == ['unused-pages-returned', 'original-contact']
+        assert len(connection.sent) == 1 and connection.sent[0].proceed
+    finally:
         bundle.close()

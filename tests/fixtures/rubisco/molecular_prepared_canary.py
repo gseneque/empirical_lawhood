@@ -16,21 +16,16 @@ import subprocess
 import traceback
 from typing import ClassVar
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256, validate_stable_id
-from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256, validate_stable_id
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_native_entry import (
-    authenticate_engine_stock, authenticate_loaded_engine_modules, authenticate_tleap_search_stock,
-    selected_tleap_command, selected_tleap_environment,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_preparation import (
-    DurableCallLedger, complete_unit, file_chunks,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_free_energy import prospective_xtb as xtb
-from empirical_lawhood.adapters.methods.rubisco_insilico_free_energy import raw_coupled_return as raw
+from empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics.durable_native_entry import authenticate_engine_stock, authenticate_loaded_engine_modules, authenticate_tleap_search_stock, selected_tleap_command, selected_tleap_environment
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_preparation import DurableCallLedger, complete_unit, file_chunks
+from empirical_lawhood.domains.rubisco.rubisco_insilico_free_energy import prospective_xtb as xtb
+from empirical_lawhood.domains.rubisco.rubisco_insilico_free_energy import raw_coupled_return as raw
 
 
 TLEAP_SCRIPT = "\n".join(("source leaprc.protein.ff14SB", "source leaprc.water.tip3p",

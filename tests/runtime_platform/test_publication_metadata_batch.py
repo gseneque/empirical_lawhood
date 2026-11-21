@@ -13,13 +13,13 @@ from time import perf_counter
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.infrastructure import publication_metadata as original
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalRootUnavailable
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits, ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.storage import publication_metadata as original
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalRootUnavailable
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits, ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
 
 
 
@@ -44,7 +44,7 @@ def publication_case(directory, count=4, shape='singletons'):
     if shape == 'singletons':
         publications = tuple(plane.write(value) for value in requests)
     else:
-        publications = plane.write_batch(requests, compact_manifests=shape == 'shared')
+        publications = plane.write_batch(requests)
     manifests = tuple(plane.read_manifest(value.materialization.relative_path) for value in publications)
     return plane, publications, records, manifests
 

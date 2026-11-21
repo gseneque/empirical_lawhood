@@ -53,7 +53,7 @@ ready by discovery. For the exact prerequisites and exit codes, see the
 [CLI reference](cli.md).
 
 Fresh approval and response-algebra authority entry points, and persisted response-algebra conformance authorizations, use the
-[strict kernel UTC parser](../../src/empirical_lawhood/kernel/time.py): valid calendar dates, seconds, optional one-to-six digit fractions and a final `Z`.
+[strict kernel UTC parser](../../src/empirical_lawhood/science/models/time.py): valid calendar dates, seconds, optional one-to-six digit fractions and a final `Z`.
 Direct construction and canonical decoding now refuse conformance timestamps outside that grammar.
 Persisted approval records retain their calendar-valid legacy parser for identity-bearing signed strings,
 including omitted seconds, compact spellings and comma fractions. Replay preserves their original bytes and signatures.
@@ -100,7 +100,7 @@ Absent sampling assumptions leave the population warrant and transported qualifi
 
 ## Exact Decimal storage
 
-The shared [canonical encoder](../../src/empirical_lawhood/kernel/serialization.py) preserves each finite Decimal's numerical value.
+The shared [canonical encoder](../../src/empirical_lawhood/science/records/serialization.py) preserves each finite Decimal's numerical value.
 It uses exact fixed-point formatting, without arithmetic normalization.
 Precision, rounding mode, exponent limits and traps cannot change the bytes or fingerprint.
 The encoder does not change the caller's context or flags.
@@ -117,11 +117,11 @@ Bind fresh records to their actual source and bytes.
 ## Rigorous threshold rank
 
 Receiver-history, split-cohort and phase-diagram use one
-[rank implementation](../../src/empirical_lawhood/adapters/methods/certified_rank.py).
+[rank implementation](../../src/empirical_lawhood/methods/certified_rank.py).
 Its algorithm identity is `arb-inertia-exact-dyadic-v2`.
 Current configurations require this identity.
 All three families bind its source and the
-[endpoint converter](../../src/empirical_lawhood/adapters/methods/_arb.py) in their scientific and observer source identities.
+[endpoint converter](../../src/empirical_lawhood/methods/_arb.py) in their scientific and observer source identities.
 Those identities also include the canonical encoder.
 
 For the entered real binary64 matrix A, the mathematical target is:
@@ -173,7 +173,7 @@ residual_norm >= (sum_ij R_ij^2)^(1/4)
 Thus `residual_norm` bounds the square root of the Gram error in operator norm.
 It is not a QR reconstruction residual.
 Interval elimination separately encloses all errors in the inertia calculation.
-The [endpoint converter](../../src/empirical_lawhood/adapters/methods/_arb.py) stores the directed dyadic bound as an exact Decimal.
+The [endpoint converter](../../src/empirical_lawhood/methods/_arb.py) stores the directed dyadic bound as an exact Decimal.
 It does not truncate the bound to a fixed number of decimal digits.
 `separation_ratio` remains absent because this method makes no separation claim.
 

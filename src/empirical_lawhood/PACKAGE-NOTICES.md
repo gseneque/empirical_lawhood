@@ -61,6 +61,16 @@ available mathematical-owner identity and unresolved original producing chain.
 These source identities preserve provenance. They convey no historical
 execution authority, newly performed campaign or qualification.
 
+## Periodic Rubisco reference implementation
+
+Project-local PySCF derivatives under `adapters/methods/rubisco_response/`
+retain their Apache-2.0 terms and original upstream attribution.
+The colocated `pyscf-periodic-LICENSE.txt`, `pyscf-periodic-NOTICE.txt` and
+`pyscf-periodic-provenance.json` identify original and adapted source hashes.
+`pyscf-periodic-diis-storage-provenance.json` binds the later complete-vector
+storage change to its current source and the unchanged preceding provenance.
+These CPU reference components provide no GPU implementation or enzyme qualification.
+
 ## Vendored reactor inputs
 
 The three inputs under `_vendor/terminal_bench_science/`

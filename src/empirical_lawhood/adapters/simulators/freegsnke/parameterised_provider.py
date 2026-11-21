@@ -6,36 +6,22 @@ from dataclasses import dataclass, fields
 from enum import StrEnum
 from typing import ClassVar, Protocol, cast, runtime_checkable
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_ids,
-    require_sorted_unique_strings,
-    validate_stable_id,
-)
-from empirical_lawhood.planning.linked_campaign import LinkedCampaignStageRole
-from empirical_lawhood.planning.response_experiment import ResponseExperimentExtensionSet
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityManifest, CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignDisposition, LinkedCampaignStageEnvelope
-from empirical_lawhood.runtime.response_experiment_binding import materialise_native_execution_request
-from empirical_lawhood.runtime.response_experiment_ports import NativeExecutionRequest, ResponseSubstrateBinding
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_ids, require_sorted_unique_strings, validate_stable_id
+from empirical_lawhood.design.linked_campaign import LinkedCampaignStageRole
+from empirical_lawhood.design.response_experiment import ResponseExperimentExtensionSet
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.linked_campaigns import LinkedCampaignDisposition, LinkedCampaignStageEnvelope
+from empirical_lawhood.execution.response_experiment_binding import materialise_native_execution_request
+from empirical_lawhood.execution.response_experiment_ports import NativeExecutionRequest, ResponseSubstrateBinding
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .contracts import FreeGsnkeProcessRequest, FreeGsnkeSavedPreparation, FreeGsnkeSourceBinding, FreeGsnkeTargetEpisodeStatus, FreeGsnkeTargetProcessResponse, FreeGsnkeTargetWorkerInput
+from empirical_lawhood.domains.fusion.freegsnke.contracts import FreeGsnkeProcessRequest, FreeGsnkeSavedPreparation, FreeGsnkeSourceBinding, FreeGsnkeTargetEpisodeStatus, FreeGsnkeTargetProcessResponse, FreeGsnkeTargetWorkerInput
 
 
 FREEGSNKE_PARAMETERISED_PROVIDER_KEY = "freegsnke.parameterised-response-acquisition"

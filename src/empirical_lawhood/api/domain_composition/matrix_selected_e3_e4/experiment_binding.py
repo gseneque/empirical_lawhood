@@ -1,15 +1,12 @@
 # SPDX-License-Identifier: MPL-2.0
 """Select genuine authored DEV custody for the additive E3/E4 public route."""
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import PROTOCOL_ID, SelectedE3E4ExperimentSpecification
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import PROTOCOL_ID, SelectedE3E4ExperimentSpecification
 from empirical_lawhood.api.matrix_selected_e3_e4_runtime import bind_selected_e3_e4_development_runtime
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence
-from empirical_lawhood.api.selected_e3_access import (
-    bootstrap_authoring_input_access, bootstrap_development_input_access,
-    bootstrap_selected_input_access, select_current_e3_access, validate_development_read_access,
-)
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence
+from empirical_lawhood.api.selected_e3_access import bootstrap_authoring_input_access, bootstrap_development_input_access, bootstrap_selected_input_access, select_current_e3_access, validate_development_read_access
 
 
 def derive_inputs(**context):

@@ -14,22 +14,22 @@ import pytest
 
 from empirical_lawhood.api import development_structure_repair as owner
 from empirical_lawhood.api.recursive_execution import _external_inputs
-from empirical_lawhood.infrastructure.execution import DirectTaskExecutor, LocalScheduler, TaskProcessError
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.recursive_authoring import RecursiveOperationSpec
-from empirical_lawhood.runtime.artifacts import ReceiptCheck
-from empirical_lawhood.runtime.development_structure_repair import DevelopmentStructureRepair
-from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, RunnerRegistry, RunnerResult, TaskOutputPayload
-from empirical_lawhood.runtime.plans import PlanLane
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+from empirical_lawhood.execution.local.execution import DirectTaskExecutor, LocalScheduler, TaskProcessError
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.recursive_authoring import RecursiveOperationSpec
+from empirical_lawhood.storage.contracts.artifacts import ReceiptCheck
+from empirical_lawhood.execution.development_structure_repair import DevelopmentStructureRepair
+from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry, RunnerResult, TaskOutputPayload
+from empirical_lawhood.execution.plans import PlanLane
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
 from tests.runtime_platform.test_execution_scheduler import StaticExternalInputResolver
 from tests.runtime_platform.test_recursive_compiler import Config, UseConfig, fixture
 from tests.test_development_output_repair import _sources
@@ -44,7 +44,7 @@ def _source_changed(source, path, digest='f' * 64):
 
 
 def _graph():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_bindings import key
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_bindings import key
     draft, registrations, registry = fixture()
     tail = replace(registrations[1], selection=replace(registrations[1].selection, capability_key='generic.tail'))
     operation = RecursiveOperationSpec.from_config(node_id='tail', selection=tail.selection,
@@ -102,8 +102,10 @@ class _TransportFixtureExecutor(DirectTaskExecutor):
 @pytest.fixture
 def failed_structure(tmp_path, monkeypatch, request):
     from empirical_lawhood.api import experiment_execution_read
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_preparation import ScheduledFullFactorDevelopmentSpecification
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4ExperimentSpecification
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_preparation import ScheduledFullFactorDevelopmentSpecification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4ExperimentSpecification
     draft, registrations, registry = _graph()
     plane = _plane(tmp_path / 'disclosed-structural-repair')
     original, replacement = _sources()
@@ -112,7 +114,12 @@ def failed_structure(tmp_path, monkeypatch, request):
     def current():
         if access_state['revoked']:
             raise PermissionError('disclosed original permission revoked')
-    access = SimpleNamespace(require_current=current)
+    def require_member(manifest):
+        current()
+        assert manifest.logical.payload_schema == registry.SCHEMA
+        assert manifest.logical.content_sha256 == registry.fingerprint()
+        assert manifest.logical.outcome_access is OutcomeAccess.DEVELOPMENT_VISIBLE
+    access = SimpleNamespace(require_current=current, require_member=require_member)
     def produce(run_id, failure, specification_kind):
         compiled = compile_recursive_wave(draft=draft, registrations=registrations, registry=registry,
             implementation_commit=original.observed_git_head, run_plan_id=run_id, output_codecs={Config.SCHEMA:Config})
@@ -138,10 +145,17 @@ def failed_structure(tmp_path, monkeypatch, request):
         source_pin = ObjectIdentity.from_record('recursive-member.implementation', original)
         # Explicit companion lookup seam: this fixture is not an E4 programme.
         spec_pin = ObjectIdentity('specification.disclosed', specification_kind.SCHEMA, specification_kind.VERSION, 'c' * 64)
+        registry_pin = ObjectIdentity.from_record('recursive-member.registry', registry)
+        registry_bytes = registry.canonical_bytes()
         packet = AuthoredRecursiveWave('packet.' + run_id, draft_pin, source_pin, (
             RecursiveWaveMember('draft.json', draft_pin, len(draft.canonical_bytes())),
             RecursiveWaveMember('experiment-specification.json', spec_pin, 1),
-            RecursiveWaveMember('implementation.json', source_pin, len(original.canonical_bytes()))))
+            RecursiveWaveMember('implementation.json', source_pin, len(original.canonical_bytes())),
+            RecursiveWaveMember('registry.json', registry_pin, len(registry_bytes))))
+        scope = 'development' if specification_kind is SelectedE3E4ExperimentSpecification else 'development/structure/analysis'
+        plane.write(ArtifactWriteRequest(packet.packet_id + '.registry', scope + '/registry.json', registry.SCHEMA,
+            ArtifactProfile.CANONICAL_JSON, 'application/json', packet.packet_id, scope, registry_bytes,
+            VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
         return (packet, run, plan, index, original, access), result
     acquisition, acquired = produce('run.disclosed.acquisition', None, SelectedE3E4ExperimentSpecification)
     mode = getattr(request, 'param', 'value-error')
@@ -169,6 +183,32 @@ def test_structural_repair_binds_complete_primary_census_and_roundtrips(failed_s
     observed[-1]()
 
 
+def test_historical_structural_read_allows_only_unrelated_registry_changes(failed_structure, monkeypatch):
+    from empirical_lawhood.api import experiment_execution_read, recursive_operations
+    case = failed_structure
+    registrations, registry, codecs = recursive_operations.operation_catalog()
+    extra = replace(registry.capabilities[0], capability_key='unrelated.new-operation')
+    newer = replace(registry, capabilities=tuple(sorted((*registry.capabilities, extra), key=lambda row: row.registry_id)))
+    monkeypatch.setattr(recursive_operations, 'operation_catalog', lambda: (registrations, newer, codecs))
+    observed = []
+    # The fixture substitutes only authored-companion lookup. Registry member
+    # authentication has its own real-publication regression in execution reads.
+    def original_registry(**kwargs):
+        assert kwargs['plan'] is case.structural[2]
+        assert kwargs['access'] is case.structural[-1]
+        observed.append(kwargs['prefix'])
+        return registry
+    monkeypatch.setattr(experiment_execution_read, '_authored_execution_registry', original_registry)
+    owner._original_controls(writer=case.plane, directory=case.directory, historical=True)[-1]()
+    assert observed == ['development/structure/analysis']
+    with pytest.raises(PermissionError, match='original capability registry'):
+        owner._original_controls(writer=case.plane, directory=case.directory)
+    changed = replace(registry.capabilities[0], implementation_sha256='f' * 64)
+    newer = replace(registry, capabilities=(changed, *registry.capabilities[1:]))
+    with pytest.raises(PermissionError, match='original capability'):
+        owner._original_controls(writer=case.plane, directory=case.directory, historical=True)
+
+
 @pytest.mark.parametrize('failed_structure', ('other-error', 'partial-success'), indirect=True)
 def test_structural_repair_refuses_other_failures_or_successful_work(failed_structure):
     with pytest.raises(PermissionError, match='measurement failure|discard successful'):
@@ -184,7 +224,7 @@ def test_structural_repair_refuses_incomplete_or_uncertain_original_custody(fail
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(b'disclosed unreceipted output')
     elif damage == 'native-contact':
-        from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
+        from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
         monkeypatch.setattr(ExternalNativeEffectContactStore, 'read', lambda *args:object())
     elif damage == 'missing-terminal':
         case.plane.root.resolve(index.terminal_event_relative_path, for_write=True).unlink()
@@ -209,8 +249,9 @@ def test_structural_original_guard_stays_live_after_selection(failed_structure, 
 
 
 @pytest.mark.parametrize('path', (
-    'adapters/simulators/exposed.py', 'adapters/methods/matrix_scheduled_history/full_factor_science.py',
-    'adapters/methods/matrix_parameter_factor/science.py', 'kernel/exposed.py',
+    'adapters/simulators/exposed.py', 'domains/matrix/matrix_scheduled_history/full_factor_science.py',
+    'domains/matrix/matrix_parameter_factor/science.py', 'science/exposed.py', 'methods/exposed.py',
+    'kernel/exposed.py', 'storage/posthoc_sources.py', 'api/effective_law_comparison.py',
 ))
 def test_structural_repair_refuses_numerical_or_kernel_changes(path):
     original, replacement = _sources()
@@ -220,10 +261,48 @@ def test_structural_repair_refuses_numerical_or_kernel_changes(path):
 
 def test_structural_repair_permits_only_selected_adapter_metadata_changes():
     original, replacement = _sources()
-    changed = _source_changed(replacement, 'adapters/methods/matrix_scheduled_history/full_factor_records.py')
+    changed = _source_changed(replacement, 'domains/matrix/matrix_scheduled_history/full_factor_records.py')
     owner.require_structural_source(original, changed)
     with pytest.raises(ValueError, match='distinct source|dependency lock'):
         owner.require_structural_source(original, replace(changed, dependency_lock_sha256='f' * 64))
+
+
+@pytest.mark.parametrize('historical', (False, True))
+def test_repair_source_uses_original_owner_names_for_each_installation(historical):
+    from empirical_lawhood.api import development_controller_repair, development_output_repair
+
+    def layout(binding):
+        def original_name(path):
+            if historical:
+                return (path.replace('domains/matrix/', 'adapters/methods/')
+                        .replace('science/', 'kernel/').replace('methods/exposed.py', 'adapters/exposed.py'))
+            return path
+
+        names = tuple(sorted((original_name(path), digest) for path, digest in binding.package_sources))
+        return replace(binding, package_sources=names, code_sources_sha256=sha256(canonical_json_bytes(names)).hexdigest())
+
+    original, replacement = map(layout, _sources())
+    package = 'adapters/methods/' if historical else 'domains/matrix/'
+    extension = 'extension_bundle.py' if historical else 'extension.py'
+    numerical = 'matrix_factor_response/configured_protected_methods.py'
+    for verify in (development_output_repair._require_scientific_source,
+                   development_controller_repair.require_scientific_source, owner.require_structural_source):
+        verify(original, replacement)
+        with pytest.raises(ValueError, match='numerical owner'):
+            verify(original, _source_changed(replacement, package + numerical))
+        shadow = ('domains/matrix/' if historical else 'adapters/methods/') + numerical
+        with pytest.raises(ValueError, match='numerical owner'):
+            verify(original, _source_changed(replacement, shadow, dict(original.package_sources)[package + numerical]))
+
+    continuation = _source_changed(replacement, package + 'matrix_researcher_programme/' + extension)
+    development_controller_repair.require_scientific_source(original, continuation)
+    owner.require_structural_source(original, continuation)
+    with pytest.raises(PermissionError, match='scientific'):
+        development_output_repair._require_scientific_source(original, continuation)
+    structure = _source_changed(replacement, package + 'matrix_scheduled_history/full_factor_records.py')
+    owner.require_structural_source(original, structure)
+    with pytest.raises(PermissionError, match='scientific'):
+        development_controller_repair.require_scientific_source(original, structure)
 
 
 @pytest.mark.parametrize('confirmed', (False, None, 1))
@@ -249,8 +328,8 @@ def test_public_structural_repair_binds_instruction_and_workers(tmp_path, monkey
 
 
 def test_selected_structure_retains_original_custody_through_its_read(failed_structure):
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
     case = failed_structure
     observed = owner._original_controls(writer=case.plane, directory=case.directory)
     proof = owner._selection(case.plane, case.directory, observed,

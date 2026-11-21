@@ -5,16 +5,11 @@ from __future__ import annotations
 from hashlib import sha256
 from typing import Any
 
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
 
-from .contracts import ADJUDICATION_SCHEMA, ExcludedSolverControlConfig, ExcludedSolverControlSourceManifest, ExcludedSolverControlSolverSmokeResult, CAPABILITY_VERSION, CONFIG_SCHEMA, EVALUATOR_CAPABILITY_KEY, MaterialPreparationRecord, NumericalViewRecord, PREPARATION_CAPABILITY_KEY, SOLVER_CAPABILITY_KEY, SolverControlInputRecord, SolverRunObservation, decode_config_bytes
-from .system import task_budget
+from empirical_lawhood.domains.materials.superconductivity.solver_control_contracts import ADJUDICATION_SCHEMA, ExcludedSolverControlConfig, ExcludedSolverControlSourceManifest, ExcludedSolverControlSolverSmokeResult, CAPABILITY_VERSION, CONFIG_SCHEMA, EVALUATOR_CAPABILITY_KEY, MaterialPreparationRecord, NumericalViewRecord, PREPARATION_CAPABILITY_KEY, SOLVER_CAPABILITY_KEY, SolverControlInputRecord, SolverRunObservation, decode_config_bytes
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.system import task_budget
 
 
 CONFIG_SCHEMA_SHA256 = sha256(CONFIG_SCHEMA.encode("utf-8")).hexdigest()

@@ -6,10 +6,10 @@ import numpy as np
 import pytest
 
 from empirical_lawhood.api.finite_operands import original_f_operand_export
-from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge import RADIAL_STIFFNESS, TransientBridgeInput, current_root_fold_arrays, fit_bridge, mechanical_kernel
-from empirical_lawhood.kernel.matrix_inputs import MatrixAllocation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge import RADIAL_STIFFNESS, TransientBridgeInput, current_root_fold_arrays, fit_bridge, mechanical_kernel
+from empirical_lawhood.domains.matrix.input_contracts import MatrixAllocation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 
 
 def test_nonrestoring_kernel_matches_independent_convolution():

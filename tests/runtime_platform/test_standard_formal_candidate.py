@@ -4,14 +4,11 @@ from __future__ import annotations
 
 from dataclasses import replace
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import ReadinessStatus
-from empirical_lawhood.planning.experiment_entry import StudyDefinition
-from empirical_lawhood.planning.formal_gaps import (
-    FormalGapCoverageAssignment,
-    FormalGapCoverageDisposition,
-)
-from empirical_lawhood.runtime.candidate_compiler import CandidateCompilationDisposition, CandidateDiagnosticCode, StandardCandidateCompilationContext, compile_study_candidate
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import ReadinessStatus
+from empirical_lawhood.design.experiment_entry import StudyDefinition
+from empirical_lawhood.design.formal_gaps import FormalGapCoverageAssignment, FormalGapCoverageDisposition
+from empirical_lawhood.execution.candidate_compiler import CandidateCompilationDisposition, CandidateDiagnosticCode, StandardCandidateCompilationContext, compile_study_candidate
 from tests.experiment_entry_support import standard_authoring_for_draft
 from tests.runtime_platform.test_candidate_compiler import (
     _fixture,

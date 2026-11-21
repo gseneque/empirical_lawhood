@@ -6,10 +6,10 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import ClassVar
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
 
-from .contracts import ACTION_COLUMNS, GLENN_2026_PROFILE, GlennArchiveInput
-from .transform import transform_glenn_archive
+from empirical_lawhood.adapters.physical.glenn.contracts import ACTION_COLUMNS, GLENN_2026_PROFILE, GlennArchiveInput
+from empirical_lawhood.adapters.physical.glenn.transform import transform_glenn_archive
 
 
 @dataclass(frozen=True, slots=True)

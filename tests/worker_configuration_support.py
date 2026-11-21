@@ -3,8 +3,8 @@
 
 from dataclasses import replace
 
-from empirical_lawhood.runtime.plans import BarrierKind, ScientificInputRole, ScientificInputSpec
-from empirical_lawhood.runtime.recursive_compiler import configuration_edge_id, configuration_input_id
+from empirical_lawhood.execution.plans import BarrierKind, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.execution.recursive_compiler import configuration_edge_id, configuration_input_id
 
 
 def freeze_worker_configuration(task):

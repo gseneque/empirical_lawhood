@@ -1,17 +1,5 @@
-"""Shared split cohort history budget interchange contracts and denominator descriptors."""
+"""External execution and serialization integration for split cohort history budget.
 
-from .contracts import SplitCohortHistoryBudgetChallengeGeometry, SplitCohortHistoryBudgetChallengeNomination, SplitCohortHistoryBudgetConfig, SplitCohortHistoryBudgetDenominatorDescriptor, SplitCohortHistoryBudgetHistoryRankForecast, SplitCohortHistoryBudgetMethodFreeze, SplitCohortHistoryBudgetRecurrenceResult, SplitCohortHistoryBudgetSeedRosterCommitment, SplitCohortHistoryBudgetTerminalCloseout, SplitCohortHistoryBudgetTContinuationGateRecord, SplitCohortHistoryBudgetUnitAdjudication
-
-__all__ = [
-    'SplitCohortHistoryBudgetChallengeGeometry',
-    'SplitCohortHistoryBudgetChallengeNomination',
-    'SplitCohortHistoryBudgetConfig',
-    'SplitCohortHistoryBudgetDenominatorDescriptor',
-    'SplitCohortHistoryBudgetHistoryRankForecast',
-    'SplitCohortHistoryBudgetMethodFreeze',
-    'SplitCohortHistoryBudgetRecurrenceResult',
-    'SplitCohortHistoryBudgetSeedRosterCommitment',
-    'SplitCohortHistoryBudgetTerminalCloseout',
-    'SplitCohortHistoryBudgetTContinuationGateRecord',
-    'SplitCohortHistoryBudgetUnitAdjudication',
-]
+Scientific records and calculations are owned by domains.history.
+SPDX-License-Identifier: MPL-2.0
+"""

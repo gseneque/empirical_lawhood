@@ -6,15 +6,15 @@ from dataclasses import replace
 import pytest
 from tests.rubisco_inquiry_source_fixtures import successor_source_operands
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-from empirical_lawhood.kernel.scientific_contributions import ContributionManifest, ContributionProduct
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.plans import ScientificInputRole
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.plans import ScientificInputRole
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
 
 def portable_parent(supplier):
@@ -49,16 +49,14 @@ def compile_complete_draft(draft, owner):
 @pytest.mark.parametrize('family', ('rubisco', 'material'))
 def test_complete_source_then_portable_parent_and_instance_successor_compiles(family):
     if family == 'rubisco':
-        from empirical_lawhood.adapters.methods.rubisco_inquiry import science, operation_bindings as owner, recursive_translation as drafts
-        from empirical_lawhood.adapters.methods.rubisco_combinations.source_binding import (
-            WilsonArticleInputV1, TeParentGenbankInputV1, WILSON_SOURCE_SHA256, GENBANK_SOURCE_SHA256,
-        )
+        from empirical_lawhood.domains.rubisco.rubisco_inquiry import science, operation_bindings as owner, recursive_translation as drafts
+        from empirical_lawhood.domains.rubisco.rubisco_combinations.source_binding import WilsonArticleInputV1, TeParentGenbankInputV1, WILSON_SOURCE_SHA256, GENBANK_SOURCE_SHA256
         article, genbank = successor_source_operands()
         operands = (WilsonArticleInputV1('input.exposed-compile.article', WILSON_SOURCE_SHA256, article.decode()),
                     TeParentGenbankInputV1('input.exposed-compile.genbank', GENBANK_SOURCE_SHA256, genbank.decode()))
     else:
-        from empirical_lawhood.adapters.methods.analytic_material_inquiry import science, operation_bindings as owner, recursive_translation as drafts
-        from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.native_quickstart import UniformElectronGasAnalyticReferenceConfig
+        from empirical_lawhood.domains.materials.analytic_material_inquiry import science, operation_bindings as owner, recursive_translation as drafts
+        from empirical_lawhood.domains.materials.electron_gas.native_quickstart import UniformElectronGasAnalyticReferenceConfig
         operands = (decode_canonical_bytes(Path('programmes/materials/superconductivity/workflows/electron-gas-response/config.json').read_bytes(), UniformElectronGasAnalyticReferenceConfig, maximum_bytes=None),)
     # Exposed pure fixture arithmetic, then real compiler; no operation runner.
     supplier = science.supply(*operands)
@@ -67,7 +65,7 @@ def test_complete_source_then_portable_parent_and_instance_successor_compiles(fa
     assert all(value.scientific_role == ScientificInputRole.SOURCE.value for value in first.external_inputs)
     parent = portable_parent(supplier)
     later = drafts.use_draft(supplier, parent=parent)
-    from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
+    from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
     product = parent.products[0]
     origins = RecursiveInputOrigins(tuple(sorted((
         RecursiveInputOrigin(value.input_id, RecursiveInputOriginKind.CONTRIBUTION,

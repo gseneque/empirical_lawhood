@@ -4,36 +4,30 @@ from contextlib import ExitStack, contextmanager, nullcontext
 from dataclasses import dataclass
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import (
-    ConfiguredProtectedE3PreparationSelection, configured_preparation_types, validate_selection_science,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import validate_request_programme_inputs
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_records import NativeTrainingAcquisitionRequest
-from empirical_lawhood.adapters.methods.matrix_finite_dt_source_assembly import source_assembly_request_types
-from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.e4_inputs import compose_programme_e4_banks
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.input_records import _require_assay
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseProtocol
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import ConfiguredProtectedE3PreparationSelection, configured_preparation_types, validate_selection_science
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import validate_request_programme_inputs
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_records import NativeTrainingAcquisitionRequest
+from empirical_lawhood.domains.matrix.matrix_finite_dt_source_assembly import source_assembly_request_types
+from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.e4_inputs import compose_programme_e4_banks
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.input_records import _require_assay
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseProtocol
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
 from empirical_lawhood.api.matrix_sampling_runtime import _original_product_metadata
-from empirical_lawhood.api.matrix_selected_e3_e4_runtime import (
-    authenticate_selected_e3_assay, authenticate_selected_e3_public_package, authenticate_selected_e3_training_banks,
-)
+from empirical_lawhood.api.matrix_selected_e3_e4_runtime import authenticate_selected_e3_assay, authenticate_selected_e3_public_package, authenticate_selected_e3_training_banks
 from empirical_lawhood.api.native_training_banks import _read_instance
 from empirical_lawhood.api.recursive_authoring import load_authored_wave
 from empirical_lawhood.api.recursive_execution import _retained_plans
 from empirical_lawhood.api.recursive_operations import operation_catalog
 from empirical_lawhood.api.selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest, _read_exact_record
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticated_programme_inputs
-from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, inherited_visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, derived_outcome_access, lineage_parent_sort_key,
-)
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticated_programme_inputs
+from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, inherited_visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, derived_outcome_access, lineage_parent_sort_key
 
 
 @dataclass(frozen=True, slots=True)
@@ -83,11 +77,9 @@ def prepared_source_lineage(*, original_e3, development_product):
 @contextmanager
 def _original_e3_metadata_context(writer):
     """Reuse immutable original controls while reloading each actual grant."""
-    from .current_result_custody import CurrentResultPlanReader
-    from empirical_lawhood.infrastructure.artifacts import _has_stock_manifest_reads
-    from empirical_lawhood.infrastructure.study_issue import (
-        ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID,
-    )
+    from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
+    from empirical_lawhood.storage.artifacts import _has_stock_manifest_reads
+    from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID
 
     stock = _has_stock_manifest_reads(writer)
     publisher = ExternalIssuedStudyPublisher(artifact_plane=writer,
@@ -183,11 +175,11 @@ def _original_assay_provider_publications(*, writer, public, original_products, 
     own custody. They cannot substitute the original run's provider copies.
     This bounded metadata join grants no access and replays no scientific work.
     """
-    from .current_result_custody import authenticate_current_execution_plan
-    from .matrix_selected_e3_family import selected_e3_product_family
-    from .matrix_selected_producer_scope import _installed_task
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-    from empirical_lawhood.runtime.input_access import validated_task_scientific_input_edges
+    from empirical_lawhood.api.current_result_custody import authenticate_current_execution_plan
+    from empirical_lawhood.api.matrix_selected_e3_family import selected_e3_product_family
+    from empirical_lawhood.api.matrix_selected_producer_scope import _installed_task
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
+    from empirical_lawhood.execution.input_access import validated_task_scientific_input_edges
 
     if not callable(require_current):
         raise TypeError("programme E4 original inputs require their current access guard")
@@ -197,7 +189,7 @@ def _original_assay_provider_publications(*, writer, public, original_products, 
     binding = selected.prior_execution
     package, issued, _, _, _, _ = (_original_product_metadata(writer, selected, selected.record)
         if read_metadata is None else read_metadata(selected))
-    from .retained_e3_evidence import current_e3_evidence
+    from empirical_lawhood.api.retained_e3_evidence import current_e3_evidence
     evidence = current_e3_evidence(writer)
     plan = (evidence.reader.authenticate_execution_plan(package=package, issued=issued, run_id=binding.run_id)
         if evidence is not None else authenticate_current_execution_plan(
@@ -266,11 +258,11 @@ def _recorded_training_operands(writer, locator):
     fit receipts and native bank seals independently bind this acquisition.
     """
     from hashlib import sha256
-    from .experiment_execution_read import load_development_execution_controls
-    from .retained_e3_evidence import current_e3_evidence
-    from empirical_lawhood.infrastructure.recursive_custody import read_exposed_recursive_payload
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
+    from empirical_lawhood.api.experiment_execution_read import load_development_execution_controls
+    from empirical_lawhood.api.retained_e3_evidence import current_e3_evidence
+    from empirical_lawhood.storage.recursive_custody import read_exposed_recursive_payload
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
     evidence = current_e3_evidence(writer)
     if evidence is not None:
         evidence.require_access()
@@ -327,10 +319,8 @@ def authenticated_programme_e4_banks(*, artifact_writer, input_commitments, orig
     must keep this context open while consuming its shared parents or publishing
     derived metadata, and must perform its own current source admission.
     """
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import (
-        MatrixProgrammeInputCommitments, MatrixProgrammePublishedInput, MatrixProgrammeProducedInput,
-    )
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammeInputCommitments, MatrixProgrammePublishedInput, MatrixProgrammeProducedInput
     if type(maximum_source_bytes) is not int or maximum_source_bytes < 1:
         raise ValueError("programme E4 requires an explicit positive source byte budget")
     for selected, kind, handle in ((input_commitments, MatrixProgrammeInputCommitments, MatrixProgrammePublishedInput),
@@ -378,13 +368,13 @@ def authenticated_programme_e4_banks(*, artifact_writer, input_commitments, orig
             selected.require_record(record, pin)
             records.append(record)
         public, preparation, assay = records
-        from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+        from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
         if getattr(preparation, 'retention', None) is not None and scientific_reconstruction_enabled():
-            from .configured_e3_retained_read import retained_execution_read
+            from empirical_lawhood.api.configured_e3_retained_read import retained_execution_read
             lifetime.enter_context(retained_execution_read(writer=writer, retention=preparation.retention))
         with authenticated_programme_inputs(writer=writer, commitment=input_commitments,
                 maximum_source_bytes=maximum_source_bytes - original_bytes) as inputs:
-            from empirical_lawhood.infrastructure.matrix_completed_source import original_e3_commitment, original_e3_programme_inputs
+            from empirical_lawhood.adapters.matrix_storage.matrix_completed_source import original_e3_commitment, original_e3_programme_inputs
             e3_inputs = lifetime.enter_context(original_e3_programme_inputs(writer=writer, inputs=inputs,
                 maximum_source_bytes=maximum_source_bytes - original_bytes))
             e3_commitment = original_e3_commitment(writer, inputs, input_commitments)
@@ -406,7 +396,7 @@ def authenticated_programme_e4_banks(*, artifact_writer, input_commitments, orig
                 training_specification, training_request = _recorded_training_operands(writer, locator)
             training_inputs = e3_inputs
             if training_request.input_commitments != e3_commitment:
-                from empirical_lawhood.infrastructure.matrix_retained_training import authenticated_retained_training_source
+                from empirical_lawhood.adapters.matrix_storage.matrix_retained_training import authenticated_retained_training_source
                 retained, training_inputs = lifetime.enter_context(authenticated_retained_training_source(
                     writer=writer, inputs=e3_inputs, maximum_source_bytes=maximum_source_bytes - original_bytes))
                 if (retained.training_locator != locator or retained.input_commitments != training_request.input_commitments

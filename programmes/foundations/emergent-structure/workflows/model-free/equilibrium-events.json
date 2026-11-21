@@ -1,0 +1,251 @@
+{
+  "label": "Separate native equilibrium and finite-horizon event feasibility cohorts",
+  "roots": [
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700401
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700402
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700403
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700404
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700405
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700406
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700407
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700408
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700409
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700410
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700411
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700412
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700413
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700414
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700415
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700416
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700501
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700502
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700503
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700504
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700505
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700506
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700507
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700508
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700509
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700510
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700511
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700512
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700513
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700514
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700515
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700516
+    }
+  ],
+  "schema": "model-free-matrix-definition.v1",
+  "settings": {
+    "response": {
+      "selection_tick": 32
+    }
+  }
+}

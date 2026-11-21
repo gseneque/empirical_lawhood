@@ -6,22 +6,13 @@ from decimal import Decimal as D
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import ACTION_ROLES, PREDICTORS
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_contracts import (
-    MatrixResponseOriginSelection, MatrixResponsePopulationPolicy,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_frontier import (
-    MatrixResponseActionScale, MatrixResponseFrontierCell, MatrixResponseFrontierProtocol,
-    MatrixResponseHorizonLoss, MatrixResponseRootFrontier,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_population_statistics import (
-    HORIZONS, ROOT_IDS, STRATA, WARRANT, MatrixResponsePopulationStatistics,
-    MatrixResponsePopulationStatisticsSpec, population_statistics, query_statistics,
-    root_loss_bounds,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import ACTION_ROLES, PREDICTORS
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_contracts import MatrixResponseOriginSelection, MatrixResponsePopulationPolicy
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_frontier import MatrixResponseActionScale, MatrixResponseFrontierCell, MatrixResponseFrontierProtocol, MatrixResponseHorizonLoss, MatrixResponseRootFrontier
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_population_statistics import HORIZONS, ROOT_IDS, STRATA, WARRANT, MatrixResponsePopulationStatistics, MatrixResponsePopulationStatisticsSpec, population_statistics, query_statistics, root_loss_bounds
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 
 
 def obj(name):

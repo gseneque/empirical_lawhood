@@ -15,22 +15,19 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, TypeVar
 
-from empirical_lawhood.api.composition import (
-    OperatorApprovalRuntimeComposition,
-    compose_operator_approval_runtime,
-)
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError, read_bounded_bytes
-from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID
-from empirical_lawhood.kernel.authority import AuthorityAction, SourceAccessClass
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.systems import SystemSpec
-from empirical_lawhood.planning.approval import ApprovalGateAttestation, DurableAuthorizationRecord, FrozenIssuedStudyApprovalProposal
-from empirical_lawhood.planning.study_issue import StudyOperationAuthority
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile, resolve_external_root_contract
-from empirical_lawhood.runtime.study_issue import PublishedStudy, PublishedExecutableStudy, build_study_approval_proposal
+from empirical_lawhood.api.composition import OperatorApprovalRuntimeComposition, compose_operator_approval_runtime
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError, read_bounded_bytes
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID
+from empirical_lawhood.science.identity.authority import AuthorityAction, SourceAccessClass
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.models.systems import SystemSpec
+from empirical_lawhood.design.approval import ApprovalGateAttestation, DurableAuthorizationRecord, FrozenIssuedStudyApprovalProposal
+from empirical_lawhood.design.study_issue import StudyOperationAuthority
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile, resolve_external_root_contract
+from empirical_lawhood.execution.study_issue import PublishedStudy, PublishedExecutableStudy, build_study_approval_proposal
 
 R = TypeVar("R", bound=CanonicalRecord)
 
@@ -50,8 +47,8 @@ def make_assigned_reactor_profile(
     It neither draws seeds nor creates authority, signatures or scientific output.
     """
     from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import AssignedReactorAuthoringProfile
-    from empirical_lawhood.adapters.simulators.reactor_prefix_response.assigned import ReactorPrefixAssignedUnit, ReactorPrefixAssignment, ReactorPrefixPriorCensus
-    from empirical_lawhood.adapters.simulators.reactor_prefix_response.panel import SCENARIOS
+    from empirical_lawhood.domains.reactor.reactor_prefix_response.native_assigned import ReactorPrefixAssignedUnit, ReactorPrefixAssignment, ReactorPrefixPriorCensus
+    from empirical_lawhood.domains.reactor.reactor_prefix_response.native_panel import SCENARIOS
 
     if len(noise_seeds) != len(SCENARIOS):
         raise ValueError("exactly five explicit native noise seeds are required")

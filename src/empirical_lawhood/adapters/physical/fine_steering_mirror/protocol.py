@@ -10,7 +10,7 @@ import yaml  # type: ignore[import-untyped]
 
 from empirical_lawhood.adapters._bounded_files import AdapterFileBoundError, read_bounded_regular
 
-from .contracts import FineSteeringMirrorObservationOperatorSpec, FineSteeringMirrorProtocolSpec
+from empirical_lawhood.domains.optics.fine_steering_mirror.contracts import FineSteeringMirrorObservationOperatorSpec, FineSteeringMirrorProtocolSpec
 
 
 MAX_FSM_PROTOCOL_BYTES = 1024 * 1024

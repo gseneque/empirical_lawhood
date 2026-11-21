@@ -1,25 +1,14 @@
 """Import-safe metadata constructors shared by this finite assay adapter binding."""
 
-from empirical_lawhood.adapters.composition.discovery import (
-    manifest as _manifest,
-    component as _component,
-    bundle as _bundle,
-    executable as _executable,
-)
-from empirical_lawhood.adapters.composition.protocol_helpers import (
-    CANONICAL_MEDIA_TYPE as CANONICAL_MEDIA_TYPE,
-)
+from empirical_lawhood.execution.declaration_helpers import manifest as _manifest, component as _component, bundle as _bundle, executable as _executable
+from empirical_lawhood.execution.protocol_helpers import CANONICAL_MEDIA_TYPE as CANONICAL_MEDIA_TYPE
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityManifest,
-    CapabilityKind,
-    CapabilityPermission,
-)
-from empirical_lawhood.runtime.extension_bundles import ExtensionBundleContribution, ExtensionComponentRegistration, ExtensionComponentKind, ExtensionContributionKind
-from empirical_lawhood.runtime.executable_bindings import ExecutableCapabilityBinding
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityKind, CapabilityPermission
+from empirical_lawhood.execution.extension_bundles import ExtensionBundleContribution, ExtensionComponentRegistration, ExtensionComponentKind, ExtensionContributionKind
+from empirical_lawhood.execution.executable_bindings import ExecutableCapabilityBinding
 
 
 def manifest(

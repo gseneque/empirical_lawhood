@@ -6,6 +6,7 @@ The real store creates BEGIN/contact over those literal records but no native
 callback, response arrays, completion or successful receipt is produced. These
 controls establish neither genuine authority nor scientific qualification.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import fields, replace
 from decimal import Decimal
@@ -15,35 +16,32 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as methods
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_records import NativeTrainingFeatureBank, NativeTrainingOutcomeBank
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_response_records as records
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_unknown_response as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_inputs as allocation_owner
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_feature_records import ConfiguredProtectedE3CausalFeature
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_inputs import ConfiguredProtectedE3PreFitJoin
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_protocol import ConfiguredProtectedE3ProtocolProjection
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_preparation import ConfiguredProtectedE3ResponseOperands
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_selection import ConfiguredProtectedE3ResponseSelection
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_response_score_validation import validate_current_score
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_secondary_readout import _checked_pair, _observed_cell
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history, parameter_history_segments, parameter_source
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MatrixArrayMember
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactGenericValidation, ArtifactManifest, ArtifactMaterialization, ArtifactProfile,
-    ArtifactWriteRequest, LogicalArtifactIdentity,
-)
-from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition, NativeSubworkPartialOutput, NativeSubworkRoster, NativeSubworkState
-from empirical_lawhood.runtime.plans import ExecutionPlan, ExecutionTask
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as methods
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_records import NativeTrainingFeatureBank, NativeTrainingOutcomeBank
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_response_records as records
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_unknown_response as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_inputs as allocation_owner
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_feature_records import ConfiguredProtectedE3CausalFeature
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_inputs import ConfiguredProtectedE3PreFitJoin
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_protocol import ConfiguredProtectedE3ProtocolProjection
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_preparation import ConfiguredProtectedE3ResponseOperands
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_selection import ConfiguredProtectedE3ResponseSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_response_score_validation import validate_current_score
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_secondary_readout import _checked_pair, _observed_cell
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history, parameter_history_segments, parameter_source
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MatrixArrayMember
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactManifest, ArtifactMaterialization, ArtifactProfile, ArtifactWriteRequest, LogicalArtifactIdentity
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition, NativeSubworkPartialOutput, NativeSubworkRoster, NativeSubworkState
+from empirical_lawhood.execution.plans import ExecutionPlan, ExecutionTask
 from tests.test_matrix_configured_protected_prefix_worker_routing import (
     configured_prefix_case as configured_prefix_case, legacy_case as legacy_case,
     original_case as original_case,
@@ -163,8 +161,7 @@ def case(configured_prefix_case, legacy_case, tmp_path_factory):  # noqa: F811
         pub = plane.write(ArtifactWriteRequest("input.disclosed.unknown." + str(index), "unknown/inputs/" + str(index),
             record.SCHEMA, ArtifactProfile.CANONICAL_JSON, "application/json", "disclosed.unknown", "unknown/inputs",
             record.canonical_bytes(), VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
-        inputs.append(decode_artifact_manifest(plane.root.resolve(pub.materialization.relative_path + ".manifest.json",
-            for_write=False).read_bytes()))
+        inputs.append(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(pub.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()))
     inputs = tuple(inputs)
     parent = replace(prefix.history.native.definition.parent_contact, task_id=task, attempt_id="attempt.disclosed.unknown.response",
         execution_plan=_pin("plan.disclosed.unknown", ExecutionPlan), execution_task=_pin(task, ExecutionTask),
@@ -220,8 +217,8 @@ def test_real_begin_contact_roundtrip_remains_unknown_without_completion(case):
 
 
 def test_pure_projection_preserves_full_grid_forecasts_and_unknown_tags(case, monkeypatch):
-    from empirical_lawhood.adapters.methods import matrix_dataset_readers
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_science
+    from empirical_lawhood.domains.matrix import matrix_dataset_readers
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_science
 
     monkeypatch.setattr(matrix_dataset_readers, "retained_array_mappings", _blocked)
     monkeypatch.setattr(response_science, "native_responses", _blocked)

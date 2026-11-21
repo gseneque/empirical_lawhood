@@ -1,10 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Reactor public source-custody names over the shared authoring owner."""
 
-from empirical_lawhood.api.authoring_handoff import (
-    authenticate_authoring_source,
-    read_authoring_source_companion,
-)
+from empirical_lawhood.api.authoring_handoff import authenticate_authoring_source, read_authoring_source_companion
 
 
 def read_reactor_source_companion(*, writer, directory, name, expected_schema):

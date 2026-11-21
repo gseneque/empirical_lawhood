@@ -6,13 +6,13 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.simulators.rc_ladder_response.campaign import VIEWS, check_native_views, run_native_view
-from empirical_lawhood.adapters.simulators.rc_ladder_response.contracts import ResistorCapacitorLadderStudyConfig
-from empirical_lawhood.adapters.simulators.rc_ladder_response.executable_binding import BINDING, ResistorCapacitorLadderNativeFactory
-from empirical_lawhood.adapters.simulators.rc_ladder_response.extension_bundle import CAPABILITY
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
+from empirical_lawhood.domains.circuits.rc_ladder.campaign import VIEWS, check_native_views, run_native_view
+from empirical_lawhood.domains.circuits.rc_ladder.contracts import ResistorCapacitorLadderStudyConfig
+from empirical_lawhood.adapters.simulators.rc_ladder_response.extension import BINDING, ResistorCapacitorLadderNativeFactory
+from empirical_lawhood.adapters.simulators.rc_ladder_response.extension import CAPABILITY
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
 
 ROOT = Path(__file__).resolve().parents[1]
 STUDY = ROOT / "programmes/foundations/measurement-and-response/workflows/rc-ladder-response/study.json"

@@ -7,13 +7,13 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_observation_inquiry import precision_control as sc
-from empirical_lawhood.adapters.methods.battery_observation_inquiry import contracts as ct
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_observation_contracts as oc
-from empirical_lawhood.infrastructure.execution import LocalScheduler, ResourceAdmissionError
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
+from empirical_lawhood.domains.battery.battery_observation_inquiry import precision_control as sc
+from empirical_lawhood.domains.battery.battery_observation_inquiry import contracts as ct
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_observation_contracts as oc
+from empirical_lawhood.execution.local.execution import LocalScheduler, ResourceAdmissionError
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
 
 
 @pytest.fixture
@@ -131,7 +131,7 @@ def test_additional_native_payload_cost_is_scoped_once_to_main(control, monkeypa
 
 
 def test_request_scope_rejects_changed_solver_default_and_restores_reader(control, monkeypatch):
-    from empirical_lawhood.adapters.methods.battery_segmented_inquiry import evidence_stream as stream
+    from empirical_lawhood.domains.battery.battery_segmented_inquiry import evidence_stream as stream
     record, _, _ = witness(control)
     # The exposed iterator isolates the new request guard; ordinary frame/custody
     # validity is still owned and exercised by the existing full-state tests.
@@ -157,8 +157,8 @@ def test_request_scope_rejects_changed_solver_default_and_restores_reader(contro
 
 def test_authenticated_config_replay_preserves_binding_and_exact_bytes():
     import io
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort
     payload = b'{"original":"exact canonical byte spelling"}'
     binding = WorkerInputBinding('config.exposed-original', 'materialization.exposed-original',
         'empirical-lawhood/exposed/original-record', 'application/json', len(payload),
@@ -208,8 +208,8 @@ def test_runtime_wrapper_emits_policy_and_actual_assignment_through_original_cus
 def test_passive_operator_capture_retains_actual_function_and_complete_sparse_matrix(control):
     import casadi
     from scipy.sparse import diags
-    from empirical_lawhood.adapters.methods.battery_observation_inquiry import processed_operator as po
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import preparation_contracts as pc
+    from empirical_lawhood.domains.battery.battery_observation_inquiry import processed_operator as po
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import preparation_contracts as pc
     # Exposed numerical fixture: no battery construction or scientific authority.
     t, y, p = casadi.MX.sym('t'), casadi.MX.sym('y', 174), casadi.MX.sym('p', 2)
     rhs = casadi.Function('exposed_rhs', [t, y, p], [y[:173] * p[0]])

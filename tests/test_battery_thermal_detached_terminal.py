@@ -8,9 +8,7 @@ import weakref
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.native import (
-    detached_terminal_solution,
-)
+from empirical_lawhood.adapters.battery.battery_thermal_inquiry.native import detached_terminal_solution
 
 pytestmark = pytest.mark.native("pybamm")
 

@@ -5,6 +5,7 @@ Real atomic publications/locks/physical guards are used. The orchestration fixtu
 explicitly substitutes graph/native metadata boundaries and is not an actual TRAIN
 run, replay, qualification, or whole historical-export adoption proof.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 from dataclasses import replace
 from hashlib import sha256
 from types import SimpleNamespace
@@ -13,19 +14,17 @@ import os
 import pytest
 
 from empirical_lawhood.api import native_training_export_resume as api
-from empirical_lawhood.infrastructure.artifacts import (
-    ArtifactIdentityConflict, ArtifactPlaneError, ExternalArtifactPlane, ExternalRootUnavailable, GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ArtifactPlaneError, ExternalArtifactPlane, ExternalRootUnavailable, GuardedExternalRoot
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
 from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ExternalRootContract, lineage_parent_sort_key
-from empirical_lawhood.runtime.native_training_export import NativeTrainingExportAdoptionSelection
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ExternalRootContract, lineage_parent_sort_key
+from empirical_lawhood.execution.native_training_export import NativeTrainingExportAdoptionSelection
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 
 
 def identity(name):
@@ -126,14 +125,14 @@ def test_real_atomic_banks_authenticate_only_their_reconstructed_bytes_and_linea
 
 @pytest.mark.parametrize('damage',('body','sidecar','marker','missing','parents','reconstructed-body','split-atomic','extra-atomic-member','ancestor'))
 def test_real_bank_admission_refuses_changed_physical_or_producer_custody(boundary,damage):
-    from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
+
     b=boundary;pubs=b.publications;values=b.values;parents=b.parents
     if damage=='body':
         p=b.path/'banks/allocation.json';p.write_bytes(b'x'*p.stat().st_size);expected=ArtifactPlaneError
     elif damage=='sidecar':
         p=b.path/pubs[0].manifest_materialization.relative_path
     elif damage=='marker':
-        m=decode_artifact_manifest((b.path/pubs[0].manifest_materialization.relative_path).read_bytes())
+        m=resolve_artifact_sidecar_bytes(b.plane, (b.path / pubs[0].manifest_materialization.relative_path).read_bytes())
         (b.path/m.publication.commit_marker_relative_path).write_bytes(b'{}');expected=ArtifactPlaneError
     elif damage=='missing':
         (b.path/'banks/allocation.json').unlink();expected=ArtifactPlaneError
@@ -226,7 +225,7 @@ def test_actual_product_decoder_refuses_foreign_or_failed_original_receipt(tmp_p
 def orchestration(boundary,monkeypatch):
     """Real bank/lock/final guards; disclosed compact/graph/native metadata seams."""
     from empirical_lawhood.api import native_training_banks, recursive_execution
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition
     b=boundary;draft=object();run=SimpleNamespace(run_plan_id=b.selection.run_id)
     products={'receipts':{r.task_id:r for r in b.receipts}}
     report={'status':'SUCCEEDED','run_id':b.selection.run_id,'packet_sha256':b.packet.fingerprint()}
@@ -247,7 +246,7 @@ def orchestration(boundary,monkeypatch):
         return features,outcomes,lambda:events.append('final-native-custody')
     monkeypatch.setattr(api,'_authenticate_receipt_reconstruction',native)
     monkeypatch.setattr(native_training_acquisition,'export_training_banks',lambda *_,**__:b.values)
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_acquisition import entry_task_id
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_acquisition import entry_task_id
     def decoded_batch(*,consume,**_):
         return consume(object(),{(entry_task_id(b.specification),'product'):b.publications[0]})
     monkeypatch.setattr(api,'_consume_receipt_products',decoded_batch)
@@ -262,7 +261,7 @@ def adopt(b):
 
 def test_disclosed_orchestration_has_fresh_proof_each_call_without_math(orchestration,monkeypatch):
     from empirical_lawhood.api import native_training_banks, matrix_native_acquisition_replay
-    from empirical_lawhood.infrastructure import matrix_array_io
+    from empirical_lawhood.adapters.matrix_storage import matrix_array_io
     b,_,_,events=orchestration
     def forbidden(*_,**__):pytest.fail('receipt reconstruction invoked numerical/native execution')
     monkeypatch.setattr(native_training_banks,'export_native_training_banks',forbidden)
@@ -318,7 +317,7 @@ def batch(boundary,monkeypatch):
 
 
 def test_actual_closed_product_batch_once_decodes_all_and_preserves_receipt_binding(batch,monkeypatch):
-    from empirical_lawhood.infrastructure import publication_metadata
+    from empirical_lawhood.storage import publication_metadata
     b,products,plan=batch;seen=[];original=publication_metadata.consume_published_materializations
     def counted(plane,publications,*,consume):
         seen.append(len(publications))
@@ -358,8 +357,8 @@ def test_actual_closed_product_batch_refuses_before_callback_result_escapes(batc
 
 @pytest.mark.parametrize('damage',('instance-read','registry','base-write','scoped-write','scoped-verify','scoped-stream-identity'))
 def test_custom_policy_refuses_before_lock_or_path_admission(boundary,monkeypatch,damage):
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-    from empirical_lawhood.infrastructure.artifacts import _ScopedArtifactPlane
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.storage.artifacts import _ScopedArtifactPlane
     b=boundary
     if damage=='instance-read':b.plane.read_manifest=lambda *_:None
     elif damage=='registry':b.plane.validators=ArtifactProfileValidatorRegistry()
@@ -407,7 +406,7 @@ def test_final_native_inspection_refuses_late_real_store_begin_before_adoption_r
 @pytest.mark.parametrize('damage',('missing-root','wrong-terminal','denominator','negative-preserved'))
 def test_shared_terminal_guard_preserves_whole_denominators_and_negative_states(monkeypatch,damage):
     from empirical_lawhood.api.matrix_native_training_read import _validate_complete_root_results
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as r
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as r
     spec=SimpleNamespace(specification_id='spec.fixture',identity=ObjectIdentity('spec.fixture',r.NativeTrainingAcquisitionSpecification.SCHEMA,'1.0.0','a'*64))
     seal=SimpleNamespace(identity=ObjectIdentity('seal.fixture',r.NativeTrainingAcquisitionSeal.SCHEMA,'1.0.0','b'*64))
     fs=tuple(SimpleNamespace(unit_id='unit.'+str(i),disposition='UNAVAILABLE') for i in (1,2))
@@ -432,7 +431,7 @@ def test_shared_terminal_guard_preserves_whole_denominators_and_negative_states(
 @pytest.mark.parametrize('mutation',(False,True))
 def test_existing_root_local_scopes_bound_rosters_and_guard_cross_root_mutation(boundary,root_count,mutation):
     from contextlib import ExitStack
-    from empirical_lawhood.infrastructure.publication_metadata import authenticate_published_materialization
+    from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization
     b=boundary;publications=[]
     for i in range(root_count):
         value=record('native-control.root.'+str(i))
@@ -478,7 +477,7 @@ def test_actual_closed_batch_keeps_two_labels_from_one_producing_receipt(boundar
     products={'receipts':{task_id:receipt},'outputs':{p.logical.logical_artifact_id:b.plane.read_manifest(p.materialization.relative_path) for p in pubs}}
     monkeypatch.setattr(api,'_receipt_product_contracts',lambda _:(('literal',task_id,ObjectIdentity,'checkpoint'),('literal',task_id,ObjectIdentity,'score')))
     seen=[]
-    from empirical_lawhood.kernel import decoding
+    from empirical_lawhood.science.records import decoding
     original=decoding.decode_canonical_bytes
     def counted(raw,kind,**kw):
         if kind is ObjectIdentity:seen.append(sha256(raw).hexdigest())
@@ -499,8 +498,8 @@ def test_actual_reconstruction_closure_reinspects_late_native_begin_with_literal
     from contextlib import ExitStack
     from tests.runtime_platform.test_native_subwork import _selected
     from empirical_lawhood.api import matrix_native_read_custody, matrix_native_training_read, matrix_native_acquisition_replay
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as r
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as owner
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as r
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as owner
     component=tmp_path/'native-closure';component.mkdir();store,definition,inputs=_selected(component)
     spec=SimpleNamespace(root_ids=('root.fixture',),object_id='spec.fixture')
     plan=SimpleNamespace(source_plan=SimpleNamespace(object_id='run.fixture'))

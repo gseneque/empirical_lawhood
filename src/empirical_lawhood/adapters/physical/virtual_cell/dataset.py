@@ -8,7 +8,11 @@ layers.  In particular, ordinary inspection refuses the real test H5AD.
 
 from __future__ import annotations
 
+from empirical_lawhood.domains.biology.virtual_cell.response_reduction import (selected_control_rows, normalization_total, normalize_control_values, canonical_sparse_row, ResponseMomentAccumulator)
+
 from bisect import bisect_right
+
+from empirical_lawhood.domains.biology.virtual_cell.response_summary import _require_positive_integer, ResponseSummaryArrays, require_response_summary_support, ControlReservoirArrays
 from collections.abc import Sequence
 from dataclasses import dataclass
 import hashlib
@@ -21,24 +25,10 @@ import h5py  # type: ignore[import-untyped]
 import numpy as np
 from numpy.typing import NDArray
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_strings,
-    validate_nonempty,
-    validate_sha256,
-    validate_stable_id,
-)
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_strings, validate_nonempty, validate_sha256, validate_stable_id
 
-from .contracts import (
-    MatrixEncoding,
-    SplitCardinality,
-    VirtualCellContractError,
-    VirtualCellSourceManifest,
-    VirtualCellSourceObject,
-    VirtualCellSourcePart,
-    VirtualCellSplit,
-)
+from empirical_lawhood.domains.biology.virtual_cell.contracts import MatrixEncoding, SplitCardinality, VirtualCellContractError, VirtualCellSourceManifest, VirtualCellSourceObject, VirtualCellSourcePart, VirtualCellSplit
 
 
 _COPY_CHUNK_BYTES = 8 * 1024**2
@@ -90,9 +80,6 @@ _SOURCE_OBJECT_IDENTITIES = {
 }
 
 
-def _require_positive_integer(value: int, *, field_name: str) -> None:
-    if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
-        raise ValueError(f"{field_name} must be a positive integer")
 
 
 def _decode_text(value: object, *, field_name: str) -> str:
@@ -695,164 +682,11 @@ def _read_h5ad_column(group: h5py.Group, field: str, *, expected_rows: int) -> N
     return cast(NDArray[np.str_], categories[codes])
 
 
-@dataclass(frozen=True, slots=True)
-class ResponseSummaryArrays:
-    """In-memory target/batch sufficient statistics for pure analysis code."""
-
-    group_ids: tuple[str, ...]
-    target_ids: tuple[str, ...]
-    batch_ids: tuple[str, ...]
-    gene_ids: tuple[str, ...]
-    normalization: str
-    normalization_target_sum: float | None
-    cell_counts: NDArray[np.int64]
-    means: NDArray[np.float64]
-    variances: NDArray[np.float64]
-
-    def __post_init__(self) -> None:
-        group_count = len(self.group_ids)
-        gene_count = len(self.gene_ids)
-        if group_count == 0 or gene_count == 0:
-            raise ValueError("response summary cannot be empty")
-        if self.normalization not in {"source", "log1p-cp10000", "log1p-fixed-total"}:
-            raise ValueError("response summary normalization is unknown")
-        if self.normalization == "log1p-fixed-total":
-            if (
-                self.normalization_target_sum is None
-                or not math.isfinite(self.normalization_target_sum)
-                or self.normalization_target_sum <= 0
-            ):
-                raise ValueError("fixed-total response summary lacks a positive target sum")
-        elif self.normalization_target_sum is not None:
-            raise ValueError("only fixed-total summaries may carry a normalization target")
-        if not (
-            len(self.target_ids) == len(self.batch_ids) == group_count
-            and self.cell_counts.shape == (group_count,)
-            and self.means.shape == (group_count, gene_count)
-            and self.variances.shape == (group_count, gene_count)
-        ):
-            raise ValueError("response summary array shapes are inconsistent")
-        if (
-            len(set(self.group_ids)) != group_count
-            or tuple(sorted(self.group_ids)) != self.group_ids
-        ):
-            raise ValueError("group IDs must be sorted and unique")
-        if len(set(self.gene_ids)) != gene_count:
-            raise ValueError("gene IDs must be unique")
-        if np.any(self.cell_counts <= 0):
-            raise ValueError("each response group must contain at least one cell")
-        if not np.all(np.isfinite(self.means)) or not np.all(np.isfinite(self.variances)):
-            raise ValueError("response summary contains nonfinite values")
-        if np.any(self.variances < 0):
-            raise ValueError("response variances cannot be negative")
 
 
-def require_response_summary_support(
-    summary: ResponseSummaryArrays,
-    *,
-    control_label: str,
-    minimum_cells_per_target: int,
-) -> None:
-    """Require frozen cell support and a matched comparator for every target batch."""
-
-    validate_nonempty(control_label, field_name="control_label")
-    _require_positive_integer(
-        minimum_cells_per_target,
-        field_name="minimum_cells_per_target",
-    )
-    counts: dict[str, int] = {}
-    control_batches = set()
-    target_batches = set()
-    for target_id, batch_id, count in zip(
-        summary.target_ids,
-        summary.batch_ids,
-        summary.cell_counts,
-        strict=True,
-    ):
-        counts[target_id] = counts.get(target_id, 0) + int(count)
-        if target_id == control_label:
-            control_batches.add(batch_id)
-        else:
-            target_batches.add(batch_id)
-    if control_label not in counts:
-        raise VirtualCellContractError("response summary lacks the frozen comparator")
-    unsupported = tuple(
-        sorted(target_id for target_id, count in counts.items() if count < minimum_cells_per_target)
-    )
-    if unsupported:
-        raise VirtualCellContractError(
-            "response summary target cell support is below the frozen minimum: "
-            + ",".join(unsupported)
-        )
-    missing_control_batches = tuple(sorted(target_batches - control_batches))
-    if missing_control_batches:
-        raise VirtualCellContractError(
-            "response summary lacks matched control batches: " + ",".join(missing_control_batches)
-        )
 
 
-@dataclass(frozen=True, slots=True)
-class ControlReservoirArrays:
-    """Deterministic nested-cell reservoir for prediction-shape compilation.
 
-    Reservoir rows retain their source/batch identities but are never promoted
-    to independent preparations.  They supply only an empirical residual shape
-    after development-visible normalization.
-    """
-
-    row_ids: tuple[str, ...]
-    batch_ids: tuple[str, ...]
-    gene_ids: tuple[str, ...]
-    normalization: str
-    normalization_target_sum: float
-    values: NDArray[np.float32]
-
-    def __post_init__(self) -> None:
-        if not self.row_ids or len(set(self.row_ids)) != len(self.row_ids):
-            raise ValueError("control reservoir row IDs must be nonempty and unique")
-        if len(self.batch_ids) != len(self.row_ids):
-            raise ValueError("control reservoir batch IDs are not row aligned")
-        if not self.gene_ids or len(set(self.gene_ids)) != len(self.gene_ids):
-            raise ValueError("control reservoir gene IDs must be nonempty and unique")
-        if self.normalization != "log1p-fixed-total":
-            raise ValueError("control reservoir requires fixed-total log1p normalization")
-        if not math.isfinite(self.normalization_target_sum) or self.normalization_target_sum <= 0:
-            raise ValueError("control reservoir normalization target is invalid")
-        if self.values.shape != (len(self.row_ids), len(self.gene_ids)):
-            raise ValueError("control reservoir matrix has the wrong shape")
-        if not np.all(np.isfinite(self.values)) or np.any(self.values < 0):
-            raise ValueError("control reservoir values must be finite and nonnegative")
-        if float(np.max(self.values)) >= 15.0:
-            raise ValueError("control reservoir exceeds cell-eval's log1p range")
-
-
-def _selected_control_rows(
-    *,
-    targets: NDArray[np.str_],
-    batches: NDArray[np.str_],
-    control_label: str,
-    maximum_cells: int,
-    seed: int,
-) -> NDArray[np.int64]:
-    control_indices = np.flatnonzero(targets == control_label)
-    if control_indices.size == 0:
-        raise VirtualCellContractError("H5AD lacks declared comparator cells")
-    batch_values = tuple(sorted(set(batches[control_indices].tolist())))
-    if maximum_cells < len(batch_values):
-        raise VirtualCellContractError("control reservoir is too small to cover observed batches")
-
-    def priority(row: int) -> bytes:
-        return hashlib.sha256(f"{seed}:{row}".encode("ascii")).digest()
-
-    chosen: set[int] = set()
-    for batch in batch_values:
-        candidates = control_indices[batches[control_indices] == batch]
-        chosen.add(min((int(value) for value in candidates), key=priority))
-    remaining = maximum_cells - len(chosen)
-    if remaining > 0:
-        candidates = (int(value) for value in control_indices if int(value) not in chosen)
-        chosen.update(sorted(candidates, key=priority)[:remaining])
-    return np.asarray(sorted(chosen), dtype=np.int64)
 
 
 def extract_control_reservoir_h5ad(
@@ -894,7 +728,7 @@ def extract_control_reservoir_h5ad(
                 raise VirtualCellContractError("H5AD obs/var must be dataframe groups")
             targets = _read_h5ad_column(obs, target_field, expected_rows=rows)
             batches = _read_h5ad_column(obs, batch_field, expected_rows=rows)
-            selected = _selected_control_rows(
+            selected = selected_control_rows(
                 targets=targets,
                 batches=batches,
                 control_label=control_label,
@@ -905,12 +739,7 @@ def extract_control_reservoir_h5ad(
             if isinstance(matrix, h5py.Dataset):
                 for output_index, row_index in enumerate(selected):
                     row = np.asarray(matrix[int(row_index), :], dtype=np.float64)
-                    total = float(np.sum(row))
-                    if total <= 0 or not np.all(np.isfinite(row)):
-                        raise VirtualCellContractError("control row is invalid for normalization")
-                    values[output_index] = np.log1p(
-                        row * (normalization_target_sum / total)
-                    ).astype(np.float32)
+                    values[output_index] = normalize_control_values(row, normalization_target_sum).astype(np.float32)
             else:
                 if _encoding(matrix) != "csr_matrix":
                     raise VirtualCellContractError("control reservoir requires CSR or dense X")
@@ -927,12 +756,8 @@ def extract_control_reservoir_h5ad(
                     data = np.asarray(data_ds[left:right], dtype=np.float64)
                     if np.any(indices < 0) or np.any(indices >= genes):
                         raise VirtualCellContractError("control CSR indices are invalid")
-                    total = float(np.sum(data))
-                    if total <= 0 or not np.all(np.isfinite(data)):
-                        raise VirtualCellContractError("control row is invalid for normalization")
-                    values[output_index, indices] = np.log1p(
-                        data * (normalization_target_sum / total)
-                    ).astype(np.float32)
+                    indices, data = canonical_sparse_row(indices, data)
+                    values[output_index, indices] = normalize_control_values(data, normalization_target_sum).astype(np.float32)
             index_field = _frame_index_field(var)
             gene_ids = tuple(np.asarray(var[index_field].asstr()[:], dtype=np.str_).tolist())
             if len(gene_ids) != genes or len(set(gene_ids)) != genes:
@@ -982,20 +807,7 @@ def summarize_h5ad(
     _require_positive_integer(maximum_rows, field_name="maximum_rows")
     _require_positive_integer(maximum_genes, field_name="maximum_genes")
     _require_positive_integer(row_chunk_size, field_name="row_chunk_size")
-    if normalization not in {"source", "log1p-cp10000", "log1p-fixed-total"}:
-        raise ValueError("normalization is not supported")
-    if normalization == "log1p-fixed-total":
-        if (
-            normalization_target_sum is None
-            or not math.isfinite(normalization_target_sum)
-            or normalization_target_sum <= 0
-        ):
-            raise ValueError("fixed-total normalization requires a positive target sum")
-        target_sum = normalization_target_sum
-    else:
-        if normalization_target_sum is not None:
-            raise ValueError("normalization target sum is only valid for fixed-total mode")
-        target_sum = 10_000.0
+    normalization_total(normalization, normalization_target_sum)
     try:
         with h5py.File(stream, "r") as handle:
             matrix = handle["X"]
@@ -1014,35 +826,13 @@ def summarize_h5ad(
             gene_ids_array = np.asarray(var[index_field].asstr()[:], dtype=np.str_)
             if gene_ids_array.shape != (genes,) or len(set(gene_ids_array.tolist())) != genes:
                 raise VirtualCellContractError("gene registry is missing, duplicated or mis-sized")
-            pairs = sorted(set(zip(targets.tolist(), batches.tolist(), strict=True)))
-            group_ids = tuple(f"target={target}|batch={batch}" for target, batch in pairs)
-            pair_to_index = {pair: index for index, pair in enumerate(pairs)}
-            row_groups = np.fromiter(
-                (
-                    pair_to_index[(target, batch)]
-                    for target, batch in zip(targets.tolist(), batches.tolist(), strict=True)
-                ),
-                dtype=np.int64,
-                count=rows,
-            )
-            counts = np.bincount(row_groups, minlength=len(pairs)).astype(np.int64, copy=False)
-            sums = np.zeros((len(pairs), genes), dtype=np.float64)
-            squared_sums = np.zeros_like(sums)
+            accumulator = ResponseMomentAccumulator.for_labels(
+                targets, batches, genes, normalization, normalization_target_sum)
             if isinstance(matrix, h5py.Dataset):
                 for start in range(0, rows, row_chunk_size):
                     stop = min(rows, start + row_chunk_size)
                     dense = np.asarray(matrix[start:stop, :], dtype=np.float64)
-                    if not np.all(np.isfinite(dense)):
-                        raise VirtualCellContractError("X contains nonfinite development values")
-                    if normalization in {"log1p-cp10000", "log1p-fixed-total"}:
-                        totals = np.sum(dense, axis=1)
-                        if np.any(totals <= 0):
-                            raise VirtualCellContractError(
-                                "count normalization encountered a nonpositive cell total"
-                            )
-                        dense = np.log1p(dense * (target_sum / totals[:, None]))
-                    np.add.at(sums, row_groups[start:stop], dense)
-                    np.add.at(squared_sums, row_groups[start:stop], dense * dense)
+                    accumulator.add_dense(start, dense)
             else:
                 if _encoding(matrix) != "csr_matrix":
                     raise VirtualCellContractError(
@@ -1058,39 +848,20 @@ def summarize_h5ad(
                     last = int(indptr[-1])
                     indices = np.asarray(indices_ds[first:last], dtype=np.int64)
                     data = np.asarray(data_ds[first:last], dtype=np.float64)
-                    if np.any(indices < 0) or np.any(indices >= genes):
-                        raise VirtualCellContractError("CSR X contains out-of-range indices")
-                    if not np.all(np.isfinite(data)):
-                        raise VirtualCellContractError("X contains nonfinite development values")
-                    local_indptr = indptr - first
-                    for local_row, group_index in enumerate(row_groups[start:stop]):
-                        left = int(local_indptr[local_row])
-                        right = int(local_indptr[local_row + 1])
-                        row_indices = indices[left:right]
-                        row_data = data[left:right]
-                        if normalization in {"log1p-cp10000", "log1p-fixed-total"}:
-                            total = float(np.sum(row_data))
-                            if total <= 0:
-                                raise VirtualCellContractError(
-                                    "count normalization encountered a nonpositive cell total"
-                                )
-                            row_data = np.log1p(row_data * (target_sum / total))
-                        np.add.at(sums[group_index], row_indices, row_data)
-                        np.add.at(squared_sums[group_index], row_indices, row_data * row_data)
-            means = sums / counts[:, None]
-            variances = np.maximum(squared_sums / counts[:, None] - means * means, 0.0)
+                    accumulator.add_csr(start, indptr - first, indices, data)
+            means, variances = accumulator.finish()
     except VirtualCellContractError:
         raise
     except (KeyError, OSError, TypeError, ValueError) as error:
         raise VirtualCellContractError("H5AD response summarization failed closed") from error
     return ResponseSummaryArrays(
-        group_ids=group_ids,
-        target_ids=tuple(target for target, _ in pairs),
-        batch_ids=tuple(batch for _, batch in pairs),
+        group_ids=accumulator.group_ids,
+        target_ids=tuple(target for target, _ in accumulator.pairs),
+        batch_ids=tuple(batch for _, batch in accumulator.pairs),
         gene_ids=tuple(gene_ids_array.tolist()),
         normalization=normalization,
         normalization_target_sum=normalization_target_sum,
-        cell_counts=counts,
+        cell_counts=accumulator.counts,
         means=means,
         variances=variances,
     )

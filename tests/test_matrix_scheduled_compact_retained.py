@@ -8,19 +8,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import (
-    NAMESPACE, ScheduledCompactBank, ScheduledCompactCommitmentConfig,
-    compact_identity, compact_native_contract,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.retained_bindings import _shared_inputs, _native, _route
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex, ScheduledNativeSourceContext
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import NAMESPACE, ScheduledCompactBank, ScheduledCompactCommitmentConfig, compact_identity, compact_native_contract
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.retained_bindings import _shared_inputs, _native, _route
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex, ScheduledNativeSourceContext
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
 from tests.test_matrix_scheduled_history_bindings import (
     bank as bank, provenance as provenance, scheduled as scheduled, stock as stock, finish, write,
 )
@@ -28,8 +25,8 @@ from tests.test_matrix_scheduled_compact_workers import compact_prefix_case
 
 
 def test_compact_retained_route_preserves_subject_and_actual_configuration(bank, monkeypatch):
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments, parameter_source
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments, parameter_source
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
 
     def blocked(*args, **kwargs):
         pytest.fail('cold compact route entered a native source or contact')
@@ -90,7 +87,7 @@ def test_compact_cold_inputs_require_actual_shared_bank_and_descriptor(bank, def
 @pytest.mark.parametrize('missing_receipt', (False, True))
 def test_actual_compact_native_custody_read_never_repairs_receipts(bank, monkeypatch, missing_receipt):
     """Actual compact prefix custody exercises the shared retained native reader."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledPrefixHistory
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledPrefixHistory
 
     case = compact_prefix_case(bank)
     history = decode_canonical_bytes(next(row.payload for row in case.result.outputs

@@ -16,14 +16,14 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import lifetime
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_feature_science as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_records as current
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import forecast, records as scheduled, science
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import lifetime
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_feature_science as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_records as current
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import forecast, records as scheduled, science
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_matrix_e3_protected_prefix_science import blocked, case as case, forbid_native as forbid_native  # noqa: F401
 from tests.test_matrix_response_error_prediction import observation
 

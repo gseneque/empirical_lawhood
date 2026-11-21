@@ -1,16 +1,15 @@
 # SPDX-License-Identifier: MPL-2.0
 """Fresh read-only native custody and received-array replay for TRAIN and E2."""
-from dataclasses import replace
-import numpy as np
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.replay_validation import validate_derived_arrays
 
 from empirical_lawhood.api.matrix_native_read_custody import _array, _expected_contact
 from empirical_lawhood.api.recursive_qualified_parents import _output_payload
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
 
 
 def inspect_native(*, store, definition, event=None, require_nonentry=False):
@@ -33,56 +32,13 @@ def inspect_native(*, store, definition, event=None, require_nonentry=False):
     return observed
 
 
-def _same_values(actual, expected, label):
-    """Exact finite values and nonuse locations, preserving original archive bytes."""
-    if set(actual) != set(expected):
-        raise PermissionError("native derived replay changes complete " + label + " array members")
-    for name, value in expected.items():
-        received = actual[name]
-        if received.dtype.str != value.dtype.str or received.shape != value.shape:
-            raise PermissionError("native derived replay changes " + label + " array dtype/shape")
-        # Complex nonuse is checked per real/imaginary component; a NaN in one
-        # component cannot hide a changed finite value in the other component.
-        equal = (np.array_equal(received.real, value.real, equal_nan=True)
-            and np.array_equal(received.imag, value.imag, equal_nan=True)) if value.dtype.kind == "c" else np.array_equal(received, value, equal_nan=True)
-        if not equal:
-            raise PermissionError("native derived replay changes " + label + " received array values")
 
 
-def validate_derived_arrays(*, source, protocol, records, prefix, diagnostic, causal_arrays, frozen, templates):
-    """Reconstruct original measurement/frame/cutoff/physical transforms only.
-
-    The caller separately authenticates native prefix custody and its actual
-    numerical assessment. This pure seam grants no receipt or source authority.
-    No archive is regenerated and no physical trajectory is acquired.
-    """
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import science, response_forecast
-    witness, frames, causal, physical, numerical = (records[key] for key in ("witness", "frames", "causal", "physical", "numerical"))
-    expected_diagnostic, traces = science.measure_prefix_values(source, prefix)
-    _same_values(diagnostic, expected_diagnostic, "prefix diagnostic")
-    if witness.traces != traces:
-        raise PermissionError("native derived replay changes original complete measured traces")
-    controls = science.check_prefix_frame_values(source, traces, prefix, diagnostic)
-    if frames != replace(frames, controls=controls,
-            numerical_pass=all(value.disposition in ("SATISFIED", "NOT_APPLICABLE") for value in controls)):
-        raise PermissionError("native derived replay changes original independent frame controls")
-    values, frame_sha, disposition, reason = science.causal_cutoff_values(source, traces,
-        numerical.numerical_pass, frames.numerical_pass, prefix, diagnostic)
-    _same_values(causal_arrays, values, "causal cutoff")
-    if causal != replace(causal, frame_sha256=frame_sha, disposition=disposition, reason=reason):
-        raise PermissionError("native derived replay changes actual causal cutoff/origin/nonuse")
-    # Existing cold forecast owner checks retained complete eigensystems and
-    # literal Hessian derivatives before reconstructing all mechanical views.
-    predicted, disposition, dispositions = response_forecast.forecast_response_arrays(protocol, causal_arrays, templates,
-        disposition=causal.disposition, retained=frozen)
-    _same_values(frozen, predicted, "physical forecast")
-    if (physical.disposition, physical.dispositions) != (disposition, dispositions):
-        raise PermissionError("native derived replay changes actual physical availability/nonuse")
 
 
 def _template_values(artifact_writer, protocol, products, cache):
     """Decode exact shared template values once in this full read's local scope."""
-    from empirical_lawhood.infrastructure.recursive_custody import read_exposed_recursive_payload
+    from empirical_lawhood.storage.recursive_custody import read_exposed_recursive_payload
     descriptor = protocol.templates
     artifact = descriptor.array_artifact
     matches = tuple(value for value in products["external_inputs"] if value.logical.logical_artifact_id == artifact.artifact_id)
@@ -110,20 +66,20 @@ def _template_values(artifact_writer, protocol, products, cache):
 def authenticate_native_custody(*, artifact_writer, specification, request, seal, source, protocol, panels,
         configurations, products, tasks, plan, records):
     """Fresh original parent/subwork inspections; no array decoding or numerical replay."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as train
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as utility
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_acquisition_contracts import native_work_definition
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as train
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as utility
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_acquisition_contracts import native_work_definition
     if type(specification) is train.NativeTrainingAcquisitionSpecification:
-        from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as owner
-        from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_bindings as binding
-        from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_science as science
+        from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as owner
+        from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_bindings as binding
+        from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_science as science
         r, is_training = train, True
         if type(request) is not train.NativeTrainingAcquisitionRequest or type(seal) is not train.NativeTrainingAcquisitionSeal:
             raise TypeError("native TRAIN replay changes its exact actual request/seal family")
     elif type(specification) is utility.NativeUtilitySpecification:
-        from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as owner
-        from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_bindings as binding
-        from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_science as science
+        from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as owner
+        from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_bindings as binding
+        from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_science as science
         r, is_training = utility, False
         if type(request) is not utility.NativeUtilityRequest or type(seal) is not utility.NativeUtilityAcquisitionSeal:
             raise TypeError("native E2 replay changes its exact actual request/seal family")
@@ -134,7 +90,7 @@ def authenticate_native_custody(*, artifact_writer, specification, request, seal
         science.admit_response(source, protocol, panels, seal, causal, physical, responses)
     elif not responses.native:
         responses.validate_nonentry(causal, physical, protocol, panels)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import validate_response_native_evidence
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import validate_response_native_evidence
     history.validate_source(source)
     if responses.native:
         if causal.disposition != "AVAILABLE" or physical.disposition != "AVAILABLE":
@@ -214,7 +170,7 @@ def replay_root(*, artifact_writer, specification, request, seal, source, protoc
     if (records["score"], records["outcome"]) != (actual_score, actual_outcome):
         raise PermissionError("native acquisition read changes score/outcome replayed from actual authenticated received arrays")
     if mechanism_rows is not None and is_training and request.candidate_specification.is_curve_primary:
-        from .matrix_mechanism_read import bound_mechanism
+        from empirical_lawhood.api.matrix_mechanism_read import bound_mechanism
         mechanism_rows.append(bound_mechanism(protocol=protocol, source=source.identity,
             causal_record=causal, physical_record=physical, response_record=responses,
             causal_arrays=causal_arrays, frozen_arrays=frozen, response_arrays=received, panels=panels,

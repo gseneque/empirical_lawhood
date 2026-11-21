@@ -9,23 +9,23 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry import evidence_stream as es
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry import operation_bindings as ob, recursive_translation as rt
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry.runner import _assess, _original_evidence
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, preparation_contracts as pc, preparation_science as ps
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_contracts as sc, segmented_evidence as se, segmented_roster as sr
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.source_derived_preparation import supply_source_roots, assess_source_roots
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, WorkerInputKind, WorkerOutputPort
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.infrastructure.execution import LocalScheduler, ResourceAdmissionError, _PipeOutputEmitter
+from empirical_lawhood.domains.battery.battery_segmented_inquiry import evidence_stream as es
+from empirical_lawhood.domains.battery.battery_segmented_inquiry import operation_bindings as ob, recursive_translation as rt
+from empirical_lawhood.adapters.battery.battery_segmented_inquiry.runner import _assess, _original_evidence
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, preparation_contracts as pc, preparation_science as ps
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_contracts as sc, segmented_evidence as se, segmented_roster as sr
+from empirical_lawhood.domains.battery.battery_refined_inquiry.source_derived_preparation import supply_source_roots, assess_source_roots
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, WorkerInputKind, WorkerOutputPort
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.local.execution import LocalScheduler, ResourceAdmissionError, _PipeOutputEmitter
 from tests.test_battery_durable_graph import stock as retained_stock
 from tests.test_battery_refined_inquiry_binding import Port
 from tests.test_battery_segmented_native import custody as native_custody, selected as native_selected, exposed_backend, acquire
@@ -243,7 +243,7 @@ def test_malformed_actual_return_stream_preserves_all_raw_and_unevaluable(custod
 
 
 def test_zero_segment_known_failure_has_header_and_explicit_unavailable_preparation(custody, monkeypatch):
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_native as native
+    from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as native
     _, _, effects = exposed_backend(custody, monkeypatch)
     monkeypatch.setattr(native, "build_runtime", lambda *_: (_ for _ in ()).throw(RuntimeError("exposed build failure")))
     result = acquire(custody)
@@ -341,22 +341,22 @@ def test_all_installed_descriptors_are_cold_and_have_exact_roles():
     import sys
     code = """import sys
 from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY as installed
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry import executable_binding as b
-for factory in b.EXECUTABLE_BINDING_FACTORIES:
+from empirical_lawhood.domains.battery.battery_segmented_inquiry import extension as b
+for factory in b.EXTENSION.factories:
     assert installed.provider_factory(factory.binding.binding_id) is factory
-print(len(b.EXECUTABLE_BINDING_FACTORIES))
+print(len(b.EXTENSION.factories))
 assert 'pybamm' not in sys.modules
 assert 'flint' not in sys.modules
 """
     result = subprocess.run([sys.executable, "-c", code], check=True, capture_output=True, text=True)
     assert result.stdout.strip() == "7"
-    from empirical_lawhood.adapters.methods.battery_segmented_inquiry import executable_binding as eb
-    assert tuple(row.manifest.capability_key for row in eb.EXECUTABLE_BINDING_FACTORIES) == tuple(
+    from empirical_lawhood.domains.battery.battery_segmented_inquiry import extension as eb
+    assert tuple(row.manifest.capability_key for row in eb.EXTENSION.factories) == tuple(
         sorted(ob.NAMESPACE + "." + operation for operation in (*ob.OPERATIONS, "controlled-forecast")))
 
 
 def test_installed_provider_creates_exact_declared_stream_semantic_contract():
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationProvider
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationProvider
     manifests = tuple(sorted(ob.operation_manifests(), key=lambda row: row.registry_id))
     registry = CapabilityRegistry("registry.exposed-segmented-provider", manifests)
     registration = next(row for row in ob.operation_registrations() if row.selection.capability_key.endswith(".forecast"))

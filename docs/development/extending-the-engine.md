@@ -1,14 +1,20 @@
-# Add a native adapter or method
+# Advanced native and protocol contracts
 
 SPDX-License-Identifier: CC-BY-4.0
 
 This guide gives the procedure for a native adapter or scientific method extension.
 It relates one declared scientific contract to records, providers and the maintained application route.
-Use it to locate the owning seams and required existing checks.
+Use the [method guide](../v1.0/add-method.md) or [domain guide](../v1.0/add-domain.md) for routine contributions.
+Use this reference when the extension needs the advanced native or protocol contracts below.
+
+For a complete small pure domain, use the [editable mass-balance starter](mass-balance-starter.md).
+It includes supplied evidence, separate prediction and falsification, static registration and the ordinary installed lifecycle.
 
 ## Prerequisites and first action
 
-Use the [tested development environment](../using/environments.md). Read the [interface policy](compatibility.md#four-supported-surfaces). Select one scientific contract and its existing adapter owner. Write the independent unit, preparation, available history, action chart, native units, receiver and horizon.
+Use the [tested development environment](../using/environments.md). Read the [interface policy](compatibility.md#four-supported-surfaces).
+Select the [supported extension profile and imports](extension-interfaces.md).
+Select one scientific contract and its existing adapter owner. Write the independent unit, preparation, available history, action chart, native units, receiver and horizon.
 
 Keep the observations, views and arms nested within their actual independent units. Declare the outcome cutoff and the result that would refute the claim. Give missing and infinite outcomes an explicit rule.
 
@@ -23,10 +29,10 @@ The reactor supplies a complete implementation example:
 |---|---|
 | Native records and source bridge | [panel.py](../../src/empirical_lawhood/adapters/simulators/reactor_prefix_response/panel.py), [assigned.py](../../src/empirical_lawhood/adapters/simulators/reactor_prefix_response/assigned.py) |
 | Native runner/provider | [provider.py](../../src/empirical_lawhood/adapters/simulators/reactor_prefix_response/provider.py) |
-| Static scientific descriptor | [Source extension bundle](../../src/empirical_lawhood/adapters/simulators/reactor_prefix_response/extension_bundle.py) |
-| Executable reconstruction | [Source binding](../../src/empirical_lawhood/adapters/simulators/reactor_prefix_response/executable_binding.py) |
-| Method custody and payload ports | [Method binding](../../src/empirical_lawhood/adapters/methods/reactor_prefix_response/executable_binding.py) |
-| Candidate composition | [authoring.py](../../src/empirical_lawhood/adapters/composition/reactor_prefix_response/authoring.py) |
+| Static scientific descriptor | [Source extension bundle](../../src/empirical_lawhood/adapters/simulators/reactor_prefix_response/extension.py) |
+| Executable reconstruction | [Source binding](../../src/empirical_lawhood/adapters/simulators/reactor_prefix_response/extension.py) |
+| Method custody and payload ports | [Method binding](../../src/empirical_lawhood/domains/reactor/reactor_prefix_response/extension.py) |
+| Candidate composition | [authoring.py](../../src/empirical_lawhood/domains/reactor/reactor_prefix_response/authoring/authoring.py) |
 
 ## Choose the smallest extension
 
@@ -41,6 +47,13 @@ Complete the local numerical check before the installed route.
 The method-only milestone below uses existing typed panels.
 The installed trace identifies the additional seams.
 Physical metrology, hidden-source access and genuine issue authority retain their separate prerequisites.
+
+The [Rubisco preparation-response extension](../../programmes/biology/photosynthesis/workflows/rubisco-response/preparation-response-v1.md#implementation-and-retained-acceptance)
+uses these existing seams for bounded preparation, force-response, independent analysis and destination-supply operations.
+Its design consumer and original-input preparer derive scientific inputs before shared inquiry commitment and successor authoring.
+The maintained operator recipe is a caller of those services.
+Its component evidence, pending complete installed acceptance and unanswered molecular questions have separate scopes.
+Do not infer absent shared configuration or execution services from the recipe's level of detail or an unfinished acceptance attempt.
 
 ## Extend a tested prerequisite connection
 
@@ -78,7 +91,7 @@ existing executable provider factory and custody owners. A prospective route
 still needs its genuine source, issue, execution and reveal contracts.
 
 Current added methods use one
-[`RecursiveOperationDeclaration`](../../src/empirical_lawhood/runtime/recursive_provider.py)
+[`RecursiveOperationDeclaration`](../../src/empirical_lawhood/execution/recursive_provider.py)
 to derive their manifest, registration and executable factory. Declare pure
 scientific hooks, numerical/publication requirements and effects there. Domain
 modules retain estimands, admissibility and independent falsifiers; the shared
@@ -88,6 +101,74 @@ and additional advertised input schemas on that same owner. Use
 `input_record_types` for input-only canonical types without widening the existing
 output codec map. These fields preserve actual contracts without a second
 handwritten manifest or an invented input port.
+
+Use the [record revision guide](record-revisions.md) when old and new output revisions must coexist.
+Keep each producer's exact revision binding and the original retained decoder.
+An explicit derivative preserves original bytes, receipts and evidence limits.
+
+For target-claim satisfaction, declare `inquiry_claim_assessment_projector` in `RecursiveInquiryHooks`.
+Return `InquiryClaimAssessment` only for an exact claim supported by the domain's independent assessor.
+Bind its original assessment contract, receipt, scope, evidence, unit census and evidence ceiling.
+Recompute the scientific disposition from authenticated products.
+Return no projection for an unsupported claim.
+The public service authenticates the producing operation and repeats validation during current readback.
+An outcome projector alone cannot establish target satisfaction.
+
+For repeated task projections, declare `inquiry_work_batch_projector` beside the existing `inquiry_work_projector`.
+Validate the whole scientific draft once.
+Return exact `ScientificInquiryWork` records for each requested task, in the supplied order.
+The API verifies the complete requested task census and repeats the projection for each new read.
+This callback retains no access decision or cache between reads.
+
+For an exact endpoint comparison, declare `inquiry_endpoint_projector` beside `inquiry_endpoint_validator`.
+Return the original `ScientificConditionScope` after complete draft validation.
+The API compares that scope with the declared requirements without repeating draft validation for each requirement.
+Keep the existing validator when compatibility needs a conditional comparison.
+
+When those consumers share a complete immutable scientific selection, declare
+`inquiry_selection_scope` on the same `RecursiveInquiryHooks`.
+Return a context manager that validates the complete selected draft and releases
+its operands at exit. Endpoint, evidence, work, outcome, contribution and input-origin
+consumers can use those operands during that one projection. A changed draft,
+validator or Decimal context requires fresh validation.
+Use `runtime.recursive_inquiry_selection.InquirySelectionPreparation` for a selector that returns a complete tuple of canonical configurations.
+Declare its exact record types and validation owners.
+Its `scope` and `read` methods share immutable operands during that invocation.
+A copied context cannot retain or reuse a selection after its scope closes.
+The API's `inquiry_projection_read` composes these consumers with the shared
+retained-roots reader and its preflight hook, so a domain projection and shared
+state projection use the same packet, draft, plan and products.
+Successor preview and admission use that same lifetime for their decision sources and selected supplier.
+Admission authenticates every authored member without retaining unselected scientific payloads in memory.
+Independent domain readers can consume the same guarded wave inside their complete scientific reconstruction.
+Pass `validate_authored` when original selection checks must run before products.
+Each consumer runs that preflight freshly, including when it shares already read immutable roots.
+Current input access and complete final byte checks remain with the read owners;
+the scientific selection is never an authentication token for another call.
+Contribution ancestry uses the same finite typed-record lifetime, with independent
+byte and access guards for each physical custody copy. Custom read policies and
+explicit closure work/depth budgets keep their independent traversal and checks.
+Copied contexts start a fresh ancestry lifetime after closure or on another thread.
+The owning lifetime runs final checks even when its consumer raises.
+
+Use the [portable assessment procedure](portable-assessments.md) to retain one exact finding with its original contribution closure.
+The certificate verifier reuses the registered claim assessor and current producing-custody checks.
+Keep original scope, adverse findings, evidence ceilings and later consumer admission distinct.
+
+Use the [portable store contract](portable-knowledge-stores.md) for bounded exchange and discovery of those original findings.
+Register exact scientific type descriptors and reuse the shipped custody, replica and physical catalogue owners.
+Current resolution repeats access and assessment checks; a discovered location or cached report supplies no admission.
+
+Use the [dependent-assessment extension](inquiry-assessment-extensions.md) when repeated opportunities share an original source root.
+Bind the complete assigned census, exact estimand, outcome bounds, stopping, missingness and frozen consumer.
+Validate the opportunity-to-root mapping against the actual source, not its labels alone.
+Keep actor inputs and evaluator diagnostics in their separate registered ports.
+
+Arb calculations use `arb_precision(bits)` from the [shared numerical owner](../../src/empirical_lawhood/methods/_arb.py).
+Keep its scope active through all arithmetic and returned-value conversion.
+The shared reentrant lock serializes the process-global precision context across method families.
+Nested calls and exceptions restore the preceding precision.
+Decimal contexts retain their separate thread-local owner.
 
 When several operations validate the same complete scientific census, declare
 `scientific_root_preparer` together with `scientific_root_validator` in
@@ -104,7 +185,7 @@ preparation retains no read permission or execution authority; actual access
 and effect boundaries keep their existing checks.
 
 For a binary input or output, declare an exact
-[`RecursiveStorageCodec`](../../src/empirical_lawhood/runtime/recursive_storage_codecs.py)
+[`RecursiveStorageCodec`](../../src/empirical_lawhood/storage/contracts/recursive_storage_codecs.py)
 in that operation's `storage_codecs`: schema/version, profile/media, input suffix,
 scientific byte ceiling when applicable, and a code-owned bounded
 `validate_stream(source, request, *, size)` function. It returns `None` or refuses.
@@ -113,14 +194,14 @@ It validates the complete physical structure without changing logical evidence
 identity. Domain readers then establish member completeness, units, clocks and
 scientific compatibility. A JSON record codec or a familiar profile label cannot
 substitute for a binary declaration. The
-[Matrix codecs](../../src/empirical_lawhood/adapters/methods/matrix_storage_codecs.py)
-and [battery stream codec](../../src/empirical_lawhood/adapters/methods/battery_segmented_inquiry/storage_codecs.py)
+[Matrix codecs](../../src/empirical_lawhood/domains/matrix/matrix_storage_codecs.py)
+and [battery stream codec](../../src/empirical_lawhood/domains/battery/battery_segmented_inquiry/storage_codecs.py)
 provide current examples. Add an encoding through its domain codec and independent
 parity/refusal tests, then regenerate the documented owners; no shared schema
 branch or CLI edit is required.
 
 For a high-level experiment, add its exact specification and
-[`ExperimentProtocolDeclaration`](../../src/empirical_lawhood/runtime/experiment_preparation.py)
+[`ExperimentProtocolDeclaration`](../../src/empirical_lawhood/execution/experiment_preparation.py)
 to the owning extension descriptor. Its `bind_inputs`, `prepare` and
 `validate_instance` functions derive and recheck the complete scientific graph.
 Keep independent-unit allocation and immutable source records separate from
@@ -250,10 +331,10 @@ Trace the current route before adding a new one:
 
 | Handoff | Owning file and requirement |
 |---|---|
-| Edited JSON → prepared canonical model | [Configuration](../using/configuration.md), then [strict model](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/contracts.py). Positive SI components, topology, action ordering and clock grid validate before contact. |
+| Edited JSON → prepared canonical model | [Configuration](../using/configuration.md), then [strict model](../../src/empirical_lawhood/domains/circuits/rc_ladder/contracts.py). Positive SI components, topology, action ordering and clock grid validate before contact. |
 | Exact model → numerical diagnostic | [native_quickstart.py](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/native_quickstart.py). Bounded 64 KiB read, strict decoding and two solver views. |
-| Strict study → typed native panel | [campaign.py](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/campaign.py), with [matrix exponential](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/matrix_exponential.py) and [backward Euler](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/refinement.py). |
-| Typed panels → numerical falsifier | `check_native_views`, plus [method config](../../src/empirical_lawhood/adapters/methods/rc_ladder_numerical_comparison/contracts.py). Keep one independent unit and two nested views. |
+| Strict study → typed native panel | [campaign.py](../../src/empirical_lawhood/domains/circuits/rc_ladder/campaign.py), with [matrix exponential](../../src/empirical_lawhood/domains/circuits/rc_ladder/matrix_exponential.py) and [backward Euler](../../src/empirical_lawhood/domains/circuits/rc_ladder/refinement.py). |
+| Typed panels → numerical falsifier | `check_native_views`, plus [method config](../../src/empirical_lawhood/domains/circuits/rc_ladder_numerical_comparison/contracts.py). Keep one independent unit and two nested views. |
 | CLI report → operational retention | [Results and failures](../using/results-and-failures.md). Optional export changes custody of the attempt, not the scientific ceiling. |
 
 A small worked change replaces the four-cell model with a one-cell numerical preparation.
@@ -263,12 +344,12 @@ Save this module as `local_rc_extension.py` in the disposable directory:
 ```python
 from decimal import Decimal
 
-from empirical_lawhood.adapters.simulators.rc_ladder_response.contracts import (
+from empirical_lawhood.domains.circuits.rc_ladder.contracts import (
     ResistorCapacitorLadderActionSegment,
     ResistorCapacitorLadderModelConfig,
     ResistorCapacitorLadderStudyConfig,
 )
-from empirical_lawhood.adapters.simulators.rc_ladder_response.campaign import (
+from empirical_lawhood.domains.circuits.rc_ladder.campaign import (
     VIEWS, run_native_view,
 )
 
@@ -307,10 +388,22 @@ The independent preparation is the numerical model, not its two solvers or three
 
 Use the independent circuit equation `dV/dt = 1 - 2V`, with `V(0)=0`.
 It gives `V(t)=(1-exp(-2t))/2` and DC voltage 0.5 V.
-The [worked check](../../tests/test_worked_rc_extension.py) imports the copied module, reconstructs its canonical study/panels,
-and compares the actual matrix-exponential output to this equation. It checks Euler error against the same independent relation.
+The [selected-file verifier](../../scripts/check_worked_rc_extension.py) executes your saved module and records its absolute path and SHA-256.
+It prepares the model once, reconstructs canonical study/panel records, and compares both solver views with the independent equation.
 Zero capacitance refuses before a solver. A tighter frozen voltage tolerance produces a negative numerical result.
 Do not use an output from the solver as its own scientific oracle.
+
+```sh
+uv run --no-sync python scripts/check_worked_rc_extension.py \
+  --module /absolute/disposable/local_rc_extension.py \
+  --output-dir /absolute/disposable/new-verification
+```
+
+Select a new output directory. The verifier retains successful records and a report there, including failures.
+This command executes trusted developer Python; it is separate from installed extension discovery and source admission.
+The check verifies the displayed one-cell contract. A different physical model needs its own independent equation and acceptance limits.
+
+The separate [guide regression](../../tests/test_worked_rc_extension.py) verifies the published code block and the selected-file command:
 
 ```sh
 uv run --no-sync pytest -q --fail-on-skip tests/test_worked_rc_extension.py
@@ -329,7 +422,7 @@ Retain its typed `ResistorCapacitorLadderNumericalCheck`, including `converged`,
 The worked check exercises this branch with native generation disabled during evaluation.
 A lower tolerance is a negative result, not a request to rerun a source.
 A physical-board claim or a substituted model/unit/grid refuses.
-For issued evaluation, the existing [method runner](../../src/empirical_lawhood/adapters/methods/rc_ladder_numerical_comparison/provider.py)
+For issued evaluation, the existing [method runner](../../src/empirical_lawhood/domains/circuits/rc_ladder_numerical_comparison/provider.py)
 still requires sealed typed inputs, authentic dependency receipts and adjudication context.
 
 ### Milestone B: provider and issued integration
@@ -355,12 +448,12 @@ The two solver views and receiver clocks are nested observations.
 
 | Seam | Exact owner, exported contract and check |
 |---|---|
-| Source records and scientific clock | [contracts.py](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/contracts.py) owns `ResistorCapacitorLadderModelConfig`, `ResistorCapacitorLadderStudyConfig` and `ResistorCapacitorLadderNativePanel`. Components use SI units. Preparation, ordered action segments and output times validate before calculation. |
-| Bounded native implementation and falsifier | [campaign.py](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/campaign.py) supplies `run_native_view` and `check_native_views`. These use the declared matrix-exponential and backward-Euler views. [Independent circuit checks](../../tests/test_resistor_capacitor_native_science.py) test the analytic one-cell transient, charge balance and source impedance. |
-| Static source contribution | [extension_bundle.py](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/extension_bundle.py) exports `EXTENSION_BUNDLE_CONTRIBUTION`. It declares the capability, conformance obligations and evidence ceiling. Registration supplies no native result. |
-| Executable source and codec roster | The [source binding](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/executable_binding.py) exports `EXECUTABLE_BINDING_CONTRIBUTION` and `EXECUTABLE_RECORD_TYPES=(ResistorCapacitorLadderStudyConfig,)`. `EXECUTABLE_BINDING_FACTORIES` contains `ResistorCapacitorLadderNativeFactory`. Its complete platform-port set is empty. [runtime_provider.py](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/runtime_provider.py) supplies two exact native runners and bounded study/view inputs. |
-| Method input, result and evaluator | The [method contracts](../../src/empirical_lawhood/adapters/methods/rc_ladder_numerical_comparison/contracts.py) own `ResistorCapacitorLadderEvaluationConfig`. The [provider](../../src/empirical_lawhood/adapters/methods/rc_ladder_numerical_comparison/provider.py) consumes both sealed panels and that config. It returns `ResistorCapacitorLadderNumericalCheck` and `ScientificAdjudicationRecord`. The [binding](../../src/empirical_lawhood/adapters/methods/rc_ladder_numerical_comparison/executable_binding.py) exports `ResistorCapacitorLadderNumericalFactory`, the evaluator codec roster and an empty platform-port set. |
-| Scientific composition and candidate | [authoring.py](../../src/empirical_lawhood/adapters/composition/rc_ladder_response/authoring.py) owns `build_rc_authoring`, `RCLadderResponseAuthoringBundle` and `ResistorCapacitorCandidateContextProvider`. Both source tasks supply the numerical evaluator. Authoring retains exact payloads, decoder registrations, source, resources and pure plan projections. |
+| Source records and scientific clock | [contracts.py](../../src/empirical_lawhood/domains/circuits/rc_ladder/contracts.py) owns `ResistorCapacitorLadderModelConfig`, `ResistorCapacitorLadderStudyConfig` and `ResistorCapacitorLadderNativePanel`. Components use SI units. Preparation, ordered action segments and output times validate before calculation. |
+| Bounded native implementation and falsifier | [campaign.py](../../src/empirical_lawhood/domains/circuits/rc_ladder/campaign.py) supplies `run_native_view` and `check_native_views`. These use the declared matrix-exponential and backward-Euler views. [Independent circuit checks](../../tests/test_resistor_capacitor_native_science.py) test the analytic one-cell transient, charge balance and source impedance. |
+| Static source contribution | [extension_bundle.py](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/extension.py) exports `EXTENSION_BUNDLE_CONTRIBUTION`. It declares the capability, conformance obligations and evidence ceiling. Registration supplies no native result. |
+| Executable source and codec roster | The [source binding](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/extension.py) exports `EXECUTABLE_BINDING_CONTRIBUTION` and `EXECUTABLE_RECORD_TYPES=(ResistorCapacitorLadderStudyConfig,)`. `EXECUTABLE_BINDING_FACTORIES` contains `ResistorCapacitorLadderNativeFactory`. Its complete platform-port set is empty. [runtime_provider.py](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/runtime_provider.py) supplies two exact native runners and bounded study/view inputs. |
+| Method input, result and evaluator | The [method contracts](../../src/empirical_lawhood/domains/circuits/rc_ladder_numerical_comparison/contracts.py) own `ResistorCapacitorLadderEvaluationConfig`. The [provider](../../src/empirical_lawhood/domains/circuits/rc_ladder_numerical_comparison/provider.py) consumes both sealed panels and that config. It returns `ResistorCapacitorLadderNumericalCheck` and `ScientificAdjudicationRecord`. The [binding](../../src/empirical_lawhood/domains/circuits/rc_ladder_numerical_comparison/extension.py) exports `ResistorCapacitorLadderNumericalFactory`, the evaluator codec roster and an empty platform-port set. |
+| Scientific composition and candidate | [authoring.py](../../src/empirical_lawhood/domains/circuits/rc_ladder/authoring/authoring.py) owns `build_rc_authoring`, `RCLadderResponseAuthoringBundle` and `ResistorCapacitorCandidateContextProvider`. Both source tasks supply the numerical evaluator. Authoring retains exact payloads, decoder registrations, source, resources and pure plan projections. |
 | Application loader and public command | [fresh_authoring.py](../../src/empirical_lawhood/adapters/composition/rc_ladder_response/fresh_authoring.py) owns `FreshRCProfile` and `load_fresh_rc_bundle`. [api/composition.py](../../src/empirical_lawhood/api/composition.py) binds installed services. `campaign circuit-author` emits the closed directory selected by `--circuit-authoring-dir`. Readiness proves the exact three runners without execution. |
 | Public configuration and discovery | [configuration_registry.py](../../src/empirical_lawhood/api/configuration_registry.py) owns `rc-ladder-model` and `rc-ladder-study`. [workflows.py](../../src/empirical_lawhood/api/workflows.py) owns `rc-ladder-response`. Existing schema, workflow and CLI generators project those facts. Guides and inputs belong to the selected source distribution. |
 | Refusal, results and recovery | The [candidate integration check](../../tests/test_resistor_capacitor_candidate.py) selects exact source/method providers and external inputs. The [family guide](../../programmes/foundations/measurement-and-response/workflows/rc-ladder-response/guide.md#recover-an-incomplete-authoring-export) preserves partial authoring. A later attempt uses a fresh path. Issued evaluation requires actual dependency receipts, adjudication context and separate authority. [Receipt-based recovery](../using/results-and-failures.md#issued-status-and-recovery) preserves completed effects. |
@@ -385,8 +478,8 @@ Keep mounts and keys with the existing platform owners.
 
 The existing RC source accepts exactly its issued study and no external platform ports.
 The evaluator accepts exactly its evaluation config and no external platform ports.
-[Source factory](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/executable_binding.py) and
-[method factory](../../src/empirical_lawhood/adapters/methods/rc_ladder_numerical_comparison/executable_binding.py) own those exact sets.
+[Source factory](../../src/empirical_lawhood/adapters/simulators/rc_ladder_response/extension.py) and
+[method factory](../../src/empirical_lawhood/domains/circuits/rc_ladder_numerical_comparison/extension.py) own those exact sets.
 Do not generalize that zero-port contract to physical or held-source adapters.
 
 The [four selectors](architecture.md#four-authoring-directory-selectors) are manual:
@@ -401,7 +494,7 @@ Real source qualification, exposure census, physical metrology, issue/approval/e
 
 ## Provider and record contracts
 
-Place the extension under its scientific owner in `adapters/simulators/`, `adapters/physical/` or `adapters/methods/`.
+Place reusable calculations under `methods`, domain meanings under `domains`, and external bridges under `adapters`.
 Define frozen dataclasses derived from `CanonicalRecord`.
 Give each record an explicit `SCHEMA` and public format `VERSION`.
 Constructor checks own units, finite values, sorted unique identities, shape and support.
@@ -413,8 +506,13 @@ Use the bounded descriptor readers and artifact-plane ports.
 After a bounded read, keep its verified bytes for subsequent work.
 Do not reopen that path with an unrestricted reader.
 Model-bank plan identity, training roots and exposure role remain scientific operands.
+Canonical worker inputs can use `WorkerInputPort.decode_canonical_record` with
+their declared byte ceiling. Sealed input cursors share immutable records only
+within their owning process, thread and lifetime. Continue checking the exact
+artifact identity, schema, complete size, policy and scientific operands at
+each operation boundary. Custom readers retain their ordinary decode path.
 
-Implement the existing [provider](../../src/empirical_lawhood/runtime/providers.py) and [execution](../../src/empirical_lawhood/runtime/execution.py) protocols.
+Implement the existing [provider](../../src/empirical_lawhood/execution/providers.py) and [execution](../../src/empirical_lawhood/execution/execution.py) protocols.
 Bind exact capability and implementation identities.
 Declare external inputs, runners and output semantic contracts.
 For canonical envelopes, declare the actual schema, `record_version` and required field keys.
@@ -424,27 +522,33 @@ Implement the factory's `build_provider(registry=..., records=..., platform_port
 
 Keep mounts, signing keys and external contact explicit. Use the existing scheduler. Compilation and construction remain operations without native effects.
 
-## Register the two contributions
+<a id="register-the-two-contributions"></a>
 
-Add `extension_bundle.py` under the adapter's allowed family root.
-Export `EXTENSION_BUNDLE_CONTRIBUTION` with capability, runtime, resource, evidence ceilings and conformance obligations.
-Add `executable_binding.py` beside that owner.
-Export `EXECUTABLE_BINDING_CONTRIBUTION`, `EXECUTABLE_BINDING_FACTORIES` and `EXECUTABLE_RECORD_TYPES`.
-The record types define the closed canonical codec roster for this binding.
+## Declare one extension
 
-Regenerate the static aggregate before the executable aggregate:
+Add one `extension.py` under the owning method, domain or adapter package.
+Export `EXTENSION = ExtensionDeclaration(...)` through the [public extension contract](../v1.0/public-api.md#one-extension-declaration).
+Its operation declarations own configuration, exact inputs and outputs, resources, evidence limits and actual hooks.
+Add protocol and public discovery tuples to that same declaration when needed.
+Routine extensions require no separate executable descriptor or manual registry census.
 
 ```sh
-uv run --no-sync python scripts/generate_extension_bundle_aggregate.py
-uv run --no-sync python scripts/generate_executable_binding_aggregate.py
-uv run --no-sync python scripts/generate_cli_reference.py
+uv run --no-sync python scripts/generate_extension_projections.py --json
 ```
 
-The expected outputs are the two generated adapter composition modules, the
-[API runtime-binding aggregate](../../src/empirical_lawhood/api/generated_experiment_runtime_bindings.py),
-and `docs/reference/cli.md`. Examine all four diffs. The generators inspect the closed `adapters/{control,methods,physical,simulators}` descriptor roots. A module outside those roots does not become executable through registration.
+The ordered generator projects the existing extension and executable aggregates, API bindings, CLI reference, workflow catalogue, configuration schemas and installation manifests.
+Use `--check --json` to inspect every stage without source writes.
+Examine generated differences and keep every fingerprint under its generator owner.
+The [complete method recipe](../v1.0/add-method.md) supplies a minimal working contribution.
 
-Keep generated fingerprints under their generator owner. If a CLI verb is required, add its lifecycle and invocation/output/refusal metadata. Use the existing CLI behavior checks for that boundary.
+The existing low-level contribution record types remain compiler and framework contracts.
+They are derived products for a routine unified extension, not a second authoring surface.
+The generator rejects duplicate declarations of the same fact.
+Static registration neither executes a method nor grants scientific or outcome-access authority.
+
+The [recursive operation/schema index](../../src/empirical_lawhood/adapters/composition/generated_recursive_operations.py) remains a closed generated codec and operation census.
+Selected operations load their exact installed factories.
+After changing a declaration, use the [selection controls](../../tests/test_selected_operation_loading.py) and the relevant scientific contract tests.
 
 ## Compose the application route
 
@@ -520,7 +624,7 @@ packets and when projecting their assessments.
 
 The current RC and battery registrations support exposed development.
 A future eligible native adapter supplies its own scientific stage/source validator through this seam.
-The [battery binding](../../src/empirical_lawhood/adapters/methods/battery_recursive_construction/scientific_binding.py) demonstrates fixed numerical claim checks.
+The [battery binding](../../src/empirical_lawhood/domains/battery/battery_recursive_construction/scientific_binding.py) demonstrates fixed numerical claim checks.
 A changed scientific question needs its declared protocol and registered assessment.
 
 For durable roots, branches, initializers or segments within a native task,
@@ -540,18 +644,18 @@ Use the following existing owners for the read lifetime:
 
 | Responsibility | Owner and contract |
 |---|---|
-| Complete publication and final byte checks | [`ExternalArtifactPlane.read_context`](../../src/empirical_lawhood/infrastructure/artifacts.py) owns the finite byte census. Its complete closing check also runs when the consumer raises. Nested stock readers can share that lifetime; custom policies retain their own checks. |
+| Complete publication and final byte checks | [`ExternalArtifactPlane.read_context`](../../src/empirical_lawhood/storage/artifacts.py) owns the finite byte census. Its complete closing check also runs when the consumer raises. Nested stock readers can share that lifetime; custom policies retain their own checks. |
 | Current protected access | The selected family's API custody owner supplies the actual access callback. Refresh original persisted grants and current time before protected bodies and at return. A locator, decoded record or prior successful check is not permission. |
-| Typed canonical records | [`read_verified_canonical_record`](../../src/empirical_lawhood/infrastructure/canonical_record_read.py) joins the exact manifest, complete publication and registered record type. Pass the existing access callback through `before_member`. It preserves stricter custom readers and their bounds. |
-| Already authenticated canonical bytes | [`decode_canonical_bytes_with_identity`](../../src/empirical_lawhood/kernel/decoding.py) returns the typed record and exact size/digest from one canonical pass. The caller still owns publication, current access and semantic producer joins. |
-| Immutable decoded records | [`decoded_record_scope`](../../src/empirical_lawhood/kernel/decoded_record_store.py) provides finite reuse bound to bytes, type, validator implementation and Decimal context. Existing read contexts select this machinery; do not add a pathname cache or a cached permission decision. |
-| Matrix array operands | [`decoded_matrix_array_scope`](../../src/empirical_lawhood/infrastructure/matrix_array_io.py) bounds compressed-plus-expanded retention within one root/case consumer. Arrays remain immutable. The caller authenticates the archive, allocation and producer before decoding. Other formats retain their own contracts. |
-| Optional ordered reconstruction | [`canonical_validation_scope`](../../src/empirical_lawhood/infrastructure/parallel_verification.py) yields a finite executor with `project_ordered`. Select admitted workers and an explicit input/workspace estimate. Results retain order and caller Decimal context; oversized operands use the documented serial path. |
+| Typed canonical records | [`read_verified_canonical_record`](../../src/empirical_lawhood/storage/canonical_record_read.py) joins the exact manifest, complete publication and registered record type. Pass the existing access callback through `before_member`. It preserves stricter custom readers and their bounds. |
+| Already authenticated canonical bytes | [`decode_canonical_bytes_with_identity`](../../src/empirical_lawhood/science/records/decoding.py) returns the typed record and exact size/digest from one canonical pass. The caller still owns publication, current access and semantic producer joins. |
+| Immutable decoded records | [`decoded_record_scope`](../../src/empirical_lawhood/science/records/decoded_record_store.py) provides finite reuse bound to bytes, type, validator implementation and Decimal context. Existing read contexts select this machinery; do not add a pathname cache or a cached permission decision. |
+| Matrix array operands | [`decoded_matrix_array_scope`](../../src/empirical_lawhood/adapters/matrix_storage/matrix_array_io.py) bounds compressed-plus-expanded retention within one root/case consumer. Arrays remain immutable. The caller authenticates the archive, allocation and producer before decoding. Other formats retain their own contracts. |
+| Optional ordered reconstruction | [`canonical_validation_scope`](../../src/empirical_lawhood/storage/parallel_verification.py) yields a finite executor with `project_ordered`. Select admitted workers and an explicit input/workspace estimate. Results retain order and caller Decimal context; oversized operands use the documented serial path. |
 
 For example, this typed-record consumer assumes the caller already selected the original manifest and actual access owner:
 
 ```python
-from empirical_lawhood.infrastructure.canonical_record_read import read_verified_canonical_record
+from empirical_lawhood.storage.canonical_record_read import read_verified_canonical_record
 
 
 def read_selected_record(writer, manifest, record_type, *, maximum_bytes,

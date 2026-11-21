@@ -12,31 +12,31 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_records import project_protected_e3_response_numerics
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_source_records import identity
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_statistical_bindings import ConfiguredProtectedE3FitConfig, statistical_task_id
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
-from empirical_lawhood.planning.study_authoring import DesignInputRecord, DesignInputRole, SourceMaterializationRole
-from empirical_lawhood.planning.formal_analysis import derive_formal_gap_applicability
-from empirical_lawhood.runtime.experiment_preparation import PreparedExperimentFile
-from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig, SourceReadMode
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_records import project_protected_e3_response_numerics
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_source_records import identity
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_statistical_bindings import ConfiguredProtectedE3FitConfig, statistical_task_id
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
+from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole, SourceMaterializationRole
+from empirical_lawhood.design.formal_analysis import derive_formal_gap_applicability
+from empirical_lawhood.execution.experiment_preparation import PreparedExperimentFile
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
 from tests.experiment_entry_support import entry_package_for_draft
 from tests.runtime_platform.test_standard_formal_candidate import _standard_fixture
 from tests.test_matrix_e3_response_records import qualification
 from tests.test_matrix_factor_confirmation_eligibility import publish
 
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_preparation as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import ConfiguredProtectedE3PreparationSelection
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_protocol import project_protected_e3_protocol
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_selection import ConfiguredProtectedE3ResponseSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_preparation as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import ConfiguredProtectedE3PreparationSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_protocol import project_protected_e3_protocol
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_selection import ConfiguredProtectedE3ResponseSelection
 from empirical_lawhood.api.experiment_preparation import load_experiment_specification, load_experiment_inputs, prepare_experiment
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_matrix_configured_protected_e3 import selected as configured_inputs, original_metadata
 from tests.test_matrix_e3_protected_public_lowering import original_case, resource_selection
 ROOT = Path(__file__).resolve().parents[1]
@@ -68,7 +68,7 @@ def prepared_case(directory):
         mathematical_protocol=mathematical, original_factor_rule=full_rule, prefix_policy=policy,
         scalar_definition=case.manifest.scalar_definition,
         normalization_source=full_rule.scalar_closure.normalization_owner,
-        normalization_source_bytes=(ROOT / "src/empirical_lawhood/adapters/simulators/six_matrix_response/response_observer.py").read_bytes(),
+        normalization_source_bytes=(ROOT / "src/empirical_lawhood/package_data/scientific_originals/matrix_scalar_response_observer.py.txt").read_bytes(),
         record_id="projection.configured-public." + str(index))
         for index, policy in enumerate(case.manifest.native_specification.selection.prefix_policies))
     old = case.response_selection
@@ -167,7 +167,7 @@ def prepared_case(directory):
 
 def write_public_file_selection(case):
     """Select existing original files through the installed public FILE schema."""
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 
     root = Path(case.plane.root.contract.canonical_path)
     record_path = root / "selected-protected-e3.canonical.json"

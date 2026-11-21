@@ -6,13 +6,13 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import selection as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import selection as domain
 from empirical_lawhood.api.experiment_preparation import load_experiment_specification, prepare_experiment
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExecutionSelection
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
 from tests.test_matrix_researcher_programme import ROOT, _execution
 from tests.test_recursive_public_service import _plane
 

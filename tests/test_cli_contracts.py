@@ -45,6 +45,16 @@ def test_recursive_run_cli_forwards_selected_workers(tmp_path, monkeypatch, comm
     module = importlib.import_module('empirical_lawhood.api.'+api_module)
     plane = object()
     monkeypatch.setattr(integrations,'_storage',lambda: (ROOT,None,plane))
+    if command == 'recursive-development-run':
+        from empirical_lawhood.api import rc_workbench
+        from empirical_lawhood.api.application_contracts import ApplicationError
+
+        def select_generic_route(**kwargs):
+            assert kwargs == {'directory': tmp_path.absolute(), 'plane': plane}
+            raise ApplicationError('UNSUPPORTED_BOUNDED_RC_SELECTION',
+                'The forwarding fixture selects the generic recursive route.')
+
+        monkeypatch.setattr(rc_workbench, 'load_bounded_rc', select_generic_route)
     calls = []
     def selected(**kwargs):
         calls.append(kwargs)
@@ -72,7 +82,7 @@ def test_recursive_run_cli_rejects_invalid_workers_before_storage(tmp_path, monk
 
 
 def test_recursive_worker_options_and_help_remain_static(monkeypatch):
-    from empirical_lawhood.infrastructure.execution import LocalExecutionResourceAdmitter
+    from empirical_lawhood.execution.local.execution import LocalExecutionResourceAdmitter
     def forbidden():
         raise AssertionError('static command discovery inspected host capacity')
     monkeypatch.setattr(LocalExecutionResourceAdmitter,'detect_capacity',staticmethod(forbidden))
@@ -194,7 +204,7 @@ def test_portable_api_errors_use_common_envelope_and_argument_errors_use_click(
     path = tmp_path / "invalid.json"
     path.write_text('{"schema":"unsupported"}')
     result = CliRunner().invoke(
-        app, ["system", "validate", "--spec", str(path), "--format", "json"]
+        app, ["--no-progress", "system", "validate", "--spec", str(path), "--format", "json"]
     )
     assert result.exit_code == 2, result.output
     document = json.loads(result.stderr)
@@ -236,7 +246,7 @@ def test_canary_cli_observed_native_contact_and_read_only_effects(
     command = f"{route}-response-native-check"
     bundle = "prepared-response" if route == "prepared" else "finite-response-law"
     config = ROOT / "programmes/foundations/emergent-structure/workflows" / bundle / f"{route}-canary.json"
-    result = CliRunner().invoke(app, ["campaign", command, "--config", str(config)])
+    result = CliRunner().invoke(app, ["--no-progress", "campaign", command, "--config", str(config)])
     assert result.exit_code == 0, result.output
     assert result.stderr == ""
     report = json.loads(result.stdout)

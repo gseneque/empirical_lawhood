@@ -11,23 +11,23 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_selection as method
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_records as pr, programme_reduction as rr
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledArrays, ScheduledCausalPrefix, ScheduledSource, identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import ScheduledCompactBank
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseLossCell, ScheduledResponseScore
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import ACTION_ROLES, PREDICTORS
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experimental_selection import DeclaredCandidate, DeclaredSelectionDesign, WholeUnitFold
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA, MatrixArrayMember
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_selection as method
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_records as pr, programme_reduction as rr
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledArrays, ScheduledCausalPrefix, ScheduledSource, identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import ScheduledCompactBank
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseLossCell, ScheduledResponseScore
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import ACTION_ROLES, PREDICTORS
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experimental_selection import DeclaredCandidate, DeclaredSelectionDesign, WholeUnitFold
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA, MatrixArrayMember
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
 from tests.test_matrix_parameter_native import coordinate
 
 
@@ -293,8 +293,8 @@ def _compiled(exposed):
     """Use the owning domain lowerer and ordinary existing recursive compiler."""
     from pathlib import Path
     from empirical_lawhood.api import load_authoring
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     declarations = method.operation_declarations()
     campaign = replace(load_authoring(Path(__file__).parents[1]/"tests/fixtures/reference-campaign.json").campaign,
         budget=declarations[0].resources)
@@ -307,7 +307,7 @@ def _compiled(exposed):
 
 
 def test_existing_compiler_preserves_actual_development_selection_then_independent_freeze(exposed):
-    from empirical_lawhood.runtime.plans import BarrierKind
+    from empirical_lawhood.execution.plans import BarrierKind
     lowered, _, compiled = _compiled(exposed)
     tasks = {row.task_id: row for row in compiled.execution_plan.tasks}
     select = tasks[method.selection_node_id(exposed.specification, "select-revision")]
@@ -320,8 +320,8 @@ def test_existing_compiler_preserves_actual_development_selection_then_independe
 
 @pytest.mark.parametrize("damage", ("future-root", "missing-freeze", "nomination-external", "future-data-port", "source-substitution"))
 def test_actual_compiler_refuses_future_selection_and_freeze_dependency_bypass(exposed, damage):
-    from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     lowered, options, _ = _compiled(exposed)
     draft = lowered.draft
     if damage == "future-root":
@@ -350,9 +350,9 @@ def test_actual_compiler_refuses_future_selection_and_freeze_dependency_bypass(e
 def _sealed_context(config, declaration, records):
     """Actual kernel-sealed operand cursors, no paths or replacement contexts."""
     import os
-    from empirical_lawhood.infrastructure.artifact_stream_primitives import _anonymous_input_descriptor, _PreopenedBoundedReader, _seal_anonymous_input
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-    from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+    from empirical_lawhood.storage.artifact_stream_primitives import _anonymous_input_descriptor, _PreopenedBoundedReader, _seal_anonymous_input
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+    from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
     manifest = declaration.manifest()
     node = method.selection_node_id(config.specification, config.operation)
     records = ((config.config_id, config, WorkerInputKind.EXTERNAL),
@@ -395,7 +395,7 @@ def test_real_registered_freeze_worker_uses_independent_sealed_cursors_twice_and
     node = method.selection_node_id(exposed.specification, "freeze-revision")
     config = method.ScheduledRevisionOperationConfig("config."+node, "freeze-revision", exposed.programme,
         exposed.specification, ObjectIdentity.from_record(exposed.reduction.reduction_id, exposed.reduction), exposed.data.identity)
-    from empirical_lawhood.runtime.execution import WorkerInputKind
+    from empirical_lawhood.execution.execution import WorkerInputKind
     context = _sealed_context(config, declaration, (("operand.nomination", nominated, WorkerInputKind.DEPENDENCY),))
     try:
         runner = declaration.provider_factory().runner_factory()
@@ -414,7 +414,7 @@ def test_real_registered_freeze_worker_uses_independent_sealed_cursors_twice_and
 
 
 def test_real_registered_select_worker_fits_both_budgets_and_preserves_exact_original_source_records(exposed, nominated):
-    from empirical_lawhood.runtime.execution import WorkerInputKind
+    from empirical_lawhood.execution.execution import WorkerInputKind
     declaration = next(row for row in method.operation_declarations() if row.capability_key.endswith(".select-revision"))
     node = method.selection_node_id(exposed.specification, "select-revision")
     config = method.ScheduledRevisionOperationConfig("config."+node, "select-revision", exposed.programme,

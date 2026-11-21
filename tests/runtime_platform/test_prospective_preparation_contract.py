@@ -5,12 +5,12 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, ExperimentCensus, ExperimentPreparation
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec
-from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, ExperimentCensus, ExperimentPreparation
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig
 from tests.runtime_platform.test_recursive_prospective_workflow import _authored_handoff_fixture
 
 

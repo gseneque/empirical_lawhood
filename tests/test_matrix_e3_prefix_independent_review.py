@@ -10,8 +10,8 @@ from dataclasses import replace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_records as owner
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history, parameter_source
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_records as owner
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history, parameter_source
 from tests import test_matrix_e3_prefix_records as producer
 from tests.test_matrix_e3_prefix_science_extraction import blocked
 from tests.test_matrix_factor_confirmation_eligibility import stock

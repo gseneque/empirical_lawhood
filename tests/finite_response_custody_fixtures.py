@@ -14,32 +14,26 @@ import json
 from typing import ClassVar
 import numpy as np
 from tests.test_finite_response_assigned_method_records import _source
-from empirical_lawhood.adapters.methods.finite_response_law import method_records as mr
-from empirical_lawhood.adapters.methods.finite_response_law.native_records import native_method_types
-from empirical_lawhood.adapters.methods.finite_response_law.assigned_native_records import FiniteResponseLawAssignedCalibrationInterface
-from empirical_lawhood.adapters.methods.finite_response_law.calibration_operands import calibration_operands
-from empirical_lawhood.adapters.methods.finite_response_law.terminal import qualify_calibration
-from empirical_lawhood.adapters.methods.finite_response_law.executable_binding import METHOD_CAPABILITY
-from empirical_lawhood.adapters.composition.finite_response_law.design import qualification_system
-from empirical_lawhood.adapters.simulators.finite_response_law.contracts import native_invocations
+from empirical_lawhood.domains.matrix.finite_response_law import method_records as mr
+from empirical_lawhood.domains.matrix.finite_response_law.native_records import native_method_types
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_native_records import FiniteResponseLawAssignedCalibrationInterface
+from empirical_lawhood.domains.matrix.finite_response_law.calibration_operands import calibration_operands
+from empirical_lawhood.domains.matrix.finite_response_law.terminal import qualify_calibration
+from empirical_lawhood.domains.matrix.finite_response_law.extension import METHOD_CAPABILITY
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.design import qualification_system
+from empirical_lawhood.domains.matrix.finite_response_law.contracts import native_invocations
 from empirical_lawhood.adapters.simulators.finite_response_law.provider import native_result_type
-from empirical_lawhood.adapters.simulators.finite_response_law.instruments import REFERENCE_INSTRUMENT
-from empirical_lawhood.adapters.simulators.finite_response_law.source import FiniteResponseLawAssignedCalibrationCheckpoint
-from empirical_lawhood.adapters.simulators.prepared_response.contracts import PreparedForceWord
-from empirical_lawhood.infrastructure.candidate_payloads import (
-    ExternalCandidatePayloadPlane,
-)
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactProfile,
-    ArtifactWriteRequest,
-    CanonicalTaskReceipt,
-)
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding
+from empirical_lawhood.domains.matrix.finite_response_law.instruments import REFERENCE_INSTRUMENT
+from empirical_lawhood.domains.matrix.finite_response_law.source import FiniteResponseLawAssignedCalibrationCheckpoint
+from empirical_lawhood.domains.matrix.prepared_response.contracts import PreparedForceWord
+from empirical_lawhood.storage.candidate_payloads import ExternalCandidatePayloadPlane
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.execution import DependencyReceiptBinding
 
 
 @dataclass(frozen=True)
@@ -58,8 +52,8 @@ def publish_runtime(
     wrong_subject=False,
 ):
     from empirical_lawhood.adapters.composition.finite_response_law.consumer_ports import FiniteResponseLawRuntimeContext
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-    from empirical_lawhood.planning.study_issue import StudyAuthorityKind, StudyOperationAuthority
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.design.study_issue import StudyAuthorityKind, StudyOperationAuthority
 
     def identity(name):
         return ObjectIdentity(
@@ -367,12 +361,9 @@ def retained_continuation(source):
     from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_retention import FiniteResponseLawEvaluationRetention
     from empirical_lawhood.adapters.simulators.finite_response_law.native_artifact import NATIVE_PAIR_SCHEMA
     from empirical_lawhood.adapters.simulators.finite_response_law.source_outputs import FiniteResponseLawAssignedEvaluationTaskResult
-    from empirical_lawhood.planning.source_qualification import ProspectiveRetainedPredecessor
-    from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignStageEnvelope
-    from empirical_lawhood.kernel.serialization import (
-        CanonicalRecord,
-        canonical_json_bytes,
-    )
+    from empirical_lawhood.design.source_qualification import ProspectiveRetainedPredecessor
+    from empirical_lawhood.execution.linked_campaigns import LinkedCampaignStageEnvelope
+    from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes
     from dataclasses import dataclass
     from typing import ClassVar
 

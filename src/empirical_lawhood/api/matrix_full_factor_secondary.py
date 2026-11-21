@@ -2,15 +2,13 @@
 """One pre-future E4 target publication and exact current retained custody."""
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import (
-    MatrixE4SecondaryReadoutSelection, MatrixE4SecondaryTarget,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_preparation as domain
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.publication_metadata import authenticate_published_materialization
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryReadoutSelection, MatrixE4SecondaryTarget
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_preparation as domain
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 
 
 def authenticate_e4_secondary_target(*, writer, selection, bank):
@@ -68,13 +66,13 @@ def derive_development_inputs(*, specification, source_selection_path, project_r
         metadata_directory, output_selection_path, execution, read_access=None):
     """Enrich copied DEV inputs through the ordinary derive-inputs command."""
     from hashlib import sha256
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_experiment as development
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_experiment as development
     from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
-    from empirical_lawhood.infrastructure.source_closure import capture_admitted_target_source, require_admitted_target_source_current
-    from empirical_lawhood.infrastructure.source_origin import require_selected_implementation
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+    from empirical_lawhood.storage.source_closure import capture_admitted_target_source, require_admitted_target_source_current
+    from empirical_lawhood.storage.source_origin import require_selected_implementation
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
     from empirical_lawhood.api.selected_e4_declarative import _write
     if type(specification) is not development.SelectedE3E4ExperimentSpecification:
         raise TypeError('E4 target derivation requires its exact current DEV specification')
@@ -126,7 +124,7 @@ def derive_development_inputs(*, specification, source_selection_path, project_r
             'secondary_readout': secondary.identity, 'authority': 'NONE', 'native_contact': 'NONE',
             'dependencies': tuple({'code': row.code, 'kind': row.kind.value, 'detail': row.detail,
                 'source_key': row.source_key} for row in preparation.dependencies)}})
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
     parents = () if inputs.evidence is None else inputs.evidence.produced_input_parents
     access, visibility = produced_access(declared_access=OutcomeAccess.OUTCOME_BLIND,
         declared_visibility=VisibilityCeiling.PROSPECTIVE, parents=parents)

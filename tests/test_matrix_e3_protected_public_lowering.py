@@ -15,26 +15,26 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_experiment_inputs import project_protected_e3_allocation
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_feature_bindings import feature_task_id
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_original_publications import ProtectedE3OriginalPublications
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_response_records import project_protected_e3_response_numerics
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_response_preparation import response_task_id
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import identity
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_statistical_bindings import ProtectedE3FitConfig, statistical_task_id
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.time import AvailabilitySpec, CausalPhase, InformationCutoff
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
-from empirical_lawhood.planning.study_authoring import DesignInputRecord, DesignInputRole, SourceMaterializationRole
-from empirical_lawhood.planning.formal_analysis import derive_formal_gap_applicability
-from empirical_lawhood.runtime.experiment_preparation import PreparedExperimentFile
-from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig, SourceReadMode
-from empirical_lawhood.runtime.execution_envelope import ChildResourceTokenLimit, NonTimeResourceBudget, ProgressHeartbeat, ProgressLivenessContract
-from empirical_lawhood.runtime.experiment_resources import ExecutionResourceSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_experiment_inputs import project_protected_e3_allocation
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_feature_bindings import feature_task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_original_publications import ProtectedE3OriginalPublications
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_response_records import project_protected_e3_response_numerics
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_response_preparation import response_task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import identity
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_statistical_bindings import ProtectedE3FitConfig, statistical_task_id
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase, InformationCutoff
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
+from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole, SourceMaterializationRole
+from empirical_lawhood.design.formal_analysis import derive_formal_gap_applicability
+from empirical_lawhood.execution.experiment_preparation import PreparedExperimentFile
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
+from empirical_lawhood.execution.execution_envelope import ChildResourceTokenLimit, NonTimeResourceBudget, ProgressHeartbeat, ProgressLivenessContract
+from empirical_lawhood.execution.experiment_resources import ExecutionResourceSelection
 from tests.experiment_entry_support import entry_package_for_draft
 from tests.runtime_platform.test_candidate_compiler import _fixture
 from tests.runtime_platform.test_standard_formal_candidate import _standard_fixture
@@ -81,7 +81,7 @@ def original_case(directory: Path, *, selected64=False, cal_count=None, eval_cou
         ("native-selection", manifest.native_specification.publication),
         ("reservation", manifest.reservation_publication),
         ("roles", publish(plane, allocation, "literal.public-e3.roles"))))
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_census_publication
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_census_publication
     originals = ProtectedE3OriginalPublications("originals.literal.public-e3", inputs.specification.identity,
         identity(manifest), inputs.training_allocation.identity,
         publish(plane, manifest, "literal.public-e3.source-manifest"),
@@ -132,7 +132,7 @@ def original_case(directory: Path, *, selected64=False, cal_count=None, eval_cou
 
 def resource_selection(_case=None, *, maximum_parallel_tasks=1):
     """Reusable explicit operational defaults; no generated task ID roster."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import ProtectedE3ResourceSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import ProtectedE3ResourceSelection
 
     controls = ExecutionResourceSelection("resources.literal.public-e3", (),
         (ChildResourceTokenLimit("child.literal.public-e3", 256, 0),), (), (), (), None, None,
@@ -145,8 +145,8 @@ def resource_selection(_case=None, *, maximum_parallel_tasks=1):
 
 def prepared_case(directory: Path, *, selected64=False, cal_count=None, eval_count=None, maximum_parallel_tasks=1):
     """Build closed preparation inputs through the real lowerer's projections."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
 
     case = original_case(directory, selected64=selected64, cal_count=cal_count, eval_count=eval_count)
     resources = resource_selection(case, maximum_parallel_tasks=maximum_parallel_tasks)
@@ -226,7 +226,7 @@ def prepared_case(directory: Path, *, selected64=False, cal_count=None, eval_cou
 
 def write_public_file_selection(case):
     """Select existing original files through the installed public FILE schema."""
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 
     root = Path(case.plane.root.contract.canonical_path)
     record_path = root / "selected-protected-e3.canonical.json"
@@ -250,7 +250,7 @@ def selected(tmp_path_factory):
 def _assert_one_selected_allocation_custody(case, draft, records, allocation):
     """All selected consumers share the actual roles publication, not a copy ID."""
     from collections import Counter
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
 
     publications = {key: publication for key, publication, _ in case.selection.fit_config.publications}
     original = publications["roles"]
@@ -300,7 +300,7 @@ def _assert_one_selected_allocation_custody(case, draft, records, allocation):
 
 
 def test_actual_originals_derive_the_complete_public_graph_without_train_or_template_reads(selected, monkeypatch, tmp_path):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
 
     case = selected
     original = tuple(record.canonical_bytes() for record in (case.manifest, case.specification,
@@ -346,11 +346,9 @@ def test_independent_graph_oracle_requires_both_freezes_complete_denominators_an
 
 
 def test_resource_defaults_derive_every_worker_bound_and_keep_the_caller_capacity(selected):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import (
-        bind_protected_e3_experiment_inputs, derive_protected_e3_resource_selection,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs, derive_protected_e3_resource_selection
     from empirical_lawhood.api.experiment_preparation import prepare_experiment
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
     chosen = selected.selection.resource_selection
     original = chosen.canonical_bytes()
@@ -374,9 +372,9 @@ def test_resource_defaults_derive_every_worker_bound_and_keep_the_caller_capacit
 
 
 def test_same_operational_selection_derives_an_edited_population_without_task_roster(selected, tmp_path):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
     edited = prepared_case(tmp_path, cal_count=1, eval_count=8)
     selection = replace(edited.selection, resource_selection=selected.selection.resource_selection)
@@ -390,8 +388,8 @@ def test_same_operational_selection_derives_an_edited_population_without_task_ro
 
 
 def test_per_operation_resource_override_changes_only_that_phase_and_preserves_originals(selected):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import ProtectedE3OperationResources
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import ProtectedE3OperationResources
 
     selected_resources = selected.selection.resource_selection
     override = ProtectedE3OperationResources("forecast", replace(selected_resources.default_budget,
@@ -408,10 +406,10 @@ def test_per_operation_resource_override_changes_only_that_phase_and_preserves_o
 
 @pytest.mark.parametrize("coordinate", ("native-tokens", "memory"))
 def test_resource_capacity_refuses_the_complete_graph_before_any_worker(selected, monkeypatch, coordinate):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs
     from empirical_lawhood.api.experiment_preparation import prepare_experiment
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExecutionSelection
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection
 
     resources = selected.selection.resource_selection
     controls = resources.resources
@@ -431,9 +429,9 @@ def test_resource_capacity_refuses_the_complete_graph_before_any_worker(selected
 
 
 def test_historical_exact_resource_roster_remains_byte_exact_and_mixed_rules_refuse(selected):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
     resources = selected.lowered.resource_selection
     original = resources.canonical_bytes()
@@ -445,15 +443,13 @@ def test_historical_exact_resource_roster_remains_byte_exact_and_mixed_rules_ref
 
 
 def test_public_prepare_and_standard_candidate_share_the_derived_selected_instance(selected):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import (
-        bind_protected_e3_experiment_inputs, derive_protected_e3_design_inputs,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs, derive_protected_e3_design_inputs
     from empirical_lawhood.api.experiment_preparation import prepare_experiment
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.planning.experiment_entry import StudyDefinition
-    from empirical_lawhood.runtime.candidate_compiler import StandardCandidateCompilationContext, compile_study_candidate
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.design.experiment_entry import StudyDefinition
+    from empirical_lawhood.execution.candidate_compiler import StandardCandidateCompilationContext, compile_study_candidate
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     from tests.runtime_platform.test_candidate_compiler import _materialization
 
     case = selected
@@ -481,7 +477,7 @@ def assert_parallel_authority_preflight(*, specification, selection, files, exec
         protocol_bytes=None):
     """Exercise actual public preparation with a sequential-only and exact policy."""
     from empirical_lawhood.api.experiment_preparation import prepare_experiment
-    from empirical_lawhood.runtime.experiment_preparation import DependencyKind
+    from empirical_lawhood.execution.experiment_preparation import DependencyKind
 
     original_policy = selection.root.system.authority_policy
     resources = selection.resource_selection
@@ -521,8 +517,8 @@ def assert_parallel_authority_preflight(*, specification, selection, files, exec
 
 
 def test_parallel_candidate_ceiling_requires_explicit_authority_before_authoring(selected):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
     assert_parallel_authority_preflight(specification=selected.specification, selection=selected.selection,
         files=selected.files, execution=ExecutionSelection(workers=4),
@@ -530,10 +526,10 @@ def test_parallel_candidate_ceiling_requires_explicit_authority_before_authoring
 
 
 def test_insufficient_declared_authority_budget_remains_a_dependency_before_native_entry(selected, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs
     from empirical_lawhood.api.experiment_preparation import prepare_experiment
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExecutionSelection
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection
 
     policy = replace(selected.selection.root.system.authority_policy,
         budget_ceiling=ResourceBudget(1, 1, 0, 1, 0, 0))
@@ -559,10 +555,10 @@ def test_insufficient_declared_authority_budget_remains_a_dependency_before_nati
 
 
 def test_public_file_selection_decodes_the_protected_carrier_and_prepares_without_science(selected, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import e3_numerical_methods
+    from empirical_lawhood.domains.matrix.matrix_factor_response import e3_numerical_methods
     from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
     path = write_public_file_selection(selected)
     original = selected.selection.canonical_bytes()
@@ -608,7 +604,7 @@ def test_public_file_selection_refuses_original_training_file_damage_before_doma
 
 
 def test_one_actual_qualified_original_container_authenticates_all_protocols_once(selected, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import commitment
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import commitment
     from empirical_lawhood.api.domain_composition.matrix_protected_response.runtime import authenticate_protected_e3_numerical_originals
 
     actual, calls = commitment.authenticate_publication, []
@@ -623,9 +619,9 @@ def test_one_actual_qualified_original_container_authenticates_all_protocols_onc
 
 
 def test_existing_qualified_cal_and_conf_containers_preserve_all_original_protocol_members(selected, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import commitment
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion, ScheduledResponseSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import commitment
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion, ScheduledResponseSelection
     from empirical_lawhood.api.domain_composition.matrix_protected_response.runtime import authenticate_protected_e3_numerical_originals
 
     containers, qualifications, profiles = [], [], []
@@ -662,7 +658,7 @@ def test_existing_qualified_cal_and_conf_containers_preserve_all_original_protoc
 
 
 def test_changed_root_question_refuses_before_lowering_reads(selected, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
 
     selection = replace(selected.selection, root=replace(selected.selection.root,
         question="Unrelated retained question"))
@@ -672,7 +668,7 @@ def test_changed_root_question_refuses_before_lowering_reads(selected, monkeypat
 
 
 def test_later_profile_changed_sidecar_descriptor_requires_its_own_original_authentication(selected):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import validate_selection_science
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import validate_selection_science
     from empirical_lawhood.api.domain_composition.matrix_protected_response.runtime import authenticate_protected_e3_numerical_originals
 
     profiles = selected.selection.numerical_profiles
@@ -709,7 +705,7 @@ def test_original_numerical_container_mutation_refuses_actual_public_authenticat
 
 @pytest.mark.parametrize("damage", ("roles", "cutoff", "source", "protocol", "training", "missing-numerical-qualification", "foreign-numerical-qualification"))
 def test_original_source_or_causal_substitution_refuses_before_public_lowering_io(selected, monkeypatch, damage):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_lowering import lower_protected_matrix_response_error
 
     case, selection = selected, selected.selection
     monkeypatch.setattr(Path, "read_bytes", lambda *_args, **_kwargs: pytest.fail("refused lowering read scientific bodies"))
@@ -738,9 +734,9 @@ def test_original_source_or_causal_substitution_refuses_before_public_lowering_i
 
 
 def test_selected64_uses_the_same_public_preparation_and_whole_unit_lowering(tmp_path):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs
     from empirical_lawhood.api.experiment_preparation import prepare_experiment
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
     case = prepared_case(tmp_path, selected64=True)
     resolved = bind_protected_e3_experiment_inputs(case.specification,

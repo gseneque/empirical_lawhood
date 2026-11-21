@@ -11,14 +11,14 @@ from decimal import Decimal
 from fractions import Fraction
 from typing import ClassVar
 
-from empirical_lawhood.kernel.datasets import ArrayDatasetManifest
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_decimal
-from empirical_lawhood.runtime.array_datasets import ArrayDatasetReader
+from empirical_lawhood.science.models.datasets import ArrayDatasetManifest
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_decimal
+from empirical_lawhood.execution.array_datasets import ArrayDatasetReader
 
-from .contracts import Grid2OpNativeStep
-from .reliability import assess_grid_episode_intervals, exact_decimal, validate_reliability_inputs
-from .reliability_contracts import GridOperatingEpisodeContext, GridServiceInterval, _identity
+from empirical_lawhood.domains.energy.grid2op.contracts import Grid2OpNativeStep
+from empirical_lawhood.domains.energy.grid2op.reliability import assess_grid_episode_intervals, exact_decimal, validate_reliability_inputs
+from empirical_lawhood.domains.energy.grid2op.reliability_contracts import GridOperatingEpisodeContext, GridServiceInterval, _identity
 
 
 ENERGY_MEMBERS = ("curtailed-energy-mwh", "delivered-energy-mwh", "demanded-energy-mwh", "redispatch-magnitude-mwh")

@@ -1,28 +1,27 @@
 """Current six-matrix development scans, full precontact proof and exact recovery."""
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
-from dataclasses import dataclass, replace
+from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
-from typing import ClassVar
 
-from empirical_lawhood.adapters.composition.matrix_response_study.design import _source_config
-from empirical_lawhood.adapters.methods.matrix_response_study import anisotropic_feasibility as science
-from empirical_lawhood.adapters.methods.matrix_response_study.geometry_inputs import MatrixGeometryAllocation, allocate_matrix_geometry, PUBLIC_GEOMETRY_MASTER_SEED, validate_geometry_source
-from empirical_lawhood.adapters.methods.matrix_response_study.scientific_seed_inputs import anisotropic_member_scientific_ordinal
-from empirical_lawhood.adapters.methods.matrix_response_study.numerical_qualification import MatrixResponseNumericalQualificationQualificationReport, MatrixResponseNumericalQualificationDisposition
-from empirical_lawhood.adapters.simulators.six_matrix_response.contracts import SixMatrixResponseSixMatrixSourceConfig
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_json_bytes, validate_sha256, validate_stable_id
-from empirical_lawhood.runtime.artifacts import ArtifactManifest
+from empirical_lawhood.domains.matrix.matrix_response_study.geometry_records import MatrixGeometryScanInput, MATRIX_GEOMETRY_INPUT_MAXIMUM_BYTES
 
-from .matrix_native_custody import MatrixNativeCustody, matrix_scientific_code_sha256, read_matrix_native_payload, preflight_matrix_native_store, retain_matrix_native_runtime
+from empirical_lawhood.domains.matrix.matrix_response_study.authoring.design import _source_config
+from empirical_lawhood.domains.matrix.matrix_response_study import anisotropic_feasibility as science
+from empirical_lawhood.domains.matrix.matrix_response_study.geometry_inputs import allocate_matrix_geometry, PUBLIC_GEOMETRY_MASTER_SEED
+from empirical_lawhood.domains.matrix.matrix_response_study.scientific_seed_inputs import anisotropic_member_scientific_ordinal
+from empirical_lawhood.domains.matrix.matrix_response_study.numerical_qualification import MatrixResponseNumericalQualificationQualificationReport, MatrixResponseNumericalQualificationDisposition
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
 
-MATRIX_GEOMETRY_INPUT_MAXIMUM_BYTES = 8 * 1024**2
-MATRIX_GEOMETRY_RESULT_MAXIMUM_BYTES = 64 * 1024**2
+from empirical_lawhood.api.matrix_native_custody import MatrixNativeCustody, matrix_scientific_code_sha256, read_matrix_native_payload, preflight_matrix_native_store, retain_matrix_native_runtime
+
 _NUMERICAL_CHECK_NAMES = (
     "action-reference-optimized", "gradient-finite-difference", "hermitian-noise-covariance",
     "ideal-background-stationarity", "ideal-spectrum", "laplacian-construction-crosscheck",
@@ -33,32 +32,6 @@ _NUMERICAL_CHECK_NAMES = (
 )
 
 
-@dataclass(frozen=True, slots=True)
-class MatrixGeometryScanInput(CanonicalRecord):
-    SCHEMA: ClassVar[str] = "empirical-lawhood/matrix-geometry/scan-input"
-    config_id: str
-    allocation: MatrixGeometryAllocation
-    source: SixMatrixResponseSixMatrixSourceConfig
-    scientific_code_sha256: str
-    environment_lock_sha256: str
-    numerical_qualification: ArtifactManifest | None = None
-    workers: int = 1
-    minimum_free_bytes: int = 1024**3
-    maximum_output_bytes: int = MATRIX_GEOMETRY_RESULT_MAXIMUM_BYTES
-
-    def __post_init__(self) -> None:
-        validate_stable_id(self.config_id, field_name="config_id")
-        validate_geometry_source(self.source)
-        for name in ("scientific_code_sha256", "environment_lock_sha256"):
-            validate_sha256(getattr(self, name), field_name=name)
-        if type(self.workers) is not int or not 1 <= self.workers <= self.source.maximum_worker_processes:
-            raise ValueError("Geometry worker count exceeds its existing source contract")
-        if self.minimum_free_bytes < 1 or self.maximum_output_bytes != MATRIX_GEOMETRY_RESULT_MAXIMUM_BYTES:
-            raise ValueError("Geometry operation lacks its bounded output/free-space contract")
-
-    @property
-    def run_id(self) -> str:
-        return f"matrix-geometry.run-{self.fingerprint()[:32]}"
 
 
 def matrix_geometry_example_input(*, environment_lock_sha256: str) -> MatrixGeometryScanInput:
@@ -103,10 +76,10 @@ def prove_matrix_geometry_scan(config: MatrixGeometryScanInput) -> dict[str, obj
     """Construct the installed native owner and exact complete graph without execution."""
     if config.scientific_code_sha256 != matrix_scientific_code_sha256():
         raise ValueError("Geometry proof scientific source owners changed after preparation")
-    from empirical_lawhood.adapters.simulators.six_matrix_response.executable_binding import MATRIX_RESPONSE_SIMULATOR_EXECUTABLE_BINDING
+    from empirical_lawhood.adapters.simulators.six_matrix_response.extension import MATRIX_RESPONSE_SIMULATOR_EXECUTABLE_BINDING
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
-    from empirical_lawhood.adapters.simulators.six_matrix_response.extension_bundle import SIX_MATRIX_RESPONSE_CAPABILITY
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
+    from empirical_lawhood.adapters.simulators.six_matrix_response.extension import SIX_MATRIX_RESPONSE_CAPABILITY
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
     registry = CapabilityRegistry("matrix-geometry.native-proof", (SIX_MATRIX_RESPONSE_CAPABILITY,))
     factory = EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY.factory(MATRIX_RESPONSE_SIMULATOR_EXECUTABLE_BINDING.binding_id)
     provider = factory.build_provider(registry=registry, records=(config.source,), platform_ports=())
@@ -157,9 +130,9 @@ def _qualification(config, writer, implementation_commit):
     parts = manifest.materialization.relative_path.split("/")
     if len(parts) != 4 or parts[0] != "runs" or parts[2:] != ["outputs", "numerical-qualification.json"]:
         raise ValueError("Geometry numerical qualification lacks its exact public task locator")
-    from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
+
     input_path = f"runs/{parts[1]}/inputs/config.json"
-    input_manifest = decode_artifact_manifest(read_bounded_bytes(writer.root.resolve(input_path + ".manifest.json", for_write=False), maximum_bytes=1024**2))
+    input_manifest = read_artifact_sidecar(writer, (writer.root.resolve(input_path + '.manifest.json', for_write=False)).relative_to(writer.root.contract.canonical_path).as_posix(), maximum_bytes=1024 ** 2)
     original = decode_canonical_bytes(read_matrix_native_payload(writer, input_manifest, maximum_bytes=MATRIX_GEOMETRY_INPUT_MAXIMUM_BYTES), MatrixGeometryScanInput, maximum_bytes=MATRIX_GEOMETRY_INPUT_MAXIMUM_BYTES)
     original_custody = _custody(original, writer, implementation_commit, read_only=True)
     if (original.run_id != parts[1] or original_custody._manifest(manifest.materialization.relative_path) != manifest
@@ -173,7 +146,7 @@ def _qualification(config, writer, implementation_commit):
         or record.implementation_commit != implementation_commit
         or record.disposition is not MatrixResponseNumericalQualificationDisposition.NUMERICALLY_QUALIFIED):
         raise ValueError("Geometry current numerical source is unqualified or belongs to another source/commit")
-    from empirical_lawhood.adapters.simulators.six_matrix_response.extension_bundle import SIX_MATRIX_RESPONSE_CAPABILITY
+    from empirical_lawhood.adapters.simulators.six_matrix_response.extension import SIX_MATRIX_RESPONSE_CAPABILITY
     if ({check.check_id for check in record.checks} != {
         f"matrix-response-numerical-qualification.{name}" for name in _NUMERICAL_CHECK_NAMES}
         or len(record.canonical_points) != len(config.source.canonical_reference_models)
@@ -343,7 +316,7 @@ def run_matrix_numerical_qualification(*, config: MatrixGeometryScanInput, artif
     report = custody.load("numerical-qualification", MatrixResponseNumericalQualificationQualificationReport)
     if report is None:
         from threadpoolctl import threadpool_limits
-        from empirical_lawhood.adapters.methods.matrix_response_study.numerical_qualification import run_matrix_response_study_numerical_qualification_qualification
+        from empirical_lawhood.domains.matrix.matrix_response_study.numerical_qualification import run_matrix_response_study_numerical_qualification_qualification
         with threadpool_limits(limits=1):
             retain_matrix_native_runtime(custody, matrix_native_runtime_observation())
             custody.begin_native_effect("numerical-qualification")

@@ -16,7 +16,7 @@ from typer.testing import CliRunner
 from empirical_lawhood.cli import attempts
 from empirical_lawhood.cli.app import app
 from empirical_lawhood.cli.metadata import RETAINED_ATTEMPT_OPTIONS
-from empirical_lawhood.infrastructure import development_attempts as storage
+from empirical_lawhood.storage import development_attempts as storage
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -72,7 +72,7 @@ def test_retained_runtime_identifies_declared_torax_and_grid_distribution_names(
         return installed[name]
 
     monkeypatch.setattr(storage, "version", installed_version)
-    monkeypatch.setattr(storage, "__file__", str(tmp_path / "site-packages/empirical_lawhood/infrastructure/development_attempts.py"))
+    monkeypatch.setattr(storage, "__file__", str(tmp_path / "site-packages/empirical_lawhood/storage/development_attempts.py"))
     destination = tmp_path / "attempt"
     attempt = storage.DevelopmentAttempt(destination, "campaign grid2op-native-check", native=True)
     try:
@@ -173,13 +173,19 @@ def test_multiple_consumed_inputs_keep_distinct_owned_snapshots(tmp_path):
         attempt.close()
 
 
-def test_no_export_preserves_stdout_stderr_and_no_files(tmp_path, native, monkeypatch):
+@pytest.mark.parametrize("quiet", [False, True], ids=["default-progress", "quiet"])
+def test_no_export_preserves_stdout_stderr_and_no_files(tmp_path, native, monkeypatch, quiet):
     _, calls, returned = native
     monkeypatch.chdir(tmp_path)
-    result = invoke(MODEL)
+    result = invoke(MODEL, before=("--no-progress",) if quiet else ())
     assert result.exit_code == 0
     assert result.stdout == json.dumps(returned, sort_keys=True, indent=2) + "\n"
-    assert result.stderr == ""
+    if quiet:
+        assert result.stderr == ""
+    else:
+        assert result.stderr.startswith("RUNNING | starting |")
+        assert "RETURNED | operation.validation_and_calculation |" in result.stderr
+        assert "retained at" not in result.stderr
     assert calls == [MODEL.read_bytes()]
     assert list(tmp_path.iterdir()) == []
 

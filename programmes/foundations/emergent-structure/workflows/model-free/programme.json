@@ -1,0 +1,778 @@
+{
+  "label": "Complete M0\u2013M7 declared programme; enter after prerequisite and budget review",
+  "roots": [
+    {
+      "modules": [
+        "M0"
+      ],
+      "role": "development",
+      "seed": 1700001
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700101
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700102
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700103
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700104
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700105
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700106
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700107
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700108
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700109
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700110
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700111
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700112
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700113
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700114
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700115
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700116
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700201
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700202
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700203
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700204
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700205
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700206
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700207
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700208
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700209
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700210
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700211
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700212
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700213
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700214
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700215
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700216
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700301
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700302
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700303
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700304
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700305
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700306
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700307
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700308
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700309
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700310
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700311
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700312
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700313
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700314
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700315
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700316
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700317
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700318
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700319
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700320
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700321
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700322
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700323
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700324
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700325
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700326
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700327
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700328
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700329
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700330
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700331
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700332
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700401
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700402
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700403
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700404
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700405
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700406
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700407
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700408
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700409
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700410
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700411
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700412
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700413
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700414
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700415
+    },
+    {
+      "modules": [
+        "M6"
+      ],
+      "role": "development",
+      "seed": 1700416
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700501
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700502
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700503
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700504
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700505
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700506
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700507
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700508
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700509
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700510
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700511
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700512
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700513
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700514
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700515
+    },
+    {
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1700516
+    }
+  ],
+  "schema": "model-free-matrix-definition.v1",
+  "settings": {
+    "memory": {
+      "protocol_age_ticks": [
+        16384
+      ]
+    },
+    "population": {
+      "mode": "reveal_all"
+    },
+    "response": {
+      "selection_tick": 32
+    }
+  }
+}

@@ -1,29 +1,30 @@
 # SPDX-License-Identifier: MPL-2.0
 """Actual original DEV acquisition and current selected E4 method custody."""
 
+from empirical_lawhood.storage.contracts.record_codecs import snapshot_record_codecs
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustodySupplier
 
 from hashlib import sha256
 from fractions import Fraction
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as acquisition_owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as p
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as acquisition_owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as p
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as owner
 from empirical_lawhood.api.current_task_custody import CurrentDevelopmentTaskCustody
 from empirical_lawhood.api.recursive_authoring import load_authored_wave
-from .recursive_execution import read_recursive_wave
-from .recursive_qualified_parents import MAX_PARENT_BYTES, _output_payload
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactManifest
-from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_selection import ScheduledRevisionTarget
+from empirical_lawhood.api.recursive_execution import read_recursive_wave
+from empirical_lawhood.api.recursive_qualified_parents import MAX_PARENT_BYTES, _output_payload
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
+from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_selection import ScheduledRevisionTarget
 
 
 def _read_control(writer, manifest, kind):
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
     if (manifest.logical.payload_schema != kind.SCHEMA or manifest.logical.media_type != "application/json"
             or manifest.logical.outcome_access is not OutcomeAccess.DEVELOPMENT_VISIBLE
             or manifest.logical.visibility_ceiling is not VisibilityCeiling.DEVELOPMENT_ONLY):
@@ -107,7 +108,7 @@ def _original_development_observations(*, writer, locator, programme, bank, data
         operation, reduction, report, products, actual_draft, actual_plan, original_input_access=None):
     """Finish one already authenticated original DEV read; no later-call authority."""
     from empirical_lawhood.api.matrix_selected_e3_e4_read import _record
-    from .matrix_read_indexes import product_record_index
+    from empirical_lawhood.api.matrix_read_indexes import product_record_index
     from functools import partial
     product_lookup = product_record_index(products)
     record = partial(_record, original_input_access=original_input_access, product_lookup=product_lookup)
@@ -122,7 +123,7 @@ def _original_development_observations(*, writer, locator, programme, bank, data
     cases = []
     index=bank.source_index()
     matched = getattr(bank.forecast_design.package.specification.measurement, 'is_matched', False)
-    from .selected_e4_case_projection import original_score_projections
+    from empirical_lawhood.api.selected_e4_case_projection import original_score_projections
     projections = original_score_projections(writer=writer, products=products, programme=programme, bank=bank,
         original_input_access=original_input_access, product_lookup=product_lookup)
     for case, result, projection in zip(programme.cases, reduction.cases, projections, strict=True):
@@ -140,14 +141,12 @@ def _original_development_observations(*, writer, locator, programme, bank, data
                 witness = record(writer, products, acquisition_owner.local_node(case.root_id, 'measure'), r.SelectedE3E4Witness)
                 if any(value is None for value in (prefix, physical, witness)):
                     raise PermissionError('matched E4 DEV observations omit the original causal/mechanical evidence')
-                from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_science import (
-                    validate_selected_account, validate_selected_account_lineage,
-                )
-                from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+                from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_science import validate_selected_account, validate_selected_account_lineage
+                from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
                 validate_selected_account_lineage(account, bank.forecast_design, protocol.public_source, prefix, witness,
                     protocol=protocol, physical=physical, physical_kind=r.SelectedE3E4MechanicalForecast)
                 if scientific_reconstruction_enabled():
-                    from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
+                    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
                     arrays = []
                     for phase, operand in (('project', prefix.arrays), ('measure', witness.arrays), ('mechanical', physical.arrays)):
                         raw = _original_array(writer, products, plan, acquisition_owner.local_node(case.root_id, phase), operand,
@@ -162,8 +161,8 @@ def _original_development_observations(*, writer, locator, programme, bank, data
             result.target_contract, feature))
     observed = p.SelectedE4ObservedData(data_id, programme.identity, r.pin(reduction), tuple(cases))
     # All original joins are independently replayed before any fitting.
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import validate_observed_data
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import E4MatchedRelationTarget
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import validate_observed_data
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import E4MatchedRelationTarget
     target = E4MatchedRelationTarget('target.source-replay', programme.criterion) if matched else ScheduledRevisionTarget("target.source-replay",
         programme.criterion, bank.forecast_design.package.specification.measurement.horizons, ("PRIMARY", "FINE"),
         "CUMULATIVE_LOG1P_NORMALIZED_RESPONSE_ERROR_ALL15")
@@ -201,7 +200,7 @@ def authenticate_selected_e4_development_operands(*, writer, draft, plan, task, 
     method packet; receipts is the official successful dependency receipt map.
     No issued package, reveal grant or invented development qualification exists.
     """
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
     if type(plan) is not DevelopmentExecutionPlan or type(config) is not owner.SelectedE4MethodConfig:
         raise PermissionError("selected revision requires its actual authored DEV plan and exact method owner")
     declarations = {row.capability_key: row for row in owner.operation_declarations()}
@@ -248,7 +247,7 @@ def authenticate_selected_e4_development_operands(*, writer, draft, plan, task, 
 
 class SelectedE4DevelopmentMethodRuntimeSupplier(CurrentIssuedTaskCustodySupplier):
     def __init__(self, supplier, *, writer, directory, plan, output_codecs):
-        self.supplier, self.writer, self.output_codecs = supplier, writer, dict(output_codecs)
+        self.supplier, self.writer, self.output_codecs = supplier, writer, snapshot_record_codecs(output_codecs)
         self.custody = CurrentDevelopmentTaskCustody(writer=writer, directory=directory, plan=plan)
 
     def resolve(self, logical_artifact_ids):
@@ -260,7 +259,7 @@ class SelectedE4DevelopmentMethodRuntimeSupplier(CurrentIssuedTaskCustodySupplie
         # Scheduler threads do not inherit the programme caller's read state.
         # Keep the complete original replay in this task's finite custody and
         # authority contexts, including the final current-task check.
-        from empirical_lawhood.infrastructure.parallel_verification import canonical_validation_scope
+        from empirical_lawhood.storage.parallel_verification import canonical_validation_scope
         pool = getattr(getattr(self.writer, '_read_verification', None), 'canonical_pool', None)
         # Share the invocation's process capacity across scheduler threads.
         # The independent custody plane still owns its separate byte census.
@@ -294,7 +293,7 @@ def bind_selected_e4_development_runtime(*, supplier, writer, directory, plan, o
 
 def prepare_selected_e4_method(supplier, context, runner):
     """Fresh issued custody and actual successful entry for a protected tail."""
-    from .selected_e4_native_runtime import authenticate_selected_e4_parent
+    from empirical_lawhood.api.selected_e4_native_runtime import authenticate_selected_e4_parent
     if type(runner) is not owner.SelectedE4MethodWorker or runner.prepared_scope is not None:
         raise PermissionError("selected protected tail needs its exact installed unprepared method worker")
     package, plan, task, receipts, controls, entry_config = authenticate_selected_e4_parent(supplier, context, runner)
@@ -323,8 +322,8 @@ def validate_selected_e4_calibration_producer(*, binding, package, execution_pla
         writer, read_scope, expected_public):
     """Exact selected CAL scope after original issued/reveal/closure admission."""
     from empirical_lawhood.api.matrix_selected_producer_scope import _installed_task, _original_output, _read_config
-    from .matrix_selected_runtime import _published_input
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_bindings import operation_declarations as native_declarations
+    from empirical_lawhood.api.matrix_selected_runtime import _published_input
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_bindings import operation_declarations as native_declarations
 
     if type(expected_public) is not p.SelectedE4PublicCalibration:
         raise TypeError("selected CAL producer requires its actual expected public original projection")
@@ -378,7 +377,7 @@ def validate_selected_e4_calibration_producer(*, binding, package, execution_pla
 
 def describe_selected_e4_development_acquisition(*, directory, artifact_writer, allow_partial):
     """Derive a locator from original DEV custody; no researcher task-ID roster."""
-    from .recursive_execution import _read_recursive_wave_with_roots
+    from empirical_lawhood.api.recursive_execution import _read_recursive_wave_with_roots
     result, roots, _ = _read_recursive_wave_with_roots(directory=directory, artifact_writer=artifact_writer,
         include_products=True, terminal_product_format="compact", allow_partial=allow_partial)
     report, products, actual_draft, actual_plan = result
@@ -409,7 +408,7 @@ def _development_acquisition_from_read(*, directory, artifact_writer, allow_part
 def selected_e4_revision_inputs_from_acquisition(*, directory, artifact_writer, allow_partial):
     """Read actual scientific source inputs for public --sources preparation."""
     if allow_partial is False:
-        from .selected_e3_access import original_e3_authority_read_context
+        from empirical_lawhood.api.selected_e3_access import original_e3_authority_read_context
         # The retained-product reader and its observation projection must share
         # one complete byte census instead of reopening publications per case.
         with original_e3_authority_read_context(artifact_writer), artifact_writer.read_context() as reading:
@@ -490,8 +489,8 @@ def validate_selected_e4_downstream_producer(*, binding, package, execution_plan
         writer, read_scope, expected_revision, expected_calibration, expected_e3_package):
     """Authenticate the genuine original CONF nomination's complete source scope."""
     from empirical_lawhood.api.matrix_selected_producer_scope import _installed_task, _original_output, _read_config
-    from .matrix_selected_runtime import _published_input
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_bindings import operation_declarations as native_declarations
+    from empirical_lawhood.api.matrix_selected_runtime import _published_input
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_bindings import operation_declarations as native_declarations
 
     if type(expected_revision) is not p.SelectedE4RevisionExport:
         raise TypeError("selected downstream producer needs its actual public original DEV decision/models")
@@ -553,11 +552,11 @@ def export_selected_e4_revision_inputs_from_acquisition(*, directory, artifact_w
         campaign, resources, allow_partial, expected_specification=None, expected_allocation=None):
     """Publish a ready public --sources selection from authenticated DEV alone."""
     from pathlib import Path
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_revision_preparation as public
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.serialization import validate_relative_locator
-    from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_revision_preparation as public
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.records.serialization import validate_relative_locator
+    from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 
     records = {**selected_e4_revision_inputs_from_acquisition(directory=directory, artifact_writer=artifact_writer,
         allow_partial=allow_partial), "campaign": campaign, "resources": resources}
@@ -565,10 +564,10 @@ def export_selected_e4_revision_inputs_from_acquisition(*, directory, artifact_w
     # publishing any derived companion.
     public.SelectedE4RevisionInputs(**records).__post_init__()
     if expected_specification is not None:
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import derive_revision_specification
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import derive_revision_specification
         derive_revision_specification(expected_specification, records["programme"])
     if expected_allocation is not None:
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import allocation
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import allocation
         if expected_allocation != allocation(records["programme"]):
             raise PermissionError("selected revision export changes its actual original native DEV allocation")
     destination = Path(output_directory)

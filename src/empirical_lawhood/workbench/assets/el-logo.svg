@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 250" role="img" aria-labelledby="el-logo-title el-logo-description">
+  <title id="el-logo-title">Empirical Lawhood</title>
+  <desc id="el-logo-description">Three open circles of gently increasing size joined on a rising diagonal.</desc>
+  <g fill="none" stroke="#e5bb80" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="84,180 236,76"/>
+    <path d="M 105.948 173.122 A 23 23 0 1 1 98.349 162.025"/>
+    <path d="M 185.764 119.926 A 27 27 0 1 1 176.845 106.899"/>
+    <path d="M 266.536 66.431 A 32 32 0 1 1 255.964 50.991"/>
+  </g>
+</svg>

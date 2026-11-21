@@ -7,20 +7,20 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods import matrix_source_evidence as owner
-from empirical_lawhood.adapters.methods.backbone_structural_transport import source_free_property_transport_source_input_parts as exposed
-from empirical_lawhood.adapters.methods.backbone_structural_transport.source_free_property_transport_contracts import source_free_property_transport_capability_registry
+from empirical_lawhood.domains.matrix import matrix_source_evidence as owner
+from empirical_lawhood.methods.backbone_structural_transport import source_free_property_transport_source_input_parts as exposed
+from empirical_lawhood.methods.backbone_structural_transport.source_free_property_transport_contracts import source_free_property_transport_capability_registry
 from empirical_lawhood.api import matrix_source_runtime as runtime
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.evidence_profiles import EvidenceProfileSelection
-from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceGateEvidence
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteResult, artifact_publication_batch_id, artifact_publication_commit_relative_path, artifact_publication_member
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.evidence_profiles import EvidenceProfileSelection
+from empirical_lawhood.design.scientific_source_qualification import ScientificSourceGateEvidence
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteResult, artifact_publication_batch_id, artifact_publication_commit_relative_path, artifact_publication_member
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 from tests.test_matrix_sampling_admission import evidence_for, request_for
 
 
@@ -108,11 +108,11 @@ def test_shared_source_helper_refuses_profile_and_source_join_substitution_befor
 def test_source_owner_requires_actual_declared_registered_implementation_and_config(
         source_case, tmp_path, monkeypatch, actual_access, actual_visibility):
     from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-    from empirical_lawhood.runtime.plans import ExternalInputSpec
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+    from empirical_lawhood.execution.plans import ExternalInputSpec
     from tests.test_recursive_public_service import _plane
 
     evidence, _ = source_case
@@ -236,12 +236,12 @@ def test_real_source_qualifier_factory_builds_manifest_bound_installed_runner(ph
 
 
 def source_memory_context(declaration, config):
-    from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, LogicalArtifactIdentity
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-    from empirical_lawhood.runtime.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
-    from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificStage
-    from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, LogicalArtifactIdentity
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+    from empirical_lawhood.execution.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+    from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificStage
+    from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment
+    from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
     from tests.test_matrix_sampling_follow_on import MemoryReader, pin
 
     manifest = declaration.manifest()
@@ -303,7 +303,7 @@ def test_genuine_source_helper_refuses_exposed_development_and_fixture_roots():
 
 
 def test_prior_identifier_allowlist_adds_only_actual_pipeline_receipt_field():
-    from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+    from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
     from tests.test_matrix_sampling_follow_on import prior_product
     pin = ObjectIdentity("source-receipt.exposed", "empirical-lawhood/planning/source-pipeline-qualification-receipt", "1.0.0", "a"*64)
     prior = prior_product(pin).prior_execution

@@ -3,33 +3,19 @@
 from dataclasses import fields
 from decimal import Decimal
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskProgressEmitter,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskProgressEmitter, TaskRunner
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .campaign import VIEWS, run_native_view
-from .contracts import ResistorCapacitorLadderNativePanel, ResistorCapacitorLadderStudyConfig
-from .extension_bundle import CAPABILITY
+from empirical_lawhood.domains.circuits.rc_ladder.campaign import VIEWS, run_native_view
+from empirical_lawhood.domains.circuits.rc_ladder.contracts import ResistorCapacitorLadderNativePanel, ResistorCapacitorLadderStudyConfig
+from empirical_lawhood.adapters.simulators.rc_ladder_response.extension import CAPABILITY
 
 
 def native_task_id(study: ResistorCapacitorLadderStudyConfig, view_id: str) -> str:

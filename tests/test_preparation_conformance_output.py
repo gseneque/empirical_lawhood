@@ -33,7 +33,7 @@ def test_conformance_invalid_output_refuses_before_native_contact(tmp_path, monk
     def forbidden(*args, **kwargs):
         raise AssertionError('invalid output entered native computation')
 
-    monkeypatch.setattr('empirical_lawhood.adapters.simulators.prepared_response.source.march_native_intervals', forbidden)
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.prepared_response.source.march_native_intervals', forbidden)
     with pytest.raises((NotADirectoryError, ValueError)):
         preparation_native_conformance(roots=roots, output_dir=output,
             conformance_id='synthetic.refused-native-conformance')

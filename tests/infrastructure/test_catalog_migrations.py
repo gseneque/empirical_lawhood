@@ -7,53 +7,22 @@ from pathlib import Path
 
 import pytest
 
-from alembic import command
-
-from alembic.config import Config
-
 from sqlalchemy import event, inspect
 
 from sqlalchemy.exc import IntegrityError
 
-from empirical_lawhood.infrastructure.sql import (
-    create_catalog_engine,
-    create_read_only_catalog_engine,
-    dataset_catalog_query_preflight,
-    unified_catalog_query_preflight,
-    upgrade_catalog,
-)
+from empirical_lawhood.storage.sql import create_catalog_engine, create_read_only_catalog_engine, dataset_catalog_query_preflight, unified_catalog_query_preflight, upgrade_catalog
 
-from empirical_lawhood.infrastructure.sql.database import ALEMBIC_HEAD, SCHEMA_VERSION
+from empirical_lawhood.storage.sql.database import ALEMBIC_HEAD, SCHEMA_VERSION
 
-from empirical_lawhood.infrastructure.sql.migrations.catalog_tables import CATALOG_TABLE_NAMES
+from empirical_lawhood.storage.sql.migrations.catalog_tables import CATALOG_TABLE_NAMES
 
-from empirical_lawhood.infrastructure.sql.migrations.dataset_tables import DATASET_PROJECTION_DIRTY_TRIGGER_DEFINITIONS, DATASET_PROJECTION_DIRTY_TRIGGER_NAMES, DATASET_SCHEMA_OBJECT_NAMES, DATASET_TABLE_NAMES
+from empirical_lawhood.storage.sql.migrations.dataset_tables import DATASET_PROJECTION_DIRTY_TRIGGER_DEFINITIONS, DATASET_PROJECTION_DIRTY_TRIGGER_NAMES, DATASET_SCHEMA_OBJECT_NAMES, DATASET_TABLE_NAMES
 
-from empirical_lawhood.infrastructure.sql.schema import (
-    dataset_external_identifier,
-    dataset_family,
-)
+from empirical_lawhood.storage.sql.schema import dataset_external_identifier, dataset_family
 
 
 
-
-def _migration_config(connection: object) -> Config:
-    config = Config()
-    migrations = (
-        Path(__file__).resolve().parents[2]
-        / "src"
-        / "empirical_lawhood"
-        / "infrastructure"
-        / "sql"
-        / "migrations"
-    )
-    config.set_main_option("script_location", str(migrations))
-    config.attributes["connection"] = connection
-    return config
-
-def _upgrade(engine: object, revision: str) -> None:
-    with engine.connect() as connection:  # type: ignore[attr-defined]
-        command.upgrade(_migration_config(connection), revision)
 
 def _schema_rows(engine: object) -> tuple[tuple[object, ...], ...]:
     with engine.connect() as connection:  # type: ignore[attr-defined]
@@ -102,7 +71,7 @@ def _family_values(
 
 def test_initial_catalog_installs_all_science_and_dataset_tables(tmp_path: Path) -> None:
     engine = create_catalog_engine(f"sqlite+pysqlite:///{tmp_path / 'catalog.sqlite3'}")
-    _upgrade(engine, ALEMBIC_HEAD)
+    upgrade_catalog(engine)
     with engine.connect() as connection:
         assert connection.exec_driver_sql("PRAGMA user_version").scalar_one() == SCHEMA_VERSION
         assert connection.exec_driver_sql("SELECT version_num FROM alembic_version").scalar_one() == ALEMBIC_HEAD
@@ -135,8 +104,8 @@ def test_initial_catalog_refuses_preexisting_schema_without_partial_adoption(tmp
     with engine.begin() as connection:
         connection.exec_driver_sql("CREATE TABLE dataset_family (pk INTEGER PRIMARY KEY)")
     before = _schema_rows(engine)
-    with engine.connect() as connection, pytest.raises(RuntimeError, match="refuses pre-existing schema objects: table dataset_family"):
-        command.upgrade(_migration_config(connection), ALEMBIC_HEAD)
+    with pytest.raises(RuntimeError, match="refuses pre-existing schema objects: table dataset_family"):
+        upgrade_catalog(engine)
     assert _schema_rows(engine) == before
     with engine.connect() as connection:
         assert connection.exec_driver_sql("PRAGMA user_version").scalar_one() == 0
@@ -158,8 +127,8 @@ def test_initial_catalog_rolls_back_nth_ddl_and_retries_cleanly(tmp_path: Path) 
 
     event.listen(engine, "before_cursor_execute", fail_third_dataset_ddl)
     try:
-        with engine.connect() as connection, pytest.raises(RuntimeError, match="injected third dataset DDL failure"):
-            command.upgrade(_migration_config(connection), ALEMBIC_HEAD)
+        with pytest.raises(RuntimeError, match="injected third dataset DDL failure"):
+            upgrade_catalog(engine)
     finally:
         event.remove(engine, "before_cursor_execute", fail_third_dataset_ddl)
     assert dataset_ddl_count == 3
@@ -179,8 +148,8 @@ def test_initial_catalog_refuses_nonempty_schema_revision(tmp_path: Path) -> Non
     engine = create_catalog_engine(f"sqlite+pysqlite:///{tmp_path / 'catalog.sqlite3'}")
     with engine.begin() as connection:
         connection.exec_driver_sql("PRAGMA user_version=1")
-    with engine.connect() as connection, pytest.raises(RuntimeError, match="requires an empty schema user_version 0; observed 1"):
-        command.upgrade(_migration_config(connection), ALEMBIC_HEAD)
+    with pytest.raises(RuntimeError, match="requires an empty schema user_version 0; observed 1"):
+        upgrade_catalog(engine)
     with engine.connect() as connection:
         assert connection.exec_driver_sql("PRAGMA user_version").scalar_one() == 1
         assert inspect(connection).get_table_names() == []

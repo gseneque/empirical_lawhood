@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from empirical_lawhood.adapters.history_budget_scientific_inputs import HistoryBudgetUnitScientificInput, require_history_budget_unit_inputs
+from empirical_lawhood.domains.history.history_budget_scientific_inputs import HistoryBudgetUnitScientificInput, require_history_budget_unit_inputs
 from empirical_lawhood.adapters._decimal_custody import require_decimal_operands_preserved
 
 from dataclasses import dataclass, fields
@@ -11,89 +11,69 @@ from typing import Any, Mapping, TypeVar, cast
 
 from threadpoolctl import threadpool_limits  # type: ignore[import-untyped]
 
-from empirical_lawhood.adapters.methods.split_cohort_history_budget.inference import integrate_untouched_recurrence, synthesize_recurrence, targeted_continuation_gate
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    canonical_json_bytes,
-    validate_sha256,
-)
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-)
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-    lineage_parent_sort_key,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityManifest, CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    StreamingOutputEmitter,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.plans import ScientificInputRole
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
+from empirical_lawhood.domains.history.split_cohort_history_budget.inference import integrate_untouched_recurrence, synthesize_recurrence, targeted_continuation_gate
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes, validate_sha256
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck, lineage_parent_sort_key
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, StreamingOutputEmitter, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.plans import ScientificInputRole
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .authoring import ARRAY_PAYLOAD_SCHEMA, CONFIG_MEDIA_TYPE, DEVELOPMENT_REPORTER_KEY, SplitCohortHistoryBudgetExternalRecord, REPORTER_KEY, VERSION, INT_ARRAY_PAYLOAD_SCHEMA, split_cohort_history_budget_phase_registry, protocol_template, scientific_graph
-from .conformance import audit_source_firewall, merge_canary_reports, merge_component_canaries, merge_concurrent_resource_reports, run_certificate_canary, run_cross_implementation_conformance, run_factorized_action_canary, run_generator_canary, run_lexical_direction_canary, run_observer_canary, run_one_pass_history_canary, run_rank_separation_canary, run_resource_canary, run_transition_canary, run_untouched_sampler_canary
-from .contracts import SplitCohortHistoryBudgetConfig, SplitCohortHistoryBudgetMethodFreeze, SplitCohortHistoryBudgetPhase, SplitCohortHistoryBudgetRecurrenceResult, SplitCohortHistoryBudgetScientificState, SplitCohortHistoryBudgetSeedRosterCommitment, SplitCohortHistoryBudgetTerminal, SplitCohortHistoryBudgetTerminalCloseout, SplitCohortHistoryBudgetTContinuationGateRecord
-from .descriptors import deterministic_development_seed
-from .runtime_contracts import SplitCohortHistoryBudgetAdjudicationBundle, SplitCohortHistoryBudgetArrayManifest, SplitCohortHistoryBudgetBootstrapSummary, SplitCohortHistoryBudgetCanaryReport, SplitCohortHistoryBudgetDenominatorBundle, SplitCohortHistoryBudgetDevelopmentGate, SplitCohortHistoryBudgetDevelopmentLedger, SplitCohortHistoryBudgetEvaluationDesignFreeze, SplitCohortHistoryBudgetGeneratorBundle, SplitCohortHistoryBudgetHistoryBundle, SplitCohortHistoryBudgetNominationFreeze, SplitCohortHistoryBudgetObserverBundle, SplitCohortHistoryBudgetPhaseCloseout, SplitCohortHistoryBudgetRequestedUnitLedger, SplitCohortHistoryBudgetSeedRoster, SplitCohortHistoryBudgetUntouchedBundle, SplitCohortHistoryBudgetUntouchedFreeze
-from .workflow import adjudication_bundle, target_adjudication_bundle, untouched_adjudication_bundle, create_seed_roster, denominator_bundle, development_ledger, evaluate_development_gate, freeze_evaluation_design, freeze_method, freeze_nominations, freeze_untouched, generator_bundle, target_generator_bundle, untouched_generator_bundle, history_bundle, receipt_closure_sha256, requested_unit_ledger, targeter_bundle, untouched_bundle, validate_seed_roster_commitment
+from empirical_lawhood.domains.history.split_cohort_history_budget.authoring import ARRAY_PAYLOAD_SCHEMA, CONFIG_MEDIA_TYPE, DEVELOPMENT_REPORTER_KEY, SplitCohortHistoryBudgetExternalRecord, REPORTER_KEY, VERSION, INT_ARRAY_PAYLOAD_SCHEMA, split_cohort_history_budget_phase_registry, protocol_template, scientific_graph
+from empirical_lawhood.adapters.split_cohort_history_budget.conformance import audit_source_firewall, merge_canary_reports, merge_component_canaries, merge_concurrent_resource_reports, run_certificate_canary, run_cross_implementation_conformance, run_factorized_action_canary, run_generator_canary, run_lexical_direction_canary, run_observer_canary, run_one_pass_history_canary, run_rank_separation_canary, run_resource_canary, run_transition_canary, run_untouched_sampler_canary
+from empirical_lawhood.domains.history.split_cohort_history_budget.contracts import SplitCohortHistoryBudgetConfig, SplitCohortHistoryBudgetMethodFreeze, SplitCohortHistoryBudgetPhase, SplitCohortHistoryBudgetRecurrenceResult, SplitCohortHistoryBudgetScientificState, SplitCohortHistoryBudgetSeedRosterCommitment, SplitCohortHistoryBudgetTerminal, SplitCohortHistoryBudgetTerminalCloseout, SplitCohortHistoryBudgetTContinuationGateRecord
+from empirical_lawhood.domains.history.split_cohort_history_budget.descriptors import deterministic_development_seed
+from empirical_lawhood.domains.history.split_cohort_history_budget.runtime_contracts import SplitCohortHistoryBudgetAdjudicationBundle, SplitCohortHistoryBudgetArrayManifest, SplitCohortHistoryBudgetBootstrapSummary, SplitCohortHistoryBudgetCanaryReport, SplitCohortHistoryBudgetDenominatorBundle, SplitCohortHistoryBudgetDevelopmentGate, SplitCohortHistoryBudgetDevelopmentLedger, SplitCohortHistoryBudgetEvaluationDesignFreeze, SplitCohortHistoryBudgetGeneratorBundle, SplitCohortHistoryBudgetHistoryBundle, SplitCohortHistoryBudgetNominationFreeze, SplitCohortHistoryBudgetObserverBundle, SplitCohortHistoryBudgetPhaseCloseout, SplitCohortHistoryBudgetRequestedUnitLedger, SplitCohortHistoryBudgetSeedRoster, SplitCohortHistoryBudgetUntouchedBundle, SplitCohortHistoryBudgetUntouchedFreeze
+from empirical_lawhood.domains.history.split_cohort_history_budget.workflow import adjudication_bundle, target_adjudication_bundle, untouched_adjudication_bundle, denominator_bundle, development_ledger, evaluate_development_gate, freeze_evaluation_design, freeze_method, freeze_nominations, freeze_untouched, generator_bundle, target_generator_bundle, untouched_generator_bundle, history_bundle, receipt_closure_sha256, requested_unit_ledger, targeter_bundle, untouched_bundle, validate_seed_roster_commitment
+from empirical_lawhood.adapters.split_cohort_history_budget.workflow import create_seed_roster
 
 
 SPLIT_COHORT_HISTORY_BUDGET_SCIENCE_SOURCE_CLOSURE_PATHS = (
     'src/empirical_lawhood/adapters/_decimal_custody.py',
-    'src/empirical_lawhood/adapters/history_budget_fixed_scientific_inputs.py',
-    'src/empirical_lawhood/adapters/history_budget_scientific_inputs.py',
-    'src/empirical_lawhood/adapters/history_budget_seed_constants.py',
-    'src/empirical_lawhood/adapters/split_cohort_history_budget/array_io.py',
-    'src/empirical_lawhood/adapters/split_cohort_history_budget/authoring.py',
     'src/empirical_lawhood/adapters/split_cohort_history_budget/conformance.py',
-    'src/empirical_lawhood/adapters/split_cohort_history_budget/contracts.py',
-    'src/empirical_lawhood/adapters/split_cohort_history_budget/descriptors.py',
-    'src/empirical_lawhood/adapters/split_cohort_history_budget/study_authoring.py',
-    'src/empirical_lawhood/adapters/split_cohort_history_budget/runtime_contracts.py',
     'src/empirical_lawhood/adapters/split_cohort_history_budget/runtime_provider.py',
     'src/empirical_lawhood/adapters/split_cohort_history_budget/workflow.py',
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/alignment.py',
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/conditioning.py',
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/discrete_rank.py',
-    "src/empirical_lawhood/adapters/methods/_arb.py",
-    "src/empirical_lawhood/adapters/methods/certified_rank.py",
-    "src/empirical_lawhood/kernel/serialization.py",
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/evaluator.py',
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/history.py',
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/inference.py',
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/preparation_sampler.py',
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/structural_rank.py',
-    'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/targeting.py',
-    'src/empirical_lawhood/adapters/simulators/rc_ladder_split_cohort_history/generator.py',
+    'src/empirical_lawhood/domains/circuits/rc_ladder_split_cohort_history/generator.py',
+    'src/empirical_lawhood/domains/circuits/reference_oracles.py',
+    'src/empirical_lawhood/domains/history/history_budget_fixed_scientific_inputs.py',
+    'src/empirical_lawhood/domains/history/history_budget_scientific_inputs.py',
+    'src/empirical_lawhood/domains/history/history_budget_seed_constants.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/alignment.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/array_codec.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/authoring.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/conditioning.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/contracts.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/descriptors.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/discrete_rank.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/evaluator.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/history.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/inference.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/preparation_sampler.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/runtime_contracts.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/structural_rank.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/study_authoring.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/targeting.py',
+    'src/empirical_lawhood/domains/history/split_cohort_history_budget/workflow.py',
+    'src/empirical_lawhood/methods/_arb.py',
+    'src/empirical_lawhood/methods/certified_rank.py',
+    'src/empirical_lawhood/science/records/serialization.py',
 )
 
 SPLIT_COHORT_HISTORY_BUDGET_INTEGRATION_SOURCE_CLOSURE_PATHS = (
-    "pyproject.toml",
+    'pyproject.toml',
     'src/empirical_lawhood/adapters/split_cohort_history_budget/composition.py',
-    "src/empirical_lawhood/api/composition.py",
-    "src/empirical_lawhood/cli/app.py",
-    "src/empirical_lawhood/cli/platform.py",
-    'src/empirical_lawhood/infrastructure/study_issue.py',
-    "src/empirical_lawhood/infrastructure/source_origin.py",
-    "uv.lock",
+    'src/empirical_lawhood/api/composition.py',
+    'src/empirical_lawhood/cli/app.py',
+    'src/empirical_lawhood/cli/platform.py',
+    'src/empirical_lawhood/storage/source_origin.py',
+    'src/empirical_lawhood/storage/study_issue.py',
+    'uv.lock',
 )
 
 SPLIT_COHORT_HISTORY_BUDGET_ALL_SOURCE_CLOSURE_PATHS = tuple(
@@ -172,27 +152,27 @@ def implementation_closures(
         observer_sha256=_closure_digest(
             source_files,
             (
-                'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/conditioning.py',
-                'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/discrete_rank.py',
-                "src/empirical_lawhood/adapters/methods/_arb.py",
-                "src/empirical_lawhood/adapters/methods/certified_rank.py",
-                "src/empirical_lawhood/kernel/serialization.py",
-                'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/history.py',
-                'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/preparation_sampler.py',
-                'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/structural_rank.py',
-                'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/targeting.py',
+                'src/empirical_lawhood/domains/history/split_cohort_history_budget/conditioning.py',
+                'src/empirical_lawhood/domains/history/split_cohort_history_budget/discrete_rank.py',
+                "src/empirical_lawhood/methods/_arb.py",
+                "src/empirical_lawhood/methods/certified_rank.py",
+                "src/empirical_lawhood/science/records/serialization.py",
+                'src/empirical_lawhood/domains/history/split_cohort_history_budget/history.py',
+                'src/empirical_lawhood/domains/history/split_cohort_history_budget/preparation_sampler.py',
+                'src/empirical_lawhood/domains/history/split_cohort_history_budget/structural_rank.py',
+                'src/empirical_lawhood/domains/history/split_cohort_history_budget/targeting.py',
             ),
         ),
         generator_sha256=_closure_digest(
             source_files,
-            ('src/empirical_lawhood/adapters/simulators/rc_ladder_split_cohort_history/generator.py',),
+            ('src/empirical_lawhood/domains/circuits/rc_ladder_split_cohort_history/generator.py',),
         ),
         evaluator_sha256=_closure_digest(
             source_files,
             (
-                'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/evaluator.py',
-                'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/alignment.py',
-                'src/empirical_lawhood/adapters/methods/split_cohort_history_budget/inference.py',
+                'src/empirical_lawhood/domains/history/split_cohort_history_budget/evaluator.py',
+                'src/empirical_lawhood/domains/history/split_cohort_history_budget/alignment.py',
+                'src/empirical_lawhood/domains/history/split_cohort_history_budget/inference.py',
             ),
         ),
     )

@@ -12,21 +12,21 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as c
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import durable_contracts as d
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import durable_operation_bindings as ob
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import durable_recursive_translation as rt
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import durable_stream as stream
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_preparation import complete_unit
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_roster import census
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.preparation import controlled_constructs
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as c
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import durable_contracts as d
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import durable_operation_bindings as ob
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import durable_recursive_translation as rt
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import durable_stream as stream
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_preparation import complete_unit
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_roster import census
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.preparation import controlled_constructs
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_rubisco_durable_preparation import selected as custody_fixture, unit
 from tests.test_rubisco_insilico_dynamics import sequences
 
@@ -204,10 +204,10 @@ class Refuse(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in {'numpy','scipy','openmm','pdbfixer','parmed','pybamm','flint'}:
             raise RuntimeError('native import refused: '+fullname)
 sys.meta_path.insert(0,Refuse())
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_extension_bundle import EXTENSION_BUNDLE_CONTRIBUTION
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_executable_binding import EXECUTABLE_BINDING_FACTORIES
-assert len(EXECUTABLE_BINDING_FACTORIES) == 1
-assert len(EXTENSION_BUNDLE_CONTRIBUTION.capability_manifests) == 1
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.extension import EXTENSION
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_operation_bindings import NODE
+assert len([factory for factory in EXTENSION.factories if factory.registration.selection.capability_key == NODE]) == 1
+assert len([manifest for manifest in EXTENSION.discovery.capability_manifests if manifest.capability_key == NODE]) == 1
 """
     root = Path(__file__).resolve().parents[1]
     result = subprocess.run([sys.executable, "-c", code], cwd=tmp_path,

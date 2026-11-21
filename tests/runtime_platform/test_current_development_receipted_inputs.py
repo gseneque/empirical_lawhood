@@ -12,14 +12,11 @@ import pytest
 
 from empirical_lawhood.api.current_task_custody import CurrentDevelopmentTaskCustody
 from empirical_lawhood.api.recursive_execution import _external_inputs
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent, ArtifactManifest, ArtifactWriteRequest, CanonicalTaskReceipt,
-    ReceiptCheck, lineage_parent_sort_key,
-)
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactManifest, ArtifactWriteRequest, CanonicalTaskReceipt, ReceiptCheck, lineage_parent_sort_key
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
 from tests.runtime_platform.test_recursive_compiler import Config
 from tests.runtime_platform.test_recursive_revealed_followup import PAIR, compile_revealed, revealed_fixture
 from tests.test_recursive_public_service import _plane

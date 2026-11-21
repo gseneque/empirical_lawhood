@@ -9,28 +9,17 @@ from typing import ClassVar
 import pytest
 
 from tests.test_doctor_profile import _profile
-from empirical_lawhood.adapters.methods.finite_response_law.runtime_ports import (
-    FiniteResponseLawControlRuntimeBinding,
-    FiniteResponseLawPreparedStorePort,
-)
-from empirical_lawhood.infrastructure.artifacts import (
-    ArtifactIdentityConflict,
-    ExternalArtifactPlane,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.study_issue import StudyOperationAuthority
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactProfile,
-    ArtifactWriteRequest,
-    CanonicalTaskReceipt,
-)
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding
-from empirical_lawhood.runtime.operator_profile import resolve_external_root_contract
+from empirical_lawhood.domains.matrix.finite_response_law.runtime_ports import FiniteResponseLawControlRuntimeBinding, FiniteResponseLawPreparedStorePort
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.study_issue import StudyOperationAuthority
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.execution import DependencyReceiptBinding
+from empirical_lawhood.execution.operator_profile import resolve_external_root_contract
 
 
 RUN = "synthetic-run"

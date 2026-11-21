@@ -11,28 +11,18 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import (
-    MatrixProgrammePhaseBinding, MatrixResearchProgrammePlan,
-)
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding, MatrixResearchProgrammePlan
 from empirical_lawhood.api import matrix_researcher_programme as owner
 from empirical_lawhood.api import matrix_researcher_programme_lineage as lineage
-from empirical_lawhood.api.experiment_preparation import (
-    _protocol, load_experiment_specification, prepare_experiment,
-)
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.experiment_inputs import (
-    ExperimentFileInputSelection, ExperimentInputBinding,
-)
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactProfile, ArtifactWriteRequest, ExternalRootContract,
-)
-from empirical_lawhood.runtime.experiment_preparation import (
-    ExecutionSelection, ExperimentInputDerivationResult,
-)
+from empirical_lawhood.api.experiment_preparation import _protocol, load_experiment_specification, prepare_experiment
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, ExperimentInputDerivationResult
 
 
 ROOT = Path(__file__).parents[1]
@@ -71,10 +61,10 @@ def _case(directory, count=4, shape="singletons"):
     if shape == "singletons":
         publications = tuple(plane.write(row) for row in requests)
     elif shape == "mixed":
-        publications = (*plane.write_batch(requests[:count // 2], compact_manifests=True),
+        publications = (*plane.write_batch(requests[:count // 2]),
             *(plane.write(row) for row in requests[count // 2:]))
     else:
-        publications = plane.write_batch(requests, compact_manifests=shape == "shared")
+        publications = plane.write_batch(requests)
     result = ExperimentInputDerivationResult(target.identity, selector, directory / "inputs/sources.json",
         preparation, publications, publications[2], target, directory / "inputs/specification.json")
     plan_pin = ObjectIdentity("plan.exposed-binding", MatrixResearchProgrammePlan.SCHEMA,

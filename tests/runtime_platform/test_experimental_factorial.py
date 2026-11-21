@@ -8,10 +8,7 @@ from itertools import product
 
 import pytest
 
-from empirical_lawhood.runtime.experimental_factorial import (
-    FactorialCoordinate, FactorialDisposition, FactorialGrid, FactorialObservation,
-    HolmDisposition, PairInteractionScale, factorial_group_contrasts, holm_adjustment,
-)
+from empirical_lawhood.execution.experimental_factorial import FactorialCoordinate, FactorialDisposition, FactorialGrid, FactorialObservation, HolmDisposition, PairInteractionScale, factorial_group_contrasts, holm_adjustment
 
 
 D = Decimal

@@ -6,10 +6,8 @@ from types import SimpleNamespace as NS
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.causal_hessian import (
-    current_eigenspace_split, origin_trend_first_variation, causal_hessian_features,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
+from empirical_lawhood.domains.matrix.matrix_factor_response.causal_hessian import current_eigenspace_split, origin_trend_first_variation, causal_hessian_features
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
 
 
 def test_transitive_signed_clusters_and_degenerate_basis_invariance():
@@ -73,8 +71,8 @@ def test_kick_variation_matches_independent_affine_derivative_including_final_in
 
 
 def causal_case():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_forecast import _hessian
-    from empirical_lawhood.adapters.methods.matrix_factor_response.science import native_position_lift
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_forecast import _hessian
+    from empirical_lawhood.domains.matrix.matrix_factor_response.science import native_position_lift
     coordinate = NS(primary_view=NS(timestep=D('.001'), friction_gamma=D(1)),
         fine_view=NS(timestep=D('.0005'), friction_gamma=D(1)),
         member=NS(mass_x=D('.1'), mass_y=D('.2'), cross_coupling_gamma=D('.2')))
@@ -118,7 +116,7 @@ def test_past_window_uses_handoff_parameters_and_refuses_future_or_replacement_w
 
 
 def test_nonfinite_past_operator_is_missing_without_a_replacement_window(monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast
     protocol, causal, frozen = causal_case()
     monkeypatch.setattr(response_forecast, '_hessian', lambda *args: np.full((96, 96), np.inf))
     result = causal_hessian_features(protocol, causal, frozen)

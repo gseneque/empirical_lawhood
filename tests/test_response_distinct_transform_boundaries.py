@@ -10,16 +10,16 @@ from tests.prepared_seed_fixtures import fixture_root_randomness
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.causal_response.models import central_gain, primary_contrast
-from empirical_lawhood.adapters.methods.finite_response_law.intervals import oriented_interval, quantile
-from empirical_lawhood.adapters.methods.information_response.models import features
-from empirical_lawhood.adapters.methods.prepared_response.calibration import prepared_joint_root_losses, prepared_root_folds
-from empirical_lawhood.adapters.methods.response_composition.development import folds, paired_response, parent_contrast, root_error, split_training
-from empirical_lawhood.adapters.simulators.finite_response_law.instruments import REFERENCE_INSTRUMENT, reference_sketch
-from empirical_lawhood.adapters.simulators.prepared_response.contracts import PreparedRoot
-from empirical_lawhood.adapters.simulators.prepared_response.instruments import PreparedPortFrame
-from empirical_lawhood.adapters.simulators.six_matrix_response.gradients import analytic_gradient_terms
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import ideal_state
+from empirical_lawhood.domains.matrix.causal_response.models import central_gain, primary_contrast
+from empirical_lawhood.domains.matrix.finite_response_law.intervals import oriented_interval, quantile
+from empirical_lawhood.domains.matrix.information_response.models import features
+from empirical_lawhood.domains.matrix.prepared_response.calibration import prepared_joint_root_losses, prepared_root_folds
+from empirical_lawhood.domains.matrix.response_composition.development import folds, paired_response, parent_contrast, root_error, split_training
+from empirical_lawhood.domains.matrix.finite_response_law.instruments import REFERENCE_INSTRUMENT, reference_sketch
+from empirical_lawhood.domains.matrix.prepared_response.contracts import PreparedRoot
+from empirical_lawhood.domains.matrix.prepared_response.instruments import PreparedPortFrame
+from empirical_lawhood.domains.matrix.six_matrix_response.gradients import analytic_gradient_terms
+from empirical_lawhood.domains.matrix.six_matrix_response.model import ideal_state
 
 
 def test_information_masks_keep_only_causal_snapshot_columns() -> None:

@@ -12,6 +12,8 @@ import os
 
 import pytest
 
+pytest_plugins = ("scripts.test_purposes",)
+
 
 def pytest_sessionstart(session: pytest.Session) -> None:
     """Set native worker limits before collecting numerical test modules."""
@@ -41,6 +43,23 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
                 importlib.metadata.version(distribution)
             except importlib.metadata.PackageNotFoundError:
                 pytest.skip(f"optional native distribution {distribution!r} is not installed")
+
+
+@pytest.fixture(scope="session")
+def rubisco_molprobity_prefix():
+    from pathlib import Path
+    from empirical_lawhood.adapters.rubisco.rubisco_response.molprobity_runtime import verify_runtime
+
+    selected = os.environ.get("EL_MOLPROBITY_TEST_PREFIX")
+    receipt = os.environ.get("EL_MOLPROBITY_TEST_RECEIPT_SHA256")
+    if not selected or not receipt:
+        pytest.skip("Select the CCTBX installation and the digest from its original installation return")
+    prefix = Path(selected)
+    verify_runtime(prefix, receipt_sha256=receipt)
+    try:
+        yield prefix
+    finally:
+        verify_runtime(prefix, receipt_sha256=receipt)
 
 
 class _RequiredChecks:

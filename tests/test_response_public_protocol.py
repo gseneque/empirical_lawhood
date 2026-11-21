@@ -9,11 +9,9 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.adapters.composition.finite_response_law import stage_input
-from empirical_lawhood.adapters.composition.finite_response_law.assignment import (
-    FiniteResponseLawCohortAssignment,
-    proposed_scientific_seeds,
-)
-from empirical_lawhood.adapters.methods.finite_response_law import science
+import empirical_lawhood.domains.matrix.finite_response_law.authoring.stage_input as stage_input_owner_0
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment import FiniteResponseLawCohortAssignment, proposed_scientific_seeds
+from empirical_lawhood.domains.matrix.finite_response_law import science
 from empirical_lawhood.api.codecs import load_registered_authoring
 
 ROOT = Path(__file__).parents[1]
@@ -28,7 +26,7 @@ def test_packaged_protocol_drives_real_stage_preflight_and_tamper_stop(tmp_path)
     config = load_registered_authoring(
         ROOT / "programmes/foundations/emergent-structure/workflows/finite-response-law/calibration-stage-input.json",
         root_schemas={
-            stage_input.FiniteResponseLawStageInput.SCHEMA: stage_input.FiniteResponseLawStageInput
+            stage_input_owner_0.FiniteResponseLawStageInput.SCHEMA: stage_input_owner_0.FiniteResponseLawStageInput
         },
     )
     prior = tmp_path / "prior.json"

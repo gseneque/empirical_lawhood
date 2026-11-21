@@ -5,17 +5,12 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Mapping
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.kernel.serialization import validate_sha256
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.records.serialization import validate_sha256
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
 
-from .contracts import FineSteeringMirrorBlockResponse, FineSteeringMirrorDevelopmentModel, FineSteeringMirrorProtocolSpec, FineSteeringMirrorVerticalSliceResult
+from empirical_lawhood.domains.optics.fine_steering_mirror.contracts import FineSteeringMirrorBlockResponse, FineSteeringMirrorDevelopmentModel, FineSteeringMirrorProtocolSpec, FineSteeringMirrorVerticalSliceResult
 
 FSM_DEVELOPMENT_CAPABILITY = "physical.fsm.development-analysis"
 FSM_EVALUATOR_CAPABILITY = "physical.fsm.sealed-evaluator"

@@ -15,11 +15,11 @@ import pytest
 
 from empirical_lawhood.api import recursive_authoring as author
 from empirical_lawhood.api import recursive_execution as execution
-from empirical_lawhood.infrastructure import artifacts, bounded_io, recursive_custody as owner
-from empirical_lawhood.infrastructure import recovery as recovery_owner, task_receipts
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactProfile
+from empirical_lawhood.storage import artifacts, bounded_io, recursive_custody as owner
+from empirical_lawhood.storage import recovery as recovery_owner, task_receipts
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile
 from tests.test_recursive_compact_output_bulk import compact_wave as compact_wave  # noqa: F401
 from tests.test_recursive_report_projection import ROOT, wave as wave  # noqa: F401
 
@@ -35,7 +35,7 @@ def _workloads():
 
 @pytest.fixture(scope="module")
 def scale_cases(compact_wave, wave):
-    from empirical_lawhood.adapters.methods.rubisco_historical.recursive_translation import historical_recursive_draft
+    from empirical_lawhood.domains.rubisco.rubisco_historical.recursive_translation import historical_recursive_draft
     cases = []
     for count, science, selected_slices in _workloads():
         draft = historical_recursive_draft(science, tuple(sorted(selected_slices, key=lambda value: value.slice_id)),

@@ -15,13 +15,13 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_forecast, prepared_response_science as prepared
-from empirical_lawhood.adapters.methods.matrix_factor_response import science as linear
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records, response_forecast, response_records, response_science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_native import native_scheduled_branch
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import SixMatrixState
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_forecast, prepared_response_science as prepared
+from empirical_lawhood.domains.matrix.matrix_factor_response import science as linear
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records, response_forecast, response_records, response_science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_native import native_scheduled_branch
+from empirical_lawhood.domains.matrix.six_matrix_response.model import SixMatrixState
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_prepared_response_method import case as prepared_case  # noqa: F401
 from tests.test_matrix_prepared_forecast import case as prepared_forecast_case  # noqa: F401
 from tests.test_matrix_scheduled_response_forecast import case as scheduled_forecast_case  # noqa: F401
@@ -30,9 +30,9 @@ from tests.test_matrix_e3_response_records import case as scheduled_metadata  # 
 
 @pytest.fixture(autouse=True)
 def _forbid_effects_and_rng(monkeypatch):
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history, parameter_history_segments, parameter_source
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history, parameter_history_segments, parameter_source
     def refused(*_args, **_kwargs):
         pytest.fail("numerical-only control entered native custody, acquisition or RNG")
     for cls, name in ((ExternalNativeEffectContactStore, "begin"), (ExternalNativeSubworkStore, "begin"),

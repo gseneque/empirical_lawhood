@@ -7,17 +7,14 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import FilesystemState, GuardedExternalRoot
-from empirical_lawhood.infrastructure.candidate_sources import ExternalCandidateInputPublisher, ExternalContentAddressedInputResolver
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.study_authoring import SourceMaterializationRole
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.source_resolution import (
-    ContentAddressedInputKind, ContentAddressedInputRequirement,
-    ContentAddressedResolutionError, SourceMaterializationConfig, SourceReadMode,
-)
+from empirical_lawhood.storage.artifacts import FilesystemState, GuardedExternalRoot
+from empirical_lawhood.storage.candidate_sources import ExternalCandidateInputPublisher, ExternalContentAddressedInputResolver
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.study_authoring import SourceMaterializationRole
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.source_resolution import ContentAddressedInputKind, ContentAddressedInputRequirement, ContentAddressedResolutionError, SourceMaterializationConfig, SourceReadMode
 
 
 class _ExposedInspector:
@@ -117,8 +114,8 @@ def test_prospective_config_decoder_uses_the_admitted_registration_envelope(tmp_
 
 
 def test_complete_e4_phase_collector_uses_the_full_programme_carrier():
-    from empirical_lawhood.adapters.composition.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_bindings import NAMESPACE
+    from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_bindings import NAMESPACE
     catalog = GENERATED_EXTENSION_BUNDLE_AGGREGATE.candidate_capability_catalog
     assert catalog.registration(NAMESPACE + ".phase-collect", "1.0.0").maximum_config_bytes is None
     assert catalog.registration(NAMESPACE + ".phase-entry", "2.0.0").maximum_config_bytes is None

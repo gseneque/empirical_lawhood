@@ -12,19 +12,19 @@ import os
 
 import pytest
 
-from empirical_lawhood.adapters.composition import generated_extension_bundles as declarations
+import empirical_lawhood.api.generated_experiment_protocols as declarations
 from empirical_lawhood.api import experiment_preparation as preparation
 from empirical_lawhood.api import experiment_read_access as owner
 from empirical_lawhood.api import generated_experiment_runtime_bindings as installed
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experimental_design import UnitAllocation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding, ExperimentProtocolDeclaration
-from empirical_lawhood.runtime.prospective_experiment import ProspectiveExperimentAssociation, instance_identity
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding, ExperimentProtocolDeclaration
+from empirical_lawhood.execution.prospective_experiment import ProspectiveExperimentAssociation, instance_identity
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
 from tests.runtime_platform.test_recursive_compiler import Config
 from tests.test_experiment_read_access import install_locator_codecs
 from tests.test_rubisco_gas_contrast import _real_plane

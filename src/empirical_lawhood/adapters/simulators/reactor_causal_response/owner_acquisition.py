@@ -3,15 +3,15 @@
 from dataclasses import dataclass, field
 from time import process_time
 from typing import Any
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.controller_runtime import TickDisposition
-from empirical_lawhood.adapters.methods.law_assessment import CandidatePayloadReader
-from empirical_lawhood.adapters.methods.reactor_causal_response.control_owner import CallbackRecordPublisher, prepare_callback, trajectory_plan
-from empirical_lawhood.adapters.methods.reactor_causal_response.terminal import EmpiricalQualificationResult
-from empirical_lawhood.adapters.methods.reactor_causal_response.controller import NumericalController
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.contracts import ReactorDelivery, ReactorFinalDelivery
-from .acquisition import NativeController
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.execution.controller_runtime import TickDisposition
+from empirical_lawhood.methods.law_assessment import CandidatePayloadReader
+from empirical_lawhood.domains.reactor.reactor_causal_response.control_owner import CallbackRecordPublisher, prepare_callback, trajectory_plan
+from empirical_lawhood.domains.reactor.reactor_causal_response.terminal import EmpiricalQualificationResult
+from empirical_lawhood.domains.reactor.reactor_causal_response.controller import NumericalController
+from empirical_lawhood.domains.reactor.reactor_prefix_response.contracts import ReactorDelivery, ReactorFinalDelivery
+from empirical_lawhood.domains.reactor.native_ports import NativeController
 
 
 @dataclass

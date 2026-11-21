@@ -1,4 +1,6 @@
-# Current paper integrations
+# Preprint components and recursive migration
+
+The [preprint migration census](../release/preprint-recursive-migration.md) maps the 22 original study and analysis families to their reauthored recursive experiments. Use the [experiment guide](../v1.0/joint-description-experiments.md) to run a recipe and the [programme record](../../programmes/shared-records/joint-description-results.md) to inspect a scientific result. The component routes below document the operations these workflows reuse.
 
 SPDX-License-Identifier: CC-BY-4.0
 
@@ -56,5 +58,4 @@ Native development source exports and saved-array analyses retain their own boun
 
 The maintained architecture and environment guides describe the reused owners. Geometry/selected-event development operations and history/tangent acquisition use the existing guarded artifact/receipt owners with explicit non-promotable ceilings; they create no issued campaign authority. Saved analysis readers authenticate original input/output bytes and lineage without repeating acquisition or fitting. Geometry selection failure is a readable negative terminal; missing histories retain the full requested census and remain unevaluable.
 
-The complete supported portable suite runs once on the frozen staged candidate before its integration commit. The artifact gate accepts authenticated precommit evidence only for a candidate that exactly matches the final selected commit.
-The evidence retains its original test attribution. Build, package comparison and installed smoke add current artifact evidence without another full-suite call; full scientific campaigns and release publication remain separate operations.
+The [release artifact procedure](../release/release-artifacts.md) defines the portable, build and installed checks for a selected source. Each scientific record retains its own producing source and evidence.

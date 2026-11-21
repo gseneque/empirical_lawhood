@@ -4,30 +4,17 @@ from __future__ import annotations
 
 from dataclasses import fields
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityManifest, CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .contracts import SixMatrixResponseSixMatrixSourceConfig
-from .simulation import MATRIX_RESPONSE_CANONICAL_MEDIA_TYPE, MATRIX_RESPONSE_MAXIMUM_REQUEST_BYTES, SixMatrixResponseEpisodeRequest, SixMatrixResponseEpisodeResult, SixMatrixResponseSixMatrixEpisodeEngine
+from empirical_lawhood.domains.matrix.six_matrix_response.contracts import SixMatrixResponseSixMatrixSourceConfig
+from empirical_lawhood.domains.matrix.six_matrix_response.simulation import MATRIX_RESPONSE_CANONICAL_MEDIA_TYPE, MATRIX_RESPONSE_MAXIMUM_REQUEST_BYTES, SixMatrixResponseEpisodeRequest, SixMatrixResponseEpisodeResult, SixMatrixResponseSixMatrixEpisodeEngine
 
 
 class SixMatrixResponseSixMatrixEpisodeTask:

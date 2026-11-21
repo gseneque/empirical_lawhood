@@ -7,26 +7,26 @@ complete actual original wave receipt authentication.
 """
 from dataclasses import replace
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as dev
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as dev_owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as protected
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_bindings as protected_owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseProgramme
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorScope
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_records import ScheduledFullFactorProtectedProduct
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_science import source_from_original
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_bindings import array_input,array_logical
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from .matrix_retained_replay import bounded_e4_replay_source, replay_weight, map_reconstructions, replay_e4_functional
-from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes_with_identity
-from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.experiment_preparation import PreparedExperimentFile
-from .matrix_read_indexes import unique_index
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as dev
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as dev_owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as protected
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_bindings as protected_owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseProgramme
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorScope
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_records import ScheduledFullFactorProtectedProduct
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_science import source_from_original
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_bindings import array_input, array_logical
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.api.matrix_retained_replay import bounded_e4_replay_source, replay_weight, map_reconstructions, replay_e4_functional
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes_with_identity
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.experiment_preparation import PreparedExperimentFile
+from empirical_lawhood.api.matrix_read_indexes import unique_index
 
 
 def _pin(record,field):return ObjectIdentity.from_record(getattr(record,field),record)
@@ -99,7 +99,7 @@ def _protected_declaration(*,writer,programme,declaration,waves,current_access=N
     """
     from empirical_lawhood.api.current_result_custody import authenticate_current_execution_plan
     from empirical_lawhood.api.matrix_selected_runtime import _published_input
-    from empirical_lawhood.api.recursive_qualified_parents import _actual_package,_replay_parent_authority
+    from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _replay_parent_authority
     if (type(declaration) is not ObjectIdentity or
             (declaration.object_schema,declaration.object_version)!=(protected.SelectedE4NativeProgrammeDeclaration.SCHEMA,protected.SelectedE4NativeProgrammeDeclaration.VERSION)
             or type(waves) is not tuple or not waves or any(type(row) is not protected.SelectedE4WaveLocator for row in waves)
@@ -181,7 +181,7 @@ def derive_original_full_factor_scope(*,writer,programme,bank,record_id,codecs,d
             _consume_original_access(access,None)
 
     def validate_development(*,packet,draft,run,plan):
-        from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+        from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
         entries=tuple(row for row in draft.operations if row.selection.capability_key==dev_owner.NAMESPACE+'.entry')
         if len(entries)!=1 or draft.development_study is None or draft.prospective_draft is not None:
             raise PermissionError('full factor original access requires its truthful original DEV entry')
@@ -208,14 +208,14 @@ def derive_original_full_factor_scope(*,writer,programme,bank,record_id,codecs,d
         if _secondary_readout is not None and entry.secondary_readout != _secondary_readout:
             raise PermissionError('full factor original reader replaces the target sealed before native entry')
         if _secondary_target is not None:
-            from .matrix_full_factor_secondary import authenticate_e4_secondary_target
+            from empirical_lawhood.api.matrix_full_factor_secondary import authenticate_e4_secondary_target
             if authenticate_e4_secondary_target(writer=writer, selection=entry.secondary_readout, bank=bank) != _secondary_target:
                 raise PermissionError('full factor original reader changes the declared dense target')
         if (entry.declaration.produced_input_parents if is_protected else entry.produced_input_parents)!=access.parents:
             raise PermissionError('full factor original entry changes its exact authenticated produced-parent census')
         if not is_protected and _development_directory is not None:
             from pathlib import Path
-            from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_method_bindings import SelectedE4DevelopmentAcquisition
+            from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_method_bindings import SelectedE4DevelopmentAcquisition
             receipt=products['receipts'].get(dev_owner.global_node(programme,'entry'))
             if receipt is None:raise PermissionError('ordinary E4 structure lacks its actual original source-entry receipt')
             relative=Path(_development_directory).resolve(strict=True).relative_to(writer.root.contract.canonical_path).as_posix()
@@ -279,11 +279,9 @@ def derive_original_full_factor_scope(*,writer,programme,bank,record_id,codecs,d
                 # verbatim from the owner; only genuinely present outputs above get locators.
                 sources[case.root_id]=selected
                 if _consume_functional is not None:
-                    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import (
-                        ScheduledResponseScore, ScheduledE4DenseMechanicalForecast, ScheduledE4DenseResponseScore,
-                    )
-                    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_secondary_readout import dense_e4_functional_rows
-                    from empirical_lawhood.infrastructure.publication_metadata import authenticate_published_materialization
+                    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseScore, ScheduledE4DenseMechanicalForecast, ScheduledE4DenseResponseScore
+                    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_secondary_readout import dense_e4_functional_rows
+                    from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization
                     node=lambda phase:owner.local_node(case.root_id,phase)
                     def record(phase,kind,field,output_id='product'):
                         return _record(writer,products,plan,node(phase),kind,field,output_id=output_id,
@@ -355,7 +353,7 @@ def derive_original_full_factor_scope(*,writer,programme,bank,record_id,codecs,d
                             causal_raw=array_bytes('project','arrays',causal.arrays)
                             original_raw=array_bytes('mechanical','arrays',physical.arrays)
                         diagnostic_raw=array_bytes('measure','arrays',witness.arrays)
-                    from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import prediction_case
+                    from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import prediction_case
                     row=replace(row,prediction=prediction_case(bank,case,row,account))
                     work=dict(row=row,case=case,is_protected=is_protected,protocol=protocol,source=bounded_e4_replay_source(native),
                         panels=panels,target=_secondary_target,secondary=_secondary_readout,score=score,dense_score=dense_score,
@@ -383,7 +381,7 @@ def derive_original_full_factor_scope(*,writer,programme,bank,record_id,codecs,d
                         raise PermissionError('full factor original native array access is relabelled')
                     original_path=writer.root.resolve(publication.materialization.relative_path,for_write=False)
                     alias=replace(artifact,artifact_id=array_logical(selected))
-                    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+                    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
                     formats=tuple(row for row in MATRIX_STORAGE_CODECS if (row.payload_schema,row.media_type)==(artifact.payload_schema,artifact.media_type))
                     if len(formats)!=1:raise PermissionError('full factor original arrays lack one exact installed codec edition')
                     files[array_input(selected)]=PreparedExperimentFile(alias,formats[0].record_version,original_path,artifact.size_bytes)
@@ -435,7 +433,7 @@ def authenticate_original_full_factor_scope(*,writer,scope,bank,codecs,current_a
 
 def authenticate_original_full_factor_reference(*,writer,reference,codecs,_consume_functional=None,
         _consume_programme_result=None,current_access=None,_secondary_target=None,_secondary_readout=None,_consume_mechanism=None):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import scope_reference
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import scope_reference
     scope,files=derive_original_full_factor_scope(writer=writer,programme=reference.programme,bank=None,
         record_id=reference.scope.object_id,codecs=codecs,development=reference.development,
         declaration=reference.declaration,waves=reference.waves,_consume_functional=_consume_functional,

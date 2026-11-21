@@ -6,18 +6,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import revision_calibration_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import revision_calibrated_future_bindings as future
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_calibration_custody import validate_calibration_producer
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import revision_calibration_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import revision_calibrated_future_bindings as future
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_calibration_custody import validate_calibration_producer
 from empirical_lawhood.api import matrix_revision_calibration_runtime as runtime
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRegistry, CapabilityRequirement
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.plans import (
-    ArtifactOutputSpec, BarrierKind, ExecutionPlan, ExecutionTask, ExternalInputSpec, PlanLane, ScientificInputRole, ScientificInputSpec,
-)
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRegistry, CapabilityRequirement
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionPlan, ExecutionTask, ExternalInputSpec, PlanLane, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 from tests.test_matrix_e4_revision_bindings import custody as seal_custody
 from tests.test_matrix_revision_calibration import calibrated  # noqa: F401
 from tests.test_matrix_programme_selection import exposed, pin  # noqa: F401
@@ -210,7 +208,7 @@ def test_reconstructed_input_view_rejects_mutable_forecasts(selected):
 
 
 def test_calibrated_native_variants_keep_original_mathematical_and_native_work_owners():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import revision_future_bindings as original
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import revision_future_bindings as original
     old = {value.registration.selection.capability_key.rsplit(".", 1)[-1]: value for value in original.operation_factories()}
     for factory in future.operation_factories():
         role = factory.manifest.capability_key.rsplit(".", 1)[-1]

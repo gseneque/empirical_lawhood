@@ -10,19 +10,19 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods import matrix_prepared_source_experiment as domain
-from empirical_lawhood.adapters.methods import matrix_prepared_source_bindings as gates
-from empirical_lawhood.adapters.methods.matrix_prepared_source_assembly import MatrixPreparedSourceAssemblyRequest
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
+from empirical_lawhood.domains.matrix import matrix_prepared_source_experiment as domain
+from empirical_lawhood.domains.matrix import matrix_prepared_source_bindings as gates
+from empirical_lawhood.domains.matrix.matrix_prepared_source_assembly import MatrixPreparedSourceAssemblyRequest
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
 from empirical_lawhood.api import prepared_source_access as owner
 from empirical_lawhood.api import selected_prepared_access as original
 from empirical_lawhood.api.matrix_source_input_assembly import publish_source_input_record
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.infrastructure.artifact_stream_primitives import ArtifactIdentityConflict
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.artifact_stream_primitives import ArtifactIdentityConflict
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
 from tests.test_matrix_finite_dt_source_assembly import c_backed_source_case, selected_request  # noqa: F401
 from tests.test_matrix_prepared_source import disclosed_certificate, prepared_bank
 from tests.test_matrix_selected_opportunity import opportunity  # noqa: F401
@@ -37,7 +37,7 @@ def source_literals(c_backed_source_case, confirmation, opportunity):  # noqa: F
     certificate = disclosed_certificate(prepared_bank(confirmation), opportunity)
     values = {field.name: getattr(finite, field.name) for field in fields(MatrixPreparedSourceAssemblyRequest)
         if hasattr(finite, field.name)}
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support
     values.update(prepared_programme=confirmation.identity, development_product=certificate.locator.identity,
         exposure_support=exposure_support(c_backed_source_case.committed.exposure_audit))
     # The request is canonical disclosed metadata. No original I/O or grant is
@@ -51,7 +51,7 @@ def _selected_case(tmp_path, source_literals, monkeypatch, *, sibling=False):
     plane = _plane(tmp_path / "source-boundary")
     parents = request.original_e3.publication.logical.lineage_parents
     if not parents:
-        from empirical_lawhood.runtime.artifacts import ArtifactLineageParent
+        from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
         parents = (ArtifactLineageParent(request.original_products[0].record,
             VisibilityCeiling.PROSPECTIVE, OutcomeAccess.EVALUATION_SEALED),)
     # Disclosed exact parent metadata only, never an actual permission context.
@@ -209,8 +209,8 @@ def test_source_grant_expiry_during_manifest_replay_refuses_before_caller_decode
 
 @pytest.mark.parametrize("phase", ("E5_CONFIRMATION", "E6_TRANSFER"))
 def test_actual_source_declaration_supports_exact_input_lanes_without_reveal_authority(phase):
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement, input_access_allowed
-    from empirical_lawhood.runtime.plans import ScientificStage
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement, input_access_allowed
+    from empirical_lawhood.execution.plans import ScientificStage
     for declaration in (gates.gate_declaration(gates.r.GATES[0], phase), gates.closeout_declaration()):
         manifest = declaration.manifest()
         config = CapabilityConfigRef("config.disclosed.source-permission", declaration.config_record_type.SCHEMA,
@@ -229,8 +229,8 @@ def test_actual_source_declaration_supports_exact_input_lanes_without_reveal_aut
 @pytest.mark.parametrize("model_input", (False, True))
 def test_explicit_model_publication_preserves_mixed_seal_and_all_eleven_parents(tmp_path, model_input):
     from decimal import Decimal
-    from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, derived_outcome_access, lineage_parent_sort_key
+    from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, derived_outcome_access, lineage_parent_sort_key
     plane = _plane(tmp_path / "model-publication")
     record = InformationCutoff("cutoff.disclosed.model-publication", "clock.disclosed.model-publication", CausalPhase.PREPARATION, Decimal(0))
     parents = tuple(sorted((ArtifactLineageParent(ObjectIdentity("parent.disclosed." + str(index),
@@ -258,7 +258,7 @@ def test_explicit_model_publication_preserves_mixed_seal_and_all_eleven_parents(
 def test_source_gate_config_contract_is_checked_before_any_control_body(actual_issued_current_task_controls, monkeypatch, damage):  # noqa: F811
     """Disclosed custody spies isolate CONFIG ordering; no scientific admission."""
     from empirical_lawhood.api import matrix_prepared_source_runtime as runtime
-    from empirical_lawhood.runtime.plans import ScientificInputRole
+    from empirical_lawhood.execution.plans import ScientificInputRole
     case = actual_issued_current_task_controls
     task = next(row for row in case.plan.tasks if row.task_id == case.context.task_id)
     config_edge, = (row for row in task.scientific_inputs if row.scientific_role is ScientificInputRole.CONFIGURATION)
@@ -334,7 +334,7 @@ def test_source_training_member_scope_remains_live_through_actual_final_rehash(t
 
 @pytest.mark.parametrize("damage", ("none", "request", "programme", "model-as-dev"))
 def test_initial_source_assembly_uses_the_same_closed_locators_before_programme_body(tmp_path, source_literals, confirmation, monkeypatch, damage):  # noqa: F811
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_assembly as assembly
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_assembly as assembly
     case = _selected_case(tmp_path, source_literals, monkeypatch)
     pair = produced_access(declared_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
         declared_visibility=VisibilityCeiling.DEVELOPMENT_ONLY, parents=case.scope.parents)
@@ -381,12 +381,12 @@ def test_source_request_prospective_membership_uses_its_actual_closed_locator_ow
     The model envelope stays deliberately undecodable, as in the before-body
     controls above. Exact member admission precedes later scientific decoding.
     """
-    from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
-    from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCandidate
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-    from empirical_lawhood.runtime.prospective_experiment import ProspectiveExperimentAssociation, instance_identity, source_filename
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveImplementationBinding, RecursiveWaveMember
+    from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
+    from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCandidate
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+    from empirical_lawhood.execution.prospective_experiment import ProspectiveExperimentAssociation, instance_identity, source_filename
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveImplementationBinding, RecursiveWaveMember
     from tests.test_recursive_public_service import _draft
     case = _selected_case(tmp_path, source_literals, monkeypatch)
     directory = case.plane.root.resolve("issued-source", for_write=True)
@@ -466,10 +466,10 @@ def test_source_request_prospective_membership_uses_its_actual_closed_locator_ow
 
 def test_request_only_assembly_first_stop_uses_no_locator_body_or_writer(tmp_path, source_literals, monkeypatch):
     """Actual public request decoding reports missing science without authority."""
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_assembly as assembly
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_assembly as assembly
     from empirical_lawhood.api import experiment_preparation as preparation
     from empirical_lawhood.api.experiment_runtime_bindings import bootstrap_selected_experiment_inputs
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
     request, _ = source_literals
     specification = assembly.MatrixPreparedSourceAssemblySpecification("assembly.disclosed.first-stop", request.identity)
     selector = ExperimentFileInputSelection("sources.disclosed.first-stop", assembly.PROTOCOL_ID,
@@ -499,11 +499,11 @@ def test_request_only_assembly_first_stop_uses_no_locator_body_or_writer(tmp_pat
 
 
 def test_request_only_exception_cannot_open_model_unknown_file_or_foreign_input(source_literals):
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_assembly as assembly
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_assembly as assembly
     from empirical_lawhood.api import experiment_preparation as preparation
     from empirical_lawhood.api.experiment_runtime_bindings import bootstrap_selected_experiment_inputs
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
     request, development = source_literals
     specification = assembly.MatrixPreparedSourceAssemblySpecification("assembly.disclosed.first-stop-negative", request.identity)
     request_row = ExperimentInputBinding("request", request.identity, "request.json", len(request.canonical_bytes()))
@@ -538,12 +538,12 @@ def test_request_only_exception_cannot_open_model_unknown_file_or_foreign_input(
 
 def test_prepared_gate_parents_join_every_actual_selected_config_field(source_literals, confirmation, opportunity):  # noqa: F811
     """Closed mathematical scope with an explicit unexecuted source-authority stop."""
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_records as records
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_pipeline as row_owner
-    from empirical_lawhood.adapters.methods.backbone_structural_transport import source_free_property_transport_source_input_parts as pipeline
-    from empirical_lawhood.planning.evidence_profiles import build_observation_evidence_world_registry, bind_profile_selection, EvidenceWorldKind
-    from empirical_lawhood.planning.source_pipelines import SourcePipelineQualificationDisposition, SourcePipelineQualificationReceipt
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_records as records
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_pipeline as row_owner
+    from empirical_lawhood.methods.backbone_structural_transport import source_free_property_transport_source_input_parts as pipeline
+    from empirical_lawhood.design.evidence_profiles import build_observation_evidence_world_registry, bind_profile_selection, EvidenceWorldKind
+    from empirical_lawhood.design.source_pipelines import SourcePipelineQualificationDisposition, SourcePipelineQualificationReceipt
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
     request, development = source_literals
     bank = prepared_bank(confirmation)
     certificate = disclosed_certificate(bank, opportunity)

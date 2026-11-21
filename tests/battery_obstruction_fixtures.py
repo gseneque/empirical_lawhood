@@ -6,10 +6,8 @@ from hashlib import sha256
 import json
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.battery_diagnostic_obstruction.contracts import (
-    ObstructionSource, ROLES,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.battery.battery_diagnostic_obstruction.contracts import ObstructionSource, ROLES
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 FIXTURE = Path(__file__).parent / 'fixtures/battery/diagnostic_obstruction'

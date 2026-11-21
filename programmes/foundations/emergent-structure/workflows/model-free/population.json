@@ -1,0 +1,270 @@
+{
+  "label": "M5 sparse native deployment after authenticated reveal-all benchmark",
+  "roots": [
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700601
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700602
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700603
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700604
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700605
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700606
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700607
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700608
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700609
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700610
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700611
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700612
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700613
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700614
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700615
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700616
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700617
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700618
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700619
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700620
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700621
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700622
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700623
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700624
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700625
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700626
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700627
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700628
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700629
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700630
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700631
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1700632
+    }
+  ],
+  "schema": "model-free-matrix-definition.v1",
+  "settings": {
+    "population": {
+      "mode": "sparse"
+    },
+    "response": {
+      "selection_tick": 32
+    }
+  }
+}

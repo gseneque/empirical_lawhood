@@ -12,7 +12,7 @@ from typing import Annotated
 
 import typer
 
-from empirical_lawhood.api.workflows import Workflow, list_workflows, show_workflow
+from empirical_lawhood.api.workflows import Workflow, installation_profiles, list_workflows, show_workflow
 from empirical_lawhood.cli.metadata import COMMAND_METADATA, invocation_contracts
 
 
@@ -34,6 +34,7 @@ def workflow_details(workflow: Workflow) -> dict[str, object]:
     contracts = invocation_contracts()
     result = asdict(workflow)
     result["prerequisites_inspected"] = False
+    result["installation_profiles"] = installation_profiles(workflow.workflow_id)
     result["operations"] = [
         {
             **asdict(operation),
@@ -53,6 +54,7 @@ def render_workflow(workflow: Workflow) -> str:
         f"Sources: {', '.join(workflow.substrates)}",
         f"Methods: {', '.join(workflow.methods)}",
         f"Environment: {workflow.environment} (not inspected)",
+        "Installation profiles: " + ", ".join(row["profile_id"] for row in facts["installation_profiles"]),
         f"Inputs: {workflow.input_availability}",
         f"Ceiling: {workflow.scientific_ceiling}",
         f"First stop: {workflow.first_missing_prerequisite}",

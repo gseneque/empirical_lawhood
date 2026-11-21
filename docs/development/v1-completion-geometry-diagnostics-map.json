@@ -1,0 +1,20 @@
+{
+  "schema": "el-v1/scientific-module-extraction/1",
+  "partial_modules": {
+    "empirical_lawhood.adapters.rubisco.rubisco_response.gp_geometry_repair_native": {
+      "scientific_owner": "empirical_lawhood.domains.rubisco.rubisco_response.gp_geometry_diagnostics",
+      "functions": [
+        "mobile_force_diagnostics",
+        "optimizer_force_diagnostics"
+      ],
+      "remaining_effects": [
+        "Amber/OpenMM engines",
+        "native objective binding",
+        "native force capture",
+        "source/output file access",
+        "solver and event logging"
+      ]
+    }
+  },
+  "preservation": "Original force/gradient sign, construction barrier, mobile atom selection, fixed-coordinate exact comparison and reductions unchanged. Diagnostic values provide no molecular admission."
+}

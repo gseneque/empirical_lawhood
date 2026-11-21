@@ -6,39 +6,39 @@ frame and response controls, including nonuse. Nomination/headroom is not a
 prerequisite for this instrument-only projection. Ordinary source/issue/reveal
 owners retain their separate authority boundaries.
 """
-from empirical_lawhood.adapters.methods.matrix_factor_response.exposure import MatrixScheduledPhysicalExclusion
+from empirical_lawhood.domains.matrix.matrix_factor_response.exposure import MatrixScheduledPhysicalExclusion
 
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustodySupplier
 
 from contextlib import contextmanager
 from dataclasses import dataclass, replace
 
-from empirical_lawhood.adapters.methods import matrix_prepared_source_records as r
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as train
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_acquisition import entry_task_id
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import authenticate_request
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_bindings as preparation
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science, prepared_prefix
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_bindings as opportunity
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_bindings as revision
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_future, selected_revision_future
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import MatrixPreparationHistory, MatrixPreparationAssessment, preparation_identity
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_forecast import MatrixPreparedMechanicalForecast
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_response_science import MatrixPreparedResponseReadout
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_development_product import MatrixSelectedDevelopmentProduct
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_development_product import MatrixRevisionDevelopmentProduct
+from empirical_lawhood.domains.matrix import matrix_prepared_source_records as r
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as train
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_acquisition import entry_task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_request
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import preparation_bindings as preparation
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import preparation_science, prepared_prefix
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_bindings as opportunity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_bindings as revision
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_future, selected_revision_future
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixPreparationHistory, MatrixPreparationAssessment, preparation_identity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_forecast import MatrixPreparedMechanicalForecast
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_response_science import MatrixPreparedResponseReadout
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_development_product import MatrixSelectedDevelopmentProduct
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_development_product import MatrixRevisionDevelopmentProduct
 from empirical_lawhood.api.native_training_banks import _read_instance, _receipt_product
 from empirical_lawhood.api.recursive_execution import _read_recursive_wave_with_roots
 from empirical_lawhood.api.recursive_operations import development_output_contracts, operation_catalog
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.time import InformationCutoff
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import MatrixParameterNumericalDesign
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
-from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.time import InformationCutoff
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import MatrixParameterNumericalDesign
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
+from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
 
 
 def _allocations(programme):
@@ -66,7 +66,7 @@ def _complete_development(writer, directory, *, validate_authored,read_access=No
 
 
 def _native_training_prerequisite(writer, locator):
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
     if type(locator) is not MatrixFiniteDtTrainingLocator:
         raise TypeError("prepared source requires the exact original native TRAIN locator")
     locator.__post_init__()
@@ -92,8 +92,7 @@ def _native_training_prerequisite(writer, locator):
 
 def _development_selection(writer, locator,*,current_access=None):
     """Select an entire real E5 graph, independently of its nomination outcome."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import (
-        MatrixSelectedOpportunityRootConfigV2, MatrixRevisionRootConfigV2)
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixSelectedOpportunityRootConfigV2, MatrixRevisionRootConfigV2
     if type(locator) not in (MatrixSelectedDevelopmentProduct, MatrixRevisionDevelopmentProduct):
         raise TypeError("prepared source needs an exact original E5 development product locator")
     locator.__post_init__()
@@ -133,7 +132,7 @@ def _development_selection(writer, locator,*,current_access=None):
             entry.entry_evidence if is_revision else entry.evidence,
             entry.entry_evidence_size_bytes if is_revision else entry.evidence_size_bytes,
             produced_input_parents=produced_parents)
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
         output_access, output_visibility = produced_access(declared_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
             declared_visibility=VisibilityCeiling.DEVELOPMENT_ONLY,
             parents=produced_parents)
@@ -182,9 +181,7 @@ def _development_selection(writer, locator,*,current_access=None):
     # its exact published input does not replay or grant their old authority.
     from empirical_lawhood.api.matrix_selected_runtime import _published_input
     evidence_pin = entry.entry_evidence if is_revision else entry.evidence
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import (
-        MatrixRevisionEntryEvidenceV2, MatrixSelectedOpportunityEvidenceV2,
-    )
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixRevisionEntryEvidenceV2, MatrixSelectedOpportunityEvidenceV2
     evidence_type = MatrixRevisionEntryEvidenceV2 if is_revision else MatrixSelectedOpportunityEvidenceV2
     evidence_specs = tuple(value for value in tasks[entry_task].external_inputs
         if (value.expected_payload_schema, value.expected_content_sha256) ==
@@ -194,7 +191,7 @@ def _development_selection(writer, locator,*,current_access=None):
     evidence = _published_input(writer, run.run_plan_id, evidence_specs[0], evidence_type)
     if evidence.identity != evidence_pin:
         raise PermissionError("prepared source changes its actual original entry evidence")
-    from .domain_composition.matrix_selected_declarative.derivation import require_evidence_produced_input_parents
+    from empirical_lawhood.api.domain_composition.matrix_selected_declarative.derivation import require_evidence_produced_input_parents
     require_evidence_produced_input_parents(writer, entry.produced_input_parents, evidence)
     # No selected-arm, headroom or NOMINATED predicate belongs to instrument custody.
     return programme, owner, is_revision, products, plan, entry_task, evidence
@@ -224,7 +221,7 @@ def _prepared_control(writer, programme, owner, is_revision, products, plan, ent
             programme.identity, source, protocol, panels, programme.selected_package, phase)
         future_owner = selected_revision_future
     else:
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import package_identity
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import package_identity
         config = selected_opportunity_future.MatrixSelectedOpportunityFutureConfig("config." + owner.NAMESPACE + "." + source.source_id + "." + phase,
             programme.identity, source, protocol, panels, programme.point_design.identity, package_identity(programme.point_design.package), phase)
         future_owner = selected_opportunity_future
@@ -275,9 +272,9 @@ def _read_development_controls(*, writer, locator):
 @contextmanager
 def _committed_e4_selections(writer, commitment, request, *, maximum_source_bytes, native_training_locator=None):
     """Keep actual whole C custody alive while using all original E4 phases."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import validate_request_programme_inputs
-    from empirical_lawhood.infrastructure.matrix_completed_source import original_e3_commitment, original_e3_programme_inputs
-    from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticated_programme_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import validate_request_programme_inputs
+    from empirical_lawhood.adapters.matrix_storage.matrix_completed_source import original_e3_commitment, original_e3_programme_inputs
+    from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticated_programme_inputs
     with authenticated_programme_inputs(writer=writer, commitment=commitment,
             maximum_source_bytes=maximum_source_bytes) as inputs, original_e3_programme_inputs(
                 writer=writer, inputs=inputs, maximum_source_bytes=maximum_source_bytes) as e3_inputs:
@@ -285,7 +282,7 @@ def _committed_e4_selections(writer, commitment, request, *, maximum_source_byte
             validate_request_programme_inputs(request, e3_inputs)
             yield inputs
         else:
-            from empirical_lawhood.infrastructure.matrix_retained_training import authenticated_retained_training_source
+            from empirical_lawhood.adapters.matrix_storage.matrix_retained_training import authenticated_retained_training_source
             with authenticated_retained_training_source(writer=writer, inputs=e3_inputs,
                     maximum_source_bytes=maximum_source_bytes) as (retained, original):
                 if (retained.input_commitments != request.input_commitments
@@ -315,12 +312,12 @@ def _e4_phases(inputs):
 
 def _require_original_e4_scope(writer, inputs, programme, evidence, *, training_specification, training_request,current_access=None):
     """Original producer joins stay distinct from pre-acquisition mathematics."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedEntryEvidence
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedEntryEvidence
     if isinstance(evidence, (opportunity.MatrixSelectedOpportunityEvidence, MatrixSelectedEntryEvidence)):
         if programme.point_design.package.specification != inputs.scientific_design.e3:
             raise PermissionError("prepared source C changes the actual original E3 scientific specification")
-        from .matrix_selected_e3_e4_runtime import authenticate_selected_e3_training_banks
-        from .selected_prepared_access import _selected
+        from empirical_lawhood.api.matrix_selected_e3_e4_runtime import authenticate_selected_e3_training_banks
+        from empirical_lawhood.api.selected_prepared_access import _selected
         authenticate_selected_e3_training_banks(public=programme.point_design.package,
             upstream_products=_selected(evidence.upstream_products,current_access), training_specification=training_specification,
             training_request=training_request, writer=writer)
@@ -377,9 +374,7 @@ def _prepared_source_exposure_facts(*, writer, locator, request, acquisition, fu
         for _, source in source_rows), key=lambda row: row.source.object_id))
     _require_original_e4_scope(writer, inputs, programme, evidence,
         training_specification=training_specification, training_request=request,current_access=current_access)
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import (
-        validate_committed_prepared_sources, validate_committed_prepared_panels,
-    )
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import validate_committed_prepared_sources, validate_committed_prepared_panels
     prepared = _prepared_phases(inputs)
     validate_committed_prepared_sources(phase=programme.phase, sources=programme.sources,
         phases=prepared, producing_provenance=inputs.producing_provenance)
@@ -459,7 +454,7 @@ def _validate_prepared_source_certificate_bank(writer, bank):
     if type(bank) is not r.MatrixPreparedSourceBank:
         raise TypeError("prepared source requires its exact complete protected future bank")
     bank.__post_init__()
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_originals import _authenticate_artifact
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_originals import _authenticate_artifact
     for artifact, custody in bank.exposure_support:
         _authenticate_artifact(writer, artifact, custody)
 
@@ -467,9 +462,7 @@ def _validate_prepared_source_certificate_bank(writer, bank):
 def _prepared_source_certificate_from_facts(*, writer, locator, native_training_locator, bank, cutoff, record_id, facts):
     """Finish this invocation's authenticated facts; no cache or source authority."""
     request, acquisition, future = facts.request, facts.acquisition, facts.future_selections
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import (
-        validate_committed_prepared_sources, validate_committed_prepared_panels,
-    )
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import validate_committed_prepared_sources, validate_committed_prepared_panels
     if bank.input_commitments.record != facts.input_commitments:
         raise PermissionError("prepared source changes its actual original whole C publication identity")
     validate_committed_prepared_sources(phase=bank.phase, sources=bank.sources,
@@ -512,8 +505,8 @@ def authenticate_prepared_source_certificate(*, writer, certificate, bank, maxim
         control_reader=None, original_input_access=None,current_access=None):
     """Reconstruct immutable scientific facts within the existing bounded lifetime."""
     if original_input_access is not None:
-        from .prepared_source_access import authenticated_prepared_source_access
-        from .selected_prepared_access import _ordinary
+        from empirical_lawhood.api.prepared_source_access import authenticated_prepared_source_access
+        from empirical_lawhood.api.selected_prepared_access import _ordinary
         with authenticated_prepared_source_access(scope=original_input_access,
                 locator=certificate.native_training_locator) as access:
             with _ordinary(writer).read_context(before_member=access.require_original_member) as originals:
@@ -522,8 +515,8 @@ def authenticate_prepared_source_certificate(*, writer, certificate, bank, maxim
                 originals.require_verification_snapshot()
             access.require_current()
         return
-    from .current_result_custody import CurrentResultPlanReader
-    from empirical_lawhood.kernel.decoding import decimal_context_key
+    from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
+    from empirical_lawhood.science.records.decoding import decimal_context_key
     if type(certificate) is not r.MatrixPreparedInstrumentCertificate:
         raise TypeError("prepared source requires its actual complete DEV control certificate")
     certificate.__post_init__()
@@ -540,7 +533,7 @@ def authenticate_prepared_source_certificate(*, writer, certificate, bank, maxim
     cache = None if reader is None else getattr(reader, "_matrix_prepared_source_certificates", None)
     cached = None if cache is None else cache.get(key)
     from empirical_lawhood.api.matrix_finite_dt_source_runtime import _native_training_file_supports, _verify_file_supports
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
     file_supports = ()
     expected = None if cached is None else cached[0]
     if cached is not None:
@@ -584,11 +577,11 @@ class MatrixPreparedSourceRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier)
             return self._prepare_matrix_prepared_source_gate(context, runner)
 
     def _prepare_matrix_prepared_source_gate(self, context, runner):
-        from empirical_lawhood.adapters.methods import matrix_prepared_source_bindings as bindings
+        from empirical_lawhood.domains.matrix import matrix_prepared_source_bindings as bindings
         if type(runner) is not bindings.MatrixPreparedSourceGateWorker:
             raise PermissionError("prepared source refuses a foreign prepared worker")
         _, _, task = self.custody.current_task(context, runner)
-        from empirical_lawhood.runtime.input_access import validated_task_scientific_input_edges
+        from empirical_lawhood.execution.input_access import validated_task_scientific_input_edges
         science_edges = validated_task_scientific_input_edges(task)
         _, manifests = self.custody.task_inputs(context, task)
         specifications = {value.logical_artifact_id: value for value in task.external_inputs}
@@ -627,8 +620,8 @@ class MatrixPreparedSourceRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier)
 def bind_prepared_source_handoff(handoff, *, writer, reveal_authority_id=None, original_input_access=None):
     from dataclasses import replace
     from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
     custody = CurrentIssuedTaskCustody(writer=writer, reveal_authority_id=reveal_authority_id,
         original_input_access=original_input_access)
     ports = []
@@ -642,10 +635,8 @@ def bind_prepared_source_handoff(handoff, *, writer, reveal_authority_id=None, o
 
 def _validate_consumer_programme(bank, consumer_programme):
     """Bind source certification to the exact downstream acquisition contract."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import (
-        MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme,
-    )
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import MatrixRevisionPreparedProgramme
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import MatrixRevisionPreparedProgramme
     if type(bank) is not r.MatrixPreparedSourceBank or type(consumer_programme) not in (
             MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme, MatrixRevisionPreparedProgramme):
         raise TypeError("prepared source requires its actual selected protected consumer programme")
@@ -657,7 +648,7 @@ def _validate_consumer_programme(bank, consumer_programme):
 
 def authenticate_installed_prepared_source_prerequisite(*, writer, result, pipeline, publications, read_scope, consumer_programme=None):
     """Actual protected consumers replay the original prepared-control owner."""
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_bindings as bindings
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_bindings as bindings
     from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
     supplied = dict(publications)
     scope_pins = {value for gate in result.gate_evidence for value in gate.input_operands
@@ -717,10 +708,10 @@ def authenticate_installed_prepared_source_prerequisite(*, writer, result, pipel
 
 def _prepared_gate_product_context(*, selection, product_custody, read_scope, package, execution_plan):
     """Join an independently read source selection to its actual owning packet."""
-    from .current_task_custody import CurrentIssuedTaskCustody
-    from .prepared_source_access import PreparedSourceOriginalInputAccess
-    from .recursive_qualified_parents import _require_owned_product_binding
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_experiment as domain
+    from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
+    from empirical_lawhood.api.prepared_source_access import PreparedSourceOriginalInputAccess
+    from empirical_lawhood.api.recursive_qualified_parents import _require_owned_product_binding
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_experiment as domain
     if (type(selection) is not domain.MatrixPreparedSourceQualificationSelection
             or type(product_custody) is not CurrentIssuedTaskCustody
             or type(product_custody.original_input_access) is not PreparedSourceOriginalInputAccess):
@@ -751,13 +742,13 @@ def validate_prepared_gate_product(*, selection, binding, package, execution_pla
     The caller has already replayed source/DEV/TRAIN scientific prerequisites.
     This metadata check never grants access from a claimed label or parent pin.
     """
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_bindings as bindings
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_experiment as domain
-    from empirical_lawhood.kernel.evidence import inherited_visibility
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, derived_outcome_access, lineage_parent_sort_key
-    from empirical_lawhood.runtime.input_access import validated_task_scientific_input_edges
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-    from .current_task_custody import _require_provider_input_manifest
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_bindings as bindings
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_experiment as domain
+    from empirical_lawhood.science.evidence.evidence import inherited_visibility
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, derived_outcome_access, lineage_parent_sort_key
+    from empirical_lawhood.execution.input_access import validated_task_scientific_input_edges
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
+    from empirical_lawhood.api.current_task_custody import _require_provider_input_manifest
 
     access = _prepared_gate_product_context(selection=selection, product_custody=product_custody,
         read_scope=read_scope, package=package, execution_plan=execution_plan)
@@ -793,7 +784,7 @@ def validate_prepared_gate_product(*, selection, binding, package, execution_pla
         raise PermissionError("prepared gate replay aliases its complete config and operand census")
     selected = [(task.capability.config.artifact_id, config, True)]
     selected.extend((edge.operational_logical_artifact_id, records[edge.consumer_input_id], False) for edge in science)
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_experiment import operand_access_from_authoring
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_experiment import operand_access_from_authoring
     operand_pairs = operand_access_from_authoring(operands=records, authoring=selection.authoring)
     inputs = []
     writer = read_scope.plan_reader.writer
@@ -816,7 +807,7 @@ def validate_prepared_gate_product(*, selection, binding, package, execution_pla
         if selected_parents != parents or parents and parents != access.parents:
             raise PermissionError("prepared gate replay changes its complete actual original parent census")
         if is_config:
-            from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
+            from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
             declared_pair = produced_access(declared_access=declaration.outcome_access,
                 declared_visibility=declaration.visibility_ceiling, parents=parents)
         else:
@@ -838,11 +829,11 @@ def validate_prepared_gate_product(*, selection, binding, package, execution_pla
 
 def authenticate_owning_prepared_source_prerequisite(*, writer, selection, result, pipeline, read_scope, product_custody):
     """Current owning read only; downstream consumers need their own live context."""
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_experiment as domain
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_experiment as domain
     package, plan = product_custody._current_package_plan
     access = _prepared_gate_product_context(selection=selection, product_custody=product_custody,
         read_scope=read_scope, package=package, execution_plan=plan)
-    from .matrix_prepared_source_experiment import pipeline_evidence
+    from empirical_lawhood.api.matrix_prepared_source_experiment import pipeline_evidence
     expected_pipeline, expected_result = pipeline_evidence(selection)
     if pipeline != expected_pipeline or result != expected_result:
         raise PermissionError("prepared source replay changes its exact independently authenticated selection")
@@ -860,10 +851,10 @@ def authenticate_owning_prepared_source_prerequisite(*, writer, selection, resul
 def validate_prepared_terminal_product(*, selection, config, product, declaration, binding, package,
         execution_plan, receipt, logical, read_scope, product_custody):
     """Preserve the two pure terminal products while guarding their full closure."""
-    from .current_task_custody import _require_provider_input_manifest
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-    from empirical_lawhood.runtime.input_access import validated_task_scientific_input_edges
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent
+    from empirical_lawhood.api.current_task_custody import _require_provider_input_manifest
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
+    from empirical_lawhood.execution.input_access import validated_task_scientific_input_edges
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
     access = _prepared_gate_product_context(selection=selection, product_custody=product_custody,
         read_scope=read_scope, package=package, execution_plan=execution_plan)
     task = read_scope.plan_reader.execution_task(execution_plan=execution_plan, task_id=binding.task_id)

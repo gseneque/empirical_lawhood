@@ -13,45 +13,19 @@ import numpy as np
 import pytest
 from scipy.stats import false_discovery_control, mannwhitneyu
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
-from empirical_lawhood.adapters.physical.virtual_cell.config import (
-    virtual_cell_2025_metric_contract,
-)
-from empirical_lawhood.adapters.physical.virtual_cell.contracts import (
-    VirtualCellContractError,
-)
-from empirical_lawhood.adapters.physical.virtual_cell.dataset import (
-    ControlReservoirArrays,
-)
-from empirical_lawhood.adapters.physical.virtual_cell.evaluation import (
-    _metric_arrays,
-    evaluate_official_2025,
-)
-from empirical_lawhood.adapters.physical.virtual_cell.metric_correction_v2 import (
-    MetricSourceSemantics,
-    OfficialMetricGaugeV2,
-    OfficialMetricSetV2,
-    correct_historical_crosswired_metrics,
-    metric_set_from_source_columns,
-    score_corrected_metrics,
-    score_source_aggregate,
-)
-from empirical_lawhood.adapters.physical.virtual_cell.prediction import (
-    PredictionH5ADBuildReceipt,
-    PredictionRoster,
-    PredictionTargetAllocation,
-    write_historical_mean_preserving_prediction_h5ad,
-    write_prediction_h5ad,
-    compile_absolute_prediction_means,
-)
-from empirical_lawhood.adapters.physical.virtual_cell.prediction_v2 import (
-    SharedTemplateShiftV2BuildReceipt,
-    SharedTemplateShiftV2Selection,
-    compile_shared_template_shift_v2_cells,
-    shared_template_shift_v2_null_cells,
-    write_shared_template_shift_v2_prediction_h5ad,
-)
+from empirical_lawhood.domains.biology.virtual_cell.config import virtual_cell_2025_metric_contract
+from empirical_lawhood.domains.biology.virtual_cell.response_summary import ControlReservoirArrays
+from empirical_lawhood.adapters.physical.virtual_cell.evaluation import _metric_arrays
+from empirical_lawhood.domains.biology.virtual_cell.metric_interpretation_v2 import metric_set_from_source_columns, score_corrected_metrics, score_source_aggregate
+from empirical_lawhood.domains.biology.virtual_cell.correction_records_v2 import MetricSourceSemantics, OfficialMetricGaugeV2, OfficialMetricSetV2
+from empirical_lawhood.adapters.physical.virtual_cell.metric_correction_v2 import correct_historical_crosswired_metrics
+from empirical_lawhood.domains.biology.virtual_cell.prediction import PredictionH5ADBuildReceipt, PredictionRoster, PredictionTargetAllocation, compile_absolute_prediction_means
+from empirical_lawhood.adapters.physical.virtual_cell.prediction import write_historical_mean_preserving_prediction_h5ad
+from empirical_lawhood.domains.biology.virtual_cell.correction_records_v2 import SharedTemplateShiftV2BuildReceipt, SharedTemplateShiftV2Selection
+from empirical_lawhood.domains.biology.virtual_cell.prediction_v2 import compile_shared_template_shift_v2_cells, shared_template_shift_v2_null_cells
+from empirical_lawhood.adapters.physical.virtual_cell.prediction_v2 import write_shared_template_shift_v2_prediction_h5ad
 
 
 class _Column:
@@ -196,16 +170,13 @@ assert not {'anndata', 'cell_eval', 'polars', 'pdex'} & set(sys.modules)
     subprocess.run([sys.executable, "-c", script], check=True)
 
 
-def test_unversioned_calls_refuse_before_output(tmp_path):
-    destination = tmp_path / "unversioned.h5ad"
-    with pytest.raises(VirtualCellContractError, match="SOFTWARE"):
-        write_prediction_h5ad(path=destination)
-    with pytest.raises(VirtualCellContractError, match="SOFTWARE"):
-        evaluate_official_2025(scratch_directory=tmp_path / "unversioned-evaluator")
-    assert not destination.exists()
-    assert not (tmp_path / "unversioned-evaluator").exists()
+def test_removed_unversioned_calls_have_no_refusal_shims():
+    from empirical_lawhood.adapters.physical.virtual_cell import evaluation, prediction
+    assert not hasattr(prediction, "write_prediction_h5ad")
+    assert not hasattr(evaluation, "evaluate_official_2025")
 
 
+@pytest.mark.numerical(oracle='Literal midpoint order statistics and independently enumerated rank map produce the exact three-cell two-gene array')
 def test_literal_rank_and_order_statistic_oracle():
     template = np.array([[4, 1], [1, 4], [3, 2], [2, 3]], dtype=np.float32)
     # For n=3, midpoint order statistics are [1,3,4]; anchor ranks determine these rows.
@@ -464,12 +435,8 @@ def test_evaluator_contract_must_match_gauge_before_import_or_observation(
     tmp_path, monkeypatch, damage
 ):
     import builtins
-    from empirical_lawhood.adapters.physical.virtual_cell.evaluation import (
-        evaluate_official_2025_v2,
-    )
-    from empirical_lawhood.adapters.physical.virtual_cell.metric_correction_v2 import (
-        require_metric_contract_gauge,
-    )
+    from empirical_lawhood.adapters.physical.virtual_cell.evaluation import evaluate_official_2025_v2
+    from empirical_lawhood.domains.biology.virtual_cell.correction_records_v2 import require_metric_contract_gauge
 
     contract = replace(virtual_cell_2025_metric_contract(), **damage)
     gauge = OfficialMetricGaugeV2()
@@ -496,9 +463,7 @@ def test_evaluator_contract_must_match_gauge_before_import_or_observation(
 
 
 def test_selected_final_and_validation_baselines_remain_distinct_and_supported():
-    from empirical_lawhood.adapters.physical.virtual_cell.config import (
-        virtual_cell_2025_validation_metric_contract,
-    )
+    from empirical_lawhood.domains.biology.virtual_cell.config import virtual_cell_2025_validation_metric_contract
 
     gauge = OfficialMetricGaugeV2()
     columns = {

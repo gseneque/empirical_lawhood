@@ -5,25 +5,21 @@ from dataclasses import replace
 from pathlib import Path
 from time import monotonic
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import curve_amendment as domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.curve_amendment_design import amend_curve_design
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import (
-    MatrixProgrammePublishedInput,
-)
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import (
-    AMENDED_PROTOCOL_ID, MatrixCurveAmendedProgrammeSpecification,
-)
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticated_programme_inputs
-from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
-from .matrix_amendment_evidence import evidence_snapshots, publish_evidence, read_evidence, validate_evidence
-from .matrix_amendment_withdrawals import withdrawn_custody
-from .matrix_programme_source_continuation import _original_custody, _predecessor
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import curve_amendment as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.curve_amendment_design import amend_curve_design
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import AMENDED_PROTOCOL_ID, MatrixCurveAmendedProgrammeSpecification
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticated_programme_inputs
+from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.api.matrix_amendment_evidence import evidence_snapshots, publish_evidence, read_evidence, validate_evidence
+from empirical_lawhood.api.matrix_amendment_withdrawals import withdrawn_custody
+from empirical_lawhood.api.matrix_programme_source_continuation import _original_custody, _predecessor
 
 
 @contextmanager
@@ -59,7 +55,7 @@ def amended_context(owner, context, record):
 
 
 def _publish_inputs(original, provenance, publish, *, record_id):
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.input_records import validate_programme_input_records
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.input_records import validate_programme_input_records
     design = amend_curve_design(original.scientific_design, record_id='design.' + record_id)
     design_publication = publish('scientific-design', design)
     provenance_publication = publish('producing-provenance', provenance, identity=provenance.identity)
@@ -85,12 +81,12 @@ def _publish_inputs(original, provenance, publish, *, record_id):
 
 def derive_inputs(*, specification, source_selection_path, project_root, artifact_writer,
         metadata_directory, output_selection_path, execution, read_access=None):
-    from .experiment_preparation import load_experiment_inputs, prepare_experiment
-    from .experiment_programme import ExperimentProgrammeService
-    from .matrix_numerical_provenance import capture_matrix_provenance
-    from .matrix_programme_allocations import _require_memory
-    from .matrix_researcher_programme import _publish
-    from .selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest
+    from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
+    from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
+    from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
+    from empirical_lawhood.api.matrix_programme_allocations import _require_memory
+    from empirical_lawhood.api.matrix_researcher_programme import _publish
+    from empirical_lawhood.api.selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest
 
     if type(specification) is not domain.MatrixProgrammeCurveAmendmentSpecification or read_access is not None:
         raise TypeError('curve amendment requires its exact ordinary metadata selection')

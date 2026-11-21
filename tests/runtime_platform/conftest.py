@@ -17,96 +17,25 @@ from tests.runtime_platform.support import (
 )
 from tests.approval_support import deterministic_approval_signer
 
-from empirical_lawhood.adapters.reference_worlds import reference_worlds
-from empirical_lawhood.kernel.authority import AuthorityAction, SourceAccessClass
-from empirical_lawhood.kernel.evidence import (
-    ClaimSpec,
-    EvidenceCeiling,
-    EvidenceRung,
-    OutcomeAccess,
-    VisibilityCeiling,
-)
-from empirical_lawhood.kernel.experiments import (
-    AssignmentKind,
-    AssignmentSpec,
-    ControlKind,
-    ControlSpec,
-    ExperimentSpec,
-    PrecisionGoal,
-    RevealBarrierSpec,
-)
-from empirical_lawhood.kernel.obligations import (
-    ClosureSpec,
-    ComputabilityEvidence,
-    FalsifierKind,
-    FalsifierSpec,
-    ObligationStatus,
-    ScientificObligations,
-    StructuralConvergenceSpec,
-    SupportSpec,
-    UncertaintySpec,
-    ValiditySpec,
-)
-from empirical_lawhood.kernel.provenance import EvidenceSnapshot, ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity, QuantityBound
-from empirical_lawhood.kernel.status import LifecycleStatus, ReadinessStatus
-from empirical_lawhood.kernel.systems import SystemSpec
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.planning.authority import (
-    ApprovalRequest,
-    AuthorizationDecision,
-    AuthorizationRecord,
-    authorize_experiment,
-)
-from empirical_lawhood.planning.approval import (
-    ApprovalCheckerRegistration,
-    ApprovalCheckerRegistry,
-    ApprovalGateAttestation,
-    ApprovalGateKind,
-    ApprovalObligations,
-    ApprovalSignatureAlgorithm,
-    AttestationResult,
-    CompleteApprovalService,
-    DurableAuthorizationRecord,
-    FrozenApprovalProposal,
-    approval_obligations_extension,
-    issue_approval_gate_attestation,
-)
-from empirical_lawhood.planning.campaigns import (
-    CampaignLane,
-    CampaignNode,
-    CampaignNodeKind,
-    CampaignSpec,
-    DecisionRight,
-)
-from empirical_lawhood.planning.design import ExperimentProposal
-from empirical_lawhood.planning.exploration import (
-    AnalysisProposal,
-    AnalysisSpec,
-    ProposalDisposition,
-    ProposalSelection,
-    SearchAxis,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.compiler import (
-    compile_exploration_plan,
-    compile_run_plan,
-    lower_run_plan,
-)
-from empirical_lawhood.runtime.plans import (
-    BarrierKind,
-    OutputTemplate,
-    ProtocolStepTemplate,
-    ProtocolTemplate,
-    ScientificStage,
-    SnapshotVerification,
-)
+from empirical_lawhood.domains.reference_worlds import reference_worlds
+from empirical_lawhood.science.identity.authority import AuthorityAction, SourceAccessClass
+from empirical_lawhood.science.evidence.evidence import ClaimSpec, EvidenceCeiling, EvidenceRung, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experiments import AssignmentKind, AssignmentSpec, ControlKind, ControlSpec, ExperimentSpec, PrecisionGoal, RevealBarrierSpec
+from empirical_lawhood.science.evidence.obligations import ClosureSpec, ComputabilityEvidence, FalsifierKind, FalsifierSpec, ObligationStatus, ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec
+from empirical_lawhood.science.identity.provenance import EvidenceSnapshot, ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity, QuantityBound
+from empirical_lawhood.science.records.status import LifecycleStatus, ReadinessStatus
+from empirical_lawhood.science.models.systems import SystemSpec
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.design.authority import ApprovalRequest, AuthorizationDecision, AuthorizationRecord, authorize_experiment
+from empirical_lawhood.design.approval import ApprovalCheckerRegistration, ApprovalCheckerRegistry, ApprovalGateAttestation, ApprovalGateKind, ApprovalObligations, ApprovalSignatureAlgorithm, AttestationResult, CompleteApprovalService, DurableAuthorizationRecord, FrozenApprovalProposal, approval_obligations_extension, issue_approval_gate_attestation
+from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
+from empirical_lawhood.design.design import ExperimentProposal
+from empirical_lawhood.design.exploration import AnalysisProposal, AnalysisSpec, ProposalDisposition, ProposalSelection, SearchAxis
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.compiler import compile_exploration_plan, compile_run_plan, lower_run_plan
+from empirical_lawhood.execution.plans import BarrierKind, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage, SnapshotVerification
 
 
 def _required_obligations(system: SystemSpec) -> ScientificObligations:

@@ -16,18 +16,13 @@ from typing import ClassVar
 
 import numpy as np
 
-from empirical_lawhood.kernel.evidence import EvidenceCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_strings,
-    validate_sha256,
-    validate_stable_id,
-)
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_strings, validate_sha256, validate_stable_id
 
-from .contracts import RcLadderResponseActionDeliveryStatus, RcLadderResponseActionLedger, RcLadderResponseBoardIdentity, RcLadderResponseBundleManifest, RcLadderResponseChannelCalibration, RcLadderResponseClockFitRecord, RcLadderResponseComponentMetrology, RcLadderResponseEpisodeManifest, RcLadderResponseEpisodeRole, RcLadderResponsePreparationRecord
-from .profile import RcLadderResponsePhysicalSemanticProfile, draft_semantic_profile
-from .source import RcLadderResponseBundleDecodeError, RcLadderResponsePreopenedMember, decode_bundle
+from empirical_lawhood.adapters.physical.rc_ladder_response.contracts import RcLadderResponseActionDeliveryStatus, RcLadderResponseActionLedger, RcLadderResponseBoardIdentity, RcLadderResponseBundleManifest, RcLadderResponseChannelCalibration, RcLadderResponseClockFitRecord, RcLadderResponseComponentMetrology, RcLadderResponseEpisodeManifest, RcLadderResponseEpisodeRole, RcLadderResponsePreparationRecord
+from empirical_lawhood.adapters.physical.rc_ladder_response.profile import RcLadderResponsePhysicalSemanticProfile, draft_semantic_profile
+from empirical_lawhood.adapters.physical.rc_ladder_response.source import RcLadderResponseBundleDecodeError, RcLadderResponsePreopenedMember, decode_bundle
 
 
 PHYSICAL_SCALE_MORPHISM_SYNTHETIC_SOURCE_COUNTERFEIT_IDS = (

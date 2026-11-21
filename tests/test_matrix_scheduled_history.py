@@ -12,28 +12,28 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.records import E1FactorRule
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import ScalarClosureSpec
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_parameter_factor.records import MatrixParameterFactorNumericalDesign, MatrixParameterScalarDefinition
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole as Role, MatrixProgrammeRoot
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as r, retained, science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_parameter_factor.records import expected_members as diagnostic_members
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source, parameter_history_segments as segments
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, CanonicalTaskReceipt
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion, NativeSubworkContact, NativeSubworkDefinition, NativeSubworkOutput
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.records import E1FactorRule
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import ScalarClosureSpec
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_parameter_factor.records import MatrixParameterFactorNumericalDesign, MatrixParameterScalarDefinition
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole as Role, MatrixProgrammeRoot
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as r, retained, science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_parameter_factor.records import expected_members as diagnostic_members
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source, parameter_history_segments as segments
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, CanonicalTaskReceipt
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion, NativeSubworkContact, NativeSubworkDefinition, NativeSubworkOutput
 from tests.test_matrix_factor_confirmation_eligibility import artifact, publish
 from tests.test_matrix_factor_confirmation_eligibility import provenance as provenance
 from tests.test_matrix_factor_confirmation_eligibility import stock as stock
@@ -173,7 +173,7 @@ def prefix_case(plane, source, *, parent=None):
          NativeSubworkOutput('checkpoint', r.ScheduledCheckpoint.SCHEMA, ArtifactProfile.CANONICAL_JSON, 'application/json')))
     native_task = 'native-subwork.'+sha256((task+':'+definition.subwork_id).encode()).hexdigest()
     raw, arrays, checkpoint = science.prefix_from_segment(source, values, artifact_id=native_task+'.output.arrays')
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest
     a = plane.write(ArtifactWriteRequest(arrays.array_artifact.artifact_id, 'software/'+native_task+'.npz', MATRIX_ARRAY_SCHEMA,
         ArtifactProfile.MATRIX_ARRAY_NPZ, 'application/x-npz', 'software-only', 'software', raw, Visibility.PROSPECTIVE, (), Access.OUTCOME_BLIND))
     c = publish(plane, checkpoint, native_task+'.output.checkpoint')
@@ -248,7 +248,7 @@ def test_actual_cutoff_full_independent_controls_and_no_rng_delivery(scheduled, 
     assert tuple(c.denominator_steps for c in numerical.controls) == (6, 12, 6, 6)
     assert tuple(len(c.measured_errors) for c in assessment.controls) == (28, 420, 28, 28, 28, 28)
     assert causal.root.role is role and causal.cutoff_tick == 6
-    from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
     delivered = decode_matrix_arrays(causal_raw, causal.arrays)
     assert set(delivered) == {'primary_positions', 'primary_momenta', 'primary_ticks', 'primary_alpha_tilde',
         'fine_positions', 'fine_momenta', 'fine_ticks', 'fine_alpha_tilde', 'frame'}
@@ -290,7 +290,7 @@ def test_cold_numerical_and_frame_controls_block_producers_rng_eigen(scheduled, 
 
 
 def factor_science_module():
-    from empirical_lawhood.adapters.methods.matrix_factor_lifetime import science as factor
+    from empirical_lawhood.domains.matrix.matrix_factor_lifetime import science as factor
     return factor
 
 
@@ -298,7 +298,7 @@ def test_mutually_forged_operator_and_spectrum_cannot_create_available_origin(sc
     plane, sources = scheduled
     source = sources[2]
     history, numerical, witness, _, _, raw, diagnostic, _ = prefix_case(plane, source)
-    from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
     values = {n: a.copy() for n, a in decode_matrix_arrays(diagnostic, witness.arrays).items()}
     values['primary_x_operator'] += np.eye(15)
     values['primary_x_spectrum'] += 1
@@ -440,7 +440,7 @@ def test_cold_witness_rejects_missing_fine_tick_or_eigenpair(scheduled, defect):
     plane, sources = scheduled
     source = sources[2]
     history, numerical, witness, _, _, raw, diagnostic, _ = prefix_case(plane, source)
-    from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
     values = {n: a.copy() for n, a in decode_matrix_arrays(diagnostic, witness.arrays).items()}
     if defect == 'half-view':
         values = {n: a for n, a in values.items() if not n.startswith('fine_')}

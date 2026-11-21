@@ -11,19 +11,10 @@ import pytest
 
 from empirical_lawhood.adapters.physical.rubisco_kinetics import csv_source
 
-from empirical_lawhood.adapters.physical.rubisco_kinetics.csv_source import (
-    CROSSWALK_HEADERS, FLAMHOLZ_HEADERS, NativeKineticCSVTableV1,
-    ReportedQuantityKind, SourceCSVProfile, SourceQuantityAdmission, decode_source_csv,
-)
-from empirical_lawhood.adapters.physical.rubisco_kinetics.records import (
-    HistoricalFeatureSliceV1, HistoricalLabelSliceV1, HistoricalTrainingSliceV1,
-    ReportedSubstitutionV1,
-)
-from empirical_lawhood.adapters.physical.rubisco_kinetics.rr2018 import (
-    DOI, HEADERS, LABELS, MAX_INPUT_BYTES, Rr2018NativeAuditV1, decode_rr2018,
-    role_slices, selected_endpoints, selected_features,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_record
+from empirical_lawhood.adapters.physical.rubisco_kinetics.csv_source import CROSSWALK_HEADERS, FLAMHOLZ_HEADERS, NativeKineticCSVTableV1, ReportedQuantityKind, SourceCSVProfile, SourceQuantityAdmission, decode_source_csv
+from empirical_lawhood.domains.rubisco.kinetics.records import HistoricalFeatureSliceV1, HistoricalLabelSliceV1, HistoricalTrainingSliceV1, ReportedSubstitutionV1
+from empirical_lawhood.adapters.physical.rubisco_kinetics.rr2018 import DOI, HEADERS, LABELS, MAX_INPUT_BYTES, Rr2018NativeAuditV1, decode_rr2018, role_slices, selected_endpoints, selected_features
+from empirical_lawhood.science.records.decoding import decode_canonical_record
 
 
 def article() -> bytes:

@@ -6,28 +6,28 @@ Real artifact and receipt stores publish literal negative scientific records.
 """
 from copy import copy
 from types import SimpleNamespace
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.runtime.recovery import ProtocolRunRecoveryIndex
-from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, RunnerRegistry
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.execution.recovery import ProtocolRunRecoveryIndex
+from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry
 
 from dataclasses import dataclass, fields, replace
 from hashlib import sha256
 import json
 from pathlib import Path
 import pytest
-from empirical_lawhood.infrastructure import execution as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_task_receipt
-from empirical_lawhood.kernel.admission import AdmissionGateKind, AdmissionGateResult, GateStatus
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactSemanticValidationRegistry, CanonicalTaskReceipt, ReceiptCheck
-from empirical_lawhood.runtime.execution import RunnerResult, TaskOutputPayload
-from empirical_lawhood.runtime.plans import ExecutionTask, ProtocolExecutionTask
-from empirical_lawhood.runtime.providers import CapabilityOutputSemanticContract
+from empirical_lawhood.execution.local import execution as owner
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore, decode_task_receipt
+from empirical_lawhood.science.evidence.admission import AdmissionGateKind, AdmissionGateResult, GateStatus
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactSemanticValidationRegistry, CanonicalTaskReceipt, ReceiptCheck
+from empirical_lawhood.execution.execution import RunnerResult, TaskOutputPayload
+from empirical_lawhood.execution.plans import ExecutionTask, ProtocolExecutionTask
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract
 from tests.runtime_platform.conftest import protocol_fixture as protocol_fixture
 from tests.runtime_platform.support import IMPLEMENTATION_COMMIT
 from tests.runtime_platform.test_execution_scheduler import _external_inputs, _plane

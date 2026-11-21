@@ -9,25 +9,14 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import (
-    full_factor_bindings as owner, full_factor_science as science,
-    records as old, selected_e4_bank_recipe as recipe,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import (
-    ScheduledFullFactorScope, scope_reference,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import (
-    SelectedE3E4CaseResult, SelectedE3E4NativeSource,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_method_bindings import (
-    SelectedE4DevelopmentAcquisition,
-)
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
-from empirical_lawhood.runtime.recursive_compiler import (
-    decode_recursive_config_input, project_recursive_config_inputs, validate_recursive_scientific_roots,
-)
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_bindings as owner, full_factor_science as science, records as old, selected_e4_bank_recipe as recipe
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorScope, scope_reference
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4CaseResult, SelectedE3E4NativeSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_method_bindings import SelectedE4DevelopmentAcquisition
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
+from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input, project_recursive_config_inputs, validate_recursive_scientific_roots
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 from tests.test_matrix_e4_full_factor_values import pin
 from tests.test_matrix_selected_e4_bank_recipe import literal_recipe_source_inputs  # noqa: F401

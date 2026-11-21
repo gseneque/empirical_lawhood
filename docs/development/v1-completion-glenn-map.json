@@ -1,0 +1,19 @@
+{
+  "schema": "el-v1/scientific-module-extraction/1",
+  "full_modules": {
+    "empirical_lawhood.adapters.physical.glenn.exploration": "empirical_lawhood.domains.optics.glenn.exploration"
+  },
+  "symbols": [
+    "GLENN_G1_EXPLORATION_PLAN_ID",
+    "GLENN_G1_PROJECTION_ARTIFACT_ID",
+    "build_glenn_g1_exploration_package",
+    "glenn_g1_diagnostic_projection",
+    "glenn_g1_exploration_registry",
+    "glenn_g1_exploration_runtime_provider",
+    "glenn_g1_exploration_system"
+  ],
+  "reason": "Effect-free physical system, evidence limits, bounded prospective design, conservative exploration assessment and authored composition; archive I/O and native format conversion remain in adapters.physical.glenn.",
+  "old_module_deleted": true,
+  "old_package_exports_removed": true,
+  "scientific_bytes_note": "Existing scientific identifiers, numerical constants, evidence ceilings and non-evaluable original-session limitations unchanged."
+}

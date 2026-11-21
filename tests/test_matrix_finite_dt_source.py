@@ -7,20 +7,20 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_records as r
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_bindings as bindings
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as train
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseBank
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, ExecutionPlan
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_records as r
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_bindings as bindings
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as train
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseBank
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, ExecutionPlan
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
 from tests.test_matrix_native_training_acquisition import fresh_training_metadata_case
 
 
@@ -118,8 +118,8 @@ def test_instrument_certificate_requires_exact_current_producing_provenance(chan
 
 
 def test_installed_source_gate_methods_keep_stage_contract_and_existing_replay_owners():
-    from empirical_lawhood.adapters.methods.matrix_source_bindings import source_declarations, PIPELINE_KEY, QUALIFICATION_KEY
-    from empirical_lawhood.runtime.candidate_compiler import _ALLOWED_STAGE_KINDS
+    from empirical_lawhood.domains.matrix.matrix_source_bindings import source_declarations, PIPELINE_KEY, QUALIFICATION_KEY
+    from empirical_lawhood.execution.candidate_compiler import _ALLOWED_STAGE_KINDS
     declarations = source_declarations()
     assert tuple(value.capability_key for value in declarations[:2]) == (PIPELINE_KEY, QUALIFICATION_KEY)
     assert {value.capability_key for value in declarations[2:]} == {
@@ -132,10 +132,10 @@ def test_installed_source_gate_methods_keep_stage_contract_and_existing_replay_o
 
 
 def test_public_finite_dt_specification_stops_at_actual_source_selection_dependency(tmp_path):
-    from empirical_lawhood.adapters.methods import matrix_finite_dt_source_experiment as domain
+    from empirical_lawhood.domains.matrix import matrix_finite_dt_source_experiment as domain
     from empirical_lawhood.api.experiment_preparation import load_experiment_specification, prepare_experiment
     from empirical_lawhood.api.domain_composition.matrix_finite_dt_source.experiment_binding import EXPERIMENT_RUNTIME_BINDING
-    from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExecutionSelection
+    from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection
     specification = domain.MatrixFiniteDtSourceQualificationSpecification("spec.disclosed.source-first-stop",
         _unexecuted("source-selection", domain.MatrixFiniteDtSourceQualificationSelection), 4)
     path = tmp_path / "copied-source-specification.json"
@@ -153,8 +153,8 @@ def test_public_finite_dt_specification_stops_at_actual_source_selection_depende
 
 
 def test_pending_source_metadata_cannot_predict_future_validity_or_erase_nonuse():
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_pipeline import MatrixFiniteDtPendingSourceRow
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledSource
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_pipeline import MatrixFiniteDtPendingSourceRow
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledSource
     row = MatrixFiniteDtPendingSourceRow("root.disclosed.pending", "group.disclosed.pending", _unexecuted("pending-source", ScheduledSource))
     assert row.invalid_disposition == "ASSIGNED_NATIVE_ACQUISITION_NOT_YET_OBSERVED"
     for changes in ({"invalid_disposition": "ALL_FUTURE_TRAJECTORIES_VALID"},

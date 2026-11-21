@@ -10,24 +10,24 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime import science as factor
-from empirical_lawhood.adapters.methods.matrix_history_analysis import algebra
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import expected_members
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_records as r, full_factor_science as science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as dev
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as protected
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_bank_recipe as recipe, records as old
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.continuation import ScheduledFullArrays
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import ideal_state
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import initial_parameter_state
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays, decode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, ExecutionPlan
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime import science as factor
+from empirical_lawhood.domains.matrix.matrix_history_analysis import algebra
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import expected_members
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_records as r, full_factor_science as science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as dev
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as protected
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_bank_recipe as recipe, records as old
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.continuation import ScheduledFullArrays
+from empirical_lawhood.domains.matrix.six_matrix_response.model import ideal_state
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import initial_parameter_state
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays, decode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, ExecutionPlan
 from tests.test_matrix_factor_lifetime import spec, root
 from tests.test_matrix_selected_e4_bank_recipe import literal_recipe_source_inputs  # noqa: F401
 from tests.test_matrix_selected_e3_e4_bridge import disclosed_produced_parents
@@ -178,7 +178,7 @@ def test_no_origin_full_history_is_measured_without_replacing_original_numerical
     assert science.read_retained(source,product,assessment,raw,diagnostic)==assessment
     if phase=='DEVELOPMENT' and numerical_pass is None:
         from empirical_lawhood.api.matrix_retained_replay import replay_full_factor, replay_weight
-        from empirical_lawhood.infrastructure.parallel_verification import CanonicalValidationPool
+        from empirical_lawhood.storage.parallel_verification import CanonicalValidationPool
         weight=replay_weight(records=(source,product,assessment),archives=((raw,source.full_arrays),(diagnostic,product.arrays)))
         value=(weight,(source,product,assessment,raw,diagnostic))
         pool=CanonicalValidationPool(2)

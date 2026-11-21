@@ -7,9 +7,9 @@ import pytest
 
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
 from empirical_lawhood.api.results import OperationStatus
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCandidate
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCandidate
 from tests.runtime_platform import test_recursive_prospective_workflow as workflow
 
 

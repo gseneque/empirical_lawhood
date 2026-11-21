@@ -12,30 +12,30 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_prefix_bindings as original
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_prefix_bindings as original
 
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_prefix_records import ConfiguredProtectedE3PrefixHistory
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_prefix_records import ConfiguredProtectedE3PrefixHistory
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledCheckpoint
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledCheckpoint
 
-from empirical_lawhood.infrastructure.execution import prepare_worker_invocation
+from empirical_lawhood.execution.local.execution import prepare_worker_invocation
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
 
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
-from empirical_lawhood.kernel.status import OperationalStatus
+from empirical_lawhood.science.records.status import OperationalStatus
 
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
 
-from empirical_lawhood.runtime.execution import RunnerResult
+from empirical_lawhood.execution.execution import RunnerResult
 
-from empirical_lawhood.runtime.native_subwork import NativeSubworkInspection, NativeSubworkState
+from empirical_lawhood.execution.native_subwork import NativeSubworkInspection, NativeSubworkState
 
 from tests import test_matrix_configured_protected_prefix_worker_routing as literal
 

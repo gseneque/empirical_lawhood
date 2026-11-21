@@ -10,18 +10,18 @@ import pytest
 
 from empirical_lawhood.api import matrix_geometry as api
 from empirical_lawhood.api.matrix_native_custody import MatrixNativeCustody
-from empirical_lawhood.adapters.methods.matrix_response_study import anisotropic_feasibility as science
-from empirical_lawhood.adapters.methods.matrix_response_study import numerical_qualification as qualification
-from empirical_lawhood.adapters.simulators.six_matrix_response.extension_bundle import SIX_MATRIX_RESPONSE_CAPABILITY
-from empirical_lawhood.adapters.simulators.six_matrix_response.simulation import SixMatrixResponseEpisodeTerminal
-from empirical_lawhood.adapters.methods.matrix_response_study.geometry_inputs import allocate_matrix_geometry, MatrixGeometrySeedCell
-from empirical_lawhood.adapters.simulators.six_matrix_response.simulation import SixMatrixResponseConstitution, derive_rng_stream
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.domains.matrix.matrix_response_study import anisotropic_feasibility as science
+from empirical_lawhood.domains.matrix.matrix_response_study import numerical_qualification as qualification
+from empirical_lawhood.adapters.simulators.six_matrix_response.extension import SIX_MATRIX_RESPONSE_CAPABILITY
+from empirical_lawhood.domains.matrix.six_matrix_response.simulation import SixMatrixResponseEpisodeTerminal
+from empirical_lawhood.domains.matrix.matrix_response_study.geometry_inputs import allocate_matrix_geometry, MatrixGeometrySeedCell
+from empirical_lawhood.domains.matrix.six_matrix_response.simulation import SixMatrixResponseConstitution, derive_rng_stream
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -250,7 +250,7 @@ def test_selected_view_sensitive_continuation_acquires_one_parent_and_recovers(c
 def _selected_view_sensitive_public_case(bound, plane, monkeypatch):
     """Reuse the complete software reference; a manufactured numerical stop is explicit."""
     from empirical_lawhood.api import selected_events
-    from empirical_lawhood.adapters.methods.matrix_response_study import shooting_committor
+    from empirical_lawhood.domains.matrix.matrix_response_study import shooting_committor
     request = replace(selected_events.selected_parent_example_input(environment_lock_sha256=bound.environment_lock_sha256), minimum_free_bytes=1)
     selected_events.reconstruct_nominated_selected_parent(config=request, artifact_writer=plane, project_root=ROOT, implementation_commit="0" * 40)
     config = selected_events.prepare_selected_event(config_id="synthetic.full-selected-negative",

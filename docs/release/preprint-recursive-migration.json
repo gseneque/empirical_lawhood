@@ -1,0 +1,1019 @@
+{
+  "schema": "el-v1/joint-description-family-implementation/2",
+  "source_claim_inventory": {
+    "path": "paper/source/claim-evidence-inventory.json",
+    "sha256": "f74edd3b33c529f78382c746739ebeabe6226b0368851282a70bcebcd08661d8"
+  },
+  "selected_preprint_edition": "0.60",
+  "scope": "New experiments modeled on all22 preprint families. Original result rereading and backwards compatibility are out of scope.",
+  "hypothesis": "For a specified family of preparations, interventions, receivers and horizons, there may be a smallest economically useful joint description; further decomposition may move dependence into interface information, memory or uncontrolled error.",
+  "claim_limit": "Finite authored candidate menu and task family under explicit economic assumptions; no universal minimum or new physical-control qualification.",
+  "recursive_stages": [
+    "calibrate",
+    "fit",
+    "prepare",
+    "forecast",
+    "evaluate",
+    "assess"
+  ],
+  "scientific_requirements": 9,
+  "families": [
+    {
+      "id": "R01",
+      "preprint_theme": "Analytical RC information illustration",
+      "new_question": "When does mean-voltage compression lose control-relevant contrast, and when do independent branch laws already suffice?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R01.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 16,
+      "evaluation_roots": 32,
+      "actions": [
+        "0.0",
+        "0.5",
+        "1.0"
+      ],
+      "horizons": [
+        "0.25",
+        "1.0",
+        "3.0"
+      ],
+      "receivers": [
+        "mean_voltage_a",
+        "mean_voltage_b"
+      ],
+      "descriptions": [
+        "independent-branches",
+        "interface",
+        "joint",
+        "memory",
+        "partitioned"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "0470d1362d10089b057a5d28c457eac39eb085c7fc2a0313498d4887097a54bf",
+      "producer_module": "empirical_lawhood.domains.circuits.joint_description",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R02",
+      "preprint_theme": "RC hidden-state challenge and history-depth tests",
+      "new_question": "For coupled RC preparations, which finite information descriptions meet receiver accuracy and control utility at each horizon?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R02.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 16,
+      "evaluation_roots": 32,
+      "actions": [
+        "0.0",
+        "0.5",
+        "1.0"
+      ],
+      "horizons": [
+        "0.25",
+        "1.0",
+        "3.0"
+      ],
+      "receivers": [
+        "mean_voltage",
+        "terminal_voltage"
+      ],
+      "descriptions": [
+        "interface",
+        "joint",
+        "memory",
+        "partitioned"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "7b879bd69309d48b04fdd5f1bcb60bf0aa27b86141d3c95d10fe63d50c4ff16f",
+      "producer_module": "empirical_lawhood.domains.circuits.joint_description",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R03",
+      "preprint_theme": "Six-matrix geometry feasibility scan",
+      "new_question": "Which preparation and action scope admits a useful geometry description, and where does removing cross-sector information move its prediction error?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R03.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "actions": [
+        "-0.1",
+        "0.0",
+        "0.1"
+      ],
+      "horizons": [
+        "0.032",
+        "0.064"
+      ],
+      "receivers": [
+        "joint-admitted",
+        "joint-gap",
+        "x-admitted",
+        "x-gap",
+        "xy-angle",
+        "y-admitted",
+        "y-gap"
+      ],
+      "descriptions": [
+        "joint",
+        "local",
+        "local-interface",
+        "local-memory"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "f593c41c984f391f866b4e3d52990f537ad6aff2055e0daf07776765f41681c5",
+      "producer_module": "empirical_lawhood.domains.matrix.joint_description.experiments",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R04",
+      "preprint_theme": "Selected geometric-event investigation",
+      "new_question": "Given a checkpoint selected only from its past, is a local, interface-augmented, remembered or joint description sufficient for conditional commitment?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R04.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "actions": [
+        "-0.1",
+        "0.0",
+        "0.1"
+      ],
+      "horizons": [
+        "0.032",
+        "0.064"
+      ],
+      "receivers": [
+        "commitment",
+        "occupation"
+      ],
+      "descriptions": [
+        "joint",
+        "local",
+        "local-interface",
+        "local-memory"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "013792cc46f1d7051a798279175f62cfc934ed347dae0075805f10e8f53c12ef",
+      "producer_module": "empirical_lawhood.domains.matrix.joint_description.experiments",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R05",
+      "preprint_theme": "Approximate algebra persistence",
+      "new_question": "Does approximate algebra persist prospectively, and which joint, interface or memory information is needed when a scalar geometry summary is inadequate?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R05.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "actions": [
+        "-0.1",
+        "0.0",
+        "0.1"
+      ],
+      "horizons": [
+        "0.032",
+        "0.064"
+      ],
+      "receivers": [
+        "algebra-survival",
+        "associative-leakage",
+        "band-ratio",
+        "commutant-mixing",
+        "lie-leakage"
+      ],
+      "descriptions": [
+        "joint",
+        "local",
+        "local-interface",
+        "local-memory"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "2e35c9e11a3480c70c73431170101ae217d2ae0450fd4b90484332342b59ee53",
+      "producer_module": "empirical_lawhood.domains.matrix.joint_description.experiments",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R06",
+      "preprint_theme": "Directional passive prediction",
+      "new_question": "When full passive response is decomposed into scalar directions, how much omitted operator coupling must be restored as interface information or memory?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R06.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "actions": [
+        "0.5",
+        "1.0"
+      ],
+      "horizons": [
+        "0.032",
+        "0.064"
+      ],
+      "receivers": [
+        "direction.00",
+        "direction.01",
+        "direction.02",
+        "direction.03",
+        "direction.04",
+        "direction.05",
+        "direction.06",
+        "direction.07",
+        "direction.08",
+        "direction.09",
+        "direction.10",
+        "direction.11",
+        "direction.12",
+        "direction.13",
+        "direction.14"
+      ],
+      "descriptions": [
+        "joint-operator",
+        "operator-memory",
+        "scalar"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "540e193ea8788b63c463e58c72dcbcbc2c084c271e44b5e178587efabea1daed",
+      "producer_module": "empirical_lawhood.domains.matrix.joint_description.experiments",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R07",
+      "preprint_theme": "Coupled-tangent response comparison",
+      "new_question": "When does a full coupled origin Hessian predict signed finite response economically better than a local scalar curvature, and can interface information repair the reduction?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R07.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "actions": [
+        "-0.1",
+        "0.0",
+        "0.1"
+      ],
+      "horizons": [
+        "0.032",
+        "0.064"
+      ],
+      "receivers": [
+        "signed-response",
+        "transverse-response"
+      ],
+      "descriptions": [
+        "interface-mechanism",
+        "joint-mechanism",
+        "local-mechanism",
+        "memory-mechanism"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "7c4f292f711418d80b172c5a0c4b215a5b97716a01316fc5314804f346128717",
+      "producer_module": "empirical_lawhood.domains.matrix.joint_description.experiments",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R08",
+      "preprint_theme": "Radial preparation-increment surrogate",
+      "new_question": "Can a radial preparation-increment law remain useful after other-sector dynamics are removed, or is their influence paid as interface data, memory or error?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R08.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "actions": [
+        "-0.1",
+        "0.0",
+        "0.1"
+      ],
+      "horizons": [
+        "0.032",
+        "0.064"
+      ],
+      "receivers": [
+        "radial-increment"
+      ],
+      "descriptions": [
+        "interface-mechanism",
+        "joint-mechanism",
+        "local-mechanism",
+        "memory-mechanism"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "e3496263ebd0660aa72c9d68f08986dd0549c1994bd327cb45d69ed3c28fe8d8",
+      "producer_module": "empirical_lawhood.domains.matrix.joint_description.experiments",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R09",
+      "preprint_theme": "Absolute-baseline and support diagnostics",
+      "new_question": "Can an increment description meet absolute-state decisions without carrying its baseline and declared preparation support?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R09.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "actions": [
+        "-0.1",
+        "0.0",
+        "0.1"
+      ],
+      "horizons": [
+        "0.032",
+        "0.064"
+      ],
+      "receivers": [
+        "absolute-position"
+      ],
+      "descriptions": [
+        "interface-mechanism",
+        "joint-mechanism",
+        "local-mechanism",
+        "memory-mechanism"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "f7532031bb2e879e2e4d3f9b15b302a8c62822f4edaa1515452bd6a7465dae3c",
+      "producer_module": "empirical_lawhood.domains.matrix.joint_description.experiments",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R10",
+      "preprint_theme": "Forecast-mediated reuse",
+      "new_question": "Can a causally forecast handoff supply the joint description needed by an unchanged lower response mechanism, and what does its decomposition cost?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R10.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "actions": [
+        "-0.1",
+        "0.0",
+        "0.1"
+      ],
+      "horizons": [
+        "0.032",
+        "0.064"
+      ],
+      "receivers": [
+        "signed-response"
+      ],
+      "descriptions": [
+        "interface-mechanism",
+        "joint-mechanism",
+        "local-mechanism",
+        "memory-mechanism"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "dcbc465e0a990aa5c3b8c157a38d7ec85a8c7b0ee5c6b58e9e6e861cfcd0da65",
+      "producer_module": "empirical_lawhood.domains.matrix.joint_description.experiments",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R11",
+      "preprint_theme": "Preparation-mediated applicability",
+      "new_question": "Can a parent preparation supply conditions for an unchanged lower response mechanism, with interface and memory costs included?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R11.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "actions": [
+        "-0.1",
+        "0.0",
+        "0.1"
+      ],
+      "horizons": [
+        "0.032",
+        "0.064"
+      ],
+      "receivers": [
+        "service",
+        "signed-response"
+      ],
+      "descriptions": [
+        "interface-mechanism",
+        "joint-mechanism",
+        "local-mechanism",
+        "memory-mechanism"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "a8fb38992f85ab25edab21bb51a301e1a9960d3ce3d2b032228c9490fa70c984",
+      "producer_module": "empirical_lawhood.domains.matrix.joint_description.experiments",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R12",
+      "preprint_theme": "Preparation diagnostics and numerical sensitivity",
+      "new_question": "Are apparent description savings stable under physically paired native timestep refinement, including failed preparation and response outcomes?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R12.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "actions": [
+        "-0.1",
+        "0.0",
+        "0.1"
+      ],
+      "horizons": [
+        "0.032",
+        "0.064"
+      ],
+      "receivers": [
+        "service",
+        "signed-response"
+      ],
+      "descriptions": [
+        "interface-mechanism",
+        "joint-mechanism",
+        "local-mechanism",
+        "memory-mechanism"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "a872e3448abc5d328bad832e0b640d42bc2aef5724183a88e95c2beef1bea352",
+      "producer_module": "empirical_lawhood.domains.matrix.joint_description.experiments",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R13",
+      "preprint_theme": "Cortical-cell records",
+      "new_question": "Which preparation, history and current-action coordinates preserve useful firing-rate selection?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R13.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "actions": [
+        "-40.0",
+        "40.0",
+        "80.0"
+      ],
+      "horizons": [
+        "0.5",
+        "1.0"
+      ],
+      "receivers": [
+        "firing_rate_hz"
+      ],
+      "descriptions": [
+        "additive",
+        "interface",
+        "joint",
+        "minimal"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": true,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "900501dd5d096b97ba6c21fa86074a9a5c93572c316dc5c127973319ba71f11a",
+      "producer_module": "empirical_lawhood.domains.joint_description_native",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R14",
+      "preprint_theme": "Optical-mirror records",
+      "new_question": "How much state, history and action-sign information is required for useful mirror displacement predictions?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R14.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "actions": [
+        "-0.1",
+        "0.0",
+        "0.1"
+      ],
+      "horizons": [
+        "0.1",
+        "0.2"
+      ],
+      "receivers": [
+        "displacement_rad"
+      ],
+      "descriptions": [
+        "additive",
+        "interface",
+        "joint",
+        "minimal"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": true,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "e95ebee84e42a9cc2adfc5ad1932a172586c00bf2b406905bfd09d05a75c8459",
+      "producer_module": "empirical_lawhood.domains.joint_description_native",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R15",
+      "preprint_theme": "Physical-battery records",
+      "new_question": "Which joint description maintains voltage and capacity error promises across recorded cells?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R15.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "actions": [
+        "0.5",
+        "1.0",
+        "2.0"
+      ],
+      "horizons": [
+        "60.0",
+        "120.0"
+      ],
+      "receivers": [
+        "discharge_capacity_ah",
+        "terminal_voltage_v"
+      ],
+      "descriptions": [
+        "additive",
+        "interface",
+        "joint",
+        "minimal"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": true,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "4a18e3a631f51b782addc847592e4383441fe7a66360bba1e3e8d40aea6bd032",
+      "producer_module": "empirical_lawhood.domains.joint_description_native",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R16",
+      "preprint_theme": "MAST-U divertor modulation",
+      "new_question": "Which state and interface coordinates preserve the complex divertor response across requested modulation frequencies?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R16.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "actions": [
+        "5.0",
+        "10.0",
+        "20.0"
+      ],
+      "horizons": [
+        "1.0"
+      ],
+      "receivers": [
+        "response_imag",
+        "response_real"
+      ],
+      "descriptions": [
+        "additive",
+        "interface",
+        "joint",
+        "minimal"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": true,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "afbc9737c9880921decc3525bceb07e0be26341be1ddfb5211967e7cbd524848",
+      "producer_module": "empirical_lawhood.domains.joint_description_native",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R17",
+      "preprint_theme": "Gym\u2013TORAX selected-action efficacy",
+      "new_question": "How much coupled preparation information is needed to forecast and select effective heating actions in Gym-TORAX?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R17.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "actions": [
+        "-0.05",
+        "0.0",
+        "0.05"
+      ],
+      "horizons": [
+        "2.0",
+        "4.0"
+      ],
+      "receivers": [
+        "fusion_gain"
+      ],
+      "descriptions": [
+        "additive",
+        "interface",
+        "joint",
+        "minimal"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu",
+        "gpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "6ebb684ab31bbd814b76062d81b2e9e8a91063c09aa420f2667a74b961567e18",
+      "producer_module": "empirical_lawhood.domains.joint_description_native",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R18",
+      "preprint_theme": "PyBaMM selected-action efficacy",
+      "new_question": "Which preparation/history description supports useful current-action selection without violating voltage or temperature limits?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R18.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "actions": [
+        "0.5",
+        "1.0",
+        "2.0"
+      ],
+      "horizons": [
+        "60.0",
+        "120.0"
+      ],
+      "receivers": [
+        "discharge_capacity_ah",
+        "peak_temperature_k",
+        "terminal_voltage_v"
+      ],
+      "descriptions": [
+        "additive",
+        "interface",
+        "joint",
+        "minimal"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "e313e158728569bbbd948b98b9448eb766bf833489bce455ded2e1b1d53f8bd7",
+      "producer_module": "empirical_lawhood.domains.joint_description_native",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R19",
+      "preprint_theme": "Reduced PyBaMM description",
+      "new_question": "When does an SPMe continuation preserve the DFN voltage/temperature promise, and where do state/history omissions cause costly error?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R19.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "actions": [
+        "0.5",
+        "1.0",
+        "2.0"
+      ],
+      "horizons": [
+        "60.0",
+        "120.0"
+      ],
+      "receivers": [
+        "temperature_reduction_defect_k",
+        "voltage_reduction_defect_v"
+      ],
+      "descriptions": [
+        "additive",
+        "interface",
+        "joint",
+        "minimal"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "ab878589c962c448c6480ba1d97538868fa0cf9a41e2d63277303dc773ea144c",
+      "producer_module": "empirical_lawhood.domains.joint_description_native",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R20",
+      "preprint_theme": "Reactor atlas and prospective service",
+      "new_question": "Which observed description supports prospective response prediction and economically useful bounded action selection?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R20.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "actions": [
+        "0.0",
+        "0.016",
+        "0.032"
+      ],
+      "horizons": [
+        "30.0",
+        "120.0",
+        "300.0"
+      ],
+      "receivers": [
+        "conversion_b",
+        "delivered_mass_kg",
+        "peak_temperature_k"
+      ],
+      "descriptions": [
+        "interface",
+        "joint",
+        "memory",
+        "partitioned"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "2c50e72a7e18e5f810e9e84981618e8287f73bdbe3d413a3169977448e395d99",
+      "producer_module": "empirical_lawhood.domains.reactor.joint_description",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R21",
+      "preprint_theme": "Reactor counterfactual service audit",
+      "new_question": "On identical fresh reactor roots, do interface or memory descriptions preserve policy utility under switching preparation history?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R21.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 48,
+      "evaluation_roots": 32,
+      "actions": [
+        "0.0",
+        "0.016",
+        "0.032"
+      ],
+      "horizons": [
+        "120.0",
+        "300.0",
+        "600.0"
+      ],
+      "receivers": [
+        "conversion_b",
+        "delivered_mass_kg",
+        "peak_temperature_k"
+      ],
+      "descriptions": [
+        "interface",
+        "joint",
+        "memory",
+        "partitioned"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": false,
+      "supported_devices": [
+        "cpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "5e4fbca7b2988fb40ae55196e4913a31576e592a06ad6a3fbff3cc52f789da00",
+      "producer_module": "empirical_lawhood.domains.reactor.joint_description",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    },
+    {
+      "id": "R22",
+      "preprint_theme": "MAST heating\u2013TORAX bridge",
+      "new_question": "Which recorded-state information and declared transport assumptions preserve separate physical and simulated heating-response predictions?",
+      "protocol_id": "joint-description.development",
+      "recipe": "configs/joint-description/R22.json",
+      "guide": "docs/v1.0/joint-description-experiments.md",
+      "family_guide": "docs/v1.0/joint-description-families.md",
+      "calibration_roots": 12,
+      "evaluation_roots": 6,
+      "actions": [
+        "-0.1",
+        "0.0",
+        "0.1"
+      ],
+      "horizons": [
+        "0.02",
+        "0.04"
+      ],
+      "receivers": [
+        "archive_temperature_change_ev",
+        "simulator_temperature_change_ev"
+      ],
+      "descriptions": [
+        "additive",
+        "interface",
+        "joint",
+        "minimal"
+      ],
+      "software_status": "IMPLEMENTED_FOCUSED_VERIFICATION",
+      "scientific_review": "IN_REPO_AGENT_REQUIRED",
+      "scientific_execution": "NOT_RUN",
+      "ci_full_suite": "NOT_RUN_DEFERRED",
+      "remote_gpu_validation": "NOT_RUN_DEFERRED",
+      "raw_cohort_required": true,
+      "supported_devices": [
+        "cpu",
+        "gpu"
+      ],
+      "original_result_reproduction": "OUT_OF_SCOPE",
+      "backwards_compatibility": "NONE_REQUIRED_OR_ADDED",
+      "recipe_sha256": "c1111c7b4a3437d3311a6b70509580697d64c7f4e778ce381213d4bc29f14350",
+      "producer_module": "empirical_lawhood.domains.joint_description_native",
+      "specification_schema": "empirical-lawhood/joint-description/specification"
+    }
+  ],
+  "deferred_to_in_repo_agent": [
+    "Review scientific designs and authored economic assumptions",
+    "Run every complete new experiment on matching native environments and raw input",
+    "Read newly produced results and exercise permitted recovery",
+    "CI/full suite",
+    "Installed native and remote GPU acceptance"
+  ]
+}

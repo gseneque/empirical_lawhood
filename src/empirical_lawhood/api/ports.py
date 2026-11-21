@@ -5,15 +5,11 @@ from __future__ import annotations
 from contextlib import AbstractContextManager
 from typing import Protocol
 
-from empirical_lawhood.kernel.systems import SystemSpec
-from empirical_lawhood.planning.design import ExperimentProposal
-from empirical_lawhood.planning.exploration import ExploratoryFinding, HypothesisSet
-from empirical_lawhood.planning.prospective import (
-    NominationObligations,
-    ProspectiveDesignContext,
-    ProspectiveNominationDecision,
-)
-from empirical_lawhood.runtime.dataset_catalog_service import DatasetCatalogReadService
+from empirical_lawhood.science.models.systems import SystemSpec
+from empirical_lawhood.design.design import ExperimentProposal
+from empirical_lawhood.design.exploration import ExploratoryFinding, HypothesisSet
+from empirical_lawhood.design.prospective import NominationObligations, ProspectiveDesignContext, ProspectiveNominationDecision
+from empirical_lawhood.execution.dataset_catalog_service import DatasetCatalogReadService
 
 
 class DatasetCatalogSessionProvider(Protocol):

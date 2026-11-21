@@ -57,7 +57,7 @@ def register_preparation_diagnostic_commands(app):
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
     ):
         """Join fixed Q8/E32 contexts and explicit diagnostic bootstrap streams."""
-        from empirical_lawhood.adapters.methods.constructed_preparation_applicability.diagnostic_records import PreparationDiagnosticInput
+        from empirical_lawhood.domains.matrix.constructed_preparation_applicability.diagnostic_records import PreparationDiagnosticInput
         from empirical_lawhood.api.preparation_diagnostics import current_preparation_diagnostic_source_sha256
         try:
             _, _, plane = h._storage()

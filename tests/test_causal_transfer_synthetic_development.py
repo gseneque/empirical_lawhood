@@ -4,8 +4,8 @@ from pathlib import Path
 
 import numpy as np
 
-from empirical_lawhood.adapters.composition.response_composition.input import ResponseCompositionInput
-from empirical_lawhood.adapters.methods.response_composition.development import COMPOSITION_EPSILON, develop_context
+from empirical_lawhood.domains.matrix.response_composition.authoring.input import ResponseCompositionInput
+from empirical_lawhood.domains.matrix.response_composition.development import COMPOSITION_EPSILON, develop_context
 from empirical_lawhood.api.codecs import load_registered_authoring
 
 ROOT = Path(__file__).parents[1]

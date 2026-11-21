@@ -9,19 +9,20 @@ import numpy as np
 import pytest
 
 from empirical_lawhood.api import selected_events as api
+from empirical_lawhood.domains.matrix.matrix_response_study import selected_event_records as records
 from empirical_lawhood.api import matrix_geometry as geometry_api
 from empirical_lawhood.api.matrix_native_custody import MatrixNativeCustody
-from empirical_lawhood.adapters.methods.matrix_response_study import shooting_committor as science
-from empirical_lawhood.adapters.methods.matrix_response_study import anisotropic_feasibility as geometry
-from empirical_lawhood.adapters.simulators.six_matrix_response import shooting as native
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import ideal_state
-from empirical_lawhood.adapters.simulators.six_matrix_response.simulation import SixMatrixResponseConstitution, SixMatrixResponseFastReceiver
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.domains.matrix.matrix_response_study import shooting_committor as science
+from empirical_lawhood.domains.matrix.matrix_response_study import anisotropic_feasibility as geometry
+from empirical_lawhood.domains.matrix.six_matrix_response import shooting as native
+from empirical_lawhood.domains.matrix.six_matrix_response.model import ideal_state
+from empirical_lawhood.domains.matrix.six_matrix_response.simulation import SixMatrixResponseConstitution, SixMatrixResponseFastReceiver
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -44,13 +45,13 @@ def test_actual_nominated_parent_fixed_context_and_complete_current_noncontact_p
     plane, request, parent, _, config = scenario
     monkeypatch.setattr(native, "replay_selected_co_anneal_event", lambda **_: pytest.fail("proof entered replay"))
     proof = api.prove_selected_event(config=config, artifact_writer=plane, implementation_commit="0" * 40)
-    assert parent.rollout.final_state_sha256 == api.NOMINATED_PARENT_FINAL_STATE
-    assert parent.rollout.rng_seed_sha256 == api.NOMINATED_PARENT_DRIVER
+    assert parent.rollout.final_state_sha256 == records.NOMINATED_PARENT_FINAL_STATE
+    assert parent.rollout.rng_seed_sha256 == records.NOMINATED_PARENT_DRIVER
     assert proof["independent_selected_events"] == 1 and proof["conditional_futures"] == 448
     assert proof["checkpoint_steps"] == (816, 848, 880, 896, 928, 960, 1024)
     assert proof["maximum_integration_steps"] == 461952
     assert not proof["scientific_execution_performed"]
-    assert decode_canonical_bytes(config.canonical_bytes(), type(config), maximum_bytes=api.SELECTED_EVENT_INPUT_MAXIMUM_BYTES) == config
+    assert decode_canonical_bytes(config.canonical_bytes(), type(config), maximum_bytes=records.SELECTED_EVENT_INPUT_MAXIMUM_BYTES) == config
     assert api.reconstruct_nominated_selected_parent(config=request, artifact_writer=plane, project_root=ROOT, implementation_commit="0" * 40)[0] == parent
 
 
@@ -63,7 +64,7 @@ def test_branch_roster_effective_stream_exclusion_and_parent_identity_refuse(sce
     with pytest.raises(ValueError, match="effective"):
         replace(config, branch_seeds=(replace(config.branch_seeds[0], full_seed_sha256=config.branch_seeds[1].full_seed_sha256[:32] + "a" * 32), *config.branch_seeds[1:]))
     with pytest.raises(ValueError, match="exposed parent"):
-        replace(config, branch_seeds=(replace(config.branch_seeds[0], full_seed_sha256=api.NOMINATED_PARENT_DRIVER[:32] + "a" * 32), *config.branch_seeds[1:]))
+        replace(config, branch_seeds=(replace(config.branch_seeds[0], full_seed_sha256=records.NOMINATED_PARENT_DRIVER[:32] + "a" * 32), *config.branch_seeds[1:]))
     with pytest.raises(ValueError, match="no admitted"):
         replace(parent, rollout=replace(parent.rollout, constitution=SixMatrixResponseConstitution.EMPTY,
             factor_y=replace(parent.rollout.factor_y, geometric=False, reason_codes=("synthetic-no-event",))))
@@ -226,7 +227,7 @@ def test_actual_same_driver_bridge_retains_view_disposition_and_bad_allocation_r
     plane, _, parent, _, config = scenario
     result = _current_conformance(scenario)
     custody = api._custody(config, plane, "0" * 40)
-    transport = custody.load("conformance-replay", api.MatrixSelectedReplayTransport)
+    transport = custody.load("conformance-replay", records.MatrixSelectedReplayTransport)
     exported = custody.store.read_by_receipt_id(config.run_id, "conformance-seed-export",
         f"receipt.{config.run_id}.conformance-seed-export.attempt-001")
     seeds = tuple(api._typed_seed(seed, role="shooting-bridge", root_id=config.protocol.parent_rollout_id,

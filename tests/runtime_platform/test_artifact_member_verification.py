@@ -7,10 +7,11 @@ import os
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
-from empirical_lawhood.runtime.artifacts import ArtifactManifest
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
+from empirical_lawhood.execution.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind
 from tests.runtime_platform.test_artifact_verification_scope import _publication
+from tests.test_artifact_sidecar_reuse import _selected_publication
 
 
 def _path(plane, relative):
@@ -30,12 +31,15 @@ def _selected(manifest):
 
 
 @pytest.mark.parametrize('count', (4, 16))
-def test_callback_reuses_complete_typed_siblings_without_second_decode_pass(tmp_path, monkeypatch, count):
-    plane, manifests = _publication(tmp_path, count)
+@pytest.mark.parametrize('physical_form', ('expanded', 'compact'))
+def test_callback_reuses_complete_typed_siblings_without_second_decode_pass(tmp_path, monkeypatch, count, physical_form):
+    plane, manifests = _selected_publication(tmp_path, physical_form, count)
     counters = {'sidecar_decodes': 0, 'payload_verifications': 0}
     decoded_rosters = {'count': 0}
-    from empirical_lawhood.infrastructure import task_receipts
+    from empirical_lawhood.storage import artifact_sidecars, task_receipts
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactPublicationCommit
     original_binding = task_receipts._publication_binding
+    original_decode = artifact_sidecars.decode_canonical_bytes
     original_read = ExternalArtifactPlane._read_current_manifest
     original_verify = ExternalArtifactPlane._verify_manifest_snapshot
 
@@ -44,8 +48,15 @@ def test_callback_reuses_complete_typed_siblings_without_second_decode_pass(tmp_
         return original_read(self, path, **kwargs)
 
     def binding(document):
+        assert physical_form == 'expanded'
         decoded_rosters['count'] += 1
         return original_binding(document)
+
+    def decode(raw, record_type, **kwargs):
+        if record_type is ArtifactPublicationCommit:
+            assert physical_form == 'compact'
+            decoded_rosters['count'] += 1
+        return original_decode(raw, record_type, **kwargs)
 
     def verify(self, manifest, **kwargs):
         counters['payload_verifications'] += 1
@@ -54,6 +65,7 @@ def test_callback_reuses_complete_typed_siblings_without_second_decode_pass(tmp_
     monkeypatch.setattr(ExternalArtifactPlane, '_read_current_manifest', read)
     monkeypatch.setattr(ExternalArtifactPlane, '_verify_manifest_snapshot', verify)
     monkeypatch.setattr(task_receipts, '_publication_binding', binding)
+    monkeypatch.setattr(artifact_sidecars, 'decode_canonical_bytes', decode)
     selected = _selected(manifests[0])
     assert plane.verify_manifest(selected) is None
     legacy = {}

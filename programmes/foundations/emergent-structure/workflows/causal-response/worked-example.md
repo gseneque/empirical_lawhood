@@ -37,9 +37,9 @@ OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 \
 uv run --no-sync python - <<'PY'
 from pathlib import Path
-from empirical_lawhood.adapters.methods.matrix_prospective.example import example_source
-from empirical_lawhood.adapters.methods.matrix_prospective.recursive_translation import prospective_draft
-from empirical_lawhood.adapters.methods.matrix_prospective.science import branch_contract
+from empirical_lawhood.domains.matrix.matrix_prospective.example import example_source
+from empirical_lawhood.domains.matrix.matrix_prospective.recursive_translation import prospective_draft
+from empirical_lawhood.domains.matrix.matrix_prospective.science import branch_contract
 from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
 
 selected = Path('/selected/guarded-root/matrix-inputs')
@@ -121,4 +121,4 @@ Those studies require their own scientific suppliers, calibration, preparation a
 The [conformance checks](../../../../../tests/test_matrix_prospective.py) verify this example's software behavior and independent numerical assessment.
 The [Matrix programme specification](../../records/matrix-programme.md) defines the separate E1–E6 investigations and scientific controls.
 Use the [programme guide](../matrix-programme/guide.md) for their supported operations and prerequisites.
-The [source implementation](../../../../../src/empirical_lawhood/adapters/methods/matrix_prospective/science.py) separates the native producer from the numerical assessor.
+The [source implementation](../../../../../src/empirical_lawhood/domains/matrix/matrix_prospective/science.py) separates the native producer from the numerical assessor.

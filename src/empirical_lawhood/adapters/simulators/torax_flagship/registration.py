@@ -4,24 +4,15 @@ from __future__ import annotations
 
 from hashlib import sha256
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.kernel.serialization import validate_sha256
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
-from empirical_lawhood.adapters.physical.mast_archive.contracts import MastCausalState
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.records.serialization import validate_sha256
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.domains.fusion.mast_archive.contracts import MastCausalState
 
-from .contracts import (
-    ToraxMappingResult,
-    ToraxMatchedPanel,
-    ToraxPreparation,
-)
-from .mapping import ToraxMappingConfig
-from .evaluation import ToraxAssumptionEnsembleEvaluation, ToraxEvaluationConfig
+from empirical_lawhood.domains.fusion.torax_flagship.contracts import ToraxMappingResult, ToraxMatchedPanel, ToraxPreparation
+from empirical_lawhood.domains.fusion.torax_flagship.mapping import ToraxMappingConfig
+from empirical_lawhood.domains.fusion.torax_flagship.evaluation import ToraxAssumptionEnsembleEvaluation, ToraxEvaluationConfig
 
 
 def build_torax_control_registry(*, implementation_sha256: str) -> CapabilityRegistry:

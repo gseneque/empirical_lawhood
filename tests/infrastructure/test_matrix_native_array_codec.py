@@ -7,7 +7,7 @@ import zipfile
 import numpy as np
 import pytest
 
-from empirical_lawhood.infrastructure.matrix_array_io import decode_native_matrix_arrays
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_native_matrix_arrays
 
 
 def archive(arrays):

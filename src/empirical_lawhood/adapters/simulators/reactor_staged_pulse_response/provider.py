@@ -6,29 +6,30 @@ from typing import Any
 import platform
 import numpy as np
 
-from empirical_lawhood.adapters.composition.phase_inputs import config_input, dependency, result, upstream
-from empirical_lawhood.adapters.composition.record_provider import RecordCampaignProvider
-from empirical_lawhood.adapters.methods.law_assessment import CandidatePayloadReader
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.config import ClassicalStage, retained_key
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.discovery import ClassicalNomination
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.law_terminal import ClassicalLaws
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.prospective_lock import ClassicalFrozenRoot
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.prospective_plan import ReactorStagedPulseResponseProspectivePlan
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.phase_records import ClassicalFirstScreen, ClassicalInducedBundle
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.prediction import ClassicalPredictionSeal, ClassicalInducedPrediction, induced_prediction
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.records import ClassicalPreparation, ClassicalPrivate, ClassicalContext
-from empirical_lawhood.adapters.methods.reactor_causal_response.provider import DependencyCustodyReader
-from empirical_lawhood.adapters.methods.reactor_causal_response.resource_contract import EmpiricalResourceGuard
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.records import FrontierAssay, FrontierPreparation, FrontierPrivate
+from empirical_lawhood.execution.phase_inputs import config_input, dependency, result, upstream
+from empirical_lawhood.execution.record_provider import RecordCampaignProvider
+from empirical_lawhood.methods.law_assessment import CandidatePayloadReader
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.config import ClassicalStage, retained_key
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.discovery import ClassicalNomination
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.law_terminal import ClassicalLaws
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.frozen_records import ClassicalFrozenRoot
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.prospective_plan import ReactorStagedPulseResponseProspectivePlan
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.phase_records import ClassicalFirstScreen, ClassicalInducedBundle
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.prediction import ClassicalPredictionSeal, ClassicalInducedPrediction, induced_prediction
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.records import ClassicalPreparation, ClassicalPrivate, ClassicalContext
+from empirical_lawhood.domains.reactor.reactor_causal_response.provider import DependencyCustodyReader
+from empirical_lawhood.domains.reactor.reactor_causal_response.resource_contract import EmpiricalResourceGuard
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.records import FrontierAssay, FrontierPreparation, FrontierPrivate
 from empirical_lawhood.adapters.simulators.reactor_finite_control_frontier.provider import source_input
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import RunnerResult, TaskContext, TaskProgressEmitter
-from empirical_lawhood.runtime.providers import ExternalInputPayload
-from .acquisition import acquire_preparation, reuse_preparation, acquire_assay
-from .config import ClassicalNativeConfig
-from .prospective import acquire_prospective
-from .extension_bundle import CAPABILITY, OUTPUT_RECORDS
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskProgressEmitter
+from empirical_lawhood.execution.providers import ExternalInputPayload
+from empirical_lawhood.adapters.simulators.reactor_staged_pulse_response.acquisition import acquire_preparation, acquire_assay
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.native_measurements import reuse_preparation
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.native_config import ClassicalNativeConfig
+from empirical_lawhood.adapters.simulators.reactor_staged_pulse_response.prospective import acquire_prospective
+from empirical_lawhood.adapters.simulators.reactor_staged_pulse_response.extension import CAPABILITY, OUTPUT_RECORDS
 
 
 @dataclass(frozen=True)
@@ -141,7 +142,7 @@ class ClassicalNativeRunner:
                         context, self.custody, ClassicalFirstScreen, "classical.first-screen"
                     )[0].entered
                 ):
-                    from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.records import ClassicalAssay
+                    from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.records import ClassicalAssay
 
                     assay = ClassicalAssay(
                         root,

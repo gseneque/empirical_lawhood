@@ -15,16 +15,16 @@ import sys
 import pytest
 from typer.testing import CliRunner
 
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain import science
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain import science
 from empirical_lawhood.api import rc_prerequisite_chain as api
 from empirical_lawhood.api.configuration import prepare_configuration, validate_configuration
 from empirical_lawhood.api.workflows import show_workflow
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 
 ROOT = Path(__file__).resolve().parents[1]
 COMMIT = "1" * 40
@@ -115,7 +115,7 @@ def guarded(name, *args, **kwargs):
         raise AssertionError('proof imported numerical stack: ' + name)
     return original(name, *args, **kwargs)
 builtins.__import__ = guarded
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.science import default_chain_config, prove_chain
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.science import default_chain_config, prove_chain
 assert prove_chain(default_chain_config()).unit_count == 11
 """
     process = subprocess.run([sys.executable, "-c", script], cwd=tmp_path,

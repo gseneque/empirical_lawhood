@@ -10,16 +10,13 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry import science as legacy
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import BatteryInquirySource
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.preparation_contracts import (
-    InitialElectrodePreparationWitness, ObservationKind, PreparationProtocol,
-    ProcessedInitialStateLayout, PreparedTraceJoin, StateBlock, StateObservation, identity,
-)
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import preparation_science as science
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.battery.battery_thermal_inquiry import science as legacy
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquirySource
+from empirical_lawhood.domains.battery.battery_refined_inquiry.preparation_contracts import InitialElectrodePreparationWitness, ObservationKind, PreparationProtocol, ProcessedInitialStateLayout, PreparedTraceJoin, StateBlock, StateObservation, identity
+from empirical_lawhood.domains.battery.battery_refined_inquiry import preparation_science as science
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_battery_thermal_inquiry import _exposed_trace
 
 D = Decimal
@@ -221,7 +218,7 @@ class Block(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in {'pybamm', 'pybammsolvers'}:
             raise AssertionError('native import attempted: ' + fullname)
 sys.meta_path.insert(0, Block())
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.preparation_science import source_root_enclosures
+from empirical_lawhood.domains.battery.battery_refined_inquiry.preparation_science import source_root_enclosures
 assert len(source_root_enclosures('ORegan2022')) == 2
 '''
     completed = subprocess.run([sys.executable, "-c", code], text=True, capture_output=True)

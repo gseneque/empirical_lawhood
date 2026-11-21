@@ -8,8 +8,8 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import response_scoring as owner
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_response import response_scoring as owner
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 ACTION = SimpleNamespace(amplitude=Decimal('.01'), force_norm=Decimal(1), pulse_steps=16)
@@ -172,8 +172,8 @@ def test_structural_advantage_is_a_strict_three_way_conjunction_in_both_views():
 @pytest.mark.parametrize('case,expected', (('complete', (29, 29)), ('failure', (4, 4)),
     ('unknown-before-failure', (2, 4)), ('nonuse', (0, 29))))
 def test_existing_e4_reader_reports_shared_k_and_preserves_nonuse(case, expected):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.retained_response_readout import adequacy_cell
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_secondary_readout import _grid_lifetime
+    from empirical_lawhood.domains.matrix.matrix_factor_response.retained_response_readout import adequacy_cell
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_secondary_readout import _grid_lifetime
 
     values = [Decimal(0)] * 29
     if case in ('failure', 'unknown-before-failure'):

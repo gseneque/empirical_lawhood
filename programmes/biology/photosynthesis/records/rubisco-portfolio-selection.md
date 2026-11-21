@@ -18,7 +18,7 @@ The [historical-procedure index](progress.md#availability-of-historical-procedur
 ## Exact evidence and candidate/query map
 
 The owner is
-[`rubisco_portfolio_inquiry`](../../../../src/empirical_lawhood/adapters/methods/rubisco_portfolio_inquiry/science.py).
+[`rubisco_portfolio_inquiry`](../../../../src/empirical_lawhood/domains/rubisco/rubisco_portfolio_inquiry/science.py).
 Its selected source audit authenticates 34 original/retained dependency files.
 Scientific operands are independently decoded from original Wilson HTML/GenBank
 and McDonald XML/XLSX. Potato's complete native Table 2 rejoins its original

@@ -9,7 +9,7 @@ It runs no simulator, source acquisition, external census inspection or provider
 It opens no catalog and grants no authority.
 
 The [workflow index](../reference/workflows.md) identifies the relevant guide and
-input role. The closed [configuration inventory](../../src/empirical_lawhood/resources/config_schemas/index.json)
+input role. The closed [configuration inventory](../../src/empirical_lawhood/package_data/config_schemas/index.json)
 lists the supplied inputs supported by the configuration commands, their root
 schema IDs, the operator storage and FAIR-MAST source configs, and the human
 provenance YAML template. Workflow declarations also identify protocol-specific
@@ -69,7 +69,7 @@ request-only examples report the missing originals explicitly.
 
 Canonical-only sources retain their original `ExperimentInputSelection` format.
 For original data files, use
-[`ExperimentFileInputSelection`](../../src/empirical_lawhood/planning/experiment_inputs.py)
+[`ExperimentFileInputSelection`](../../src/empirical_lawhood/design/experiment_inputs.py)
 with canonical record bindings and file bindings in one exact selection. Each
 file declares its original `ArtifactIdentity`, codec revision, relative path and
 byte bound. Every member must lie beneath the selection's real parent directory;
@@ -150,10 +150,21 @@ empirical-lawhood --project-root /absolute/reader-source --operator-profile /abs
 
 The CLI flag overrides the configuration. The invocation records both choices.
 An operational configuration at record version `1.0.0` is read with reconstruction
-off; its original bytes remain unchanged. New configurations use version `2.0.0`.
+off; its original bytes remain unchanged. New configurations use version `3.0.0`.
 Full reconstruction performs the original scientific read and exhaustive report
 under current access. It can be substantially more expensive than operational
 status. Use it explicitly for an integrated scientific report.
+
+## Optional accelerated compute
+
+Operational configuration version `3.0.0` adds `accelerated_compute`.
+Omission means `false`; only JSON or YAML booleans are accepted.
+Versions `1.0.0` and `2.0.0` retain their original bytes and select `false`.
+Set `value.accelerated_compute: true` in a copied input to select supported GPU operations.
+Use the existing `operational-configuration` consumer to validate and prepare that input.
+Validation and static discovery perform no device or provider contact.
+The invocation records the requested selection separately from the actual backend.
+The [accelerated compute guide](accelerated-compute.md) gives supported operations, environments, resource controls and deployment steps.
 
 ## Output reservations and actual storage
 
@@ -167,8 +178,15 @@ The actual mount, write access and storage checks remain active at guarded I/O b
 Actual storage exhaustion can stop a write and leaves its original recovery records intact.
 Frozen plans, task ceilings, source requirements and input access remain unchanged.
 
-The global `--allow-output-reservation-overcommit` flag remains accepted for command compatibility.
-It does not change storage admission or require a retained invocation.
+The default `strict-mount-contained-no-symlink` profile requires storage outside
+the checkout, home and temporary roots on a separately selected mount. For an
+explicitly selected persistent local directory, use
+`explicit-local-contained-no-symlink`. This permits a dedicated subdirectory of
+the home directory and permits `/` as its actual mount. The storage directory
+itself cannot be `/`, the home directory, the checkout or a temporary directory.
+Artifact and scientific-scratch namespaces remain disjoint; actual mount,
+filesystem, free-space and symlink checks still apply. This operational choice
+grants no scientific or outcome-access authority.
 
 ## Explicit metadata RSS allowance
 
@@ -302,7 +320,7 @@ their versioned scientific decoder allocations. The large historical
 retained-member decoder keeps its 512 MiB physical allowance. Authoring,
 candidate and campaign-package capacities, schema checks and nesting/node
 bounds keep their separate contracts. Custody allowances are defined in
-[artifact contracts](../../src/empirical_lawhood/runtime/artifacts.py), with producer
+[artifact contracts](../../src/empirical_lawhood/storage/contracts/artifacts.py), with producer
 checks in [prospective authoring](../../src/empirical_lawhood/api/recursive_prospective_authoring.py).
 
 Operational attempts write the complete JSON report after rendering it,
@@ -326,6 +344,7 @@ limit.
 |---|---|---:|---|
 | `recursive-inquiry` | `campaign recursive-author`; partial draft explanation | 8 MiB | Editable typed programme; selected path closure and evidence roles remain explicit |
 | `recursive-prospective` | `campaign recursive-author`; prospective specification explanation | 16 MiB | Editable typed prospective specification; exact source, assignment, parent roles and separate issue/execution/reveal gates remain required |
+| `rubisco-preparation-response-design` | [Paired preparation-response route](../../programmes/biology/photosynthesis/workflows/rubisco-response/preparation-response-v1.md#use-the-maintained-operator-recipe) | 1 MiB | Editable copied design; canonical input required by the original-input preparer. Frozen designs retain their original bytes. |
 | `rc-ladder-model` | `campaign rc-ladder-native-check` | 64 KiB | Editable; exact JSON consumer |
 | `rc-ladder-study` | `campaign circuit-author` study | 128 KiB | Editable; exact JSON consumer |
 | `brian2-current` | `campaign brian2-native-check` | 16 KiB | Editable; exact JSON consumer |
@@ -349,6 +368,10 @@ limit.
 | `finite-prior-census` | Finite input check `--prior-exposure` | 128 MiB | Retained flat import; owning `_census` parser only |
 | `exposed-inventory` | Supplied example documentary inventory | New 64 KiB shape-check ceiling | Helper shape only; member hashes/custody not authenticated |
 | `evidence-provenance-template` | `configs/templates/evidence-provenance.yaml` | No consuming limit | Human template; runner validation/preparation unsupported |
+
+The Rubisco design consumer uses the existing `config validate`, `config prepare` and offline schema services.
+Its domain loader separately authenticates the original root, plan, contribution and complete model inputs before deriving a supplier draft.
+These existing routes supply configuration and preparation, not scientific acquisition or integrated acceptance.
 
 YAML is accepted only for the editable roles whose consuming command already
 uses the restricted authoring codec. Exact JSON consumers and retained imports

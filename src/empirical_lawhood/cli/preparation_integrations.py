@@ -165,7 +165,7 @@ def register_preparation_commands(campaign_app: typer.Typer) -> None:
         """Prepare the fixed full-size stage/source from actual published inputs."""
         from empirical_lawhood.api.preparation_inputs import create_preparation_selection
         from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access
-        from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+        from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
         h = _helpers()
         try:
             root, _, plane = h._storage()

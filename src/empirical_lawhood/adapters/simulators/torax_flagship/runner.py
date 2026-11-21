@@ -9,23 +9,11 @@ from decimal import Decimal
 from importlib.metadata import version
 from typing import Protocol
 
-from empirical_lawhood.kernel.authority import AuthorityAction, ResourceBudget
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.science.identity.authority import AuthorityAction, ResourceBudget
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 
-from .contracts import (
-    ToraxAction,
-    ToraxActionSpec,
-    ToraxMatchedPanel,
-    ToraxMappedField,
-    ToraxNumericalView,
-    ToraxPanelDisposition,
-    ToraxPreparation,
-    ToraxRolloutResult,
-    ToraxRolloutState,
-    ToraxRuntimeIdentity,
-    ToraxValidityChecks,
-)
+from empirical_lawhood.domains.fusion.torax_flagship.contracts import ToraxAction, ToraxActionSpec, ToraxMatchedPanel, ToraxMappedField, ToraxNumericalView, ToraxPanelDisposition, ToraxPreparation, ToraxRolloutResult, ToraxRolloutState, ToraxRuntimeIdentity, ToraxValidityChecks
 
 
 @dataclass(frozen=True, slots=True)

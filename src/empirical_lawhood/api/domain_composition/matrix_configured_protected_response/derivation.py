@@ -7,9 +7,9 @@ def derive_input_selection(*, specification, source_selection_path, project_root
         metadata_directory, output_selection_path, execution, read_access=None):
     """Publish the selected target without reconstructing an old preparation."""
     from empirical_lawhood.api.experiment_preparation import _protocol, load_experiment_inputs
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection
     from empirical_lawhood.api.configured_e3_secondary_target import derive_secondary_input_selection
 
     source, destination = Path(source_selection_path), Path(output_selection_path)

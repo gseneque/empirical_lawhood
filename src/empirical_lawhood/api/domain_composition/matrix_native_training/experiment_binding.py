@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: MPL-2.0
 """Cold native TRAIN postprocessing registration; ordinary DEV runtime retained."""
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_acquisition import PROTOCOL_ID
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_records import NativeTrainingAcquisitionSpecification
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_acquisition import PROTOCOL_ID
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_records import NativeTrainingAcquisitionSpecification
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 
 
 def export_products(**kwargs):

@@ -6,17 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.native_parent_finalization import (
-    NativeParentFinalizationPending, authenticate_native_parent_return, completed_native_parent_scope,
-    inspect_native_parent_return,
-)
-from empirical_lawhood.infrastructure.native_subwork_ipc import (
-    NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress,
-)
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.native_subwork import NativeSubworkRoster, NativeSubworkState, NativeSubworkUncertainContact
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedNativeWork
+from empirical_lawhood.storage.artifact_validation import ArtifactIdentityConflict
+from empirical_lawhood.storage.native_parent_finalization import NativeParentFinalizationPending, authenticate_native_parent_return, completed_native_parent_scope, inspect_native_parent_return
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.native_subwork import NativeSubworkRoster, NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.execution.prepared_native_invocation import PreparedNativeWork
 from tests.runtime_platform.test_native_subwork import _complete, _publish, _selected, _store
 from tests.runtime_platform.test_worker_preflight import _case
 
@@ -115,7 +110,7 @@ def test_unknown_contacted_sibling_refuses_even_after_known_failed_return_and_ch
     work = _work(store, first)
     _finish(store, first, failed=True)
     entry = store.begin(work.definitions[1]); store.contact(entry)
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
     original = ExternalNativeSubworkStore.inspect
     seen = []
     def inspect(self, definition):
@@ -190,7 +185,7 @@ def test_child_receipt_write_failure_is_parent_pending_only_after_whole_known_ce
     store, first, _ = _selected(tmp_path)
     work = _work(store, first)
     entry = store.begin(first); store.contact(entry); _publish(store, entry, b"FALSIFIED")
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
     def interrupted(*args, **kwargs):
         raise OSError("exposed repeated child receipt publication failure")
     monkeypatch.setattr(ExternalTaskReceiptStore, "commit", interrupted)
@@ -207,7 +202,7 @@ def test_unknown_deferred_sibling_precedes_known_child_receipt_publication_pendi
     store, first, _ = _selected(tmp_path)
     work = _work(store, first)
     entry = store.begin(first); store.contact(entry); _publish(store, entry, b"FALSIFIED")
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
     def interrupted(*args, **kwargs):
         raise OSError("exposed repeated child receipt publication failure")
     monkeypatch.setattr(ExternalTaskReceiptStore, "commit", interrupted)

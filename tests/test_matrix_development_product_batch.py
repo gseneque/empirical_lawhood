@@ -9,18 +9,18 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_revision_preparation as preparation
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4DevelopmentProduct
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_revision_preparation as preparation
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4DevelopmentProduct
 from empirical_lawhood.api import recursive_authoring, recursive_execution, selected_e4_method_runtime
 from empirical_lawhood.api import selected_e4_native_runtime as owner
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_matrix_selected_e4_methods import selected_revision, selected_e4_populations, selected_bridge, transfer, pin, campaign_fixture  # noqa: F401
 from tests.test_recursive_public_service import _plane
 

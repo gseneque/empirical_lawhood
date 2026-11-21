@@ -9,23 +9,16 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods import matrix_prepared_source_experiment as domain
-from empirical_lawhood.adapters.methods.matrix_prepared_source_assembly import (
-    DEVELOPMENT_TYPES, prepared_assembly_request_types,
-)
-from empirical_lawhood.infrastructure.publication_metadata import read_publication_metadata
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experimental_design import UnitAllocation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactProfile, ArtifactWriteResult, artifact_publication_member,
-)
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-from empirical_lawhood.runtime.prospective_experiment import (
-    ALLOCATION_FILENAME, ASSOCIATION_FILENAME, INSTANCE_FILENAME, SPECIFICATION_FILENAME,
-    ProspectiveExperimentAssociation,
-)
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+from empirical_lawhood.domains.matrix import matrix_prepared_source_experiment as domain
+from empirical_lawhood.domains.matrix.matrix_prepared_source_assembly import DEVELOPMENT_TYPES, prepared_assembly_request_types
+from empirical_lawhood.storage.publication_metadata import read_publication_metadata
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteResult, artifact_publication_member
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+from empirical_lawhood.execution.prospective_experiment import ALLOCATION_FILENAME, ASSOCIATION_FILENAME, INSTANCE_FILENAME, SPECIFICATION_FILENAME, ProspectiveExperimentAssociation
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
 
 
 def is_prepared_source_result(result):
@@ -51,7 +44,7 @@ def _publication_rows(publications):
 
 
 def _association(writer, publications):
-    from .prospective_experiment import _directory, _read_prospective_locator
+    from empirical_lawhood.api.prospective_experiment import _directory, _read_prospective_locator
     candidates = tuple(row for row in publications
         if row[0].object_schema == ProspectiveExperimentAssociation.SCHEMA)
     if len(candidates) != 1:
@@ -162,7 +155,7 @@ def _producer_bindings(executions):
 
 
 def _require_associated_package(association, package, binding):
-    from .models import ExperimentPackage
+    from empirical_lawhood.api.models import ExperimentPackage
     if (type(package) is not ExperimentPackage or package.run_plan_id != binding.run_id
             or ObjectIdentity.from_record(package.package_id, package) != binding.package
             or ObjectIdentity.from_record(package.issued_study.issue_id, package.issued_study) != binding.issued_study
@@ -190,15 +183,13 @@ class PreparedSourceReplay:
 def authenticated_prepared_source_replay(*, writer, executions, bootstrap_publications, codecs,
         current_access=None):
     """Reopen the actual source producer; never bind the consumer as its parent."""
-    from .current_result_custody import retained_output_artifact_plane
-    from .current_task_custody import CurrentIssuedTaskCustody
-    from .matrix_prepared_source_experiment import _retained_selection, authenticate_selection
-    from .prepared_source_access import PreparedSourceOriginalInputAccess, require_prepared_source_scope
-    from .prospective_experiment import (
-        _bootstrap_prospective_original_inputs, _read_retained_prospective_experiment,
-    )
-    from .recursive_qualified_parents import _actual_package, _ParentReadScope
-    from .selected_prepared_access import _ordinary
+    from empirical_lawhood.api.current_result_custody import retained_output_artifact_plane
+    from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
+    from empirical_lawhood.api.matrix_prepared_source_experiment import _retained_selection, authenticate_selection
+    from empirical_lawhood.api.prepared_source_access import PreparedSourceOriginalInputAccess, require_prepared_source_scope
+    from empirical_lawhood.api.prospective_experiment import _bootstrap_prospective_original_inputs, _read_retained_prospective_experiment
+    from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _ParentReadScope
+    from empirical_lawhood.api.selected_prepared_access import _ordinary
     ordinary = _ordinary(writer)
     first = _producer_bindings(executions)
     rest, supplied = partition_prepared_source_publications(writer=ordinary,
@@ -226,7 +217,7 @@ def authenticated_prepared_source_replay(*, writer, executions, bootstrap_public
     # The retained parser authenticated the actual candidate/instance/member
     # association; the source owner still validates the whole scientific body.
     access.require_current()
-    from .current_result_custody import authenticate_current_execution_plan
+    from empirical_lawhood.api.current_result_custody import authenticate_current_execution_plan
     actual_plan = authenticate_current_execution_plan(package=package, issued=package.issued_study,
         run_id=first.run_id, writer=ordinary)
     if (ObjectIdentity.from_record(actual_plan.execution_plan_id, actual_plan) != first.execution_plan

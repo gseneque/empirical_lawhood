@@ -7,22 +7,20 @@ import pickle
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_composition as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_adjudication import ProtectedE3AdjudicationConfig
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_feature_bindings import ProtectedE3FeatureConfig
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_original_publications import ORIGINAL_PUBLICATION_REQUIREMENT
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_response_records import ProtectedE3ResponseConfig
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import ProtectedE3SourceConfig, ProtectedE3SourcePhase
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_statistical_bindings import ProtectedE3StatisticalConfig
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_composition as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_adjudication import ProtectedE3AdjudicationConfig
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_feature_bindings import ProtectedE3FeatureConfig
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_original_publications import ORIGINAL_PUBLICATION_REQUIREMENT
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_response_records import ProtectedE3ResponseConfig
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import ProtectedE3SourceConfig, ProtectedE3SourcePhase
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_statistical_bindings import ProtectedE3StatisticalConfig
 from empirical_lawhood.api.experiment_preparation import prepare_experiment
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-from empirical_lawhood.runtime.capabilities import CapabilityKind
-from empirical_lawhood.runtime.plans import BarrierKind, ScientificStage
-from empirical_lawhood.runtime.recursive_compiler import (
-    RecursiveScientificRootContext, decode_recursive_config_input, project_recursive_config_inputs, validate_recursive_scientific_roots,
-)
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+from empirical_lawhood.execution.capabilities import CapabilityKind
+from empirical_lawhood.execution.plans import BarrierKind, ScientificStage
+from empirical_lawhood.execution.recursive_compiler import RecursiveScientificRootContext, decode_recursive_config_input, project_recursive_config_inputs, validate_recursive_scientific_roots
 from tests.test_matrix_e3_protected_public_lowering import prepared_case
 
 
@@ -131,7 +129,7 @@ def test_root_refuses_changed_ordinary_custody_population_and_numerical_scope(ca
     elif damage == "root-units":
         root = replace(root, evaluation_unit_ids=root.evaluation_unit_ids[1:])
     elif damage == "root-world":
-        from empirical_lawhood.kernel.worlds import WorldKind
+        from empirical_lawhood.science.models.worlds import WorldKind
         root = replace(root, system=replace(root.system, world=replace(root.system.world, kind=WorldKind.ANALYTIC_REFERENCE)))
     else:
         fit = owner.validate_current_configs(case.configs).fit

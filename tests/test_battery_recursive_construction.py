@@ -9,24 +9,19 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_recursive_construction import science
-from empirical_lawhood.adapters.methods.battery_recursive_construction.contracts import (
-    BatteryCheckpoint, BatteryOperation, BatteryOperationConfig, BatterySourceContract, BatteryTrace,
-)
-from empirical_lawhood.adapters.methods.battery_recursive_construction.examples import (
-    _pair, battery_wave_a_draft, battery_wave_b_draft,
-)
-from empirical_lawhood.adapters.methods.battery_recursive_construction.executable_binding import (
-    operation_declarations, operation_manifests, operation_registrations, output_codecs,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as State, AssessmentPhase, ContributionRole
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.scientific_contributions import ContributionManifest, ContributionProduct
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.adapters.battery.battery_recursive_construction import science
+import empirical_lawhood.domains.battery.battery_recursive_construction.assessment as science_science
+from empirical_lawhood.domains.battery.battery_recursive_construction.contracts import BatteryCheckpoint, BatteryOperation, BatteryOperationConfig, BatterySourceContract, BatteryTrace
+from empirical_lawhood.domains.battery.battery_recursive_construction.examples import _pair, battery_wave_a_draft, battery_wave_b_draft
+from empirical_lawhood.domains.battery.battery_recursive_construction.extension import operation_declarations, operation_manifests, operation_registrations, output_codecs
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as State, AssessmentPhase, ContributionRole
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
 D = Decimal
 
@@ -57,7 +52,7 @@ def _trace(checkpoint, route, word="hold", *, voltages=None):
         context.prec = 50
         capacity = tuple(checkpoint.capacity_Ah + (D(currents[0]) * D(max(0, min(int(t), 420) - 300)) +
                          D(currents[1]) * D(max(0, min(int(t), 540) - 420))) / D(3600) for t in clocks)
-    return BatteryTrace(f"{checkpoint.checkpoint_id}.{word}.{route.lower()}", science.identity(checkpoint),
+    return BatteryTrace(f"{checkpoint.checkpoint_id}.{word}.{route.lower()}", science_science.identity(checkpoint),
                         checkpoint.unit_id, checkpoint.history, word, route, "tighter" if route == "TIGHTER" else "coarse",
                         clocks, tuple(D(4) for _ in clocks) if voltages is None else tuple(voltages), capacity,
                         tuple(D("293.15") for _ in clocks), route != "SOC", True, (), 5 if route == "REFERENCE" else 3, checkpoint.source)
@@ -69,15 +64,15 @@ def _a_products():
         checkpoint = _checkpoint(history=history)
         traces = [_trace(checkpoint, route) for route in ("REFERENCE", "FULL", "SOC")]
         checkpoints.append(checkpoint)
-        assessments.append(science.assess_restart(_config(BatteryOperation.ASSESS, history=history), checkpoint, *traces))
-    procedure = science.construct_procedure(_config(BatteryOperation.PROCEDURE), tuple(checkpoints), tuple(assessments))
+        assessments.append(science_science.assess_restart(_config(BatteryOperation.ASSESS, history=history), checkpoint, *traces))
+    procedure = science_science.construct_procedure(_config(BatteryOperation.PROCEDURE), tuple(checkpoints), tuple(assessments))
     return checkpoints, assessments, procedure
 
 
 def _test_manifest(procedure):
     # This exposed test reference has no signer or authority and is never used
     # by the public contribution import service as authenticated evidence.
-    product = ContributionProduct("test.procedure-product", science.identity(procedure),
+    product = ContributionProduct("test.procedure-product", science_science.identity(procedure),
                                   ArtifactIdentity("test.procedure-artifact", "test-fixture", procedure.SCHEMA,
                                                    procedure.fingerprint(), "application/json", len(procedure.canonical_bytes())),
                                   ObjectIdentity("test.unissued-receipt", "empirical-lawhood/runtime/canonical-task-receipt", "1.0.0", "c" * 64),
@@ -91,9 +86,9 @@ def _b_products(*, null=False):
     _, _, procedure = _a_products()
     manifest = _test_manifest(procedure)
     checkpoint = _checkpoint("B")
-    summary = science.project_checkpoint(checkpoint)
-    c1 = science.admit_procedure(_config(BatteryOperation.ADMIT_C1, "B", manifest=manifest), manifest, procedure, summary)
-    c2 = science.admit_procedure(_config(BatteryOperation.ADMIT_C2, "B", manifest=manifest), manifest, procedure, summary)
+    summary = science_science.project_checkpoint(checkpoint)
+    c1 = science_science.admit_procedure(_config(BatteryOperation.ADMIT_C1, "B", manifest=manifest), manifest, procedure, summary)
+    c2 = science_science.admit_procedure(_config(BatteryOperation.ADMIT_C2, "B", manifest=manifest), manifest, procedure, summary)
     traces, assessments = [], []
     for word in ("early1", "early3", "hold", "late1"):
         volts = [D(4)] * 31
@@ -106,13 +101,13 @@ def _b_products(*, null=False):
                 volts[11] = D("3.70")
         reference, full, tighter = [_trace(checkpoint, route, word, voltages=volts) for route in ("REFERENCE", "FULL", "TIGHTER")]
         traces.extend((reference, full, tighter))
-        assessments.append(science.assess_restart(_config(BatteryOperation.ASSESS, "B", word=word), checkpoint, reference, full))
+        assessments.append(science_science.assess_restart(_config(BatteryOperation.ASSESS, "B", word=word), checkpoint, reference, full))
     config = _config(BatteryOperation.VOLTAGE, "B", manifest=manifest)
     return config, checkpoint, c1, c2, tuple(traces), tuple(assessments)
 
 
 def test_static_catalog_and_compilation_do_not_import_or_contact_pybamm():
-    script = "from empirical_lawhood.adapters.methods.battery_recursive_construction.examples import battery_wave_a_draft; import sys; battery_wave_a_draft(); print('pybamm' in sys.modules)"
+    script = "from empirical_lawhood.domains.battery.battery_recursive_construction.examples import battery_wave_a_draft; import sys; battery_wave_a_draft(); print('pybamm' in sys.modules)"
     assert subprocess.check_output([sys.executable, "-c", script], text=True).strip() == "False"
     manifests = operation_manifests()
     assert tuple(row.registry_id for row in manifests) == tuple(sorted(row.registry_id for row in manifests))
@@ -173,15 +168,15 @@ def test_substituted_instance_or_capacity_is_refused_before_native_build(monkeyp
 def test_full_fidelity_and_soc_voltage_adequacy_are_distinct_claims():
     cp = _checkpoint()
     reference, full, soc = [_trace(cp, route) for route in ("REFERENCE", "FULL", "SOC")]
-    adequate = science.assess_restart(_config(BatteryOperation.ASSESS), cp, reference, full, soc)
+    adequate = science_science.assess_restart(_config(BatteryOperation.ASSESS), cp, reference, full, soc)
     assert adequate.supply.disposition is State.SATISFIED
     assert adequate.soc_disposition == "ADEQUATE_WITHIN_TESTED_SCOPE"
     soc = replace(soc, voltage_V=(D(4), *(D("4.002") for _ in range(30))))
-    inadequate = science.assess_restart(_config(BatteryOperation.ASSESS), cp, reference, full, soc)
+    inadequate = science_science.assess_restart(_config(BatteryOperation.ASSESS), cp, reference, full, soc)
     assert inadequate.supply.disposition is State.SATISFIED
     assert inadequate.soc_disposition == "INADEQUATE"
     bad_full = replace(full, voltage_V=(D(4), *(D("4.000002") for _ in range(30))))
-    failed = science.assess_restart(_config(BatteryOperation.ASSESS), cp, reference, bad_full, soc)
+    failed = science_science.assess_restart(_config(BatteryOperation.ASSESS), cp, reference, bad_full, soc)
     assert failed.supply.disposition is State.FALSIFIED
     assert "FULL_RESTART_VOLTAGE_DEFECT" in failed.supply.reason_codes
 
@@ -190,7 +185,7 @@ def test_current_integral_control_cannot_be_replaced_by_equal_voltage():
     cp = _checkpoint()
     reference, full = [_trace(cp, route) for route in ("REFERENCE", "FULL")]
     full = replace(full, capacity_Ah=tuple(D(0) for _ in full.capacity_Ah))
-    result = science.assess_restart(_config(BatteryOperation.ASSESS), cp, reference, full)
+    result = science_science.assess_restart(_config(BatteryOperation.ASSESS), cp, reference, full)
     assert result.maximum_voltage_error_V == 0
     assert result.supply.disposition is State.FALSIFIED
     assert not result.capacity_control_passed
@@ -200,7 +195,7 @@ def test_failed_soc_alternative_does_not_falsify_a_faithful_full_procedure():
     cp = _checkpoint()
     reference, full, soc = [_trace(cp, route) for route in ("REFERENCE", "FULL", "SOC")]
     soc = replace(soc, capacity_Ah=tuple(D(0) for _ in soc.capacity_Ah))
-    result = science.assess_restart(_config(BatteryOperation.ASSESS), cp, reference, full, soc)
+    result = science_science.assess_restart(_config(BatteryOperation.ASSESS), cp, reference, full, soc)
     assert result.supply.disposition is State.SATISFIED
     assert result.soc_disposition == "UNEVALUABLE"
     assert result.soc_capacity_control_passed is False
@@ -225,12 +220,12 @@ def test_nonfinite_native_output_retains_the_returned_finite_prefix(monkeypatch)
 def test_both_assigned_histories_are_required_for_procedure():
     checkpoints, assessments, _ = _a_products()
     with pytest.raises(ValueError, match="actual assigned checkpoints"):
-        science.construct_procedure(_config(BatteryOperation.PROCEDURE), tuple(checkpoints), (assessments[0], assessments[0]))
+        science_science.construct_procedure(_config(BatteryOperation.PROCEDURE), tuple(checkpoints), (assessments[0], assessments[0]))
 
 
 def test_shared_supplier_admission_is_consumer_specific_and_state_free(monkeypatch):
     _, cp, c1, c2, _, _ = _b_products()
-    summary = science.project_checkpoint(cp)
+    summary = science_science.project_checkpoint(cp)
     assert not hasattr(summary, "state_hex")
     assert c1.supply.phase is AssessmentPhase.ADMISSION and c1.supply.disposition is State.SATISFIED
     assert c2.supply.disposition is State.REFUSED
@@ -242,7 +237,7 @@ def test_shared_supplier_admission_is_consumer_specific_and_state_free(monkeypat
 
 def test_distinct_further_voltage_product_preserves_actual_contrasts_and_denominators():
     config, _, c1, c2, traces, assessments = _b_products()
-    result = science.assess_voltage(config, c1, c2, traces, assessments)
+    result = science_science.assess_voltage(config, c1, c2, traces, assessments)
     assert result.c1_path_disposition is State.SATISFIED
     assert result.c1_c2_joint_disposition is State.REFUSED
     assert result.assigned_unit_ids == ("battery-preparation-b",)
@@ -255,7 +250,7 @@ def test_distinct_further_voltage_product_preserves_actual_contrasts_and_denomin
 
 def test_null_voltage_findings_are_successful_assessed_development_products():
     config, _, c1, c2, traces, assessments = _b_products(null=True)
-    result = science.assess_voltage(config, c1, c2, traces, assessments)
+    result = science_science.assess_voltage(config, c1, c2, traces, assessments)
     assert result.c1_path_disposition is State.SATISFIED
     assert all(r.finding == "BOUNDED_NULL_OR_NONDISCRIMINATING" for r in result.contrast_results)
 
@@ -263,9 +258,9 @@ def test_null_voltage_findings_are_successful_assessed_development_products():
 def test_missing_nested_control_and_tighter_capacity_failure_are_preserved():
     config, _, c1, c2, traces, assessments = _b_products()
     with pytest.raises(ValueError, match="missing or duplicates"):
-        science.assess_voltage(config, c1, c2, traces[:-1], assessments)
+        science_science.assess_voltage(config, c1, c2, traces[:-1], assessments)
     traces = tuple(replace(t, capacity_Ah=tuple(D(0) for _ in t.capacity_Ah)) if t.route == "TIGHTER" else t for t in traces)
-    result = science.assess_voltage(config, c1, c2, traces, assessments)
+    result = science_science.assess_voltage(config, c1, c2, traces, assessments)
     assert result.c1_path_disposition is State.FALSIFIED
     assert "FORWARD_CURRENT_INTEGRAL_CONTROL_FAILED" in result.reason_codes
     assert all(r.finding == "UNEVALUABLE" for r in result.contrast_results)
@@ -275,17 +270,17 @@ def test_unavailable_contrast_is_absent_rather_than_a_fabricated_zero():
     config, _, c1, c2, traces, assessments = _b_products()
     traces = tuple(replace(t, clocks_seconds=(), voltage_V=(), capacity_Ah=(), temperature_K=(), completed=False,
                            reason_codes=("NATIVE_STOP",), native_phase_calls=0) if t.route == "TIGHTER" else t for t in traces)
-    result = science.assess_voltage(config, c1, c2, traces, assessments)
+    result = science_science.assess_voltage(config, c1, c2, traces, assessments)
     assert result.c1_path_disposition is State.UNEVALUABLE
     assert all(r.tighter_V is None and r.coarse_V is not None and r.finding == "UNEVALUABLE" for r in result.contrast_results)
 
 
 def test_decimal_context_does_not_change_the_scientific_reducer():
     config, _, c1, c2, traces, assessments = _b_products()
-    expected = science.assess_voltage(config, c1, c2, traces, assessments)
+    expected = science_science.assess_voltage(config, c1, c2, traces, assessments)
     with localcontext() as ctx:
         ctx.prec = 3
-        actual = science.assess_voltage(config, c1, c2, traces, assessments)
+        actual = science_science.assess_voltage(config, c1, c2, traces, assessments)
     assert actual == expected
     assert decode_canonical_bytes(actual.canonical_bytes(), type(actual), maximum_bytes=4 * 1024**2) == actual
 
@@ -297,7 +292,7 @@ def test_native_checkpoint_full_state_restart_and_soc_bookkeeping():
     reference = science.continue_checkpoint(_config(BatteryOperation.REFERENCE), cp)
     full = science.continue_checkpoint(_config(BatteryOperation.FULL), cp)
     soc = science.continue_checkpoint(_config(BatteryOperation.SOC), cp)
-    result = science.assess_restart(_config(BatteryOperation.ASSESS), cp, reference, full, soc)
+    result = science_science.assess_restart(_config(BatteryOperation.ASSESS), cp, reference, full, soc)
     print(json.dumps({"scientific_disposition": result.supply.disposition.value,
                       "reason_codes": result.supply.reason_codes,
                       "full_voltage_error_V": str(result.maximum_voltage_error_V),

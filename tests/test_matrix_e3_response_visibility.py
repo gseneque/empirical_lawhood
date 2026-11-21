@@ -11,16 +11,16 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseArrays
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledSource
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA, MatrixArrayMember
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.compiler import compile_run_plan
-from empirical_lawhood.runtime.plans import OutputTemplate
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseArrays
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledSource
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA, MatrixArrayMember
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.compiler import compile_run_plan
+from empirical_lawhood.execution.plans import OutputTemplate
 from tests.runtime_platform.conftest import build_protocol_fixture
 from tests.test_matrix_e3_response_records import arguments, case as response_case, publication, qualification  # noqa: F401
 
@@ -101,8 +101,8 @@ def test_original_template_contract_stays_blind():
 
 
 def test_compiled_physical_forecast_retains_original_exposed_numerical_parameters(response_case):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_records as records
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_science as science
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_records as records
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_science as science
     from tests.test_matrix_e3_response_lifecycle import compiled_response_output
     from tests.test_matrix_e3_response_science import LIMITS, byte_fetch, public_context, store
 

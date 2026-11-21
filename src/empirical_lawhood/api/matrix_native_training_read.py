@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: MPL-2.0
 """Public TRAIN scientific read through actual custody and received-array replay."""
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as r
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import authenticate_request
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census, has_response_measurements, validate_response_native_evidence
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as r
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_request
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census, has_response_measurements, validate_response_native_evidence
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 from empirical_lawhood.api.matrix_native_read_custody import _record, _array, _producers, _graph
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 def _authenticate_root_records(specification, request, seal, root_id, configs, products, tasks, run_id, *, source_index, get):
     """Authenticate original typed producer ancestry without array mathematics."""
@@ -144,7 +144,7 @@ def read_development_result(*, directory, artifact_writer, specification, instan
         for root_id in specification.root_ids)
     features, outcomes, summary = _validate_complete_root_results(specification, request, seal, pairs,
         get_summary=lambda: _record(products, tasks, run_id, owner.terminal_task_id(specification), r.NativeTrainingSummary))
-    from empirical_lawhood.kernel.serialization import canonical_value
+    from empirical_lawhood.science.records.serialization import canonical_value
     return {"scientific_completion": "COMPLETE_NATIVE_TRAIN_ARRAY_REPLAY", "state": "NATIVE_TRAIN_MEASUREMENTS_RETAINED",
         **({'same_bank_mechanism': canonical_value(tuple(mechanism_rows))} if request.candidate_specification.is_curve_primary else {}),
         "qualification": "NOT_ESTABLISHED", "sampling_warrant": "NOT_ESTABLISHED", "assigned_units": len(features),

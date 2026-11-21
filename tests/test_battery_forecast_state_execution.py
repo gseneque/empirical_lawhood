@@ -4,32 +4,33 @@
 The solver products are explicitly exposed fixtures. No native engine is
 contacted, and this does not establish the later TP2 native canary acceptance.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_state_execution as execution
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_state_census as census
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_state_control as state
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_state_orchestration as orchestration
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_step_control as step
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_evidence_stream as stream
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.recursive_translation import _campaign
-from empirical_lawhood.infrastructure.prepared_native_invocation import NativeInputPublication, prepare_native_invocation
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import ClaimSpec, EvidenceCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A, DevelopmentStudySpec
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactStreamWriteRequest
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRegistry
-from empirical_lawhood.runtime.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_state_execution as execution
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_state_census as census
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_state_control as state
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_state_orchestration as orchestration
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_step_control as step
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_evidence_stream as stream
+from empirical_lawhood.domains.battery.battery_refined_inquiry.recursive_translation import _campaign
+from empirical_lawhood.storage.prepared_native_invocation import NativeInputPublication, prepare_native_invocation
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import ClaimSpec, EvidenceCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A, DevelopmentStudySpec
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactStreamWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRegistry
+from empirical_lawhood.execution.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform.test_native_subwork import _plane
 from tests.test_battery_forecast_state_control import selected as selected_fixture
 from tests.test_battery_forecast_state_orchestration import complete_failed as complete_failed_fixture, observed_stream, port as exposed_port
@@ -84,8 +85,7 @@ def prepare_pair(directory, selected, original):
             "exposed.original-streams", "inputs", iter(lines), maximum_bytes=len(payload),
             maximum_chunk_bytes=max(map(len, lines)), visibility_ceiling=execution.VISIBILITY,
             parent_visibility_ceilings=(), outcome_access=execution.ACCESS))
-        manifest = decode_artifact_manifest(plane.root.resolve(result.materialization.relative_path
-            + ".manifest.json", for_write=False).read_bytes())
+        manifest = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes())
         identity = ObjectIdentity("original.exposed." + name, stream.LosslessEvidenceLine.SCHEMA,
             "1.0.0", manifest.logical.content_sha256)
         original_streams.append((identity, manifest))
@@ -194,8 +194,8 @@ def test_graph_requires_complete_scientific_inputs_and_qualifies_no_model(origin
 
 
 def test_local_declaration_keeps_complete_census_and_existing_lossless_codec_without_runner(monkeypatch):
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry.controlled_operation_bindings import LOSSLESS_STORAGE_CODECS
-    from empirical_lawhood.runtime.plans import ScientificStage
+    from empirical_lawhood.domains.battery.battery_refined_inquiry.controlled_operation_bindings import LOSSLESS_STORAGE_CODECS
+    from empirical_lawhood.execution.plans import ScientificStage
 
     def forbidden(*args, **kwargs):
         pytest.fail("cold local declarations constructed a runner or temporary resource")

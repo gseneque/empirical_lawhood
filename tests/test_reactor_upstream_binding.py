@@ -9,7 +9,7 @@ import pytest
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.prepared_input import ReactorPreparedInput, check_prepared_input
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.reactor_binding import ReactorResolvedPort, ReactorSourceBinding, EnvironmentBoundReactorSourceBinding, required_upstream_port_keys
 from empirical_lawhood.api.codecs import load_registered_authoring
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 ROOT = Path(__file__).parents[1]
 
@@ -27,7 +27,7 @@ def _binding(
     native_sha: str, source_sha: str, route: str = "local"
 ) -> ReactorSourceBinding:
     from hashlib import sha256
-    from empirical_lawhood.adapters.methods.reactor_causal_response.native_benchmark import EmpiricalNativeEnvironment
+    from empirical_lawhood.domains.reactor.reactor_causal_response.native_benchmark import EmpiricalNativeEnvironment
 
     source = os.environ.get("REACTOR_HELD_SOURCE_ROOT")
     if source is None:
@@ -217,13 +217,13 @@ def test_frontier_input_tuple_must_contain_the_authenticated_study_source() -> N
 @pytest.mark.held
 def test_all_reactor_factories_with_synthetic_guarded_ports(route: str) -> None:
     """EXPOSED_DEVELOPMENT_NONPROMOTABLE: no task, publication or grant is real."""
-    from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.config import ClassicalDesign, ClassicalStage, ClassicalUpstream
-    from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.config import FrontierDesign
-    from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.discovery import FrontierDevelopment
-    from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.phase import FrontierPhase, FrontierUpstream
+    from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.config import ClassicalDesign, ClassicalStage, ClassicalUpstream
+    from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.config import FrontierDesign
+    from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.discovery import FrontierDevelopment
+    from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.phase import FrontierPhase, FrontierUpstream
     from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_input import load_batch_source
     from empirical_lawhood.adapters.simulators.reactor_prefix_response.reactor_binding import _study_source_payload
-    from empirical_lawhood.kernel.references import ArtifactIdentity
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
 
     source_name, discovery_name = (
         os.environ.get("REACTOR_HELD_SOURCE_ROOT"),

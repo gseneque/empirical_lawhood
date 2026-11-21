@@ -13,30 +13,14 @@ from typing import ClassVar
 import pytest
 from typer.testing import CliRunner
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_specification import (
-    selected_deanneal_specification,
-)
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_specification import selected_deanneal_specification
 from empirical_lawhood.api.configuration import validate_configuration
-from empirical_lawhood.api.experiment_preparation import (
-    experiment_preparation_report,
-    experiment_protocols,
-    load_experiment_inputs,
-    load_experiment_specification,
-    prepare_experiment,
-)
+from empirical_lawhood.api.experiment_preparation import experiment_preparation_report, experiment_protocols, load_experiment_inputs, load_experiment_specification, prepare_experiment
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
-from empirical_lawhood.runtime.experiment_preparation import (
-    DependencyKind,
-    ExecutionSelection,
-    ExperimentCensus,
-    ExperimentDependency,
-    ExperimentPreparation,
-    ExperimentProtocolDeclaration,
-    PreparedExperimentInputs,
-)
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection, ExperimentCensus, ExperimentDependency, ExperimentPreparation, ExperimentProtocolDeclaration, PreparedExperimentInputs
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -224,7 +208,16 @@ class OtherSpecification(CanonicalRecord):
 
 
 def test_generic_schema_dispatch_uses_installed_declaration_without_matrix_wiring(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
+    from types import ModuleType
+
+    # Model an installed code-owned declaration, including its real resolver
+    # contract. A test-module locator is deliberately not a production owner.
+    module_name = "empirical_lawhood.fixture_other_experiment"
+    module = ModuleType(module_name)
+    module.OtherSpecification = OtherSpecification
+    monkeypatch.setitem(sys.modules, module_name, module)
+    monkeypatch.setattr(OtherSpecification, "__module__", module_name)
 
     calls = []
 
@@ -257,7 +250,7 @@ def test_generic_schema_dispatch_uses_installed_declaration_without_matrix_wirin
 
 
 def test_undeclared_schema_or_wrong_returned_identity_cannot_select_scientific_code(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
 
     specification = OtherSpecification("fixture.other-specification", 3)
     source = tmp_path / "undeclared.json"
@@ -300,10 +293,10 @@ class NativeImportRefusal(importlib.abc.MetaPathFinder):
             forbidden()
 sys.meta_path.insert(0, NativeImportRefusal())
 subprocess.Popen = forbidden
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationProviderFactory, RecursiveOperationProvider
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationProviderFactory, RecursiveOperationProvider
 RecursiveOperationProviderFactory.build_provider = forbidden
 RecursiveOperationProvider.runners = forbidden
-from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+import empirical_lawhood.api.generated_experiment_protocols as generated
 generated.EXPERIMENT_PROTOCOL_DECLARATIONS = tuple(replace(declaration, prepare=forbidden)
     for declaration in generated.EXPERIMENT_PROTOCOL_DECLARATIONS)
 from empirical_lawhood.api.experiment_preparation import experiment_protocols
@@ -345,7 +338,7 @@ def _write_source_selection(directory, specification, records):
 
 
 def _other_input_scope(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
 
     calls = []
     method_handle = object()
@@ -462,7 +455,7 @@ def test_generic_input_path_traversal_refuses_during_strict_selection_decode(tmp
 
 
 def test_generic_input_explicit_byte_bound_refuses_before_domain_binding(tmp_path, monkeypatch):
-    from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
+    from empirical_lawhood.storage.bounded_io import BoundedFileIOError
 
     specification, _, selection, path, calls, _ = _other_input_scope(tmp_path, monkeypatch)
     binding = selection.bindings[0]
@@ -473,7 +466,7 @@ def test_generic_input_explicit_byte_bound_refuses_before_domain_binding(tmp_pat
 
 
 def test_generic_input_callback_must_return_the_registered_typed_handle(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
 
     specification, _, _, path, _, _ = _other_input_scope(tmp_path, monkeypatch)
     declaration = generated.EXPERIMENT_PROTOCOL_DECLARATIONS[0]
@@ -489,9 +482,9 @@ def test_generic_input_callback_must_return_the_registered_typed_handle(tmp_path
 ), ids=("exposed12-20-8", "exposed64-64-64"))
 def test_complete_exposed_source_banks_prepare_through_public_cli_without_scientific_contact(
         tmp_path, monkeypatch, train_count, cal_count, eval_count, minimum_usable, rank, threshold, tasks):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import experiment_methods as science
+    from empirical_lawhood.domains.matrix.matrix_factor_response import experiment_methods as science
     from empirical_lawhood.api.recursive_authoring import implementation_binding
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationProviderFactory
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationProviderFactory
     from tests.test_matrix_experiment_methods import fixture, selected_input_records
 
     specification, source_inputs, _, method_inputs = fixture(
@@ -557,7 +550,7 @@ def test_public_cli_wrong_source_protocol_refuses_before_creating_preparation_re
 
 
 def test_matrix_source_selection_is_reused_unchanged_after_supported_question_edit(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import experiment_methods as science
+    from empirical_lawhood.domains.matrix.matrix_factor_response import experiment_methods as science
     from empirical_lawhood.api.recursive_authoring import implementation_binding
     from tests.test_matrix_experiment_methods import fixture, selected_input_records
 
@@ -594,7 +587,7 @@ def test_matrix_source_selection_is_reused_unchanged_after_supported_question_ed
 
 
 def test_public_partial_source_selection_reports_missing_campaign_bank_and_execution_choices_together(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import experiment_methods as science
+    from empirical_lawhood.domains.matrix.matrix_factor_response import experiment_methods as science
     from tests.test_matrix_experiment_methods import fixture, selected_input_records
 
     specification, source_inputs, _, method_inputs = fixture()
@@ -623,7 +616,7 @@ def test_public_partial_source_selection_reports_missing_campaign_bank_and_execu
 
 
 def test_public_count_and_unit_selection_edit_reuses_original_source_bindings_and_derives_complete_graph(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import experiment_methods as science
+    from empirical_lawhood.domains.matrix.matrix_factor_response import experiment_methods as science
     from empirical_lawhood.api.recursive_authoring import implementation_binding
     from tests.test_matrix_experiment_methods import fixture, selected_input_records
 

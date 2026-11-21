@@ -6,36 +6,21 @@ from dataclasses import dataclass, fields
 from hashlib import sha256
 from typing import ClassVar, Final, TypeAlias
 
-from empirical_lawhood.adapters.methods.independent_substrate_grounding import IndependentSubstrateTargetKind, IndependentSubstrateTargetTerminalHandoff
-from empirical_lawhood.adapters.physical.nrel_inverter_consistency import NRELArchiveReadinessDisposition, NRELArchiveReadiness, nrel_readiness_stop_handoff
-from empirical_lawhood.adapters.simulators.grid2op_source_readiness import Grid2OpReadinessDisposition, Grid2OpSourceReadiness, grid2op_readiness_stop_handoff
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    validate_semantic_version,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.candidate_compiler import CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityRegistration
-from empirical_lawhood.runtime.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-)
+from empirical_lawhood.methods.independent_substrate_grounding import IndependentSubstrateTargetKind, IndependentSubstrateTargetTerminalHandoff
+from empirical_lawhood.domains.energy.inverter.archive_readiness import NRELArchiveReadinessDisposition, NRELArchiveReadiness, nrel_readiness_stop_handoff
+from empirical_lawhood.domains.energy.grid2op.source_readiness import Grid2OpReadinessDisposition, Grid2OpSourceReadiness, grid2op_readiness_stop_handoff
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_semantic_version, validate_sha256, validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.candidate_compiler import CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityRegistration
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, CampaignRuntimeProvider, ExternalInputPayload
 
 
 INDEPENDENT_SUBSTRATE_PREENTRY_STOP_VERSION: Final = "1.0.0"

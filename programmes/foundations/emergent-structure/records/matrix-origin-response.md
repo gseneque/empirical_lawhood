@@ -4,9 +4,9 @@ SPDX-License-Identifier: CC-BY-4.0
 
 This is the numerical construction contract for the amended Matrix response
 assay. Its implementation is in
-[`origin_mechanics.py`](../../../../src/empirical_lawhood/adapters/methods/matrix_factor_response/origin_mechanics.py)
+[`origin_mechanics.py`](../../../../src/empirical_lawhood/domains/matrix/matrix_factor_response/origin_mechanics.py)
 and the native instrument boundary is `origin_io_system` in
-[`science.py`](../../../../src/empirical_lawhood/adapters/methods/matrix_factor_response/science.py).
+[`science.py`](../../../../src/empirical_lawhood/domains/matrix/matrix_factor_response/science.py).
 The construction and exposed numerical controls alone do not establish a
 completed public programme, an issued scientific source, or fresh evidence.
 The [programme guide](../workflows/matrix-programme/guide.md) owns the

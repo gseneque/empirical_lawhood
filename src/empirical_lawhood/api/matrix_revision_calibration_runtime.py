@@ -8,45 +8,32 @@ records. No source eligibility, missing native effect or authority is inferred.
 
 from dataclasses import replace
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import NAMESPACE as COMPACT_NAMESPACE, ScheduledCompactBank, compact_identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition import (
-    ScheduledProgrammeAcquisitionAdmissionConfig, ScheduledProgrammeAcquisitionCollectorConfig, validate_acquisition_root,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition_custody import validate_acquisition_operation_census
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_parent import authenticate_global_parent
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import validate_programme_bank
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_reduction import ScheduledProgrammeWaveResult, reduce_programme
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_selection import ScheduledRevisionCaseData, ScheduledRevisionDataBank
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledCausalPrefix, identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseScore
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_calibration import ScheduledRevisionCalibration
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_calibration_bindings import (
-    BLIND, MAXIMUM_RECORD_BYTES, PreparedRevisionCalibration, RevisionCalibrationInputs,
-    ScheduledRevisionCalibrationConfig, ScheduledRevisionCalibrationScope, ScheduledRevisionCalibrationSources,
-    ScheduledRevisionCalibrationWorker, calibration_task_id, pin,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_calibration_custody import (
-    ScheduledRevisionCalibrationCustody, validate_calibration_producer,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_future_bindings import (
-    ScheduledRevisionFutureScope,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_public import ScheduledRevisionPublicCalibration
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_seal_custody import prior_seal_scope_validator
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import NAMESPACE as COMPACT_NAMESPACE, ScheduledCompactBank, compact_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition import ScheduledProgrammeAcquisitionAdmissionConfig, ScheduledProgrammeAcquisitionCollectorConfig, validate_acquisition_root
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition_custody import validate_acquisition_operation_census
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_parent import authenticate_global_parent
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import validate_programme_bank
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_reduction import ScheduledProgrammeWaveResult, reduce_programme
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_selection import ScheduledRevisionCaseData, ScheduledRevisionDataBank
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledCausalPrefix, identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseScore
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_calibration import ScheduledRevisionCalibration
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_calibration_bindings import BLIND, MAXIMUM_RECORD_BYTES, PreparedRevisionCalibration, RevisionCalibrationInputs, ScheduledRevisionCalibrationConfig, ScheduledRevisionCalibrationScope, ScheduledRevisionCalibrationSources, ScheduledRevisionCalibrationWorker, calibration_task_id, pin
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_calibration_custody import ScheduledRevisionCalibrationCustody, validate_calibration_producer
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_future_bindings import ScheduledRevisionFutureScope
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_public import ScheduledRevisionPublicCalibration
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_seal_custody import prior_seal_scope_validator
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody, issued_custody_for_supplier
 from empirical_lawhood.api.matrix_sampling_runtime import _original_product, _selected_control
 from empirical_lawhood.api.matrix_scheduled_factorial_runtime import _ordinary_execution, _original_external
-from empirical_lawhood.api.recursive_qualified_parents import (
-    _authenticate_prior_execution, _output_payload, _prior_native_subwork, _replay_parent_authority,
-    _semantic_writer, _verify_receipt_closure,
-)
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.plans import ExecutionPlan
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorNativeBinding
+from empirical_lawhood.api.recursive_qualified_parents import _authenticate_prior_execution, _output_payload, _prior_native_subwork, _replay_parent_authority, _semantic_writer, _verify_receipt_closure
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.execution.plans import ExecutionPlan
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorNativeBinding
 
 
 def _record_input(writer, run_id, task, name, kind):
@@ -311,8 +298,8 @@ def bind_revision_calibration_handoff(handoff, *, writer, reveal_authority_id=No
     """Bind the registered producer to the ordinary public prospective handoff."""
     from empirical_lawhood.api.recursive_prospective_authoring import RecursiveProspectiveApplicationHandoff
     from empirical_lawhood.api.matrix_scheduled_programme_runtime import ProgrammeRuntimeInputSupplier
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
     if type(handoff) is not RecursiveProspectiveApplicationHandoff or not handoff.compilation.config_inputs or any(
             type(value.record) is not ScheduledRevisionCalibrationConfig for value in handoff.compilation.config_inputs):
         raise TypeError("revision calibration requires its exact public prospective producer handoff")

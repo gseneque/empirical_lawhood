@@ -13,15 +13,9 @@ import zipfile
 import pytest
 
 from empirical_lawhood.adapters.physical.rubisco_kinetics import direct_panels
-from empirical_lawhood.adapters.physical.rubisco_kinetics.direct_panels import (
-    DAVIDI_SHEETS, MCDONALD_SHEETS, DavidiCorrectionRowV1, DavidiCorrectionTableV1,
-    DirectEndpointPanelV1, build_davidi2020_panel, build_mcdonald2025_panel, decode_tsai2025_correction,
-)
-from empirical_lawhood.adapters.physical.rubisco_kinetics.workbook import (
-    MAX_SELECTED_XML_BYTES, NS, OFFICE_REL_NS, REL_NS, NativeWorkbookV1,
-    decode_native_workbook,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_record
+from empirical_lawhood.adapters.physical.rubisco_kinetics.direct_panels import DAVIDI_SHEETS, MCDONALD_SHEETS, DavidiCorrectionRowV1, DavidiCorrectionTableV1, DirectEndpointPanelV1, build_davidi2020_panel, build_mcdonald2025_panel, decode_tsai2025_correction
+from empirical_lawhood.adapters.physical.rubisco_kinetics.workbook import MAX_SELECTED_XML_BYTES, NS, OFFICE_REL_NS, REL_NS, NativeWorkbookV1, decode_native_workbook
+from empirical_lawhood.science.records.decoding import decode_canonical_record
 
 
 def worksheet(cells):

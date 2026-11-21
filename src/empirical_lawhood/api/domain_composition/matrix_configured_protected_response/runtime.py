@@ -5,15 +5,15 @@ from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification as MatrixResponseErrorSpecification
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_originals import authenticate_configured_protected_e3_fit_config
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_statistical_bindings import ConfiguredProtectedE3FitConfig, ConfiguredProtectedE3StatisticalRunner
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification as MatrixResponseErrorSpecification
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_originals import authenticate_configured_protected_e3_fit_config
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_statistical_bindings import ConfiguredProtectedE3FitConfig, ConfiguredProtectedE3StatisticalRunner
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody, CurrentIssuedTaskCustodySupplier
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExperimentPreparation
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExperimentPreparation
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 
 
 def _fit(compilation):
@@ -21,7 +21,7 @@ def _fit(compilation):
 
 
 def _selection(records):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import configured_preparation_types
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import configured_preparation_types
 
     values = tuple(record for _, record in records if type(record) in configured_preparation_types())
     if len(values) != 1:
@@ -35,8 +35,8 @@ def authenticate_protected_e3_numerical_originals(writer, selection):
     One existing qualified selection may cover every selected protocol. This
     current authentication creates no earlier publication or numerical warrant.
     """
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_records import _object
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_records import _object
 
     containers = {_object(row): row for row in (selection.response_selection, *selection.protocols, *selection.numerical_containers)}
     checked = set()
@@ -137,12 +137,10 @@ class ProtectedE3RuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
 
 def prepare_protected_e3_experiment_authoring(preparation, *, project_root, artifact_writer, output_dir):
     """Bind resources from the actual candidate without changing selected science."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import (
-        RESOURCE_BINDING_DEPENDENCY, derive_protected_e3_design_inputs,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import RESOURCE_BINDING_DEPENDENCY, derive_protected_e3_design_inputs
     from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
     from empirical_lawhood.api.prospective_experiment import preview_prepared_prospective_experiment_candidate
-    from empirical_lawhood.runtime.experiment_resources import bind_execution_resources
+    from empirical_lawhood.execution.experiment_resources import bind_execution_resources
 
     if (type(preparation) is not ExperimentPreparation
             or type(preparation.specification_record) is not MatrixResponseErrorSpecification):
@@ -156,7 +154,7 @@ def prepare_protected_e3_experiment_authoring(preparation, *, project_root, arti
         raise ValueError("protected E3 authoring retains unresolved scientific or source entry dependencies: " + "; ".join(
             row.code + " (" + row.kind.value + "): " + row.detail for row in unresolved))
     selected = _selection(preparation.design_records)
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection
     if isinstance(selected, ConfiguredE3ContinuedPreparationSelection):
         from empirical_lawhood.api.configured_e3_retained_runtime import authenticate_selection
         with authenticate_selection(writer=artifact_writer, selection=selected):
@@ -175,7 +173,7 @@ def prepare_protected_e3_experiment_authoring(preparation, *, project_root, arti
     preview = preview_prepared_prospective_experiment_candidate(preparation=preparation, design_inputs=design,
         source_configs=source_configs,
         project_root=project_root, artifact_writer=artifact_writer)
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import derive_protected_e3_resource_selection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import derive_protected_e3_resource_selection
 
     resources = bind_execution_resources(derive_protected_e3_resource_selection(preparation),
         issued_extensions=preview.issued_extensions)
@@ -184,11 +182,11 @@ def prepare_protected_e3_experiment_authoring(preparation, *, project_root, arti
 
 
 def _fit_from_draft(draft):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_composition import operation_declarations
-    from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_composition import operation_declarations
+    from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
 
     registered = {row.registration().selection.selection_id: row.registration() for row in operation_declarations()}
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_continued_response import original_config
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_continued_response import original_config
     records = tuple(original_config(decode_recursive_config_input(operation,
         registered[operation.selection.selection_id]).record) for operation in draft.operations)
     records = tuple(record for record in records if type(record) is ConfiguredProtectedE3FitConfig)
@@ -200,10 +198,10 @@ def _fit_from_draft(draft):
 def bind_configured_protected_e3_experiment_handoff(handoff, *, specification, allocation, source_records,
         artifact_writer, reveal_authority_id=None):
     """Recheck the original instance and attach only parent-side fit custody."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import validate_protected_e3_experiment_instance
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import validate_protected_e3_experiment_instance
     from empirical_lawhood.api.recursive_prospective_authoring import RecursiveProspectiveApplicationHandoff
-    from empirical_lawhood.kernel.serialization import validate_stable_id
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.science.records.serialization import validate_stable_id
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
 
     if type(handoff) is not RecursiveProspectiveApplicationHandoff:
         raise TypeError("protected E3 requires the actual public prospective handoff")
@@ -222,7 +220,7 @@ def bind_configured_protected_e3_experiment_handoff(handoff, *, specification, a
         raise PermissionError("protected E3 handoff changes its actual candidate or original fit selection")
     authenticate_configured_protected_e3_fit_config(artifact_writer, fit)
     ports = []
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection
     retained_scope = None
     if isinstance(selection, ConfiguredE3ContinuedPreparationSelection):
         from empirical_lawhood.api.configured_e3_retained_runtime import RetainedE3ExecutionScope

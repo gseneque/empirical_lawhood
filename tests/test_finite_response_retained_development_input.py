@@ -9,9 +9,9 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.composition.finite_response_law.informative_composition_input import ARRAYS, ROOTS, FiniteResponseLawInformativeCompositionParent, analyze_informative_composition_parent, check_informative_composition_parent
-from empirical_lawhood.adapters.methods.finite_response_law.science import FiniteResponseLawScienceSpec
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.informative_composition_input import ARRAYS, ROOTS, FiniteResponseLawInformativeCompositionParent, analyze_informative_composition_parent, check_informative_composition_parent
+from empirical_lawhood.domains.matrix.finite_response_law.science import FiniteResponseLawScienceSpec
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def fixture():

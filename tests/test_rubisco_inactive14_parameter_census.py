@@ -9,12 +9,7 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.amber_parameters import (
-    Inactive14ScaleSupport,
-    assigned_census,
-    assigned_census_supported_inactive14,
-    read_prmtop,
-)
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.amber_parameters import Inactive14ScaleSupport, assigned_census, assigned_census_supported_inactive14, read_prmtop
 from tests.test_rubisco_preparation_integrity import amber_text, topology
 
 
@@ -101,7 +96,7 @@ def test_all_later_complete_force_and_sign_falsifiers_execute_after_zero_support
 
 
 def test_supported_method_imports_cold_without_numpy_native_or_producer():
-    module = 'empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.amber_parameters'
+    module = 'empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.amber_parameters'
     code = f'''
 import importlib.abc
 import sys

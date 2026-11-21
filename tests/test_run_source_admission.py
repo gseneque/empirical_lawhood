@@ -9,10 +9,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure import run_source_admission as owner
-from empirical_lawhood.infrastructure import source_closure
-from empirical_lawhood.infrastructure.run_source_admission import RunSourceAdmissionError
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.storage import run_source_admission as owner
+from empirical_lawhood.storage import source_closure
+from empirical_lawhood.storage.run_source_admission import RunSourceAdmissionError
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.infrastructure.test_selected_candidate import candidate_case as candidate_case  # noqa: F401
 
 
@@ -222,15 +222,14 @@ def test_untyped_or_ambiguous_entry_selection_refuses_before_source_or_writes(en
 
 def test_pytest_entry_captures_once_and_authenticates_expanded_test_scope(entry, monkeypatch):
     archives, checked = [], []
-    git, verify = source_closure._git, source_closure._verify_selected_member
-    def observe_git(root, *arguments):
-        if arguments[0] == "archive":
-            archives.append(arguments)
-        return git(root, *arguments)
+    archive, verify = source_closure._git_archive_stream, source_closure._verify_selected_member
+    def observe_archive(root, consumer):
+        archives.append(root)
+        return archive(root, consumer)
     def observe_member(root, member):
         checked.append(member.relative_path)
         return verify(root, member)
-    monkeypatch.setattr(source_closure, "_git", observe_git)
+    monkeypatch.setattr(source_closure, "_git_archive_stream", observe_archive)
     monkeypatch.setattr(source_closure, "_verify_selected_member", observe_member)
     source = owner._capture_source(entry.project)
     assert len(archives) == 1

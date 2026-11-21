@@ -1,5 +1,6 @@
 """One exposed held-source root per selected batch, history, feed and local contract."""
 
+from empirical_lawhood.domains.reactor.reactor_causal_response.source_actuator import bind_native_actuator
 import os
 from dataclasses import replace
 from decimal import Decimal
@@ -11,44 +12,45 @@ import pytest
 
 pytestmark = pytest.mark.held
 
-from empirical_lawhood.adapters.methods.reactor_selected_action_response.config import ClassicalDesign
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.config import FIRST, SECONDS
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.config import ZERO as classical_zero
-from empirical_lawhood.adapters.methods.reactor_causal_response.numerical import CausalFeatures, Observation, features
-from empirical_lawhood.adapters.methods.reactor_prepared_feed_qualification.config import ROOTS as feed_roots
-from empirical_lawhood.adapters.methods.reactor_prepared_feed_qualification.config import FeedQualificationDesign
-from empirical_lawhood.adapters.methods.reactor_prepared_feed_qualification.config import freeze_discovery as freeze_feed_discovery
-from empirical_lawhood.adapters.methods.reactor_prepared_feed_qualification.scoring import root_scores as feed_root_scores
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.config import ROOTS as frontier_roots
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.config import ZERO, FrontierDesign, Pulse
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.qualification import cp as frontier_cp
-from empirical_lawhood.adapters.methods.reactor_local_domain_qualification.config import ROOTS as local_roots
-from empirical_lawhood.adapters.methods.reactor_local_domain_qualification.config import LocalQualificationDesign
-from empirical_lawhood.adapters.methods.reactor_local_domain_qualification.config import freeze_discovery as freeze_local_discovery
-from empirical_lawhood.adapters.methods.reactor_regime_response.config import ROOTS as regime_roots
-from empirical_lawhood.adapters.methods.reactor_regime_response.config import ReactorRegimeResponseDesign
-from empirical_lawhood.adapters.methods.reactor_regime_response.preparation_evidence import preparation_evidence
-from empirical_lawhood.adapters.simulators.reactor_staged_pulse_response.acquisition import causal_context as staged_pulse_causal_context
-from empirical_lawhood.adapters.simulators.reactor_staged_pulse_response.acquisition import native_window as staged_pulse_native_window
-from empirical_lawhood.adapters.simulators.reactor_staged_pulse_response.words import project_pulse as project_staged_pulse
-from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import ExplorationController, TapeController, acquire_episode
-from empirical_lawhood.adapters.simulators.reactor_causal_response.design import draw_scenario
-from empirical_lawhood.adapters.simulators.reactor_causal_response.interface import Actuator, measured_labels
+from empirical_lawhood.domains.reactor.reactor_selected_action_response.config import ClassicalDesign
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.config import FIRST, SECONDS
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.config import ZERO as classical_zero
+from empirical_lawhood.domains.reactor.reactor_causal_response.numerical import CausalFeatures, Observation, features
+from empirical_lawhood.domains.reactor.reactor_prepared_feed_qualification.config import ROOTS as feed_roots
+from empirical_lawhood.domains.reactor.reactor_prepared_feed_qualification.config import FeedQualificationDesign
+from empirical_lawhood.domains.reactor.reactor_prepared_feed_qualification.config import freeze_discovery as freeze_feed_discovery
+from empirical_lawhood.domains.reactor.reactor_prepared_feed_qualification.scoring import root_scores as feed_root_scores
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.config import ROOTS as frontier_roots
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.config import ZERO, FrontierDesign, Pulse
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.qualification import cp as frontier_cp
+from empirical_lawhood.domains.reactor.reactor_local_domain_qualification.config import ROOTS as local_roots
+from empirical_lawhood.domains.reactor.reactor_local_domain_qualification.config import LocalQualificationDesign
+from empirical_lawhood.domains.reactor.reactor_local_domain_qualification.config import freeze_discovery as freeze_local_discovery
+from empirical_lawhood.domains.reactor.reactor_regime_response.config import ROOTS as regime_roots
+from empirical_lawhood.domains.reactor.reactor_regime_response.config import ReactorRegimeResponseDesign
+from empirical_lawhood.domains.reactor.reactor_regime_response.preparation_evidence import preparation_evidence
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.native_measurements import causal_context as staged_pulse_causal_context
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.native_measurements import native_window as staged_pulse_native_window
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.native_words import project_pulse as project_staged_pulse
+from empirical_lawhood.domains.reactor.reactor_causal_response.measurements import ExplorationController, TapeController
+from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import acquire_episode
+from empirical_lawhood.domains.reactor.reactor_causal_response.design import draw_scenario
+from empirical_lawhood.domains.reactor.reactor_causal_response.actuator import measured_labels
 from empirical_lawhood.adapters.simulators.reactor_prepared_feed_qualification.acquisition import acquire_feed_root
-from empirical_lawhood.adapters.simulators.reactor_finite_control_frontier.acquisition import native_window as frontier_native_window
-from empirical_lawhood.adapters.simulators.reactor_finite_control_frontier.words import project_pulse, pulse_tape
-from empirical_lawhood.adapters.simulators.reactor_matched_replay_forecast.design import assigned_scenarios as history_scenarios
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.native_measurements import native_window as frontier_native_window
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.words import project_pulse, pulse_tape
+from empirical_lawhood.domains.reactor.reactor_matched_replay_forecast.design import assigned_scenarios as history_scenarios
 from empirical_lawhood.adapters.simulators.reactor_matched_replay_forecast.trace import acquire_history_unit
-from empirical_lawhood.adapters.simulators.reactor_local_domain_qualification.acquisition import assay_anchors as local_assay_anchors
-from empirical_lawhood.adapters.simulators.reactor_local_domain_qualification.acquisition import candidate_features as local_candidate_features
-from empirical_lawhood.adapters.simulators.reactor_regime_response.acquisition import _episode as regime_episode
+from empirical_lawhood.domains.reactor.reactor_local_domain_qualification.native_features import assay_anchors as local_assay_anchors
+from empirical_lawhood.domains.reactor.reactor_local_domain_qualification.native_features import candidate_features as local_candidate_features
+from empirical_lawhood.domains.reactor.reactor_regime_response.native_measurements import _episode as regime_episode
 from empirical_lawhood.adapters.simulators.reactor_regime_response.acquisition import acquire_preparation as acquire_regime_preparation
-from empirical_lawhood.adapters.simulators.reactor_regime_response.panel import assay_tape as regime_assay_tape
-from empirical_lawhood.adapters.simulators.reactor_regime_response.panel import select_anchors
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_design import assigned_scenarios as batch_scenarios
+from empirical_lawhood.domains.reactor.reactor_regime_response.panel import assay_tape as regime_assay_tape
+from empirical_lawhood.domains.reactor.reactor_regime_response.panel import select_anchors
+from empirical_lawhood.domains.reactor.reactor_prefix_response.batch_design import assigned_scenarios as batch_scenarios
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_input import ReactorBatchInput, check_batch_input, load_batch_source
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_trace import acquire_reference_batch
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.finite_words import overlay_feed_tape
+from empirical_lawhood.domains.reactor.reactor_prefix_response.finite_words import overlay_feed_tape
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.prepared_input import ReactorPreparedInput, check_prepared_input
 from empirical_lawhood.api.codecs import load_registered_authoring
 
@@ -739,7 +741,7 @@ def test_shipped_empirical_selection_has_causal_action_and_native_receiver() -> 
     )
     assert nominal.complete and refined.complete
     callback = 60  # early, at the 600 s dosing-window onset
-    actuator = Actuator(source.plant_source.encode(), source.plant_params.encode())
+    actuator = bind_native_actuator(source.plant_source.encode(), source.plant_params.encode())
     receivers = np.empty((2, 2, 3))
     for view, donor in enumerate((nominal, refined)):
         history = tuple(

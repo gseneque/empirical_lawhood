@@ -9,47 +9,43 @@ from hashlib import sha256
 from pathlib import Path
 from typing import ClassVar
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_declarative as domain
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as native
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as existing
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as p, selected_e4_methods as science
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_NPZ_CODEC
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_declarative as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as native
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as existing
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as p, selected_e4_methods as science
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_NPZ_CODEC
 from empirical_lawhood.api.derived_array_access import derive_matrix_array_access, validate_derived_matrix_array_access
 from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
-from empirical_lawhood.api.derived_metadata_access import (
-    derive_canonical_metadata_access, validate_derived_metadata_access,
-)
-from .matrix_sampling_runtime import _original_product
-from .matrix_source_runtime import authenticate_matrix_source_qualification
-from .recursive_qualified_parents import MAX_PARENT_BYTES, _output_payload
-from .selected_e4_native_runtime import development_products, validate_original_calibration_phase
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.publication_metadata import authenticate_published_materialization
-from empirical_lawhood.infrastructure.source_closure import (
-    capture_admitted_target_source, require_admitted_target_source_current,
-)
-from empirical_lawhood.infrastructure.source_origin import require_selected_implementation
-from empirical_lawhood.infrastructure.task_receipts import encode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, inherited_visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_json_bytes, validate_stable_id
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult, derived_outcome_access
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.api.derived_metadata_access import derive_canonical_metadata_access, validate_derived_metadata_access
+from empirical_lawhood.api.matrix_sampling_runtime import _original_product
+from empirical_lawhood.api.matrix_source_runtime import authenticate_matrix_source_qualification
+from empirical_lawhood.api.recursive_qualified_parents import MAX_PARENT_BYTES, _output_payload
+from empirical_lawhood.api.selected_e4_native_runtime import development_products, validate_original_calibration_phase
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization
+from empirical_lawhood.storage.source_closure import capture_admitted_target_source, require_admitted_target_source_current
+from empirical_lawhood.storage.source_origin import require_selected_implementation
+from empirical_lawhood.storage.task_receipts import encode_artifact_manifest
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, inherited_visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes, validate_stable_id
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult, derived_outcome_access
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
 
 def authenticate_inputs(writer, specification, selected, codecs, *, project_root, execution):
     """Replay original custody once; only bounded summaries leave that owner."""
     request, bank = selected.request, selected.bank
-    from .selected_prepared_access import selected_e4_original_input_access
+    from empirical_lawhood.api.selected_prepared_access import selected_e4_original_input_access
     actual_parents=selected_e4_original_input_access(artifact_writer=writer,upstream_products=request.upstream_products,
         calibration_product=request.calibration_product,
         development=(request.development_nomination,request.development_freeze)).parents
     if actual_parents!=request.produced_input_parents:
         raise PermissionError("declarative E4 substitutes its exact actual produced-input parent census")
     programme = domain.validate_request(specification, request, bank, selected.calibration_bank)
-    from .matrix_full_factor_secondary import authenticate_e4_secondary_target
+    from empirical_lawhood.api.matrix_full_factor_secondary import authenticate_e4_secondary_target
     if authenticate_e4_secondary_target(writer=writer, selection=selected.secondary_readout, bank=bank) != request.structure.secondary_target:
         raise PermissionError('declarative E4 replaces the original frozen target')
     if request.bank_publication is None or request.source is None:
@@ -61,8 +57,8 @@ def authenticate_inputs(writer, specification, selected, codecs, *, project_root
         raise PermissionError("declarative E4 substitutes exact original bank publication")
     summary_id = "original-summary." + request.record_id
     if specification.bank_recipe is not None:
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_bank_recipe import validate_selected_e4_recipe_bank
-        from .selected_e4_bank_recipe import authenticate_selected_e4_bank_recipe_inputs
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_bank_recipe import validate_selected_e4_recipe_bank
+        from empirical_lawhood.api.selected_e4_bank_recipe import authenticate_selected_e4_bank_recipe_inputs
         inputs = selected.bank_recipe_inputs
         if (inputs is None or inputs.original_products != request.upstream_products
                 or inputs.original_public_package != bank.forecast_design.package):
@@ -71,7 +67,7 @@ def authenticate_inputs(writer, specification, selected, codecs, *, project_root
         summary = authenticate_selected_e4_bank_recipe_inputs(inputs=inputs, project_root=project_root,
             artifact_writer=writer, execution=execution, summary_record_id=summary_id)
     else:
-        from .matrix_selected_e3_e4_runtime import authenticate_selected_e3_public_package
+        from empirical_lawhood.api.matrix_selected_e3_e4_runtime import authenticate_selected_e3_public_package
         summary = authenticate_selected_e3_public_package(writer=writer, public=bank.forecast_design.package,
             upstream_products=request.upstream_products, codecs=codecs, summary_record_id=summary_id,
             response_criterion=bank.forecast_design.criterion_record,
@@ -119,7 +115,7 @@ def authenticate_inputs(writer, specification, selected, codecs, *, project_root
         pipeline=source.pipeline, executions=source.executions, publications=source.publications, codecs=codecs, read_scope=scope)
 
     # Preserve original selection/reservation/audit/assay and template custody.
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
     for record, publication in ((bank.reservation.allocation, bank.reservation.publication),
             (bank.specification.selection, bank.specification.publication), (bank.audit, bank.audit_publication),
             (bank.response_selection, bank.response_selection_publication),
@@ -169,11 +165,9 @@ def materialize_plan_access(writer, plan, publication, metadata_relative):
     publications, configs, qualifications = [], {}, {}
     arrays_by_identity = {(value.logical.logical_artifact_id, value.logical.content_sha256): value
         for value in plan.bank.response_selection.template_publications}
-    from empirical_lawhood.api.derived_array_access import (
-        DerivedInputAccess, derive_matrix_input_access_batch, supports_derived_input_access_batch,
-    )
-    from empirical_lawhood.infrastructure.publication_metadata import checkpoint_publication_access
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_record_parents,produced_access
+    from empirical_lawhood.api.derived_array_access import DerivedInputAccess, derive_matrix_input_access_batch, supports_derived_input_access_batch
+    from empirical_lawhood.storage.publication_metadata import checkpoint_publication_access
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_record_parents, produced_access
     canonical = {}
     def retain_access(config, qualification):
         if config.source_id in configs and configs[config.source_id] != config:
@@ -303,7 +297,7 @@ class SelectedE4DerivedMetadataIndex(CanonicalRecord):
 
 def _result(*, specification, selector, selected, plan, writer, metadata_relative, metadata_to_inputs,
         destination, selector_relative, execution, publications, retained_members=(), before_publish=None, read_access=None):
-    from .experiment_preparation import load_experiment_inputs, prepare_experiment
+    from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
     parents=selected.request.produced_input_parents
     access=derived_outcome_access(OutcomeAccess.OUTCOME_BLIND,*(value.outcome_access for value in parents))
     ceilings=tuple(value.visibility_ceiling for value in parents)
@@ -402,7 +396,7 @@ def _result(*, specification, selector, selected, plan, writer, metadata_relativ
 
 def _retained_selected(*, writer, specification, original, destination, metadata, selector_relative, read_access=None):
     """Authenticate a complete former projection; preserve original created flags."""
-    from .experiment_preparation import load_experiment_inputs
+    from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
     selector_raw = read_bounded_bytes(destination, maximum_bytes=64 * 1024**2)
     selector = decode_canonical_bytes(selector_raw, ExperimentFileInputSelection, maximum_bytes=len(selector_raw))
     if selector.canonical_bytes() != selector_raw or selector.protocol_id != domain.PROTOCOL_ID:
@@ -449,7 +443,7 @@ def _retained_selected(*, writer, specification, original, destination, metadata
 
 def derive_inputs(*, specification, source_selection_path, project_root, artifact_writer,
         metadata_directory, output_selection_path, execution, read_access=None):
-    from .experiment_preparation import load_experiment_inputs, _protocol
+    from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, _protocol
     from empirical_lawhood.api.recursive_operations import operation_catalog
     source, destination, metadata = map(Path, (source_selection_path, output_selection_path, metadata_directory))
     if (not all(value.is_absolute() for value in (source, destination, metadata))
@@ -484,7 +478,7 @@ def derive_inputs(*, specification, source_selection_path, project_root, artifac
     publications = ()
     if selected.bank is None:
         require_stable()
-        from .selected_e4_bank_recipe import publish_selected_e4_bank_recipe
+        from empirical_lawhood.api.selected_e4_bank_recipe import publish_selected_e4_bank_recipe
         result = publish_selected_e4_bank_recipe(inputs=selected.bank_recipe_inputs, project_root=root,
             artifact_writer=artifact_writer, metadata_directory=metadata / "bank", execution=execution,
             _admitted_source=admitted)

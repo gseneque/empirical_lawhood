@@ -132,7 +132,7 @@ def test_custody_relocation_refuses_omitted_or_tampered_original_member_before_c
                                   'failed-attempt', 'changed-run', 'extra-task'))
 def test_prior_census_refuses_inconsistent_actual_invocation_before_marker_read(monkeypatch, damage):
     module = launcher()
-    import empirical_lawhood.infrastructure.native_effect_custody as custody
+    import empirical_lawhood.storage.native_effect_custody as custody
     monkeypatch.setattr(custody.ExternalNativeEffectContactStore, 'read',
                         lambda *args: pytest.fail('inconsistent prior census reached marker access'))
     actual = {key: 'exposed.' + key for key in ('run_id', 'status', 'packet_sha256', 'draft_sha256',

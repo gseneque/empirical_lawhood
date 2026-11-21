@@ -14,20 +14,18 @@ import numpy as np
 import pytest
 from threadpoolctl import threadpool_limits
 
-from empirical_lawhood.api.experiment_preparation import (
-    author_prepared_experiment, load_experiment_inputs, load_experiment_specification, prepare_experiment)
+from empirical_lawhood.api.experiment_preparation import author_prepared_experiment, load_experiment_inputs, load_experiment_specification, prepare_experiment
 from empirical_lawhood.api.recursive_authoring import implementation_binding, load_authored_wave
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.recursive_execution import read_recursive_wave
 from empirical_lawhood.api.native_training_banks import export_native_training_banks
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as acquisition
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as records
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import (
-    ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding)
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as acquisition
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as records
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_matrix_native_training_acquisition import fresh_training_metadata_case
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -94,7 +92,7 @@ def _actual_case(tmp_path, monkeypatch, *, training_count=1):
         census = case.request.future_manifest.audit.census
         future_bytes = case.request.future_manifest.canonical_bytes()
         prior_corpus = case.request.future_manifest.audit.prior_corpus
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support
         census_artifacts = {artifact for artifact, _ in exposure_support(case.request.future_manifest.audit)}
         assert len(census_artifacts) == 1
         mandatory_publications = records.future_response_support(case.request)
@@ -150,7 +148,7 @@ def _actual_case(tmp_path, monkeypatch, *, training_count=1):
 @pytest.mark.native
 def test_public_native_train_author_run_read_export_and_zero_executor_recovery(tmp_path, monkeypatch):
     from tests.test_matrix_native_training_parent_preflight import observe_native_preflight_controls
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_bindings
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_bindings
     ready_phases = observe_native_preflight_controls(monkeypatch, native_training_bindings)
     with threadpool_limits(limits=1):
         case = _actual_case(tmp_path, monkeypatch)
@@ -181,7 +179,7 @@ def test_public_native_train_author_run_read_export_and_zero_executor_recovery(t
             record_id="banks.disclosed-native-train")
         assert exported.allocation == preparation.allocation
         assert exported.acquisition == case.acquisition
-        from empirical_lawhood.infrastructure.publication_metadata import authenticate_published_materialization
+        from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization
         authenticate_published_materialization(case.plane, exported.acquisition_publication)
         assert exported.acquisition_publication.logical.content_sha256 == exported.acquisition.fingerprint()
         assert exported.acquisition.candidate == case.request.candidate_specification.identity
@@ -195,8 +193,8 @@ def test_public_native_train_author_run_read_export_and_zero_executor_recovery(t
 
         # The installed generic public export transition reuses those exact
         # publications; it must not schedule any additional native task.
-        from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_exports import NativeTrainingBankExportSelection
-        from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+        from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_exports import NativeTrainingBankExportSelection
+        from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
         from empirical_lawhood.api.recursive_execution import _retained_plans
         packet, draft, _, payloads = load_authored_wave(directory=directory, artifact_writer=case.plane, lazy_payloads=True)
         run, plan, _ = _retained_plans(payloads, draft)
@@ -204,7 +202,7 @@ def test_public_native_train_author_run_read_export_and_zero_executor_recovery(t
             run.run_plan_id, ObjectIdentity.from_record(packet.packet_id, packet),
             ObjectIdentity.from_record(plan.execution_plan_id, plan))
         from types import SimpleNamespace
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_primary_amendment import MatrixE3PrimaryFamilyAmendment
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_primary_amendment import MatrixE3PrimaryFamilyAmendment
         from empirical_lawhood.api.configured_e3_primary_amendment import _entry_product
         family=tuple(sorted((*case.request.candidate_specification.assessment.comparison_ids,'e1.recurrence-survival','e2.utility')))
         amended=replace(case.request.candidate_specification.assessment,alpha_denominator=280,comparison_ids=family)
@@ -241,7 +239,7 @@ def test_public_native_train_author_run_read_export_and_zero_executor_recovery(t
 
 @pytest.mark.held
 def test_full64_native_training_public_author_load_remains_bounded_and_effect_free(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_bindings as bindings
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_bindings as bindings
     def forbidden(*args, **kwargs):
         raise AssertionError("full64 metadata preparation entered native work")
     monkeypatch.setattr(bindings, "execute_parameter_native_work", forbidden)
@@ -263,13 +261,13 @@ def _assert_actual_native_training_instrument_certificate(case, directory, produ
     This control does not build/admit an E4 source bank or confer freshness.
     Every TRAIN source, plan, receipt, control and native evidence remains real.
     """
-    from empirical_lawhood.adapters.methods import matrix_finite_dt_source_records as finite
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseBank
+    from empirical_lawhood.domains.matrix import matrix_finite_dt_source_records as finite
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseBank
     from empirical_lawhood.api import matrix_finite_dt_source_runtime as runtime
     from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
     from empirical_lawhood.api.recursive_execution import _retained_plans
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-    from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
 
     packet, draft, _, payloads = load_authored_wave(directory=directory, artifact_writer=case.plane, lazy_payloads=True)
     run, plan, _ = _retained_plans(payloads, draft)

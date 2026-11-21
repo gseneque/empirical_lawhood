@@ -6,12 +6,12 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api.preparation_inputs import prepare_preparation_allocation, _retained_output
-from empirical_lawhood.adapters.methods.preparation_applicability.exposure import PreparationApplicabilityExposure, effective_seed_ids, public_historical_exposure
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.config import FIXED_PROBE_SEED
+from empirical_lawhood.domains.matrix.preparation_applicability.exposure import PreparationApplicabilityExposure, effective_seed_ids, public_historical_exposure
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.config import FIXED_PROBE_SEED
 from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.matrix_inputs import MatrixAllocation, MATRIX_NATIVE_PURPOSES
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.input_contracts import MatrixAllocation, MATRIX_NATIVE_PURPOSES
 from tests.preparation_applicability_fixtures import synthetic_identity
 
 
@@ -83,7 +83,7 @@ def test_outcome_blind_result_still_requires_actual_custody():
 
 
 def test_actual_conformance_streams_remain_exposed_after_renaming_units():
-    from empirical_lawhood.adapters.methods.preparation_applicability.conformance import reject_conformance_reuse
+    from empirical_lawhood.domains.matrix.preparation_applicability.conformance import reject_conformance_reuse
     old=prepare_preparation_allocation(allocation_id="test.conformance.bank",cohort_namespace="test.conformance.bank",phase="D",master_seed=736)
     current=prepare_preparation_allocation(allocation_id="test.new.bank",cohort_namespace="test.new.bank",phase="D",master_seed=737,proposed_unrun=True)
     first=current.roots[0]
@@ -96,7 +96,7 @@ def test_actual_conformance_streams_remain_exposed_after_renaming_units():
 
 def test_operational_run_changes_with_actual_allocation_under_same_scientific_id():
     from tests.test_preparation_applicability_authoring import ordinary_stage
-    from empirical_lawhood.adapters.methods.preparation_applicability.config import preparation_run_id
+    from empirical_lawhood.domains.matrix.preparation_applicability.config import preparation_run_id
     stage,_=ordinary_stage("D")
     allocation=prepare_preparation_allocation(allocation_id="test.second.allocation",cohort_namespace="test.second.roots",
         phase="D",master_seed=93406)

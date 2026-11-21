@@ -14,14 +14,14 @@ import pytest
 
 from empirical_lawhood.api import current_task_custody as owner
 from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader, _current_control
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent
-from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind
-from empirical_lawhood.runtime.plans import RunPlan
-from empirical_lawhood.runtime.providers import ExternalInputPayload
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
+from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind
+from empirical_lawhood.execution.plans import RunPlan
+from empirical_lawhood.execution.providers import ExternalInputPayload
 from tests.test_current_result_custody import actual_issued_current_task_controls as actual_issued_current_task_controls
 from tests.test_issued_original_input_scope import _DisclosedOriginalScope
 

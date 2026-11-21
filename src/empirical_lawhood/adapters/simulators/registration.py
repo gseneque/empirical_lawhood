@@ -7,45 +7,19 @@ from datetime import timedelta
 import hashlib
 from typing import ClassVar
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_json_bytes
-from empirical_lawhood.kernel.serialization import validate_sha256, validate_stable_id
-from empirical_lawhood.kernel.time import parse_utc_timestamp
-from empirical_lawhood.planning.dataset_manifests import (
-    DatasetCapabilityKind,
-    DatasetDirectorySelectorManifest,
-    DatasetRegistrationManifest,
-)
-from empirical_lawhood.planning.datasets import (
-    CurrentMaterializationVerification,
-    CustodyState,
-    DatasetMaterialization,
-    DatasetMaterializationVerificationObservations,
-    DatasetMaterializationVerificationSubject,
-    EvidenceReferenceKind,
-    RegisteredImplementationIdentity,
-)
-from empirical_lawhood.runtime.dataset_io import (
-    DatasetDirectoryGuardReceipt,
-    DatasetDirectorySourceInspector,
-)
-from empirical_lawhood.runtime.dataset_registration import (
-    DatasetRegistrationSupportingRecord,
-    PreparedDatasetRegistration,
-)
-from empirical_lawhood.runtime.datasets import (
-    DatasetFormatInspectorRegistration,
-    DatasetInspectorImplementationBinding,
-)
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes
+from empirical_lawhood.science.records.serialization import validate_sha256, validate_stable_id
+from empirical_lawhood.science.models.time import parse_utc_timestamp
+from empirical_lawhood.design.dataset_manifests import DatasetCapabilityKind, DatasetDirectorySelectorManifest, DatasetRegistrationManifest
+from empirical_lawhood.design.datasets import CurrentMaterializationVerification, CustodyState, DatasetMaterialization, DatasetMaterializationVerificationObservations, DatasetMaterializationVerificationSubject, EvidenceReferenceKind, RegisteredImplementationIdentity
+from empirical_lawhood.storage.contracts.dataset_io import DatasetDirectoryGuardReceipt, DatasetDirectorySourceInspector
+from empirical_lawhood.execution.dataset_registration import DatasetRegistrationSupportingRecord, PreparedDatasetRegistration
+from empirical_lawhood.execution.datasets import DatasetFormatInspectorRegistration, DatasetInspectorImplementationBinding
 
-from .registry import (
-    SIMULATOR_DATASET_INSPECTOR_KEY,
-    SIMULATOR_DIRECTORY_FORMAT_PROFILE_ID,
-    SIMULATOR_DIRECTORY_MEDIA_TYPE,
-    SIMULATOR_MAX_SINGLE_FILE_BYTES,
-)
-from .lineage import SimulatorGenerationLineageManifest
-from .manifests import build_simulator_directory_output_contract
+from empirical_lawhood.adapters.simulators.registry import SIMULATOR_DATASET_INSPECTOR_KEY, SIMULATOR_DIRECTORY_FORMAT_PROFILE_ID, SIMULATOR_DIRECTORY_MEDIA_TYPE, SIMULATOR_MAX_SINGLE_FILE_BYTES
+from empirical_lawhood.adapters.simulators.lineage import SimulatorGenerationLineageManifest
+from empirical_lawhood.adapters.simulators.manifests import build_simulator_directory_output_contract
 
 
 @dataclass(frozen=True, slots=True)

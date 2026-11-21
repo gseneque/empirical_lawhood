@@ -6,17 +6,17 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import compact_bindings as cb
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import compact_records as cr
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex, ScheduledNativeSourceContext
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import operation_bindings as b, records as r, retained
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.plans import BarrierKind, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import compact_bindings as cb
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import compact_records as cr
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex, ScheduledNativeSourceContext
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import operation_bindings as b, records as r, retained
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import BarrierKind, ScientificInputRole, ScientificInputSpec
 from tests.matrix_native_invocation_support import literal_native_task, prepared_native_store
 from tests.test_matrix_scheduled_history_bindings import (
     TEST_BUDGET, bank as bank, provenance as provenance, scheduled as scheduled, stock as stock,

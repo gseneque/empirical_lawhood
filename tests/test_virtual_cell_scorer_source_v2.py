@@ -17,15 +17,8 @@ import zipfile
 
 import pytest
 
-from empirical_lawhood.adapters.physical.virtual_cell.config import (
-    virtual_cell_2025_metric_contract,
-)
-from empirical_lawhood.adapters.physical.virtual_cell.scorer_source_v2 import (
-    SCORER_SOURCE_FILES_V2,
-    SOURCE_ARCHIVE_SHA256,
-    ScorerSourceUnavailable,
-    require_selected_scorer_contract_v2,
-)
+from empirical_lawhood.domains.biology.virtual_cell.config import virtual_cell_2025_metric_contract
+from empirical_lawhood.adapters.physical.virtual_cell.scorer_source_v2 import SCORER_SOURCE_FILES_V2, SOURCE_ARCHIVE_SHA256, ScorerSourceUnavailable, require_selected_scorer_contract_v2
 
 
 @pytest.mark.parametrize(
@@ -89,7 +82,7 @@ from pathlib import Path
 import py_compile
 import sys
 from types import ModuleType, SimpleNamespace
-from empirical_lawhood.adapters.physical.virtual_cell.config import virtual_cell_2025_metric_contract
+from empirical_lawhood.domains.biology.virtual_cell.config import virtual_cell_2025_metric_contract
 from empirical_lawhood.adapters.physical.virtual_cell.scorer_source_v2 import (
     authenticate_installed_scorer_source_v2, ScorerSourceUnavailable)
 root = Path(sys.argv[1])

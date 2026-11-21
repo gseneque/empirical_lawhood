@@ -6,33 +6,25 @@ from dataclasses import dataclass, fields
 from threading import Lock
 from typing import ClassVar, Protocol, cast, runtime_checkable
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
-from empirical_lawhood.planning.response_experiment import ResponseExperimentExtensionSet
-from empirical_lawhood.planning.linked_campaign import LinkedCampaignStageRole
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, StudyOperationAuthority, require_study_authority
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityManifest, CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    StreamingOutputEmitter,
-    TaskContext,
-    TaskRunner,
-    WorkerInputPort,
-)
-from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignDisposition, LinkedCampaignStageEnvelope
-from empirical_lawhood.runtime.response_experiment_binding import materialise_native_acquisition_request
-from empirical_lawhood.runtime.response_experiment_ports import NativeAcquisitionRequest, ResponseSubstrateBinding
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.design.response_experiment import ResponseExperimentExtensionSet
+from empirical_lawhood.design.linked_campaign import LinkedCampaignStageRole
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, StudyOperationAuthority, require_study_authority
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import StreamingOutputEmitter, TaskContext, TaskRunner, WorkerInputPort
+from empirical_lawhood.execution.linked_campaigns import LinkedCampaignDisposition, LinkedCampaignStageEnvelope
+from empirical_lawhood.execution.response_experiment_binding import materialise_native_acquisition_request
+from empirical_lawhood.execution.response_experiment_ports import NativeAcquisitionRequest, ResponseSubstrateBinding
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .archive_receiver_projection import MastArchiveReceiverProjectionConfig, MastArchiveReceiverProjectionDisposition, MastArchiveReceiverProjectorPort, MastArchiveReceiverScientificProjection
-from .query_source import MASTUArchiveAcquisitionDisposition, MASTUArchiveAcquisitionResult, MASTUArchiveAcquisitionUnitManifest, MASTUArchiveCompactManifestResult, MASTUArchiveCustodyPort, MASTUArchiveObjectReceipt, MASTUArchiveQueryClient, MASTUArchiveQueryManifest, MASTUArchiveQuerySourceConfig, MASTUArchiveQuery, reduce_mastu_archive_acquisition_results, retrieve_mastu_archive_query
+from empirical_lawhood.domains.fusion.mast_archive_response_qualification.archive_receiver_projection import MastArchiveReceiverProjectionConfig, MastArchiveReceiverProjectionDisposition, MastArchiveReceiverProjectorPort, MastArchiveReceiverScientificProjection
+from empirical_lawhood.domains.fusion.mast_archive_response_qualification.query_contracts import MASTUArchiveAcquisitionDisposition, MASTUArchiveAcquisitionResult, MASTUArchiveAcquisitionUnitManifest, MASTUArchiveCompactManifestResult, MASTUArchiveObjectReceipt, MASTUArchiveQueryManifest, MASTUArchiveQuerySourceConfig, MASTUArchiveQuery, reduce_mastu_archive_acquisition_results
+from empirical_lawhood.adapters.physical.mast_archive_response_qualification.query_source import MASTUArchiveCustodyPort, MASTUArchiveQueryClient, retrieve_mastu_archive_query
 
 
 MASTU_ARCHIVE_CANONICAL_MEDIA_TYPE = "application/vnd.empirical-lawhood.canonical+json"

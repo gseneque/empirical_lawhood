@@ -15,21 +15,23 @@ from typing import ClassVar
 import pytest
 
 from empirical_lawhood.api import experiment_preparation as tested_owner, recursive_operations
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityManifest
-from empirical_lawhood.runtime.experiment_preparation import (
-    ExecutionSelection, ExperimentCensus, ExperimentPreparation, ExperimentProtocolDeclaration, PreparedExperimentInputs,
-)
-from empirical_lawhood.runtime import recursive_record_codecs
-from empirical_lawhood.runtime.recursive_storage_codecs import RecursiveStorageCodec
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection
+from empirical_lawhood.design.study_authoring import CapabilitySelection
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityManifest
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, ExperimentCensus, ExperimentPreparation, ExperimentProtocolDeclaration, PreparedExperimentInputs
+from empirical_lawhood.execution.plans import OutputTemplate, ScientificStage
+from empirical_lawhood.execution.recursive_compiler import RecursiveOperationRegistration, RecursivePortContract
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationProviderFactory, recursive_operation_binding
+from empirical_lawhood.storage.contracts import recursive_record_codecs
+from empirical_lawhood.storage.contracts.recursive_storage_codecs import RecursiveStorageCodec
 
 @pytest.fixture
 def owner():
@@ -61,6 +63,27 @@ def opaque_stream(_stream):
     return None
 
 
+def literal_factory(record_type):
+    budget = ResourceBudget(1, 1024**2, 0, None, 1024**2, 1024**2)
+    schema = record_type.SCHEMA
+    capability = CapabilitySelection('fixture.file-census', '1.0.0', 'b' * 64)
+    manifest = CapabilityManifest(capability.capability_key, capability.capability_version, CapabilityKind.TRANSFORM,
+        schema, 'a' * 64, (schema,), (schema,), (), EvidenceCeiling.NON_PROMOTABLE,
+        OutcomeAccess.DEVELOPMENT_VISIBLE, budget, True, False, 'python', 'python', False, False, False,
+        ('fixture.file-census-check',), capability.implementation_sha256)
+    registration = RecursiveOperationRegistration(capability, ScientificStage.TRANSFORM, record_type,
+        (RecursivePortContract('operand', schema, 'application/json', 1024**2),),
+        (OutputTemplate('result', schema, ArtifactProfile.CANONICAL_JSON, 'application/json', '.json'),),
+        manifest.permissions, manifest.maximum_outcome_access, VisibilityCeiling.DEVELOPMENT_ONLY,
+        budget, input_record_types=(record_type,))
+
+    def forbid_runner():
+        raise AssertionError('FILE metadata validation constructed a scientific runner')
+
+    return RecursiveOperationProviderFactory(recursive_operation_binding(registration=registration,
+        manifest=manifest), registration, manifest, forbid_runner, {schema: record_type})
+
+
 def literal_case(tmp_path, monkeypatch, owner, count):
     counts = {'catalog': 0, 'census': 0, 'bind': 0}
     files, bindings, payloads = {}, [], {}
@@ -79,15 +102,7 @@ def literal_case(tmp_path, monkeypatch, owner, count):
     selected = tmp_path / 'selection.json'
     selected.write_bytes(selection.canonical_bytes())
     specification = LiteralSpec('spec.file-census')
-    budget = ResourceBudget(1, 1024**2, 0, None, 1024**2, 1024**2)
-    manifest = CapabilityManifest('fixture.file-census', '1.0.0', CapabilityKind.TRANSFORM,
-        LiteralFile.SCHEMA, 'a' * 64, (LiteralFile.SCHEMA,), (LiteralFile.SCHEMA,),
-        ( ), EvidenceCeiling.NON_PROMOTABLE, OutcomeAccess.DEVELOPMENT_VISIBLE, budget,
-        True, False, 'python', 'python', False, False, False, ('fixture.file-census-check',), 'b' * 64)
-    registration = SimpleNamespace(selection=SimpleNamespace(selection_id='fixture.file-census'),
-        input_record_types=(LiteralFile,), storage_codecs=())
-    factories = [SimpleNamespace(registration=registration, manifest=manifest,
-        output_codecs={LiteralFile.SCHEMA: LiteralFile})]
+    factories = [literal_factory(LiteralFile)]
     monkeypatch.setattr(recursive_operations, 'operation_factories', lambda: tuple(factories))
     actual_catalog = recursive_operations.operation_catalog
     actual_census = recursive_record_codecs.input_record_type_census
@@ -184,8 +199,7 @@ def test_standalone_guard_does_not_leak_a_census_between_invocations(tmp_path, m
     case = literal_case(tmp_path, monkeypatch, owner, 1)
     binding, = case.bindings
     assert owner._file_byte_limit(case.declaration, binding.identity, binding.record_version, ()) is None
-    case.factories[0].registration.input_record_types = ()
-    case.factories[0].output_codecs = {}
+    case.factories[0] = literal_factory(LiteralSpec)
     with pytest.raises(ValueError, match='identical installed'):
         owner._file_byte_limit(case.declaration, binding.identity, binding.record_version, ())
     assert case.counts == {'catalog': 2, 'census': 4, 'bind': 0}
@@ -218,7 +232,7 @@ def test_bad_revision_refuses_before_discovering_a_type_roster(tmp_path, monkeyp
 
 
 def prepared_one_file(owner, case, resolved):
-    from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
+    from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
     from tests.runtime_platform.test_recursive_compiler import fixture
     draft, _, _ = fixture()  # Existing literal generic conformance graph, no native runner.
     binding, = case.bindings
@@ -252,8 +266,7 @@ def test_author_second_pass_reopens_roster_and_path_after_prepare_authoring(tmp_
         calls.append('prepare_authoring')
         assert case.counts['catalog'] == 1
         if damage == 'roster':
-            case.factories[0].registration.input_record_types = ()
-            case.factories[0].output_codecs = {}
+            case.factories[0] = literal_factory(LiteralSpec)
         else:
             path = next(iter(case.files.values()))
             target = path.with_suffix('.retained')

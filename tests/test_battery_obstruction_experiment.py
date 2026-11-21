@@ -9,23 +9,20 @@ from types import MappingProxyType, SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_diagnostic_obstruction import (
-    authenticated_operation as operation, contracts as c, experiment_preparation as owner,
-    experiment_specification as records, recursive_translation as translation, science, source_custody,
-)
+from empirical_lawhood.domains.battery.battery_diagnostic_obstruction import authenticated_operation as operation, contracts as c, experiment_preparation as owner, experiment_specification as records, recursive_translation as translation, science, source_custody
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.scientific_contributions import ContributionManifest, ContributionProduct
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt, ExternalRootContract
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, ExperimentProtocolDeclaration
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
-from empirical_lawhood.runtime.recursive_compiler import RecursiveScientificRootContext, compile_recursive_wave
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt, ExternalRootContract
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, ExperimentProtocolDeclaration
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
+from empirical_lawhood.execution.recursive_compiler import RecursiveScientificRootContext, compile_recursive_wave
 from tests.battery_obstruction_fixtures import load_retained_obstruction_source
 
 
@@ -142,7 +139,7 @@ def test_new_validator_refuses_missing_external_contract_roster_in_a_manual_cont
     compiled = compile_recursive_wave(draft=draft, registrations=(declaration.registration(),),
         registry=CapabilityRegistry("registry.exposed-obstruction", (declaration.manifest(),)),
         implementation_commit="3" * 40, output_codecs=declaration.record_codecs)
-    from empirical_lawhood.runtime.plans import ScientificStage
+    from empirical_lawhood.execution.plans import ScientificStage
     context = RecursiveScientificRootContext(draft.development_study, records.AUTHENTICATED_NODE, ScientificStage.FALSIFY,
         OutcomeAccess.DEVELOPMENT_VISIBLE, VisibilityCeiling.DEVELOPMENT_ONLY, (c.UNIT,), (c.UNIT,), False,
         draft.requirements, draft.connections, (), (), compiled.config_inputs, draft.links)
@@ -206,7 +203,7 @@ def test_parent_location_never_becomes_an_arbitrary_directory_or_aliased_manifes
 
 
 def test_public_loader_and_preparer_use_same_closed_selection_and_location_seam(selected, tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
     declaration = ExperimentProtocolDeclaration(records.PROTOCOL_ID, records.ObstructionExperimentSpecification,
         owner.prepare_obstruction_experiment, "battery-obstruction-experiment", maximum_config_bytes=4 * 1024 * 1024,
         input_record_types=owner.input_record_types(), bind_inputs=owner.bind_obstruction_experiment_inputs,

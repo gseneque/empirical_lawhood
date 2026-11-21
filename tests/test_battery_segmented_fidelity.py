@@ -11,18 +11,19 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import preparation_contracts as pc
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_contracts as sc, segmented_fidelity as sf
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_native as native, segmented_science as ss
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry.evidence_stream import SegmentEvidenceFrame
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition
+from empirical_lawhood.domains.battery.battery_refined_inquiry import preparation_contracts as pc
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_contracts as sc, segmented_fidelity as sf
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as native
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_science as ss
+from empirical_lawhood.domains.battery.battery_segmented_inquiry.evidence_stream import SegmentEvidenceFrame
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition
 from tests.runtime_platform.test_native_subwork import _plane
 from tests.test_battery_segmented_science import _segment_fixture, prepared as prepared_fixture
 
@@ -203,7 +204,7 @@ def test_selected_exact_rational_boundaries_survive_outward_projection(prepared,
 
 
 def test_control_import_does_not_load_native_battery_or_numeric_engine():
-    result = subprocess.run((sys.executable, "-c", "import sys; import empirical_lawhood.adapters.methods.battery_refined_inquiry.segmented_fidelity; assert 'pybamm' not in sys.modules; assert 'numpy' not in sys.modules"),
+    result = subprocess.run((sys.executable, "-c", "import sys; import empirical_lawhood.domains.battery.battery_refined_inquiry.segmented_fidelity; assert 'pybamm' not in sys.modules; assert 'numpy' not in sys.modules"),
         capture_output=True, text=True, check=False)
     assert result.returncode == 0, result.stderr
 

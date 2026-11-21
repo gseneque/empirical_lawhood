@@ -17,29 +17,19 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_prediction import knn, records as r
-from empirical_lawhood.adapters.methods.rubisco_prediction.operation_bindings import (
-    BUDGETS, MAX_BYTES, MEDIA_TYPE, NODE_IDS, PHASES, SOURCE_OUTPUTS, TOTAL_BUDGET,
-    operation_declarations, output_codecs,
-    prepare_source, scientific_design,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.operation_contracts import (
-    ANALYSIS_UNIT_ID, SOURCE_IDS, PlantPredictionConstructConfigV1,
-    PlantPredictionEvaluateConfigV1, PlantPredictionSourceConfigV1,
-)
-from empirical_lawhood.adapters.methods.rubisco_prediction.recursive_translation import plant_prediction_recursive_draft
+from empirical_lawhood.domains.rubisco.rubisco_prediction import knn, records as r
+from empirical_lawhood.domains.rubisco.rubisco_prediction.operation_bindings import BUDGETS, MAX_BYTES, MEDIA_TYPE, NODE_IDS, PHASES, SOURCE_OUTPUTS, TOTAL_BUDGET, operation_declarations, output_codecs, prepare_source, scientific_design
+from empirical_lawhood.domains.rubisco.rubisco_prediction.operation_contracts import ANALYSIS_UNIT_ID, SOURCE_IDS, PlantPredictionConstructConfigV1, PlantPredictionEvaluateConfigV1, PlantPredictionSourceConfigV1
+from empirical_lawhood.domains.rubisco.rubisco_prediction.recursive_translation import plant_prediction_recursive_draft
 from empirical_lawhood.adapters.physical.rubisco_kinetics.iqbal2023 import decode_iqbal2023
 from empirical_lawhood.adapters.physical.rubisco_kinetics.mcdonald2026 import decode_mcdonald2026
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind,
-    WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort,
-)
-from empirical_lawhood.runtime.plans import BarrierKind, ScientificStage
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRegistry
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import BarrierKind, ScientificStage
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_rubisco_prediction import software_natural, software_plant
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -301,13 +291,13 @@ class Refuse(importlib.abc.MetaPathFinder):
         if fullname == 'rapidfuzz' or fullname.startswith('rapidfuzz.'):
             raise AssertionError('optional distance import during registration')
 sys.meta_path.insert(0, Refuse())
-from empirical_lawhood.adapters.methods.rubisco_prediction import knn
+from empirical_lawhood.domains.rubisco.rubisco_prediction import knn
 def refuse(*args, **kwargs):
     raise AssertionError('cold descriptor interpreted source or computed')
 knn.prepare_training = knn.prepare_plant_roles = knn.fit = knn.predict = refuse
-from empirical_lawhood.adapters.methods.rubisco_prediction.executable_binding import EXECUTABLE_BINDING_FACTORIES
-from empirical_lawhood.adapters.methods.rubisco_prediction.operation_bindings import operation_declarations
-assert len(EXECUTABLE_BINDING_FACTORIES) == len(tuple(declaration.registration() for declaration in operation_declarations())) == len(tuple(declaration.runner_factory() for declaration in operation_declarations())) == 3
+from empirical_lawhood.domains.rubisco.rubisco_prediction.extension import EXTENSION
+from empirical_lawhood.domains.rubisco.rubisco_prediction.operation_bindings import operation_declarations
+assert len(EXTENSION.factories) == len(tuple(declaration.registration() for declaration in operation_declarations())) == len(tuple(declaration.runner_factory() for declaration in operation_declarations())) == 3
 assert 'rapidfuzz' not in sys.modules
 """
     completed = subprocess.run([sys.executable, "-c", script], cwd=ROOT,

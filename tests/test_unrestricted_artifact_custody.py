@@ -6,6 +6,7 @@ is installed. All payloads and lineage leaves have actual canonical bytes. The
 real guarded artifact plane publishes and authenticates them; no test signer,
 native provider, qualification record or synthetic scientific outcome is used.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import dataclass, replace
 from hashlib import sha256
@@ -13,26 +14,15 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import (
-    ArtifactIdentityConflict,
-    ExternalArtifactPlane,
-)
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.development_native_custody import (
-    read_development_native_payload,
-)
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactCustodyLimits,
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ArtifactWriteRequest,
-    lineage_parent_sort_key,
-)
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.development_native_custody import read_development_native_payload
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits, ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, lineage_parent_sort_key
 from tests.numerical_provenance_fixtures import numerical_plane
 
 
@@ -74,7 +64,7 @@ def manifest(plane, result):
     )
     assert len(raw) == result.manifest_materialization.size_bytes
     assert sha256(raw).hexdigest() == result.manifest_materialization.physical_sha256
-    value = decode_artifact_manifest(raw)
+    value = resolve_artifact_sidecar_bytes(plane, raw)
     assert value.logical == result.logical
     assert value.materialization == result.materialization
     return value
@@ -89,7 +79,7 @@ def census(plane):
 
 
 def test_actual_canonical_payload_and_string_exceed_former_custody_limits(tmp_path, monkeypatch):
-    from empirical_lawhood.infrastructure import artifact_validation as formats
+    from empirical_lawhood.storage import artifact_validation as formats
     monkeypatch.setattr(formats._CanonicalJsonFileInspector, 'validate',
         lambda self: pytest.fail('bounded large canonical control selected the token-by-token parser'))
     plane = numerical_plane(tmp_path / "custody")

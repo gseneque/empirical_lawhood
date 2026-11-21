@@ -138,7 +138,7 @@ source is
 The inspected file at
 `/home/chevre/gs-ml/icf-yolo-rubisco-r02s-20260925` is byte-identical to that
 committed source. Selective reuse now appears in the maintained
-[native Rr heavy-scaffold owner](../../../../src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_preparation.py),
+[native Rr heavy-scaffold owner](../../../../src/empirical_lawhood/domains/rubisco/kinetics/rr_preparation.py),
 with independent original-PDB checks and explicit current mutation records.
 This is a heavy-coordinate projection; it does not port the old native Amber
 execution or establish completed chemical states.
@@ -328,7 +328,7 @@ successful denominator. No rotamer, protonation, force field or relaxation is
 selected from endpoint labels. These computational preparation requirements do
 not require new laboratory synthesis before a computational submission.
 
-The [maintained constructor](../../../../src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_coupled_preparation.py)
+The [maintained constructor](../../../../src/empirical_lawhood/domains/rubisco/kinetics/rr_coupled_preparation.py)
 and seventeen focused tests implement these explicit Asn/proton/cap inventories.
 Root's combined focused and architecture/discovery run passes **29 checks in
 43.14 s**. Independent review confirms all seven exact source operands,
@@ -342,7 +342,7 @@ case retains both C2–C3 and planarity failures; none is a ready QM job. Its
 passes with zero producer calls. The software copies retain their prior
 exposure and do not become fresh biological units.
 
-The [maintained embedding owner](../../../../src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_coupled_embedding.py)
+The [maintained embedding owner](../../../../src/empirical_lawhood/domains/rubisco/rubisco_insilico_structure/embedding.py)
 now derives complete source-charge fields from those sealed contexts. Its
 spectator-residue donor assignments and five exact CA redistributions conserve
 the selected source charges while retaining a common approximately −0.50709849 e

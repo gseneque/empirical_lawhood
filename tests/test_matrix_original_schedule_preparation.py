@@ -8,18 +8,18 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_records as records
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science as prepared
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_initialization_science as initialization
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.protected_preparation_records import MatrixReservedTransferSources
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedProtectedSpecification
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import expected_members
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity as scheduled_identity
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history as original
-from empirical_lawhood.adapters.simulators.six_matrix_response.simulation import BAOABGradientCache
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import preparation_records as records
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as prepared_owner_0
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as initialization_owner_0
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.protected_preparation_records import MatrixReservedTransferSources
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedProtectedSpecification
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import expected_members
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity as scheduled_identity
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history as original
+from empirical_lawhood.domains.matrix.six_matrix_response.simulation import BAOABGradientCache
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_matrix_preparation_initialization import forbid_contact, source_for_family
 from tests.test_matrix_selected_point import selected_design
 from tests.test_matrix_selected_protected import transfer  # noqa: F401
@@ -63,7 +63,7 @@ def original_prefix(coordinate, count, coarse, bridge):
 
 
 def prepared_original(source):
-    initial, raw = initialization.initialize_source(source, source.provenance,
+    initial, raw = initialization_owner_0.initialize_source(source, source.provenance,
         state_id="initial.disclosed.original-schedule", artifact_id="array.disclosed.original-schedule")
     recipe = records.original_schedule_recipe(source.coordinate, source.policy.cutoff_tick,
         recipe_id="recipe.disclosed.original-schedule", effort_unit="coupling-path-length")
@@ -78,7 +78,7 @@ def test_original_schedule_matches_every_original_paired_state_with_supplied_noi
     subject, initial_raw = prepared_original(source)
     forbid_contact(monkeypatch)
     coarse, bridge = supplied_innovations(subject.total_ticks)
-    actual = prepared.propagate_preparation(subject, initial_raw, coarse_innovations=coarse, bridge_innovations=bridge)
+    actual = prepared_owner_0.propagate_preparation(subject, initial_raw, coarse_innovations=coarse, bridge_innovations=bridge)
     expected = original_prefix(source.coordinate, subject.total_ticks, coarse, bridge)
     assert set(actual) == set(expected)
     for name in expected:
@@ -90,9 +90,9 @@ def test_original_schedule_matches_every_original_paired_state_with_supplied_noi
         for before, after in zip(subject.recipe.half_tick_couplings, subject.recipe.half_tick_couplings[1:])
         for x, y in zip(before, after, strict=True)), Fraction(0)))
     assert decode_canonical_bytes(subject.canonical_bytes(), records.MatrixPreparationSource, maximum_bytes=None) == subject
-    raw, operand = prepared.preparation_array_product(subject, initial_raw, actual, artifact_id="array.disclosed.parity")
+    raw, operand = prepared_owner_0.preparation_array_product(subject, initial_raw, actual, artifact_id="array.disclosed.parity")
     assert operand.recipe == subject.recipe.identity
-    assert prepared.consume_preparation_arrays(subject, initial_raw, operand, raw)["fine_positions"].tobytes() == expected["fine_positions"].tobytes()
+    assert prepared_owner_0.consume_preparation_arrays(subject, initial_raw, operand, raw)["fine_positions"].tobytes() == expected["fine_positions"].tobytes()
 
 
 def test_full_schedule_not_just_endpoints_and_preparation_stream_clock_are_required(transfer):  # noqa: F811
@@ -174,15 +174,15 @@ def test_v1_hold_bytes_and_constant_interpretation_are_unchanged(transfer):  # n
 
 
 def test_revision_point_can_retain_original_schedule_nonuse_without_changing_recipe_edition():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels, SelectedE4RevisionPoint
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_prefix import MatrixPreparedCausalPrefix
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels, SelectedE4RevisionPoint
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_prefix import MatrixPreparedCausalPrefix
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
     public = selected_design("E6_TRANSFER").sources[0][1]
     coordinate = public.original.coordinate
     recipe = records.original_schedule_recipe(coordinate, coordinate.ramp_ticks,
         recipe_id="recipe.disclosed.revision-original-schedule", effort_unit="coupling-path-length")
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4DownstreamNomination
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4DownstreamNomination
     pin = lambda name, schema, version="1.0.0": ObjectIdentity(name, schema, version, "a" * 64)
     point = SelectedE4RevisionPoint("point.disclosed.original-schedule",
         pin("nomination.disclosed", SelectedE4DownstreamNomination.SCHEMA, SelectedE4DownstreamNomination.VERSION),

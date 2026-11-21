@@ -8,20 +8,20 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_prediction_bindings as method
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_experiment import MatrixPreparationSourceBank
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import MatrixFactorAction, MatrixFactorResponseModel
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as original
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseArrays, ScheduledResponseProtocol, physical_forecast_implementation
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_prediction_bindings as method
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_experiment import MatrixPreparationSourceBank
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import MatrixFactorAction, MatrixFactorResponseModel
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as original
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseArrays, ScheduledResponseProtocol, physical_forecast_implementation
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests import test_matrix_prepared_point as point_fixture
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 
@@ -123,9 +123,9 @@ def test_complete_prepared_prediction_refuses_external_or_census_edits(selected,
 
 
 def test_same_researcher_preparation_seam_rebuilds_full_graph_without_running_any_method(selected, tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_prediction_experiment as public
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, PreparedExperimentFile
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_prediction_experiment as public
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, PreparedExperimentFile
     from tests.test_matrix_later_programme import ref
 
     programme, lowered, initial, templates = selected
@@ -143,9 +143,12 @@ def test_same_researcher_preparation_seam_rebuilds_full_graph_without_running_an
     def forbidden(*args, **kwargs):
         raise AssertionError("preparation/instance authentication ran a source, measurement, outcome reduction or forecast")
 
-    for owner, names in ((method.source_owner.science, ("propagate_preparation", "acquire_preparation", "assess_preparation_arrays")),
-            (method.prepared_prefix, ("measure_prepared_prefix", "check_prepared_frames", "project_prepared_prefix")),
-            (method.prepared_point, ("causal_feature", "forecast")), (method.prepared_forecast, ("forecast_public",))):
+    from empirical_lawhood.adapters.simulators.matrix_preparation import preparation_io
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_prefix, prepared_point, prepared_forecast
+
+    for owner, names in ((preparation_io, ("propagate_preparation", "acquire_preparation", "assess_preparation_arrays")),
+            (prepared_prefix, ("measure_prepared_prefix", "check_prepared_frames", "project_prepared_prefix")),
+            (prepared_point, ("causal_feature", "forecast")), (prepared_forecast, ("forecast_public",))):
         for name in names:
             monkeypatch.setattr(owner, name, forbidden)
     bound = public.bind_prediction_inputs(specification, {"programme": programme, "campaign": campaign}, files=files)

@@ -6,25 +6,18 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import (
-    PHASES, MatrixProgrammeObservation, programme_frontier,
-)
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import (
-    MatrixProgrammeAuthoritySelection, MatrixProgrammeOperationSelection,
-    MatrixResearchProgrammePlan, MatrixResearchProgrammeSpecification,
-)
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import PHASES, MatrixProgrammeObservation, programme_frontier
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixProgrammeAuthoritySelection, MatrixProgrammeOperationSelection, MatrixResearchProgrammePlan, MatrixResearchProgrammeSpecification
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_recursive_public_service import _plane
 from tests.test_matrix_finite_dt_source_assembly import c_backed_source_case  # noqa: F401
 
-from empirical_lawhood.api.matrix_researcher_programme import (
-    MatrixResearchProgrammeService, _disposition_denominators, _disposition_facts,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService, _disposition_denominators, _disposition_facts
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
 
 
 ROOT = Path(__file__).parents[1]
@@ -126,10 +119,10 @@ def test_frontier_rejects_mislabelled_observation_and_unknown_phase():
 
 
 def test_current_c_backed_native_specification_reports_guarded_original_authentication(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_assembly as native
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_assembly as native
     from tests.test_matrix_native_training_assembly import assembly_case
     _, specification, request, _, _, execution = assembly_case(tmp_path)
-    monkeypatch.setattr('empirical_lawhood.infrastructure.matrix_programme_inputs.authenticate_programme_inputs',
+    monkeypatch.setattr('empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs.authenticate_programme_inputs',
         lambda **_kw: pytest.fail("static preparation inspected C's guarded original publications"))
     bound = native.bind_inputs(specification, {"request": request}).method_inputs
     assert bound.request is request
@@ -142,7 +135,7 @@ def test_current_c_backed_native_specification_reports_guarded_original_authenti
 
 
 def test_current_c_backed_source_binding_keeps_original_science_and_missing_key_hold(c_backed_source_case):  # noqa: F811
-    from empirical_lawhood.adapters.methods import matrix_finite_dt_source_assembly as source
+    from empirical_lawhood.domains.matrix import matrix_finite_dt_source_assembly as source
     from tests.test_matrix_finite_dt_source_assembly import selected_request
     request = selected_request(c_backed_source_case)
     specification = source.MatrixFiniteDtSourceAssemblySpecification("assembly.disclosed-current-source", request.identity)
@@ -158,7 +151,7 @@ def test_current_c_backed_source_binding_keeps_original_science_and_missing_key_
         source.bind_inputs(specification, {"request": request, "recipe-inputs": object()})
     old = request.to_document()
     old["version"] = "1.0.0"
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
     with pytest.raises(ValueError):
         decode_canonical_bytes(canonical_json_document_bytes(old), type(request), maximum_bytes=None)
 
@@ -215,8 +208,8 @@ def test_ordinary_retained_history_owner_preserves_256_unentered_and_zero_recalc
     This descriptive public owner is separate from the programme's actual
     native E2 response frontier. No native source or fresh evidence is claimed.
     """
-    from empirical_lawhood.adapters.methods.matrix_history_analysis import experiment_preparation as owner
-    from empirical_lawhood.adapters.methods.matrix_history_analysis.records import MatrixHistoryAllocation, MatrixHistoryAnalysisConfig
+    from empirical_lawhood.domains.matrix.matrix_history_analysis import experiment_preparation as owner
+    from empirical_lawhood.domains.matrix.matrix_history_analysis.records import MatrixHistoryAllocation, MatrixHistoryAnalysisConfig
     from empirical_lawhood.api import matrix_history_analysis as history
     plane = _plane(tmp_path / 'retained-history-owner')
     root = Path(plane.root.contract.canonical_path)
@@ -259,7 +252,7 @@ def test_native_e2_completion_keeps_adverse_results_and_refuses_passive_or_defer
 @pytest.mark.parametrize('changed', ('reveal-only', 'different-run', 'different-package'))
 def test_replacement_reveal_keeps_immutable_original_run_without_publication(monkeypatch, changed):
     from dataclasses import replace
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixProgrammeRunBinding
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixProgrammeRunBinding
     from empirical_lawhood.api import matrix_researcher_programme_lineage as lineage
     programme = ObjectIdentity('programme.literal-original', MatrixResearchProgrammePlan.SCHEMA,
         MatrixResearchProgrammePlan.VERSION, 'a' * 64)

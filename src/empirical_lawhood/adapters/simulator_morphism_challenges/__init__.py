@@ -1,15 +1,5 @@
-"""Shared simulator morphism challenges interchange contracts and denominator descriptors."""
+"""External execution and serialization integration for simulator morphism challenges.
 
-from .contracts import SimulatorMorphismChallengeChallengeNomination, SimulatorMorphismChallengeConfig, SimulatorMorphismChallengeDenominatorDescriptor, SimulatorMorphismChallengeHistoryRankForecast, SimulatorMorphismChallengeMethodFreeze, SimulatorMorphismChallengeRecurrenceResult, SimulatorMorphismChallengeSeedRosterCommitment, SimulatorMorphismChallengeTerminalCloseout, SimulatorMorphismChallengeUnitAdjudication
-
-__all__ = [
-    'SimulatorMorphismChallengeChallengeNomination',
-    'SimulatorMorphismChallengeConfig',
-    'SimulatorMorphismChallengeDenominatorDescriptor',
-    'SimulatorMorphismChallengeHistoryRankForecast',
-    'SimulatorMorphismChallengeMethodFreeze',
-    'SimulatorMorphismChallengeRecurrenceResult',
-    'SimulatorMorphismChallengeSeedRosterCommitment',
-    'SimulatorMorphismChallengeTerminalCloseout',
-    'SimulatorMorphismChallengeUnitAdjudication',
-]
+Scientific records and calculations are owned by domains.history.
+SPDX-License-Identifier: MPL-2.0
+"""

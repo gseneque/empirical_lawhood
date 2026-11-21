@@ -8,7 +8,7 @@ import pytest
 
 from empirical_lawhood.api.recursive_authoring import author_recursive_wave, load_authored_wave
 from empirical_lawhood.api.recursive_execution import read_recursive_wave, run_recursive_wave
-from empirical_lawhood.runtime.recursive_compiler import RegisteredPublicationRequirement
+from empirical_lawhood.execution.recursive_compiler import RegisteredPublicationRequirement
 
 from tests.test_recursive_public_service import _draft, _plane
 
@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_development_boundaries_recheck_registered_premises_before_publication_or_execution(tmp_path, monkeypatch):
     from empirical_lawhood.api import recursive_authoring as owner
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
 
     draft = _draft()
     registrations, registry, codecs = owner.operation_catalog()

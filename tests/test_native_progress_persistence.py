@@ -6,7 +6,7 @@ from threading import Event
 
 import pytest
 
-from empirical_lawhood.infrastructure import execution as owner
+from empirical_lawhood.execution.local import execution as owner
 
 
 def test_durable_milestones_bound_every_actual_sample_and_retain_exact_final(monkeypatch):

@@ -9,12 +9,12 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import scope_reference
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import scope_reference
 from empirical_lawhood.api import matrix_full_factor_access as access_owner
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
 from tests.test_matrix_e4_full_factor_public import _development_access_seam, _real_plane, selected  # noqa: F401
 from tests.test_matrix_e4_full_factor_values import scopes  # noqa: F401
 from tests.test_matrix_selected_e4_bank_recipe import literal_recipe_source_inputs  # noqa: F401
@@ -66,7 +66,7 @@ def test_selected_bootstrap_reads_only_exact_locator_then_returns_fresh_guard(se
         assert key=='request' and pin==selected.specification.request and kind is type(selected.request)
         events.append('request-locator')
         return selected.request
-    from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding,ExperimentInputSelection
+    from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
     selection=ExperimentInputSelection('inputs.disclosed-access',
         'matrix.e4.selected-full-factor-followup.development',(ExperimentInputBinding('request',
             selected.request.identity,'request.json',len(selected.request.canonical_bytes())),))
@@ -116,12 +116,12 @@ def _published_original_history_file(selected_case,tmp_path,monkeypatch,*,extra_
     authentication, freshness or scientific qualification.
     """
     from types import SimpleNamespace
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as development
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as records
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as common
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent
-    from empirical_lawhood.runtime.experiment_preparation import PreparedExperimentFile
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as development
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as records
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as common
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
+    from empirical_lawhood.execution.experiment_preparation import PreparedExperimentFile
     from tests.test_matrix_e3_protected_response_science import literal_native_metadata
     from tests.test_matrix_e4_full_factor_values import _analytic_full,pin
 
@@ -206,7 +206,7 @@ def test_original_file_authenticates_its_exact_indirect_history_companion(select
     'grant-member','grant-final'))
 def test_original_file_refuses_substitution_unselected_sibling_and_later_revocation(
         selected,tmp_path,monkeypatch,damage):  # noqa: F811
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
     case=_published_original_history_file(selected,tmp_path,monkeypatch,extra_sealed=damage=='extra-sealed')
     source,file=case.source,case.file
     history_index=next(index for index,row in enumerate(source.original_products) if row.record==source.history)

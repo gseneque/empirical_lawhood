@@ -11,6 +11,7 @@ import sys
 import pytest
 
 from empirical_lawhood.adapters.simulators.rubisco_electronic import core as e
+import empirical_lawhood.domains.rubisco.electronic.frontier_diagnostics as e_science
 
 
 def software_xyz():
@@ -98,7 +99,7 @@ def test_source_refuses_incomplete_extra_or_spoofed_atom_census(change):
 
 @pytest.mark.native("numpy")
 def test_diagonal_overlap_uses_metric_normalization_and_one_electron_density():
-    result = e.homo_populations(((4.0, 0.0), (0.0, 9.0)), (0.3, 4 / 15), (0, 1), 2)
+    result = e_science.homo_populations(((4.0, 0.0), (0.0, 9.0)), (0.3, 4 / 15), (0, 1), 2)
     # Metric norm is 4*(3/10)^2 + 9*(4/15)^2 = 1. Euclidean
     # normalization, coefficient squares and a two-electron factor differ.
     assert result["overlap_eigenvalues"] == pytest.approx((4, 9), abs=1e-13)
@@ -109,7 +110,7 @@ def test_diagonal_overlap_uses_metric_normalization_and_one_electron_density():
 
 @pytest.mark.native("numpy")
 def test_nontrivial_overlap_has_independently_known_distinct_partitions():
-    result = e.homo_populations(((1.0, 0.6), (0.6, 1.0)), (1.0, 0.0), (0, 1), 2)
+    result = e_science.homo_populations(((1.0, 0.6), (0.6, 1.0)), (1.0, 0.0), (0, 1), 2)
     # The symmetric square root is [[3,1],[1,3]]/sqrt(10).
     # Squaring its first column gives (.9,.1), unlike S*c or c alone.
     assert result["lowdin_by_atom"] == pytest.approx((0.9, 0.1), abs=1e-13)
@@ -120,8 +121,8 @@ def test_nontrivial_overlap_has_independently_known_distinct_partitions():
 def test_negative_mulliken_is_retained_and_homo_phase_does_not_change_density():
     overlap = ((1.0, 0.6), (0.6, 1.0))
     coefficient = (1 / sqrt(2.6), -2 / sqrt(2.6))
-    result = e.homo_populations(overlap, coefficient, (0, 1), 2)
-    reversed_phase = e.homo_populations(overlap, tuple(-v for v in coefficient), (0, 1), 2)
+    result = e_science.homo_populations(overlap, coefficient, (0, 1), 2)
+    reversed_phase = e_science.homo_populations(overlap, tuple(-v for v in coefficient), (0, 1), 2)
     # Independent hand calculation: S^(1/2)*c = (1,-5)/sqrt(26).
     assert result["lowdin_by_atom"] == pytest.approx((1 / 26, 25 / 26), abs=1e-13)
     assert result["mulliken_by_atom"] == pytest.approx((-1 / 13, 14 / 13), abs=1e-13)
@@ -133,8 +134,8 @@ def test_negative_mulliken_is_retained_and_homo_phase_does_not_change_density():
 @pytest.mark.native("numpy")
 def test_ao_condensation_preserves_complete_atom_mass_and_ao_permutation():
     overlap = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0))
-    result = e.homo_populations(overlap, (1 / 3, 2 / 3, 2 / 3), (0, 0, 1), 2)
-    permuted = e.homo_populations(overlap, (2 / 3, 1 / 3, 2 / 3), (1, 0, 0), 2)
+    result = e_science.homo_populations(overlap, (1 / 3, 2 / 3, 2 / 3), (0, 0, 1), 2)
+    permuted = e_science.homo_populations(overlap, (2 / 3, 1 / 3, 2 / 3), (1, 0, 0), 2)
     for key in ("lowdin_by_atom", "mulliken_by_atom"):
         assert result[key] == pytest.approx((5 / 9, 4 / 9), abs=1e-13)
         assert permuted[key] == pytest.approx(result[key], abs=1e-13)
@@ -150,7 +151,7 @@ def test_ao_condensation_preserves_complete_atom_mass_and_ao_permutation():
 ])
 def test_nonphysical_or_nonfinite_overlap_refuses_without_eigenvalue_clipping(overlap):
     with pytest.raises(ValueError):
-        e.homo_populations(overlap, (1.0, 0.0), (0, 1), 2)
+        e_science.homo_populations(overlap, (1.0, 0.0), (0, 1), 2)
 
 
 @pytest.mark.native("numpy")
@@ -166,11 +167,11 @@ def test_nonphysical_or_nonfinite_overlap_refuses_without_eigenvalue_clipping(ov
 ])
 def test_orbital_norm_shape_and_complete_ao_atom_coverage_are_guarded(coefficient, census, natoms):
     with pytest.raises(ValueError):
-        e.homo_populations(((1.0, 0.0), (0.0, 1.0)), coefficient, census, natoms)
+        e_science.homo_populations(((1.0, 0.0), (0.0, 1.0)), coefficient, census, natoms)
 
 
 def test_complete_carbon_criterion_and_all_site_directions_are_retained():
-    result = e.assess_carbon_ordering(software_results())
+    result = e_science.assess_carbon_ordering(software_results())
     assert result["assigned_anion_cases"] == ["B2", "B3", "W2", "W3"]
     assert result["assigned_anion_denominator"] == result["evaluable_anion_count"] == 4
     assert result["primary_entry_pass"]
@@ -191,7 +192,7 @@ def test_complete_carbon_criterion_and_all_site_directions_are_retained():
 def test_failed_case_never_shrinks_denominator_or_borrows_its_partial_populations(status):
     cases = software_results()
     cases["B3"]["status"] = status
-    result = e.assess_carbon_ordering(cases)
+    result = e_science.assess_carbon_ordering(cases)
     assert result["assigned_anion_denominator"] == 4
     assert result["evaluable_anion_count"] == 3
     assert not result["primary_entry_pass"]
@@ -206,7 +207,7 @@ def test_exact_carbon_tie_fails_primary_and_secondary_cannot_replace_it():
     cases = software_results()
     primary = cases["W3"]["populations"]["lowdin_by_atom"]
     primary[1], primary[2] = 0.25, 0.25
-    result = e.assess_carbon_ordering(cases)
+    result = e_science.assess_carbon_ordering(cases)
     assert not result["primary_entry_pass"]
     assert result["primary_family_pass"] == {"B": True, "W": False}
     assert not result["carbon_ordering"]["lowdin"]["W3"]["criterion_pass"]
@@ -216,7 +217,7 @@ def test_exact_carbon_tie_fails_primary_and_secondary_cannot_replace_it():
     cases = software_results()
     secondary = cases["B2"]["populations"]["mulliken_by_atom"]
     secondary[1], secondary[2] = secondary[2], secondary[1]
-    result = e.assess_carbon_ordering(cases)
+    result = e_science.assess_carbon_ordering(cases)
     assert result["primary_entry_pass"]
     assert not result["carbon_ordering"]["mulliken"]["B2"]["criterion_pass"]
 
@@ -237,4 +238,4 @@ def test_assessment_refuses_wrong_roster_or_incomplete_spoofed_population(mutati
         else:
             values[0] += 0.2
     with pytest.raises(ValueError):
-        e.assess_carbon_ordering(cases)
+        e_science.assess_carbon_ordering(cases)

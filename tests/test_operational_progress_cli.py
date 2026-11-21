@@ -10,8 +10,8 @@ from typer.testing import CliRunner
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.cli import integrations
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.infrastructure.progress import JsonProgressReporter, read_progress
-from empirical_lawhood.runtime.progress import report_progress
+from empirical_lawhood.storage.progress import OperationalProgressReporter, read_progress
+from empirical_lawhood.execution.progress import report_progress
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,7 +22,7 @@ def test_real_public_preparation_progress_preserves_report_bytes(tmp_path):
                  str(ROOT / "programmes/foundations/emergent-structure/workflows/matrix-response-experiment/alternative.json")]
     ordinary = CliRunner().invoke(app, arguments)
     selected = tmp_path / "progress.json"
-    observed = CliRunner().invoke(app, [*arguments, "--progress-file", str(selected)])
+    observed = CliRunner().invoke(app, ["--progress-file", str(selected), *arguments])
     assert ordinary.exit_code == observed.exit_code == 0, observed.output
     assert observed.stdout == ordinary.stdout
     record = read_progress(selected)
@@ -53,7 +53,7 @@ def test_cli_progress_keeps_result_and_can_be_read_without_storage(tmp_path, mon
     monkeypatch.setattr(ExperimentProgrammeService, method, execute)
     arguments = ["campaign", "experiment-" + method, "--authoring-dir", str(authoring)]
     ordinary = CliRunner().invoke(app, arguments)
-    observed = CliRunner().invoke(app, [*arguments, "--progress-file", str(selected)])
+    observed = CliRunner().invoke(app, ["--progress-file", str(selected), *arguments])
     assert ordinary.exit_code == observed.exit_code == 0, observed.output
     assert ordinary.stdout == observed.stdout
     assert len(seen) == 2 and seen[0] == seen[1]
@@ -86,8 +86,7 @@ def test_bad_progress_destination_refuses_before_work(tmp_path, monkeypatch, loc
         pytest.fail("bad progress destination reached scientific storage")
 
     monkeypatch.setattr(integrations, "_storage", forbidden)
-    result = CliRunner().invoke(app, ["campaign", "experiment-run", "--authoring-dir", str(authoring),
-                                    "--progress-file", str(selected)])
+    result = CliRunner().invoke(app, ["--progress-file", str(selected), "campaign", "experiment-run", "--authoring-dir", str(authoring)])
     assert result.exit_code == 2, result.output
     if location == "occupied":
         assert selected.read_bytes() == b"preserve existing bytes"
@@ -105,8 +104,7 @@ def test_refused_work_preserves_partial_progress_and_original_exit(tmp_path, mon
 
     monkeypatch.setattr(integrations, "_storage", lambda: (tmp_path, object(), object()))
     monkeypatch.setattr(ExperimentProgrammeService, "run", refuse)
-    result = CliRunner().invoke(app, ["campaign", "experiment-run", "--authoring-dir", str(authoring),
-                                    "--progress-file", str(selected)])
+    result = CliRunner().invoke(app, ["--progress-file", str(selected), "campaign", "experiment-run", "--authoring-dir", str(authoring)])
     assert result.exit_code == 2, result.output
     assert "software fixture refusal" in result.stderr
     record = read_progress(selected)
@@ -115,7 +113,7 @@ def test_refused_work_preserves_partial_progress_and_original_exit(tmp_path, mon
 
 def test_progress_view_shows_unknown_total_without_guess(tmp_path):
     selected = tmp_path / "progress.json"
-    reporter = JsonProgressReporter(selected, "software fixture", minimum_interval=0)
+    reporter = OperationalProgressReporter(selected, "software fixture", minimum_interval=0)
     reporter.update(phase="validate_inputs", done=7)
     result = CliRunner().invoke(app, ["progress", "--file", str(selected)])
     assert result.exit_code == 0, result.output
@@ -142,9 +140,8 @@ def test_progress_cannot_create_missing_list_valued_scientific_operand(tmp_path,
         pytest.fail("progress destination overwrote a selected scientific operand")
 
     monkeypatch.setattr(integrations, "_storage", forbidden)
-    result = CliRunner().invoke(app, ["campaign", "experiment-run", "--authoring-dir", str(authoring),
-                                    "--plan", str(tmp_path / "plan.json"), "--parent-input-binding", str(selected),
-                                    "--progress-file", str(selected)])
+    result = CliRunner().invoke(app, ["--progress-file", str(selected), "campaign", "experiment-run", "--authoring-dir", str(authoring),
+                                    "--plan", str(tmp_path / "plan.json"), "--parent-input-binding", str(selected)])
     assert result.exit_code == 2, result.output
     assert not selected.exists()
 
@@ -157,7 +154,7 @@ def test_progress_stays_outside_selected_output_root_before_preparation(tmp_path
 
     monkeypatch.setattr(experiment_preparation, "_prepare", forbidden)
     selected = tmp_path / "progress.json"
-    result = CliRunner().invoke(app, ["campaign", "experiment-explain", "--input", str(tmp_path / "specification.json"),
-                                    "--output-root", str(tmp_path), "--progress-file", str(selected)])
+    result = CliRunner().invoke(app, ["--progress-file", str(selected), "campaign", "experiment-explain", "--input", str(tmp_path / "specification.json"),
+                                    "--output-root", str(tmp_path)])
     assert result.exit_code == 2, result.output
     assert not selected.exists()

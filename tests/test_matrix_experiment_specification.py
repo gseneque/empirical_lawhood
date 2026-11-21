@@ -9,14 +9,12 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_preparation import prepare_matrix_response_error
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_specification import (
-    FAMILIES, MatrixResponseErrorSpecification, selected_deanneal_specification,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExecutionSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_preparation import prepare_matrix_response_error
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_specification import FAMILIES, MatrixResponseErrorSpecification, selected_deanneal_specification
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection
 
 
 PROTOCOL = (Path(__file__).parents[1] / "programmes/foundations/emergent-structure/records/matrix-e2-e3-candidate/candidate-design02.json").read_bytes()

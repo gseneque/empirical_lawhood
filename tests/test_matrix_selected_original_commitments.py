@@ -11,22 +11,22 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_original_commitments as owner
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_experiment import MatrixPreparationSourceBank
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import MatrixPreparationInitialState, MatrixCouplingRecipe, MatrixPreparationSource
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.protected_preparation_records import MatrixProtectedSourceClosure, MatrixReservedTransferSources
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import authenticate_future_response_selections
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as sr
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_original_commitments as owner
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_experiment import MatrixPreparationSourceBank
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixPreparationInitialState, MatrixCouplingRecipe, MatrixPreparationSource
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.protected_preparation_records import MatrixProtectedSourceClosure, MatrixReservedTransferSources
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_future_response_selections
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as sr
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 from tests.test_matrix_factor_confirmation_eligibility import publish
 from tests.test_matrix_native_training_acquisition import fresh_training_metadata_case
 from tests.test_matrix_native_training_future_commitments import _declare, _selections
@@ -100,7 +100,7 @@ def test_e6_consumes_exact_actual_pretrain_four_role_publications_and_panels(tmp
     for bound in (None, 0, -1, True):
         with pytest.raises(ValueError, match='positive complete C source byte budget'):
             replace(commitment, maximum_source_bytes=bound)
-    from empirical_lawhood.kernel.decoding import decode_canonical_record
+    from empirical_lawhood.science.records.decoding import decode_canonical_record
     with pytest.raises(ValueError, match='version'):
         decode_canonical_record({**commitment.to_document(), 'version': '1.0.0'}, type(commitment))
     assert 'original_e4_recipe_index' not in commitment.to_document()['value']
@@ -108,8 +108,8 @@ def test_e6_consumes_exact_actual_pretrain_four_role_publications_and_panels(tmp
         request=request, future_selections=future, e4_phases=())
     # The prepared source predecessor must enforce the same exact panel IDs
     # before qualification, independently of the later protected entry check.
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_records as prepared
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_records as prepared
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support
     supports=exposure_support(request.future_manifest.audit)
     bank=prepared.MatrixPreparedSourceBank('bank.disclosed.original-transfer',sources,assay,panels,supports,request.input_commitments)
     prepared.require_original_future_commitments(bank,request,future)
@@ -180,7 +180,7 @@ def test_e5_refuses_actual_original_train_reserved_panel_and_full_e6_physical_al
     own_streams = source_bank.sources[0].root.streams
     prepared_panel = replace(panels[0][1][0], panel_id='panel.disclosed.separate-e5', independent_group_id='group.disclosed.separate-e5', streams=own_streams)
     own_panels = (('group.disclosed.separate-e5', (prepared_panel,)),)
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.input_records import ResolvedMatrixProgrammePhaseInputs
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.input_records import ResolvedMatrixProgrammePhaseInputs
     e4 = tuple((label, ResolvedMatrixProgrammePhaseInputs("e4." + label.lower(),
         request.future_manifest.reservation, request.future_manifest.native_specification, selection))
         for label, selection in e4)
@@ -201,9 +201,9 @@ def test_e5_refuses_actual_original_train_reserved_panel_and_full_e6_physical_al
 
 
 def test_all_new_entry_declarations_have_exact_committed_evidence_and_real_worker_factories():
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_bindings as opportunity
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_protected_bindings as protected
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_bindings as revision
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_bindings as opportunity
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_protected_bindings as protected
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_bindings as revision
     owners = ((opportunity, owner.MatrixSelectedOpportunityRootConfigV2, owner.MatrixSelectedOpportunityEvidenceV2),
         (protected, owner.MatrixSelectedProtectedRootConfigV3, owner.MatrixSelectedEntryEvidenceV3),
         (revision, owner.MatrixRevisionRootConfigV2, owner.MatrixRevisionEntryEvidenceV2))

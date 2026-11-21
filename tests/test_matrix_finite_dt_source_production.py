@@ -17,31 +17,30 @@ from unittest.mock import patch
 
 import pytest
 
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_experiment as domain
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_records as r
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_pipeline as rows_owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as train
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as bridge
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as phase
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponsePanel
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion, ScheduledResponseSelection
-from empirical_lawhood.adapters.methods.backbone_structural_transport import source_free_property_transport_source_input_parts as template
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.api.matrix_finite_dt_source_pipeline import (
-    MatrixFiniteDtDatasetClock, materialize_finite_dt_source, publish_finite_dt_source_metadata)
-from empirical_lawhood.kernel.authority import AuthorityAction, ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.source_pipelines import SourcePipelineArtifactProfile
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_experiment as domain
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_records as r
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_pipeline as rows_owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as train
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as bridge
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as phase
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponsePanel
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion, ScheduledResponseSelection
+from empirical_lawhood.methods.backbone_structural_transport import source_free_property_transport_source_input_parts as template
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.api.matrix_finite_dt_source_pipeline import MatrixFiniteDtDatasetClock, materialize_finite_dt_source, publish_finite_dt_source_metadata
+from empirical_lawhood.science.identity.authority import AuthorityAction, ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.source_pipelines import SourcePipelineArtifactProfile
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests import matrix_selected_source_predecessor as existing
 from tests.matrix_selected_e4_public_fixture import _source_admissions, publication
 from tests.runtime_platform.test_candidate_compiler import _fixture
@@ -137,10 +136,8 @@ def _materialization(future, *, rows_module=rows_owner):
     """Execute the actual installed source materializer under TEST dataset authority."""
     rows_owner = rows_module
     from empirical_lawhood.api.recursive_authoring import implementation_binding
-    from empirical_lawhood.planning.dataset_authority import (
-        DatasetStorageScope, DatasetWorkEnvelope, DatasetFileLimits, DatasetControlLimits,
-        DatasetAuthorizationIssuerRegistration, issue_dataset_operation_authorization)
-    from empirical_lawhood.planning.datasets import DatasetEvidenceClass, DatasetMaterializationClass
+    from empirical_lawhood.design.dataset_authority import DatasetStorageScope, DatasetWorkEnvelope, DatasetFileLimits, DatasetControlLimits, DatasetAuthorizationIssuerRegistration, issue_dataset_operation_authorization
+    from empirical_lawhood.design.datasets import DatasetEvidenceClass, DatasetMaterializationClass
     from empirical_lawhood.api import matrix_finite_dt_dataset_metadata as metadata_owner
     namespace, writer, programme, bank = future.namespace, future.writer, future.programme, future.bank
     budget = ResourceBudget(1, 2 * 1024**3, 0, 60, 128 * 1024**2, 64 * 1024**2)
@@ -246,12 +243,11 @@ def source_case(tmp_path, *, future, certificate, project_root=ROOT):
     from empirical_lawhood.api.recursive_authoring import implementation_binding
     from empirical_lawhood.api.recursive_operations import operation_catalog
     from empirical_lawhood.api.recursive_prospective_authoring import preview_recursive_prospective_candidate
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation, UnitRoleAssignment, IndependentUnit
-    from empirical_lawhood.planning.evidence_profiles import (
-        EvidenceWorldKind, bind_profile_selection, build_observation_evidence_world_registry)
-    from empirical_lawhood.runtime.experiment_resources import bind_execution_resources
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-    from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveDesignInputs, RecursiveProspectiveOperand
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation, UnitRoleAssignment, IndependentUnit
+    from empirical_lawhood.design.evidence_profiles import EvidenceWorldKind, bind_profile_selection, build_observation_evidence_world_registry
+    from empirical_lawhood.execution.experiment_resources import bind_execution_resources
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveDesignInputs, RecursiveProspectiveOperand
     from tests.experiment_entry_support import standard_authoring_for_draft
     namespace, writer, bank, programme = future.namespace, future.writer, future.bank, future.programme
     materialized, rule = _materialization(future)
@@ -288,7 +284,7 @@ def source_case(tmp_path, *, future, certificate, project_root=ROOT):
             for name in operands})
     source_configs, qualifications = _source_admissions(draft, records, (), root=root, prefix=namespace,
         observation_operator=bank.response_selection.identity)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_preparation import _source_projection
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_preparation import _source_projection
     draft = _source_projection(draft, SimpleNamespace(source_configs=source_configs, qualifications=qualifications),
         {value.logical_artifact_id: dict(records)[value.input_id].VERSION for value in draft.external_inputs})
     registrations, registry, codecs = operation_catalog()
@@ -343,8 +339,8 @@ def test_real_future_bank_refuses_reserved_independent_panel_alias_before_materi
     """Actual typed stream alias; names/groups differ and no native work begins."""
     import os
     import pytest
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import selected_public_package_types
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import selected_public_package_types
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     from tests.test_matrix_finite_dt_source import _certificate, _control
     from tests.test_matrix_native_training_acquisition import fresh_training_metadata_case
     selected_path = os.environ.get("EL_FINITE_DT_DISCLOSED_PUBLIC_PACKAGE")
@@ -377,10 +373,10 @@ def test_real_future_bank_refuses_reserved_independent_panel_alias_before_materi
 def test_source_projection_preserves_actual_compiler_role_contract_and_rejects_substitution():
     """Actual canonical bytes and compiler source owner; no bank, fit or I/O."""
     import pytest
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_preparation import _source_projection
-    from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveStudyDraft
-    from empirical_lawhood.planning.study_authoring import SourceMaterializationRole
-    from empirical_lawhood.runtime.candidate_compiler import ScientificInputRole, _source_diagnostics
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_preparation import _source_projection
+    from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveStudyDraft
+    from empirical_lawhood.design.study_authoring import SourceMaterializationRole
+    from empirical_lawhood.execution.candidate_compiler import ScientificInputRole, _source_diagnostics
 
     root, context = _fixture()
     template = context.template(root.dag_template_key)
@@ -418,8 +414,8 @@ def _disclosed_metadata_future(tmp_path):
     """Metadata-only TEST operands; no authentic acquisition or qualification."""
     import os
     import pytest
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import selected_public_package_types
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import selected_public_package_types
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     from tests.test_matrix_native_training_acquisition import fresh_training_metadata_case
     selected_path = os.environ.get("EL_FINITE_DT_DISCLOSED_PUBLIC_PACKAGE")
     if selected_path is None:
@@ -439,7 +435,7 @@ def _disclosed_metadata_future(tmp_path):
 @pytest.mark.held
 def test_actual_pending_inspector_and_closed_canonical_verifier_precede_materialization(tmp_path):
     from empirical_lawhood.api import matrix_finite_dt_dataset_metadata as metadata
-    from empirical_lawhood.infrastructure.dataset_evidence import ExternalDatasetEvidenceVerifier, EXTERNAL_DATASET_EVIDENCE_SCHEMA_IDS
+    from empirical_lawhood.storage.dataset_evidence import ExternalDatasetEvidenceVerifier, EXTERNAL_DATASET_EVIDENCE_SCHEMA_IDS
     future = _disclosed_metadata_future(tmp_path)
     invoked = []
     original_inspect = metadata.inspect_pending_source
@@ -466,7 +462,7 @@ def test_actual_pending_inspector_and_closed_canonical_verifier_precede_material
 def test_pending_source_consumer_replays_real_manifest_and_rejects_registry_lookalike(tmp_path):
     import pytest
     from empirical_lawhood.api.matrix_finite_dt_source_pipeline import authenticate_finite_dt_source_materialization
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
     future = _disclosed_metadata_future(tmp_path)
     materialized, rule = _materialization(future)
     def replay(config):

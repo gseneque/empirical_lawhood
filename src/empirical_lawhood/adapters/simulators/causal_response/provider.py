@@ -2,27 +2,23 @@
 
 from typing import cast
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityManifest, CapabilityRegistry
-from empirical_lawhood.runtime.execution import RunnerResult, TaskContext, TaskRunner, WorkerInputKind
-from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignStageEnvelope
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
-from empirical_lawhood.adapters.methods.causal_response.prediction import predict_parent
-from empirical_lawhood.adapters.methods.causal_response.records import CausalResponseCommittedPrediction
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskRunner, WorkerInputKind
+from empirical_lawhood.execution.linked_campaigns import LinkedCampaignStageEnvelope
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
+from empirical_lawhood.domains.matrix.causal_response.prediction import predict_parent
+from empirical_lawhood.domains.matrix.causal_response.records import CausalResponseCommittedPrediction
 from empirical_lawhood.adapters.simulators.response_geometry_prospective.provider import decode_port, output_result, read_port, semantic_contracts
 from empirical_lawhood.adapters.simulators.prepared_response.native_pair import MAXIMUM_PAIR_BYTES, NATIVE_PAIR_SCHEMA
 from empirical_lawhood.adapters.simulators.prepared_response.native_tasks import PreparedNativeInvocation
 from empirical_lawhood.adapters.simulators.prepared_response.provider import PreparedStaticSourceTask, Predecessors, prepared_native_stage_envelope
 from empirical_lawhood.adapters.simulators.prepared_response.source_outputs import PreparedNativeTaskResult, decode_prepared_task_native
-from .contracts import CausalResponseNativeConfig, native_invocations
+from empirical_lawhood.domains.matrix.causal_response.contracts import CausalResponseNativeConfig, native_invocations
 
 
 def validate_prediction(

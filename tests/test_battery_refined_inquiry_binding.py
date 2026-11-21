@@ -12,21 +12,22 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic import science as diagnosis
-from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic.contracts import DiagnosticResult
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import scope as original_scope
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, native, science
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import operation_bindings as owner
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.executable_binding import EXECUTABLE_BINDING_FACTORIES
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A, ContributionRole
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.scientific_contributions import ContributionManifest, ContributionProduct
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityRegistry
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, RunnerResult, TaskOutputPayload, WorkerInputKind, WorkerOutputPort
+from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic import science as diagnosis
+from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic.contracts import DiagnosticResult
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import scope as original_scope
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, native, science
+from empirical_lawhood.domains.battery.battery_refined_inquiry import operation_bindings as owner
+from empirical_lawhood.domains.battery.battery_refined_inquiry.extension import EXTENSION as _extension_owner_1
+EXECUTABLE_BINDING_FACTORIES = _extension_owner_1.factories
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A, ContributionRole
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityRegistry
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, RunnerResult, TaskOutputPayload, WorkerInputKind, WorkerOutputPort
 from tests.test_battery_dfn_precision_diagnostic import config_rows, exposed as diagnostic_trace
 from tests.test_battery_refined_inquiry import selected as selected, table
 
@@ -81,17 +82,16 @@ class RefuseNative(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0]=='pybamm': raise AssertionError('cold discovery imports PyBaMM')
 sys.meta_path.insert(0,RefuseNative())
 from empirical_lawhood.api import recursive_operations as api
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.executable_binding import EXECUTABLE_BINDING_FACTORIES
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.extension_bundle import EXTENSION_BUNDLE_CONTRIBUTION
+from empirical_lawhood.domains.battery.battery_refined_inquiry.extension import EXTENSION
 factories={x.binding.binding_id:x for x in api.operation_factories()}
 _,registry,_=api.operation_catalog()
-assert all(factories[x.binding.binding_id] is x for x in EXECUTABLE_BINDING_FACTORIES)
-runners=tuple(x.runner_factory() for x in EXECUTABLE_BINDING_FACTORIES)
-assert tuple(x.manifest for x in runners)==tuple(x.manifest for x in EXECUTABLE_BINDING_FACTORIES)
+assert all(factories[x.binding.binding_id] is x for x in EXTENSION.factories)
+runners=tuple(x.runner_factory() for x in EXTENSION.factories)
+assert tuple(x.manifest for x in runners)==tuple(x.manifest for x in EXTENSION.factories)
 assert all(callable(x.execute) for x in runners)
-assert len(EXECUTABLE_BINDING_FACTORIES)==30
-assert tuple(x.manifest for x in EXECUTABLE_BINDING_FACTORIES)==EXTENSION_BUNDLE_CONTRIBUTION.capability_manifests
-assert all(x.next_wave_builder is not None for x in EXECUTABLE_BINDING_FACTORIES)
+assert len(EXTENSION.factories)==30
+assert tuple(x.manifest for x in EXTENSION.factories)==EXTENSION.discovery.capability_manifests
+assert all(x.next_wave_builder is not None for x in EXTENSION.factories)
 assert 'pybamm' not in sys.modules
 print(json.dumps({'count':len(registry.capabilities),'new_count':len(runners)}))
 """
@@ -101,7 +101,7 @@ print(json.dumps({'count':len(registry.capabilities),'new_count':len(runners)}))
 
 
 def test_all_factories_delegate_exact_successor_operands_to_owner(monkeypatch):
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import recursive_translation as drafts
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import recursive_translation as drafts
     operands = (object(), object(), object())
     result = object()
     calls = []
@@ -228,8 +228,8 @@ def test_pure_reducer_rejects_incomplete_or_substituted_raw_dependencies(stock, 
 
 
 def compile_stock(stock):
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry.recursive_translation import qualification_draft
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.domains.battery.battery_refined_inquiry.recursive_translation import qualification_draft
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     draft = qualification_draft(stock.diagnostic, stock.source, stock.policy, stock.selection, parent=parent(stock.diagnostic))
     registry = CapabilityRegistry("registry.exposed-refined", tuple(sorted(owner.operation_manifests(), key=lambda x: x.registry_id)))
     compiled = compile_recursive_wave(draft=draft, registrations=owner.operation_registrations(), registry=registry,
@@ -259,7 +259,7 @@ def test_compiler_preserves_source_history_gate_and_all_trace_dependency_edges(s
 
 
 def test_compiler_refuses_source_disguised_history_and_wrong_trace_mapping(stock):
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     draft, compiled = compile_stock(stock)
     registry = compiled.registry
     diagnostic = next(link for link in draft.links if link.consumer_node_id.endswith("validate-policy") and link.consumer_input_id == "diagnostic")
@@ -296,16 +296,16 @@ def test_real_pure_reducer_shared_scheduler_full_receipts_and_no_native(stock, t
     execution, scientific result, authentic diagnosis or qualification campaign.
     """
     from empirical_lawhood.api.recursive_execution import _external_inputs
-    from empirical_lawhood.infrastructure.execution import DirectTaskExecutor, LocalScheduler
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.infrastructure.recursive_custody import read_recursive_products
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import recursive_translation as drafts
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, RunnerRegistry
-    from empirical_lawhood.runtime.plans import PlanLane
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+    from empirical_lawhood.execution.local.execution import DirectTaskExecutor, LocalScheduler
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.recursive_custody import read_recursive_products
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import recursive_translation as drafts
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry
+    from empirical_lawhood.execution.plans import PlanLane
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
     from tests.runtime_platform.test_execution_scheduler import StaticExternalInputResolver
     from tests.test_recursive_public_service import _plane
 

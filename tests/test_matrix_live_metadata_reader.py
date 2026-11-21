@@ -8,11 +8,11 @@ import pytest
 
 from empirical_lawhood.api import matrix_researcher_programme_lineage as lineage
 from empirical_lawhood.api.retained_e3_evidence import retained_e3_evidence_context, retained_e3_reader
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 from tests.test_recursive_public_service import _plane
 
 
@@ -29,7 +29,7 @@ def publish(plane, count=1):
         record.SCHEMA, ArtifactProfile.CANONICAL_JSON, 'application/json', 'live-metadata-controls',
         'controls', record.canonical_bytes(), VisibilityCeiling.PROSPECTIVE, (), OutcomeAccess.OUTCOME_BLIND)
         for record in records)
-    plane.write_compact_batch(requests)
+    plane.write_batch(requests)
     return records, requests
 
 
@@ -43,8 +43,8 @@ def test_sibling_reads_share_typed_controls_only_until_the_actual_owner_exits(tm
     plane = _plane(tmp_path / 'artifacts')
     expected, requests = publish(plane, count)
     calls = []
-    from empirical_lawhood.infrastructure import canonical_record_read
-    from empirical_lawhood.kernel import decoding
+    from empirical_lawhood.storage import canonical_record_read
+    from empirical_lawhood.science.records import decoding
     for module in (decoding, canonical_record_read):
         original = module.decode_canonical_bytes_with_identity
         def decode(raw, kind, *, _original=original, **kwargs):
@@ -132,7 +132,7 @@ def test_different_reader_policy_is_not_replaced_by_the_shared_owner(tmp_path, s
             artifact_verification=plane.artifact_verification)
         calls = []
         if selection == 'strict':
-            from empirical_lawhood.runtime.operational_configuration import ArtifactVerificationMode
+            from empirical_lawhood.execution.operational_configuration import ArtifactVerificationMode
             other.artifact_verification = ArtifactVerificationMode.STRICT
         elif selection == 'workers':
             other.maximum_parallel_verifications += 1

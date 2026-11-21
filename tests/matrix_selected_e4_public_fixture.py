@@ -17,29 +17,29 @@ import os
 from pathlib import Path
 from types import SimpleNamespace
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import MatrixSelectedPublicPackage
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as bridge
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as dev
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_experiment as development
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as e4
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponsePanel, ScheduledResponseProtocol
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion, ScheduledResponseSelection
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import MatrixSelectedPublicPackage
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as bridge
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as dev
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_experiment as development
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as e4
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponsePanel, ScheduledResponseProtocol
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion, ScheduledResponseSelection
 from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
 from empirical_lawhood.api.matrix_selected_runtime import _published_input
-from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256, read_bounded_bytes
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.prospective_experiment import source_filename
+from empirical_lawhood.storage.bounded_io import bounded_file_sha256, read_bounded_bytes
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.prospective_experiment import source_filename
 from tests.matrix_selected_original_public_fixture import EL_ROOT, actual_publication, original_selected_package, read_selection
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,7 +59,7 @@ def held_selection(path):
     value = json.loads(read_bounded_bytes(path, maximum_bytes=128 * 1024))
     if type(value) is not dict or set(value) != SELECTION_KEYS:
         raise ValueError("E4 held selection changes its closed declared input census")
-    from empirical_lawhood.kernel.serialization import validate_relative_locator, validate_stable_id
+    from empirical_lawhood.science.records.serialization import validate_relative_locator, validate_stable_id
     validate_stable_id(value["record_id"])
     validate_stable_id(value["namespace"])
     validate_relative_locator(value["output_relative_path"])
@@ -101,8 +101,8 @@ def held_selection(path):
 
 def publication(writer, record, name, *, lineage_parents=()):
     """Publish new disclosed metadata through the actual guarded owner."""
-    from empirical_lawhood.runtime.artifacts import derived_outcome_access
-    from empirical_lawhood.kernel.evidence import inherited_visibility
+    from empirical_lawhood.storage.contracts.artifacts import derived_outcome_access
+    from empirical_lawhood.science.evidence.evidence import inherited_visibility
     access=derived_outcome_access(old.OutcomeAccess.OUTCOME_BLIND,*(value.outcome_access for value in lineage_parents))
     ceilings=tuple(value.visibility_ceiling for value in lineage_parents)
     return writer.write(ArtifactWriteRequest(name, "release-validation/" + name + ".json",
@@ -130,7 +130,7 @@ def original_assay(originals):
         if row.capability.capability_key == "matrix-e3-protected.physical-forecast")
     spec, = (row for row in task.external_inputs if row.expected_payload_schema == ScheduledResponseProtocol.SCHEMA)
     protocol = _published_input(originals.writer, originals.issued_package.run_plan_id, spec, ScheduledResponseProtocol)
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
     relative, _, _ = provider_input_location(originals.writer, originals.issued_package.run_plan_id,
         protocol.templates.array_artifact.artifact_id)
     manifest = originals.writer.read_manifest(relative, maximum_bytes=originals.writer.custody_limits.manifest_bytes)
@@ -343,7 +343,7 @@ def retained_census(writer, run_ids):
 
 def execution_selection(originals, selected):
     from empirical_lawhood.api.recursive_authoring import implementation_binding
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
     return ExecutionSelection(workers=selected.workers, environment_id="main-locked",
         source_snapshot=ObjectIdentity.from_record("recursive-member.implementation", implementation_binding(ROOT)),
         output_root=originals.writer.root.contract.canonical_path)
@@ -360,9 +360,9 @@ def authored_plan(directory, writer):
 def method_products(directory, writer):
     from empirical_lawhood.api.recursive_execution import read_recursive_wave
     from empirical_lawhood.api.matrix_selected_e3_e4_read import _record
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as science
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as native
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as native
     report, products, draft, plan = read_recursive_wave(directory=directory, artifact_writer=writer,
         include_products=True, terminal_product_format="compact", allow_partial=False)
     records, locators = {}, {}
@@ -387,10 +387,10 @@ def method_products(directory, writer):
 
 
 def revision_inputs(originals, populations, selected, directory, acquisition_directory):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_revision_transition as transition
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as science
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
-    from empirical_lawhood.kernel.experimental_selection import WholeUnitFold
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_revision_transition as transition
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
+    from empirical_lawhood.science.experiments.experimental_selection import WholeUnitFold
     raw = read_bounded_bytes(Path(selected.revision_specification_path), maximum_bytes=1024**2)
     template = decode_canonical_bytes(raw, transition.SelectedE4RevisionAcquisitionSpecification, maximum_bytes=len(raw))
     groups = populations.programmes["DEV"].group_ids
@@ -431,8 +431,8 @@ def _planned_publication(writer, directory, name, record):
 
 def _source_admissions(draft, records, arrays, *, root, prefix, observation_operator, retained_history_ids=()):
     """New disclosed materialization receipts, never reused historical grants."""
-    from empirical_lawhood.planning.study_authoring import SourceMaterializationRole
-    from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig, SourceReadMode
+    from empirical_lawhood.design.study_authoring import SourceMaterializationRole
+    from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
     from tests.runtime_platform.test_candidate_compiler import _fixture
     _, context = _fixture()
     template = context.qualifications[0]
@@ -474,10 +474,10 @@ def _source_admissions(draft, records, arrays, *, root, prefix, observation_oper
 
 
 def _phase_root(originals, programme, bank, evidence, revision, original_summary, calibration, budget):
-    from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling
-    from empirical_lawhood.kernel.obligations import ObligationStatus
-    from empirical_lawhood.planning.study_authoring import DesignInputRecord, DesignInputRole
+    from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling
+    from empirical_lawhood.science.evidence.obligations import ObligationStatus
+    from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole
     root = original_preparation(originals).root
     index=bank.source_index()
     clock = programme.cases[0].information_cutoff.clock_id
@@ -485,7 +485,7 @@ def _phase_root(originals, programme, bank, evidence, revision, original_summary
     pins = {programme.identity, bank.identity, programme.reservation, programme.allocation, programme.specification,
         programme.forecast_design, programme.response_selection, programme.criterion, evidence.identity,
         revision.decision.identity, original_summary.identity, *programme.source_census}
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as native
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as native
     for descriptor in bank.sources:
         source = native.SelectedE4ProtectedNativeSourceReference.from_bank(programme,bank,descriptor,index=index)
         pins.update((source.identity, source.reference.identity, source.provenance,
@@ -556,10 +556,10 @@ def _phase_root(originals, programme, bank, evidence, revision, original_summary
 
 def confirmation_choices(selected, populations, originals, revision, calibration, *, build_scope=True):
     """Copied settings choose inference; actual predecessor identities are joined."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as science
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial as factorial
-    from empirical_lawhood.kernel.decoding import decode_canonical_record
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial as factorial
+    from empirical_lawhood.science.records.decoding import decode_canonical_record
     raw = read_bounded_bytes(Path(selected.confirmation_selection_path), maximum_bytes=1024**2)
     document = json.loads(raw)
     if type(document) is not dict or set(document) != {"calibration_alpha", "nomination_rule", "factorial"}:
@@ -580,16 +580,16 @@ def confirmation_choices(selected, populations, originals, revision, calibration
 
 def protected_plan(originals, populations, selected, *, label, products, predecessor, directory,
         public_calibration=None, calibration_product=None, disclosed_parent_metadata=None):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as native
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_bindings as bindings
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as public
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_operational_resources as resources
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
-    from empirical_lawhood.runtime.experiment_resources import ExecutionResourceSelection
-    from empirical_lawhood.runtime.execution_envelope import ChildResourceTokenLimit, ProgressHeartbeat, ProgressLivenessContract
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as native
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_bindings as bindings
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as public
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_operational_resources as resources
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
+    from empirical_lawhood.execution.experiment_resources import ExecutionResourceSelection
+    from empirical_lawhood.execution.execution_envelope import ChildResourceTokenLimit, ProgressHeartbeat, ProgressLivenessContract
     from tests.experiment_entry_support import entry_package_for_draft
     from tests.runtime_platform.test_standard_formal_candidate import _standard_fixture
-    from empirical_lawhood.planning.formal_analysis import derive_formal_gap_applicability
+    from empirical_lawhood.design.formal_analysis import derive_formal_gap_applicability
     programme, bank = populations.programmes[label], populations.banks[label]
     revision = e4.SelectedE4RevisionExport.from_products(populations.programmes["DEV"], products.nomination, products.frozen,
         record_id="export." + selected.namespace)

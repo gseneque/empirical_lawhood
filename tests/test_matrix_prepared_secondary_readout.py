@@ -5,10 +5,10 @@ from decimal import Decimal as D, localcontext
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_secondary_readout as science
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_point import forecast_selected_point
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_secondary_readout as science
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_point import forecast_selected_point
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census
 from tests.test_matrix_selected_protected import transfer, confirmation  # noqa: F401
 from tests.test_matrix_selected_opportunity import opportunity, literal_observations  # noqa: F401
 

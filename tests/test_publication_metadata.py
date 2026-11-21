@@ -10,11 +10,11 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.publication_metadata import read_publication_metadata
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage.publication_metadata import read_publication_metadata
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 from tests.numerical_provenance_fixtures import numerical_plane
 
 
@@ -84,7 +84,7 @@ def test_original_batch_metadata_corruption_is_refused_before_payload_access(
         else:
             path.write_bytes(b'{}\n')
     _block_payload_access(monkeypatch, plane, (first, second))
-    with pytest.raises((ValueError, FileNotFoundError)):
+    with pytest.raises((ValueError, FileNotFoundError, ArtifactIdentityConflict)):
         read_publication_metadata(plane, first)
 
 

@@ -16,16 +16,13 @@ import tracemalloc
 import numpy as np
 import pytest
 
-from empirical_lawhood.infrastructure.artifact_stream_primitives import _anonymous_input_descriptor, _seal_anonymous_input
-from empirical_lawhood.infrastructure import dataset_readers as shared_reader
-from empirical_lawhood.infrastructure.dataset_readers import (
-    ArrayDatasetReader, ArrayTransformWriter, AuthenticatedBlockByteSource, DatasetFDMember,
-    PhysicalFDByteSource, SealedFDByteSource, VerifiedArrayTransform,
-)
-from empirical_lawhood.kernel.datasets import ArrayDatasetManifest, ArrayDatasetMember
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.array_datasets import ArrayDatasetReader as ReaderContract
+from empirical_lawhood.storage.artifact_stream_primitives import _anonymous_input_descriptor, _seal_anonymous_input
+from empirical_lawhood.storage import dataset_readers as shared_reader
+from empirical_lawhood.storage.dataset_readers import ArrayDatasetReader, ArrayTransformWriter, AuthenticatedBlockByteSource, DatasetFDMember, PhysicalFDByteSource, SealedFDByteSource, VerifiedArrayTransform
+from empirical_lawhood.science.models.datasets import ArrayDatasetManifest, ArrayDatasetMember
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.array_datasets import ArrayDatasetReader as ReaderContract
 
 
 class BytesSource:
@@ -437,8 +434,15 @@ def test_regular_file_or_wrong_extent_cannot_claim_immutable_descriptor_capabili
     with tempfile.TemporaryFile() as handle:
         handle.write(b"12345678")
         handle.flush()
-        with pytest.raises(ValueError, match="protections"):
+        with pytest.raises(ValueError) as refusal:
             SealedFDByteSource({"state": DatasetFDMember(handle.fileno(), 0, 8, 8)}, maximum_chunk_bytes=8)
+        # An ordinary file may support querying seals while remaining writable.
+        assert str(refusal.value) in {
+            "dataset lease lacks actual immutable descriptor protections",
+            "dataset lease changes exact extent or lacks complete immutable descriptor seals",
+        }
+        assert os.pwrite(handle.fileno(), b"x", 0) == 1
+        assert os.pread(handle.fileno(), 8, 0) == b"x2345678"
     descriptor = _anonymous_input_descriptor()
     try:
         os.write(descriptor, b"12345678")

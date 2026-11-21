@@ -4,8 +4,8 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 FINITE = ResourceBudget(1, 100, 0, 3, 10, 20)

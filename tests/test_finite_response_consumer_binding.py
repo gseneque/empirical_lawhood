@@ -9,28 +9,28 @@ from decimal import Decimal
 
 import pytest
 
-from empirical_lawhood.adapters.composition.finite_response_law.consumer_input import FiniteResponseLawAuthoringInput, build_consumer_authoring
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.consumer_input import FiniteResponseLawAuthoringInput, build_consumer_authoring
 from empirical_lawhood.adapters.composition.finite_response_law.stage_input import inspect_consumer_providers
-from empirical_lawhood.adapters.methods.finite_response_law.law_payloads import FiniteResponseLawLowerPayload
-from empirical_lawhood.adapters.methods.finite_response_law.science import FiniteResponseLawScienceSpec
-from empirical_lawhood.adapters.methods.finite_response_law.preparation_policy_projection import FiniteResponseLawPreparationPolicyProjectionConfig
-from empirical_lawhood.adapters.methods.finite_response_law.preparation_policy_provider import PREPARATION_POLICY_EVIDENCE_PORT
-from empirical_lawhood.adapters.methods.finite_response_law.preparation_screen_results import FiniteResponseLawRetainedProspectiveCloseoutReference, FiniteResponseLawPreparationPolicyScreenConfig
-from empirical_lawhood.adapters.simulators.finite_response_law.contracts import FiniteResponseLawNativeConfig
+from empirical_lawhood.domains.matrix.finite_response_law.law_payloads import FiniteResponseLawLowerPayload
+from empirical_lawhood.domains.matrix.finite_response_law.science import FiniteResponseLawScienceSpec
+from empirical_lawhood.domains.matrix.finite_response_law.preparation_policy_projection import FiniteResponseLawPreparationPolicyProjectionConfig
+from empirical_lawhood.domains.matrix.finite_response_law.preparation_policy_provider import PREPARATION_POLICY_EVIDENCE_PORT
+from empirical_lawhood.domains.matrix.finite_response_law.preparation_screen_results import FiniteResponseLawRetainedProspectiveCloseoutReference, FiniteResponseLawPreparationPolicyScreenConfig
+from empirical_lawhood.domains.matrix.finite_response_law.contracts import FiniteResponseLawNativeConfig
 from empirical_lawhood.adapters.simulators.finite_response_law.discovery import SOURCE_CAPABILITY
 from empirical_lawhood.adapters.simulators.finite_response_law.provider import RETAINED_SOURCE_PORT
 from empirical_lawhood.adapters.simulators.finite_response_law.preparation_policy_screen.discovery import SOURCE_CAPABILITY as PREPARATION_POLICY_SOURCE
-from empirical_lawhood.adapters.simulators.finite_response_law.preparation_policy_contracts import FiniteResponseLawPreparationPolicyNativeConfig, FiniteResponseLawPreparationPolicyRetainedPrefix
+from empirical_lawhood.domains.matrix.finite_response_law.preparation_policy_contracts import FiniteResponseLawPreparationPolicyNativeConfig, FiniteResponseLawPreparationPolicyRetainedPrefix
 from empirical_lawhood.adapters.simulators.finite_response_law.preparation_policy_provider import PREPARATION_POLICY_RETAINED_SOURCE_PORT
-from empirical_lawhood.adapters.simulators.prepared_response.contracts import PARENTS, PreparedNativeSpec, prepared_native_member, prepared_numerical_view
+from empirical_lawhood.domains.matrix.prepared_response.contracts import PARENTS, PreparedNativeSpec, prepared_native_member, prepared_numerical_view
 from empirical_lawhood.adapters.simulators.prepared_response.source_outputs import PreparedNativeTaskResult
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.planning.source_qualification import SourceQualificationRetainedPredecessor
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.design.source_qualification import SourceQualificationRetainedPredecessor
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
 
 
 def identity(name, schema):
@@ -213,7 +213,7 @@ def test_retained_consumer_graphs_build_real_providers_without_read_or_execution
         == packet
     )
     if stage == "preparation-screening":
-        from empirical_lawhood.adapters.simulators.finite_response_law.preparation_policy_contracts import preparation_policy_native_invocations
+        from empirical_lawhood.domains.matrix.finite_response_law.preparation_policy_contracts import preparation_policy_native_invocations
 
         assert len(packet.source.roots) == roots
         assert len(preparation_policy_native_invocations(packet.source)) == tasks

@@ -1,0 +1,61 @@
+{
+  "project": "PySCF",
+  "scope": "Source provenance for the v1.0 package reorganisation and extracted numerical methods.",
+  "predecessors": [
+    {
+      "path": "pyscf-periodic-provenance.json",
+      "sha256": "31fddbb2a9a06d0ffe302320f129cdda5186f8136012619d334002fa19ec8d37"
+    },
+    {
+      "path": "pyscf-periodic-diis-storage-provenance.json",
+      "sha256": "0b37b3a11432023e09c205a8f37964140aa3ece0c712dd9a367cc5e8011a1337"
+    }
+  ],
+  "derivatives": [
+    {
+      "path": "adapters/rubisco/rubisco_response/pyscf_periodic_dft.py",
+      "predecessor_path": "pyscf_periodic_dft.py",
+      "predecessor_sha256": "02c445198a0605d796bc332a7e4d0a0345eacaf81145d24640b5547e6fa963a1",
+      "sha256": "77eec0d2c4d42f27f4af3c950ab34b3dc5cef4bf1812459686c496c7e2b726b7",
+      "changes": "The adapter imports the domain memory-block selection."
+    },
+    {
+      "path": "adapters/rubisco/rubisco_response/pyscf_periodic_diis.py",
+      "predecessor_path": "pyscf_periodic_diis.py",
+      "predecessor_sha256": "51100b03b4f25297af7c18392a9a97aaa512ea75d012081983d664b86fb7b9bf",
+      "sha256": "0051b7fb7dad3f4df13c46cd4a066dadfa3b5814b328a67d8bc8a37f5f017612",
+      "changes": "The adapter calls the shared checked DIIS eigensolver and block accumulator. The previous out-of-core vector storage remains in this adapter."
+    },
+    {
+      "path": "adapters/rubisco/rubisco_response/pyscf_periodic_electronic.py",
+      "predecessor_path": "pyscf_periodic_electronic.py",
+      "predecessor_sha256": "917381c0b74ef5d4963ee1dbeb81c8efc29a46c974cbbe2457f7b95bfd65dfc6",
+      "sha256": "c4259fd6928a137cd38895d8085486eeb698674d740e5d902aa31fe6fe9e55cd",
+      "changes": "The adapter imports the shared charged-background energy calculation and the current molecular and memory modules."
+    },
+    {
+      "path": "adapters/rubisco/rubisco_response/pyscf_periodic_jk.py",
+      "predecessor_path": "pyscf_periodic_jk.py",
+      "predecessor_sha256": "706800390cd6ddf27a5311b294c91a9e933ddf1bc9e1fc2e6d51b67660ec64ef",
+      "sha256": "d52cc8a9c8a35e0ec78c3cc3f5125789e4147817bb5af53021dce9897598bdfb",
+      "changes": "The adapter imports the domain memory observation and CVHF allocation marker."
+    },
+    {
+      "path": "adapters/rubisco/rubisco_response/pyscf_periodic_mm_mole.py",
+      "predecessor_path": "pyscf_periodic_mm_mole.py",
+      "predecessor_sha256": "c6f92d4c1e9e4f3fd0a0e51106743ab9295572a6a9141fad66ed684af197cc36",
+      "sha256": "cd95f960c0593f23f24d32d16268cd2f458e58910db4b5457ef6cdee38033693",
+      "changes": "The adapter imports the domain memory-block selection."
+    }
+  ],
+  "shared_sources": [
+    {
+      "path": "methods/electronic_structure/diis.py",
+      "sha256": "afd2cf1d9e4ffb8511fe2152e9972361a07ffb9d918d9b839b6dde86e77db7b5"
+    },
+    {
+      "path": "methods/electrostatics.py",
+      "sha256": "d1e93e75fa2200bf344fd7b646f8abb73e26a834ad9acc6a35461f097032d712"
+    }
+  ]
+}

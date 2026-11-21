@@ -7,10 +7,10 @@ from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from io import StringIO
 
-from empirical_lawhood.adapters.methods.structured_target import IndependentSubstrateTargetPhase
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.methods.structured_target import IndependentSubstrateTargetPhase
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
-from .contracts import NRELActionKind, NRELArchiveDecodeResult, NRELArchiveMemberFormat, NRELArchiveSourceBinding, NRELColumnRole, NRELNativeSample, NRELPreparationTrace, NRELSafeDecodeProfile
+from empirical_lawhood.domains.energy.inverter.archive_contracts import NRELActionKind, NRELArchiveDecodeResult, NRELArchiveMemberFormat, NRELArchiveSourceBinding, NRELColumnRole, NRELNativeSample, NRELPreparationTrace, NRELSafeDecodeProfile
 
 
 def _optional(value: str) -> str | None:

@@ -11,19 +11,19 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as p
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_preparation import directory_census
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import control_contracts as f,nve_contracts as c,nve_roster
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.nve_instrumentation import NVEProgress,retain_checkpoint
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.nve_science import assess_nve,requested_binary64_positions,reduce_return
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_instrumentation import selected_value
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition,NativeSubworkCompletion,NativeSubworkState,NativeSubworkRoster
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.execution import WorkerInputBinding,WorkerInputKind,WorkerInputPort,WorkerOutputPort
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.nve_runner import NVEControlRunner
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as p
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_preparation import directory_census
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import control_contracts as f, nve_contracts as c, nve_roster
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.nve_instrumentation import NVEProgress, retain_checkpoint
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.nve_science import assess_nve, requested_binary64_positions, reduce_return
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_instrumentation import selected_value
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition, NativeSubworkCompletion, NativeSubworkState, NativeSubworkRoster
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerOutputPort
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.nve_runner import NVEControlRunner
 from tests.test_rubisco_chemical_force_controls import plan as plan,exposed_identity
 from tests.test_rubisco_durable_preparation import selected as selected
 
@@ -149,7 +149,7 @@ def test_real_typed_worker_port_census_is_checked_before_nve_handoff(staged,sele
 
 
 def publish_case(tmp_path,plan,supply,changed,case=None):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import contracts
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import contracts
     case=plan.selected_cases[0] if case is None else case
     dt,tolerance=next(row[1:] for row in contracts.INTEGRATION if row[0]==case[-1])
     interval_steps=int(Decimal(10)/dt)
@@ -251,7 +251,7 @@ def test_actual_full_states_clocks_steps_source_and_denominators_are_independent
 
 
 def test_refined_system_changes_only_frozen_ewald_precision():
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.nve_science import join_full_hamiltonian
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.nve_science import join_full_hamiltonian
     admitted=full_system()
     refined=full_system('0.0000001')
     join_full_hamiltonian(refined,admitted,'refined')
@@ -272,7 +272,7 @@ def test_reported_components_cannot_round_a_precision_miss_to_positive(staged,tm
     assessed=assess_nve(plan,(returned,),(supply,),current_raw_root=tmp_path,native_calls=((returned.unit_id,native),))
     row=next(row for row in assessed.reported_component_excursions if row[0]==returned.unit_id)
     assert row[1:]==supplementary.as_integer_ratio()
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     raw=assessed.canonical_bytes()
     assert decode_canonical_bytes(raw,c.NVEControlAssessment,maximum_bytes=len(raw))==assessed
     assert assessed.VERSION=='1.1.0'

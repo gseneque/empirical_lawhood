@@ -8,17 +8,17 @@ import sys
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.operational_configuration import ArtifactVerificationMode
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.operational_configuration import ArtifactVerificationMode
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 from tests.test_reduced_artifact_verification import _mask_changed_stat
 
 
 def _additional(plane, count):
-    rows = plane.write_compact_batch(tuple(ArtifactWriteRequest(
+    rows = plane.write_batch(tuple(ArtifactWriteRequest(
         'exposed.prior.' + str(index), 'prior/' + str(index) + '.json', ObjectIdentity.SCHEMA,
         ArtifactProfile.CANONICAL_JSON, 'application/json', 'exposed.prior', 'prior',
         ObjectIdentity('exposed.prior.' + str(index), ObjectIdentity.SCHEMA, '1.0.0', 'b' * 64).canonical_bytes(),

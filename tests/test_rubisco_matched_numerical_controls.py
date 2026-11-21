@@ -7,20 +7,18 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as p
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_contracts import DurableUnitReturn
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.preparation import controlled_constructs
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.preparation_integrity import PreparationIntegrity
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.physical_preparation_geometry import PhysicalPreparationGeometry
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import contracts as sampling, control_contracts as f, nve_contracts as n
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.matched_controls import (
-    MatchedNumericalAssessment, NVE_KEYS, SCIENCE_PREFIXES, assess_matched_numerical,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.science import hardware_from_stdout
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition, NativeSubworkCompletion
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as p
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_contracts import DurableUnitReturn
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.preparation import controlled_constructs
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.preparation_integrity import PreparationIntegrity
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.physical_preparation_geometry import PhysicalPreparationGeometry
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import contracts as sampling, control_contracts as f, nve_contracts as n
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.matched_controls import MatchedNumericalAssessment, NVE_KEYS, SCIENCE_PREFIXES, assess_matched_numerical
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.science import hardware_from_stdout
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition, NativeSubworkCompletion
 
 
 def identity(name, kind):

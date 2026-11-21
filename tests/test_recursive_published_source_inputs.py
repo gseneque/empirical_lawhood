@@ -14,12 +14,12 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import recursive_authoring as owner, recursive_operations
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest
 from tests.runtime_platform.test_recursive_compiler import Config, BUDGET, fixture
 from tests.runtime_platform.test_recursive_storage_codec_registration import SCHEMA, MEDIA, _codec, _declaration, _framed, _request
 from tests.test_recursive_public_service import _plane

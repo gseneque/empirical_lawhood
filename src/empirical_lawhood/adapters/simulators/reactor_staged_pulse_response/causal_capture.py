@@ -6,13 +6,13 @@ from typing import Callable
 
 import numpy as np
 
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.records import ClassicalContext
-from empirical_lawhood.adapters.methods.reactor_local_domain_qualification.records import LocalArrayPayload
-from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import NativeController
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.records import ClassicalContext
+from empirical_lawhood.domains.reactor.reactor_local_domain_qualification.records import LocalArrayPayload
+from empirical_lawhood.domains.reactor.native_ports import NativeController
 from empirical_lawhood.adapters.simulators.reactor_causal_response.delivery import BatchDeliverySession
-from empirical_lawhood.adapters.simulators.reactor_regime_response.committed_branch import WatchedPreparedTape
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.contracts import ReactorCommand, ReactorDelivery, ReactorFinalDelivery
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.reactor.reactor_regime_response.prepared_tape import WatchedPreparedTape
+from empirical_lawhood.domains.reactor.reactor_prefix_response.contracts import ReactorCommand, ReactorDelivery, ReactorFinalDelivery
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 @dataclass

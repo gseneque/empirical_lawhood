@@ -1,46 +1,48 @@
-![Empirical Lawhood: A civilisational response-law engine. Light passes through two stone rings.](assets/empirical-lawhood-hero.jpg)
+![Empirical Lawhood: light passes through two stone rings.](assets/empirical-lawhood-hero.jpg)
 
 # Empirical Lawhood
 
-Empirical Lawhood investigates how scientific knowledge can help produce the
-conditions for further knowledge and action. This repository contains the
-research engine, programme records and supported researcher workflows.
+How can reliable scientific capabilities accumulate when the conditions required to use one result must themselves be discovered or constructed?
 
-| Start here | What you will find |
-|---|---|
-| **[Explore research programmes](programmes/README.md)** | Scientific questions, findings, study designs and available workflows across Foundations, Materials, Energy and Biology. |
-| **[Run your first example](docs/getting-started.md)** | Installation, a small reactor demonstration and the first readable report. |
-| **[Develop the engine](docs/development/README.md)** | Architecture, contribution guidance, extension recipes and focused verification. |
+Empirical Lawhood represents that work as a recursive investigation.
+A question declares its required conditions, selected suppliers and assessments.
+The framework prepares and executes the work, retains its evidence and makes assessed contributions available to subsequent investigations.
 
-The [EL website](https://empiricallawhood.org/) tells the project's story.
-Its [Research account](https://empiricallawhood.org/how-the-method-developed/)
-connects the investigations and their findings.
+[Read the preprint (edition 0.60, PDF)](paper/editions/v0.60-deposit/Empirical_Lawhood_Manuscript_v0.60.pdf) · [Explore the study results by programme](programmes/README.md)
+
+**Version 1.0 is in release-candidate review.**
+Users upgrading from 0.3.0 must update imports from the retired Python packages. [RC1 tag](https://github.com/gseneque/empirical_lawhood/tree/1.0.0-RC1) · [Release notes](docs/release/1.0.0.md) · [Migration guide](docs/v1.0/migration.md)
+
+## Run a first investigation
+
+Does a sample’s initial mass plus the mass added agree with its observed final mass within 0.01 kg?
+This example predicts the final mass for three supplied samples, assesses the observations and prints the path to the retained result.
+
+From a clean Linux x86-64 checkout with uv installed, choose a new workspace outside the checkout.
+The command below creates `el-mass-balance-example` in your home directory.
+
+```sh
+uv sync --locked --python 3.11.14
+uv run --no-sync python scripts/examples/v1_investigation.py \
+  --project-root "$PWD" --workspace "$HOME/el-mass-balance-example" \
+  --case positive --tolerance-kg 0.01
+```
+
+The expected assessment is `SATISFIED` for the three supplied samples.
+The investigation guide also shows what happens when one observation disagrees or is missing. [Investigation guide](docs/v1.0/define-investigation.md) · [Installation and wheel usage](docs/getting-started.md)
 
 ## Find your way
 
-Each programme brings its scientific records and runnable inputs together.
-Start with its overview, then select a study or workflow. A **study design
-(protocol)** specifies the question, observations, analysis and outcome rules.
-A **run guide** gives the inputs and commands. **Findings** describe what the
-study actually established and what remains unresolved.
+| What you want to do | Where to start |
+| --- | --- |
+| Turn a scientific question into an investigation | [From a question to an investigation](docs/v1.0/from-question-to-investigation.md) |
+| Define an investigation, contribute a reusable calculation or add a domain | [Public contributor guides](docs/v1.0/README.md) |
+| Find a runnable workflow or inspect retained results | [Workflow catalogue](docs/reference/workflows.md) · [Research workbench](docs/using/research-workbench.md) |
 
-Use the [researcher guide](docs/using/README.md) for shared procedures and the
-[workflow catalogue](docs/reference/workflows.md) for complete command discovery.
-Choose an [environment](docs/using/environments.md) before running a workflow.
-Generated runs and scientific custody belong in your explicitly selected
-external storage.
+## Citation and licensing
 
-## Release and citation
-
-The software version is **0.3.0**, the public schema baseline is **1.0.0**, and
-the selected preprint edition is **0.60**. See the
-[0.3.0 release notes](docs/release/0.3.0.md), [release guide](docs/release/README.md), [changelog](CHANGELOG.md),
-[citation guide](CITATION.md) and [reproducibility statement](REPRODUCIBILITY.md).
-Software conformance, development findings and scientific qualification have
-separate evidence requirements. Each programme states its limits.
-
-Code is MPL-2.0; project documentation is CC-BY-4.0. Generated evidence and
-third-party materials retain their [specific licences](docs/reference/licensing.md).
-[Working with AI](docs/reference/ai-usage.md).
+The software and the selected preprint edition (0.60) have separate citations.
+Code is licensed under MPL-2.0 and project documentation under CC-BY-4.0.
+Evidence and third-party materials carry their own terms. [Citation guide](CITATION.md) · [Reproducibility](REPRODUCIBILITY.md) · [Licensing](docs/reference/licensing.md) · [AI usage](docs/reference/ai-usage.md) · [Project website](https://empiricallawhood.org/)
 
 SPDX-License-Identifier: CC-BY-4.0

@@ -5,16 +5,12 @@ from __future__ import annotations
 from hashlib import sha256
 from typing import Any
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
 
-from .contracts import ADMISSION_CAPABILITY_KEY, ADJUDICATION_SCHEMA, CAPABILITY_VERSION, CONFIG_SCHEMA, EVALUATOR_CAPABILITY_KEY, METHOD_CAPABILITY_KEY, MethodConformanceResult, SOURCE_CAPABILITY_KEY, SourceStopResult, UniformElectronGasTransverseScreenConfig, TruthInputBatch, TruthLawBatch, TruthOracleBatch, TruthScreenBatch, decode_config_bytes
+from empirical_lawhood.domains.materials.electron_gas.contracts import ADMISSION_CAPABILITY_KEY, ADJUDICATION_SCHEMA, CAPABILITY_VERSION, CONFIG_SCHEMA, EVALUATOR_CAPABILITY_KEY, METHOD_CAPABILITY_KEY, MethodConformanceResult, SOURCE_CAPABILITY_KEY, SourceStopResult, UniformElectronGasTransverseScreenConfig, TruthInputBatch, TruthLawBatch, TruthOracleBatch, TruthScreenBatch
+from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.configuration import decode_config_bytes
 
 
 CONFIG_SCHEMA_SHA256 = sha256(CONFIG_SCHEMA.encode("utf-8")).hexdigest()

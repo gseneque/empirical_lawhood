@@ -6,19 +6,13 @@ from dataclasses import replace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import (
-    compact_records as compact, programme_bindings as bindings, programme_global as global_owner,
-    programme_records as records,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import ScheduledCommitment
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.runtime.execution import (
-    DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding,
-    WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort,
-)
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import compact_records as compact, programme_bindings as bindings, programme_global as global_owner, programme_records as records
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import ScheduledCommitment
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
 from tests.test_matrix_factor_response import Reader
 from tests.test_matrix_scheduled_compact_graph import (
     bank as bank, provenance as provenance, response_bank as response_bank, scheduled as scheduled, stock as stock,
@@ -70,9 +64,9 @@ def test_programme_factories_have_explicit_new_control_and_real_unchanged_v2_con
 
 
 def test_actual_programme_admission_and_decoder_refuse_unreceipted_or_outside_wave_before_contact(response_bank, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_prediction
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_science
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments
+    from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_prediction
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_science
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments
     def blocked(*args, **kwargs):
         pytest.fail('programme worker admission/decoder entered native science or fitting')
     monkeypatch.setattr(np.random, 'Generator', blocked)
@@ -87,7 +81,7 @@ def test_actual_programme_admission_and_decoder_refuse_unreceipted_or_outside_wa
     # The actual new metadata worker produces the parent and an ordinary
     # stored receipt. This exposed software run establishes no scientific
     # source qualification or genuine issue/native authority.
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.retained import _manifest
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.retained import _manifest
     global_inputs = tuple(_manifest(plane, p.materialization.relative_path) for _, p in global_owner.source_publications(bank))
     global_inputs += tuple(_manifest(plane, p.materialization.relative_path) for p in bank.response_selection.template_publications)
     global_inputs += (write(plane, bank.bank_id, bank.canonical_bytes(), bank.SCHEMA),)
@@ -97,15 +91,15 @@ def test_actual_programme_admission_and_decoder_refuse_unreceipted_or_outside_wa
     parent = decode_canonical_bytes(global_result.outputs[0].payload, global_owner.ScheduledProgrammeGlobalCommit,
         maximum_bytes=bindings.MAXIMUM_RECORD_BYTES)
     parent_receipt, parent_outputs = finish(plane, global_context, global_result, response_bank[1][0])
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
     parent_manifest, = parent_outputs
     parent_publication = ArtifactWriteResult(parent_manifest.logical, parent_manifest.materialization,
         plane._manifest_materialization(logical_artifact_id=parent_manifest.logical.logical_artifact_id,
             relative_path=parent_manifest.materialization.relative_path+'.manifest.json',
             payload=(plane.root.resolve(parent_manifest.materialization.relative_path+'.manifest.json', for_write=False)).read_bytes()), True)
-    from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, CandidateExecutionPlan, ExecutionTask, ExternalInputSpec, PlanLane, ScientificStage
-    from empirical_lawhood.runtime.capabilities import CapabilityRequirement
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_parent import ScheduledProgrammeGlobalParentBinding
+    from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, CandidateExecutionPlan, ExecutionTask, ExternalInputSpec, PlanLane, ScientificStage
+    from empirical_lawhood.execution.capabilities import CapabilityRequirement
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_parent import ScheduledProgrammeGlobalParentBinding
     from tests.test_matrix_factor_confirmation_eligibility import publish
     factory, = global_owner.operation_factories()
     m = factory.manifest
@@ -159,7 +153,7 @@ def test_actual_programme_admission_and_decoder_refuse_unreceipted_or_outside_wa
             (source.coordinate.coordinate_id, source.coordinate), (source.provenance.identity.object_id, source.provenance),
             *((source.root.stream_identity(stream).object_id, stream) for stream in source.root.streams))
         values = tuple(write(plane, name, value.canonical_bytes(), value.SCHEMA) for name, value in shared)
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.retained import _manifest
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.retained import _manifest
         values += tuple(_manifest(plane, p.materialization.relative_path) for p in
             (source.reservation.publication, source.specification.publication))
         return programme_context(plane, config, 'prefix', compact.NAMESPACE+'.'+root_id+'.prefix',
@@ -183,9 +177,9 @@ def test_actual_programme_admission_and_decoder_refuse_unreceipted_or_outside_wa
     # Use the actual recursive compiler and a complete global study. The
     # supplied qualifications are explicitly hypothetical software fixtures.
     from tests.programme_entry_support import programme_scientific_root, qualify_programme_draft
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_composition as composition
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_composition as composition
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     root, reference = programme_scientific_root(response_bank, programme, bank)
     tasks = composition.programme_wave_runtime_task_ids(programme, bank, wave.wave_id)
     from tests.runtime_platform.test_candidate_compiler import _fixture
@@ -220,7 +214,7 @@ def test_actual_programme_admission_and_decoder_refuse_unreceipted_or_outside_wa
     # The ordinary bounded wave cannot own full64 evidential support. Keep
     # the stock candidate compiler's exact refusal instead of assigning
     # global observation, convergence, uncertainty or reveal to admission.
-    from empirical_lawhood.runtime.candidate_compiler import CandidateDiagnosticCode
+    from empirical_lawhood.execution.candidate_compiler import CandidateDiagnosticCode
     assert compiled.candidate_report.candidate is None
     diagnostics = compiled.candidate_report.diagnostics
     assert all(d.code is CandidateDiagnosticCode.SCIENTIFIC_OBLIGATION_UNCOVERED for d in diagnostics), diagnostics

@@ -7,9 +7,9 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.infrastructure import matrix_array_io as owner
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.adapters.matrix_storage import matrix_array_io as owner
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 
 
 @pytest.mark.parametrize("population", (8, 257))

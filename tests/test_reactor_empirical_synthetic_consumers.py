@@ -10,15 +10,15 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.reactor_causal_response.calibration import RootOperands, calibrate, qualification_operands
-from empirical_lawhood.adapters.methods.reactor_causal_response.campaign_analysis import analyze_cohort, analyze_root
-from empirical_lawhood.adapters.methods.reactor_causal_response.config import ARMS, CONFIRMATION_ROOTS, ROLES, EmpiricalRecipe, arm_order
-from empirical_lawhood.adapters.methods.reactor_causal_response.discovery import Rows, discover
-from empirical_lawhood.adapters.methods.reactor_causal_response.experiment_records import EmpiricalDiscoveryEnvelope, EmpiricalQualificationTerminal
-from empirical_lawhood.adapters.methods.reactor_causal_response.numerical import Observation, features
+from empirical_lawhood.domains.reactor.reactor_causal_response.calibration import RootOperands, calibrate, qualification_operands
+from empirical_lawhood.domains.reactor.reactor_causal_response.campaign_analysis import analyze_cohort, analyze_root
+from empirical_lawhood.domains.reactor.reactor_causal_response.config import ARMS, CONFIRMATION_ROOTS, ROLES, EmpiricalRecipe, arm_order
+from empirical_lawhood.domains.reactor.reactor_causal_response.discovery import Rows, discover
+from empirical_lawhood.domains.reactor.reactor_causal_response.experiment_records import EmpiricalDiscoveryEnvelope, EmpiricalQualificationTerminal
+from empirical_lawhood.domains.reactor.reactor_causal_response.numerical import Observation, features
 from empirical_lawhood.adapters.simulators.reactor_causal_response.campaign import acquire_confirmation
-from empirical_lawhood.adapters.simulators.reactor_causal_response.interface import Actuator
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.reactor.reactor_causal_response.actuator import Actuator
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def _identity(name: str) -> ObjectIdentity:

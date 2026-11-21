@@ -1,0 +1,174 @@
+{
+  "actions": [
+    0.5,
+    1.0,
+    2.0
+  ],
+  "calibration_unit_ids": [
+    "unit.r19.calibration.0000",
+    "unit.r19.calibration.0001",
+    "unit.r19.calibration.0002",
+    "unit.r19.calibration.0003",
+    "unit.r19.calibration.0004",
+    "unit.r19.calibration.0005",
+    "unit.r19.calibration.0006",
+    "unit.r19.calibration.0007",
+    "unit.r19.calibration.0008",
+    "unit.r19.calibration.0009",
+    "unit.r19.calibration.0010",
+    "unit.r19.calibration.0011"
+  ],
+  "descriptions": [
+    {
+      "features": [
+        "action",
+        "horizon",
+        "initial_soc"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 3 coordinate accesses, 3 coordinate conversions, 0 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 6.0,
+      "id": "minimal",
+      "interface_dimension": 0,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "ridge",
+      "rationale": "Test whether one instantaneous state coordinate supports this action/receiver family.",
+      "state_dimension": 1
+    },
+    {
+      "features": [
+        "action",
+        "horizon",
+        "history_current_a",
+        "initial_soc",
+        "initial_temperature_k"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 5 coordinate accesses, 5 coordinate conversions, 0 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 10.0,
+      "id": "additive",
+      "interface_dimension": 0,
+      "memory_dimension": 1,
+      "memory_samples": 1,
+      "model": "ridge",
+      "rationale": "Separate additive preparation and retained-history coordinates; no multiplicative interface.",
+      "state_dimension": 2
+    },
+    {
+      "features": [
+        "action",
+        "horizon",
+        "history_current_a",
+        "initial_soc",
+        "initial_temperature_k",
+        "action_x_state",
+        "action_x_context"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 7 coordinate accesses, 7 coordinate conversions, 2 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 16.0,
+      "id": "interface",
+      "interface_dimension": 2,
+      "memory_dimension": 1,
+      "memory_samples": 1,
+      "model": "ridge",
+      "rationale": "Pay for explicit action/state and action/history interface dependence.",
+      "state_dimension": 2
+    },
+    {
+      "features": [
+        "action",
+        "horizon",
+        "history_current_a",
+        "initial_soc",
+        "initial_temperature_k",
+        "action_x_state",
+        "action_x_context",
+        "state_x_context"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 8 coordinate accesses, 8 coordinate conversions, 3 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 19.0,
+      "id": "joint",
+      "interface_dimension": 3,
+      "memory_dimension": 1,
+      "memory_samples": 1,
+      "model": "ridge",
+      "rationale": "Joint second-order description is an authored candidate, not an assertion of global minimality.",
+      "state_dimension": 2
+    }
+  ],
+  "economics": {
+    "accounting_unit": "authored-cost-unit",
+    "action_price": "0",
+    "compute_price": "0.0001",
+    "interface_price": "0.001",
+    "maximum_control_regret": "1",
+    "memory_price": "0.001",
+    "minimum_coverage": "0.9",
+    "missing_penalty": "1000000",
+    "reuse_count": 1,
+    "ridge_penalty": "0.001",
+    "safety_penalty": "1000000",
+    "state_price": "0.001"
+  },
+  "evaluation_unit_ids": [
+    "unit.r19.evaluation.0000",
+    "unit.r19.evaluation.0001",
+    "unit.r19.evaluation.0002",
+    "unit.r19.evaluation.0003",
+    "unit.r19.evaluation.0004",
+    "unit.r19.evaluation.0005"
+  ],
+  "family_id": "R19",
+  "horizons": [
+    60.0,
+    120.0
+  ],
+  "parameters": {
+    "atol": 1e-08,
+    "expected_versions": {
+      "pybamm": "26.6.2.0"
+    },
+    "history_current_a_range": [
+      0.0,
+      1.0
+    ],
+    "history_duration_s": 30.0,
+    "initial_soc_range": [
+      0.35,
+      0.8
+    ],
+    "initial_temperature_k_range": [
+      293.15,
+      303.15
+    ],
+    "parameter_set": "Chen2020",
+    "rtol": 1e-06,
+    "sample_interval_s": 5.0,
+    "spatial_points": 12
+  },
+  "question": "When does an SPMe continuation preserve the DFN voltage/temperature promise, and where do state/history omissions cause costly error?",
+  "receiver_policies": {
+    "temperature_reduction_defect_k": {
+      "max_abs_error": 0.5,
+      "safety_lower": 0,
+      "safety_upper": 1,
+      "scale": 1,
+      "target": 0,
+      "units": "K",
+      "weight": 1.0
+    },
+    "voltage_reduction_defect_v": {
+      "max_abs_error": 0.02,
+      "safety_lower": 0,
+      "safety_upper": 0.05,
+      "scale": 0.05,
+      "target": 0,
+      "units": "V",
+      "weight": 1.0
+    }
+  },
+  "seed": 20261114
+}

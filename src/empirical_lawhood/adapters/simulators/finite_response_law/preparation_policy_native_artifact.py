@@ -5,9 +5,9 @@ from functools import lru_cache
 import io
 from typing import ClassVar
 
-from .native_artifact import FiniteResponseLawNativePairArtifact, METADATA
+from empirical_lawhood.adapters.simulators.finite_response_law.native_artifact import FiniteResponseLawNativePairArtifact, METADATA
 from empirical_lawhood.adapters.simulators.six_matrix_response.response_source import response_hdf5_text, response_hdf5_writer
-from .preparation_policy_source import FiniteResponseLawPreparationPolicyNativeCheckpoint, FiniteResponseLawPreparationPolicyNativeDelivery
+from empirical_lawhood.domains.matrix.finite_response_law.preparation_policy_source import FiniteResponseLawPreparationPolicyNativeCheckpoint, FiniteResponseLawPreparationPolicyNativeDelivery
 
 PREPARATION_POLICY_NATIVE_PAIR_SCHEMA = 'empirical-lawhood/simulators/finite-response-law/preparation-screen-native-pair-hdf5'
 PREPARATION_POLICY_METADATA = {

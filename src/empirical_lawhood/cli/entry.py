@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from collections.abc import MutableMapping
 import os
+import sys
 
 
 NUMERICAL_THREAD_ENV_VARS = (
@@ -80,8 +81,14 @@ def main() -> None:
     """Set numerical limits before importing the full CLI and dispatch it."""
 
     enforce_single_thread_environment()
-    from empirical_lawhood.cli.app import main as cli_main
-
+    if "--no-progress" in sys.argv[1:] or any(v in sys.argv[1:] for v in ("--help", "-h")) or any(k.endswith("_COMPLETE") for k in os.environ):
+        from empirical_lawhood.cli.app import main as cli_main
+    else:
+        from empirical_lawhood.storage.progress import OperationalProgressReporter
+        from empirical_lawhood.execution.progress import report_progress
+        with OperationalProgressReporter(None, "CLI startup", stream=sys.stderr):
+            report_progress(phase="cli.import", detail="Loading command definitions; remaining work unknown")
+            from empirical_lawhood.cli.app import main as cli_main
     cli_main()
 
 

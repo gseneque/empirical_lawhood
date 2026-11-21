@@ -5,9 +5,9 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.infrastructure.recovery import RunRecoveryError, _require_catalog_dependency_causes
-from empirical_lawhood.runtime.execution import OperationalFailureClass
-from empirical_lawhood.runtime.recovery import OperationalFailureDiagnostic, TaskRecoveryDisposition
+from empirical_lawhood.storage.recovery import RunRecoveryError, _require_catalog_dependency_causes
+from empirical_lawhood.execution.execution import OperationalFailureClass
+from empirical_lawhood.execution.recovery import OperationalFailureDiagnostic, TaskRecoveryDisposition
 from tests.recovery_support import case as case
 
 

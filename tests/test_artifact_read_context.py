@@ -12,9 +12,9 @@ import sys
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, ExternalRootUnavailable, verify_read_context_snapshots
-from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256
-from empirical_lawhood.runtime.artifacts import ArtifactSemanticValidationRegistry, ArtifactWriteRequest
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, ExternalRootUnavailable, verify_read_context_snapshots
+from empirical_lawhood.storage.bounded_io import bounded_file_sha256
+from empirical_lawhood.storage.contracts.artifacts import ArtifactSemanticValidationRegistry, ArtifactWriteRequest
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 
 
@@ -149,7 +149,7 @@ def test_real_shared_closure_has_one_member_traversal_and_linear_path_work(tmp_p
             assert sum(len(row[0]) for row in reading._read_verification.context_censuses[
                 (reading.validators, reading.semantic_validations.fingerprint())].values()) <= 2 * count
     assert work['payloads'] == count
-    assert work['sidecars'] == 2 * count
+    assert work['sidecars'] == count
     assert work['snapshot_paths'] <= 5 * (2 * count + 1)
     assert work['snapshot_calls'] <= 8
     assert work['snapshot_content_checks'] == work['snapshot_paths']
@@ -217,7 +217,7 @@ def test_new_read_closure_has_no_intermediate_rehash_and_one_complete_final_guar
 
 
 def test_internal_borrow_cannot_remove_worker_delivery_or_an_absent_final_guard(tmp_path):
-    from empirical_lawhood.runtime.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind
+    from empirical_lawhood.execution.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind
 
     plane, manifests = _publication(tmp_path, 1)
     with pytest.raises(ArtifactIdentityConflict, match='active read context'):
@@ -232,7 +232,7 @@ def test_internal_borrow_cannot_remove_worker_delivery_or_an_absent_final_guard(
 
 @pytest.mark.parametrize('mode', ('reduced', 'strict'))
 def test_composite_checkpoint_hashes_a_shared_census_once_and_refreshes_all_access(tmp_path, mode):
-    from empirical_lawhood.runtime.operational_configuration import ArtifactVerificationMode
+    from empirical_lawhood.execution.operational_configuration import ArtifactVerificationMode
     plane, manifests = _publication(tmp_path, 4)
     plane.artifact_verification = ArtifactVerificationMode(mode)
     access = []

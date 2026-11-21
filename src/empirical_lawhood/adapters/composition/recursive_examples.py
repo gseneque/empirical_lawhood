@@ -4,20 +4,20 @@
 from dataclasses import replace
 from decimal import Decimal
 
-from empirical_lawhood.kernel.authority import AuthorityAction, AuthorityPolicy, ResourceBudget, SourceAccessClass
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import ConditionRole, ContributionRole, ScientificConditionScope, ScientificRequirementSpec
-from empirical_lawhood.kernel.status import LifecycleStatus
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft, SupplierProposal
-from empirical_lawhood.planning.study_authoring import UnresolvedDecision
+from empirical_lawhood.science.identity.authority import AuthorityAction, AuthorityPolicy, ResourceBudget, SourceAccessClass
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import ConditionRole, ContributionRole, ScientificConditionScope, ScientificRequirementSpec
+from empirical_lawhood.science.records.status import LifecycleStatus
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft, SupplierProposal
+from empirical_lawhood.design.study_authoring import UnresolvedDecision
 
 
 def rc_scientific_examples():
     """Reconstruct the three frozen historical designs without private paths."""
-    from empirical_lawhood.adapters.methods.rc_prerequisite_chain.science import default_chain_config
+    from empirical_lawhood.domains.circuits.rc_prerequisite_chain.science import default_chain_config
     original = default_chain_config()
     menu_protocol = replace(original.protocol, protocol_id="rc-prerequisite-chain.dc1-menu-v2",
         preparation_durations_seconds=(*original.protocol.preparation_durations_seconds, Decimal("2")),

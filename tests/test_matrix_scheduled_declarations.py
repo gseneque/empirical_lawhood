@@ -5,25 +5,11 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_prospective import operation_bindings as prospective
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import (
-    calibration_bindings as calibration,
-    compact_bindings as compact,
-    operation_bindings as scheduled,
-    programme_acquisition_bindings as acquisition,
-    programme_bindings as programme,
-    programme_calibration_bindings as global_calibration,
-    programme_confirmation as confirmation,
-    programme_global as global_freeze,
-    programme_tail_freeze as tail,
-    response_bindings as response,
-    revision_calibrated_future_bindings as calibrated_future,
-    revision_forecast_bindings as revision_forecast,
-    revision_future_bindings as revision_future,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityPermission as Permission
-from empirical_lawhood.runtime.execution import ParentPreparedTaskRunner
-from empirical_lawhood.runtime.plans import BarrierKind, ScientificStage
+from empirical_lawhood.domains.matrix.matrix_prospective import operation_bindings as prospective
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import calibration_bindings as calibration, compact_bindings as compact, operation_bindings as scheduled, programme_acquisition_bindings as acquisition, programme_bindings as programme, programme_calibration_bindings as global_calibration, programme_confirmation as confirmation, programme_global as global_freeze, programme_tail_freeze as tail, response_bindings as response, revision_calibrated_future_bindings as calibrated_future, revision_forecast_bindings as revision_forecast, revision_future_bindings as revision_future
+from empirical_lawhood.execution.capabilities import CapabilityPermission as Permission
+from empirical_lawhood.execution.execution import ParentPreparedTaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ScientificStage
 
 
 # These rosters and implementation labels are copied from the preserved 3eb56810
@@ -226,7 +212,7 @@ def test_current_native_callbacks_and_inquiry_identity_keep_their_owning_functio
         assert rows['responses'].execution_properties.native_work_preparer is response.prepare_native_work
         assert rows['prefix'].execution_properties.complete_unit_census is True
         assert rows['responses'].execution_properties.complete_unit_census is True
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_qualified_parent
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_qualified_parent
     calibrated = by_role(acquisition)['forecast-calibrated'].scientific_hooks
     assert calibrated.qualified_parent_assessor is programme_qualified_parent.qualified_parent_assessor
     assert calibrated.qualified_parent_evidence_schema_ids == (

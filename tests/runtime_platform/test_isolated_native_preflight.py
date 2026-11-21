@@ -10,15 +10,15 @@ import sys
 
 import pytest
 
-from empirical_lawhood.infrastructure import isolated_native_subwork as bridge
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, WorkerPreflightError
-from empirical_lawhood.infrastructure.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkReply, NativeSubworkRequest, PipeNativeSubworkProgress
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.execution import ReceiptCheck, RunnerResult, TaskOutputPayload
-from empirical_lawhood.runtime.isolated_native_subwork import IsolatedNativeEntryReturn, IsolatedNativeEntrySelection, IsolatedNativeInvocation, IsolatedNativeProcessStart
-from empirical_lawhood.runtime.native_subwork import NativeSubworkOutput, NativeSubworkReceiptPublicationPending, NativeSubworkRoster, NativeSubworkState
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, PreparedNativeWork, PreparedWorkerEnvironment, WorkerPreflightMismatch, WorkerPreflightResult
+from empirical_lawhood.execution.local import isolated_native_subwork as bridge
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, WorkerPreflightError
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkReply, NativeSubworkRequest, PipeNativeSubworkProgress
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.execution import ReceiptCheck, RunnerResult, TaskOutputPayload
+from empirical_lawhood.execution.isolated_native_subwork import IsolatedNativeEntryReturn, IsolatedNativeEntrySelection, IsolatedNativeInvocation, IsolatedNativeProcessStart
+from empirical_lawhood.execution.native_subwork import NativeSubworkOutput, NativeSubworkReceiptPublicationPending, NativeSubworkRoster, NativeSubworkState
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, PreparedNativeWork, PreparedWorkerEnvironment, WorkerPreflightMismatch, WorkerPreflightResult
 from tests.runtime_platform.test_native_subwork import ExposedInput, _store
 from tests.runtime_platform.test_worker_preflight import ExposedReadRunner, _case, _literal_readiness
 
@@ -29,12 +29,12 @@ import os
 from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.isolated_native_subwork import IsolatedNativeEntryReturn, IsolatedNativeProcessStart
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkOutput
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, PreparedNativeWork
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.isolated_native_subwork import IsolatedNativeEntryReturn, IsolatedNativeProcessStart
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkOutput
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, PreparedNativeWork
 
 def _record(raw, kind):
     return decode_canonical_bytes(raw.encode(), kind, maximum_bytes=len(raw.encode()))

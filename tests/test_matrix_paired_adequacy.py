@@ -10,9 +10,9 @@ from math import comb
 import pytest
 from scipy.stats import beta, binomtest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import paired_adequacy as owner
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.paired_power import paired_binary_power
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import paired_adequacy as owner
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.methods.statistics.paired_power import paired_binary_power
 
 
 def compare(rows):

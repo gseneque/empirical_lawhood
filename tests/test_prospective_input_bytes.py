@@ -8,9 +8,9 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.api import recursive_prospective_authoring as owner
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.input_payloads import InputBytes
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.input_payloads import InputBytes
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec
 from tests.runtime_platform.test_recursive_compiler import Config
 from tests.runtime_platform.test_recursive_input_record_revisions_public import _revisioned_prospective_fixture
 from tests.runtime_platform.test_recursive_prospective_workflow import _authored_handoff_fixture, _registrations
@@ -72,7 +72,7 @@ def test_public_changed_input_transport_refuses_before_any_bulk_publication(tmp_
     entered = []
 
     def author(**kwargs):
-        from empirical_lawhood.infrastructure.candidate_sources import ExternalCandidateInputPublisher
+        from empirical_lawhood.storage.candidate_sources import ExternalCandidateInputPublisher
 
         bindings = list(kwargs["input_bindings"])
         automatic = {row.config_identity.object_fingerprint for row in kwargs["spec"].draft.operations

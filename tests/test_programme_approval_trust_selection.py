@@ -14,9 +14,9 @@ from typer.testing import CliRunner
 
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.planning.approval import ApprovalCheckerRegistry, AttestationResult, issue_approval_gate_attestation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.design.approval import ApprovalCheckerRegistry, AttestationResult, issue_approval_gate_attestation
 from tests.approval_support import deterministic_approval_signer
 from tests.runtime_platform.test_study_approval import _checker_registrations
 from tests.test_programme_catalog_selection import (

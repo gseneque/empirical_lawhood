@@ -5,22 +5,7 @@ from __future__ import annotations
 
 from importlib import import_module
 
-_EXPORT_MODULES = {
-    'ExcludedSolverControlAuthoringBundle': "authoring",
-    'ExcludedSolverControlConfig': "contracts",
-    'ExcludedSolverControlConfigDecoder': "registration",
-    'ExcludedSolverControlRuntimeProvider': "runtime",
-    'ExcludedSolverControlSourceManifest': "contracts",
-    "FixedQEExecutor": "solver",
-    "MaterialSolverExecutor": "solver",
-    "SyntheticMaterialSolverExecutor": "solver",
-    'excluded_solver_control_candidate_catalog': "candidate",
-    'build_excluded_solver_control_authoring_bundle': "authoring",
-    "config_decoders": "registration",
-    'expected_excluded_solver_control_source_manifest': "source",
-    'inspect_excluded_solver_control_external_assets': "source",
-    "load_config": "contracts",
-}
+_EXPORT_MODULES = {'ExcludedSolverControlAuthoringBundle': 'authoring', 'ExcludedSolverControlConfigDecoder': 'registration', 'ExcludedSolverControlRuntimeProvider': 'runtime', 'FixedQEExecutor': 'solver', 'MaterialSolverExecutor': 'solver', 'SyntheticMaterialSolverExecutor': 'solver', 'build_excluded_solver_control_authoring_bundle': 'authoring', 'config_decoders': 'registration', 'expected_excluded_solver_control_source_manifest': 'source', 'inspect_excluded_solver_control_external_assets': 'source', 'load_config': 'contracts'}
 
 __all__ = list(_EXPORT_MODULES)
 

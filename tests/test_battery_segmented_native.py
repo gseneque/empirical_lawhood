@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: MPL-2.0
 """Exposed bounded-method fixtures with real custody; no battery acquisition."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from decimal import Decimal
 from hashlib import sha256
-from pathlib import Path
 import subprocess
 import sys
 from types import SimpleNamespace
@@ -12,21 +12,21 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, science
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_native as native
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.preparation_contracts import ObservationKind, PreparationProtocol
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.preparation_science import PREPARATION_SOURCE_MEMBERS
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.segmented_contracts import SegmentedMethodProtocol, SegmentedNativeConfig
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.source_derived_preparation import assess_source_roots, supply_source_roots
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, science
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as native
+from empirical_lawhood.domains.battery.battery_refined_inquiry.preparation_contracts import ObservationKind, PreparationProtocol
+from empirical_lawhood.domains.battery.battery_refined_inquiry.preparation_science import PREPARATION_SOURCE_MEMBERS
+from empirical_lawhood.domains.battery.battery_refined_inquiry.segmented_contracts import SegmentedMethodProtocol, SegmentedNativeConfig
+from empirical_lawhood.domains.battery.battery_refined_inquiry.source_derived_preparation import assess_source_roots, supply_source_roots
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
 from tests.runtime_platform.test_native_subwork import _plane, _store
 from tests.test_battery_prepared_native import model_fixture
 from tests.test_battery_refined_inquiry import exposed as exposed_fixture, selected as selected_fixture
@@ -61,8 +61,7 @@ def custody(tmp_path, selected, request):
         result = plane.write(ArtifactWriteRequest(name, "inputs/" + name + ".json", record.SCHEMA,
             ArtifactProfile.CANONICAL_JSON, "application/json", "exposed.segment.inputs", "inputs", record.canonical_bytes(),
             VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
-        manifests.append(decode_artifact_manifest(plane.root.resolve(
-            result.materialization.relative_path + ".manifest.json", for_write=False).read_bytes()))
+        manifests.append(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()))
     manifests = tuple(sorted(manifests, key=lambda row: row.materialization.materialization_id))
     parent = NativeEffectContact("exposed.segment", "battery.forecast", "exposed.segment.battery.forecast.attempt-001",
         ObjectIdentity("plan.exposed", "empirical-lawhood/runtime/development-execution-plan", "1.0.0", "1" * 64),
@@ -152,8 +151,7 @@ def exposed_backend(custody, monkeypatch, *, derivatives="returned", fail_at=Non
             solution.chamber = float(custody.config.chamber_temperature_k)
             return solution
 
-    backend = SimpleNamespace(BaseSolver=Solver, Solution=Solution, lithium_ion=SimpleNamespace(ElectrodeSOHSolver=SOH),
-        __file__=str(Path.cwd() / ".venv/lib/python3.11/site-packages/pybamm/__init__.py"))
+    backend = SimpleNamespace(BaseSolver=Solver, Solution=Solution, lithium_ion=SimpleNamespace(ElectrodeSOHSolver=SOH))
     solver = Solver()
 
     def build(config, protocol, selected_backend):
@@ -168,7 +166,11 @@ def exposed_backend(custody, monkeypatch, *, derivatives="returned", fail_at=Non
 
     monkeypatch.setitem(sys.modules, "pybamm", backend)
     monkeypatch.setattr(native, "build_runtime", build)
-    monkeypatch.setattr(native.passive, "_validate_source_pins", lambda *_: None)
+    def selected_sources(selected_backend, protocol, members):
+        assert selected_backend is backend and protocol == custody.protocol
+        assert members == custody.config.source.source_members
+
+    monkeypatch.setattr(native.passive, "_validate_source_pins", selected_sources)
     return backend, solver, effects
 
 
@@ -422,7 +424,7 @@ def test_foreign_protocol_refuses_before_effect_or_import(custody, monkeypatch):
 
 def test_segmented_owner_import_is_cold():
     result = subprocess.run([sys.executable, "-c",
-        "import sys; from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_native as n; "
+        "import sys; from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as n; "
         "assert 'pybamm' not in sys.modules; assert 'flint' not in sys.modules; assert len(n.forecast_outputs()) == 10"],
         check=False, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr

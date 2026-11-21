@@ -10,30 +10,24 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.kernel.authority import AuthorityAction, ResourceBudget
-from empirical_lawhood.kernel.evidence import ClaimSpec, EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import DevelopmentStudySpec
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import LifecycleStatus
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
-from empirical_lawhood.planning.recursive_authoring import RecursiveInputLink, RecursiveOperationSpec, RecursiveStudyDraft
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, derived_outcome_access
-from empirical_lawhood.runtime.candidate_compiler import CandidateDiagnosticCode, _source_diagnostics
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityPermission, CapabilityRegistry, input_access_allowed
-from empirical_lawhood.runtime.compiler import _config_input
-from empirical_lawhood.runtime.input_access import derive_original_parent_input_contracts, validate_planned_input_access
-from empirical_lawhood.runtime.plans import OutputTemplate, ScientificInputRole, ScientificStage, development_task_output_custody
-from empirical_lawhood.runtime.recursive_compiler import (
-    DecodedRecursiveConfigInput, RecursiveConfigInput, RecursivePortContract, compile_recursive_wave,
-    configuration_graph_bindings, decode_recursive_config_input, project_recursive_config_inputs,
-    validate_recursive_config_input,
-)
-from empirical_lawhood.runtime.recursive_provider import (
-    RecursiveExecutionProperties, RecursiveOperationDeclaration, RecursiveScientificHooks,
-)
-from empirical_lawhood.runtime.scientific_graph_preservation import prove_development_graph_parity
+from empirical_lawhood.science.identity.authority import AuthorityAction, ResourceBudget
+from empirical_lawhood.science.evidence.evidence import ClaimSpec, EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import DevelopmentStudySpec
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import LifecycleStatus
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
+from empirical_lawhood.design.recursive_authoring import RecursiveInputLink, RecursiveOperationSpec, RecursiveStudyDraft
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, derived_outcome_access
+from empirical_lawhood.execution.candidate_compiler import CandidateDiagnosticCode, _source_diagnostics
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityPermission, CapabilityRegistry, input_access_allowed
+from empirical_lawhood.execution.compiler import _config_input
+from empirical_lawhood.execution.input_access import derive_original_parent_input_contracts, validate_planned_input_access
+from empirical_lawhood.execution.plans import OutputTemplate, ScientificInputRole, ScientificStage, development_task_output_custody
+from empirical_lawhood.execution.recursive_compiler import DecodedRecursiveConfigInput, RecursiveConfigInput, RecursivePortContract, compile_recursive_wave, configuration_graph_bindings, decode_recursive_config_input, project_recursive_config_inputs, validate_recursive_config_input
+from empirical_lawhood.execution.recursive_provider import RecursiveExecutionProperties, RecursiveOperationDeclaration, RecursiveScientificHooks
+from empirical_lawhood.execution.scientific_graph_preservation import prove_development_graph_parity
 
 
 @dataclass(frozen=True, slots=True)

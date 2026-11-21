@@ -3,20 +3,22 @@ from __future__ import annotations
 import json
 import subprocess
 from hashlib import sha256
+from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.effective_law_comparison.analysis import PosthocDocumentSet, execute_analysis
-from empirical_lawhood.adapters.methods.effective_law_comparison.authoring import build_authorized_package, build_freeze
-from empirical_lawhood.adapters.methods.effective_law_comparison.sources import ParentSourceDefinition, SourceMemberDefinition, qualify_parent_sources
-from empirical_lawhood.adapters.independent_source_exports import IndependentSourceExport, OriginalObjectReference, OriginalArtifactReference
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity, ArtifactMaterialization, ArtifactManifest
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.posthoc import POSTHOC_ANALYSIS_IDS, PosthocExecutionAuthorization
+from empirical_lawhood.methods.effective_law_comparison.analysis import PosthocDocumentSet, execute_analysis
+from empirical_lawhood.api.effective_law_comparison import build_authorized_package, build_freeze
+from empirical_lawhood.design.posthoc_sources import ParentSourceDefinition, SourceMemberDefinition
+from empirical_lawhood.storage.posthoc_sources import qualify_parent_sources
+from empirical_lawhood.science.identity.source_exports import IndependentSourceExport, OriginalObjectReference, OriginalArtifactReference
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity, ArtifactMaterialization, ArtifactManifest
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.posthoc import POSTHOC_ANALYSIS_IDS, PosthocExecutionAuthorization
 
 
 def _parent(source_export: IndependentSourceExport | None = None) -> ParentSourceDefinition:
@@ -48,7 +50,21 @@ def _current_source(tmp_path, *, write_manifest: bool = True):
     validator = ArtifactGenericValidation("validator.canonical-json", "1.0.0", "3" * 64, schema, ArtifactProfile.CANONICAL_JSON)
     logical = LogicalArtifactIdentity("sample-artifact", digest, schema, ArtifactProfile.CANONICAL_JSON, "application/json", VisibilityCeiling.OUTCOME_VISIBLE, (), OutcomeAccess.EVALUATION_REVEALED, validator)
     physical = ArtifactMaterialization("sample-materialization", "sample-artifact", "sample-root", "inputs/sample.json", digest, len(payload), "none")
-    manifest = ArtifactManifest(logical, physical)
+    from empirical_lawhood.storage.contracts.artifact_sidecar import ArtifactManifestReference
+    from empirical_lawhood.storage.contracts.artifacts import (
+        ArtifactPublicationBinding, ArtifactPublicationCommit, ArtifactPublicationScope,
+        artifact_publication_batch_id, artifact_publication_commit_relative_path, artifact_publication_member)
+    scope = ArtifactPublicationScope('sample.publication', 'sample-root', 'inputs',
+        VisibilityCeiling.OUTCOME_VISIBLE, OutcomeAccess.EVALUATION_REVEALED)
+    members = (artifact_publication_member(logical, physical),)
+    batch = artifact_publication_batch_id(scope, members)
+    commit = ArtifactPublicationCommit(batch, scope, members).canonical_bytes()
+    binding = ArtifactPublicationBinding(batch, scope, artifact_publication_commit_relative_path(scope, batch),
+        sha256(commit).hexdigest(), len(commit), members)
+    manifest = ArtifactManifestReference.from_manifest(ArtifactManifest(logical, physical, binding))
+    marker = tmp_path / binding.commit_marker_relative_path
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    marker.write_bytes(commit)
     if write_manifest:
         path.with_suffix(".json.manifest.json").write_bytes(manifest.canonical_bytes())
     original_schema = "icf-yolo/results/qtsq-closeout/v4"
@@ -68,7 +84,7 @@ def _current_source(tmp_path, *, write_manifest: bool = True):
         target_relative_path="inputs/sample.json",
         target_task_receipt=ObjectIdentity("current.sample-receipt", "empirical-lawhood/runtime/canonical-task-receipt", "1.0.0", "2" * 64),
         target_manifest_sha256=manifest.fingerprint(),
-        target_publication_commit_sha256="4" * 64,
+        target_publication_commit_sha256=binding.commit_marker_sha256,
         original_physical_unit_ids=("original.sample-unit",),
         target_physical_unit_ids=("sample-unit",),
     )
@@ -111,7 +127,7 @@ def test_partition_sensitive_analysis_requires_explicit_mapping() -> None:
 def test_posthoc_freeze_uses_explicit_roster_and_clean_source(tmp_path, monkeypatch) -> None:
     subprocess.run(("git", "init", "-q", str(tmp_path)), check=True)
     _, _, export, _ = _current_source(tmp_path)
-    from empirical_lawhood.adapters.methods.effective_law_comparison import provider
+    from empirical_lawhood.methods.effective_law_comparison import provider
     monkeypatch.setattr(
         provider,
         "SUPPORTED_INPUT_SCHEMAS",
@@ -186,3 +202,105 @@ def test_posthoc_freeze_uses_explicit_roster_and_clean_source(tmp_path, monkeypa
             plan_sha256=sha256(b"one explicit nonpromotable plan").hexdigest(),
             freeze_id="sample-posthoc.freeze",
         )
+
+
+def test_retained_posthoc_reader_preserves_bytes_and_refuses_changed_ancestry(tmp_path):
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactSemanticValidation, CanonicalTaskReceipt
+    from empirical_lawhood.storage.posthoc_results import EffectiveLawPosthocReadPorts, read_published_task
+
+    implementation = "a" * 64
+    resolutions = []
+    verifications = []
+
+    class ReadOnlyRoot:
+        def resolve(self, relative_path, *, for_write, operation_minimum_free_bytes=0):
+            assert for_write is False
+            resolutions.append(relative_path)
+            return tmp_path / relative_path
+
+    class ReadOnlyPlane:
+        def verify(self, materialization):
+            verifications.append(materialization.relative_path)
+            payload = (tmp_path / materialization.relative_path).read_bytes()
+            assert len(payload) == materialization.size_bytes
+            if sha256(payload).hexdigest() != materialization.physical_sha256:
+                raise ValueError("changed original bytes")
+
+        def verify_manifest(self, manifest):
+            self.verify(manifest.materialization)
+            sidecar = tmp_path / (manifest.materialization.relative_path + ".manifest.json")
+            assert sidecar.read_bytes() == manifest.canonical_bytes()
+
+    def publish_fixture(relative_path, artifact_id, document, *, payload=None):
+        payload = canonical_json_bytes(document) if payload is None else payload
+        schema = document["schema"]
+        generic = ArtifactGenericValidation("validator.canonical-json", "1.0.0", "3" * 64,
+            schema, ArtifactProfile.CANONICAL_JSON)
+        semantic = ArtifactSemanticValidation(f"posthoc-json.{artifact_id}", "1.0.0", implementation,
+            schema, ArtifactProfile.CANONICAL_JSON, ("schema", "value", "version"),
+            tuple(sorted(document["value"])))
+        logical = LogicalArtifactIdentity(artifact_id, sha256(payload).hexdigest(), schema,
+            ArtifactProfile.CANONICAL_JSON, "application/json", VisibilityCeiling.OUTCOME_VISIBLE,
+            (), OutcomeAccess.EVALUATION_REVEALED, generic, semantic_validation=semantic)
+        physical = ArtifactMaterialization(artifact_id + ".physical", artifact_id, "test.root",
+            relative_path, sha256(payload).hexdigest(), len(payload), "none")
+        manifest = ArtifactManifest(logical, physical)
+        path = tmp_path / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(payload)
+        (tmp_path / (relative_path + ".manifest.json")).write_bytes(manifest.canonical_bytes())
+        return manifest
+
+    output_path = "run/outputs/task.one/result.json"
+    output = publish_fixture(output_path, "output.one", {
+        "schema": "empirical-lawhood/test/posthoc-retained", "version": "1.0.0",
+        "value": {"disposition": "UNEVALUABLE"},
+    })
+    receipt = CanonicalTaskReceipt("receipt.one", "run.one", "task.one", "attempt-001", "b" * 40,
+        ("input.original",), (output.materialization,), (output.logical,), (), OperationalStatus.SUCCEEDED, ())
+    publish_fixture("run/receipts/task.one/attempt-001.json", "receipt.one",
+        json.loads(receipt.canonical_bytes()), payload=receipt.canonical_bytes())
+    before = {path.relative_to(tmp_path): path.read_bytes() for path in tmp_path.rglob("*") if path.is_file()}
+    ports = EffectiveLawPosthocReadPorts(ReadOnlyRoot(), lambda registry: ReadOnlyPlane(),
+        lambda raw: decode_canonical_bytes(raw, ArtifactManifest, maximum_bytes=1024**2),
+        lambda raw: decode_canonical_bytes(raw, CanonicalTaskReceipt, maximum_bytes=16 * 1024**2),
+        "run", "run.one")
+    arguments = dict(ports=ports, task_id="task.one", implementation_commit="b" * 40,
+        implementation_sha256=implementation, expected_input_materialization_ids=("input.original",))
+    retained = read_published_task(**arguments)
+    assert retained.document["value"]["disposition"] == "UNEVALUABLE"
+    assert retained.receipt == receipt
+    assert retained.result.created is False
+    assert verifications and resolutions
+    assert before == {path.relative_to(tmp_path): path.read_bytes() for path in tmp_path.rglob("*") if path.is_file()}
+    with pytest.raises(ValueError, match="input closure drifted"):
+        read_published_task(**{**arguments, "expected_input_materialization_ids": ("input.substituted",)})
+    (tmp_path / output_path).write_bytes(before[Path(output_path)].replace(b"UNEVALUABLE", b"SATISFIED  "))
+    with pytest.raises(ValueError, match="changed original bytes"):
+        read_published_task(**arguments)
+
+
+def test_retained_posthoc_reader_refuses_partial_publication_without_writing(tmp_path):
+    from empirical_lawhood.storage.posthoc_results import EffectiveLawPosthocReadPorts, read_published_task
+
+    class ReadOnlyRoot:
+        def resolve(self, relative_path, *, for_write, operation_minimum_free_bytes=0):
+            assert for_write is False
+            return tmp_path / relative_path
+
+    def forbidden(*args):
+        raise AssertionError("absent or partial publication cannot reach a codec or verifier")
+
+    ports = EffectiveLawPosthocReadPorts(ReadOnlyRoot(), forbidden, forbidden, forbidden, "run", "run.one")
+    arguments = dict(ports=ports, task_id="task.one", implementation_commit="b" * 40,
+        implementation_sha256="a" * 64, expected_input_materialization_ids=())
+    assert read_published_task(**arguments) is None
+    output = tmp_path / "run/outputs/task.one/result.json"
+    output.parent.mkdir(parents=True)
+    output.write_bytes(b"{}")
+    with pytest.raises(ValueError, match="partial published state"):
+        read_published_task(**arguments)
+    assert tuple(path for path in tmp_path.rglob("*") if path.is_file()) == (output,)

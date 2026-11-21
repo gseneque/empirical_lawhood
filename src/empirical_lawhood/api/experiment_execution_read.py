@@ -8,10 +8,42 @@ Every scientific consumer must still use its ordinary complete result reader.
 from contextlib import contextmanager
 from pathlib import Path
 
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.recursive_custody import _execution_operational_census, _partial_operational_census
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.recursive_custody import _execution_operational_census, _partial_operational_census
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+
+
+def _retained_continuation_registry(*, writer, prefix, members, plan, index, access):
+    """Supply the authenticated original registry only to an existing repair read."""
+    from empirical_lawhood.api.native_continuation_execution import continuation_relative_path
+    path = writer.root.resolve(continuation_relative_path(index.run_id), for_write=False)
+    if not path.exists() and not path.is_symlink():
+        return None
+    return _authored_execution_registry(writer=writer, prefix=prefix, members=members, plan=plan, access=access)
+
+
+def _authored_execution_registry(*, writer, prefix, members, plan, access):
+    """Authenticate the original registry for an already authenticated control set."""
+    from empirical_lawhood.storage.recursive_custody import read_exposed_recursive_payload
+    from empirical_lawhood.storage.recursive_control_read import decode_authored_control
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from hashlib import sha256
+    name = 'registry.json'
+    member = members[name]
+    def payload(_name):
+        manifest = writer.read_manifest(prefix + '/' + name)
+        raw = read_exposed_recursive_payload(writer, manifest, maximum_bytes=member.size_bytes,
+            original_input_access=access)
+        if (len(raw) != member.size_bytes or sha256(raw).hexdigest() != member.identity.object_fingerprint
+                or manifest.logical.payload_schema != member.identity.object_schema):
+            raise PermissionError('execution registry changes its original authored member')
+        return raw
+    registry = decode_authored_control(members, name, CapabilityRegistry, read_payload=payload)
+    if (ObjectIdentity.from_record(member.identity.object_id, registry) != member.identity
+            or registry.fingerprint() != plan.registry_sha256):
+        raise PermissionError('execution registry changes its original plan binding')
+    return registry
 
 
 def load_development_execution_controls(*, directory, artifact_writer, expected_specification_bytes=None, read_access=None):
@@ -20,13 +52,13 @@ def load_development_execution_controls(*, directory, artifact_writer, expected_
     This reader cannot supply executable operands. The execution owner still
     authenticates the complete authored wave and its graph before dispatch.
     """
-    from .experiment_runtime_bindings import bootstrap_authored_development_inputs
-    from empirical_lawhood.infrastructure.recursive_custody import read_recursive_bootstrap_record, read_exposed_recursive_payload
-    from empirical_lawhood.kernel.decoding import decimal_context_key
-    from empirical_lawhood.infrastructure.recursive_control_read import CONTROL_VIEWS, decode_authored_control
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveImplementationBinding
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+    from empirical_lawhood.api.experiment_runtime_bindings import bootstrap_authored_development_inputs
+    from empirical_lawhood.storage.recursive_custody import read_recursive_bootstrap_record, read_exposed_recursive_payload
+    from empirical_lawhood.science.records.decoding import decimal_context_key
+    from empirical_lawhood.storage.recursive_control_read import CONTROL_VIEWS, decode_authored_control
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveImplementationBinding
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
 
     directory = Path(directory)
     if directory != directory.resolve(strict=True) or any(p.is_symlink() for p in (directory, *directory.parents)):
@@ -35,7 +67,7 @@ def load_development_execution_controls(*, directory, artifact_writer, expected_
     prefix = directory.relative_to(root).as_posix()
     packet = read_recursive_bootstrap_record(artifact_writer, prefix + '/authored-wave.json', AuthoredRecursiveWave)
     members = {row.filename: row for row in packet.members}
-    from .retained_e3_evidence import current_e3_evidence
+    from empirical_lawhood.api.retained_e3_evidence import current_e3_evidence
     retained = current_e3_evidence(artifact_writer)
     control_key = prefix, packet.fingerprint(), decimal_context_key()
     cached = None if retained is None or read_access is not None else retained.authored_controls.get(control_key)
@@ -65,8 +97,11 @@ def load_development_execution_controls(*, directory, artifact_writer, expected_
                 raise PermissionError('execution controls change the selected specification')
         if access is not None:
             access.require_current()
-        from .development_output_repair import select_development_output_repair
-        index = select_development_output_repair(writer=artifact_writer, plan=plan, predecessor=index)
+        from empirical_lawhood.api.development_output_repair import select_development_output_repair
+        registry = _retained_continuation_registry(writer=artifact_writer, prefix=prefix, members=members,
+            plan=plan, index=index, access=access)
+        index = select_development_output_repair(writer=artifact_writer, plan=plan, predecessor=index,
+            retained_registry=registry)
         return packet, run, plan, index, source, access
 
     def bootstrap(name, kind):
@@ -89,7 +124,7 @@ def load_development_execution_controls(*, directory, artifact_writer, expected_
         return raw
 
     def read(name, kind):
-        from empirical_lawhood.runtime.progress import report_progress
+        from empirical_lawhood.execution.progress import report_progress
         member = members[name]
         report_progress(phase='decode_retained.' + kind.SCHEMA.rsplit('/', 1)[-1])
         record = decode_authored_control(members, name, kind, read_payload=read_raw)
@@ -115,11 +150,14 @@ def load_development_execution_controls(*, directory, artifact_writer, expected_
     if access is not None:
         access.require_current()
     result = packet, run, plan, index, source, access
-    from .selected_e3_access import SelectedE3OriginalInputAccess
+    from empirical_lawhood.api.selected_e3_access import SelectedE3OriginalInputAccess
     if retained is not None and read_access is None and (access is None or type(access) is SelectedE3OriginalInputAccess):
         retained.authored_controls[control_key] = result
-    from .development_output_repair import select_development_output_repair
-    index = select_development_output_repair(writer=artifact_writer, plan=plan, predecessor=index)
+    from empirical_lawhood.api.development_output_repair import select_development_output_repair
+    registry = _retained_continuation_registry(writer=artifact_writer, prefix=prefix, members=members,
+        plan=plan, index=index, access=access)
+    index = select_development_output_repair(writer=artifact_writer, plan=plan, predecessor=index,
+        retained_registry=registry)
     return packet, run, plan, index, source, access
 
 
@@ -133,14 +171,12 @@ def observed_development_authoring(*, directory, artifact_writer, authoring_repo
     this invocation's actual author; every member and the absent run namespace
     remain guarded through the enclosing author's return.
     """
-    from empirical_lawhood.infrastructure.recursive_custody import (
-        AuthenticatedRecursivePayloads, read_recursive_bootstrap_record,
-    )
-    from empirical_lawhood.infrastructure.recursive_control_read import decode_authored_control
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveImplementationBinding
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+    from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads, read_recursive_bootstrap_record
+    from empirical_lawhood.storage.recursive_control_read import decode_authored_control
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveImplementationBinding
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
 
     directory = Path(directory)
     if (type(authoring_report) is not dict or authoring_report.get('status') != 'AUTHORED'
@@ -203,16 +239,17 @@ def observed_development_authoring(*, directory, artifact_writer, authoring_repo
             writer.require_verification_snapshot()
 
 
-def read_execution_records(*, writer, plan, index, observe_controls=None):
+def read_execution_records(*, writer, plan, index, observe_controls=None, authored_object=None):
     """Authenticate the frozen complete attempt census, including absent slots."""
-    from .recursive_execution import _custody_control_pins
-    from empirical_lawhood.runtime.progress import report_progress
+    from empirical_lawhood.api.recursive_execution import _custody_control_pins
+    from empirical_lawhood.execution.progress import report_progress
 
     report_progress(phase='retained_execution.controls.' + index.run_id)
     index.validate_plan(plan)
     before = _custody_control_pins(writer, index)
     recovery, receipts = ExternalRunRecoveryStore(writer), ExternalTaskReceiptStore(writer)
     run_path = writer.root.resolve('runs/' + index.run_id, for_write=False)
+    events = {}
     if not run_path.exists() and not run_path.is_symlink():
         terminal, rows = None, ()
         state = 'UNENTERED'
@@ -221,7 +258,7 @@ def read_execution_records(*, writer, plan, index, observe_controls=None):
         if not index_path.exists() and not index_path.is_symlink():
             # Input materialization precedes index publication. Absence of the
             # index is never evidence that a worker is active or has entered.
-            from .recursive_unentered import require_input_only_run
+            from empirical_lawhood.api.recursive_unentered import require_input_only_run
             require_input_only_run(writer, plan, index.run_id)
             terminal, rows, state = None, (), 'INPUTS_PARTIAL'
         else:
@@ -231,10 +268,10 @@ def read_execution_records(*, writer, plan, index, observe_controls=None):
             terminal = recovery.read_terminal(index)
             report_progress(phase='retained_execution.receipts.' + index.run_id)
             if terminal is None:
-                rows, _, _, _ = _partial_operational_census(recovery=recovery, store=receipts, plan=plan, index=index)
+                rows, events, _, _ = _partial_operational_census(recovery=recovery, store=receipts, plan=plan, index=index)
                 state = 'INCOMPLETE'
             else:
-                rows, _, _ = _execution_operational_census(recovery=recovery, store=receipts,
+                rows, events, _ = _execution_operational_census(recovery=recovery, store=receipts,
                     plan=plan, index=index, terminal=terminal)
                 state = terminal.operational_status
                 if state == 'SUCCEEDED' and (set(terminal.completed_task_ids) != {task.task_id for task in plan.tasks}
@@ -247,8 +284,11 @@ def read_execution_records(*, writer, plan, index, observe_controls=None):
         require_input_only_run(writer, plan, index.run_id)
     if observe_controls is not None:
         observe_controls(index, before)
-    from .development_output_repair import repair_report
-    return {**repair_report(index), 'run_id': index.run_id, 'status': state, 'execution_complete': state == 'SUCCEEDED',
+    from empirical_lawhood.api.development_output_repair import repair_report
+    from empirical_lawhood.api.retained_diagnostics import retained_failure_diagnostics
+    diagnostics = retained_failure_diagnostics(plan=plan, index=index, events=events, authored_object=authored_object)
+    return {**repair_report(index), **({'failure_diagnostics': diagnostics} if diagnostics else {}),
+        'run_id': index.run_id, 'status': state, 'execution_complete': state == 'SUCCEEDED',
         'execution_plan': ObjectIdentity.from_record(plan.execution_plan_id, plan).to_document(),
         'execution_plan_sha256': plan.fingerprint(),
         'recovery_index': ObjectIdentity.from_record(index.recovery_index_id, index).to_document(),
@@ -264,7 +304,7 @@ def read_execution_records(*, writer, plan, index, observe_controls=None):
 def read_development_execution(*, directory, artifact_writer, expected_specification_bytes=None,
         observe_controls=None, read_access=None):
     """Use the original authored owner before inspecting a development run."""
-    from .selected_e3_access import original_e3_authority_read_context
+    from empirical_lawhood.api.selected_e3_access import original_e3_authority_read_context
 
     with original_e3_authority_read_context(artifact_writer), artifact_writer.read_context() as writer:
         packet, _, plan, index, source, access = load_development_execution_controls(
@@ -272,7 +312,8 @@ def read_development_execution(*, directory, artifact_writer, expected_specifica
             read_access=read_access)
         if access is not None:
             access.require_current()
-        report = read_execution_records(writer=writer, plan=plan, index=index, observe_controls=observe_controls)
+        report = read_execution_records(writer=writer, plan=plan, index=index, observe_controls=observe_controls,
+            authored_object=packet.draft)
         if access is not None:
             access.require_current()
         writer.require_verification_snapshot()
@@ -286,8 +327,8 @@ def read_development_execution(*, directory, artifact_writer, expected_specifica
 def read_prospective_execution(*, selected, artifact_writer, package=None, run_id, observe_controls=None,
         reveal_authority_id=None):
     """Read issued execution controls, without opening protected outcome bodies."""
-    from .current_result_custody import CurrentResultPlanReader, current_result_package_present
-    from .recursive_qualified_parents import _actual_package
+    from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader, current_result_package_present
+    from empirical_lawhood.api.recursive_qualified_parents import _actual_package
 
     if not current_result_package_present(writer=artifact_writer, run_id=run_id):
         run_path = artifact_writer.root.resolve('runs/' + run_id, for_write=False)
@@ -307,13 +348,14 @@ def read_prospective_execution(*, selected, artifact_writer, package=None, run_i
                 or original.issued_study.source_closure != selected.implementation):
             raise PermissionError('issued execution inspection changes its original candidate/source/package')
         if reveal_authority_id is not None:
-            from .protected_e3_read_custody import _current_read_grants
+            from empirical_lawhood.api.protected_e3_read_custody import _current_read_grants
             _current_read_grants(writer, original, reveal_authority_id)
         plan = reader.authenticate_execution_plan(package=original, issued=original.issued_study, run_id=run_id)
         if {task.task_id for task in plan.tasks} != {task.task_id for task in selected.projection.tasks}:
             raise PermissionError('issued execution inspection changes its original complete task census')
         index = reader.original_recovery_index(package=original, execution_plan=plan)
-        report = read_execution_records(writer=writer, plan=plan, index=index, observe_controls=observe_controls)
+        report = read_execution_records(writer=writer, plan=plan, index=index, observe_controls=observe_controls,
+            authored_object=selected.instance.specification)
         writer.require_verification_snapshot()
         if reveal_authority_id is not None:
             _current_read_grants(writer, original, reveal_authority_id)

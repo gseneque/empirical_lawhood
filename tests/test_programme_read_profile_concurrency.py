@@ -14,7 +14,7 @@ from typer.testing import CliRunner
 
 from empirical_lawhood.api.results import CampaignStatusRequest, ResumeCampaignRequest, RunCampaignRequest
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
 from tests.test_programme_catalog_selection import (
     CATALOG, ROOT, _cli_fixture, _service, _source_catalog_census,
     operator, prospective_selection,  # noqa: F401
@@ -57,7 +57,7 @@ def test_real_four_core_profile_read_composes_selected_api_without_work_or_root_
 
 
 @pytest.mark.parametrize("lifecycle", ("run", "recover"))
-def test_explicit_run_and_recovery_workers_still_refuse_profile_mismatch(
+def test_explicit_run_and_recovery_workers_refuse_exceeding_profile_maximum(
         prospective_selection, operator, monkeypatch, lifecycle):  # noqa: F811
     selection = prospective_selection
     profile = replace(operator, maximum_parallel_tasks=4)
@@ -65,8 +65,8 @@ def test_explicit_run_and_recovery_workers_still_refuse_profile_mismatch(
     service = _service(selection, profile, catalog_relative_path=CATALOG)
     request = (RunCampaignRequest(Path(profile.external_root_locator) / "absent-package.json")
         if lifecycle == "run" else ResumeCampaignRequest("run.synthetic.absent"))
-    with pytest.raises(ValueError, match="experiment workers differ from the selected operator profile"):
-        getattr(service, lifecycle)(directory=selection.directory, maximum_parallel_tasks=1, request=request)
+    with pytest.raises(ValueError, match="usable CPU capacity"):
+        getattr(service, lifecycle)(directory=selection.directory, maximum_parallel_tasks=5, request=request)
     assert list((Path(profile.external_root_locator) / "scratch").iterdir()) == []
 
 

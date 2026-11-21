@@ -88,4 +88,4 @@ This reactor binding supplies no default family authority.
 
 The [reactor experiment guide](guide.md) owns the worked numerical contract and upstream attribution.
 The [scientific integrity guide](../../../../../docs/reference/scientific-integrity.md) states the evidence boundaries.
-The [public specification](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/specification.md) owns its separate finite-response scientific operands.
+The [public specification](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/specification.md) owns its separate finite-response scientific operands.

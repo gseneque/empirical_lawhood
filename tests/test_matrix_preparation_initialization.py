@@ -5,6 +5,7 @@ The public publication control discloses its original-custody stub. Independent
 source/seed exclusion and original reserve authentication remain with the actual
 production entry owner; the stub is never a scientific evidence fixture.
 """
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as _preparation_io_effect
 from dataclasses import replace
 from decimal import Decimal
 from hashlib import sha256
@@ -13,26 +14,27 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_initialization as domain
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_initialization_science as science
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_records as records
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science as consumer
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import MatrixPreparedOriginalCommitments
-from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import preparation_initialization as domain
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import preparation_initialization_science as science
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as science_owner_0
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import preparation_records as records
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as consumer_owner_0
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixPreparedOriginalCommitments
+from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
 from empirical_lawhood.api import matrix_preparation_initialization as api
 from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs, load_experiment_inputs
 from empirical_lawhood.api.recursive_authoring import implementation_binding
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
 from tests.test_matrix_factor_confirmation_eligibility import _matrix_plane
 from tests.test_matrix_prepared_source import prepared_bank
 from tests.test_matrix_selected_protected import transfer, unpublished  # noqa: F401
@@ -69,7 +71,7 @@ def forbid_contact(monkeypatch):
         pytest.fail("declared initialization entered RNG, trajectory or native contact")
     for name in ("Generator", "PCG64DXSM", "default_rng"):
         monkeypatch.setattr(np.random, name, forbidden)
-    monkeypatch.setattr(consumer, "acquire_preparation", forbidden)
+    monkeypatch.setattr(_preparation_io_effect, "acquire_preparation", forbidden)
 
 
 @pytest.mark.parametrize("family", science.FOUR_FAMILY_PREPARATION_IDS)
@@ -77,8 +79,8 @@ def test_all_four_declared_initial_rules_produce_exact_common_state_without_rng(
     source = source_for_family(transfer, family)
     forbid_contact(monkeypatch)
     before = source.reference.canonical_bytes()
-    state, raw = science.initialize_source(source, source.provenance, state_id="state.disclosed.initialization", artifact_id="array.disclosed.initialization")
-    actual = consumer.initial_state(state, raw)
+    state, raw = science_owner_0.initialize_source(source, source.provenance, state_id="state.disclosed.initialization", artifact_id="array.disclosed.initialization")
+    actual = consumer_owner_0.initial_state(state, raw)
     expected, alpha = science._literal_initial(source.coordinate)
     assert np.array_equal(actual.positions, expected["positions"]) and np.array_equal(actual.momenta, expected["momenta"])
     assert state.alpha_tilde == alpha and state.cutoff.clock_id == source.coordinate.clock_id
@@ -106,13 +108,13 @@ def test_primary_and_fine_must_match_before_common_state_projection(transfer, mo
         return state
     monkeypatch.setattr(science, "initial_parameter_state", changed)
     with pytest.raises(ValueError, match="share the exact original tick-zero"):
-        science.initialize_source(source, source.provenance, state_id="state.disclosed.views", artifact_id="array.disclosed.views")
+        science_owner_0.initialize_source(source, source.provenance, state_id="state.disclosed.views", artifact_id="array.disclosed.views")
 
 
 def test_independent_proof_refuses_consistently_rehashed_wrong_state_before_native(transfer, monkeypatch):  # noqa: F811
     source = transfer.sources.closure.original(transfer.sources.closure.descriptors[0],
         index=transfer.sources.closure.source_index())
-    state, raw = science.initialize_source(source, source.provenance, state_id="state.disclosed.mutation", artifact_id="array.disclosed.mutation")
+    state, raw = science_owner_0.initialize_source(source, source.provenance, state_id="state.disclosed.mutation", artifact_id="array.disclosed.mutation")
     arrays, _ = science._literal_initial(source.coordinate)
     arrays["positions"][0, 0, 0, 0] += 1
     changed_raw, members = encode_matrix_arrays(arrays)
@@ -120,8 +122,8 @@ def test_independent_proof_refuses_consistently_rehashed_wrong_state_before_nati
         sha256=sha256(changed_raw).hexdigest(), size_bytes=len(changed_raw)))
     forbid_contact(monkeypatch)
     with pytest.raises(ValueError, match="independent complete original Q2"):
-        consumer.initial_state(changed, changed_raw)
-    assert consumer.initial_state(state, raw).step_index == 0
+        consumer_owner_0.initial_state(changed, changed_raw)
+    assert consumer_owner_0.initial_state(state, raw).step_index == 0
     for values in ({"cutoff": replace(state.cutoff, clock_id="clock.foreign")}, {"alpha_tilde": (Decimal(1), Decimal(1))},
             {"native_contact_count": 1}, {"consumed_streams": (source.root.stream_identity(source.root.streams[0]),)}):
         with pytest.raises(ValueError): replace(state, **values)
@@ -197,7 +199,7 @@ def test_missing_actual_original_prerequisite_refuses_before_any_publication(tra
 def test_public_pin_accepts_exact_v2_edition_and_refuses_foreign_version(transfer):  # noqa: F811
     source = transfer.sources.closure.original(transfer.sources.closure.descriptors[0],
         index=transfer.sources.closure.source_index())
-    state, _ = science.initialize_source(source, source.provenance, state_id="state.disclosed.public", artifact_id="array.disclosed.public")
+    state, _ = science_owner_0.initialize_source(source, source.provenance, state_id="state.disclosed.public", artifact_id="array.disclosed.public")
     prepared = transfer.sources.source_arms()[0][1]
     value = MatrixPreparedPublicSource(prepared.identity, ScheduledPublicSource.from_source(source), prepared.recipe.identity, state.identity)
     with pytest.raises(ValueError): replace(value, initial=replace(value.initial, object_version="99.0.0"))

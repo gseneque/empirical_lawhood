@@ -1,0 +1,163 @@
+{
+  "label": "Exposed M2 post-hoc rebin and history comparison from the original pilot observations",
+  "roots": [
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700201
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700202
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700203
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700204
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700205
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700206
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700207
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700208
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700209
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700210
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700211
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700212
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700213
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700214
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700215
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700216
+    }
+  ],
+  "schema": "model-free-matrix-definition.v1",
+  "settings": {
+    "memory": {
+      "bin_edges": [
+        [
+          -10.0,
+          -1.0,
+          0.0,
+          1.0,
+          10.0
+        ],
+        [
+          -10.0,
+          0.0,
+          10.0
+        ],
+        [
+          -100.0,
+          0.0,
+          100.0
+        ]
+      ],
+      "history_orders": [
+        1
+      ],
+      "lags": [
+        1,
+        16,
+        256,
+        1024
+      ],
+      "observation_dimensions": [
+        1,
+        2
+      ],
+      "optional_diagnostics": [
+        "compression"
+      ],
+      "protocol_age_ticks": [
+        16384
+      ]
+    },
+    "response": {
+      "selection_tick": 32
+    }
+  }
+}

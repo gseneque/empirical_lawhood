@@ -14,16 +14,13 @@ import pytest
 
 from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
 from empirical_lawhood.api.selected_e4_bank_recipe import _read_exact_record
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.infrastructure.canonical_record_read import read_verified_canonical_record
-from empirical_lawhood.infrastructure.publication_metadata import read_published_canonical_record
-from empirical_lawhood.kernel import decoding
-from empirical_lawhood.kernel.decoded_record_store import (
-    DecodedRecordStore, current_decoded_record_store, decode_scoped_canonical_bytes,
-    decoded_record_scope, record_store_key,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+from empirical_lawhood.storage.canonical_record_read import read_verified_canonical_record
+from empirical_lawhood.storage.publication_metadata import read_published_canonical_record
+from empirical_lawhood.science.records import decoding
+from empirical_lawhood.science.records.decoded_record_store import DecodedRecordStore, current_decoded_record_store, decode_scoped_canonical_bytes, decoded_record_scope, record_store_key
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 from tests.test_artifact_publication_admission import _plane, _requests
 
 

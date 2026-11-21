@@ -26,7 +26,7 @@ The [electrothermal owner](../../../../src/empirical_lawhood/adapters/simulators
 retains SPMe/DFN × isothermal/lumped × CasADi/IDAKLU denominators with Chen2020 and pouch geometry.
 The [public input owner](../../../../src/empirical_lawhood/adapters/simulators/pybamm_development_input.py)
 permits only SPMe/isothermal/CasADi; the
-[recursive source contract](../../../../src/empirical_lawhood/adapters/methods/battery_recursive_construction/contracts.py)
+[recursive source contract](../../../../src/empirical_lawhood/domains/battery/battery_recursive_construction/contracts.py)
 also fixes isothermal SPMe. Neither shipped input establishes thermal controller science.
 
 Installed `Chen2020.py` has SHA-256
@@ -83,9 +83,9 @@ this audit did not reauthenticate those scientific packages.
 ## Controller seam and open entry gates
 
 RA5-C should use the existing
-[author](../../../../src/empirical_lawhood/adapters/control/controller_authoring.py),
-[compiler](../../../../src/empirical_lawhood/runtime/controller_compiler.py) and
-[runtime](../../../../src/empirical_lawhood/runtime/controller_runtime.py).
+[author](../../../../src/empirical_lawhood/methods/control/controller_authoring.py),
+[compiler](../../../../src/empirical_lawhood/execution/controller_compiler.py) and
+[runtime](../../../../src/empirical_lawhood/execution/controller_runtime.py).
 `DeliveryControllerAuthor.author` retains finite admission/reachability,
 ACT/HOLD synthesis, instance binding and exact implementation identities.
 `ControllerCompiler.compile` returns controller, HOLD-only or NONATTEMPT dispositions.

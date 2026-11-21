@@ -6,30 +6,26 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.composition.discovery import manifest as capability_manifest
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_preparation as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_prefix_records import ProtectedE3PrefixHistory
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import (
-    NAMESPACE, ProtectedE3SourceConfig, ProtectedE3SourcePhase, identity, source_task_id,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as sr
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import compact_identity
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments as segments
-from empirical_lawhood.infrastructure.execution import _prepare_native_work, prepare_worker_invocation
-from empirical_lawhood.infrastructure.prepared_native_invocation import (
-    NativeInputPublication, prepare_native_invocation, validate_prepared_native_invocation,
-)
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityPermission, CapabilityRequirement
-from empirical_lawhood.runtime.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificStage
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.execution.declaration_helpers import manifest as capability_manifest
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_preparation as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_prefix_records import ProtectedE3PrefixHistory
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import NAMESPACE, ProtectedE3SourceConfig, ProtectedE3SourcePhase, identity, source_task_id
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as sr
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import compact_identity
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments as segments
+from empirical_lawhood.execution.local.execution import _prepare_native_work, prepare_worker_invocation
+from empirical_lawhood.storage.prepared_native_invocation import NativeInputPublication, prepare_native_invocation, validate_prepared_native_invocation
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityPermission, CapabilityRequirement
+from empirical_lawhood.execution.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificStage
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.test_matrix_e3_protected_source_records import case as case  # noqa: F401
 from tests.test_matrix_e3_protected_source_records import scheduled as scheduled  # noqa: F401
 from tests.test_matrix_factor_confirmation_eligibility import stock as stock, provenance as provenance  # noqa: F401

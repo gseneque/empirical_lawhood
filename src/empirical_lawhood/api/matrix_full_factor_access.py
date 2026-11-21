@@ -7,15 +7,15 @@ custody checks; neither their labels nor a prior permission check grants access.
 """
 from dataclasses import dataclass, replace
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_preparation as domain
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as original_workers
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_preparation as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as original_workers
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence
 from empirical_lawhood.api.selected_e3_access import SelectedE3OriginalInputAccess, selected_e3_originals
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.prospective_experiment import source_filename
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.prospective_experiment import source_filename
 
 
 def _pin(record, field):
@@ -37,7 +37,7 @@ def development_packet_access(*,artifact_writer,directory,read_access=None):
     if len(tasks)!=1:
         raise PermissionError('full factor DEV bootstrap lacks one actual original entry task')
     task,=tasks
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4ExperimentSpecification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4ExperimentSpecification
     specification=decode_canonical_bytes(payloads['experiment-specification.json'],SelectedE3E4ExperimentSpecification,
         maximum_bytes=len(payloads['experiment-specification.json']))
     raw=payloads[source_filename(specification.evidence)]
@@ -52,7 +52,7 @@ def development_packet_access(*,artifact_writer,directory,read_access=None):
 
 def development_original_access(*, artifact_writer, request, evidence=None, read_access=None):
     """Authenticate the actual original packet before any child protected body."""
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
     if type(request) is not domain.ScheduledFullFactorDevelopmentRequestV3:
         raise TypeError('full factor DEV bootstrap requires its exact current locator request')
     request.__post_init__()
@@ -139,11 +139,9 @@ def require_file_access(*,writer,file,access,source):
     The ordinary reader has authenticated this source's original receipt
     locators. Their immutable publication facts do not grant current access.
     """
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_records import (
-        ScheduledFullFactorSource, ScheduledFullFactorProtectedProduct,
-    )
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_bindings import array_logical
-    from empirical_lawhood.runtime.experiment_preparation import PreparedExperimentFile
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_records import ScheduledFullFactorSource, ScheduledFullFactorProtectedProduct
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_bindings import array_logical
+    from empirical_lawhood.execution.experiment_preparation import PreparedExperimentFile
 
     if type(source) is not ScheduledFullFactorSource or type(file) is not PreparedExperimentFile:
         raise TypeError('full factor alias requires its exact actual source and FILE handle')
@@ -162,7 +160,7 @@ def require_file_access(*,writer,file,access,source):
     history,=histories
     protected=type(history) is ScheduledFullFactorProtectedProduct
     if protected:
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_bindings
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_bindings
         task=selected_e4_native_bindings.local_node(source.root_id,'continue')
         run_id=history.wave.run_id
     else:
@@ -218,7 +216,7 @@ class ProtectedFullFactorInputAccess:
 
     def require_current(self,*,artifact_writer=None):
         from empirical_lawhood.api.selected_e4_access import require_current_e4_access
-        from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane,_ScopedArtifactPlane
+        from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, _ScopedArtifactPlane
         writer=self.writer if artifact_writer is None else artifact_writer
         if writer.root.contract!=self.writer.root.contract:
             raise PermissionError('full factor access changes its actual guarded original root')
@@ -227,13 +225,13 @@ class ProtectedFullFactorInputAccess:
         require_current_e4_access(writer=writer,originals=self.waves,current_access=self.current_access)
 
     def record_parents(self,record):
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_record_parents
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_record_parents
         return produced_record_parents(record,self.parents)
 
     def require_member(self,manifest):
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
-        from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-        from empirical_lawhood.runtime.artifacts import ArtifactManifest
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
+        from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+        from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
         if type(manifest) is not ArtifactManifest:
             raise TypeError('full factor access requires the exact authenticated member')
         logical=manifest.logical

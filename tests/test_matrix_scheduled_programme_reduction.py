@@ -10,18 +10,18 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_records as records
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_reduction as reduction
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import MatrixParameterCoordinate
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import MatrixResponseFrontierProtocol
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseScore
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import ScheduledCompactBank
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_records as records
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_reduction as reduction
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import MatrixParameterCoordinate
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import MatrixResponseFrontierProtocol
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseScore
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import ScheduledCompactBank
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.execution.execution import DependencyReceiptBinding
 
 
 def _synthetic(key, schema, version='1.0.0'):

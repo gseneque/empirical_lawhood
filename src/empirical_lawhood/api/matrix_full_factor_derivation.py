@@ -4,17 +4,17 @@ from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_preparation as domain,full_factor_bindings as methods
-from empirical_lawhood.api.experiment_preparation import load_experiment_inputs,prepare_experiment
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_preparation as domain, full_factor_bindings as methods
+from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
 from empirical_lawhood.api.matrix_full_factor_custody import derive_original_full_factor_scope
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding,ExperimentFileInputBinding,ExperimentFileInputSelection
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent,ArtifactProfile,ArtifactWriteRequest,lineage_parent_sort_key,derived_outcome_access
-from empirical_lawhood.kernel.evidence import inherited_visibility
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentFileInputBinding, ExperimentFileInputSelection
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, lineage_parent_sort_key, derived_outcome_access
+from empirical_lawhood.science.evidence.evidence import inherited_visibility
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
 
 def _identity(role,value):
@@ -149,8 +149,8 @@ def _derive_observed_input_selection(*,specification,method_inputs,scope,files,p
     draft=methods.lower(scope,bound.resources,draft_id='draft.full-factor.'+target.fingerprint(),campaign=bound.campaign)
     # All pure scope/template/graph checks precede the first metadata write.
     scope_publication=publish('scope',scope,logical=scope.record_id)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import scope_reference
-    from empirical_lawhood.runtime.experiment_preparation import PreparedExperimentFile
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import scope_reference
+    from empirical_lawhood.execution.experiment_preparation import PreparedExperimentFile
     reference=scope_reference(scope)
     file_map=dict(files);file_map[methods.scope_input(scope)]=PreparedExperimentFile(reference.scope_artifact,scope.VERSION,
         artifact_writer.root.resolve(scope_publication.materialization.relative_path,for_write=False),len(scope.canonical_bytes()))

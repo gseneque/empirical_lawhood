@@ -5,9 +5,9 @@ from dataclasses import replace
 import pytest
 
 from empirical_lawhood.api.matrix_amendment_withdrawals import _withdrawn_packet
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.recursive_custody import read_recursive_bootstrap_record
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage.recursive_custody import read_recursive_bootstrap_record
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
 from tests.test_matrix_programme_metadata_reuse import just_authored  # noqa: F401
 from tests.test_recursive_report_projection import wave  # noqa: F401
 
@@ -65,9 +65,9 @@ def test_withdrawn_packet_refuses_foreign_source_changed_bytes_or_any_execution_
 
 
 def test_withdrawn_control_reuse_keeps_nonentry_current_and_expires(just_authored, monkeypatch):  # noqa: F811
-    from empirical_lawhood.kernel import decoding
+    from empirical_lawhood.science.records import decoding
     from empirical_lawhood.api.retained_e3_evidence import retained_e3_evidence_context
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
     f = just_authored
     original = decoding.decode_canonical_bytes_with_identity
     calls = []
@@ -97,7 +97,7 @@ def test_withdrawn_control_reuse_keeps_nonentry_current_and_expires(just_authore
 
 @pytest.mark.parametrize('custom', (False, True))
 def test_authored_members_keep_the_live_sidecar_owner_and_custom_fallback(just_authored, monkeypatch, custom):  # noqa: F811
-    from empirical_lawhood.infrastructure import recursive_custody
+    from empirical_lawhood.storage import recursive_custody
     f = just_authored
     reads = []
     actual = recursive_custody.read_bounded_bytes

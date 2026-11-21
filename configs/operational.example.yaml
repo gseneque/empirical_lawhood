@@ -1,5 +1,6 @@
 schema: empirical-lawhood/runtime/operational-configuration
-version: 2.0.0
+version: 3.0.0
 value:
   artifact_verification: reduced
   scientific_reconstruction: 'off'
+  accelerated_compute: false

@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: MPL-2.0
 """Lazy registered public selected-preparation composition."""
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_declarative_preparation import PROTECTED_PROTOCOL_ID
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedProtectedSpecification
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_declarative_preparation import PROTECTED_PROTOCOL_ID
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedProtectedSpecification
 
 
 def derive_inputs(**kwargs):
@@ -16,7 +16,7 @@ def prepare_authoring(*args, **kwargs):
 
 
 def bind(handoff, *, specification, allocation, source_records, artifact_writer, reveal_authority_id=None,original_input_access=None,read_access=None):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as domain
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as domain
     domain.validate_instance(specification=specification, allocation=allocation,
         draft=handoff.compilation.draft, source_records=source_records)
     from empirical_lawhood.api.domain_composition.matrix_selected_declarative.derivation import validate_current_metadata
@@ -44,7 +44,7 @@ EXPERIMENT_RUNTIME_BINDING = ExperimentRuntimeBinding(PROTECTED_PROTOCOL_ID, bin
 # Exact existing locator classes only. Requests/selections contain fitted bodies.
 from dataclasses import replace
 from empirical_lawhood.api import selected_prepared_access as original_access
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_declarative_preparation import locator_record_types
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_declarative_preparation import locator_record_types
 
 EXPERIMENT_RUNTIME_BINDING=replace(EXPERIMENT_RUNTIME_BINDING,
     prospective_bootstrap_record_types=locator_record_types(),

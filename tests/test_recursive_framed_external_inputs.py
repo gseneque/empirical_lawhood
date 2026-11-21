@@ -10,17 +10,15 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_array_chunks import (
-    FRAMED_ARRAY_MEDIA, FRAMED_ARRAY_SCHEMA, iter_framed_bytes,
-)
+from empirical_lawhood.domains.matrix.matrix_array_chunks import FRAMED_ARRAY_MEDIA, FRAMED_ARRAY_SCHEMA, iter_framed_bytes
 from empirical_lawhood.api import recursive_authoring as author
 from empirical_lawhood.api.recursive_execution import _external_inputs
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-from empirical_lawhood.runtime.recursive_compiler import RecursivePortContract, compile_recursive_wave
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.execution.recursive_compiler import RecursivePortContract, compile_recursive_wave
 from tests.runtime_platform.test_recursive_compiler import Config, fixture
 from tests.test_matrix_array_chunks import small_case
 from tests.test_recursive_public_service import _plane

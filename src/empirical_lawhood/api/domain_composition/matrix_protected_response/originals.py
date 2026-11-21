@@ -8,10 +8,10 @@ Those checks compose at the owning public/current-task entry before TRAIN.
 
 from decimal import Decimal
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_specification import MatrixResponseErrorSpecification
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_experiment_inputs import ProtectedE3SourceInputs, project_protected_e3_allocation
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_original_publications import ProtectedE3OriginalPublications, authenticate_protected_e3_fit_originals
-from empirical_lawhood.kernel.experimental_design import UnitAllocation
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_specification import MatrixResponseErrorSpecification
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_experiment_inputs import ProtectedE3SourceInputs, project_protected_e3_allocation
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_original_publications import ProtectedE3OriginalPublications, authenticate_protected_e3_fit_originals
+from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
 
 
 def bind_protected_e3_original_inputs(plane, originals, *, specification, allocation, publications, fit_cutoff):

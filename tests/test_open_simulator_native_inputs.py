@@ -8,10 +8,11 @@ from importlib.metadata import version
 
 import pytest
 
-from empirical_lawhood.adapters.simulators.pybamm_electrothermal_hierarchy import BATTERY_ELECTROTHERMAL_SOURCE_VERSION, _runtime_objects, denominators, qualification_preparations
-from empirical_lawhood.adapters.simulators.torax_native.contracts import NativeToraxActionStage, NativeToraxAction, NativeToraxPreparation, NativeToraxView
+from empirical_lawhood.domains.battery.electrothermal_hierarchy import BATTERY_ELECTROTHERMAL_SOURCE_VERSION, denominators, qualification_preparations
+from empirical_lawhood.adapters.simulators.pybamm_electrothermal_hierarchy import _runtime_objects
+from empirical_lawhood.domains.fusion.torax_native.contracts import NativeToraxActionStage, NativeToraxAction, NativeToraxPreparation, NativeToraxView
 from empirical_lawhood.adapters.simulators.torax_native.runtime import build_native_torax_config
-from empirical_lawhood.kernel.action_contracts import ActionDeliveryStage
+from empirical_lawhood.science.response.action_contracts import ActionDeliveryStage
 
 
 @pytest.mark.native('pybamm')

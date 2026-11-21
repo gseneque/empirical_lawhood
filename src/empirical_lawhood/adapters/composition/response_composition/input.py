@@ -1,32 +1,17 @@
 "response composition exposed-source qualification selection with a pre-outcome target authority stop."
+from empirical_lawhood.domains.matrix.response_composition.authoring.input import ResponseCompositionInput as _science_ResponseCompositionInput
 
-from dataclasses import dataclass
 from pathlib import Path
-from typing import ClassVar
 
 from empirical_lawhood.adapters.composition.response_parent_custody import ResponseParentTargetAuthorityStore
 from empirical_lawhood.adapters.composition.response_parent_reader import read_authenticated_parent
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
-@dataclass(frozen=True, slots=True)
-class ResponseCompositionInput(CanonicalRecord):
-    SCHEMA: ClassVar[str] = 'empirical-lawhood/composition/response-composition/response-composition-input'
-    config_id: str
-    evidence_role: str
-
-    def __post_init__(self) -> None:
-        validate_stable_id(self.config_id, field_name="config_id")
-        if (
-            not self.config_id.startswith("empirical-lawhood-response-composition-")
-            or self.evidence_role != "EXPOSED_SOURCE_QUALIFICATION_DEVELOPMENT_NONPROMOTABLE"
-        ):
-            raise ValueError("RESPONSE_COMPOSITION_INPUT_INVALID: source qualification development role")
 
 
 def check_response_composition_input(
-    config: ResponseCompositionInput,
+    config: _science_ResponseCompositionInput,
     *,
     source_root: Path | None,
     parent_manifest: Path | None,
@@ -46,7 +31,7 @@ def check_response_composition_input(
         analysis_record=analysis_record,
         authority_store=authority_store,
     )
-    from .scalar_parent import ResponseCompositionScalarParent
+    from empirical_lawhood.domains.matrix.response_composition.authoring.scalar_parent import ResponseCompositionScalarParent
 
     if parent.grant.parent.source_schema != ResponseCompositionScalarParent.SCHEMA:
         raise ValueError("RESPONSE_COMPOSITION_TYPED_SCALAR_PARENT_REQUIRED")
@@ -75,4 +60,4 @@ def check_response_composition_input(
     }
 
 
-__all__ = ['ResponseCompositionInput', 'check_response_composition_input']
+__all__ = ['check_response_composition_input']

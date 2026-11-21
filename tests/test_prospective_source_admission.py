@@ -11,18 +11,18 @@ import pytest
 
 from empirical_lawhood.api import recursive_prospective_authoring as owner
 from empirical_lawhood.api import prospective_experiment as experiment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, canonical_json_document_bytes
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, canonical_json_document_bytes
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
 from tests.prospective_source_capture_fixture import synthetic_capture
 
 
 def installed_capture():
     """Literal installed metadata, with no installation, Git or source observation."""
-    from empirical_lawhood.infrastructure.selected_candidate import canonical_source_metadata_bytes
-    from empirical_lawhood.infrastructure.source_closure import TrackedSourceMember
-    from empirical_lawhood.infrastructure.source_policy import InstalledSourceAdmission
-    from empirical_lawhood.planning.study_issue import SelectedSourceManifestMember
+    from empirical_lawhood.storage.selected_candidate import canonical_source_metadata_bytes
+    from empirical_lawhood.storage.source_closure import TrackedSourceMember
+    from empirical_lawhood.storage.source_policy import InstalledSourceAdmission
+    from empirical_lawhood.design.study_issue import SelectedSourceManifestMember
     original = synthetic_capture('source.installed', 'a' * 64)
     files = tuple(sorted((*original.source.tracked_files,
         TrackedSourceMember('pyproject.toml', '100644', 1, '2' * 64),
@@ -77,7 +77,7 @@ def test_new_capture_selects_exact_source_and_retains_truthful_raw_status(monkey
 
 
 def test_installed_capture_and_cold_companions_keep_exact_metadata_without_git_claims(monkeypatch):
-    from empirical_lawhood.infrastructure import selected_candidate
+    from empirical_lawhood.storage import selected_candidate
     capture = installed_capture()
     monkeypatch.setattr(owner, 'capture_target_closure', lambda *_args: capture)
     monkeypatch.setattr(selected_candidate, 'installed_candidate',
@@ -104,7 +104,7 @@ def test_installed_capture_and_cold_companions_keep_exact_metadata_without_git_c
     'reordered-paths', 'duplicate-paths', 'source-identity', 'member-hash', 'symlink-mode', 'missing-lock',
 ))
 def test_installed_observation_refuses_foreign_policy_git_claims_or_build_metadata(damage):
-    from empirical_lawhood.infrastructure.selected_candidate import canonical_source_metadata_bytes
+    from empirical_lawhood.storage.selected_candidate import canonical_source_metadata_bytes
     capture = installed_capture()
     observation, _, _ = companions(capture)
     document = json.loads(observation.source_observation_json)

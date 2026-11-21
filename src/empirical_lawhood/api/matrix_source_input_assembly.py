@@ -19,8 +19,8 @@ def publish_source_input_record(*, writer, prefix, namespace, name, record, rela
     embedding it in another immutable scientific record would change replay.
     """
     from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, inherited_visibility
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, derived_outcome_access, lineage_parent_sort_key
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, inherited_visibility
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, derived_outcome_access, lineage_parent_sort_key
 
     if type(lineage_parents) is not tuple or any(type(value) is not ArtifactLineageParent for value in lineage_parents):
         raise TypeError("source publication requires exact actual lineage parents")
@@ -28,8 +28,8 @@ def publish_source_input_record(*, writer, prefix, namespace, name, record, rela
         raise ValueError("model input publication requires its explicit nonempty actual parent census")
     parents = tuple(sorted(set(lineage_parents), key=lineage_parent_sort_key))
     if model_input:
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
-        from empirical_lawhood.kernel.evidence import VisibilityCeiling
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
+        from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
         access, visibility = produced_access(declared_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
             declared_visibility=VisibilityCeiling.DEVELOPMENT_ONLY, parents=parents)
     else:
@@ -48,27 +48,22 @@ def publish_source_input_record(*, writer, prefix, namespace, name, record, rela
 
 def materialize_source_input_rows(*,writer,project,prefix,namespace,selected,key_path,selected_start,seconds,reasons,
         implementation,publication,retained,rows,rule,bank,programme,cutoff,envelope,root,rows_owner,r,assay_identity,certificate,verification_kind):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity
     from empirical_lawhood.api import matrix_finite_dt_dataset_metadata as metadata_owner
-    from empirical_lawhood.api.matrix_finite_dt_source_pipeline import (
-        MatrixFiniteDtDatasetClock, MatrixFiniteDtSourceMaterialization,
-        materialize_finite_dt_source)
+    from empirical_lawhood.api.matrix_finite_dt_source_pipeline import MatrixFiniteDtDatasetClock, MatrixFiniteDtSourceMaterialization, materialize_finite_dt_source
     from empirical_lawhood.api.selected_e4_bank_recipe import _read_exact_record
-    from empirical_lawhood.infrastructure import authority as authority_owner
-    from empirical_lawhood.kernel.authority import AuthorityAction
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.kernel.worlds import WorldKind
-    from empirical_lawhood.planning import dataset_authority as grants
-    from empirical_lawhood.planning.datasets import DatasetEvidenceClass, DatasetMaterializationClass
-    from empirical_lawhood.planning.evidence_profiles import (
-        EvidenceWorldKind, bind_profile_selection, build_observation_evidence_world_registry)
-    from empirical_lawhood.planning.source_pipelines import (
-        SourcePipelineArtifactProfile, SourcePipelineChangeSemantics, SourcePipelineCoordinate,
-        SourcePipelineMode, SourcePipelineProfile, SourcePipelineTransformEdge)
-    from empirical_lawhood.planning.study_authoring import CapabilitySelection
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult
-    from empirical_lawhood.adapters.methods.matrix_source_evidence import MatrixSourcePipelineConfig
+    from empirical_lawhood.storage import authority as authority_owner
+    from empirical_lawhood.science.identity.authority import AuthorityAction
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.science.models.worlds import WorldKind
+    from empirical_lawhood.design import dataset_authority as grants
+    from empirical_lawhood.design.datasets import DatasetEvidenceClass, DatasetMaterializationClass
+    from empirical_lawhood.design.evidence_profiles import EvidenceWorldKind, bind_profile_selection, build_observation_evidence_world_registry
+    from empirical_lawhood.design.source_pipelines import SourcePipelineArtifactProfile, SourcePipelineChangeSemantics, SourcePipelineCoordinate, SourcePipelineMode, SourcePipelineProfile, SourcePipelineTransformEdge
+    from empirical_lawhood.design.study_authoring import CapabilitySelection
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult
+    from empirical_lawhood.domains.matrix.matrix_source_evidence import MatrixSourcePipelineConfig
 
     if (envelope.files.max_single_file_bytes < len(rows.canonical_bytes())
             or envelope.resources.source_scan_bytes < len(rows.canonical_bytes())
@@ -149,7 +144,7 @@ def materialize_source_input_rows(*,writer,project,prefix,namespace,selected,key
         key_path.parent.mkdir(mode=0o700, parents=True, exist_ok=False)
     signer = (authority_owner.Ed25519DatasetAuthorizationSigner.from_private_key_file(key_path) if key_path.exists()
         else authority_owner.Ed25519DatasetAuthorizationSigner.create_private_key_file(key_path))
-    import empirical_lawhood.planning.dataset_authority as authority_implementation
+    import empirical_lawhood.design.dataset_authority as authority_implementation
     issuer = grants.DatasetAuthorizationIssuerRegistration("issuer-registration." + namespace,
         selected["metadata_issuer_id"], frozenset((AuthorityAction.DATASET_TRANSFORMATION,)),
         sha256(Path(authority_implementation.__file__).read_bytes()).hexdigest(), "1.0.0", signer.signature_algorithm,
@@ -197,10 +192,10 @@ def materialize_source_input_rows(*,writer,project,prefix,namespace,selected,key
 
 def _bind_source_scope(root,scope):
     """Bind the actual installed source scope as a declared scientific operand."""
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtSourceScope
-    from empirical_lawhood.adapters.methods.matrix_prepared_source_records import MatrixPreparedSourceScope
-    from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-    from empirical_lawhood.planning.study_authoring import DesignInputRecord,DesignInputRole,StudyDraft
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtSourceScope
+    from empirical_lawhood.domains.matrix.matrix_prepared_source_records import MatrixPreparedSourceScope
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole, StudyDraft
     if type(root) is not StudyDraft or type(scope) not in (MatrixFiniteDtSourceScope,MatrixPreparedSourceScope):
         raise TypeError('source scope binding requires exact installed draft and source-scope owners')
     root.__post_init__();scope.__post_init__()
@@ -223,18 +218,18 @@ def _bind_source_scope(root,scope):
 
 def prepare_source_candidate(*,writer,project,namespace,publication,domain,bindings,scope,operands,materialized,
         root,budget,operational,implementation,programme,operand_lineage,model_input_names=frozenset()):
-    from empirical_lawhood.adapters.composition.experiment_authoring import formal_entry
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_preparation import _source_projection
+    from empirical_lawhood.execution.experiment_authoring import formal_entry
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_preparation import _source_projection
     from empirical_lawhood.api.derived_metadata_access import derive_canonical_metadata_access
     from empirical_lawhood.api.recursive_operations import operation_catalog
     from empirical_lawhood.api.recursive_prospective_authoring import preview_recursive_prospective_candidate
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.planning.formal_gaps import FormalGapEvidenceWorld
-    from empirical_lawhood.runtime.experiment_resources import bind_execution_resources
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-    from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveDesignInputs, RecursiveProspectiveOperand
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, inherited_visibility
-    from empirical_lawhood.runtime.artifacts import derived_outcome_access
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.design.formal_gaps import FormalGapEvidenceWorld
+    from empirical_lawhood.execution.experiment_resources import bind_execution_resources
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveDesignInputs, RecursiveProspectiveOperand
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, inherited_visibility
+    from empirical_lawhood.storage.contracts.artifacts import derived_outcome_access
 
     if set(operand_lineage) != set(operands):
         raise ValueError("source preparation requires the complete actual operand lineage census")
@@ -243,8 +238,8 @@ def prepare_source_candidate(*,writer,project,namespace,publication,domain,bindi
     operand_access = {}
     for name, parents in operand_lineage.items():
         if name in model_input_names:
-            from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
-            from empirical_lawhood.kernel.evidence import VisibilityCeiling
+            from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
+            from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
             if not parents:
                 raise ValueError("source model input omits its complete actual parent census")
             operand_access[name] = produced_access(declared_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
@@ -258,9 +253,7 @@ def prepare_source_candidate(*,writer,project,namespace,publication,domain,bindi
         pipeline=materialized.config, root=root, campaign=root.campaign, draft_id="draft." + namespace,
         terminal_budgets=terminals, operand_access=operand_access)
     from empirical_lawhood.api.derived_array_access import DerivedInputAccess, derive_matrix_input_access_batch, supports_derived_input_access_batch
-    from empirical_lawhood.infrastructure.publication_metadata import (
-        checkpoint_publication_access,
-    )
+    from empirical_lawhood.storage.publication_metadata import checkpoint_publication_access
     configs, qualifications, input_bindings = [], [], []
     batch_access = supports_derived_input_access_batch(writer, len(lowered.external_inputs))
     pending = []

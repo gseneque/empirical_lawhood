@@ -6,12 +6,12 @@ from decimal import Decimal
 import pytest
 from tests.rubisco_inquiry_source_fixtures import finalist_source_operands
 
-from empirical_lawhood.adapters.methods.rubisco_cycle_constraints import assessment as cycle, contracts, recursive_translation as cycle_drafts
-from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry import science as portfolio
-from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.challenge import FINALIST_IDS, FinalistChallenge, challenge_finalists
-from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.source_manifest import INITIAL_CANDIDATE_IDS
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition
+from empirical_lawhood.domains.rubisco.rubisco_cycle_constraints import assessment as cycle, contracts, recursive_translation as cycle_drafts
+from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry import science as portfolio
+from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry.challenge import FINALIST_IDS, FinalistChallenge, challenge_finalists
+from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry.source_manifest import INITIAL_CANDIDATE_IDS
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition
 
 
 @pytest.fixture(scope='module')

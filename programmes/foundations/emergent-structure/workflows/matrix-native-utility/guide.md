@@ -10,10 +10,9 @@ Start with the [specification](specification.example.json) and freeze its missin
 
 ## Prerequisites
 
-Use the existing locked main environment and an explicit EL storage profile.
+Use the existing locked main environment and an explicit storage profile.
 Select at least four distinct physical cores, with one numerical thread per worker.
-Keep inputs, temporary files and outputs on EL.
-The [environment guide](../../../../../docs/development/maintainer-environment.md) gives the selected host profile.
+Use the selected mount for inputs, temporary files and outputs. Follow the [environment guide](../../../../../docs/using/environments.md#select-storage-and-reuse-an-environment) to select the host and storage.
 
 The example has replacement root and protocol identities and no utility criterion.
 It therefore stops before lowering or native contact.

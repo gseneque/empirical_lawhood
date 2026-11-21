@@ -6,12 +6,10 @@ from decimal import Decimal as D
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_specification import matched_e3_estimators
-from empirical_lawhood.adapters.methods.matrix_factor_response.matched_response_prediction import MATCHED_FEATURES, MATCHED_FEATURE_BLOCKS
-from empirical_lawhood.adapters.methods.matrix_factor_response.matched_response_fitting import (
-    MatchedTrainingRow, fit_matched_models, fit_ridge_bundle, predict_bundle,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_specification import matched_e3_estimators
+from empirical_lawhood.domains.matrix.matrix_factor_response.matched_response_prediction import MATCHED_FEATURES, MATCHED_FEATURE_BLOCKS
+from empirical_lawhood.domains.matrix.matrix_factor_response.matched_response_fitting import MatchedTrainingRow, fit_matched_models, fit_ridge_bundle, predict_bundle
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def rows64():
@@ -66,10 +64,18 @@ def test_one_missing_target_excludes_the_same_whole_roots_from_every_arm_without
         assert 'INSUFFICIENT_COMMON_COMPLETE_FOLD_0' in model.prerequisite_reasons
 
 
-def test_weighted_bundle_matches_an_independent_normal_equation_with_unpenalized_intercept():
+@pytest.mark.numerical(oracle='Independent weighted ridge normal equations with unpenalized intercept')
+def test_weighted_bundle_matches_an_independent_normal_equation_with_unpenalized_intercept(monkeypatch):
+    from empirical_lawhood.domains.matrix.matrix_factor_response import matched_response_fitting as fitting
     rows = tuple(MatchedTrainingRow('test.row.%d' % index, 'test.group.a' if index == 0 else 'test.group.b',
         'test.family', (('constant', D(7)), ('x', D(index))), (D(index) / 100 + D('.001'),) * 58, ()) for index in range(4))
+    dictionaries = []
+    def feature_map(values):
+        dictionaries.append(values)
+        return dict(values)
+    monkeypatch.setattr(fitting, 'dict', feature_map, raising=False)
     model = fit_ridge_bundle(rows, ('constant', 'x'), D(10))
+    assert dictionaries == [row.features for row in rows]
     weights = np.array([1., 1/3, 1/3, 1/3])
     x = np.array([0., 1., 2., 3.])
     mean = np.average(x, weights=weights)

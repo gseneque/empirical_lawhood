@@ -11,22 +11,22 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import ScheduledCompactBank
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_confirmation import ScheduledProgrammeAuthenticatedParent
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_preparation import derive_protected_factorial_experiment
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import ScheduledCompactBank
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_confirmation import ScheduledProgrammeAuthenticatedParent
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_preparation import derive_protected_factorial_experiment
 from empirical_lawhood.api import matrix_protected_experiment as owner
 from empirical_lawhood.api import recursive_prospective_authoring as prospective_owner
 from empirical_lawhood.api.matrix_scheduled_programme_runtime import ProgrammeRuntimeInputSupplier
-from empirical_lawhood.infrastructure.candidate_sources import ExternalCandidateInputPublisher, ExternalContentAddressedInputResolver
-from empirical_lawhood.infrastructure.recursive_prospective_inputs import RecursiveContentInputSupplier
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.planning.study_authoring import DesignInputRole
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.recursive_prospective import RecursiveCandidateContextProvider
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort, recursive_input_port_key
-from empirical_lawhood.runtime.source_resolution import CandidateSourceResolutionService
+from empirical_lawhood.storage.candidate_sources import ExternalCandidateInputPublisher, ExternalContentAddressedInputResolver
+from empirical_lawhood.storage.recursive_prospective_inputs import RecursiveContentInputSupplier
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.design.study_authoring import DesignInputRole
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.recursive_prospective import RecursiveCandidateContextProvider
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort, recursive_input_port_key
+from empirical_lawhood.execution.source_resolution import CandidateSourceResolutionService
 from tests.test_matrix_programme_factorial_confirmation import _pin
 from tests.test_matrix_programme_factorial_confirmation_seal import _catalog
 from tests.test_matrix_protected_factorial_preparation import (
@@ -151,7 +151,7 @@ def test_standalone_owner_refuses_original_authority_or_exact_global_binding_cha
 def test_real_actual_entry_returns_fresh_authenticated_parent_after_unchanged_source_guards(routing, monkeypatch):
     # Only routing owners are substituted; no result is a scientific credential.
     from empirical_lawhood.api import matrix_scheduled_programme_runtime
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_qualified_parent
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_qualified_parent
     monkeypatch.undo()
     events = []
     monkeypatch.setattr(owner.programme, "validate_programme_bank", lambda *args: events.append("bank"))

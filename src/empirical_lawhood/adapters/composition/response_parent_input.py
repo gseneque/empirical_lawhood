@@ -5,14 +5,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
-    from .response_parent_custody import ResponseParentTargetAuthorityStore, ResponseParentTargetGrant
+    from empirical_lawhood.adapters.composition.response_parent_custody import ResponseParentTargetAuthorityStore, ResponseParentTargetGrant
 
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_strings,
-    validate_sha256,
-    validate_stable_id,
-)
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_strings, validate_sha256, validate_stable_id
 
 
 @dataclass(frozen=True, slots=True)
@@ -114,7 +109,7 @@ def require_target_parent_authority(
         raise ValueError(
             f"{code}_TARGET_CUSTODY_STORE_REQUIRED: native_tasks=0 analysis_tasks=0"
         )
-    from .response_parent_custody import _resolve_grants
+    from empirical_lawhood.adapters.composition.response_parent_custody import _resolve_grants
 
     assert (
         custody is not None

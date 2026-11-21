@@ -8,8 +8,8 @@ check their proposed handoff against the original typed operands.
 from dataclasses import fields, is_dataclass
 from decimal import Decimal
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
 
 def require_decimal_operands_preserved(

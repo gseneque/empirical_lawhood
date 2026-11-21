@@ -7,7 +7,9 @@ from enum import Enum
 from importlib import metadata
 import platform
 
-from .models import DoctorDependencySummary
+from empirical_lawhood.api.models import DoctorDependencySummary
+from empirical_lawhood.adapters.composition.generated_public_facets import ENVIRONMENT_DECLARATIONS
+from empirical_lawhood.execution.discovery_descriptors import EnvironmentDeclaration
 
 
 class EnvironmentRoute(str, Enum):
@@ -21,35 +23,36 @@ class EnvironmentRoute(str, Enum):
     PREPARATION_APPLICABILITY = "preparation-applicability"
 
 
-# These are the documented native contracts, not the wider package installation
-# ranges. Observing their metadata cannot establish source or scientific readiness.
-_VERSIONS = {
-    EnvironmentRoute.REACTOR: (("numpy", "2.4.6"),),
-    EnvironmentRoute.PREPARED_RESPONSE: (("numpy", "2.4.6"),),
-    EnvironmentRoute.OPEN_SIMULATORS: (
-        ("gymtorax", "1.1.1"), ("torax", "1.4.2"),
-        ("jax", "0.10.2"), ("jaxlib", "0.10.2"),
-        ("numpy", "2.4.6"), ("scipy", "1.17.1"),
-        ("xarray", "2026.7.0"), ("pybamm", "26.6.2.0"),
-    ),
-    EnvironmentRoute.REACTION_RESPONSE: (("cantera", "3.2.0"), ("fipy", "4.0.3")),
-    EnvironmentRoute.RC_CHALLENGES: (("numpy", "2.4.6"), ("scipy", "1.17.1")),
-    EnvironmentRoute.FINITE_RESPONSE_LAW: (("numpy", "2.4.6"), ("scipy", "1.17.1")),
-    EnvironmentRoute.PREPARATION_APPLICABILITY: (("numpy", "2.4.6"), ("scipy", "1.17.1")),
-    EnvironmentRoute.GRID2OP: (("grid2op", "1.12.5"), ("lightsim2grid", "0.13.1")),
-}
+def environment_routes() -> tuple[EnvironmentDeclaration, ...]:
+    """Return closed code-owned facts, without inspecting an environment."""
+    return ENVIRONMENT_DECLARATIONS
+
+
+def environment_by_id(route: str) -> EnvironmentDeclaration:
+    """Legacy Enum callers and new adapter route IDs share the same lookup."""
+    identifier = route.value if isinstance(route, EnvironmentRoute) else route
+    if isinstance(identifier, str):
+        for declaration in ENVIRONMENT_DECLARATIONS:
+            if declaration.route_id == identifier:
+                return declaration
+    raise ValueError(f"unknown environment route: {route}")
 
 
 def inspect_route_dependencies(
-    route: EnvironmentRoute | None,
+    route: EnvironmentRoute | str | None,
 ) -> tuple[DoctorDependencySummary, ...]:
     """Read distribution metadata only; never import or initialize a simulator."""
 
-    selected = (("gymtorax", "1.1.1"), ("torax", "1.4.2")) if route is None else _VERSIONS[route]
+    declaration = None if route is None else environment_by_id(route)
+    # Preserve the original default inspection's two observations and no CPython
+    # assertion. This narrow report still makes no workflow-readiness claim.
+    selected = (tuple(row for row in environment_by_id("open-simulators").distribution_versions
+                      if row[0] in ("gymtorax", "torax"))
+                if declaration is None else declaration.distribution_versions)
     observations: list[tuple[str, str | None, str]] = []
-    if route is not None:
-        python = platform.python_version() if platform.python_implementation() == "CPython" else None
-        observations.append(("cpython", python, "3.11.14"))
+    if declaration is not None:
+        python = platform.python_version() if platform.python_implementation() == declaration.python_implementation else None
+        observations.append((declaration.python_implementation.lower(), python, declaration.python_version))
     for distribution, expected in selected:
         try:
             installed = metadata.version(distribution)
@@ -60,7 +63,7 @@ def inspect_route_dependencies(
         DoctorDependencySummary(
             dependency_id=name,
             available=installed is not None,
-            required_for_actions=("gym-torax-substrate" if route is None else route.value,),
+            required_for_actions=("gym-torax-substrate" if declaration is None else declaration.route_id,),
             reason_codes=(
                 (f"DEPENDENCY_{name.upper()}_ABSENT",) if installed is None else
                 (f"DEPENDENCY_{name.upper()}_VERSION_MISMATCH",) if installed != expected else ()

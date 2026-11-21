@@ -6,25 +6,16 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial_confirmation import ScheduledFactorialCriteriaBinding
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_preparation import prepare_protected_factorial_experiment
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_specification import (
-    ProtectedFactorialAcquisitionRoster,
-    ProtectedFactorialExperimentSpecification,
-)
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial_confirmation import ScheduledFactorialCriteriaBinding
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_preparation import prepare_protected_factorial_experiment
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_specification import ProtectedFactorialAcquisitionRoster, ProtectedFactorialExperimentSpecification
 from empirical_lawhood.api.experiment_preparation import author_prepared_experiment, experiment_preparation_report
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_entry import StudyDefinition
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
-from empirical_lawhood.runtime.experiment_preparation import (
-    DependencyKind,
-    ExecutionSelection,
-    ExperimentCensus,
-    ExperimentDependency,
-    ExperimentPreparation,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_entry import StudyDefinition
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection, ExperimentCensus, ExperimentDependency, ExperimentPreparation
 
 
 ROOT = Path(__file__).resolve().parents[1]

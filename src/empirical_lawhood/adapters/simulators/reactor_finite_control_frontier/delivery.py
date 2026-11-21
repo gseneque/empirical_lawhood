@@ -6,12 +6,12 @@ from dataclasses import dataclass, field
 from empirical_lawhood.adapters.simulators.reactor_causal_response.delivery import BatchDeliverySession
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.finite_delivery import deliver_feed_word
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.finite_callback import FiniteCommittedBranchOwner
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.contracts import ReactorDelivery
-from empirical_lawhood.kernel.action_contracts import OccurrenceActionWord
-from empirical_lawhood.kernel.control import ScientificCommitmentKind
-from empirical_lawhood.planning.controller_study import ImplementationBinding, ImplementationRole
-from empirical_lawhood.runtime.controller_runtime import DeliveryPortResult
-from .words import PulseProjection
+from empirical_lawhood.domains.reactor.reactor_prefix_response.contracts import ReactorDelivery
+from empirical_lawhood.science.response.action_contracts import OccurrenceActionWord
+from empirical_lawhood.science.response.control import ScientificCommitmentKind
+from empirical_lawhood.design.controller_study import ImplementationBinding, ImplementationRole
+from empirical_lawhood.execution.controller_runtime import DeliveryPortResult
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.words import PulseProjection
 
 
 @dataclass

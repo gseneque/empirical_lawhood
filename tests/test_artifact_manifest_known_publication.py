@@ -7,17 +7,12 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.infrastructure import task_receipts
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest, encode_artifact_manifest
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalizationError
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactGenericValidation, ArtifactManifest, ArtifactMaterialization, ArtifactProfile,
-    ArtifactPublicationBinding, ArtifactPublicationCommit, ArtifactPublicationScope,
-    LogicalArtifactIdentity, artifact_publication_batch_id, artifact_publication_commit_relative_path,
-    artifact_publication_member,
-)
+from empirical_lawhood.storage import task_receipts
+from empirical_lawhood.storage.task_receipts import decode_artifact_manifest, encode_artifact_manifest
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalizationError
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactManifest, ArtifactMaterialization, ArtifactProfile, ArtifactPublicationBinding, ArtifactPublicationCommit, ArtifactPublicationScope, LogicalArtifactIdentity, artifact_publication_batch_id, artifact_publication_commit_relative_path, artifact_publication_member
 
 
 def _manifests(count=4, *, media_type="application/json"):

@@ -16,29 +16,29 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import ClassVar
 
-from empirical_lawhood.adapters.methods import matrix_source_evidence as shared
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as phase
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as native
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledResponseSelection
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import MatrixParameterNumericalDesign
-from empirical_lawhood.adapters.methods.backbone_structural_transport import source_free_property_transport_source_input_parts as template
-from empirical_lawhood.kernel.authority import AuthorityAction, ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id, require_sorted_unique_ids
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.planning.evidence_profiles import EvidenceProfileSelection
-from empirical_lawhood.planning.metatheory import MetatheoryApplicability, MetatheoryCellDisposition, MetatheoryEvidenceCeiling, MetatheoryMethodSelection
-from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceGateKind, ScientificSourceGateSpec, ScientificSourceGateEvidence, ScientificSourceQualificationSpec, ScientificSourceInvalidUnitPolicy
-from empirical_lawhood.planning.source_pipelines import SourcePipelineArtifactProfile, SourcePipelineProfile, SourcePipelineQualificationReceipt, SourcePipelineEdgeAccounting
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityPermission, CapabilityRegistry
-from empirical_lawhood.runtime.execution import RunnerResult, TaskContext, TaskOutputPayload
-from empirical_lawhood.runtime.plans import ScientificStage, OutputTemplate
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationDeclaration, RecursiveScientificHooks
-from empirical_lawhood.runtime.recursive_compiler import RecursivePortContract
+from empirical_lawhood.domains.matrix import matrix_source_evidence as shared
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as phase
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as native
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledResponseSelection
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import MatrixParameterNumericalDesign
+from empirical_lawhood.methods.backbone_structural_transport import source_free_property_transport_source_input_parts as template
+from empirical_lawhood.science.identity.authority import AuthorityAction, ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id, require_sorted_unique_ids
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.design.evidence_profiles import EvidenceProfileSelection
+from empirical_lawhood.design.structural_claims import MetatheoryApplicability, MetatheoryCellDisposition, MetatheoryEvidenceCeiling, MetatheoryMethodSelection
+from empirical_lawhood.design.scientific_source_qualification import ScientificSourceGateKind, ScientificSourceGateSpec, ScientificSourceGateEvidence, ScientificSourceQualificationSpec, ScientificSourceInvalidUnitPolicy
+from empirical_lawhood.design.source_pipelines import SourcePipelineArtifactProfile, SourcePipelineProfile, SourcePipelineQualificationReceipt, SourcePipelineEdgeAccounting
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload
+from empirical_lawhood.execution.plans import ScientificStage, OutputTemplate
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationDeclaration, RecursiveScientificHooks
+from empirical_lawhood.execution.recursive_compiler import RecursivePortContract
 from tests.matrix_selected_e4_public_fixture import DISCLOSURE, ROOT, publication, task_budget, original_preparation, _source_admissions
 
 KEY = "matrix-release-selected-e4-source"
@@ -220,7 +220,7 @@ class ReleaseGateWorker:
         self.kind, self.manifest = kind, gate_declaration(kind).manifest()
 
     def execute(self, context):
-        from empirical_lawhood.adapters.methods.matrix_factor_response.protected_prefix_workers import _read
+        from empirical_lawhood.domains.matrix.matrix_factor_response.protected_prefix_workers import _read
         if type(context) is not TaskContext:
             raise PermissionError("release gate needs actual issued prepared context")
         try:
@@ -268,7 +268,7 @@ def input_kinds():
 
 
 def gate_declaration(kind):
-    from empirical_lawhood.adapters.methods.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
+    from empirical_lawhood.domains.matrix.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
     return RecursiveOperationDeclaration(KEY + "." + kind.value.lower(), "1.0.0",
         "exposed-release-source-gate-v1." + implementation_sha(), CapabilityKind.NUMERICAL_QUALIFIER,
         ReleaseGateConfig, ScientificStage.QUALIFY,
@@ -302,10 +302,10 @@ class ReleaseSourceCloseoutWorker:
         self.manifest = source_closeout_declaration().manifest()
 
     def execute(self, context):
-        from empirical_lawhood.adapters.methods.matrix_factor_response.protected_prefix_workers import _read
-        from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord, AdjudicationEvaluability
-        from empirical_lawhood.kernel.status import ScientificStatus, AdmissionStatus
-        from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceQualificationResult
+        from empirical_lawhood.domains.matrix.matrix_factor_response.protected_prefix_workers import _read
+        from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord, AdjudicationEvaluability
+        from empirical_lawhood.science.records.status import ScientificStatus, AdmissionStatus
+        from empirical_lawhood.design.scientific_source_qualification import ScientificSourceQualificationResult
         try:
             context.__post_init__()
             prepared, adjudication = context.prepared_invocation, context.scientific_adjudication_context
@@ -346,9 +346,9 @@ class ReleaseSourceCloseoutWorker:
 
 
 def source_closeout_declaration():
-    from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-    from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceQualificationResult
-    from empirical_lawhood.adapters.methods.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
+    from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+    from empirical_lawhood.design.scientific_source_qualification import ScientificSourceQualificationResult
+    from empirical_lawhood.domains.matrix.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
     ports = tuple((kind.value.lower(), ScientificSourceGateEvidence.SCHEMA) for kind in GATES) + (
         ("pipeline", SourcePipelineQualificationReceipt.SCHEMA), ("qualification", ScientificSourceQualificationResult.SCHEMA))
     return RecursiveOperationDeclaration(KEY + ".adjudicate", "1.0.0", "exposed-source-closeout-v1." + implementation_sha(),
@@ -373,7 +373,7 @@ def _publish(writer, record, publications, field="record_id"):
 
 
 def _raw_artifact(writer, *, name, raw, relative):
-    from empirical_lawhood.kernel.references import ArtifactIdentity
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
     stored = writer.write(ArtifactWriteRequest(name, relative,
         "empirical-lawhood/source/checksummed-uninterpreted-public-bytes",
         ArtifactProfile.RAW_SOURCE_BYTES, "text/plain", "publication." + name,
@@ -386,10 +386,10 @@ def _raw_artifact(writer, *, name, raw, relative):
 def _transformation_manifest(*, writer, selected, namespace, source, output, rows, cutoff, transform,
         transform_config, source_scope, destination_scope, control_scope, envelope, publications):
     """Use the real manifest grammar; no issue-shaped or fake-schema record."""
-    from empirical_lawhood.planning import dataset_manifests as dm
-    from empirical_lawhood.planning.datasets import DatasetMaterialization, DatasetMaterializationClass, DatasetEvidenceClass, DatasetSelectorRef, DatasetSelectorKind, CustodyState
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-    from empirical_lawhood.runtime.datasets import DatasetCapabilityLimits, DatasetEvidenceVerifierRegistration
+    from empirical_lawhood.design import dataset_manifests as dm
+    from empirical_lawhood.design.datasets import DatasetMaterialization, DatasetMaterializationClass, DatasetEvidenceClass, DatasetSelectorRef, DatasetSelectorKind, CustodyState
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+    from empirical_lawhood.execution.datasets import DatasetCapabilityLimits, DatasetEvidenceVerifierRegistration
     selector = DatasetSelectorRef("selector." + namespace, DatasetSelectorKind.COMPLETE_RELEASE, rows.SCHEMA, rows.fingerprint(), True)
     materialization = DatasetMaterialization("dataset-source." + namespace, "release." + namespace,
         DatasetMaterializationClass.METADATA_OBSERVATION, DatasetEvidenceClass.METADATA_ONLY, BLIND,
@@ -453,15 +453,12 @@ def _transformation_manifest(*, writer, selected, namespace, source, output, row
 
 
 def source_pipeline(*, originals, programme, bank, selected, namespace, publications):
-    from empirical_lawhood.planning.datasets import DatasetEvidenceClass, DatasetMaterializationClass
-    from empirical_lawhood.planning.dataset_authority import (
-        DatasetStorageScope, DatasetWorkEnvelope, DatasetFileLimits, DatasetControlLimits,
-        DatasetAuthorizationIssuerRegistration, issue_dataset_operation_authorization,
-    )
-    from empirical_lawhood.runtime.datasets import DatasetCapabilityLimits, DatasetCapabilityRegistry
-    from empirical_lawhood.runtime.source_pipelines import compile_source_pipeline, SourcePipelineExecutionEvidence, SourcePipelineValidatorEvidence
-    from empirical_lawhood.runtime.sources import SourceResult
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
+    from empirical_lawhood.design.datasets import DatasetEvidenceClass, DatasetMaterializationClass
+    from empirical_lawhood.design.dataset_authority import DatasetStorageScope, DatasetWorkEnvelope, DatasetFileLimits, DatasetControlLimits, DatasetAuthorizationIssuerRegistration, issue_dataset_operation_authorization
+    from empirical_lawhood.execution.datasets import DatasetCapabilityLimits, DatasetCapabilityRegistry
+    from empirical_lawhood.execution.source_pipelines import compile_source_pipeline, SourcePipelineExecutionEvidence, SourcePipelineValidatorEvidence
+    from empirical_lawhood.execution.sources import SourceResult
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
     from empirical_lawhood.api.recursive_authoring import implementation_binding
     current_implementation = implementation_binding(ROOT)
     writer = originals.writer
@@ -598,15 +595,11 @@ def source_pipeline(*, originals, programme, bank, selected, namespace, publicat
 
 def _closed_sdk(declarations):
     """Add only these six test workers to the installed SDK composition."""
-    from empirical_lawhood.adapters.composition.discovery import bundle
-    from empirical_lawhood.adapters.composition.generated_extension_bundles import EXTENSION_BUNDLE_CONTRIBUTIONS
-    from empirical_lawhood.adapters.composition.generated_executable_bindings import (
-        EXECUTABLE_BINDING_CONTRIBUTIONS, EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY,
-    )
-    from empirical_lawhood.runtime.extension_bundles import ExtensionContributionKind, compose_extension_bundle_aggregate
-    from empirical_lawhood.runtime.executable_bindings import (
-        ExecutableBindingContribution, ExecutableCapabilityProviderFactoryRegistry, compose_executable_binding_aggregate,
-    )
+    from empirical_lawhood.execution.declaration_helpers import bundle
+    from empirical_lawhood.execution.generated_extension_bundles import EXTENSION_BUNDLE_CONTRIBUTIONS
+    from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_BINDING_CONTRIBUTIONS, EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
+    from empirical_lawhood.execution.extension_bundles import ExtensionContributionKind, compose_extension_bundle_aggregate
+    from empirical_lawhood.execution.executable_bindings import ExecutableBindingContribution, ExecutableCapabilityProviderFactoryRegistry, compose_executable_binding_aggregate
     contributions, factories = [], []
     for declaration in declarations:
         manifest = declaration.manifest()
@@ -632,18 +625,13 @@ def _source_root(originals, programme, common, *, namespace, budget):
     estimand is exact finite metadata agreement; no original response, sampling,
     numerical convergence, calibration, or scientific qualification is tested.
     """
-    from empirical_lawhood.kernel.experiments import (
-        AssignmentKind, AssignmentSpec, ControlKind, ControlSpec, PrecisionGoal, RevealBarrierSpec,
-    )
-    from empirical_lawhood.kernel.obligations import (
-        ClosureSpec, ComputabilityEvidence, FalsifierKind, FalsifierSpec, ObligationStatus,
-        ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec,
-    )
-    from empirical_lawhood.kernel.status import ReadinessStatus
-    from empirical_lawhood.kernel.quantities import QuantityKind, QuantitySpec, ResponseDirection
-    from empirical_lawhood.kernel.time import AvailabilitySpec
-    from empirical_lawhood.planning.study_authoring import DesignInputRecord, DesignInputRole
-    from empirical_lawhood.kernel.worlds import WorldKind
+    from empirical_lawhood.science.experiments.experiments import AssignmentKind, AssignmentSpec, ControlKind, ControlSpec, PrecisionGoal, RevealBarrierSpec
+    from empirical_lawhood.science.evidence.obligations import ClosureSpec, ComputabilityEvidence, FalsifierKind, FalsifierSpec, ObligationStatus, ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec
+    from empirical_lawhood.science.records.status import ReadinessStatus
+    from empirical_lawhood.science.models.quantities import QuantityKind, QuantitySpec, ResponseDirection
+    from empirical_lawhood.science.models.time import AvailabilitySpec
+    from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole
+    from empirical_lawhood.science.models.worlds import WorldKind
     preparation = original_preparation(originals)
     root, cutoff = preparation.root, common.cutoff
     designs = tuple(DesignInputRecord("design." + namespace + "." + str(index), reference,
@@ -741,7 +729,7 @@ def _source_root(originals, programme, common, *, namespace, budget):
 
 def _source_obligation_owners(root, namespace):
     """Explicit proof owners for this TEST metadata contract, never E3 science."""
-    from empirical_lawhood.runtime.candidate_compiler import _required_obligation_ids
+    from empirical_lawhood.execution.candidate_compiler import _required_obligation_ids
     experiment, obligations = root.experiment, root.experiment.obligations
     def node(value):
         return namespace + "." + value
@@ -770,8 +758,8 @@ def _source_obligation_owners(root, namespace):
 
 
 def _source_draft(originals, programme, bank, scope, pipeline, qualification, selected, namespace):
-    from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft, RecursiveOperationSpec, RecursiveExternalInput, RecursiveInputLink
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_preparation import _source_projection
+    from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft, RecursiveOperationSpec, RecursiveExternalInput, RecursiveInputLink
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_preparation import _source_projection
     declarations = (*tuple(gate_declaration(kind) for kind in GATES), *shared.source_declarations(), source_closeout_declaration())
     closeout = ReleaseSourceCloseoutConfig("config.closeout." + namespace,
         tuple(sorted((shared.reference(value, field) for value, field in (
@@ -826,8 +814,8 @@ def _source_draft(originals, programme, bank, scope, pipeline, qualification, se
 
 
 def _resources(draft, selected, namespace):
-    from empirical_lawhood.runtime.execution_envelope import NonTimeResourceBudget, ExecutionResourceTaskCellSpec, ChildResourceTokenLimit
-    from empirical_lawhood.runtime.experiment_resources import ExecutionResourceSelection
+    from empirical_lawhood.execution.execution_envelope import NonTimeResourceBudget, ExecutionResourceTaskCellSpec, ChildResourceTokenLimit
+    from empirical_lawhood.execution.experiment_resources import ExecutionResourceSelection
     budget = task_budget(selected)
     cells = tuple(ExecutionResourceTaskCellSpec("cell." + row.node_id, row.node_id, "child." + namespace,
         None, None, 1, 0, 0, False,
@@ -844,13 +832,13 @@ def _sdk_execution(originals, handoff, issued, directory, selected, *, executor_
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY
     from empirical_lawhood.api.execution import CampaignExecutionService
     from empirical_lawhood.api.facade import EmpiricalLawhoodApi
-    from empirical_lawhood.infrastructure.execution import DurableExecutionResourceEnvelopeCoordinator
-    from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
-    from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog
-    from empirical_lawhood.infrastructure.study_issue import ExternalIssuedExtensionPayloadSource, ExternalIssuedStudyPublisher, GitStudySourceClosureInspector
-    from empirical_lawhood.runtime.executable_bindings import LayeredCampaignRuntimeProviderResolver
-    from empirical_lawhood.runtime.issued_extension_payloads import IssuedExtensionPayloadResolver
-    from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
+    from empirical_lawhood.execution.local.execution import DurableExecutionResourceEnvelopeCoordinator
+    from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+    from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog
+    from empirical_lawhood.storage.study_issue import ExternalIssuedExtensionPayloadSource, ExternalIssuedStudyPublisher, GitStudySourceClosureInspector
+    from empirical_lawhood.execution.executable_bindings import LayeredCampaignRuntimeProviderResolver
+    from empirical_lawhood.execution.issued_extension_payloads import IssuedExtensionPayloadResolver
+    from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
     from tests.test_matrix_e3_public_programme import _ObservedProcessExecutor
     _, factories, _, writer, _, package, reveal, approval, authorities = issued
     directory.mkdir(parents=True, exist_ok=True)
@@ -885,7 +873,7 @@ def _sdk_execution(originals, handoff, issued, directory, selected, *, executor_
 def _actual_bindings(writer, package, plan, expected, codecs):
     from empirical_lawhood.api.current_result_custody import retained_output_artifact_plane
     from empirical_lawhood.api.recursive_qualified_parents import _collect_receipt_closure, _verify_receipt_closure, _output_payload
-    from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+    from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
     semantic = retained_output_artifact_plane(package, plan, writer, codecs)
     with semantic.verification_scope() as guarded:
         closure = _collect_receipt_closure(package, plan, guarded, None,
@@ -927,9 +915,9 @@ def selected_e4_source_predecessor(*, project_root, originals, programme, bank, 
     from empirical_lawhood.api.results import RunCampaignRequest, CampaignStatusRequest, ResumeCampaignRequest
     from empirical_lawhood.api.matrix_source_runtime import authenticate_matrix_source_qualification, matrix_source_publication_references
     from empirical_lawhood.api.recursive_qualified_parents import _ParentReadScope
-    from empirical_lawhood.runtime.experiment_resources import bind_execution_resources
-    from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveDesignInputs, RecursiveProspectiveOperand
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.experiment_resources import bind_execution_resources
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveDesignInputs, RecursiveProspectiveOperand
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     from tests.experiment_entry_support import standard_authoring_for_draft
     from tests.runtime_platform.test_study_issue import _issue_api_fixture
     from tests.runtime_platform.test_recursive_prospective_workflow import _issue_public_handoff
@@ -948,9 +936,7 @@ def selected_e4_source_predecessor(*, project_root, originals, programme, bank, 
         bank=bank, selected=selected, namespace=namespace, publications=publications)
     # Use actual owning profile identities; this selects no inferential rung
     # and supplies no empirical premise or scientific qualification.
-    from empirical_lawhood.planning.evidence_profiles import (
-        EvidenceWorldKind, bind_profile_selection, build_observation_evidence_world_registry,
-    )
+    from empirical_lawhood.design.evidence_profiles import EvidenceWorldKind, bind_profile_selection, build_observation_evidence_world_registry
     evidence_registry = build_observation_evidence_world_registry()
     world, = (value for value in evidence_registry.world_profiles
         if value.world_kind is EvidenceWorldKind.DETERMINISTIC_SIMULATOR)

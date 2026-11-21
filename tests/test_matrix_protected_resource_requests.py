@@ -5,14 +5,14 @@ from dataclasses import replace
 from decimal import Decimal as D
 import numpy as np
 import pytest
-from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_pooled_bindings as pooled
-from empirical_lawhood.adapters.methods.matrix_parameter_response.records import MatrixParameterResponseSource
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import STRATA
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.runtime.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile
+from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_pooled_bindings as pooled
+from empirical_lawhood.domains.matrix.matrix_parameter_response.records import MatrixParameterResponseSource
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import STRATA
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile
 from tests.test_matrix_factor_response import Reader
 
 
@@ -26,7 +26,7 @@ def _blocked(*args, **kwargs):
 
 
 def _block_effects(monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_prediction
+    from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_prediction
     monkeypatch.setattr(response_error_prediction, 'fit_error_model', _blocked)
     monkeypatch.setattr(pooled, 'forecast', _blocked)
     for name in ('default_rng', 'Generator', 'PCG64', 'PCG64DXSM'):

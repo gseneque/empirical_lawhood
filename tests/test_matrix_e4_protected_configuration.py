@@ -11,9 +11,9 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_protected_workers as worker
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.plans import ScientificInputRole
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_protected_workers as worker
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.plans import ScientificInputRole
 from tests.test_matrix_e4_protected_entry_source_identity import _deny_effects, _prefix_case
 from tests.test_matrix_selected_e4_fixtures import selected_e4_populations, selected_bridge, transfer  # noqa: F401
 from tests.test_matrix_selected_e4_methods import selected_revision  # noqa: F401

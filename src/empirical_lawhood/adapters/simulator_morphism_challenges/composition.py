@@ -11,33 +11,32 @@ from dataclasses import dataclass
 from hashlib import sha256
 from typing import Callable, Mapping
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256, validate_stable_id
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.planning.experiment_entry import ExecutableStudyDefinition, ProposedStudyExtension, ProposedStudyExtensionSet
-from empirical_lawhood.planning.formal_analysis import (
-    FormalGapSourceCapabilityInventory,
-    FormalMethodCatalog,
-)
-from empirical_lawhood.planning.formal_gaps import FormalGapRegister
-from empirical_lawhood.planning.study_authoring import DesignInputRecord
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityCatalog
-from empirical_lawhood.runtime.candidate_composition import CandidateContextResolution, StandardCandidateContextResolution
-from empirical_lawhood.runtime.source_resolution import CandidateSourceResolution
-from empirical_lawhood.runtime.artifacts import ArtifactWriter
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.source_resolution import CandidateCapabilityConfigDecoder
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256, validate_stable_id
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.design.experiment_entry import ExecutableStudyDefinition, ProposedStudyExtension, ProposedStudyExtensionSet
+from empirical_lawhood.design.formal_analysis import FormalGapSourceCapabilityInventory, FormalMethodCatalog
+from empirical_lawhood.design.formal_gaps import FormalGapRegister
+from empirical_lawhood.design.study_authoring import DesignInputRecord
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog
+from empirical_lawhood.execution.candidate_composition import CandidateContextResolution, StandardCandidateContextResolution
+from empirical_lawhood.execution.source_resolution import CandidateSourceResolution
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriter
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.source_resolution import CandidateCapabilityConfigDecoder
 
-from .authoring import SimulatorMorphismChallengeExternalRecord, config_decoders
-from .contracts import SimulatorMorphismChallengeConfig
-from .contracts import SimulatorMorphismChallengePhase
-from .numeric_inputs import RCChallengeNumericInput
-from .retained_results import RCChallengeRetainedResult
-from .issued_inputs import CAPABILITY_INPUT_TYPES, RCChallengeIssuedExternalInput, RCChallengeIssuedInputs, RCChallengeRuntimeInputPort, capability_port_key
-from .extension_bundle import INSTALLED_IMPLEMENTATION_SHA256
-from .capability_configs import CAPABILITY_CONFIG_TYPES
-from .study_authoring import SimulatorMorphismChallengeStandardAuthoringBundle, build_simulator_morphism_challenges_standard_authoring_bundle
-from .runtime_provider import SimulatorMorphismChallengeCampaignRuntimeProvider, implementation_closures
+from empirical_lawhood.domains.history.simulator_morphism_challenges.authoring import SimulatorMorphismChallengeExternalRecord, config_decoders
+from empirical_lawhood.domains.history.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeConfig
+from empirical_lawhood.domains.history.simulator_morphism_challenges.contracts import SimulatorMorphismChallengePhase
+from empirical_lawhood.adapters.simulator_morphism_challenges.numeric_inputs import authenticate_numeric_input
+from empirical_lawhood.domains.history.simulator_morphism_challenges.numeric_publications import RCChallengeNumericInput
+from empirical_lawhood.domains.history.simulator_morphism_challenges.retained_results import RCChallengeRetainedResult
+from empirical_lawhood.domains.history.simulator_morphism_challenges.issued_inputs import CAPABILITY_INPUT_TYPES, RCChallengeIssuedExternalInput, RCChallengeIssuedInputs, capability_port_key
+from empirical_lawhood.adapters.simulator_morphism_challenges.input_custody import RCChallengeRuntimeInputPort
+from empirical_lawhood.adapters.simulator_morphism_challenges.extension import INSTALLED_IMPLEMENTATION_SHA256
+from empirical_lawhood.domains.history.simulator_morphism_challenges.capability_configs import CAPABILITY_CONFIG_TYPES
+from empirical_lawhood.domains.history.simulator_morphism_challenges.study_authoring import SimulatorMorphismChallengeStandardAuthoringBundle, build_simulator_morphism_challenges_standard_authoring_bundle
+from empirical_lawhood.adapters.simulator_morphism_challenges.runtime_provider import SimulatorMorphismChallengeCampaignRuntimeProvider, implementation_closures
 
 
 @dataclass(frozen=True, slots=True)
@@ -103,7 +102,7 @@ class SimulatorMorphismChallengePhaseComposition:
 
     @property
     def decoder_registrations(self):
-        from .executable_binding import BINDINGS
+        from empirical_lawhood.adapters.simulator_morphism_challenges.extension import BINDINGS
 
         selected = {value.capability_key for value in self.bundle.base.registry.capabilities}
         return tuple(decoder for binding in BINDINGS if binding.capability_key in selected
@@ -150,7 +149,7 @@ class RCChallengeCandidateContextProvider:
 def runtime_platform_ports(*, config: SimulatorMorphismChallengeConfig,
                            source_files: Mapping[str, bytes], artifact_writer: ArtifactWriter,
                            prerequisite_access_verifier: Callable[[RCChallengeRetainedResult], None] | None = None):
-    from .authoring import simulator_morphism_challenges_phase_registry
+    from empirical_lawhood.domains.history.simulator_morphism_challenges.authoring import simulator_morphism_challenges_phase_registry
 
     registry = simulator_morphism_challenges_phase_registry(implementation_sha256=INSTALLED_IMPLEMENTATION_SHA256, config=config)
     port = RCChallengeRuntimeInputPort(source_files, artifact_writer, prerequisite_access_verifier)
@@ -180,7 +179,7 @@ def compose_simulator_morphism_challenges_phase(
     if numeric_input is not None:
         if artifact_writer is None:
             raise ValueError("RC phase composition requires the actual external custody verifier")
-        numeric_input.authenticate(artifact_writer)
+        authenticate_numeric_input(numeric_input, artifact_writer)
     for retained in prerequisite_custody:
         if artifact_writer is None:
             raise ValueError("RC prerequisite custody requires the selected external verifier")

@@ -1,0 +1,166 @@
+{
+  "$defs": {
+    "ForecastUpgradeSpecification_0c7d15e54331": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/mass-balance/forecast-upgrade-specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "conversion": {
+              "description": "conversion; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "independent_unit_ids": {
+              "description": "independent unit ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "scope": {
+              "$ref": "#/$defs/MassScope_505d84b13f3c",
+              "description": "scope; constructor checks semantics and units."
+            },
+            "source": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "source; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "record_id",
+            "source",
+            "scope",
+            "independent_unit_ids",
+            "conversion"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MassScope_505d84b13f3c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/mass-balance/scope"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "clock_id": {
+              "description": "clock id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "condition": {
+              "description": "condition; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "population_id": {
+              "description": "population id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "receiver_id": {
+              "description": "receiver id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "source_id": {
+              "description": "source id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "units": {
+              "description": "units; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "population_id",
+            "source_id",
+            "receiver_id",
+            "clock_id",
+            "units",
+            "condition"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:mass-balance-forecast-upgrade",
+  "$ref": "#/$defs/ForecastUpgradeSpecification_0c7d15e54331",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Mass Balance Forecast Upgrade",
+  "x-consumer": "mass-balance-forecast-upgrade",
+  "x-consumer-maximum-bytes": 131072,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

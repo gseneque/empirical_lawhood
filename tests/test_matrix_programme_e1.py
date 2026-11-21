@@ -7,31 +7,23 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_bindings, compact_preparation
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import e1_assembly as domain
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_bindings, compact_preparation
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import e1_assembly as domain
 from empirical_lawhood.api import matrix_programme_e1 as owner
-from empirical_lawhood.kernel.authority import AuthorityAction, AuthorityPolicy, ResourceBudget, SourceAccessClass
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.kernel.evidence import ClaimSpec, EvidenceCeiling, EvidenceRung, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experiments import AssignmentKind, AssignmentSpec, ControlKind, ControlSpec, PrecisionGoal
-from empirical_lawhood.kernel.obligations import (
-    ClosureSpec, ComputabilityEvidence, FalsifierKind, FalsifierSpec, ObligationStatus,
-    ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.quantities import QuantityKind, QuantitySpec, ResponseDirection
-from empirical_lawhood.kernel.status import LifecycleStatus, ReadinessStatus
-from empirical_lawhood.kernel.systems import IndependentUnitSpec, RelationalIdentity, SystemBoundaryKind, SystemSpec
-from empirical_lawhood.kernel.time import (
-    AvailabilitySpec, CausalPhase, ClockLabelSemantics, ClockSpec, HoldSemantics, HorizonSpec, SamplingSemantics,
-)
-from empirical_lawhood.kernel.worlds import (
-    ComputabilityEnvelope, NumericalCoordinateKind, NumericalCoordinateSpec, NumericalViewSpec,
-    RandomnessSemantics, WorldKind, WorldSpec,
-)
-from empirical_lawhood.planning.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
-from empirical_lawhood.runtime.execution_envelope import ChildResourceTokenLimit, NonTimeResourceBudget, ProgressHeartbeat, ProgressLivenessContract
-from empirical_lawhood.runtime.experiment_resources import ExecutionResourceSelection
+from empirical_lawhood.science.identity.authority import AuthorityAction, AuthorityPolicy, ResourceBudget, SourceAccessClass
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.science.evidence.evidence import ClaimSpec, EvidenceCeiling, EvidenceRung, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experiments import AssignmentKind, AssignmentSpec, ControlKind, ControlSpec, PrecisionGoal
+from empirical_lawhood.science.evidence.obligations import ClosureSpec, ComputabilityEvidence, FalsifierKind, FalsifierSpec, ObligationStatus, ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.quantities import QuantityKind, QuantitySpec, ResponseDirection
+from empirical_lawhood.science.records.status import LifecycleStatus, ReadinessStatus
+from empirical_lawhood.science.models.systems import IndependentUnitSpec, RelationalIdentity, SystemBoundaryKind, SystemSpec
+from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase, ClockLabelSemantics, ClockSpec, HoldSemantics, HorizonSpec, SamplingSemantics
+from empirical_lawhood.science.models.worlds import ComputabilityEnvelope, NumericalCoordinateKind, NumericalCoordinateSpec, NumericalViewSpec, RandomnessSemantics, WorldKind, WorldSpec
+from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
+from empirical_lawhood.execution.execution_envelope import ChildResourceTokenLimit, NonTimeResourceBudget, ProgressHeartbeat, ProgressLivenessContract
+from empirical_lawhood.execution.experiment_resources import ExecutionResourceSelection
 from tests.test_matrix_programme_allocations import census as census  # noqa: F401
 
 ROOT = Path(__file__).parents[1]
@@ -160,9 +152,9 @@ def test_current_context_and_request_have_no_earlier_root_or_receipt_input(assem
 
 def test_real_c_assembly_rebuilds_current_e1_and_replays_without_native_or_old_ready(assembled_case, monkeypatch):
     import numpy as np
-    from empirical_lawhood.adapters.simulators.six_matrix_response import simulation
+    from empirical_lawhood.domains.matrix.six_matrix_response import simulation
     from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
 
     kwargs, actual = assembled_case
     monkeypatch.setattr(simulation, 'baoab_step_with_hermitian_noise', lambda *a, **kw: pytest.fail('metadata assembly acquired native history'))
@@ -206,7 +198,7 @@ def test_real_c_assembly_rebuilds_current_e1_and_replays_without_native_or_old_r
 def test_public_copied_configuration_derives_the_existing_compact_protocol(assembled_case):
     from empirical_lawhood.api.configuration import validate_configuration
     from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs, load_experiment_inputs
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 
     kwargs, _ = assembled_case
     copied = Path(kwargs['artifact_writer'].root.contract.canonical_path) / 'copied-e1-assembly'

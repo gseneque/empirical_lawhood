@@ -1,0 +1,193 @@
+{
+  "label": "Frozen source and held parameter transport; zero-new-action versus probed and new-local suppliers",
+  "roots": [
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700701
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700702
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700703
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700704
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700705
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700706
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700707
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700708
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700709
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700710
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700711
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700712
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700713
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700714
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700715
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700716
+    }
+  ],
+  "schema": "model-free-matrix-definition.v1",
+  "settings": {
+    "native": {
+      "coordinates": [
+        {
+          "cross_coupling": "1",
+          "friction": "1",
+          "id": "nominal",
+          "temperature": "1"
+        },
+        {
+          "cross_coupling": "1",
+          "friction": "1",
+          "id": "temperature-1-125",
+          "temperature": "1.125"
+        },
+        {
+          "cross_coupling": "1",
+          "friction": "1",
+          "id": "temperature-3-25",
+          "temperature": "3.25"
+        },
+        {
+          "cross_coupling": "2",
+          "friction": "1",
+          "id": "cross-coupling-2",
+          "temperature": "1"
+        }
+      ]
+    },
+    "response": {
+      "selection_tick": 32
+    },
+    "transfer": {
+      "destination_coordinate_ids": [
+        "nominal",
+        "temperature-1-125",
+        "temperature-3-25",
+        "cross-coupling-2"
+      ],
+      "probe_action_budget": 48,
+      "source_coordinate_id": "nominal"
+    }
+  }
+}

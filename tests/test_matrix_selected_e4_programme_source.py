@@ -9,8 +9,8 @@ import pytest
 
 from empirical_lawhood.api import recursive_authoring, selected_e4_programme_service as owner
 from empirical_lawhood.api import composite_experiment_programme as source_owner
-from empirical_lawhood.infrastructure import source_closure
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.storage import source_closure
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.infrastructure.test_selected_candidate import candidate_case as candidate_case  # noqa: F401
 
 ROOT = Path(__file__).resolve().parents[1]

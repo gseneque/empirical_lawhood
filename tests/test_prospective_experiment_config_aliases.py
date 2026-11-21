@@ -10,14 +10,14 @@ from hashlib import sha256
 from types import SimpleNamespace
 
 from empirical_lawhood.api.prospective_experiment import _input_bindings
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveOperationSpec
-from empirical_lawhood.planning.study_authoring import SourceMaterializationRole
-from empirical_lawhood.runtime.experiment_preparation import PreparedExperimentFile
-from empirical_lawhood.runtime.input_payloads import InputBytes
-from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig, SourceReadMode
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveOperationSpec
+from empirical_lawhood.design.study_authoring import SourceMaterializationRole
+from empirical_lawhood.execution.experiment_preparation import PreparedExperimentFile
+from empirical_lawhood.execution.input_payloads import InputBytes
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
 from tests.runtime_platform.test_recursive_compiler import Config, SourceConfig, fixture
 
 

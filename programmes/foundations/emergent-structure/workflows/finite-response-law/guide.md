@@ -8,7 +8,7 @@ Use this workflow for current 32-root calibration, qualification of the frozen 4
 
 ## Fixed nomination and current inputs
 
-The [frozen specification](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/specification.md) retains an original citation to an omitted Methods and Evidence PDF.
+The [frozen specification](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/specification.md) retains an original citation to an omitted Methods and Evidence PDF.
 That historical link does not resolve in this release.
 Check the [paper filename crosswalk](../../../../../paper/SOURCES.md#historical-filenames-and-current-validation) before following it.
 Current commands below do not require that omitted paper payload.
@@ -166,8 +166,8 @@ The informative-composition stage must retain this report before fresh calibrati
 Its identity must accompany the development readout and frozen fitted package.
 Passing development gates, package freeze and technical prerequisites remain separate requirements.
 The diagnostic cannot nominate or qualify that package or supply authority.
-See the [frozen protocol](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/specification.md)
-and [paired-test owner](../../../../../src/empirical_lawhood/planning/paired_power.py).
+See the [frozen protocol](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/specification.md)
+and [paired-test owner](../../../../../src/empirical_lawhood/methods/statistics/paired_power.py).
 
 ## Supply an explicit finite scientific seed allocation
 
@@ -194,7 +194,7 @@ An incomplete, repeated, reordered or out-of-range allocation refuses.
 For a reproducible new proposal, call the public allocation helper:
 
 ```python
-from empirical_lawhood.adapters.composition.finite_response_law.assignment import proposed_scientific_seeds
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment import proposed_scientific_seeds
 
 allocation = proposed_scientific_seeds("calibration", master_seed=12345)
 # Supply allocation as scientific_seeds in the reviewed assignment constructor.
@@ -332,7 +332,7 @@ cover missing-future supplement and preparation-screen. The calibration/prospect
 None of these fixtures supplies an authentic qualified parent.
 
 Preparation-screening prefix preparation remains a supplied scientific input. For all eight prepared-response and sixteen information-response roots, authenticate the successful receipts, canonical results and native payloads.
-Use the existing [compact instrument](../../../../../src/empirical_lawhood/adapters/simulators/finite_response_law/instruments.py) for both 24-channel prefix vectors.
+Use the existing [compact instrument](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/instruments.py) for both 24-channel prefix vectors.
 Derive them from the common frame and 31 history samples at clock 4096. Each numerical view must end at native step
 `4096 * refinement`. Declare the original instrument and source/result
 identities in the typed prefix, preserving the original decimal conversion
@@ -380,7 +380,7 @@ The [finite-method counterexamples](../../../../../tests/test_finite_response_me
 They use explicitly synthetic representations of original scientific operands. They do not repair the
 exposed calibration/evaluation roster or import a qualified lower package.
 
-The retained preparation-policy [saved-operand verifier](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/retained_entry_readiness/verification.py)
+The retained preparation-policy [saved-operand verifier](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/retained_entry_readiness/verification.py)
 independently validates normal equations, train/held root separation, rank-18
 calibration, interval choices and joint success on the distinct 24-root,
 nine-schedule chart. Its fixed gates and supplied report remain outcome-visible. For the original complete cache, call `validate_retained_inputs(m, trajectory,
@@ -392,22 +392,22 @@ completed preparation-screen/bridge lineage separately, and enforce the declared
 resource bounds before loading. These functions perform no model solve, native
 work or issue. A successful arithmetic check grants no authority.
 
-The [preparation-policy independent development calculation](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/preparation_policy_verification.py)
-retains the separate adequacy-provider screen. The [closure summary](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/retained_entry_readiness/posthoc_summary.py)
-retains all affine error components and their cross terms. The [response-composition maximum](../../../../../src/empirical_lawhood/adapters/methods/response_composition/verification.py)
+The [preparation-policy independent development calculation](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/preparation_policy_verification.py)
+retains the separate adequacy-provider screen. The [closure summary](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/retained_entry_readiness/posthoc_summary.py)
+retains all affine error components and their cross terms. The [response-composition maximum](../../../../../src/empirical_lawhood/domains/matrix/response_composition/verification.py)
 provides the original explicit per-root/per-parent reduction over both views
 and the declared primary horizons. These are separate retained contracts.
 
-From original operands, the [independent informative-composition verifier](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/independent_informative_composition.py) reconstructs four outer folds and their three coefficient folds.
+From original operands, the [independent informative-composition verifier](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/independent_informative_composition.py) reconstructs four outer folds and their three coefficient folds.
 It reconstructs training-only normalizers, affine coefficients, scales, root scores and every finite-menu decision. Its linear solves belong to this
 independent audit. It does not call the producer's acceptance code. The
-[independent calibration verifier](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/independent_calibration.py)
+[independent calibration verifier](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/independent_calibration.py)
 also validates the sole qualification record against rank 30, complete request
 counts and the recorded eligibility gate. Authenticate and authorize all input
 arrays and records before using either library. Their output is an exposed
 development consistency check and grants no fresh entry or publication authority.
 
-The [missing-future owner](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/supplement.py)
+The [missing-future owner](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/supplement.py)
 also retains `supplement_from_evaluation`, which maps the authenticated original
 16-root supplementary evaluation into the complete nine-word panel and its
 observed/valid masks. It preserves the second-future clock, word order, complete
@@ -415,7 +415,7 @@ native-update census and duplicate-slot refusals. The existing
 `join_missing_future` then keeps earlier observations intact. The reducer does
 not authenticate receipts or the scientific adjudication on the caller's behalf.
 
-The [independent opportunity verifiers](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/independent_opportunity.py)
+The [independent opportunity verifiers](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/independent_opportunity.py)
 retain the distinct original single-future opportunity and two-future opportunity native-word
 charts. They independently reconstruct admissibility, smallest-word selection,
 aligned magnitude discrimination and equal-root request statistics, then check
@@ -425,7 +425,7 @@ Supply authenticated original arrays, request freeze and report bytes after
 separate analysis authorization. These library readouts perform no native work,
 publication or qualification.
 
-The [independent evaluation audit](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/independent_evaluation.py)
+The [independent evaluation audit](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/independent_evaluation.py)
 rechecks the original 64-root prospective-evaluation native losses, selected-word success and false
 admissions, fixed confidence bounds, paired bootstrap and added-use comparison.
 Its continuation entry point retains the separate analysis status. Its receipted
@@ -435,7 +435,7 @@ receipts, revealed operands and analysis authority before entry. Any continuatio
 repair, retry census and cumulative elapsed accounting require their own runtime
 proofs. These arithmetic functions do not perform those acts.
 
-The [retained feature assembler](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/retained_features.py)
+The [retained feature assembler](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/retained_features.py)
 keeps the original 16 retained prepared and 32 information-response roots, each with five parent payloads and two
 numerical views. It assembles 24-channel prefix and handoff features with the existing compact instrument.
 It validates native lineage, original root order, clocks and equal shared prefixes across parents. Authenticate the input
@@ -443,7 +443,7 @@ inventory, successful receipts, source freeze and artifact hashes separately.
 The returned lineage binds supplied record identities and payload hashes. It
 does not carry historical file paths or authorize fitting or native execution.
 
-`verify_screen_readout` in the [preparation-policy verifier](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/preparation_policy_verification.py)
+`verify_screen_readout` in the [preparation-policy verifier](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/preparation_policy_verification.py)
 validates the original complete preparation-screen screen against its unchanged lower evaluator,
 all 24 panels, root-level A/J/C readouts and gates. It also reconstructs the
 recorded fit dependencies and validates their exact identities. This exposed-data
@@ -451,7 +451,7 @@ audit includes independent affine fits. Authenticate the frozen operands,
 receipts, retained recovery census and analysis authority first. It neither
 acquires native observations nor publishes a qualification or repairs execution.
 
-The installed [validate_retained_native_panel](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/retained_native_validation.py) library independently validates the
+The installed [validate_retained_native_panel](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/retained_native_validation.py) library independently validates the
 original 16 retained prepared and 32 information-response retained roots before calling the existing panel
 importer. It preserves all native common-start, parent-work, word, future,
 clock/view, checkpoint and shared-innovation joins, plus the original sampled
@@ -460,7 +460,7 @@ result/payload pairs under separate analysis authority. Original inventory,
 receipt, source, custody, summary/status and cumulative resource proofs remain
 caller prerequisites. This readout grants no new authentication budget.
 
-The [frozen-package owner](../../../../../src/empirical_lawhood/adapters/methods/finite_response_law/frozen_package.py) retains `thread_settings` for observed single-thread environment/backend verification.
+The [frozen-package owner](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/frozen_package.py) retains `thread_settings` for observed single-thread environment/backend verification.
 Its `verify_frozen_dependencies` validates original result/readout, NumPy/Python/lock, complete scientific source hashes and unchanged interval function bodies. Supply the authenticated six-file/four-family frozen scope
 and its source bytes explicitly. This check does not refit coefficients or
 qualify a new run. Changed scientific bytes or numerical versions require a

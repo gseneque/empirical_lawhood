@@ -6,8 +6,10 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.adapters.composition.response_parent_input import ImportedResponseParentCustody
-from empirical_lawhood.adapters.composition.prepared_response.dependent_input import PreparedResponseDependentInput, check_dependent_input
-from empirical_lawhood.adapters.composition.response_composition.input import ResponseCompositionInput, check_response_composition_input
+from empirical_lawhood.domains.matrix.prepared_response.authoring.dependent_input import PreparedResponseDependentInput
+from empirical_lawhood.adapters.composition.prepared_response.dependent_input import check_dependent_input
+from empirical_lawhood.domains.matrix.response_composition.authoring.input import ResponseCompositionInput
+from empirical_lawhood.adapters.composition.response_composition.input import check_response_composition_input
 from empirical_lawhood.api.codecs import load_registered_authoring
 
 ROOT = Path(__file__).parents[1] / "programmes/foundations/emergent-structure/workflows"

@@ -8,6 +8,7 @@ real qualification or candidate authority is asserted. Added controls execute no
 continuation/response solver; durable BEGIN is distinct from native CONTACT.
 Triggered CAL/CONF model-bearing point parity/source admission remain separate.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 from dataclasses import replace
 from decimal import Decimal as D
 from hashlib import sha256
@@ -18,36 +19,36 @@ import numpy as np
 import pytest
 from threadpoolctl import threadpool_limits
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryReadoutSelection
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_methods import METHODS
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old, science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_science as method
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as programme_owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as devrecords
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4RevisionNomination, SelectedE4FrozenRevision
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import FAMILY_MAP, ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_protected_workers import SelectedE4ProtectedWorker
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import bind_selected_native_source
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryReadoutSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_methods import METHODS
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old, science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_science as method
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as programme_owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as devrecords
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4RevisionNomination, SelectedE4FrozenRevision
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import FAMILY_MAP, ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_protected_workers import SelectedE4ProtectedWorker
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import bind_selected_native_source
 from empirical_lawhood.api.recursive_authoring import implementation_binding
-from empirical_lawhood.infrastructure import execution as lifecycle
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.infrastructure.numerical_provenance import selected_worker_environment
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
-from empirical_lawhood.runtime.native_subwork import NativeSubworkInputError, NativeSubworkState, NativeSubworkUncertainContact
-from empirical_lawhood.adapters.methods.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
+from empirical_lawhood.execution.local import execution as lifecycle
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+
+from empirical_lawhood.storage.numerical_provenance import selected_worker_environment
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, VisibilityCeiling as Visibility
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.execution.native_subwork import NativeSubworkInputError, NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.domains.matrix.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
 from tests.test_matrix_e4_worker_preflight import pin, record_exposure
 from tests.test_matrix_factor_confirmation_eligibility import stock, provenance, publish  # noqa: F401
 from tests.test_matrix_scheduled_history import scheduled  # noqa: F401
@@ -174,8 +175,8 @@ def protected_native_case(scheduled, provenance, monkeypatch):  # noqa: F811
         protocol, _ = literal_protocol()
         protocol = replace(protocol, public_source=local.public, horizon_steps=(1, 2),
             templates=replace(protocol.templates, source=local.reference.identity, producers=(local.reference.identity,)))
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponsePanel
-        from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponsePanel
+        from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
         group = source.root.root.independent_group_id
         panels = (ScheduledResponsePanel("panel.e4-worker.common", group, "COMMON_NOISE_PANEL", "ORIGINAL_COMPLETED_PREFIX_GENERATOR_STATES", source.root.streams),
             ScheduledResponsePanel("panel.e4-worker.independent", group, "INDEPENDENT_FUTURE", "FRESH_DECLARED_FUTURE_START_AT_CUTOFF",
@@ -206,7 +207,7 @@ def protected_native_case(scheduled, provenance, monkeypatch):  # noqa: F811
         store.parent_contacts.begin(contract.expected_parent_contact)
         result = runner.execute_with_native_subwork(context, store)
         raw_outputs = {row.output_id.rsplit(".", 1)[-1]: row.payload for row in result.outputs}
-        from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
         history = decode_canonical_bytes(raw_outputs["product"], r.SelectedE4ProtectedPrefixHistory, maximum_bytes=None)
         record_exposure(case, "prefix", completion=history.native.completion, raw=raw_outputs["arrays"])
         prefix = science.consume_prefix(bind_selected_native_source(local, provenance), history.arrays, raw_outputs["arrays"])
@@ -318,7 +319,7 @@ def test_actual_protected_e4_begin_replays_late_input_publication_damage(protect
     original = next(row for row in inputs if row.artifact_id.endswith('.source'))
     source_path = protected_native_case.plane.root.resolve(original.materialization.relative_path, for_write=False)
     sidecar = source_path.with_name(source_path.name + '.manifest.json')
-    manifest = decode_artifact_manifest(sidecar.read_bytes())
+    manifest = resolve_artifact_sidecar_bytes(protected_native_case.plane, sidecar.read_bytes())
     assert manifest.publication is not None
     target = (source_path if damage == 'source-body' else sidecar if damage == 'source-sidecar' else
         protected_native_case.plane.root.resolve(manifest.publication.commit_marker_relative_path, for_write=False))

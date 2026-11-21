@@ -46,7 +46,7 @@ for deferred families and their existing evidence ceilings.
 ## Native Matrix source and future scope
 
 Native direct inputs bind exact configurations, acquisition seals and original parent materializations.
-The shared [native contract owner](../../src/empirical_lawhood/adapters/methods/matrix_factor_response/native_acquisition_contracts.py) supplies these operands to TRAIN and E2 consumers.
+The shared [native contract owner](../../src/empirical_lawhood/domains/matrix/matrix_factor_response/native_acquisition_contracts.py) supplies these operands to TRAIN and E2 consumers.
 Response inputs also bind the causal prefix, physical forecast and exact future panels.
 Scheduling dependencies alone do not identify the scientific inputs that a task consumes.
 

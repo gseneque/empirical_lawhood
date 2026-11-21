@@ -67,7 +67,7 @@ def _matrix_export_with_reviewed_provenance_identity(historical):
 def test_public_authoring_wrapper_exports_match_frozen_products_and_reviewed_identities(tmp_path, monkeypatch, family):
     expected = json.loads(BASELINE.read_text())[family]
     if family == "matrix":
-        from empirical_lawhood.runtime import candidate_compiler
+        from empirical_lawhood.execution import candidate_compiler
 
         compile_candidate = candidate_compiler.compile_draft_candidate
         compiled_implementations = []
@@ -85,7 +85,7 @@ def test_public_authoring_wrapper_exports_match_frozen_products_and_reviewed_ide
             compile_with_preserved_implementation,
         )
         expected = _matrix_export_with_reviewed_provenance_identity(expected)
-    actual = export_wrapper(family, tmp_path, monkeypatch, frozen_matrix_lock=family == "matrix")
+    actual = export_wrapper(family, tmp_path, monkeypatch, frozen_matrix_producer=family == "matrix")
     if family != "matrix":
         # Preserve every historical byte except the added operational native
         # return failure disposition. Scientific products keep exact hashes.
@@ -103,10 +103,10 @@ def test_public_authoring_wrapper_exports_match_frozen_products_and_reviewed_ide
 
 
 def test_current_matrix_export_binds_actual_lock_without_changing_scientific_roots_or_seeds(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.composition.prepared_response.exposure import PreparedExposureInspection, prepared_seed_ids
-    from empirical_lawhood.adapters.composition.prepared_response.native_authoring import PreparedResponseNativeAuthoringInput
+    from empirical_lawhood.domains.matrix.prepared_response.authoring.exposure import PreparedExposureInspection, prepared_seed_ids
+    from empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring import PreparedResponseNativeAuthoringInput
     from empirical_lawhood.api.codecs import load_registered_authoring
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
     actual = export_wrapper("matrix", tmp_path, monkeypatch)
     exposure = decode_canonical_bytes(

@@ -11,11 +11,11 @@ import pytest
 
 from tests.runtime_platform.test_execution_scheduler import _plane
 from tests.runtime_platform.test_native_effect_contact import _native_runtime
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.sql import create_catalog_engine
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.sql import create_catalog_engine
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.native_effects import NativeEffectContact
 
 
 def _contact(plan):

@@ -14,16 +14,13 @@ import pytest
 from tests.numerical_provenance_fixtures import PROJECT_ROOT, numerical_plane
 
 from empirical_lawhood.api.finite_operands import original_f_operand_export, preparation_operands_export, saved_matrix_arrays_export, saved_matrix_arrays_import
-from empirical_lawhood.api.matrix_preparation_analysis import (
-    baseline_support_analysis, preparation_analysis_read, tangent_preparation_configuration,
-    transient_response_analysis,
-)
-from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge import mechanical_kernel
-from empirical_lawhood.adapters.methods.matrix_preparation_analysis.records import BaselineSupportConfig, TransientAnalysisConfig
-from empirical_lawhood.adapters.methods.matrix_preparation_analysis.transient import baseline_support_analysis as evaluate_baseline, transient_analysis, verify_saved_forecasts
-from empirical_lawhood.adapters.methods.matrix_preparation_analysis.tangent_records import TangentPreparationConfig
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.api.matrix_preparation_analysis import baseline_support_analysis, preparation_analysis_read, tangent_preparation_configuration, transient_response_analysis
+from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge import mechanical_kernel
+from empirical_lawhood.domains.matrix.matrix_preparation_analysis.records import BaselineSupportConfig, TransientAnalysisConfig
+from empirical_lawhood.domains.matrix.matrix_preparation_analysis.transient import baseline_support_analysis as evaluate_baseline, transient_analysis, verify_saved_forecasts
+from empirical_lawhood.domains.matrix.matrix_preparation_analysis.tangent_records import TangentPreparationConfig
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_matrix_operand_transport import allocation
 
 
@@ -208,7 +205,7 @@ def test_missing_input_manifest_or_completion_refuses_without_fit(tmp_path, oper
         bridge_directory=bridge, original_f_directory=original, artifact_writer=plane, project_root=PROJECT_ROOT)
     def forbidden(*args, **kwargs):
         raise AssertionError("retained read repeated numerical/native work")
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.matrix_preparation_analysis.transient.transient_analysis", forbidden)
+    monkeypatch.setattr("empirical_lawhood.domains.matrix.matrix_preparation_analysis.transient.transient_analysis", forbidden)
     monkeypatch.setattr("empirical_lawhood.api.matrix_preparation_analysis.capture_matrix_provenance", forbidden)
     assert preparation_analysis_read(directory, artifact_writer=numerical_plane(tmp_path))[0] == result
     for name in ("analysis-inputs.canonical.json", "analysis-completion.canonical.json.manifest.json"):
@@ -228,8 +225,8 @@ def test_missing_input_manifest_or_completion_refuses_without_fit(tmp_path, oper
 
 def test_independently_custodied_wrong_roles_state_schema_census_and_environment_refuse(tmp_path, operands):
     """Generic byte custody alone cannot satisfy the scientific reader contract."""
-    from empirical_lawhood.infrastructure.retained_analysis import publish_retained_analysis, read_retained_analysis
-    from empirical_lawhood.runtime.retained_analysis import RetainedAnalysisMember
+    from empirical_lawhood.storage.retained_analysis import publish_retained_analysis, read_retained_analysis
+    from empirical_lawhood.execution.retained_analysis import RetainedAnalysisMember
 
     native, bridge, original, _, _, _, _ = operands
     plane = numerical_plane(tmp_path)
@@ -303,7 +300,7 @@ def test_console_actual_transient_baseline_and_authenticated_readout(tmp_path, o
     def forbidden(*args, **kwargs):
         raise AssertionError("console readout recalculated producing science")
     monkeypatch.setattr("empirical_lawhood.api.matrix_preparation_analysis.capture_matrix_provenance", forbidden)
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.matrix_preparation_analysis.transient.transient_analysis", forbidden)
+    monkeypatch.setattr("empirical_lawhood.domains.matrix.matrix_preparation_analysis.transient.transient_analysis", forbidden)
     for output in outputs.values():
         result = runner.invoke(app, ["campaign", "matrix-analysis-result", "--directory", str(output)])
         assert result.exit_code == 0, (result.output, result.exception)

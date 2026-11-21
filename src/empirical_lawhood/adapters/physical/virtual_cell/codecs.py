@@ -14,24 +14,11 @@ import pyarrow as pa  # type: ignore[import-untyped]
 from safetensors.numpy import load as load_safetensors
 from safetensors.numpy import save as save_safetensors
 
-from .analysis import (
-    LinearResponseModel,
-    ModelFamily,
-    PrefixAdmissionModel,
-    Standardization,
-    TargetFeatureMatrix,
-)
-from .contracts import VirtualCellContractError
-from .dataset import ControlReservoirArrays, ResponseSummaryArrays
-from .records import (
-    CONTROL_RESERVOIR_TABLE_SCHEMA,
-    MODEL_SAFETENSORS_SCHEMA,
-    OFFICIAL_METRICS_TABLE_SCHEMA,
-    PREDICTED_MEAN_TABLE_SCHEMA,
-    PREDICTION_H5AD_ENVELOPE_SCHEMA,
-    RESPONSE_SUMMARY_TABLE_SCHEMA,
-    TARGET_FEATURE_TABLE_SCHEMA,
-)
+from empirical_lawhood.domains.biology.virtual_cell.analysis import LinearResponseModel, ModelFamily, PrefixAdmissionModel, Standardization, TargetFeatureMatrix
+from empirical_lawhood.domains.biology.virtual_cell.contracts import VirtualCellContractError
+from empirical_lawhood.domains.biology.virtual_cell.response_summary import ControlReservoirArrays
+from empirical_lawhood.domains.biology.virtual_cell.response_summary import ResponseSummaryArrays
+from empirical_lawhood.domains.biology.virtual_cell.records import CONTROL_RESERVOIR_TABLE_SCHEMA, MODEL_SAFETENSORS_SCHEMA, OFFICIAL_METRICS_TABLE_SCHEMA, PREDICTED_MEAN_TABLE_SCHEMA, PREDICTION_H5AD_ENVELOPE_SCHEMA, RESPONSE_SUMMARY_TABLE_SCHEMA, TARGET_FEATURE_TABLE_SCHEMA
 
 
 _VECTOR_DTYPE = np.dtype("<f8")

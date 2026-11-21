@@ -16,17 +16,12 @@ from numpy.typing import NDArray
 
 from empirical_lawhood.api.configuration import _write_new_file
 from empirical_lawhood.adapters._bounded_files import read_bounded_contained
-from empirical_lawhood.adapters.methods.finite_response_law.original_f import OriginalFiniteResponseLaw
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.matrix_inputs import (
-    MAXIMUM_MATRIX_ARRAY_BYTES,
-    MATRIX_ARRAY_SCHEMA,
-    MatrixAllocation,
-    SavedMatrixArrays,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.finite_response_law.original_f import OriginalFiniteResponseLaw
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.input_contracts import MAXIMUM_MATRIX_ARRAY_BYTES, MATRIX_ARRAY_SCHEMA, MatrixAllocation, SavedMatrixArrays
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 
 ORIGINAL_F_FILENAMES = (
     "payload.canonical.json", "manifest.json", "publication-commit.json",
@@ -49,7 +44,7 @@ def _read_selected(path: Path, *, maximum_bytes: int) -> bytes:
 
 
 def _public_bytes(package: str, filenames: tuple[str, ...], sizes: tuple[int, ...]) -> tuple[bytes, ...]:
-    root = files("empirical_lawhood").joinpath("resources", "finite_response_law", package)
+    root = files("empirical_lawhood").joinpath("package_data", "finite_response_law", package)
     result = []
     for name, size in zip(filenames, sizes, strict=True):
         with root.joinpath(name).open("rb") as stream:
@@ -73,9 +68,7 @@ def _export_files(destination: Path, members: Mapping[str, bytes], manifest_name
 
 def original_f_operand_export(destination: Path, *, payload_id: str):
     """Export the actual original bytes and distinct current original-F record."""
-    from empirical_lawhood.adapters.methods.finite_response_law.original_f import (
-        authenticate_original_f_sources, original_f_from_bytes, original_f_source_identities,
-    )
+    from empirical_lawhood.domains.matrix.finite_response_law.original_f import authenticate_original_f_sources, original_f_from_bytes, original_f_source_identities
 
     sources = _public_bytes("original_f", ORIGINAL_F_FILENAMES, (37921, 3919, 1428, 17166, 522736))
     identities = original_f_source_identities(tuple(f"{payload_id}.source.{index}" for index in range(5)))
@@ -87,9 +80,7 @@ def original_f_operand_export(destination: Path, *, payload_id: str):
 
 def original_f_operand_import(operand_path: Path, *, source_directory: Path):
     """Import supplied original files, authenticated against the current wrapper."""
-    from empirical_lawhood.adapters.methods.finite_response_law.original_f import (
-        OriginalFiniteResponseLaw, authenticate_original_f_sources, original_f_from_bytes,
-    )
+    from empirical_lawhood.domains.matrix.finite_response_law.original_f import OriginalFiniteResponseLaw, authenticate_original_f_sources, original_f_from_bytes
 
     operand = decode_canonical_bytes(_read_selected(operand_path, maximum_bytes=1024**2), OriginalFiniteResponseLaw, maximum_bytes=1024**2)
     sources = tuple(_read_selected(source_directory / name, maximum_bytes=identity.size_bytes) for name, identity in zip(ORIGINAL_F_FILENAMES, operand.source_identities, strict=True))
@@ -102,7 +93,7 @@ def original_f_operand_import(operand_path: Path, *, source_directory: Path):
 
 def current_nomination_operand_export(destination: Path, *, nomination_id: str):
     """Deliver config-compatible report/coefficient/manifest with original crosswalk."""
-    from empirical_lawhood.adapters.methods.finite_response_law.nominated_package import current_nomination_from_sources
+    from empirical_lawhood.domains.matrix.finite_response_law.nominated_package import current_nomination_from_sources
 
     sources = _public_bytes("nomination", ("development-report.json", "coefficients.transport.json", "development-manifest.json"), (32160, 763803, 227387))
     operand, current = current_nomination_from_sources(nomination_id, sources)
@@ -113,7 +104,7 @@ def current_nomination_operand_export(destination: Path, *, nomination_id: str):
 
 
 def current_nomination_operand_import(operand_path: Path, *, source_directory: Path):
-    from empirical_lawhood.adapters.methods.finite_response_law.nominated_package import CurrentNominationOperand, authenticate_current_nomination
+    from empirical_lawhood.domains.matrix.finite_response_law.nominated_package import CurrentNominationOperand, authenticate_current_nomination
 
     operand = decode_canonical_bytes(_read_selected(operand_path, maximum_bytes=65536), CurrentNominationOperand, maximum_bytes=65536)
     sources = tuple(_read_selected(source_directory / name, maximum_bytes=identity.size_bytes) for name, identity in zip(NOMINATION_SOURCE_FILENAMES, operand.original_artifacts, strict=True))
@@ -159,13 +150,10 @@ def saved_matrix_arrays_import(
 
 def _authenticate_current_source_completion(directory, *, manifest, allocation, artifact_writer):
     """Native source markers require independently committed complete custody."""
-    from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
+    from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
     from empirical_lawhood.api.matrix_numerical_provenance import authenticate_recorded_matrix_provenance
-    from empirical_lawhood.infrastructure.retained_analysis import read_retained_analysis, read_retained_analysis_member
-    from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source_records import (
-        CurrentPreparationSourceConfig, MatrixPreparationSourceConfig,
-        CurrentPreparationSourceReport, CurrentPreparationRootReport,
-    )
+    from empirical_lawhood.storage.retained_analysis import read_retained_analysis, read_retained_analysis_member
+    from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source_records import CurrentPreparationSourceConfig, MatrixPreparationSourceConfig, CurrentPreparationSourceReport, CurrentPreparationRootReport
     markers = ("source-config.canonical.json", "source-report.canonical.json", "numerical-provenance.canonical.json")
     if not any((directory / name).exists() or (directory / name).is_symlink() for name in markers):
         if any(item.payload_schema == NumericalProducingProvenance.SCHEMA for item in manifest.source_artifacts):
@@ -184,7 +172,7 @@ def _authenticate_current_source_completion(directory, *, manifest, allocation, 
                     "arrays.npz", "allocation.canonical.json", "numerical-provenance.canonical.json"}
         if {member.relative_path for member in completion.members} != expected:
             raise ValueError("Derived fit completion changes its complete member census")
-        from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge import TransientBridgeInput, TransientBridgeSpec
+        from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge import TransientBridgeInput, TransientBridgeSpec
         source = decode_canonical_bytes(raw("bridge-input.canonical.json"), TransientBridgeInput, maximum_bytes=16 * 1024**2)
         spec = decode_canonical_bytes(raw("bridge-spec.canonical.json"), TransientBridgeSpec, maximum_bytes=16 * 1024**2)
         if source.allocation != allocation.identity or source.spec != spec or source.identity not in manifest.producers:
@@ -231,10 +219,8 @@ def _authenticate_current_source_completion(directory, *, manifest, allocation, 
 def prepare_matrix_source_configuration(*, config_id: str, allocation: MatrixAllocation,
                                         original_f: OriginalFiniteResponseLaw | None = None, project_root: Path | None = None):
     """Bind the selected implementation; checkout callers supply an explicit root."""
-    from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source_records import (
-        CurrentPreparationSourceConfig, MatrixPreparationSourceConfig, MatrixPreparationSourceProtocol,
-    )
-    from empirical_lawhood.infrastructure.numerical_provenance import observe_implementation_source
+    from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source_records import CurrentPreparationSourceConfig, MatrixPreparationSourceConfig, MatrixPreparationSourceProtocol
+    from empirical_lawhood.storage.numerical_provenance import observe_implementation_source
     _, code, lock, _, _ = observe_implementation_source(project_root)
     if original_f is None:
         return MatrixPreparationSourceConfig(config_id, allocation.identity,
@@ -250,7 +236,7 @@ def current_preparation_code_sources_sha256() -> str:
 
 
 def current_preparation_protocol_identity() -> ObjectIdentity:
-    from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge import TransientBridgeSpec
+    from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge import TransientBridgeSpec
 
     return ObjectIdentity.from_record("finite-response-law.transient-bridge-protocol", TransientBridgeSpec())
 
@@ -271,7 +257,7 @@ def current_preparation_source_export(
     It grants no scientific execution authority or prospective eligibility.
     Native acquisition is not performed by export of already saved operands.
     """
-    from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source_records import CurrentPreparationSourceConfig
+    from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source_records import CurrentPreparationSourceConfig
 
     if (
         not isinstance(config, CurrentPreparationSourceConfig)
@@ -295,7 +281,7 @@ def matrix_preparation_source_export(
     shared64MiB expansion ceiling. Larger scientific campaigns compose explicit
     per-root/batch production; this helper never drops a configured root.
     """
-    from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source_records import MatrixPreparationSourceConfig
+    from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source_records import MatrixPreparationSourceConfig
 
     if not isinstance(config, MatrixPreparationSourceConfig) or config.allocation != allocation.identity or config.code_sources_sha256 != current_preparation_code_sources_sha256() or any(root.cohort not in ("q2", "cir1") or root.source_prefix is not None for root in allocation.roots) or len(allocation.roots) > 32:
         raise ValueError("Matrix source changes its current roster, source kinds, code or bounded invocation size")
@@ -303,14 +289,14 @@ def matrix_preparation_source_export(
 
 
 def _matrix_source_export(destination: Path, *, config, allocation: MatrixAllocation, original_f_identity: ObjectIdentity | None, project_root: Path, artifact_writer, progress=None) -> SavedMatrixArrays:
-    from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source import acquire_current_preparation_root
-    from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source_records import CurrentPreparationSourceReport
+    from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source import acquire_current_preparation_root
+    from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source_records import CurrentPreparationSourceReport
 
     if not destination.is_dir() or destination.is_symlink() or tuple(destination.iterdir()):
         raise ValueError("Current source destination must be an explicitly selected empty real directory")
 
-    from empirical_lawhood.infrastructure.retained_analysis import publish_retained_analysis
-    from empirical_lawhood.runtime.retained_analysis import RetainedAnalysisMember
+    from empirical_lawhood.storage.retained_analysis import publish_retained_analysis
+    from empirical_lawhood.execution.retained_analysis import RetainedAnalysisMember
     from empirical_lawhood.api.matrix_numerical_provenance import preflight_matrix_output_directory
     preflight_matrix_output_directory(directory=destination, artifact_writer=artifact_writer,
         project_root=project_root, allow_existing_empty=True)
@@ -386,10 +372,7 @@ def preparation_operands_export(
     project_root: Path,
 ) -> SavedMatrixArrays:
     """Produce the minimum current bridge/readiness operands from saved native arrays."""
-    from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge import TransientBridgeInput, TransientBridgeSpec, current_root_fold_arrays, fit_hold
-    from empirical_lawhood.adapters.methods.finite_response_law.fitting import Normalizer
-    from empirical_lawhood.adapters.methods.preparation_applicability.measurement import validity
-    from empirical_lawhood.adapters.methods.response_formalization import affine_prediction, fit_affine_operator
+    from empirical_lawhood.domains.matrix.finite_response_law.current_preparation import derive_preparation_operands
 
     if not destination.is_dir() or destination.is_symlink() or any(destination.iterdir()):
         raise ValueError("Derived operand output must be an explicitly selected empty real directory")
@@ -398,43 +381,8 @@ def preparation_operands_export(
         project_root=project_root, allow_existing_empty=True)
     provenance = capture_matrix_provenance(project_root=project_root)
     native, allocation, arrays = saved_matrix_arrays_import(native_manifest_path, arrays_path=native_arrays_path, allocation_path=allocation_path, artifact_writer=artifact_writer)
-    if native.original_f != original_f.identity or tuple(root.cohort for root in allocation.roots) != ("q2",) * 8 + ("cir1",) * 16:
-        raise ValueError("Current preparation arrays change original F or ordered native prefix kinds")
-    expected = {"x": (24, 24, 2), "z": (24, 9, 24, 2), "y": (24, 9, 4, 8, 2, 2), "work": (24, 9, 2), "features": (24, 9, 2, 26, 24), "positions": (24, 9, 2, 26, 2, 3, 4, 4), "momenta": (24, 9, 2, 26, 2, 3, 4, 4)}
-    for name, shape in expected.items():
-        if name not in arrays or arrays[name].shape != shape or not np.isfinite(arrays[name]).all() or arrays[name].dtype != np.dtype("complex128" if name in ("positions", "momenta") else "float64"):
-            raise ValueError(f"UNEVALUABLE: incomplete required current {name} array")
-    identity_bytes = native.canonical_bytes()
-    native_record_artifact = ArtifactIdentity(f"{native.operand_id}.manifest", "current-native-array-manifest", native.SCHEMA, sha256(identity_bytes).hexdigest(), "application/json", len(identity_bytes))
-    source = TransientBridgeInput(f"{operand_id}.input", allocation.identity, original_f.identity, native.array_artifact, native_record_artifact, tuple(root.root_id for root in allocation.roots), tuple(root.cohort for root in allocation.roots))
-    fitted = current_root_fold_arrays(current_input=source, original_f=original_f, primary_prefix=arrays["x"][..., 0], native_handoff=arrays["z"], trajectories=arrays["features"])
-    out = dict(arrays)
-    out.update(fitted.arrays)
-    out.update(center=np.asarray(original_f.center, dtype=np.float64), scale=np.asarray(original_f.scale, dtype=np.float64), operator=np.asarray(original_f.operator, dtype=np.float64).reshape(25, 32))
-    # Current all-nine U2 baseline uses the same excluded-root ridge10 recipe.
-    # It is a saved current fit, not an alias of an archival U2 prediction.
-    upper_z = np.empty((24, 9, 24), dtype=np.float64)
-    folds = fitted.arrays["folds"]
-    prefix = arrays["x"][..., 0]
-    for fold in range(4):
-        train, test = np.flatnonzero(folds != fold), np.flatnonzero(folds == fold)
-        normalizer = Normalizer.fit(prefix[train])
-        operators = np.stack([fit_affine_operator(normalizer.apply(prefix[train]), arrays["z"][train, schedule, :, 0], ridge=10) for schedule in range(9)])
-        upper_z[test] = np.stack([affine_prediction(operator, normalizer.apply(prefix[test])) for operator in operators], axis=1)
-        np.testing.assert_allclose(upper_z[test, 0], fit_hold(prefix[train], arrays["z"][train, 0, :, 0], prefix[test]), rtol=1e-12, atol=1e-12)
-        for suffix, value in (("center", normalizer.center), ("scale", normalizer.scale), ("operator", operators), ("train", train), ("excluded", test)):
-            out[f"u2.fold.{fold}.{suffix}"] = np.asarray(value)
-    out["upper_z"] = upper_z
-    out["upper_mean"] = original_f.predict(upper_z.reshape(-1, 24)).mean.reshape(24, 9, 4, 8)
-    summaries = [validity(original_f, arrays["z"][root], arrays["y"][root], arrays["work"][root]) for root in range(24)]
-    for index, name in enumerate(("maxima", "conjuncts", "margin", "mean", "width", "supported")):
-        out[name] = np.stack([summary[index] for summary in summaries])
-    for row in fitted.fits:
-        for name in ("training_roots", "test_roots", "normalizer_center", "normalizer_scale", "kernel_scale", "operator"):
-            out[f"radial.all.fold.{row['fold']}.{name}"] = np.asarray(row[name])
-        out[f"radial.all.fold.{row['fold']}.kernel_rank"] = np.asarray(row["kernel_rank"], dtype=np.int64)
-        out[f"radial.all.fold.{row['fold']}.training_modal_projection_mse"] = np.asarray(row["training_modal_projection_mse"], dtype=np.float64)
-    spec = TransientBridgeSpec()
+    source, spec, out, native_record_artifact = derive_preparation_operands(
+        native=native, allocation=allocation, arrays=arrays, original_f=original_f, operand_id=operand_id)
     provenance_raw = provenance.canonical_bytes()
     provenance_artifact = ArtifactIdentity("numerical.producing-provenance", "derived-numerical-provenance",
         provenance.SCHEMA, sha256(provenance_raw).hexdigest(), "application/json", len(provenance_raw))
@@ -442,8 +390,8 @@ def preparation_operands_export(
     _write_new_file(destination / "bridge-input.canonical.json", source.canonical_bytes())
     _write_new_file(destination / "bridge-spec.canonical.json", spec.canonical_bytes())
     manifest = saved_matrix_arrays_export(destination, operand_id=operand_id, allocation=allocation, arrays=out, producers=(source.identity, ObjectIdentity.from_record("finite-response-law.transient-bridge-protocol", spec)), source_artifacts=(native.array_artifact, native_record_artifact, provenance_artifact), source_receipts=native.source_receipts, original_f=original_f.identity)
-    from empirical_lawhood.infrastructure.retained_analysis import publish_retained_analysis
-    from empirical_lawhood.runtime.retained_analysis import RetainedAnalysisMember
+    from empirical_lawhood.storage.retained_analysis import publish_retained_analysis
+    from empirical_lawhood.execution.retained_analysis import RetainedAnalysisMember
     members = [RetainedAnalysisMember("arrays.npz", manifest.array_artifact)]
     for name, record in (("bridge-input.canonical.json", source), ("bridge-spec.canonical.json", spec),
                          ("arrays.canonical.json", manifest), ("allocation.canonical.json", allocation),
@@ -454,16 +402,3 @@ def preparation_operands_export(
     publish_retained_analysis(directory=destination, artifact_writer=artifact_writer,
         completion_id=f"{operand_id}.fit-completion", members=tuple(members))
     return manifest
-
-
-def preparation_bridge_fits(arrays: Mapping[str, NDArray[np.generic]]) -> tuple[Mapping[str, object], ...]:
-    """Restore the four exact saved radial.all fit records for readiness."""
-    result = []
-    for fold in range(4):
-        row = {"model": "radial.all", "fold": fold}
-        for name in ("training_roots", "test_roots", "normalizer_center", "normalizer_scale", "kernel_scale", "operator"):
-            row[name] = arrays[f"radial.all.fold.{fold}.{name}"]
-        row["kernel_rank"] = int(arrays[f"radial.all.fold.{fold}.kernel_rank"])
-        row["training_modal_projection_mse"] = float(arrays[f"radial.all.fold.{fold}.training_modal_projection_mse"])
-        result.append(row)
-    return tuple(result)

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """One Matrix runner; completed original E1/E2 remain read-only predecessors."""
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import CONTINUED_PROTOCOL_ID
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import CONTINUED_PROTOCOL_ID
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 
 
 def programme_service_factory(*, service, descriptor=None):

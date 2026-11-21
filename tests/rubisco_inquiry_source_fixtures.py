@@ -11,14 +11,9 @@ from pathlib import Path
 
 from tests.rubisco_nomination_fixture import source_operands
 
-from empirical_lawhood.adapters.methods.rubisco_cycle_constraints import contracts
-from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.challenge import (
-    YAMORI_BYTES,
-    YAMORI_SHA256,
-)
-from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.source_manifest import (
-    SOURCE_MANIFEST,
-)
+from empirical_lawhood.domains.rubisco.rubisco_cycle_constraints import contracts
+from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry.challenge import YAMORI_BYTES, YAMORI_SHA256
+from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry.source_manifest import SOURCE_MANIFEST
 
 FIXTURES = Path(__file__).parent / "fixtures"
 CANDIDATE_MANIFEST_SHA256 = "17dcdd2ed789cca72be619b2e12bd4f16728a351ad547b4f6c3d43c175c9e62d"

@@ -7,11 +7,11 @@ from itertools import product
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import ACTION_ROLES, PREDICTORS
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_selection as method
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseLossCell, ScheduledResponseScore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import ACTION_ROLES, PREDICTORS
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_selection as method
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseLossCell, ScheduledResponseScore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_matrix_prepared_assay_method import literal_protocol
 from tests.test_matrix_programme_selection import pin
 

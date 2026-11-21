@@ -17,9 +17,9 @@ from typer.testing import CliRunner
 from empirical_lawhood.adapters.simulators.torax_native.native_quickstart import NativeToraxQuickstart
 from empirical_lawhood.adapters.simulators.torax_native.runtime import build_native_torax_config
 from empirical_lawhood.adapters.simulators.torax_native import runtime
-from empirical_lawhood.adapters.simulators.torax_native.contracts import NativeToraxEpisodeDisposition
+from empirical_lawhood.domains.fusion.torax_native.contracts import NativeToraxEpisodeDisposition
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "programmes/energy/fusion/workflows/tokamak-heat-response/config.json"

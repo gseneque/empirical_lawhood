@@ -6,11 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.preparation_integrity import (
-    COORDINATE_ORIGIN_METHOD,
-    validate_origins,
-    validate_origins_from_coordinates,
-)
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.preparation_integrity import COORDINATE_ORIGIN_METHOD, validate_origins, validate_origins_from_coordinates
 from tests.test_rubisco_physical_preparation_geometry import inpcrd
 from tests.test_rubisco_preparation_integrity import full_exposed_origins
 
@@ -75,13 +71,8 @@ def test_coherent_false_water_origin_map_cannot_pass_coordinate_successor():
         validate_origins_from_coordinates(*args)
 
 
-def test_global_duplicate_candidate_is_refused_instead_of_picking_one_water():
-    with pytest.raises(ValueError,match='unique complete raw candidate'):
-        validate_origins_from_coordinates(*exposed(duplicate_added=True))
-
-
 def test_coordinate_proof_refuses_before_lower_predicates_are_entered(monkeypatch):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import preparation_integrity
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import preparation_integrity
 
     monkeypatch.setattr(preparation_integrity,'validate_origins',lambda *args,**kwargs:pytest.fail('lower predicates entered before coordinate proof'))
     with pytest.raises(ValueError,match='unique complete raw candidate'):

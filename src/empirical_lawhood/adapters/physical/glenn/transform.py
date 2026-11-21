@@ -15,22 +15,10 @@ from numpy.lib import format as npy_format
 import pyarrow as pa  # type: ignore[import-untyped]
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
-from .contracts import (
-    ACTION_COLUMNS,
-    CANONICAL_COLUMNS,
-    COLUMN_ROLES,
-    MODEL_COLUMNS,
-    NUISANCE_COLUMNS,
-    OBSERVATION_COLUMNS,
-    GlennAdapterError,
-    GlennArchiveInput,
-    GlennColumnRole,
-    GlennExceptionCode,
-    GlennTransformProfile,
-)
-from .source import GlennArchiveAudit, inspect_glenn_archive
+from empirical_lawhood.adapters.physical.glenn.contracts import ACTION_COLUMNS, CANONICAL_COLUMNS, COLUMN_ROLES, MODEL_COLUMNS, NUISANCE_COLUMNS, OBSERVATION_COLUMNS, GlennAdapterError, GlennArchiveInput, GlennColumnRole, GlennExceptionCode, GlennTransformProfile
+from empirical_lawhood.adapters.physical.glenn.source import GlennArchiveAudit, inspect_glenn_archive
 
 
 GLENN_OUTPUT_SCHEMA_ID = 'empirical-lawhood/physical/glenn/glenn-observations'

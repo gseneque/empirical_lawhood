@@ -8,8 +8,8 @@ import pytest
 
 from empirical_lawhood.api.execution import CampaignExecutionService
 from empirical_lawhood.api.models import ExperimentPackage
-from empirical_lawhood.infrastructure import run_source_admission
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.storage import run_source_admission
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def _identity(name):

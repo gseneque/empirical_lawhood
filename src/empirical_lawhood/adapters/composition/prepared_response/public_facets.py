@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: MPL-2.0
+"""Code-owned public facts; discovery performs no scientific or prerequisite work."""
+
+from empirical_lawhood.execution.discovery_descriptors import ConfigurationDeclaration
+
+CONFIGURATION_DECLARATIONS = (ConfigurationDeclaration(consumer='prepared-prior-census',
+                          schema_id='empirical-lawhood/composition/prepared-response/prepared-exposure-inspection',
+                          record_module=None,
+                          record_name=None,
+                          disposition='import',
+                          maximum_bytes=67108864,
+                          requires_canonical=False,
+                          command='campaign matrix-response-author --prior-inspection',
+                          owner='_prior_census',
+                          supplied_inputs=('programmes/foundations/measurement-and-response/workflows/reactor-response/exposed-inputs/prepared-response-prior-exposure.json',)),
+ ConfigurationDeclaration(consumer='prepared-dependent-input',
+                          schema_id='empirical-lawhood/composition/prepared-response/prepared-response-dependent-input',
+                          record_module='empirical_lawhood.domains.matrix.prepared_response.authoring.dependent_input',
+                          record_name='PreparedResponseDependentInput',
+                          disposition='editable',
+                          maximum_bytes=16384,
+                          requires_canonical=False,
+                          command='campaign dependent-response-input-check',
+                          owner='PreparedResponseDependentInput',
+                          supplied_inputs=('programmes/foundations/emergent-structure/workflows/prepared-response/prepared-dependent-refinement-input.json',
+                                           'programmes/foundations/emergent-structure/workflows/prepared-response/prepared-fresh-response-calibration-input.json')),
+ ConfigurationDeclaration(consumer='matrix-response-authoring',
+                          schema_id='empirical-lawhood/composition/prepared-response/prepared-response-native-authoring-input',
+                          record_module='empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring',
+                          record_name='PreparedResponseNativeAuthoringInput',
+                          disposition='editable',
+                          maximum_bytes=1048576,
+                          requires_canonical=False,
+                          command='campaign matrix-response-author',
+                          owner='PreparedResponseNativeAuthoringInput',
+                          supplied_inputs=('programmes/foundations/emergent-structure/workflows/causal-response/causal-author.json',
+                                           'programmes/foundations/emergent-structure/workflows/information-response/information-author.json',
+                                           'programmes/foundations/emergent-structure/workflows/prepared-response/prepared-source-qualification-author.json')))

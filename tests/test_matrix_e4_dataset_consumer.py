@@ -11,11 +11,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_dataset_readers import bridge_saved_arrays
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_array_preparation import selected_record_array_mappings
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4ProtectedArrays
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.matrix.matrix_dataset_readers import bridge_saved_arrays
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_array_preparation import selected_record_array_mappings
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4ProtectedArrays
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_matrix_dataset_readers import real_port
 from tests.test_matrix_e3_scheduled_datasets import physical_dataset
 from tests.test_matrix_e3_protected_prefix_science import (  # noqa: F401

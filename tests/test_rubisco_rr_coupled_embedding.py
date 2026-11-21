@@ -16,15 +16,15 @@ import tarfile
 
 import pytest
 
-from empirical_lawhood.adapters.physical.rubisco_kinetics import rr_coupled_preparation as rr
+import empirical_lawhood.domains.rubisco.kinetics.rr_coupled_preparation as rr
 
 
 REPO = Path(rr.__file__).resolve().parents[5]
 MODULE = Path(__file__).with_name('rr_coupled_embedding.py')
 if not MODULE.exists():
-    MODULE = REPO / 'src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_coupled_embedding.py'
+    MODULE = REPO / 'src/empirical_lawhood/domains/rubisco/rubisco_insilico_structure/embedding.py'
 SPEC = importlib.util.spec_from_file_location(
-    'empirical_lawhood.adapters.physical.rubisco_kinetics.rr_coupled_embedding', MODULE)
+    'empirical_lawhood.domains.rubisco.rubisco_insilico_structure.embedding', MODULE)
 em = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = em
 SPEC.loader.exec_module(em)
@@ -198,7 +198,7 @@ class Guard(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in {'numpy','scipy','pyscf','openmm','pyarrow','h5py','onnx','safetensors'}:
             raise AssertionError('cold import entered '+fullname)
 sys.meta_path.insert(0, Guard())
-spec=importlib.util.spec_from_file_location('empirical_lawhood.adapters.physical.rubisco_kinetics.rr_coupled_embedding',sys.argv[1])
+spec=importlib.util.spec_from_file_location('empirical_lawhood.domains.rubisco.rubisco_insilico_structure.embedding',sys.argv[1])
 module=importlib.util.module_from_spec(spec);sys.modules[spec.name]=module;spec.loader.exec_module(module)
 assert module.MODEL_ID=='rr-coupled-source-charge-embedding-proposal-v1'
 '''

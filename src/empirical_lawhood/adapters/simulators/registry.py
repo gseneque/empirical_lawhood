@@ -5,40 +5,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import ClassVar, Final
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256
-from empirical_lawhood.planning.dataset_manifests import (
-    DatasetCapabilityBinding,
-    DatasetCapabilityKind,
-    DatasetDirectorySelectorManifest,
-    DatasetRegistrationManifest,
-    DatasetTransformationManifest,
-)
-from empirical_lawhood.planning.datasets import (
-    CurrentMaterializationVerification,
-    DatasetMaterialization,
-    DatasetMaterializationVerificationReceipt,
-)
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.datasets import (
-    DatasetCapabilityLimits,
-    DatasetCapabilityRegistry,
-    DatasetEvidenceVerification,
-    DatasetEvidenceVerifierRegistration,
-    DatasetFormatInspectorRegistration,
-    DatasetImplementationRegistry,
-    DatasetSupportingIdentityRegistry,
-    validate_dataset_capability_bindings,
-)
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256
+from empirical_lawhood.design.dataset_manifests import DatasetCapabilityBinding, DatasetCapabilityKind, DatasetDirectorySelectorManifest, DatasetRegistrationManifest, DatasetTransformationManifest
+from empirical_lawhood.design.datasets import CurrentMaterializationVerification, DatasetMaterialization, DatasetMaterializationVerificationReceipt
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.datasets import DatasetCapabilityLimits, DatasetCapabilityRegistry, DatasetEvidenceVerification, DatasetEvidenceVerifierRegistration, DatasetFormatInspectorRegistration, DatasetImplementationRegistry, DatasetSupportingIdentityRegistry, validate_dataset_capability_bindings
 
 
 SIMULATOR_DATASET_CONFIG_KEY: Final = "dataset.config.simulator-directory"

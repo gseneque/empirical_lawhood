@@ -14,16 +14,12 @@ from pathlib import Path
 import stat
 from typing import BinaryIO, cast
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.serialization import validate_stable_id
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.records.serialization import validate_stable_id
 
-from .contracts import (
-    VirtualCellContractError,
-    VirtualCellSourceManifest,
-    VirtualCellSourceObject,
-)
-from .dataset import SegmentedBinaryReader
-from .ports import VirtualCellScratchWorkspace
+from empirical_lawhood.domains.biology.virtual_cell.contracts import VirtualCellContractError, VirtualCellSourceManifest, VirtualCellSourceObject
+from empirical_lawhood.adapters.physical.virtual_cell.dataset import SegmentedBinaryReader
+from empirical_lawhood.adapters.physical.virtual_cell.ports import VirtualCellScratchWorkspace
 
 
 _HASH_CHUNK_BYTES = 8 * 1024**2

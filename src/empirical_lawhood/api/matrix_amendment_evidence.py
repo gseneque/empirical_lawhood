@@ -5,11 +5,11 @@ from hashlib import sha256
 import json
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import curve_amendment as domain
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from .matrix_researcher_programme_lineage import read_published_record
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import curve_amendment as domain
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.api.matrix_researcher_programme_lineage import read_published_record
 
 
 def evidence_snapshots(specification):
@@ -83,7 +83,7 @@ def validate_evidence(specification, snapshots, exposure, provenance):
 
 def publish_evidence(writer, specification, snapshots, metadata_directory, *, admit_output):
     """Publish exposed source snapshots without occupying reserved sidecar names."""
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammeProducedInput
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammeProducedInput
     rows = []
     for snapshot in snapshots:
         path = Path(metadata_directory) / 'exposed-evidence' / (snapshot.analysis + '.' + snapshot.member + '.snapshot.json')
@@ -99,7 +99,7 @@ def publish_evidence(writer, specification, snapshots, metadata_directory, *, ad
 
 def read_evidence(writer, record, provenance):
     """Reopen published snapshots; original external analysis paths are provenance."""
-    from .selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
     rows = []
     for selected in record.evidence:
         publication = selected.publication

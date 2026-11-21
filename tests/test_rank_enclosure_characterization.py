@@ -14,15 +14,16 @@ import mpmath as mp
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods import certified_rank as rank
-from empirical_lawhood.adapters.methods._arb import endpoint_decimal
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.methods import certified_rank as rank
+from empirical_lawhood.methods._arb import endpoint_decimal
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.probes.rank_enclosure_probe import FAMILIES, exact_endpoint, observe_endpoints, observe_residuals
 
 
 @pytest.mark.parametrize("family", tuple(FAMILIES))
 @pytest.mark.parametrize("threshold", (False, True))
 @pytest.mark.parametrize("digits", (2, 15, 180))
+@pytest.mark.numerical(oracle='Exact Fraction midpoint plus or minus the stored Arb radius independently bounds directed decimal endpoints')
 def test_current_endpoint_counterexamples_enclose_at_every_context(family, threshold, digits):
     observed = observe_endpoints(family, digits, threshold=threshold)
     assert observed["lower_outward"] and observed["upper_outward"]
@@ -34,6 +35,7 @@ def test_current_endpoint_counterexamples_enclose_at_every_context(family, thres
     ((1, -160), (1, -500)), ((1, -1074), (1, -1200)), ((1, 1023), (1, 900)),
 ))
 @pytest.mark.parametrize("bits", (53, 384))
+@pytest.mark.numerical(oracle='Exact rational midpoint and radius independently establish outward endpoint direction across binary exponents')
 def test_endpoint_direction_against_exact_stored_ball(midpoint, radius, bits):
     with ctx.workprec(bits), localcontext() as context:
         context.prec = 2
@@ -46,6 +48,7 @@ def test_endpoint_direction_against_exact_stored_ball(midpoint, radius, bits):
         assert not any(context.flags.values())
 
 
+@pytest.mark.numerical(oracle='Literal rational 1 + 2**-300 is exactly representable and must survive both endpoint conversions')
 def test_more_than_eighty_decimal_digits_are_preserved_at_the_numeric_boundary():
     exact = Fraction(1) + Fraction(1, 2**300)
     with ctx.workprec(384), localcontext() as context:
@@ -86,6 +89,7 @@ def _fraction(point):
     np.array([[0.1, 0.3], [1e-90, 0.5], [2.**-600, -0.25]]),
     np.array([[0.1, 0.3, 2.**-600], [1e-90, 0.5, -0.25]]),
 ))
+@pytest.mark.numerical(oracle='Fraction binary64 Gram product and squared norm inequalities independently bound Arb midpoint error and rank thresholds')
 def test_stored_residual_bounds_independently_exact_gram_error(matrix):
     certificate = rank.certify_rank(matrix)
     # Fraction defines the exact binary64 Gram independently of Arb arithmetic.
@@ -115,6 +119,7 @@ _TAU = 2.**-159  # two-dimensional matrices with norm <= 1
     (np.nextafter(_TAU, 0.0), 1), (_TAU, 1), (np.nextafter(_TAU, np.inf), 2),
     (1e-100, 1), (0.0, 1),
 ))
+@pytest.mark.numerical(oracle='Diagonal singular values equal absolute diagonal entries, with analytic two-dimensional threshold 2**-159')
 def test_threshold_adjacent_singular_values_use_strict_greater_than(small, expected):
     certificate = rank.certify_rank(np.diag([0.5, small]))
     assert certificate.lower <= expected <= certificate.upper
@@ -133,12 +138,14 @@ def test_threshold_adjacent_singular_values_use_strict_greater_than(small, expec
     (np.diag([np.finfo(float).max, np.nextafter(0., 1.)]), 1),
     (np.diag([np.nextafter(0., 1.), np.nextafter(0., 1.)]), 0),
 ))
+@pytest.mark.numerical(oracle='Analytic diagonal, identity, dependent-row and two-by-two singular values give literal thresholded ranks including binary64 extremes')
 def test_analytic_controls_include_extreme_binary64_magnitudes(matrix, expected):
     for entered in (matrix, matrix.T, -matrix[::-1, ::-1]):
         certificate = rank.certify_rank(entered)
         assert (certificate.lower, certificate.upper) == (expected, expected)
 
 
+@pytest.mark.numerical(oracle='Diagonal singular values 0.5 and 1e-100 have thresholded rank one despite algebraic rank two')
 def test_exact_rank_only_caps_and_never_promotes_a_subthreshold_direction():
     result = rank.certify_rank(np.diag([0.5, 1e-100]))
     assert (result.lower, result.upper) == (1, 1)  # exact algebraic rank is two
@@ -237,10 +244,14 @@ def test_family_record_producers_use_the_shared_certificate(family):
     ("history_budget_phase_diagram", "HistoryBudgetPhaseDiagram"),
 ))
 def test_new_algorithm_and_shared_source_are_bound(family, prefix):
-    contracts = importlib.import_module(f"empirical_lawhood.adapters.{family}.contracts")
-    descriptors = importlib.import_module(f"empirical_lawhood.adapters.{family}.descriptors")
-    provider = importlib.import_module(f"empirical_lawhood.adapters.{family}.runtime_provider")
-    conformance = importlib.import_module(f"empirical_lawhood.adapters.{family}.conformance")
+    scientific_owner = ("empirical_lawhood.domains.circuits.receiver_history" if family == "receiver_history"
+                        else f"empirical_lawhood.domains.history.{family}")
+    integration_owner = (scientific_owner if family == "receiver_history"
+                         else f"empirical_lawhood.adapters.{family}")
+    contracts = importlib.import_module(scientific_owner + ".contracts")
+    descriptors = importlib.import_module(scientific_owner + ".descriptors")
+    provider = importlib.import_module(integration_owner + ".runtime_provider")
+    conformance = importlib.import_module(integration_owner + ".conformance")
     config = descriptors.default_config(getattr(contracts, prefix + "Phase").CANARY)
     assert config.discrete_rank_algorithm_id == rank.ALGORITHM_ID
     with pytest.raises(ValueError):
@@ -250,14 +261,17 @@ def test_new_algorithm_and_shared_source_are_bound(family, prefix):
     sources = {path: (root / path).read_bytes() for path in paths}
     before = provider.implementation_closures(sources)
     conformance.audit_source_firewall(sources)
-    for path in ("src/empirical_lawhood/adapters/methods/_arb.py",
-                 "src/empirical_lawhood/adapters/methods/certified_rank.py",
-                 "src/empirical_lawhood/kernel/serialization.py"):
+    generator_path = conformance._GENERATOR_PATH
+    with pytest.raises(ValueError, match="firewall"):
+        conformance.audit_source_firewall({**sources, generator_path: sources[generator_path] + b"\nimport empirical_lawhood.domains.circuits.rc_ladder.mna\n"})
+    for path in ("src/empirical_lawhood/methods/_arb.py",
+                 "src/empirical_lawhood/methods/certified_rank.py",
+                 "src/empirical_lawhood/science/records/serialization.py"):
         changed = {**sources, path: sources[path] + b"\n# synthetic source change\n"}
         after = provider.implementation_closures(changed)
         assert before.observer_sha256 != after.observer_sha256
         assert before.complete_sha256 != after.complete_sha256
-        if "/kernel/" in path:
+        if path == "src/empirical_lawhood/science/records/serialization.py":
             continue
         with pytest.raises(ValueError, match="firewall"):
             conformance.audit_source_firewall({**sources, path: b"import empirical_lawhood.adapters.simulators.forbidden\n"})

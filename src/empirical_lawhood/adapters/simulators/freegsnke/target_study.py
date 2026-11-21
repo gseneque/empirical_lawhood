@@ -5,14 +5,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import ClassVar
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
-from empirical_lawhood.planning.study_authoring import ConditionalChildRequest
-from empirical_lawhood.runtime.candidate_compiler import StudyTemplate
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.design.study_authoring import ConditionalChildRequest
+from empirical_lawhood.execution.candidate_compiler import StudyTemplate
 
-from .target_design import FreeGsnkePowerFreeze
-from .target_evaluation import FreeGsnkeAdmissionEvaluationEvaluation
-from .target_lifecycle_protocol import FREEGSNKE_ADMISSION_EVALUATION_STEP_ID
-from .target_validation_protocol import FREEGSNKE_PROSPECTIVE_VALIDATION_PARENT_INPUT_ID, freegsnke_prospective_conditional_request
+from empirical_lawhood.domains.fusion.freegsnke.target_design import FreeGsnkePowerFreeze
+from empirical_lawhood.domains.fusion.freegsnke.target_evaluation import FreeGsnkeAdmissionEvaluationEvaluation
+from empirical_lawhood.adapters.simulators.freegsnke.target_lifecycle_protocol import FREEGSNKE_ADMISSION_EVALUATION_STEP_ID
+from empirical_lawhood.adapters.simulators.freegsnke.target_validation_protocol import FREEGSNKE_PROSPECTIVE_VALIDATION_PARENT_INPUT_ID, freegsnke_prospective_conditional_request
 
 
 @dataclass(frozen=True, slots=True)

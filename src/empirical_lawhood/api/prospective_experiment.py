@@ -4,6 +4,7 @@
 The original fourteen-member handoff remains closed and unchanged. Its companion
 retains one copy of the selected design and commits their association last.
 """
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 from contextlib import contextmanager, nullcontext
 from collections.abc import Mapping
@@ -13,31 +14,28 @@ import json
 from pathlib import Path
 from types import MappingProxyType
 
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.source_closure import capture_target_closure
-from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experimental_design import UnitAllocation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCandidate
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding, ExperimentPreparation
-from empirical_lawhood.runtime.input_payloads import InputBytes
-from empirical_lawhood.runtime.progress import report_progress
-from empirical_lawhood.runtime.prospective_experiment import (
-    ALLOCATION_FILENAME, ASSOCIATION_FILENAME, INSTANCE_FILENAME, SPECIFICATION_FILENAME,
-    PreparedProspectiveExperimentHandoff, ProspectiveExperimentAssociation, instance_identity, source_filename,
-)
-from empirical_lawhood.runtime.recursive_compiler import derive_recursive_scientific_selection
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec, RecursiveProspectiveDesignInputs
-from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.source_closure import capture_target_closure
+from empirical_lawhood.storage.study_issue import GitStudySourceClosureInspector
 
-from .experiment_runtime_bindings import experiment_runtime_binding
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCandidate
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding, ExperimentPreparation
+from empirical_lawhood.execution.input_payloads import InputBytes
+from empirical_lawhood.execution.progress import report_progress
+from empirical_lawhood.execution.prospective_experiment import ALLOCATION_FILENAME, ASSOCIATION_FILENAME, INSTANCE_FILENAME, SPECIFICATION_FILENAME, PreparedProspectiveExperimentHandoff, ProspectiveExperimentAssociation, instance_identity, source_filename
+from empirical_lawhood.execution.recursive_compiler import derive_recursive_scientific_selection
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec, RecursiveProspectiveDesignInputs
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig
+
+from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding
 
 
 _CONTROL_BYTES = 1024**2
@@ -58,7 +56,7 @@ def _directory(directory, writer):
 
 def _read_prospective_locator(directory, name, writer, kind, *, expected=None):
     """Partial exact metadata proof; never hash publication siblings here."""
-    from empirical_lawhood.runtime.artifacts import artifact_custody_limits
+    from empirical_lawhood.storage.contracts.artifacts import artifact_custody_limits
     path = directory / name
     if any(value.is_symlink() for value in (path, path.with_name(name + ".manifest.json"))):
         raise ValueError("prospective locator metadata refuses symbolic links")
@@ -99,10 +97,10 @@ def _source_provenance_member_facts(*, writer, packet, directory):
     committed role; the unchanged retained parser still decodes and joins its
     entire closure/manifest/observation body before returning any result.
     """
-    from empirical_lawhood.infrastructure.publication_metadata import read_publication_metadata
-    from empirical_lawhood.runtime.artifacts import artifact_custody_limits, artifact_publication_member
+    from empirical_lawhood.storage.publication_metadata import read_publication_metadata
+    from empirical_lawhood.storage.contracts.artifacts import artifact_custody_limits, artifact_publication_member
     from empirical_lawhood.api.recursive_prospective_authoring import ProspectiveSourceObservation
-    from empirical_lawhood.planning.study_issue import SelectedSourceManifest
+    from empirical_lawhood.design.study_issue import SelectedSourceManifest
 
     if type(packet) is not AuthoredRecursiveWave:
         raise TypeError("source provenance bootstrap requires its exact authenticated packet")
@@ -159,7 +157,7 @@ def _source_provenance_member_facts(*, writer, packet, directory):
 
 
 def _bootstrap_prospective_original_inputs(*, directory, artifact_writer, read_access=None):
-    from .experiment_preparation import experiment_protocols
+    from empirical_lawhood.api.experiment_preparation import experiment_protocols
     selected = _directory(directory, artifact_writer)
     companion = _directory(selected / "experiment", artifact_writer)
     association = _read_prospective_locator(companion, ASSOCIATION_FILENAME, artifact_writer,
@@ -265,7 +263,7 @@ def _read(directory, name, writer, *, maximum, schema=None, original_input_acces
     path = directory / name
     if any(value.is_symlink() for value in (path, path.with_name(name + ".manifest.json"))):
         raise ValueError("prospective experiment member refuses symbolic links")
-    manifest = decode_artifact_manifest(read_bounded_bytes(path.with_name(name + ".manifest.json"), maximum_bytes=_CONTROL_BYTES))
+    manifest = read_artifact_sidecar(writer, (path.with_name(name + '.manifest.json')).relative_to(writer.root.contract.canonical_path).as_posix(), maximum_bytes=_CONTROL_BYTES)
     material = manifest.materialization
     logical = manifest.logical
     if (material.relative_path != path.relative_to(Path(writer.root.contract.canonical_path)).as_posix()
@@ -287,7 +285,7 @@ def _read(directory, name, writer, *, maximum, schema=None, original_input_acces
 
 
 def _prospective_roots(directory, writer, *, original_input_access=None, _retained=None):
-    from .recursive_prospective_authoring import _AuthoredProspectiveRoots, _prospective_member_codec, _prospective_selection_decoder
+    from empirical_lawhood.api.recursive_prospective_authoring import _AuthoredProspectiveRoots, _prospective_member_codec, _prospective_selection_decoder
 
     if _retained is not None and type(_retained) is not _AuthoredProspectiveRoots:
         raise TypeError("prospective roots require the owning author's immutable objects")
@@ -418,8 +416,8 @@ def preview_prepared_prospective_experiment_candidate(*, preparation, design_inp
         project_root, artifact_writer, composition=None, api_factory=None, candidate_catalog=None,
         read_access=None, original_input_access=None):
     """Preview through the original owner without fabricating a bound specification."""
-    from .experiment_preparation import _validate_prepared_input_files
-    from .recursive_prospective_authoring import preview_recursive_prospective_candidate
+    from empirical_lawhood.api.experiment_preparation import _validate_prepared_input_files
+    from empirical_lawhood.api.recursive_prospective_authoring import preview_recursive_prospective_candidate
 
     if type(preparation) is not ExperimentPreparation or type(design_inputs) is not RecursiveProspectiveDesignInputs:
         raise TypeError("prospective preview needs exact prepared inputs and resource-free design")
@@ -473,7 +471,7 @@ def author_prepared_prospective_experiment(*, preparation: ExperimentPreparation
         read_access=None, original_input_access=None):
     """Author candidate custody and original design; grant no execution authority."""
     from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
-    from .recursive_prospective_authoring import author_recursive_prospective
+    from empirical_lawhood.api.recursive_prospective_authoring import author_recursive_prospective
 
     if type(preparation) is not ExperimentPreparation or type(prospective_spec) is not RecursiveProspectiveAuthoringSpec:
         raise TypeError("prospective experiment authoring requires its exact preparation and existing prospective specification")
@@ -552,7 +550,7 @@ def author_prepared_prospective_experiment(*, preparation: ExperimentPreparation
     companion = destination / "experiment"
     companion.mkdir(exist_ok=False)
     relative = companion.relative_to(custody_root).as_posix()
-    from .experiment_runtime_bindings import original_input_record_publication
+    from empirical_lawhood.api.experiment_runtime_bindings import original_input_record_publication
     for name, record in (*sorted(records.items()), (ASSOCIATION_FILENAME, association)):
         _require_original_inputs(original_input_access)
         # Instance/association/specification and closed locator companions stay
@@ -643,7 +641,7 @@ def _load_retained_prospective_experiment(*, directory, project_root, storage_pr
     immutable payload mapping. This generic custody read performs no scientific
     rederivation, current operation lookup, provider binding or source capture.
     """
-    from .recursive_prospective_authoring import load_retained_recursive_prospective_handoff, _read_retained_recursive_prospective_handoff
+    from empirical_lawhood.api.recursive_prospective_authoring import load_retained_recursive_prospective_handoff, _read_retained_recursive_prospective_handoff
 
     selected = _directory(directory, artifact_writer)
     if storage_profile is None:
@@ -663,7 +661,7 @@ def _load_retained_prospective_experiment(*, directory, project_root, storage_pr
 
 def _read_retained_prospective_experiment(*, directory, artifact_writer, original_input_access):
     """Reuse the fixed retained parser after the actual original bootstrap."""
-    from .recursive_prospective_authoring import _read_retained_recursive_prospective_handoff
+    from empirical_lawhood.api.recursive_prospective_authoring import _read_retained_recursive_prospective_handoff
     selected = _directory(directory, artifact_writer)
     if (original_input_access is None
             or getattr(original_input_access, "issued_directory", None) != selected):
@@ -729,8 +727,8 @@ def _load_prepared_prospective_experiment(*, directory, project_root, storage_pr
     can authenticate original bytes before the campaign API checks its source
     amendment. Readout uses the separate retained metadata loader.
     """
-    from .recursive_prospective_authoring import _load_recursive_prospective_handoff_with_roots
-    from .experiment_preparation import experiment_protocols
+    from empirical_lawhood.api.recursive_prospective_authoring import _load_recursive_prospective_handoff_with_roots
+    from empirical_lawhood.api.experiment_preparation import experiment_protocols
 
     report_progress(phase="load_experiment", done=0, total=1)
     if type(require_current_source) is not bool:

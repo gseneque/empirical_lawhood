@@ -8,11 +8,11 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_originals, protected_original_publications
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import corpus_artifact
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_originals, protected_original_publications
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import corpus_artifact
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 from tests.test_recursive_public_service import _plane
 
 

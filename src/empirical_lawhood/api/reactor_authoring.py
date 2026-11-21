@@ -5,26 +5,19 @@ SPDX-License-Identifier: MPL-2.0
 
 from __future__ import annotations
 from pathlib import Path
-from empirical_lawhood.adapters.composition.generated_executable_bindings import (
-    EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY,
-    EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY,
-)
-from empirical_lawhood.adapters.composition.generated_extension_bundles import (
-    GENERATED_EXTENSION_BUNDLE_AGGREGATE,
-)
-from empirical_lawhood.adapters.composition.reactor_prefix_response.authoring import ReactorPrefixResponseCandidateContextProvider, build_reactor_authoring
-from empirical_lawhood.adapters.composition.reactor_prefix_response.resources import reactor_resource_envelope
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.panel import ReactorSourceBundle
+from empirical_lawhood.domains.reactor.reactor_prefix_response.authoring.authoring import ReactorPrefixResponseCandidateContextProvider, build_reactor_authoring
+from empirical_lawhood.domains.reactor.reactor_prefix_response.authoring.resources import reactor_resource_envelope
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_panel import ReactorSourceBundle
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
 from empirical_lawhood.api.results import CompileCandidateRequest
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.packaged_source import load_packaged_reactor_source
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_run_plan
-from empirical_lawhood.runtime.study_issue import MAX_ISSUE_PAYLOAD_BYTES, project_standard_study_extensions
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.execution.compiler import compile_preissue_run_plan, lower_run_plan
+from empirical_lawhood.execution.study_issue import project_standard_study_extensions
 from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import FreshReactorAuthoringProfile, fresh_assignment_status
 from empirical_lawhood.api.recursive_prospective_authoring import _capture_prospective_source, _publish_source_provenance
-from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
+from empirical_lawhood.storage.study_issue import GitStudySourceClosureInspector
 
 
 def _save_new(directory: Path, name: str, record: CanonicalRecord) -> Path:
@@ -58,11 +51,6 @@ def author_fresh_reactor(
         assignment=getattr(profile, "assignment", None),
         prior_census=getattr(profile, "prior_census", None),
     )
-    if any(
-        len(record.canonical_bytes()) > MAX_ISSUE_PAYLOAD_BYTES
-        for record in (bundle.authoring.base, bundle.authoring)
-    ):
-        raise ValueError("REACTOR_AUTHORING_EXCEEDS_PRODUCTION_ISSUE_BYTE_BOUND")
     if output_dir.is_symlink() or output_dir.exists() and any(output_dir.iterdir()):
         raise FileExistsError(
             "fresh reactor authoring output must be a new empty directory"
@@ -79,6 +67,10 @@ def author_fresh_reactor(
         _save_new(output_dir, f"decoder-{index}.json", record)
         for index, record in enumerate(bundle.decoder_registrations)
     )
+    from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY, EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
+
+    from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+
     api = EmpiricalLawhoodApi(
         repo_root=root,
         external_root=None,

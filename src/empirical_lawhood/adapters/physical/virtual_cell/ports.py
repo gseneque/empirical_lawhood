@@ -6,9 +6,9 @@ from contextlib import AbstractContextManager
 from pathlib import Path
 from typing import BinaryIO, Protocol
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
 
-from .contracts import VirtualCellSourceObject
+from empirical_lawhood.domains.biology.virtual_cell.contracts import VirtualCellSourceObject
 
 
 class VirtualCellSourcePort(Protocol):

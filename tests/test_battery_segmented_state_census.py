@@ -6,13 +6,13 @@ from decimal import Decimal as D
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_state_census as census
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_contracts as sc, segmented_fidelity as local
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_qualification as sq, segmented_roster as sr
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_science as ss
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_state_census as census
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_contracts as sc, segmented_fidelity as local
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_qualification as sq, segmented_roster as sr
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_science as ss
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_battery_segmented_fidelity_stream import _stream, _compare, prepared as prepared_fixture
 from tests.test_battery_segmented_qualification import stocks as stocks_fixture, roster as roster_fixture
 from tests.test_battery_segmented_qualification import negative_product, _receipt, uncertain, selected54  # noqa: F401

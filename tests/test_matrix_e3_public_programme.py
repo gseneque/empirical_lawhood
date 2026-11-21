@@ -22,11 +22,11 @@ import pytest
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.prospective_experiment import load_prepared_prospective_experiment
 from empirical_lawhood.api.results import CampaignStatusRequest, ResumeCampaignRequest, RunCampaignRequest
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
 from tests.test_matrix_e3_protected_public_lowering import prepared_case
 from tests.runtime_platform.test_recursive_prospective_workflow import _issue_public_handoff
 
@@ -93,7 +93,7 @@ class _ReadyObservation:
     sha256: str
 
     def proof(self):
-        from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256
+        from empirical_lawhood.storage.bounded_io import bounded_file_sha256
 
         assert bounded_file_sha256(self.path, maximum_bytes=self.size_bytes) == (self.size_bytes, self.sha256)
         return {'invocation': self.invocation.to_document(), 'ready': self.ready,
@@ -253,11 +253,11 @@ def _catalog_census(output, catalog):
 
 def _native_receipt_census(plane, run_id, plan, native_tasks, receipts):
     """Authenticate leaf completions independently of ordinary plan receipts."""
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-    from empirical_lawhood.kernel.evidence import VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import most_restrictive_outcome_access
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkRoster, NativeSubworkState
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import most_restrictive_outcome_access
+    from empirical_lawhood.execution.native_subwork import NativeSubworkRoster, NativeSubworkState
 
     selected = tuple(task for task in plan.tasks if task.task_id in native_tasks)
     contacts = ExternalNativeEffectContactStore(plane=plane,
@@ -301,19 +301,16 @@ def _native_receipt_census(plane, run_id, plan, native_tasks, receipts):
 
 def _execution(case, handoff, parts, output, *, executor_factory=None, maximum_parallel_tasks=1):
     """Reuse public issue scaffolding with the actual installed provider set."""
-    from empirical_lawhood.adapters.composition.generated_executable_bindings import (
-        EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY,
-        EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY,
-    )
+    from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY, EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
     from empirical_lawhood.api.execution import CampaignExecutionService
     from empirical_lawhood.api.facade import EmpiricalLawhoodApi
-    from empirical_lawhood.infrastructure.execution import DurableExecutionResourceEnvelopeCoordinator
-    from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
-    from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog
-    from empirical_lawhood.infrastructure.study_issue import ExternalIssuedExtensionPayloadSource, ExternalIssuedStudyPublisher
-    from empirical_lawhood.runtime.executable_bindings import LayeredCampaignRuntimeProviderResolver
-    from empirical_lawhood.runtime.issued_extension_payloads import IssuedExtensionPayloadResolver
-    from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
+    from empirical_lawhood.execution.local.execution import DurableExecutionResourceEnvelopeCoordinator
+    from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+    from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog
+    from empirical_lawhood.storage.study_issue import ExternalIssuedExtensionPayloadSource, ExternalIssuedStudyPublisher
+    from empirical_lawhood.execution.executable_bindings import LayeredCampaignRuntimeProviderResolver
+    from empirical_lawhood.execution.issued_extension_payloads import IssuedExtensionPayloadResolver
+    from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
     from tests.runtime_platform.test_study_issue import _PassthroughSourceInspector
 
     _, factories, _, plane, _, package, reveal, approval, authorities = parts
@@ -352,12 +349,12 @@ def _execution(case, handoff, parts, output, *, executor_factory=None, maximum_p
 
 def test_original_protected_public_prepare_author_worker_assess_read_and_recover(tmp_path, monkeypatch):
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
-    from empirical_lawhood.adapters.composition.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as science
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_statistical_bindings import statistical_task_id
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs
-    from empirical_lawhood.infrastructure.source_closure import capture_target_closure
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as science
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_statistical_bindings import statistical_task_id
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import bind_protected_e3_experiment_inputs
+    from empirical_lawhood.storage.source_closure import capture_target_closure
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
     from tests.runtime_platform.test_study_issue import _issue_api_fixture
 
     design = os.environ.get('EL_E3_PUBLIC_DESIGN', 'small')
@@ -374,7 +371,7 @@ def test_original_protected_public_prepare_author_worker_assess_read_and_recover
         tmp_path / 'originals', design, maximum_parallel_tasks=maximum_parallel_tasks)
     required_mount = Path(os.environ.get('EL_E3_REQUIRED_MOUNT', str(tmp_path)))
     if 'EL_E3_REQUIRED_MOUNT' in os.environ:
-        from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+        from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
 
         case.plane = ExternalArtifactPlane(GuardedExternalRoot(replace(case.plane.root.contract,
             required_mount_path=str(required_mount))), validators=case.plane.validators,

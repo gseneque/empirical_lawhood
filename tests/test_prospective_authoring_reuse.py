@@ -11,10 +11,10 @@ import pytest
 
 from empirical_lawhood.api import prospective_experiment as companion
 from empirical_lawhood.api import recursive_prospective_authoring as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalRootUnavailable
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCandidate
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveDesignInputs
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalRootUnavailable
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCandidate
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveDesignInputs
 from tests import test_prospective_experiment as fixtures
 from tests.prospective_source_capture_fixture import synthetic_capture
 from tests.test_recursive_prospective_resource_preview import _arguments, _install_fixture_hook
@@ -221,7 +221,7 @@ def test_reused_root_objects_do_not_hide_changed_published_custody(selected, mon
 
     monkeypatch.setattr(owner, "author_recursive_prospective", author)
     directory = Path(selected.plane.root.contract.canonical_path) / ("refused-published-root-" + damage)
-    error = {"candidate": ArtifactIdentityConflict, "sidecar": ValueError,
+    error = {"candidate": ArtifactIdentityConflict, "sidecar": ArtifactIdentityConflict,
         "marker": ArtifactIdentityConflict, "ancestor": ExternalRootUnavailable}[damage]
     with pytest.raises(error):
         _public_author(selected, monkeypatch, directory.name)

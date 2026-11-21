@@ -5,25 +5,25 @@ from contextvars import ContextVar
 from dataclasses import dataclass
 from types import MappingProxyType
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_composition import operation_declarations
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_lowering import selected_configs, task_id, operation_class, lower_protected_matrix_response_error
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import RETAINED_PHASES, source_binding
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_unfinished_execution import ConfiguredE3CompletedOutput, ConfiguredE3UnfinishedExecution
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeState
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_composition import operation_declarations
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_lowering import selected_configs, task_id, operation_class, lower_protected_matrix_response_error
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import RETAINED_PHASES, source_binding
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_unfinished_execution import ConfiguredE3CompletedOutput, ConfiguredE3UnfinishedExecution
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeState
 
-from .configured_e3_retained_custody import _pin, _resources
-from .configured_e3_retained_read import continued_plan_read
-from .current_result_custody import CurrentResultPlanReader
-from .domain_composition.matrix_configured_protected_response.scientific_read import _selected_preparation, _original_design
-from .protected_e3_read_custody import authorize, _current_read_grants
-from .prospective_experiment import load_retained_prospective_experiment
-from .recursive_execution import _custody_control_pins
-from .recursive_qualified_parents import _actual_package, _verify_receipt_closure
+from empirical_lawhood.api.configured_e3_retained_custody import _pin, _resources
+from empirical_lawhood.api.configured_e3_retained_read import continued_plan_read
+from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
+from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.scientific_read import _selected_preparation, _original_design
+from empirical_lawhood.api.protected_e3_read_custody import authorize, _current_read_grants
+from empirical_lawhood.api.prospective_experiment import load_retained_prospective_experiment
+from empirical_lawhood.api.recursive_execution import _custody_control_pins
+from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _verify_receipt_closure
 
 
 _active_unfinished_reads = ContextVar('configured_e3_unfinished_reads', default=())
@@ -144,7 +144,7 @@ def read_unfinished_e3(*, artifact_writer, directory, run_id, reveal_authority_i
                 if task.task_id in receipts and phase not in RETAINED_PHASES:
                     raise PermissionError('unfinished E3 cannot follow completed future response work')
                 if task.task_id in receipts and phase == 'forecast':
-                    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_continued_response import original_config
+                    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_continued_response import original_config
                     if original_config(config).mode != 'calibration':
                         raise PermissionError('unfinished E3 refuses a completed confirmation forecast')
             unfinished = set(configs) - set(receipts)
@@ -186,7 +186,7 @@ def read_unfinished_e3(*, artifact_writer, directory, run_id, reveal_authority_i
                     retained.original.require_access()
 
                 def current():
-                    from empirical_lawhood.infrastructure.artifacts import verify_read_context_snapshots
+                    from empirical_lawhood.storage.artifacts import verify_read_context_snapshots
 
                     access()
                     if _custody_control_pins(view, index) != controls:

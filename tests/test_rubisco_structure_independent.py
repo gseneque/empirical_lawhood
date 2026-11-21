@@ -7,14 +7,10 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_structure import (
-    contracts as c,
-    independent_assessment as independent,
-    science,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_structure.independent_cif import read_cif
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import contracts as c, independent_assessment as independent, science
+from empirical_lawhood.domains.rubisco.rubisco_insilico_structure.independent_cif import read_cif
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.rubisco_nomination_fixture import nominee, structural_source
 from tests.rubisco_structure_fixture import historical_products
 

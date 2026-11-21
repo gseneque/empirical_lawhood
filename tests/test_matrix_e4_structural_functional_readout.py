@@ -6,17 +6,15 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_secondary_readout as secondary
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_science as full
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as original
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseScore,ScheduledResponseLossCell,branch_census
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import (
-    ScheduledE4DenseResponseCell, ScheduledE4DenseResponseScore, ScheduledE4DenseMechanicalForecast,
-)
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_secondary_readout as secondary
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_science as full
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as original
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseScore, ScheduledResponseLossCell, branch_census
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_native import ScheduledResponseTransitionControl
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledE4DenseResponseCell, ScheduledE4DenseResponseScore, ScheduledE4DenseMechanicalForecast
 from tests.test_matrix_e4_full_factor_public import selected_values, _real_plane
 from tests.test_matrix_e4_full_factor_values import scopes,literal_recipe_source_inputs,_analytic_full  # noqa: F401
 
@@ -177,7 +175,7 @@ def test_original_raw_score_and_complete_nested_cells_are_required(joined,damage
 
 
 def test_interval_failure_order_does_not_invent_a_common_origin_or_point_order():
-    from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import FactorLifetime
+    from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import FactorLifetime
     functional={'last_definite_pass':16,'first_definite_failure':64}
     origin=128
     assert secondary._failure_order(FactorLifetime(32,'LEFT_PRESENT','EXIT_INTERVAL',80,96,()),functional,origin)=='STRUCTURAL_FAILURE_PRECEDES_FUNCTIONAL_INTERVAL'

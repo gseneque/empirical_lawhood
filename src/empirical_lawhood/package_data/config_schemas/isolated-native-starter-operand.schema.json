@@ -1,0 +1,58 @@
+{
+  "$defs": {
+    "SquareInput_d455ab4d007b": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/isolated-native-starter/integer-sequence"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "evidence_scope": {
+              "description": "evidence scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "last_integer": {
+              "description": "last integer; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "units": {
+              "description": "units; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "record_id",
+            "last_integer",
+            "units",
+            "evidence_scope"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:isolated-native-starter-operand",
+  "$ref": "#/$defs/SquareInput_d455ab4d007b",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Isolated Native Starter Operand",
+  "x-consumer": "isolated-native-starter-operand",
+  "x-consumer-maximum-bytes": 2097152,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

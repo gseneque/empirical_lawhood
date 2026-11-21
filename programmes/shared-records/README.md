@@ -8,6 +8,7 @@ Use the linked programme overview for current supported operations.
 
 | Record | Scope |
 |---|---|
+| [Finite joint descriptions across twenty studies](joint-description-results.md) | Primary CPU findings, unsupported observations and two physical cohorts awaiting acquisition |
 | [Matrix and battery stopping readout](matrix-battery-stopping-readout.md) | Separate Matrix development and battery outcomes at the 13 October checkpoint |
 | [Recursive prerequisite provenance](recursive-prerequisite-provenance.md) | Shared RC/battery execution counts, producing identities and original evidence custody |
 | [Compact closeout](applied-el/closeout.md) | Original cross-domain compact allocation and operational stop |

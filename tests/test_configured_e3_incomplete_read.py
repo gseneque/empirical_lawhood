@@ -13,8 +13,8 @@ import pytest
 
 from empirical_lawhood.api import configured_e3_incomplete_read as owner
 from empirical_lawhood.api.domain_composition.matrix_configured_protected_response import scientific_read as reader
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experimental_statistics import binomial_upper_tail, split_upper_calibration
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.methods.statistics.experimental_statistics import binomial_upper_tail, split_upper_calibration
 from tests.test_matrix_configured_unknown_response import (
     case as case, configured_prefix_case as configured_prefix_case,
     legacy_case as legacy_case, no_science as no_science, original_case as original_case,
@@ -30,8 +30,8 @@ def empty_rows(case):
 @pytest.mark.parametrize('changed_bytes', (False, True))
 def test_external_input_projection_uses_frozen_artifact_order_and_checks_identity(monkeypatch, changed_bytes):
     """Disclosed metadata isolates ordering; it supplies no publication authority."""
-    from empirical_lawhood.kernel.evidence import OutcomeAccess
-    from empirical_lawhood.infrastructure.execution import SchedulerConsistencyError
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+    from empirical_lawhood.execution.local.execution import SchedulerConsistencyError
 
     ids = ('z.config', 'a.operand')  # Declaration order differs from artifact order.
     manifests, specs, checks = {}, [], []
@@ -89,7 +89,7 @@ def test_missing_forecasts_keep_full_denominators_without_inventing_observations
 
 
 def test_real_unknown_contact_is_none_in_full_census_and_other_states_remain_distinct(case):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_unknown_response import score_unknown_response
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_unknown_response import score_unknown_response
     score, outcome = score_unknown_response(case.availability, case.operands,
         score_id='read-score.disclosed', outcome_id='read-outcome.disclosed')
     rows = empty_rows(case)
@@ -114,11 +114,9 @@ def test_real_unknown_contact_is_none_in_full_census_and_other_states_remain_dis
 def test_raw_return_without_products_stays_known_and_missing_in_the_full_census(
         case, monkeypatch, error_type, return_code):
     """Literal call facts test the reader projection; no native call or genuine issue."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_unknown_response import (
-        ConfiguredProtectedE3UnknownResponseAvailability,
-    )
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkCallEntry, NativeSubworkCallReturn
-    from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_unknown_response import ConfiguredProtectedE3UnknownResponseAvailability
+    from empirical_lawhood.execution.native_subwork import NativeSubworkCallEntry, NativeSubworkCallReturn
+    from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract
 
     availability = case.availability
     parent, definition = availability.parent_contact, availability.definition
@@ -169,7 +167,7 @@ def test_raw_return_without_products_stays_known_and_missing_in_the_full_census(
 
 @pytest.mark.parametrize('damage', ('missing-freeze', 'foreign-freeze', 'foreign-allocation', 'foreign-outcome'))
 def test_incomplete_math_refuses_foreign_original_paired_premises(case, damage):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_unknown_response import score_unknown_response
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_unknown_response import score_unknown_response
     _, outcome = score_unknown_response(case.availability, case.operands,
         score_id='read-score.disclosed', outcome_id='read-outcome.disclosed')
     forecast = case.error
@@ -327,7 +325,7 @@ def test_current_task_preparation_does_not_renew_effect_authority(actual_issued_
 
 def test_incomplete_assessment_support_is_an_explicit_owning_declaration():
     from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.experiment_binding import EXPERIMENT_RUNTIME_BINDING
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+    from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
     assert EXPERIMENT_RUNTIME_BINDING.supports_incomplete_assessment is True
     with pytest.raises(TypeError, match='explicit boolean'):
         replace(EXPERIMENT_RUNTIME_BINDING, supports_incomplete_assessment=1)

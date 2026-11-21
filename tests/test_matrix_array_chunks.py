@@ -8,13 +8,10 @@ import shutil
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_array_chunks import (
-    ChunkedMatrixArrays, MatrixArrayInterval, MatrixWholeArrayMember,
-    encode_chunk, iter_chunk_arrays, verify_chunked_arrays, whole_member,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.matrix_inputs import MAXIMUM_MATRIX_ARRAY_BYTES
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_array_chunks import ChunkedMatrixArrays, MatrixArrayInterval, MatrixWholeArrayMember, encode_chunk, iter_chunk_arrays, verify_chunked_arrays, whole_member
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.input_contracts import MAXIMUM_MATRIX_ARRAY_BYTES
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def identity(name):
@@ -137,7 +134,7 @@ def test_whole_member_beyond_original_64mib_has_complete_bounded_leaves(tmp_path
 
 def test_framed_container_original_leaves_roundtrip_partial_reads():
     from io import BytesIO
-    from empirical_lawhood.adapters.methods.matrix_array_chunks import framed_artifact, framed_size, iter_framed_bytes, iter_framed_chunk_arrays
+    from empirical_lawhood.domains.matrix.matrix_array_chunks import framed_artifact, framed_size, iter_framed_bytes, iter_framed_chunk_arrays
     _,manifest,raws = small_case()
     def fetch(artifact):
         raw = raws[artifact.artifact_id]
@@ -154,7 +151,7 @@ def test_framed_container_original_leaves_roundtrip_partial_reads():
 @pytest.mark.parametrize('defect',('truncated','changed-header','changed-container-hash','changed-whole-hash','extra-tail','changed-leaf'))
 def test_framed_late_error_prevents_final_success_seal(defect):
     from io import BytesIO
-    from empirical_lawhood.adapters.methods.matrix_array_chunks import framed_artifact, iter_framed_bytes, iter_framed_chunk_arrays
+    from empirical_lawhood.domains.matrix.matrix_array_chunks import framed_artifact, iter_framed_bytes, iter_framed_chunk_arrays
     _,manifest,raws = small_case()
     fetch = lambda artifact:iter((raws[artifact.artifact_id],))
     artifact = framed_artifact(manifest,fetch,artifact_id='array.container')

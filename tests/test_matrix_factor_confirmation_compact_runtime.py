@@ -5,15 +5,15 @@ from hashlib import sha256
 from pathlib import Path
 import pytest
 import numpy as np
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_records as r,compact_science as science,compact_bindings as owner,compact_preparation as domain
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import science as original_science
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import MatrixParameterNativeHistory,coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_records as r, compact_science as science, compact_bindings as owner, compact_preparation as domain
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import science as original_science
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import MatrixParameterNativeHistory, coordinate_identity
 from tests.test_matrix_factor_confirmation_compact_core import compact_case
 from tests.test_matrix_factor_confirmation_history import e1 as e1,complete_history
 from tests.test_matrix_factor_confirmation_eligibility import provenance as provenance,stock as stock
@@ -38,7 +38,7 @@ def selected_case(e1):
 
 def test_actual_compact_public_preparation_reports_real_qualification_entry_and_resource_holds(e1,monkeypatch):
     spec,selected,sources=selected_case(e1)
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
     monkeypatch.setattr(parameter_source,'acquire_parameter_history',_no_science)
     monkeypatch.setattr(science,'measure',_no_science)
     inputs=domain.bind_inputs(spec,{'selection':selected})
@@ -84,7 +84,7 @@ def _compact_history(e1,source):
 
 
 def test_native_direct_operand_revision_preserves_exact_legacy_history_and_rejects_crossed_rosters(e1):
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     from tests.native_completion_fixtures import publish_completion
     _,sources=compact_case(e1);source=sources[0]
     history,_,_,_,_,_=_compact_history(e1,source)
@@ -133,7 +133,7 @@ def test_actual_measurement_bytes_preserved_with_time_zero_risk_and_independent_
     monkeypatch.setattr(np.linalg,'eigh',_no_science);monkeypatch.setattr(np.linalg,'eigvalsh',_no_science)
     assessment=science.assess_factor(source,history,numerical,product,raw,diagnostic)
     assert assessment.controls==old_assessment.controls
-    from empirical_lawhood.adapters.methods.matrix_parameter_factor import independent
+    from empirical_lawhood.domains.matrix.matrix_parameter_factor import independent
     from tests.test_matrix_independent_gram import literal_operator
     with monkeypatch.context() as literal:
         literal.setattr(independent,'raw_operator',literal_operator)
@@ -146,7 +146,7 @@ def test_actual_measurement_bytes_preserved_with_time_zero_risk_and_independent_
         parent=history.native.definition.parent_contact;task=r.NAMESPACE+'.'+source.root_id+'.'+phase
         receipts.append(CanonicalTaskReceipt('receipt.compact.'+phase,parent.run_id,task,parent.attempt_id if phase=='history' else 'attempt.'+task,
             source.implementation_commit,parent.input_materialization_ids if phase=='history' else (),tuple(row.materialization for row in outputs),tuple(row.logical for row in outputs),(),OperationalStatus.SUCCEEDED,()))
-    from empirical_lawhood.infrastructure import matrix_array_io
+    from empirical_lawhood.adapters.matrix_storage import matrix_array_io
     decoded=[]
     decode=matrix_array_io._decode_matrix_arrays
     def counted(*args):
@@ -159,7 +159,7 @@ def test_actual_measurement_bytes_preserved_with_time_zero_risk_and_independent_
     if family==0:
         from types import SimpleNamespace
         from empirical_lawhood.api.matrix_retained_replay import replay_e1, replay_weight, map_reconstructions
-        from empirical_lawhood.infrastructure.parallel_verification import CanonicalValidationPool
+        from empirical_lawhood.storage.parallel_verification import CanonicalValidationPool
         value=(source,history,numerical,product,assessment,raw,diagnostic,tuple(receipts))
         weight=replay_weight(records=(source,history,numerical,product,assessment,*receipts),
             archives=((raw,history.arrays),(diagnostic,product.arrays)))

@@ -7,7 +7,7 @@ import json
 import pytest
 
 from empirical_lawhood.api import current_result_custody, recursive_qualified_parents as owner
-from empirical_lawhood.runtime.recursive_compiler import RecursivePortContract
+from empirical_lawhood.execution.recursive_compiler import RecursivePortContract
 from tests.runtime_platform.test_recursive_prospective_parents import (
     _parent_inputs, parent_fixture as parent_fixture,
 )
@@ -70,7 +70,7 @@ def test_shared_parent_recompiles_and_traverses_complete_closure_once(parent_fix
         counted('live_authority_replays', owner._replay_parent_authority))
     monkeypatch.setattr(current_result_custody, '_index_execution_tasks',
         counted('task_index_builds', current_result_custody._index_execution_tasks))
-    from empirical_lawhood.runtime import recovery
+    from empirical_lawhood.execution import recovery
     monkeypatch.setattr(recovery, 'build_run_recovery_index',
         counted('original_index_builds', recovery.build_run_recovery_index))
     evidence = owner.authenticate_recursive_qualified_parents(spec_bindings=bindings, draft=draft,

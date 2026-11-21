@@ -17,20 +17,20 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence, SelectedE3E4DevelopmentProgramme
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Evidence, SelectedE3E4DevelopmentProgramme
 from empirical_lawhood.api import recursive_qualified_parents as authority
 from empirical_lawhood.api import selected_e3_access as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, _ScopedArtifactPlane
-from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads, read_recursive_bootstrap_record
-from empirical_lawhood.infrastructure import recursive_custody as custody
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, lineage_parent_sort_key
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, _ScopedArtifactPlane
+from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads, read_recursive_bootstrap_record
+from empirical_lawhood.storage import recursive_custody as custody
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, lineage_parent_sort_key
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
 from tests.runtime_platform.test_recursive_compiler import Config
 from tests.test_current_result_custody import actual_issued_current_task_controls  # noqa: F401
 from tests.test_current_result_historical_access import later_reveal
@@ -337,7 +337,7 @@ def test_shared_original_authority_context_reloads_revocation_and_expiry(
 
 def test_original_authority_context_keeps_foreign_policy_and_custom_reads_eager(
         actual_issued_current_task_controls, monkeypatch):  # noqa: F811
-    from empirical_lawhood.runtime.artifacts import ArtifactSemanticValidationRegistry
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactSemanticValidationRegistry
     f = actual_issued_current_task_controls
     plane = f.control.service.artifact_plane
     with owner.original_e3_authority_read_context(plane):
@@ -582,7 +582,7 @@ def test_product_verification_expiry_refuses_before_independent_body_rehash(wave
 def test_four_original_publication_replays_reuse_only_stock_base_and_reload_grants(
         actual_issued_current_task_controls, monkeypatch, custom_policy):  # noqa: F811
     """Actual issue custody only; literal locators are not four completed E3 products."""
-    from empirical_lawhood.infrastructure import study_issue
+    from empirical_lawhood.storage import study_issue
     f = actual_issued_current_task_controls
     plane = f.control.service.artifact_plane
     originals = literal_originals(f, f.control.reveal)
@@ -622,7 +622,7 @@ def test_four_original_publication_replays_reuse_only_stock_base_and_reload_gran
 @pytest.mark.parametrize('damage', ('type', 'writer', 'grantee'))
 def test_original_publication_reader_refuses_foreign_owner_or_writer(
         actual_issued_current_task_controls, damage):  # noqa: F811
-    from empirical_lawhood.infrastructure import study_issue
+    from empirical_lawhood.storage import study_issue
     f = actual_issued_current_task_controls
     plane = f.control.service.artifact_plane
     original = literal_originals(f, f.control.reveal)[0]
@@ -640,7 +640,7 @@ def test_original_publication_reader_refuses_foreign_owner_or_writer(
 @pytest.mark.parametrize('damage', ('revoked', 'expired', 'source'))
 def test_warm_original_publication_keeps_current_grant_and_source_refusals(
         actual_issued_current_task_controls, monkeypatch, damage):  # noqa: F811
-    from empirical_lawhood.infrastructure import study_issue
+    from empirical_lawhood.storage import study_issue
     f = actual_issued_current_task_controls
     plane = f.control.service.artifact_plane
     original = literal_originals(f, f.control.reveal)[0]
@@ -669,7 +669,7 @@ def test_warm_original_publication_keeps_current_grant_and_source_refusals(
 
 def test_warm_original_publication_final_guard_refuses_same_stat_base_corruption(
         actual_issued_current_task_controls):  # noqa: F811
-    from empirical_lawhood.infrastructure import study_issue
+    from empirical_lawhood.storage import study_issue
     f = actual_issued_current_task_controls
     plane = f.control.service.artifact_plane
     original = literal_originals(f, f.control.reveal)[0]

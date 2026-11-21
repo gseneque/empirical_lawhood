@@ -86,7 +86,7 @@ Retirement changes no original result, receipt, source archive or expense.
 
 The incident-specific launchers and six operational operands described in the original work period are historical.
 Use each current guide's supported commands and storage contract for new work.
-The maintainer's [EL storage selection](../../maintainer-environment.md) is local deployment guidance, not an engine default.
+For new work, select an explicit [storage profile](../../../using/environments.md#select-storage-and-reuse-an-environment).
 
 Retained reading or recovery authenticates the original exact storage identities
 and bytes. A separately selected EL replica uses the existing publication/custody

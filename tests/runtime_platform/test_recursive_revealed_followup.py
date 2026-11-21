@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Exposed software controls for revealed PURE follow-up; no scientific issue."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 
@@ -7,19 +8,19 @@ import pytest
 
 from empirical_lawhood.api.current_task_custody import CurrentDevelopmentTaskCustody
 from empirical_lawhood.api.recursive_execution import _external_inputs
-from empirical_lawhood.infrastructure.development_native_custody import read_development_native_payload
-from empirical_lawhood.infrastructure.recursive_custody import read_exposed_recursive_payload
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest, CanonicalTaskReceipt, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityPermission
-from empirical_lawhood.runtime.plans import BarrierKind, DevelopmentExecutionPlan
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex, TaskRecoveryEvent
+from empirical_lawhood.storage.development_native_custody import read_development_native_payload
+from empirical_lawhood.storage.recursive_custody import read_exposed_recursive_payload
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, CanonicalTaskReceipt, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityPermission
+from empirical_lawhood.execution.plans import BarrierKind, DevelopmentExecutionPlan
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex, TaskRecoveryEvent
 from tests.runtime_platform.test_recursive_compiler import Config, SourceConfig, fixture
 from tests.test_recursive_public_service import _plane
 
@@ -87,7 +88,7 @@ def test_revealed_aliases_preserve_exact_role_and_custody_control_bytes(tmp_path
     for value in values:
         assert (value.logical.outcome_access, value.logical.visibility_ceiling) == PAIR
         path = plane.root.resolve(value.materialization.relative_path + ".manifest.json", for_write=False)
-        manifest = decode_artifact_manifest(path.read_bytes(), maximum_bytes=None)
+        manifest = resolve_artifact_sidecar_bytes(plane, path.read_bytes(), maximum_bytes=None)
         raw = read_exposed_recursive_payload(plane, manifest, maximum_bytes=value.materialization.size_bytes)
         codec = SourceConfig if manifest.logical.payload_schema == SourceConfig.SCHEMA else type(compiled.config_inputs[1].record)
         assert custody.control_record(manifest, codec, len(raw)).canonical_bytes() == raw
@@ -118,7 +119,7 @@ def test_recovery_event_inherits_actual_revealed_receipt_without_relabeling(tmp_
     event = TaskRecoveryEvent.from_receipt(index, receipt)
     store.append_event(index, event, receipt=receipt)
     path = plane.root.resolve(attempt.event_relative_path + ".manifest.json", for_write=False)
-    manifest = decode_artifact_manifest(path.read_bytes(), maximum_bytes=None)
+    manifest = resolve_artifact_sidecar_bytes(plane, path.read_bytes(), maximum_bytes=None)
     assert (manifest.logical.outcome_access, manifest.logical.visibility_ceiling) == PAIR
     assert ObjectIdentity.from_record(receipt.receipt_id, receipt) in tuple(parent.identity for parent in manifest.logical.lineage_parents)
     assert store.read_event(index, attempt.event_relative_path) == event

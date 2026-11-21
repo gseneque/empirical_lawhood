@@ -6,9 +6,9 @@ from decimal import Decimal
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.planning.metatheory import MetatheoryAggregateDisposition, MetatheoryApplicability
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.design.structural_claims import MetatheoryAggregateDisposition, MetatheoryApplicability
 from tests import matrix_selected_source_predecessor as release
 from tests.test_matrix_selected_e4_fixtures import selected_e4_populations, selected_bridge, transfer  # noqa: F401
 from tests.test_matrix_source_evidence import source_case  # noqa: F401
@@ -41,8 +41,8 @@ def test_six_independent_closed_gate_products_replay_complete_source_scope(close
     assert len(specification.gates) == 7
     assert sum(value.applicability is MetatheoryApplicability.NOT_APPLICABLE for value in specification.gates) == 1
     declarations = tuple(release.gate_declaration(kind) for kind in release.GATES)
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.adapters.methods.matrix_source_evidence import MatrixSourceQualificationConfig
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.domains.matrix.matrix_source_evidence import MatrixSourceQualificationConfig
     qualifier = MatrixSourceQualificationConfig("config.disclosed-release-source", specification, common.pipeline_receipt,
         CapabilityRegistry("registry.disclosed-release-source",
             tuple(sorted((value.manifest() for value in declarations), key=lambda value: value.registry_id))),
@@ -172,9 +172,9 @@ def test_actual_raw_source_publication_uses_existing_contract_and_exact_supporti
     """Exercise actual raw custody before any original E3 or source workflow."""
     from hashlib import sha256
     from pathlib import Path
-    from empirical_lawhood.planning.dataset_manifests import DatasetCapabilityBinding, DatasetCapabilityKind
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile
-    from empirical_lawhood.runtime.datasets import DatasetSupportingIdentityRegistry
+    from empirical_lawhood.design.dataset_manifests import DatasetCapabilityBinding, DatasetCapabilityKind
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+    from empirical_lawhood.execution.datasets import DatasetSupportingIdentityRegistry
     from tests.test_recursive_public_service import _plane
     writer = _plane(tmp_path / "plane")
     source = Path(release.__file__) if role == "runtime" else release.ROOT / "uv.lock"
@@ -209,7 +209,7 @@ def test_actual_source_pipeline_public_lifecycle_boundaries(tmp_path_factory, mo
     from pathlib import Path
     from types import SimpleNamespace
 
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_bank_recipe as recipe
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_bank_recipe as recipe
     from empirical_lawhood.api import recursive_prospective_authoring as author
     from tests.runtime_platform import test_study_issue as issue_owner
     from tests.test_matrix_selected_e4_bank_recipe import literal_recipe_source_inputs
@@ -219,9 +219,9 @@ def test_actual_source_pipeline_public_lifecycle_boundaries(tmp_path_factory, mo
     prefix = "disclosed-source-preview"
     profile = None
     if boundary != "preview":
-        from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-        from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-        from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile, resolve_external_root_contract
+        from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+        from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, resolve_external_root_contract
 
         profile_path = Path(os.environ.get("EL_TEST_OPERATOR_PROFILE",
             "/media/chevre/EL/empirical-lawhood/operator-profiles/el-four-core-default.json"))
@@ -281,8 +281,8 @@ def test_actual_source_pipeline_public_lifecycle_boundaries(tmp_path_factory, mo
     actual_author = author.author_recursive_prospective
 
     def author_boundary(**kwargs):
-        from empirical_lawhood.kernel.evidence import EvidenceCeiling
-        from empirical_lawhood.runtime.candidate_compiler import _required_obligation_ids
+        from empirical_lawhood.science.evidence.evidence import EvidenceCeiling
+        from empirical_lawhood.execution.candidate_compiler import _required_obligation_ids
 
         preview, spec = kwargs["expected_preview"], kwargs["spec"]
         assert preview is observed["preview"]

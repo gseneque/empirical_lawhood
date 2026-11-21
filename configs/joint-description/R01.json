@@ -1,0 +1,186 @@
+{
+  "actions": [
+    0.0,
+    0.5,
+    1.0
+  ],
+  "calibration_unit_ids": [
+    "unit.r01.calibration.0000",
+    "unit.r01.calibration.0001",
+    "unit.r01.calibration.0002",
+    "unit.r01.calibration.0003",
+    "unit.r01.calibration.0004",
+    "unit.r01.calibration.0005",
+    "unit.r01.calibration.0006",
+    "unit.r01.calibration.0007",
+    "unit.r01.calibration.0008",
+    "unit.r01.calibration.0009",
+    "unit.r01.calibration.0010",
+    "unit.r01.calibration.0011",
+    "unit.r01.calibration.0012",
+    "unit.r01.calibration.0013",
+    "unit.r01.calibration.0014",
+    "unit.r01.calibration.0015"
+  ],
+  "descriptions": [
+    {
+      "features": [
+        "joint_prediction"
+      ],
+      "forecast_work_basis": "Authored conservative per-receiver/horizon dense-work proxy:100*(2+1)^3 forced flow +100*2^3*1 preparation/history flows +20*2^2*2 projection +20*max(2,2)*min(2,2)^2 least-squares reconstruction. No sharing credit; not an operation-count proof or runtime measurement.",
+      "forecast_work_unit": "authored-scalar-operation",
+      "forecast_work_units": 3820,
+      "id": "joint",
+      "interface_dimension": 0,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "fixed",
+      "rationale": "Both present branch voltages and pre-response time constants.",
+      "state_dimension": 2
+    },
+    {
+      "features": [
+        "partition_prediction"
+      ],
+      "forecast_work_basis": "Authored conservative per-receiver/horizon dense-work proxy:100*(2+1)^3 forced flow +100*2^3*1 preparation/history flows +20*2^2*1 projection +20*max(2,1)*min(2,1)^2 least-squares reconstruction. No sharing credit; not an operation-count proof or runtime measurement.",
+      "forecast_work_unit": "authored-scalar-operation",
+      "forecast_work_units": 3620,
+      "id": "partitioned",
+      "interface_dimension": 0,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "fixed",
+      "rationale": "Present mean only; minimum-norm hidden contrast is zero.",
+      "state_dimension": 1
+    },
+    {
+      "features": [
+        "interface_prediction"
+      ],
+      "forecast_work_basis": "Authored conservative per-receiver/horizon dense-work proxy:100*(2+1)^3 forced flow +100*2^3*1 preparation/history flows +20*2^2*2 projection +20*max(2,2)*min(2,2)^2 least-squares reconstruction. No sharing credit; not an operation-count proof or runtime measurement.",
+      "forecast_work_unit": "authored-scalar-operation",
+      "forecast_work_units": 3820,
+      "id": "interface",
+      "interface_dimension": 1,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "fixed",
+      "rationale": "Present mean and independently measured branch-voltage contrast.",
+      "state_dimension": 1
+    },
+    {
+      "features": [
+        "memory_prediction"
+      ],
+      "forecast_work_basis": "Authored conservative per-receiver/horizon dense-work proxy:100*(2+1)^3 forced flow +100*2^3*4 preparation/history flows +20*2^2*4 projection +20*max(2,4)*min(2,4)^2 least-squares reconstruction. No sharing credit; not an operation-count proof or runtime measurement.",
+      "forecast_work_unit": "authored-scalar-operation",
+      "forecast_work_units": 6540,
+      "id": "memory",
+      "interface_dimension": 0,
+      "memory_dimension": 1,
+      "memory_samples": 3,
+      "model": "fixed",
+      "rationale": "Present mean plus three pre-decision mean observations.",
+      "state_dimension": 1
+    },
+    {
+      "features": [
+        "independent_prediction"
+      ],
+      "forecast_work_basis": "Authored per-receiver/horizon scalar proxy: two exponential evaluations priced at20 plus six arithmetic operations each; no dense operator. Not measured runtime.",
+      "forecast_work_unit": "authored-scalar-operation",
+      "forecast_work_units": 52,
+      "id": "independent-branches",
+      "interface_dimension": 0,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "fixed",
+      "rationale": "Uncoupled branch laws compose exactly with no dynamic interface; negative control.",
+      "state_dimension": 2
+    }
+  ],
+  "economics": {
+    "accounting_unit": "authored-cost-unit",
+    "action_price": "0",
+    "compute_price": "0.0001",
+    "interface_price": "0.001",
+    "maximum_control_regret": "1",
+    "memory_price": "0.001",
+    "minimum_coverage": "0.9",
+    "missing_penalty": "1000000",
+    "reuse_count": 1,
+    "ridge_penalty": "0.001",
+    "safety_penalty": "1000000",
+    "state_price": "0.001"
+  },
+  "evaluation_unit_ids": [
+    "unit.r01.evaluation.0000",
+    "unit.r01.evaluation.0001",
+    "unit.r01.evaluation.0002",
+    "unit.r01.evaluation.0003",
+    "unit.r01.evaluation.0004",
+    "unit.r01.evaluation.0005",
+    "unit.r01.evaluation.0006",
+    "unit.r01.evaluation.0007",
+    "unit.r01.evaluation.0008",
+    "unit.r01.evaluation.0009",
+    "unit.r01.evaluation.0010",
+    "unit.r01.evaluation.0011",
+    "unit.r01.evaluation.0012",
+    "unit.r01.evaluation.0013",
+    "unit.r01.evaluation.0014",
+    "unit.r01.evaluation.0015",
+    "unit.r01.evaluation.0016",
+    "unit.r01.evaluation.0017",
+    "unit.r01.evaluation.0018",
+    "unit.r01.evaluation.0019",
+    "unit.r01.evaluation.0020",
+    "unit.r01.evaluation.0021",
+    "unit.r01.evaluation.0022",
+    "unit.r01.evaluation.0023",
+    "unit.r01.evaluation.0024",
+    "unit.r01.evaluation.0025",
+    "unit.r01.evaluation.0026",
+    "unit.r01.evaluation.0027",
+    "unit.r01.evaluation.0028",
+    "unit.r01.evaluation.0029",
+    "unit.r01.evaluation.0030",
+    "unit.r01.evaluation.0031"
+  ],
+  "family_id": "R01",
+  "horizons": [
+    0.25,
+    1.0,
+    3.0
+  ],
+  "parameters": {
+    "contrast_max_v": 0.45,
+    "contrast_min_v": 0.05,
+    "history_depth": 4,
+    "history_lag_s": 0.1,
+    "tau_one_s": 1.0,
+    "tau_two_s": 4.0
+  },
+  "question": "When does mean-voltage compression lose control-relevant contrast, and when do independent branch laws already suffice?",
+  "receiver_policies": {
+    "mean_voltage_a": {
+      "max_abs_error": 0.02,
+      "safety_lower": 0.0,
+      "safety_upper": 1.25,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "V",
+      "weight": 1.0
+    },
+    "mean_voltage_b": {
+      "max_abs_error": 0.02,
+      "safety_lower": 0.0,
+      "safety_upper": 1.25,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "V",
+      "weight": 1.0
+    }
+  },
+  "seed": 20261114
+}

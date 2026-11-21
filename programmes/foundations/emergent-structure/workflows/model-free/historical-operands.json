@@ -1,0 +1,50 @@
+{
+  "instruction": "Preserve unavailable evidence. A documentary hash does not authenticate an external native operand.",
+  "native_raw_custody": "NOT_INCLUDED_IN_INPUT_BRANCH_SNAPSHOT",
+  "required_for_exact_comparison": [
+    "original final reports with original custody",
+    "native acquisitions and physical input identities",
+    "TRAIN and CAL operands where a learned comparison requires them",
+    "exact original endpoints, clocks, receiver maps and complete root rosters"
+  ],
+  "rows": [
+    {
+      "native_reproduction_authority": false,
+      "path": "programmes/foundations/emergent-structure/records/matrix-programme.md",
+      "sha256": "2506d7a0fa98cdc10213cd0df168edffe9560a8a59506c4a77653b37d042456c",
+      "status": "DOCUMENTARY_RECORD_PRESENT"
+    },
+    {
+      "native_reproduction_authority": false,
+      "path": "programmes/foundations/emergent-structure/records/release-results.md",
+      "sha256": "ece3abd52b9b17f1e8237ed28dd9cb5802958806d38a22ad734f07dfc220d839",
+      "status": "DOCUMENTARY_RECORD_PRESENT"
+    },
+    {
+      "native_reproduction_authority": false,
+      "path": "programmes/foundations/emergent-structure/records/matrix-sci02b-development-result.md",
+      "sha256": "02f1c94e7564990172bfc16395e76fb6570d10f06d28aa3307a318894ae6ab33",
+      "status": "DOCUMENTARY_RECORD_PRESENT"
+    },
+    {
+      "native_reproduction_authority": false,
+      "path": "programmes/foundations/emergent-structure/records/matrix-sci02c-result.md",
+      "sha256": "cca0ec4523bff1bf5243a2cd47b42243275942e8c5e269bba9d6a9b9aa30db88",
+      "status": "DOCUMENTARY_RECORD_PRESENT"
+    },
+    {
+      "native_reproduction_authority": false,
+      "path": "programmes/foundations/emergent-structure/records/matrix-sci02d-result.md",
+      "sha256": "bee2cf44052384917d2900d33a0de93762cd461665f7553cc98123f751fc0303",
+      "status": "DOCUMENTARY_RECORD_PRESENT"
+    },
+    {
+      "native_reproduction_authority": false,
+      "path": "programmes/foundations/emergent-structure/workflows/classical-series/history.md",
+      "sha256": "022a2d52639c5aaedb930d7206c29fb69b68423bf2ee27bb9e1d2676b87f616c",
+      "status": "DOCUMENTARY_RECORD_PRESENT"
+    }
+  ],
+  "schema": "matrix-model-free-historical-inventory.v1",
+  "status": "DOCUMENTARY_INVENTORY_ONLY"
+}

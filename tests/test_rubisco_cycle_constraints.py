@@ -6,10 +6,7 @@ from decimal import Decimal as D
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_cycle_constraints.science import (
-    BranchRates, branch_observables, common_release_response, finite_gas_flux,
-    joint_necessities, realize_conditional_branch,
-)
+from empirical_lawhood.domains.rubisco.rubisco_cycle_constraints.science import BranchRates, branch_observables, common_release_response, finite_gas_flux, joint_necessities, realize_conditional_branch
 
 
 @pytest.mark.parametrize('a,b,release,off', [(3, 0, 7, 2), (3, 5, 7, 2), (7, 2, 1, 0), (1, 20, 4, 13)])

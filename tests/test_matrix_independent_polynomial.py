@@ -7,9 +7,9 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_parameter_history import independent as original
-from empirical_lawhood.adapters.methods.matrix_parameter_history import independent_polynomial as compiled
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
+from empirical_lawhood.domains.matrix.matrix_parameter_history import independent as original
+from empirical_lawhood.domains.matrix.matrix_parameter_history import independent_polynomial as compiled
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
 from tests.test_matrix_parameter_history import source
 from tests.test_matrix_parameter_native import REGIMES, coordinate
 

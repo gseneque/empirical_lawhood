@@ -8,13 +8,11 @@ from hashlib import sha256
 import pytest
 
 from empirical_lawhood.api import finite_operands as owner
-from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge import TransientBridgeSpec
-from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source_records import (
-    CurrentPreparationSourceConfig, MatrixPreparationSourceConfig, MatrixPreparationSourceProtocol,
-)
-from empirical_lawhood.infrastructure import numerical_provenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge import TransientBridgeSpec
+from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source_records import CurrentPreparationSourceConfig, MatrixPreparationSourceConfig, MatrixPreparationSourceProtocol
+from empirical_lawhood.storage import numerical_provenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_matrix_operand_transport import allocation
 
 

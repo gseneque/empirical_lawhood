@@ -5,6 +5,7 @@ The existing generic prospective fixture uses truth-known software science and
 synthetic authority scaffolding. No genuine signer, native task, scientific
 execution, qualification or protected real source is used by these tests.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import dataclass, replace
 from hashlib import sha256
@@ -17,24 +18,19 @@ import pytest
 
 from empirical_lawhood.api import prospective_experiment as owner
 from empirical_lawhood.api import recursive_prospective_authoring as prospective
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import (
-    ExecutionSelection, ExperimentCensus, ExperimentInstanceBinding, ExperimentPreparation,
-    ExperimentProtocolDeclaration, PreparedExperimentFile, PreparedExperimentInputs,
-)
-from empirical_lawhood.runtime.prospective_experiment import (
-    ASSOCIATION_FILENAME, ProspectiveExperimentAssociation, source_filename,
-)
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec
-from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, ExperimentCensus, ExperimentInstanceBinding, ExperimentPreparation, ExperimentProtocolDeclaration, PreparedExperimentFile, PreparedExperimentInputs
+from empirical_lawhood.execution.prospective_experiment import ASSOCIATION_FILENAME, ProspectiveExperimentAssociation, source_filename
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig
 from tests.runtime_platform.test_recursive_compiler import Config
 from tests.runtime_platform.test_recursive_prospective_workflow import FixtureCanonicalSource, _authored_handoff_fixture, _registrations
 
@@ -105,7 +101,7 @@ def selected(tmp_path_factory, request):
             lambda *_args, **_kwargs: preparation, "synthetic-prospective-experiment",
             input_record_types=(SourceMaterializationConfig,), bind_inputs=lambda *_args: PreparedExperimentInputs({}),
             validate_instance=_validate_instance, input_file_record_types=(FixtureCanonicalSource,))
-        from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+        import empirical_lawhood.api.generated_experiment_protocols as generated
         patch.setattr(generated, "EXPERIMENT_PROTOCOL_DECLARATIONS", (declaration,))
         patch.setattr(owner, "capture_target_closure", prospective.capture_target_closure)
         patch.setattr(owner, "GitStudySourceClosureInspector", prospective.GitStudySourceClosureInspector)
@@ -297,7 +293,7 @@ def test_cold_loader_refuses_consistently_republished_changed_design(selected, t
         plane.write(ArtifactWriteRequest(association.association_id + "." + name.removesuffix(".json"), "selected/experiment/" + name,
             json.loads(raw)["schema"], ArtifactProfile.CANONICAL_JSON, "application/json", association.association_id,
             "selected/experiment", raw, VisibilityCeiling.PROSPECTIVE, (), OutcomeAccess.OUTCOME_BLIND))
-        plane.verify_manifest(decode_artifact_manifest((companion / (name + ".manifest.json")).read_bytes(), maximum_bytes=None))
+        plane.verify_manifest(resolve_artifact_sidecar_bytes(plane, (companion / (name + '.manifest.json')).read_bytes(), maximum_bytes=None))
     if damage == "extra-file":
         (companion / "unselected.json").write_bytes(b"{}\n")
     # Re-publish all original14 control records and the original packet through
@@ -315,12 +311,12 @@ def test_cold_loader_refuses_consistently_republished_changed_design(selected, t
     # bytes through real custody so mutations reach their own scientific guards.
     assert len(packet.members) == 14
     closure = decode_canonical_bytes(prospective_payloads["source-closure.json"],
-        prospective.ImplementationSourceClosure, maximum_bytes=prospective.MAXIMUM_SPEC_BYTES)
+        prospective.ImplementationSourceClosure, maximum_bytes=len(prospective_payloads["source-closure.json"]))
     relative = "selected/prospective/provenance"
     for name, kind in zip(prospective.SOURCE_PROVENANCE_MEMBERS,
             (prospective.SelectedSourceManifest, prospective.ProspectiveSourceObservation), strict=True):
         raw = (selected.directory / "prospective/provenance" / name).read_bytes()
-        record = decode_canonical_bytes(raw, kind, maximum_bytes=prospective.MAXIMUM_SPEC_BYTES)
+        record = decode_canonical_bytes(raw, kind, maximum_bytes=len(raw))
         assert record.canonical_bytes() == raw
         plane.write(ArtifactWriteRequest(closure.source_closure_id + ".provenance." + name.removesuffix(".json"),
             relative + "/" + name, record.SCHEMA, ArtifactProfile.CANONICAL_JSON, "application/json",

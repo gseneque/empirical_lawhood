@@ -5,25 +5,17 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.experiments import ExperimentSpec
-from empirical_lawhood.kernel.provenance import EvidenceSnapshot
-from empirical_lawhood.kernel.systems import SystemSpec
-from empirical_lawhood.planning.approval import (
-    CompleteApprovalService,
-    DurableAuthorizationRecord,
-    FrozenApprovalProposal,
-)
-from empirical_lawhood.planning.authority import ApprovalRequest, AuthorizationRecord
-from empirical_lawhood.planning.campaigns import CampaignSpec
-from empirical_lawhood.planning.design import ExperimentProposal
-from empirical_lawhood.planning.exploration import ExplorationPlan
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan, ProtocolTemplate, ProtocolRunPlan, SnapshotVerification
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.experiments.experiments import ExperimentSpec
+from empirical_lawhood.science.identity.provenance import EvidenceSnapshot
+from empirical_lawhood.science.models.systems import SystemSpec
+from empirical_lawhood.design.approval import CompleteApprovalService, DurableAuthorizationRecord, FrozenApprovalProposal
+from empirical_lawhood.design.authority import ApprovalRequest, AuthorizationRecord
+from empirical_lawhood.design.campaigns import CampaignSpec
+from empirical_lawhood.design.design import ExperimentProposal
+from empirical_lawhood.design.exploration import ExplorationPlan
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan, ProtocolTemplate, ProtocolRunPlan, SnapshotVerification
 
 IMPLEMENTATION_COMMIT = "a" * 40
 

@@ -1,0 +1,279 @@
+{
+  "$defs": {
+    "ExternalRootContract_e5748e778b4d": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/runtime/external-root-contract"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "allowed_filesystem_types": {
+              "description": "allowed filesystem types; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "canonical_path": {
+              "description": "canonical path; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "expected_mount_source": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "expected mount source; constructor checks semantics and units."
+            },
+            "expected_volume_identity": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "expected volume identity; constructor checks semantics and units."
+            },
+            "logical_name": {
+              "description": "logical name; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "minimum_free_bytes": {
+              "description": "minimum free bytes; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "mount_contract_schema": {
+              "description": "mount contract schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "required_mount_path": {
+              "description": "required mount path; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "storage_root_id": {
+              "description": "storage root id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "storage_root_id",
+            "logical_name",
+            "canonical_path",
+            "required_mount_path",
+            "mount_contract_schema",
+            "minimum_free_bytes",
+            "expected_mount_source",
+            "expected_volume_identity",
+            "allowed_filesystem_types"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "SquareSpecification_79986820eff7": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/isolated-native-starter/specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "calculation": {
+              "description": "calculation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "operand": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "operand; constructor checks semantics and units."
+            },
+            "provenance": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "provenance; constructor checks semantics and units."
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "worker": {
+              "$ref": "#/$defs/WorkerSelection_2527d0d3e52b",
+              "description": "worker; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "specification_id",
+            "operand",
+            "provenance",
+            "worker",
+            "calculation"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "WorkerSelection_2527d0d3e52b": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/isolated-native-starter/worker-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "environment": {
+              "description": "environment; constructor checks semantics and units.",
+              "items": {
+                "items": false,
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "fault": {
+              "description": "fault; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "interpreter_path": {
+              "description": "interpreter path; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "interpreter_sha256": {
+              "description": "interpreter sha256; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "numpy_version": {
+              "description": "numpy version; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "package_root": {
+              "description": "package root; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "scratch_contract": {
+              "$ref": "#/$defs/ExternalRootContract_e5748e778b4d",
+              "description": "scratch contract; constructor checks semantics and units."
+            },
+            "scratch_directory": {
+              "description": "scratch directory; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "source_root": {
+              "description": "source root; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "interpreter_path",
+            "interpreter_sha256",
+            "numpy_version",
+            "source_root",
+            "package_root",
+            "scratch_directory",
+            "scratch_contract",
+            "environment",
+            "fault"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:isolated-native-starter-experiment",
+  "$ref": "#/$defs/SquareSpecification_79986820eff7",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Isolated Native Starter Experiment",
+  "x-consumer": "isolated-native-starter-experiment",
+  "x-consumer-maximum-bytes": 2097152,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

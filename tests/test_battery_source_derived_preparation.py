@@ -5,9 +5,9 @@ from dataclasses import replace
 from decimal import Decimal as D
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, preparation_science as ps, source_derived_preparation as derived
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, preparation_science as ps, source_derived_preparation as derived
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_battery_refined_inquiry import selected as historical_selection
 
 

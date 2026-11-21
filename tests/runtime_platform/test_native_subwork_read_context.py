@@ -10,12 +10,12 @@ import sys
 import pytest
 
 from empirical_lawhood.api import recursive_qualified_parents as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+from empirical_lawhood.storage.bounded_io import bounded_file_sha256
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
 from tests.runtime_platform.test_recursive_prior_native_replay import _blocked_progress, _stored
 from tests.test_artifact_read_context import _work
 
@@ -153,10 +153,8 @@ def test_ordinary_completed_inspection_keeps_its_eager_snapshot(original):
 
 @pytest.mark.parametrize('count', (8, 16))
 def test_public_parent_inspection_checks_its_whole_census_a_constant_number_of_times(tmp_path, monkeypatch, count):
-    from empirical_lawhood.infrastructure.native_parent_finalization import (
-        _native_parent_definitions, inspect_native_parent_return,
-    )
-    from empirical_lawhood.runtime.prepared_native_invocation import PreparedNativeWork
+    from empirical_lawhood.storage.native_parent_finalization import _native_parent_definitions, inspect_native_parent_return
+    from empirical_lawhood.execution.prepared_native_invocation import PreparedNativeWork
 
     _blocked_progress(monkeypatch)
     fixture = _stored(tmp_path, subwork_count=count)

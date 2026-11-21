@@ -4,9 +4,9 @@
 from hashlib import sha256
 import json
 
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.selected_candidate import read_source_metadata
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, canonical_json_document_bytes
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.selected_candidate import read_source_metadata
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, canonical_json_document_bytes
 
 
 def current_source_entry_proof(custody_root, context, prepared_contract):

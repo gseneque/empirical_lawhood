@@ -1,16 +1,17 @@
 """Current RC result/prerequisite inspection from exact committed task receipts."""
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 from dataclasses import dataclass
 
-from empirical_lawhood.adapters.simulator_morphism_challenges.retained_results import RCChallengeRetainedResult, RCChallengeResultAuthorityContext
-from empirical_lawhood.adapters.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeRecurrenceResult
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_artifact_manifest
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactWriter, CanonicalTaskReceipt
+from empirical_lawhood.domains.history.simulator_morphism_challenges.retained_results import RCChallengeRetainedResult, RCChallengeResultAuthorityContext
+from empirical_lawhood.domains.history.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeRecurrenceResult
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactWriter, CanonicalTaskReceipt
 
 
 @dataclass(frozen=True, slots=True)
@@ -105,16 +106,14 @@ def bind_rc_challenge_selected_output(*, result_id: str, run_id: str, task_id: s
         raise ValueError("RC_RESULT_SELECTED_OUTPUT_ABSENT_FROM_EXACT_RECEIPT")
     logical, physical = matches[0]
     _authenticate_result_access(context=authority_context, receipt=receipt, logical=logical, writer=writer)
-    manifests = tuple(decode_artifact_manifest(read_bounded_bytes(
-        writer.root.resolve(materialization.relative_path + ".manifest.json", for_write=False), maximum_bytes=16 * 1024**2))
+    manifests = tuple(read_artifact_sidecar(writer, (writer.root.resolve(materialization.relative_path + '.manifest.json', for_write=False)).relative_to(writer.root.contract.canonical_path).as_posix(), maximum_bytes=16 * 1024 ** 2)
         for materialization in receipt.output_materializations)
     if tuple(value.materialization for value in manifests) != receipt.output_materializations or tuple(value.logical for value in manifests) != receipt.output_logical_artifacts:
         raise ValueError("RC_RESULT_FULL_RECEIPT_PUBLICATION_MISMATCH")
     writer.verify_manifests(manifests)
     output_manifest = next(value for value in manifests if value.materialization == physical)
     receipt_path = f"runs/{run_id}/receipts/{task_id}/{receipt.attempt_id}.json"
-    receipt_manifest = decode_artifact_manifest(read_bounded_bytes(
-        writer.root.resolve(receipt_path + ".manifest.json", for_write=False), maximum_bytes=16 * 1024**2))
+    receipt_manifest = read_artifact_sidecar(writer, (writer.root.resolve(receipt_path + '.manifest.json', for_write=False)).relative_to(writer.root.contract.canonical_path).as_posix(), maximum_bytes=16 * 1024 ** 2)
     raw = read_bounded_bytes(writer.root.resolve(physical.relative_path, for_write=False), maximum_bytes=8 * 1024**2)
     return bind_rc_challenge_retained_result(result_id=result_id, record_payload=raw, output_manifest=output_manifest,
         task_receipt=receipt, receipt_manifest=receipt_manifest, writer=writer, authority_context=authority_context)

@@ -10,18 +10,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_prefix_bindings as declarations
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_prefix_records as records
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_prefix_science as science
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_prefix_workers as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_science as legacy_science
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_source_records import (
-    ConfiguredProtectedE3SourceConfig, ProtectedE3SourcePhase as Phase, identity, source_task_id,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_prefix_bindings as declarations
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_prefix_records as records
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_prefix_science as science
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_prefix_workers as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_science as legacy_science
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_source_records import ConfiguredProtectedE3SourceConfig, ProtectedE3SourcePhase as Phase, identity, source_task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
 from tests.test_matrix_configured_e3_v2 import configured_case
 from tests import test_matrix_e3_protected_prefix_workers as literal_workers
 from tests.test_matrix_e3_prefix_records import literal_history
@@ -128,17 +126,13 @@ def test_configured_reader_still_rejects_legacy_record_type_before_arrays(config
 
 def _configured_native_direct_inputs(case, plane, *, damage=None):
     from hashlib import sha256
-    from empirical_lawhood.infrastructure.prepared_native_invocation import (
-        NativeInputPublication, prepare_native_invocation,
-    )
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-    from empirical_lawhood.runtime.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
-    from empirical_lawhood.runtime.plans import (
-        ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec,
-    )
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+    from empirical_lawhood.storage.prepared_native_invocation import NativeInputPublication, prepare_native_invocation
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+    from empirical_lawhood.execution.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
+    from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec
+    from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 
     declaration = declarations.prefix_declaration()
     manifest = declaration.manifest()
@@ -198,10 +192,10 @@ def _configured_native_direct_inputs(case, plane, *, damage=None):
 def test_configured_native_preparer_uses_direct_operands_without_current_result_reader(
         configured_prefix_case, monkeypatch, tmp_path, damage):
     from empirical_lawhood.api import current_result_custody
-    from empirical_lawhood.infrastructure import recursive_custody
-    from empirical_lawhood.infrastructure.execution import prepare_worker_invocation
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments
+    from empirical_lawhood.storage import recursive_custody
+    from empirical_lawhood.execution.local.execution import prepare_worker_invocation
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments
     from tests.test_matrix_e3_protected_prefix_workers import _matrix_plane
 
     def forbidden(*_args, **_kwargs):

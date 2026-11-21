@@ -2,16 +2,19 @@
 """Construction reuse never suppresses new context, mutation or local checks."""
 from collections import OrderedDict
 from collections.abc import Mapping
+from concurrent.futures import ThreadPoolExecutor
+from contextvars import copy_context
 from dataclasses import dataclass, replace
 from decimal import Decimal, Inexact, localcontext
+import multiprocessing
 from typing import ClassVar
 from weakref import ref
 
 import pytest
 
-from empirical_lawhood.kernel import decoding
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, record_validation_scope, validate_record_fields
-from empirical_lawhood.kernel.serialization import CanonicalRecord, CanonicalizationError
+from empirical_lawhood.science.records import decoding
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, record_validation_scope, validate_record_fields
+from empirical_lawhood.science.records.serialization import CanonicalRecord, CanonicalizationError
 
 
 @dataclass(frozen=True, slots=True)
@@ -199,3 +202,151 @@ def test_validation_lifetime_keeps_no_records_alive():
         reference = ref(child)
         del child
         assert reference() is None
+
+
+def test_unscoped_validation_does_not_construct_an_unused_policy_signature(monkeypatch):
+    child = Child(Decimal(1))
+
+    def unexpected_key():
+        raise RuntimeError('policy signature')
+
+    monkeypatch.setattr(decoding, 'decimal_context_key', unexpected_key)
+    validate_record_fields(child)
+    with record_validation_scope(), pytest.raises(RuntimeError, match='policy signature'):
+        validate_record_fields(child)
+    object.__setattr__(child, 'value', Decimal(-1))
+    with pytest.raises(ValueError, match='negative child'):
+        validate_record_fields(child)
+
+
+def test_decimal_signature_tracks_every_setting_and_trap_but_not_sticky_flags():
+    with localcontext() as context:
+        baseline = decoding.decimal_context_key()
+        context.flags[Inexact] = not context.flags[Inexact]
+        assert decoding.decimal_context_key() == baseline
+        for signal in context.traps:
+            original = context.traps[signal]
+            context.traps[signal] = not original
+            assert decoding.decimal_context_key() != baseline
+            context.traps[signal] = original
+        for field, value in (('prec', context.prec + 1), ('rounding', 'ROUND_DOWN'),
+                ('Emin', context.Emin + 1), ('Emax', context.Emax - 1),
+                ('clamp', 1 - context.clamp), ('capitals', 1 - context.capitals)):
+            original = getattr(context, field)
+            if value == original:
+                continue
+            setattr(context, field, value)
+            assert decoding.decimal_context_key() != baseline
+            setattr(context, field, original)
+        assert decoding.decimal_context_key() == baseline
+
+
+def test_copied_closed_context_cannot_reuse_its_intrinsic_proof_or_decode_memo(monkeypatch):
+    child = Child(Decimal(1))
+    calls = []
+    original = Child.__post_init__
+
+    def observed(value):
+        calls.append(value)
+        original(value)
+
+    monkeypatch.setattr(Child, '__post_init__', observed)
+    token = decoding._decoded_validations.set(OrderedDict())
+    try:
+        with record_validation_scope():
+            validate_record_fields(child)
+            copied = copy_context()
+    finally:
+        decoding._decoded_validations.reset(token)
+    copied.run(validate_record_fields, child)
+    assert len(calls) == 2
+
+    def fresh():
+        with record_validation_scope():
+            validate_record_fields(child)
+            validate_record_fields(child)
+
+    copied.run(fresh)
+    assert len(calls) == 3
+
+
+def test_copied_thread_gets_fresh_intrinsic_proofs_and_keeps_parent_active(monkeypatch):
+    child = Child(Decimal(1))
+    calls = []
+    original = Child.__post_init__
+
+    def observed(value):
+        calls.append(value)
+        original(value)
+
+    monkeypatch.setattr(Child, '__post_init__', observed)
+    token = decoding._decoded_validations.set(OrderedDict())
+    try:
+        with record_validation_scope():
+            validate_record_fields(child)
+            parent = decoding._record_validation_lifetime.get()
+
+            def independent():
+                validate_record_fields(child)
+                with record_validation_scope():
+                    current = decoding._record_validation_lifetime.get()
+                    assert current is not parent
+                    validate_record_fields(child)
+                    validate_record_fields(child)
+
+            with ThreadPoolExecutor(max_workers=1) as threads:
+                threads.submit(copy_context().run, independent).result(timeout=5)
+            assert parent.active
+            validate_record_fields(child)
+            validate_record_fields(child)
+    finally:
+        decoding._decoded_validations.reset(token)
+    # The child's distinct record-local entry cannot overwrite the parent's
+    # decoder memo; that still-owned memo supplies the final parent proof.
+    assert len(calls) == 3
+
+
+@pytest.mark.skipif('fork' not in multiprocessing.get_all_start_methods(), reason='requires fork')
+def test_forked_process_gets_fresh_intrinsic_validation_lifetime(monkeypatch):
+    child = Child(Decimal(1))
+    calls = []
+    original = Child.__post_init__
+
+    def observed(value):
+        calls.append(value)
+        original(value)
+
+    monkeypatch.setattr(Child, '__post_init__', observed)
+    context = multiprocessing.get_context('fork')
+    receiver, sender = context.Pipe(duplex=False)
+    with record_validation_scope():
+        validate_record_fields(child)
+        parent = decoding._record_validation_lifetime.get()
+
+        def independent():
+            try:
+                validate_record_fields(child)
+                with record_validation_scope():
+                    current = decoding._record_validation_lifetime.get()
+                    validate_record_fields(child)
+                    validate_record_fields(child)
+                    sender.send((current is not parent, len(calls)))
+            finally:
+                sender.close()
+
+        process = context.Process(target=independent)
+        process.start()
+        sender.close()
+        try:
+            assert receiver.poll(5)
+            assert receiver.recv() == (True, 3)
+            process.join(5)
+            assert process.exitcode == 0
+        finally:
+            if process.is_alive():
+                process.terminate()
+                process.join(5)
+            receiver.close()
+        assert parent.active
+        validate_record_fields(child)
+    assert len(calls) == 1

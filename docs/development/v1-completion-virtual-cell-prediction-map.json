@@ -1,0 +1,34 @@
+{
+  "schema": "el-v1/scientific-module-extraction/1",
+  "partial_modules": {
+    "empirical_lawhood.adapters.physical.virtual_cell.prediction": {
+      "scientific_owner": "empirical_lawhood.domains.biology.virtual_cell.prediction",
+      "functions": [
+        "allocate_prediction_roster",
+        "HistoricalPredictionPreparation",
+        "prepare_historical_prediction"
+      ],
+      "remaining_effects": [
+        "CSV parsing and source byte hashing",
+        "HDF5 output creation and encoding",
+        "file receipt hashing"
+      ]
+    },
+    "empirical_lawhood.adapters.physical.virtual_cell.prediction_v2": {
+      "scientific_owner": "empirical_lawhood.domains.biology.virtual_cell.prediction_v2",
+      "functions": [
+        "SharedTemplateShiftV2Preparation",
+        "admit_shared_template_shift_v2_prediction"
+      ],
+      "remaining_effects": [
+        "HDF5 output creation and encoding",
+        "file receipt hashing"
+      ]
+    }
+  },
+  "breaking_api_removals": [
+    "empirical_lawhood.adapters.physical.virtual_cell.prediction.write_prediction_h5ad",
+    "empirical_lawhood.adapters.physical.virtual_cell.evaluation.evaluate_official_2025"
+  ],
+  "preservation": "Original explicit historical compiler remains a scientific original-record reproduction, with supplied-array logic extracted. V2 whole-action admission remains before destination creation; target populations remain bounded-memory second-pass compilation; original schema strings and receipts unchanged."
+}

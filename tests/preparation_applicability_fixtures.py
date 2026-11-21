@@ -1,9 +1,9 @@
 """Explicitly synthetic current authoring inputs; no operative eligibility."""
-from empirical_lawhood.kernel.matrix_inputs import MatrixAllocation, MatrixRootAllocation, MatrixPurposeSeed, MATRIX_NATIVE_PURPOSES
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.adapters.methods.preparation_applicability.config import ORIGINAL_F_SCHEMA, PreparationApplicabilityUpstream
-from empirical_lawhood.adapters.methods.preparation_applicability.exposure import PreparationApplicabilityExposure
+from empirical_lawhood.domains.matrix.input_contracts import MatrixAllocation, MatrixRootAllocation, MatrixPurposeSeed, MATRIX_NATIVE_PURPOSES
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.preparation_applicability.config import ORIGINAL_F_SCHEMA, PreparationApplicabilityUpstream
+from empirical_lawhood.domains.matrix.preparation_applicability.exposure import PreparationApplicabilityExposure
 
 
 def synthetic_identity(name):
@@ -17,7 +17,7 @@ def allocation(count, *, constructed=False, phase='q'):
         independent = [MatrixPurposeSeed(name, offset+100*(i+1)+j) for j,name in enumerate(MATRIX_NATIVE_PURPOSES)]
         conditioning = ()
         if constructed:
-            from empirical_lawhood.adapters.methods.constructed_preparation_applicability.config import FIXED_PROBE_SEED
+            from empirical_lawhood.domains.matrix.constructed_preparation_applicability.config import FIXED_PROBE_SEED
             conditioning = (MatrixPurposeSeed('passive-probes',FIXED_PROBE_SEED,'PCG64DXSM'),)
         else:
             independent.append(MatrixPurposeSeed('passive-probes',(offset+10000+i)<<128,'PCG64DXSM'))
@@ -26,8 +26,8 @@ def allocation(count, *, constructed=False, phase='q'):
 
 
 def stage_and_source(phase='Q'):
-    from empirical_lawhood.adapters.methods.constructed_preparation_applicability.config import ConstructedPreparationStage, ConstructedPreparationSource
-    from empirical_lawhood.adapters.methods.constructed_preparation_applicability.records import ConstructedPreparationDesign
+    from empirical_lawhood.domains.matrix.constructed_preparation_applicability.config import ConstructedPreparationStage, ConstructedPreparationSource
+    from empirical_lawhood.domains.matrix.constructed_preparation_applicability.records import ConstructedPreparationDesign
     design = ConstructedPreparationDesign()
     source = ConstructedPreparationSource('1'*64,'2'*64,synthetic_identity('exposed.synthetic.native'),synthetic_identity('exposed.synthetic.conformance'))
     lower = PreparationApplicabilityUpstream('lower',ArtifactIdentity('exposed.synthetic.lower','exposed-test-only',ORIGINAL_F_SCHEMA,'3'*64,'application/json',16),synthetic_identity('exposed.synthetic.lower.receipt'),'exposed.synthetic.lower.run')

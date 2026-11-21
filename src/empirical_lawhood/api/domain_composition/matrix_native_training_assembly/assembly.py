@@ -8,24 +8,24 @@ from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as acquisition
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_assembly import validate_request
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import validate_request_programme_inputs
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as acquisition
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_assembly import validate_request
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import validate_request_programme_inputs
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
 from empirical_lawhood.api.selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticate_programme_inputs
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticate_programme_inputs
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 
 
 _FUTURE_ROLES = (("CALIBRATION", "e3.calibration"), ("EVALUATION", "e3.confirmation"),

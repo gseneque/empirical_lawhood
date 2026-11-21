@@ -10,12 +10,12 @@ import pytest
 from empirical_lawhood.api.recursive_authoring import author_recursive_wave, implementation_binding, load_authored_wave
 from empirical_lawhood.api.recursive_execution import read_recursive_wave, run_recursive_wave
 from empirical_lawhood.api import numerical_provenance as provenance_owner
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.contracts import RCPrerequisiteChainConfig
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, FilesystemState, GuardedExternalRoot
-from empirical_lawhood.infrastructure.execution import ExecutionResourceCapacity, LocalExecutionResourceAdmitter
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.contracts import RCPrerequisiteChainConfig
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, FilesystemState, GuardedExternalRoot
+from empirical_lawhood.execution.local.execution import ExecutionResourceCapacity, LocalExecutionResourceAdmitter
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -40,6 +40,40 @@ def _draft():
     return rc_recursive_draft(config, unit_ids=(config.units[6].unit_id,), include_summary=False)
 
 
+def test_returned_finalizer_accepts_direct_authored_calibration_without_inventing_experiment_instance(
+        tmp_path, monkeypatch):
+    from empirical_lawhood.api import recursive_execution as execution
+    from empirical_lawhood.api import retained_e3_control_repair as frozen
+    from empirical_lawhood.execution.local.execution import LocalScheduler, LocalProcessExecutor
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.numerical_provenance import observe_worker_environment, selected_worker_environment
+    source = implementation_binding(ROOT)
+    plane = _plane(tmp_path / "direct-calibration")
+    directory = tmp_path / "direct-calibration/authored"
+    author_recursive_wave(draft=_draft(), project_root=ROOT, artifact_writer=plane, output_dir=directory)
+    class DisclosedBeforeDispatch(RuntimeError):
+        pass
+    with monkeypatch.context() as setup:
+        def stop(*args, **kwargs):
+            raise DisclosedBeforeDispatch()
+        setup.setattr(LocalScheduler, "execute", stop)
+        with pytest.raises(DisclosedBeforeDispatch):
+            run_recursive_wave(directory=directory, project_root=ROOT, artifact_writer=plane)
+    environment = replace(observe_worker_environment(), selected_environment=selected_worker_environment())
+    monkeypatch.setattr(frozen, "observe_frozen_repair_worker", lambda **kwargs: (source, environment))
+    monkeypatch.setattr(frozen, "observe_frozen_worker_package_root", lambda environment: str(ROOT / "src"))
+    def forbidden(*args, **kwargs):
+        pytest.fail("returned-only inspection entered an uncontacted direct calibration")
+    monkeypatch.setattr(LocalProcessExecutor, "execute", forbidden)
+    monkeypatch.setattr(LocalProcessExecutor, "execute_deadline_free", forbidden)
+    monkeypatch.setattr(ExternalNativeEffectContactStore, "begin", forbidden)
+    report = execution.finalize_returned_recursive_tasks(directory=directory, project_root=ROOT,
+        artifact_writer=plane, worker_interpreter=environment.interpreter_path, worker_source_root=ROOT)
+    assert report["new_native_contact_count"] == 0 and report["task_count"] == 9
+    assert report["receipted_task_ids"] == () and len(report["unreceipted_task_ids"]) == 9
+    assert report["scientific_completion"] == "NOT_ASSESSED"
+
+
 @pytest.mark.parametrize('worker_mode',('default-serial','detected-parallel','explicit-parallel'))
 def test_public_service_preserves_adverse_census_and_recovers_without_native(tmp_path, monkeypatch, worker_mode):
     # Snapshot this software fixture's source once; concurrent editor changes are
@@ -47,8 +81,8 @@ def test_public_service_preserves_adverse_census_and_recovers_without_native(tmp
     source = implementation_binding(ROOT)
     import empirical_lawhood.api.recursive_authoring as author
     import empirical_lawhood.api.recursive_execution as execute
-    from empirical_lawhood.infrastructure import execution as scheduler_owner
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local import execution as scheduler_owner
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     selected_count = 1 if worker_mode == 'default-serial' else min(2,len(os.sched_getaffinity(0)))
     capacity = replace(LocalExecutionResourceAdmitter.detect_capacity(),cpu_cores=selected_count)
     monkeypatch.setattr(LocalExecutionResourceAdmitter,'detect_capacity',staticmethod(lambda: capacity))
@@ -125,7 +159,7 @@ def test_invalid_capacity_type_refuses_before_custody(monkeypatch, capacity):
 @pytest.mark.parametrize('limit',('capacity','affinity'))
 def test_excessive_worker_count_refuses_before_native_contact(monkeypatch, limit):
     from empirical_lawhood.api import recursive_execution as execute
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     def forbidden(*args, **kwargs):
         raise AssertionError('excessive worker selection reached custody or native contact')
     monkeypatch.setattr(execute,'load_authored_wave',forbidden)
@@ -140,7 +174,7 @@ def test_excessive_worker_count_refuses_before_native_contact(monkeypatch, limit
 @pytest.mark.parametrize("lifecycle", ("run", "recover"))
 def test_initial_programme_authenticates_then_refuses_a_generic_wave_before_executor(tmp_path, monkeypatch, lifecycle):
     from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     from empirical_lawhood.api import recursive_authoring as author, recursive_execution as execute
     plane = _plane(tmp_path / "selected")
     directory = tmp_path / "selected/authored"

@@ -5,7 +5,7 @@ Direct mathematical definitions carry no prior study or entry. The actual
 current scientific root and formal candidate are built through ordinary owners;
 proposer, issue, execution and reveal remain genuine separate acts.
 """
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support as current_exposure_support
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support as current_exposure_support
 import calendar
 from dataclasses import fields, replace
 from datetime import datetime
@@ -23,18 +23,18 @@ def scientific_root(*, namespace, candidate, manifest, allocation, protocols, cu
     candidate. Hardware ceilings and authority are explicit operator records.
     This declaration is not a qualification, freshness or human-attestation act.
     """
-    from empirical_lawhood.adapters.composition.experiment_authoring import single_experiment_campaign
-    from empirical_lawhood.kernel.authority import AuthorityAction
-    from empirical_lawhood.kernel.evidence import ClaimSpec, EvidenceCeiling, EvidenceRung, OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.experiments import AssignmentKind, AssignmentSpec, ControlKind, ControlSpec, ExperimentSpec, PrecisionGoal, RevealBarrierSpec
-    from empirical_lawhood.kernel.obligations import ClosureSpec, FalsifierKind, FalsifierSpec, ObligationStatus, ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec
-    from empirical_lawhood.kernel.quantities import QuantityKind, QuantitySpec, ResponseDirection
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
-    from empirical_lawhood.kernel.status import ReadinessStatus
-    from empirical_lawhood.kernel.systems import IndependentUnitSpec, RelationalIdentity, SystemBoundaryKind, SystemSpec
-    from empirical_lawhood.kernel.time import AvailabilitySpec, CausalPhase, ClockLabelSemantics, ClockSpec, HoldSemantics, HorizonSpec, InformationCutoff, SamplingSemantics
-    from empirical_lawhood.kernel.worlds import NumericalCoordinateKind, NumericalCoordinateSpec, NumericalViewSpec, RandomnessSemantics, WorldKind, WorldSpec
-    from empirical_lawhood.planning.study_authoring import DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, StudyDraft, StudyDraftLifecycle
+    from empirical_lawhood.execution.experiment_authoring import single_experiment_campaign
+    from empirical_lawhood.science.identity.authority import AuthorityAction
+    from empirical_lawhood.science.evidence.evidence import ClaimSpec, EvidenceCeiling, EvidenceRung, OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.experiments.experiments import AssignmentKind, AssignmentSpec, ControlKind, ControlSpec, ExperimentSpec, PrecisionGoal, RevealBarrierSpec
+    from empirical_lawhood.science.evidence.obligations import ClosureSpec, FalsifierKind, FalsifierSpec, ObligationStatus, ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec
+    from empirical_lawhood.science.models.quantities import QuantityKind, QuantitySpec, ResponseDirection
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
+    from empirical_lawhood.science.records.status import ReadinessStatus
+    from empirical_lawhood.science.models.systems import IndependentUnitSpec, RelationalIdentity, SystemBoundaryKind, SystemSpec
+    from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase, ClockLabelSemantics, ClockSpec, HoldSemantics, HorizonSpec, InformationCutoff, SamplingSemantics
+    from empirical_lawhood.science.models.worlds import NumericalCoordinateKind, NumericalCoordinateSpec, NumericalViewSpec, RandomnessSemantics, WorldKind, WorldSpec
+    from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, StudyDraft, StudyDraftLifecycle
 
     measurement = candidate.measurement
     prefix = namespace + ".e3"
@@ -156,8 +156,8 @@ def scientific_root(*, namespace, candidate, manifest, allocation, protocols, cu
 
 def _committed_future_sources(manifest, future_phases):
     """Resolve the exact source pins in all authenticated future responses."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 
     if set(future_phases) != {"CALIBRATION", "EVALUATION", "TRANSFER_NEARBY", "TRANSFER_SHIFTED"}:
         raise ValueError("configured future sources lose their complete original phase census")
@@ -184,53 +184,52 @@ def _committed_future_sources(manifest, future_phases):
 
 def assemble_configured_e3_inputs(*,assembly_specification,assembly_request,scientific_protocol,primary_amendment=None,request_path,project_root,artifact_writer,
         metadata_directory,output_selection_path,execution,export_adoption=None,continued_context=None):
-    from empirical_lawhood.adapters.composition.experiment_authoring import formal_entry
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_inputs as inputs_owner
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_preparation as preparation_owner
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_originals import ConfiguredProtectedE3OriginalPublications
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_protocol import project_protected_e3_protocol, validate_protected_e3_response_selection
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_records import project_protected_e3_response_numerics
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_selection import ConfiguredProtectedE3ResponseSelection
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_statistical_bindings import ConfiguredProtectedE3FitConfig, statistical_task_id
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_specification import ConfiguredE3CoordinateCensus
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest, identity
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_input_custody import read_protected_e3_original_publication
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import coordinate_identity, identity as scheduled_identity
+    from empirical_lawhood.execution.experiment_authoring import formal_entry
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_inputs as inputs_owner
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_preparation as preparation_owner
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_originals import ConfiguredProtectedE3OriginalPublications
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_protocol import project_protected_e3_protocol, validate_protected_e3_response_selection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_records import project_protected_e3_response_numerics
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_selection import ConfiguredProtectedE3ResponseSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_statistical_bindings import ConfiguredProtectedE3FitConfig, statistical_task_id
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_specification import ConfiguredE3CoordinateCensus
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest, identity
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_input_custody import read_protected_e3_original_publication
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import coordinate_identity, identity as scheduled_identity
     from empirical_lawhood.api.derived_array_access import derive_matrix_array_access
     from empirical_lawhood.api.derived_metadata_access import derive_canonical_metadata_access
     from empirical_lawhood.api.native_training_banks import export_native_training_banks
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import authenticate_future_response_selections
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_future_response_selections
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
     from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling,OutcomeAccess,VisibilityCeiling
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.kernel.time import AvailabilitySpec,CausalPhase,InformationCutoff
-    from empirical_lawhood.planning.approval import SystemDecisionClock
-    from empirical_lawhood.planning.experiment_entry import validate_experiment_entry
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding,ExperimentFileInputSelection,ExperimentInputBinding
-    from empirical_lawhood.planning.formal_gaps import FormalGapEvidenceWorld
-    from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile,ArtifactWriteRequest,ArtifactWriteResult
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase, InformationCutoff
+    from empirical_lawhood.design.approval import SystemDecisionClock
+    from empirical_lawhood.design.experiment_entry import validate_experiment_entry
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.design.formal_gaps import FormalGapEvidenceWorld
+    from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_assembly import (
-        ConfiguredProtectedE3AssemblyRequest, validate_scientific_protocol)
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_assembly import ConfiguredProtectedE3AssemblyRequest, validate_scientific_protocol
     from empirical_lawhood.api.recursive_authoring import implementation_binding
     from empirical_lawhood.api.experiment_preparation import _input_member
     if type(assembly_request) is not ConfiguredProtectedE3AssemblyRequest:
         raise TypeError('configured E3 preprocessing requires its exact current scientific request')
     validate_scientific_protocol(assembly_request, scientific_protocol)
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_primary_amendment import MatrixE3PrimaryFamilyAmendment
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_primary_amendment import MatrixE3PrimaryFamilyAmendment
     if assembly_request.primary_amendment is not None:
         if type(primary_amendment) is not MatrixE3PrimaryFamilyAmendment or primary_amendment.identity != assembly_request.primary_amendment:
             raise ValueError("configured scientific assembly requires its exact declared primary amendment")
@@ -256,7 +255,7 @@ def assemble_configured_e3_inputs(*,assembly_specification,assembly_request,scie
         'bank_export_relative_path':assembly_request.bank_export_relative_path,
         'native_training_directory':str(writer.root.resolve(assembly_request.native_training_locator.authored_directory,for_write=False)),
         'normalization_source_file':str(_input_member(Path(request_path).parent,assembly_request.normalization_file.relative_path))}
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
     publications=[]
     def commit(request):
         from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
@@ -362,7 +361,7 @@ def assemble_configured_e3_inputs(*,assembly_specification,assembly_request,scie
     coordinate_map={coordinate_identity(value):value for value in manifest.reservation.allocation.coordinates}
     roles=dict(candidate.role_coordinates)
     nominal=coordinate_map[roles["CALIBRATION"]]
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_assembly import require_computability_scope
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_assembly import require_computability_scope
     require_computability_scope(envelope, computability, nominal)
     observation=capture_matrix_provenance(project_root=project)
     expected_source=(implementation.package_sources,implementation.code_sources_sha256,
@@ -526,7 +525,7 @@ def assemble_configured_e3_inputs(*,assembly_specification,assembly_request,scie
         manifest,training,sources,projections,mathematical,responses,protocols,panels,numerical_profiles,*artifacts,
         resources,numerical_qualifications=(response_qualification,))
     if primary_amendment is not None:
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_primary_amendment import MatrixE3PrimaryFamilyAmendmentBinding,primary_amendment_root
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_primary_amendment import MatrixE3PrimaryFamilyAmendmentBinding, primary_amendment_root
         from empirical_lawhood.api.configured_e3_primary_amendment import authenticate_primary_amendment
         from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
         if export.acquisition is None or export.acquisition_publication is None or export.acquisition_receipt is None:
@@ -548,9 +547,7 @@ def assemble_configured_e3_inputs(*,assembly_specification,assembly_request,scie
         (export.features,export.outcomes),export.publications[1:],strict=True)}
     templates_by_id={value.logical.logical_artifact_id:value for value in templates}
     from empirical_lawhood.api.derived_array_access import DerivedInputAccess, derive_matrix_input_access_batch, supports_derived_input_access_batch
-    from empirical_lawhood.infrastructure.publication_metadata import (
-        checkpoint_publication_access,
-    )
+    from empirical_lawhood.storage.publication_metadata import checkpoint_publication_access
     versions={};configs=[];qualifications=[];copied=[]
     batch_access=supports_derived_input_access_batch(writer,len(lowered.draft.external_inputs))
     pending=[]

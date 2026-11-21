@@ -7,7 +7,7 @@ from types import MethodType, SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
 from empirical_lawhood.api.matrix_researcher_programme_e4_lineage import programme_e3_originals
 from empirical_lawhood.api.matrix_researcher_programme_lineage import read_published_record
 from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammeProjectionContext
@@ -17,7 +17,7 @@ from tests.test_configured_e3_product_export import export_case, products, origi
 
 @pytest.fixture(autouse=True)
 def full_original_read():
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
     with scientific_reconstruction_operation('full'):
         yield
 
@@ -85,7 +85,7 @@ def test_interruption_after_original_export_keeps_embedded_request_bytes_on_fres
     form a genuine whole C programme. Downstream scientific joins remain owned
     by their independent actual readers, outside this deliberately closed seam.
     """
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_assembly import MatrixFiniteDtSourceAssemblyRequest
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_assembly import MatrixFiniteDtSourceAssemblyRequest
     case, exported = c_backed_source_case, export_case
     exported.read.preparation = case.preparation
     plane = exported.products.plane

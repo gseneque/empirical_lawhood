@@ -7,11 +7,11 @@ import pytest
 
 from empirical_lawhood.api import configured_e3_retained_runtime as owner
 from empirical_lawhood.api import current_task_custody
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_composition
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_lowering import operation_class
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_bindings import retained_input_id
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.plans import BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_composition
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_lowering import operation_class
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_bindings import retained_input_id
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.plans import BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
 from tests.worker_configuration_support import freeze_worker_configuration
 from tests.test_matrix_e3_retained_continuation import (  # noqa: F401
     continuation_case, public_case,

@@ -2,6 +2,7 @@
 
 SPDX-License-Identifier: MPL-2.0
 """
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 from hashlib import sha256
 import json
@@ -9,37 +10,29 @@ from pathlib import Path
 
 import numpy as np
 
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability import diagnostics
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.diagnostic_records import (
-    PreparationDiagnosticInput, PreparationDiagnosticPhaseInput,
-    PreparationDiagnosticReport, PreparationDiagnosticRootReceipts, diagnostic_json_payload,
-)
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.measurement import measure_root, requests
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.readout import report, constructor_crossing
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.records import (
-    ConstructedPreparationSelection, ConstructedPreparationLowerSeal,
-    ConstructedPreparationMeasuredRoot, ConstructedPreparationReport,
-)
-from empirical_lawhood.adapters.methods.preparation_applicability.measurement import reduce_panel, service, validity
-from empirical_lawhood.adapters.methods.preparation_applicability.result_access import PREPARATION_PROTECTED_OUTCOMES
-from empirical_lawhood.adapters.simulators.constructed_preparation_applicability.records import (
-    ConstructedPreparationPrefix, ConstructedPreparationParents, ConstructedPreparationPanel,
-)
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability import diagnostics
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.diagnostic_records import PreparationDiagnosticInput, PreparationDiagnosticPhaseInput, PreparationDiagnosticReport, PreparationDiagnosticRootReceipts, diagnostic_json_payload
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.measurement import measure_root, requests
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.readout import report, constructor_crossing
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.records import ConstructedPreparationSelection, ConstructedPreparationLowerSeal, ConstructedPreparationMeasuredRoot, ConstructedPreparationReport
+from empirical_lawhood.domains.matrix.preparation_applicability.measurement import reduce_panel, service, validity
+from empirical_lawhood.domains.matrix.preparation_applicability.result_access import PREPARATION_PROTECTED_OUTCOMES
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.phase_records import ConstructedPreparationPrefix, ConstructedPreparationParents, ConstructedPreparationPanel
 from empirical_lawhood.api.current_result_custody import require_current_result_receipt_outputs
 from empirical_lawhood.api.preparation_inputs import _retained_output
 from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes, MAX_ARTIFACT_MANIFEST_BYTES
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, validate_relative_locator
-from empirical_lawhood.kernel.status import OperationalStatus, ScientificStatus
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest, ArtifactProfile, ArtifactLineageParent, lineage_parent_sort_key
-from empirical_lawhood.runtime.recovery import RunRecoveryIndex
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, validate_relative_locator
+from empirical_lawhood.science.records.status import OperationalStatus, ScientificStatus
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactProfile, ArtifactLineageParent, lineage_parent_sort_key
+from empirical_lawhood.execution.recovery import RunRecoveryIndex
 
 TASKS = ("prefix", "select", "parents", "lower", "assay", "measure")
 KINDS = (ConstructedPreparationPrefix, ConstructedPreparationSelection,
@@ -50,7 +43,7 @@ KINDS = (ConstructedPreparationPrefix, ConstructedPreparationSelection,
 def current_preparation_diagnostic_source_sha256():
     """Bind actual mathematical and input/API owners, independently of labels."""
     paths = (Path(__file__), Path(diagnostics.__file__),
-             Path(__file__).parents[1] / "adapters/methods/constructed_preparation_applicability/diagnostic_records.py")
+             Path(__file__).parents[1] / "domains/matrix/constructed_preparation_applicability/diagnostic_records.py")
     return sha256(canonical_json_bytes(tuple(sha256(read_bounded_bytes(path, maximum_bytes=1024**2)).hexdigest()
                                             for path in paths))).hexdigest()
 
@@ -197,8 +190,8 @@ def _phase_read(phase, *, artifact_writer, bootstrap_seed, common_request, authe
         or terminal.scientific_status != expected_status
         or terminal.reason_codes != (f"BOUNDARY_{stage.phase}_{summary.disposition}",)):
         raise ValueError("diagnostic substitutes the original adjudication")
-    from empirical_lawhood.runtime.adjudication import ScientificAdjudicationContext, AdjudicationEvaluability
-    from empirical_lawhood.kernel.status import AdmissionStatus
+    from empirical_lawhood.execution.adjudication import ScientificAdjudicationContext, AdjudicationEvaluability
+    from empirical_lawhood.science.records.status import AdmissionStatus
     task = next(value for value in execution.tasks if value.task_id == "ap.adjudication")
     receipt = receipts[task.task_id]
     output = task.outputs[0]
@@ -318,8 +311,7 @@ def read_preparation_diagnostics(config, *, artifact_writer, relative_root):
         expected_inputs.extend(ObjectIdentity.from_record(logical.logical_artifact_id, logical)
             for receipt in receipts.values() for logical in receipt.output_logical_artifacts)
     validate_relative_locator(relative_root)
-    manifest = decode_artifact_manifest(read_bounded_bytes(artifact_writer.root.resolve(
-        f"{relative_root}/report.json.manifest.json", for_write=False), maximum_bytes=MAX_ARTIFACT_MANIFEST_BYTES))
+    manifest = read_artifact_sidecar(artifact_writer, (artifact_writer.root.resolve(f'{relative_root}/report.json.manifest.json', for_write=False)).relative_to(artifact_writer.root.contract.canonical_path).as_posix(), maximum_bytes=artifact_writer.custody_limits.manifest_bytes)
     if (manifest.logical.logical_artifact_id != f"{config.analysis_id}.report"
         or manifest.logical.payload_schema != PreparationDiagnosticReport.SCHEMA
         or manifest.logical.profile is not ArtifactProfile.CANONICAL_JSON

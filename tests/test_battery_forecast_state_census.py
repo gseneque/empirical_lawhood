@@ -3,11 +3,11 @@
 from dataclasses import fields, replace
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_state_census as census
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_state_control as state, forecast_step_control as step
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_state_census as census
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_state_control as state, forecast_step_control as step
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_battery_segmented_state_census import complete_negative as complete_negative_fixture
 from tests.test_battery_segmented_state_census import roster, stocks, prepared  # noqa: F401
 from tests.test_battery_segmented_state_census import selected54, uncertain  # noqa: F401

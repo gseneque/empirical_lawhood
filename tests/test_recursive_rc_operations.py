@@ -6,14 +6,14 @@ from decimal import Decimal
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain import operations, science
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain import operation_contracts as records
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.operation_bindings import assessment_projector, operation_manifests, operation_registrations, output_codecs
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain import operations, science
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain import operation_contracts as records
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.operation_bindings import assessment_projector, operation_manifests, operation_registrations, output_codecs
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
 
 def phases(config, unit_id):
@@ -118,7 +118,7 @@ def test_precontact_compiler_refuses_a_coherent_scientific_root_substitution(mon
 
 
 def test_shared_supply_projection_keeps_every_nested_result_and_actual_evidence():
-    from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition, AssessmentPhase
+    from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition, AssessmentPhase
     config = science.default_chain_config()
     unit = next(value for value in config.units if value.initial_voltage_volts == Decimal("0.4"))
     result, committed, native, measured, support = phases(config, unit.unit_id)
@@ -139,7 +139,7 @@ def test_shared_supply_projection_keeps_every_nested_result_and_actual_evidence(
 
 def test_materials_partial_has_distinct_subjects_no_physical_supplier_and_no_native():
     from empirical_lawhood.adapters.composition.recursive_examples import materials_partial_draft, rc_scientific_examples
-    from empirical_lawhood.planning.recursive_authoring import explain_recursive_draft
+    from empirical_lawhood.design.recursive_authoring import explain_recursive_draft
     draft = materials_partial_draft()
     explanation = explain_recursive_draft(draft)
     assert explanation["scientific_root"] == "UNSELECTED" and not draft.selected_operation_ids
@@ -151,7 +151,7 @@ def test_materials_partial_has_distinct_subjects_no_physical_supplier_and_no_nat
 
 
 def test_second_view_failure_retains_first_raw_view_and_complete_unevaluable_census(monkeypatch):
-    from empirical_lawhood.adapters.simulators.rc_ladder_response import campaign
+    from empirical_lawhood.domains.circuits.rc_ladder import campaign
     config = science.default_chain_config()
     original = campaign.run_native_view
     calls = []

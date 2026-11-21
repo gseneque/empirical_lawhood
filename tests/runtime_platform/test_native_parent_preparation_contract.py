@@ -6,11 +6,11 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.execution import ParentPreparedTaskRunner, TaskContext, WorkerIsolationProfile, WorkerOutputPort, prepare_task_runner
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, PreparedWorkerEnvironment
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.execution.execution import ParentPreparedTaskRunner, TaskContext, WorkerIsolationProfile, WorkerOutputPort, prepare_task_runner
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, PreparedWorkerEnvironment
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 
 
 def native_context(fixture):

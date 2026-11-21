@@ -6,17 +6,27 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure import source_origin as owner
+from empirical_lawhood.storage import source_origin as owner
 
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = ROOT / "src/empirical_lawhood"
-TRACKED = ("src/empirical_lawhood/__init__.py", "src/empirical_lawhood/infrastructure/source_origin.py",
+TRACKED = ("src/empirical_lawhood/__init__.py", "src/empirical_lawhood/storage/source_origin.py",
     "src/empirical_lawhood/_vendor/declared.py")
 
 
 @pytest.fixture
-def modules(monkeypatch):
+def modules(monkeypatch, tmp_path):
+    # Model both a real ordinary package and a PEP 420 namespace independently
+    # of the current production layout. Only the Git census and module table
+    # are synthetic; the source-origin owner inspects these actual files.
+    root = tmp_path / "source"
+    for relative in (*TRACKED, "src/empirical_lawhood/storage/__init__.py"):
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("# disclosed source-shape fixture\n")
+    monkeypatch.setitem(globals(), "ROOT", root)
+    monkeypatch.setitem(globals(), "PACKAGE", root / "src/empirical_lawhood")
     values = {"empirical_lawhood": SimpleNamespace(__file__=str(PACKAGE / "__init__.py"))}
     monkeypatch.setattr(owner, "sys", SimpleNamespace(modules=values))
 
@@ -34,7 +44,7 @@ def modules(monkeypatch):
 
 
 def test_tracked_python_module_and_exact_source_namespace_are_admitted(modules):
-    modules["empirical_lawhood.infrastructure.source_origin"] = SimpleNamespace(__file__=str(PACKAGE / "infrastructure/source_origin.py"))
+    modules["empirical_lawhood.storage.source_origin"] = SimpleNamespace(__file__=str(PACKAGE / "storage/source_origin.py"))
     modules["empirical_lawhood._vendor"] = SimpleNamespace(__file__=None,
         __spec__=SimpleNamespace(submodule_search_locations=[str(PACKAGE / "_vendor")]))
     assert owner.require_executing_target_source(ROOT) == PACKAGE
@@ -51,7 +61,7 @@ def test_non_source_or_foreign_extension_origins_cannot_be_silently_skipped(modu
     SimpleNamespace(__file__=None, __spec__=SimpleNamespace(submodule_search_locations=[])),
     SimpleNamespace(__file__=None, __spec__=SimpleNamespace(submodule_search_locations=str(PACKAGE / "_vendor"))),
     SimpleNamespace(__file__=None, __spec__=SimpleNamespace(submodule_search_locations=[str(PACKAGE / "_vendor"), "/other"])),
-    SimpleNamespace(__file__=None, __spec__=SimpleNamespace(submodule_search_locations=[str(PACKAGE / "infrastructure")]))))
+    SimpleNamespace(__file__=None, __spec__=SimpleNamespace(submodule_search_locations=[str(PACKAGE / "storage")]))))
 def test_originless_modules_require_one_exact_actual_namespace_directory(modules, module):
     modules["empirical_lawhood._vendor"] = module
     with pytest.raises(owner.ExecutingSourceMismatch, match="namespace|origin cannot be verified"):
@@ -59,8 +69,8 @@ def test_originless_modules_require_one_exact_actual_namespace_directory(modules
 
 
 def test_regular_package_cannot_masquerade_as_an_originless_namespace(modules):
-    modules["empirical_lawhood.infrastructure"] = SimpleNamespace(__file__=None,
-        __spec__=SimpleNamespace(submodule_search_locations=[str(PACKAGE / "infrastructure")]))
+    modules["empirical_lawhood.storage"] = SimpleNamespace(__file__=None,
+        __spec__=SimpleNamespace(submodule_search_locations=[str(PACKAGE / "storage")]))
     with pytest.raises(owner.ExecutingSourceMismatch, match="namespace"):
         owner.require_executing_target_source(ROOT)
 

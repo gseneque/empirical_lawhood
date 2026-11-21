@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.runtime.artifacts import ArtifactPublicationScope, artifact_publication_member
+from empirical_lawhood.storage.contracts.artifacts import ArtifactPublicationScope, artifact_publication_member
 
 
 def _namespace(context, directory, *, paths=None, locks=()):
@@ -106,9 +106,9 @@ def _authenticate_members(context, directory, requests):
 
 @contextmanager
 def retained_e4_bank_metadata(context):
-    from .matrix_programme_completed_continuation import require_unentered_successors
-    from .matrix_programme_e4_inputs import authenticated_programme_e4_banks, programme_e4_bank_requests
-    from .matrix_programme_e4_phases import _source_request
+    from empirical_lawhood.api.matrix_programme_completed_continuation import require_unentered_successors
+    from empirical_lawhood.api.matrix_programme_e4_inputs import authenticated_programme_e4_banks, programme_e4_bank_requests
+    from empirical_lawhood.api.matrix_programme_e4_phases import _source_request
 
     directory = context.metadata_directory('e4.development')
     if not directory.exists() and not directory.is_symlink():

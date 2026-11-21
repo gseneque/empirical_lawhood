@@ -1,38 +1,21 @@
 """One-CLI uniform electron gas analytic candidate packet and pure preissue plan projection."""
 
-from dataclasses import dataclass
+from empirical_lawhood.domains.materials.electron_gas.authoring_profile import UniformElectronGasAnalyticAuthoringProfile as _ueg_UniformElectronGasAnalyticAuthoringProfile
 from pathlib import Path
-from typing import ClassVar
 
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.planning.experiment_entry import ExecutableStudyDefinition
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.experiment_entry import ExecutableStudyDefinition
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure
 
-from .analytic_authoring import UniformElectronGasAnalyticAuthoringBundle, build_uniform_electron_gas_analytic_authoring
-from .native_quickstart import UniformElectronGasAnalyticReferenceConfig
+from empirical_lawhood.domains.materials.electron_gas.analytic_authoring import UniformElectronGasAnalyticAuthoringBundle, build_uniform_electron_gas_analytic_authoring
+from empirical_lawhood.domains.materials.electron_gas.native_quickstart import UniformElectronGasAnalyticReferenceConfig
 
 _MAX_CONFIG_BYTES = 128 * 1024
 _MAX_PACKET_BYTES = 16 * 1024 * 1024
 
 
-@dataclass(frozen=True, slots=True)
-class UniformElectronGasAnalyticAuthoringProfile(CanonicalRecord):
-    SCHEMA: ClassVar[str] = 'empirical-lawhood/simulators/uniform-electron-gas-response/analytic-authoring-profile'
 
-    profile_id: str
-    experiment_id: str
-    config_sha256: str
-
-    def __post_init__(self) -> None:
-        validate_stable_id(self.profile_id, field_name="profile_id")
-        validate_stable_id(self.experiment_id, field_name="experiment_id")
-        validate_sha256(self.config_sha256, field_name="config_sha256")
 
 
 def load_uniform_electron_gas_analytic_config(path: Path) -> UniformElectronGasAnalyticReferenceConfig:
@@ -48,7 +31,7 @@ def load_uniform_electron_gas_analytic_authoring_bundle(directory: Path) -> Unif
 
     profile = decode_canonical_bytes(
         read_bounded_bytes(directory / "profile.json", maximum_bytes=_MAX_CONFIG_BYTES),
-        UniformElectronGasAnalyticAuthoringProfile,
+        _ueg_UniformElectronGasAnalyticAuthoringProfile,
         maximum_bytes=_MAX_CONFIG_BYTES,
     )
     config = load_uniform_electron_gas_analytic_config(directory / "config.json")
@@ -79,7 +62,6 @@ def load_uniform_electron_gas_analytic_authoring_bundle(directory: Path) -> Unif
 
 
 __all__ = [
-    'UniformElectronGasAnalyticAuthoringProfile',
     "load_uniform_electron_gas_analytic_config",
     "load_uniform_electron_gas_analytic_authoring_bundle",
 ]

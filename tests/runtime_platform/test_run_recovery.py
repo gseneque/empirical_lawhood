@@ -17,24 +17,15 @@ from tests.runtime_platform.test_execution_scheduler import (
 )
 from tests.runtime_platform.test_study_package_preservation import _authorized_inputs, _compile_authorized
 
-from empirical_lawhood.infrastructure.execution import InjectedSchedulerCrash
-from empirical_lawhood.infrastructure.recovery import (
-    ExternalRunRecoveryStore,
-    RunRecoveryError,
-    decode_task_recovery_event,
-    decode_run_recovery_index,
-)
-from empirical_lawhood.infrastructure.sql import (
-    SQLiteOperationalRepository,
-    create_catalog_engine,
-    upgrade_catalog,
-)
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.serialization import CanonicalizationError
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.execution import TaskAttemptDisposition
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan
-from empirical_lawhood.runtime.recovery import CandidateRunRecoveryIndex, TaskRecoveryEvent, build_run_recovery_index
+from empirical_lawhood.execution.local.execution import InjectedSchedulerCrash
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore, RunRecoveryError, decode_task_recovery_event, decode_run_recovery_index
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.serialization import CanonicalizationError
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.execution import TaskAttemptDisposition
+from empirical_lawhood.execution.plans import CandidateExecutionPlan
+from empirical_lawhood.execution.recovery import CandidateRunRecoveryIndex, TaskRecoveryEvent, build_run_recovery_index
 
 
 def _delete_test_projection(
@@ -344,8 +335,8 @@ def test_recovery_probes_scale_linearly_and_never_scan_directories(
 
 
 def test_recovery_custody_limits_are_explicit_and_preserve_large_attempt_census(tmp_path, protocol_fixture):
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-    from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits
 
     # An exposed software plan declares all possible attempts; none is executed.
     plan = protocol_fixture.execution_plan

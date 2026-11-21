@@ -8,13 +8,13 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import e4_structural_prediction as science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as original
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import FAMILY_MAP
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_secondary_readout import OriginalFunctionalRows
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_selection import physical_grid_features
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import e4_structural_prediction as science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as original
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import FAMILY_MAP
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_secondary_readout import OriginalFunctionalRows
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_selection import physical_grid_features
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_selected_e4_fixtures import selected_e4_populations, selected_bridge, transfer  # noqa: F401
 from tests.test_matrix_programme_scientific_design import build_scientific_design
 

@@ -5,24 +5,23 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from types import MappingProxyType
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification as MatrixResponseErrorSpecification
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_adjudication import adjudication_task_id, conditional_reasons
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_methods import ConfiguredProtectedE3Assessment, ConfiguredProtectedE3Calibration, ConfiguredProtectedE3FrozenProducts, ConfiguredProtectedE3ModelSet
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_statistical_bindings import statistical_task_id
-from ...codecs import MAX_CAMPAIGN_PACKAGE_BYTES
-from ...current_result_custody import _current_control, authenticate_current_execution_plan, retained_output_artifact_plane
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification as MatrixResponseErrorSpecification
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_adjudication import adjudication_task_id, conditional_reasons
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_methods import ConfiguredProtectedE3Assessment, ConfiguredProtectedE3Calibration, ConfiguredProtectedE3FrozenProducts, ConfiguredProtectedE3ModelSet
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_statistical_bindings import statistical_task_id
+from empirical_lawhood.api.current_result_custody import _current_control, authenticate_current_execution_plan, retained_output_artifact_plane
 from empirical_lawhood.api.models import ExperimentPackage
-from ...protected_e3_read_custody import authorize as _authorize, configured_receipt_read, original_design, product as _product
-from ...protected_e3_read_custody import identity as _identity  # noqa: F401 - retained reader helper
+from empirical_lawhood.api.protected_e3_read_custody import authorize as _authorize, configured_receipt_read, original_design, product as _product
+from empirical_lawhood.api.protected_e3_read_custody import identity as _identity  # noqa: F401 - retained reader helper
 from empirical_lawhood.api.matrix_training_provenance import fitted_training_provenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import validate_stable_id
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import validate_stable_id
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
 
 
 def _retained_scientific_writer(package, plan, writer):
     """Project typed codecs only; preserve the original stored manifests."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_composition import operation_declarations
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_composition import operation_declarations
 
     codecs = {}
     for declaration in operation_declarations():
@@ -53,10 +52,10 @@ def _selected_preparation(selected):
     once for primary-amendment and frozen secondary-target consumers together.
     """
     from hashlib import sha256
-    from ...prospective_experiment import RetainedProspectiveExperiment
-    from empirical_lawhood.runtime.prospective_experiment import PreparedProspectiveExperimentHandoff, source_filename
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import configured_preparation_types
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.api.prospective_experiment import RetainedProspectiveExperiment
+    from empirical_lawhood.execution.prospective_experiment import PreparedProspectiveExperimentHandoff, source_filename
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import configured_preparation_types
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
     if type(selected) not in (RetainedProspectiveExperiment, PreparedProspectiveExperimentHandoff):
         raise TypeError('protected configured read requires its actual retained or prepared companion')
@@ -143,7 +142,7 @@ def _configured_e3_read(*, selected, artifact_writer, run_id, reveal_authority_i
     # No mutable global cache survives this read or grants outcome authority.
     writer = artifact_writer
     package = _current_control(writer=writer, run_id=run_id, name='campaign-package',
-        record_type=ExperimentPackage, maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES)
+        record_type=ExperimentPackage, maximum_bytes=None)
     if (ObjectIdentity.from_record(package.issued_study.candidate.candidate_id, package.issued_study.candidate)
             != selected.association.candidate
             or package.issued_study.source_closure != selected.implementation
@@ -298,8 +297,8 @@ def _configured_e3_read(*, selected, artifact_writer, run_id, reveal_authority_i
                 report['retained_execution']['completed_receipts_reused'] = len(retained.unfinished.completed_receipts)
         output = report
         if original_products:
-            from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_inputs import ConfiguredProtectedE3PreFitJoin
-            from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
+            from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_inputs import ConfiguredProtectedE3PreFitJoin
+            from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
 
             model_freeze, _ = read_product(writer, plan, receipts,
                 statistical_task_id(*ids, 'freeze', mode='model'), ConfiguredProtectedE3FrozenProducts)

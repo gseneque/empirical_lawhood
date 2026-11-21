@@ -10,8 +10,8 @@ import pytest
 from empirical_lawhood.api import recursive_execution, selected_e4_native_read
 from empirical_lawhood.api.current_result_custody import retained_output_artifact_plane
 from empirical_lawhood.api.integration_artifact_profiles import INTEGRATION_ARTIFACT_PROFILE_VALIDATORS
-from empirical_lawhood.infrastructure import artifacts, recursive_custody
-from empirical_lawhood.runtime.recovery import build_run_recovery_index
+from empirical_lawhood.storage import artifacts, recursive_custody
+from empirical_lawhood.execution.recovery import build_run_recovery_index
 from tests.runtime_platform.test_recursive_prospective_workflow import (
     Config, _public_issued_handoff_fixture, _run_public_handoff,
 )
@@ -20,8 +20,8 @@ from tests.runtime_platform.test_recursive_prospective_workflow import (
 @pytest.fixture(scope='module')
 def issued_outputs(tmp_path_factory):
     """Five actual PURE software tasks; no Matrix native work or scientific claim."""
-    from empirical_lawhood.adapters.reference_worlds.runtime import ReferenceAdjudicationFixture
-    from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
+    from empirical_lawhood.domains.reference_worlds.runtime import ReferenceAdjudicationFixture
+    from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
     root = tmp_path_factory.mktemp('issued-bookkeeping')
     with pytest.MonkeyPatch.context() as patch:
         parts = _public_issued_handoff_fixture(root, patch)
@@ -114,7 +114,7 @@ def test_e5_e6_common_reader_reuses_custody_and_keeps_live_guards(issued_outputs
     """Real issued controls/receipts; an explicit seam stops before Matrix science."""
     from empirical_lawhood.api import matrix_selected_scientific_read as reader, recursive_operations
     from empirical_lawhood.api.selected_prepared_access import guarded_output_payload
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
     f=issued_outputs
     package=f.fixture.package
     selected=SimpleNamespace(association=SimpleNamespace(candidate=reader._pin(package.issued_study.candidate,'candidate_id')),

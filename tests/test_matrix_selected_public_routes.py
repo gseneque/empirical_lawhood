@@ -2,12 +2,10 @@
 """One public preparation lifecycle; retained low-level science is distinct."""
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as current
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_prepared_choices import (
-    SelectedPreparedDevelopmentSpecification, SelectedPreparedProtectedSpecification,
-)
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as current
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedDevelopmentSpecification, SelectedPreparedProtectedSpecification
 from empirical_lawhood.api.experiment_preparation import experiment_protocols, prepare_experiment
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_matrix_selected_opportunity import opportunity  # noqa: F401
 from tests.test_matrix_selected_protected import transfer, confirmation  # noqa: F401
 

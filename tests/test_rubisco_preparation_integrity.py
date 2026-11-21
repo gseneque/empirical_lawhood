@@ -13,12 +13,12 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as c
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import preparation, science
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.amber_parameters import assigned_census, read_prmtop, validate_assignment
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.preparation_integrity import AMINO, PreparationIntegrity, assess, disposition_census, read_heavy_pdb, validate_origins
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as c
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import preparation, science
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.amber_parameters import assigned_census, read_prmtop, validate_assignment
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.preparation_integrity import AMINO, PreparationIntegrity, assess, disposition_census, read_heavy_pdb, validate_origins
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_rubisco_insilico_dynamics import sequences
 
 
@@ -69,7 +69,7 @@ def expected_audit():
 
 
 def test_complete_raw_assignment_preserves_zero_negative_signs_and_all_tables(monkeypatch):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import parameter_audit
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import parameter_audit
 
     monkeypatch.setattr(parameter_audit,"assigned_parameter_inventory",lambda *args:pytest.fail("producer enumeration entered"))
     result = validate_assignment(amber_text(topology()),expected_audit())
@@ -140,14 +140,14 @@ import importlib.abc
 import sys
 class Refuse(importlib.abc.MetaPathFinder):
     def find_spec(self, fullname, path=None, target=None):
-        blocked = ('numpy','parmed','openmm','pdbfixer','empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.native','empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.parameter_audit','empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.coordinate_plan','empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.science','empirical_lawhood.adapters.methods.rubisco_insilico_structure.science')
+        blocked = ('numpy','parmed','openmm','pdbfixer','empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics.native','empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.parameter_audit','empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.coordinate_plan','empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.science','empirical_lawhood.domains.rubisco.rubisco_insilico_structure.science')
         if any(fullname == name or fullname.startswith(name+'.') for name in blocked):
             raise RuntimeError('producer/native import refused: '+fullname)
 sys.meta_path.insert(0,Refuse())
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.amber_parameters import read_prmtop
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.preparation_integrity import disposition_census
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.contracts import model_roster
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.amber_parameters import read_prmtop
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.preparation_integrity import disposition_census
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.contracts import model_roster
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 rows = tuple(('model.'+'.'.join(row),A.NOT_ATTEMPTED,('EXPOSED',)) for row in model_roster())
 assert disposition_census(rows)[1] is A.NOT_ATTEMPTED
 assert read_prmtop('%VERSION exposed\\n%FLAG TITLE\\n%FORMAT(20a4)\\nTEST\\n')['TITLE'] == ('TEST',)

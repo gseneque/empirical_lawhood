@@ -11,17 +11,17 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_PYTHON_SOURCE_CODEC
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as operations
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4OperationalSelection
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_PYTHON_SOURCE_CODEC
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as operations
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4OperationalSelection
 from empirical_lawhood.api import recursive_authoring as owner
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExperimentCensus, ExperimentPreparation
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExperimentCensus, ExperimentPreparation
 from tests.test_experiment_selected_input_bootstrap import Model
 from tests.test_rubisco_gas_contrast import _real_plane
 

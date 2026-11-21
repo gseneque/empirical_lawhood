@@ -11,15 +11,15 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_step_control as step
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_native as storage
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_records as records
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import preparation_contracts as pc
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_native as native
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry import evidence_stream as stream
-from empirical_lawhood.runtime.native_subwork import NativeSubworkOutput, NativeSubworkState, NativeSubworkUncertainContact
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.kernel.status import OperationalStatus
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_step_control as step
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_native as storage
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_records as records
+from empirical_lawhood.domains.battery.battery_refined_inquiry import preparation_contracts as pc
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as native
+from empirical_lawhood.domains.battery.battery_segmented_inquiry import evidence_stream as stream
+from empirical_lawhood.execution.native_subwork import NativeSubworkOutput, NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.science.records.status import OperationalStatus
 from tests.test_battery_forecast_step_control import config as step_config_fixture, selected as step_selected_fixture, witness
 from tests.test_battery_segmented_native import custody as custody_fixture, exposed_backend, acquire
 from tests.test_battery_refined_inquiry import selected as native_selected_fixture
@@ -110,7 +110,7 @@ def test_actual_process_death_retains_context_before_first_call_and_closed_prefi
         assert first.configuration == request.identity
         full = stream.completed_record(custody.store, first, completed, "full-state", records.FullSegmentIndex)
         sources = custody.store.iter_completed_output(first, "raw-return", maximum_chunk_bytes=records.codec.CHUNK_BYTES)
-        from empirical_lawhood.adapters.methods.battery_refined_inquiry.lossless_evidence_stream import bounded_lines, selected_temporary_files
+        from empirical_lawhood.domains.battery.battery_refined_inquiry.lossless_evidence_stream import bounded_lines, selected_temporary_files
         raw, decoded_sources, handles = records.decode_raw_segment(bounded_lines(sources), selected_temporary_files(tmp_path))
         try:
             view = records.DecodedFullSegment(full, raw, decoded_sources)
@@ -183,8 +183,8 @@ def test_checkpoint_definition_preserves_source_streams_inputs_and_rejects_parti
 
 @pytest.mark.parametrize("role", ("forecast-step-policy", "forecast-step-assignment", "step-assignment"))
 def test_uncontrolled_observation_checkpoint_rejects_forecast_control_roles(custody, role):
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import development_restart_control as development
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_observation_native as observation
+    from empirical_lawhood.adapters.battery.battery_refined_inquiry import development_restart_control as development
+    from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_observation_native as observation
 
     selected = replace(custody.definition, operation_id="battery.segmented-observation.initial-window",
         outputs=observation.observation_outputs())
@@ -214,7 +214,7 @@ def test_first_solver_request_cannot_substitute_completed_checkpoint_bytes(custo
 
 
 def test_existing_development_control_has_explicit_actual_checkpoint_roles(custody):
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import development_restart_control as development
+    from empirical_lawhood.adapters.battery.battery_refined_inquiry import development_restart_control as development
     selected = replace(custody.definition, operation_id="battery.development.restart-control", outputs=development.outputs())
     checkpoint = native.build_preparation_checkpoint_definition(selected)
     assert {row.output_id for row in checkpoint.outputs} == {

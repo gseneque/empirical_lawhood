@@ -20,14 +20,8 @@ The runner uses the selected checkout and discloses local plans separately.
 No local work plan is a packaged prerequisite or an additional acceptance gate.
 Select explicit packet, cache and environment destinations on suitable external storage.
 Verify the actual mount, write access and capacity before substantial output.
-The maintainer's EL selection is documented separately in the
-[local storage guidance](../development/maintainer-environment.md#storage-and-retained-evidence).
-Researchers select their own paths and storage profile.
-Keep the selected checkout unchanged while source-bound scientific processes remain active.
-Prepare documentation corrections in the external maintainer packet during those processes.
-Apply and review them after the bound processes exit.
-Regenerate affected references from their owners.
-Run the documentation checks on the final candidate.
+Follow the [environment and storage guide](../using/environments.md#select-storage-and-reuse-an-environment) for placement.
+Keep the checkout fixed while source-bound processes are active. Regenerate affected references from their owners and check the documentation on the final candidate.
 
 Settle the candidate and select the release's software and scientific evidence scope.
 The portable gate verifies software conformance with exposed controls and an installed worked example.
@@ -55,6 +49,8 @@ If its filesystem does not support Python environment symlinks, add
 `--environment-root /path/on-posix-filesystem/new-release-environments`.
 This directory must be new and outside the source checkout and packet.
 It holds the fresh environments and temporary files. The packet retains their paths.
+Use a short environment path for local Unix-socket transports.
+An `AF_UNIX path too long` failure requires a shorter `--environment-root` selection.
 Keep sufficient free space on both filesystems.
 Use `--offline` only with a complete verified dependency and interpreter cache.
 The [test profile guide](../development/testing.md) gives native and held prerequisites.
@@ -123,6 +119,12 @@ owners, including the active catalog migration.
 Selected skips fail.
 
 The runner builds the wheel through its newly produced sdist. It compares every package source/resource member with the selected Git source. It installs those exact artifact bytes in a separate wheel environment. Installed checks cover leaf help, metadata, packaged notices, native refusals and the full public reactor example.
+
+Both artifacts must bind their `Documentation` URL to their exact source commit.
+The metadata check refuses `main`, another commit, a missing link or duplicate documentation entries.
+The installed check verifies the same link against the installed source metadata.
+Before release selection, the release documentation maintainer records final ASD-STE100 review in the external packet.
+That record states the reviewed documents, unresolved findings and accepted exceptions.
 
 They also cover partial failure, existing-output refusal and console bootstrap before NumPy import. These are software and exposed-development checks. They grant no scientific authority or admission.
 

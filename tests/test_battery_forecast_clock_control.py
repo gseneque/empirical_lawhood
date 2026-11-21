@@ -10,19 +10,19 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_clock_control as clock
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_step_control as step
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import forecast_state_orchestration as orchestration
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_evidence_stream as stream
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_records as lossless
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_native as storage
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_fidelity_stream as paired
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactStreamWriteRequest
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_clock_control as clock
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_step_control as step
+from empirical_lawhood.domains.battery.battery_refined_inquiry import forecast_state_orchestration as orchestration
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_evidence_stream as stream
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_records as lossless
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_native as storage
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_fidelity_stream as paired
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactStreamWriteRequest
 from tests.runtime_platform.test_native_subwork import _plane
 from tests.test_battery_forecast_state_execution import original_pairs as original_pairs_fixture
 from tests.test_battery_forecast_state_orchestration import failed_observation, port

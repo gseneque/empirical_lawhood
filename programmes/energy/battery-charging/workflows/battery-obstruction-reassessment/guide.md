@@ -18,7 +18,7 @@ history assessment supplies no numerical adequacy or new physical unit.
 ## Select the original inputs
 
 Use `ObstructionExperimentSpecification` from the
-[domain specification owner](../../../../../src/empirical_lawhood/adapters/methods/battery_diagnostic_obstruction/experiment_specification.py).
+[domain specification owner](../../../../../src/empirical_lawhood/domains/battery/battery_diagnostic_obstruction/experiment_specification.py).
 It selects the exact `ObstructionSource` and original negative
 `ContributionManifest` identities. Question and evidence meaning retain their
 existing protocol; researchers do not assemble operation, edge or claim IDs.
@@ -43,7 +43,7 @@ match the original source, and its cost identity must match the original complet
 cost bytes. The original member census remains in one owning source record.
 
 Use the existing locked main environment and a selected immutable producing
-checkout. Follow [environment reuse](../../../../../docs/development/maintainer-environment.md)
+checkout. Follow [environment reuse](../../../../../docs/using/environments.md#select-storage-and-reuse-an-environment)
 without synchronizing an environment to inspect or prepare these inputs.
 
 ## Use the common programme service

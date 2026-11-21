@@ -1,30 +1,28 @@
 """Native tasks on the installed acquisition, resource and receipt seams."""
 
-from empirical_lawhood.adapters.composition.record_provider import RecordCampaignProvider
+from empirical_lawhood.execution.record_provider import RecordCampaignProvider
 from dataclasses import dataclass
 from decimal import Decimal as D
 from typing import Any
 import platform
 import numpy as np
-from empirical_lawhood.adapters.methods.reactor_causal_response.campaign_records import EmpiricalStudySource
-from empirical_lawhood.adapters.methods.reactor_causal_response.provider import DependencyCustodyReader
-from empirical_lawhood.adapters.methods.reactor_causal_response.resource_contract import EmpiricalResourceGuard
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.phase import FrontierPhase
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.provider_common import config_input, dependency, result, upstream
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.records import FrontierPreparation, FrontierPrivate, FrontierRetainedRoot
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.selection import FrontierPredictionSeal
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.prospective_plan import ReactorFiniteControlFrontierProspectivePlan
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.prospective_lock import FrontierFrozenRoot
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import TaskContext, RunnerResult, TaskProgressEmitter
-from empirical_lawhood.runtime.providers import (
-    ExternalInputPayload,
-)
-from .acquisition import acquire_preparation, acquire_assay
-from .prospective import acquire_prospective
-from .config import FrontierNativeConfig
-from .extension_bundle import CAPABILITY, OUTPUT_RECORDS
+from empirical_lawhood.domains.reactor.reactor_causal_response.campaign_records import EmpiricalStudySource
+from empirical_lawhood.domains.reactor.reactor_causal_response.provider import DependencyCustodyReader
+from empirical_lawhood.domains.reactor.reactor_causal_response.resource_contract import EmpiricalResourceGuard
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.phase import FrontierPhase
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.provider_common import config_input, dependency, result, upstream
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.records import FrontierPreparation, FrontierPrivate, FrontierRetainedRoot
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.selection import FrontierPredictionSeal
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.prospective_plan import ReactorFiniteControlFrontierProspectivePlan
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.frozen_records import FrontierFrozenRoot
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import TaskContext, RunnerResult, TaskProgressEmitter
+from empirical_lawhood.execution.providers import ExternalInputPayload
+from empirical_lawhood.adapters.simulators.reactor_finite_control_frontier.acquisition import acquire_preparation, acquire_assay
+from empirical_lawhood.adapters.simulators.reactor_finite_control_frontier.prospective import acquire_prospective
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.native_config import FrontierNativeConfig
+from empirical_lawhood.adapters.simulators.reactor_finite_control_frontier.extension import CAPABILITY, OUTPUT_RECORDS
 
 
 def source_input(context: TaskContext) -> EmpiricalStudySource:
@@ -90,7 +88,7 @@ class FrontierNativeRunner:
                 seal = dependency(
                     context, self.custody, FrontierPredictionSeal, f"frontier.predictions.{root}"
                 )[0]
-                from empirical_lawhood.kernel.provenance import ObjectIdentity
+                from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
                 return result(
                     context,

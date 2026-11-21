@@ -14,13 +14,13 @@ import pytest
 
 def assert_actual_replay_rejects_changed_records(*, case, products, draft, plan, training, monkeypatch):
     from empirical_lawhood.api.matrix_native_acquisition_replay import replay_root
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
     if training:
-        from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as r
-        from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as owner
+        from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as r
+        from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as owner
     else:
-        from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as r
-        from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as owner
+        from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as r
+        from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as owner
     configs = dict(owner.contracts(case.specification, case.request)[0])
     tasks = {task.task_id: task for task in plan.tasks}
     root_id = case.specification.root_ids[0]  # Existing disclosed literal000 only.
@@ -59,7 +59,7 @@ def assert_actual_replay_rejects_changed_records(*, case, products, draft, plan,
             (wrong_score.identity if value == selected["score"].identity else value for value in wrong_outcome.evidence),
             key=lambda value: value.object_id)))
     else:
-        from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_science import assess_score
+        from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_science import assess_score
         wrong_outcome = assess_score(case.specification, protocol, panels, case.acquisition, wrong_score)
     wrong_score.canonical_bytes()
     wrong_outcome.canonical_bytes()

@@ -7,14 +7,14 @@ import pytest
 
 from empirical_lawhood.api import current_result_custody, preparation_result_access, rc_challenge_results
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustodySupplier
-from empirical_lawhood.infrastructure.artifacts import ArtifactProfileValidatorRegistry, ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactMaterialization, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ExternalRootContract, LogicalArtifactIdentity, ReceiptCheck
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan
+from empirical_lawhood.storage.artifacts import ArtifactProfileValidatorRegistry, ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactMaterialization, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, ExternalRootContract, LogicalArtifactIdentity, ReceiptCheck
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
+from empirical_lawhood.execution.plans import CandidateExecutionPlan
 
 
 class _DisclosedCustodySupplier(CurrentIssuedTaskCustodySupplier):
@@ -25,8 +25,8 @@ class _DisclosedCustodySupplier(CurrentIssuedTaskCustodySupplier):
 def test_unregistered_custody_attribute_does_not_silently_join_scope(actual_issued_current_task_controls):
     from types import SimpleNamespace
     from empirical_lawhood.api.current_task_custody import current_issued_task_control_scope
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
     f = actual_issued_current_task_controls
     f.control.service.executable_platform_ports = (ExecutablePlatformPort('foreign.custody-attribute',
         RecursiveOperationInputPort(SimpleNamespace(custody=f.custody, resolve_input=lambda spec: spec))),)
@@ -36,9 +36,9 @@ def test_unregistered_custody_attribute_does_not_silently_join_scope(actual_issu
 
 def test_original_parent_scope_reuses_plan_reader_and_expires_with_actual_run(actual_issued_current_task_controls):
     from empirical_lawhood.api.current_task_custody import current_issued_task_control_scope
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
     f = actual_issued_current_task_controls
     supplier = _DisclosedCustodySupplier(custody=f.custody, resolve_input=lambda spec: spec)
     f.control.service.executable_platform_ports = (ExecutablePlatformPort('typed.original-parent-scope',
@@ -172,7 +172,7 @@ def test_unprotected_downgrade_cannot_skip_present_current_control(tmp_path, fro
 
 
 def test_exposed_unissued_output_preserves_existing_inspection_contract(tmp_path, frozen_outputs):
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
     _, receipt, logical = frozen_outputs
     rows = tuple(replace(value, outcome_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
         visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY, parent_visibility_ceilings=())
@@ -210,7 +210,7 @@ def test_concrete_lineage_census_does_not_replace_frozen_access_contract(frozen_
 
 
 def test_exposed_label_cannot_replace_actual_stored_protected_receipt(tmp_path, frozen_outputs, monkeypatch):
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
     _, receipt, logical = frozen_outputs
     plane = ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
         'synthetic.result-store', 'stored protected receipt downgrade denial', str(tmp_path), str(next(parent for parent in tmp_path.parents if parent.is_mount())),
@@ -240,9 +240,9 @@ def actual_issued_current_task_controls(tmp_path,monkeypatch):
     from types import SimpleNamespace
     from empirical_lawhood.api import execution as execution_owner
     from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
-    from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-    from empirical_lawhood.runtime.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
-    from empirical_lawhood.runtime.plans import BarrierKind
+    from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+    from empirical_lawhood.execution.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
+    from empirical_lawhood.execution.plans import BarrierKind
     from tests.runtime_platform.test_recursive_prospective_workflow import (
         _public_issued_handoff_fixture,_run_public_handoff,
     )
@@ -274,9 +274,9 @@ def actual_issued_current_task_controls(tmp_path,monkeypatch):
 
 def test_current_task_scope_checks_prepared_plan_once_but_replays_current_authority(actual_issued_current_task_controls,monkeypatch):
     from empirical_lawhood.api.current_task_custody import current_issued_task_control_scope
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore, ExternalIssuedStudyPublisher
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore, ExternalIssuedStudyPublisher
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 
     f=actual_issued_current_task_controls
     validation_calls=[];validate_plan=current_result_custody._require_prepared_plan_bindings
@@ -346,7 +346,7 @@ def test_current_plan_reuse_rejects_changed_controls_and_expired_scope(actual_is
 
 
 def test_original_index_reuse_stays_bound_to_the_authenticated_plan(actual_issued_current_task_controls,monkeypatch):
-    from empirical_lawhood.runtime import recovery
+    from empirical_lawhood.execution import recovery
     f=actual_issued_current_task_controls
     builds=[];build=recovery.build_run_recovery_index
     def counted_build(plan,**kwargs):
@@ -371,10 +371,10 @@ def test_direct_api_scheduler_owns_control_lifetime_before_any_worker(actual_iss
     from empirical_lawhood.api import execution as execution_owner
     from empirical_lawhood.api.current_task_custody import current_issued_task_control_scope
     from empirical_lawhood.api.results import RunCampaignRequest
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 
     f=actual_issued_current_task_controls
-    from empirical_lawhood.infrastructure import source_origin
+    from empirical_lawhood.storage import source_origin
     # This fixture authors an explicitly synthetic source checkout. Its test
     # stops at the scheduler boundary and establishes no actual-source entry.
     def disclosed_source(root):
@@ -429,9 +429,9 @@ def test_four_current_parent_preparations_share_plan_validation_and_release_befo
     from concurrent.futures import ThreadPoolExecutor
     from threading import Barrier
     from empirical_lawhood.api.current_task_custody import current_issued_task_control_scope
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 
     f = actual_issued_current_task_controls
     validations, grants = [], []
@@ -477,9 +477,9 @@ def test_matrix_shared_custody_refuses_foreign_writer_reveal_or_owner_before_rea
     from empirical_lawhood.api.domain_composition.matrix_configured_protected_response import runtime as configured
     from empirical_lawhood.api import matrix_sampling_runtime as sampling, matrix_selected_runtime as selected
     from empirical_lawhood.api.matrix_selected_revision_runtime import RevisionRuntimeInputSupplier
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_bindings import ENTRY_ORIGINAL_COMMITMENTS_KEY, operation_declarations
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_workers import SelectedProtectedWorker
-    from empirical_lawhood.adapters.methods.matrix_sampling_bindings import MatrixSamplingWorker
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_bindings import ENTRY_ORIGINAL_COMMITMENTS_KEY, operation_declarations
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_workers import SelectedProtectedWorker
+    from empirical_lawhood.domains.matrix.matrix_sampling_bindings import MatrixSamplingWorker
 
     writer = object()
     custody = (object() if damage == "type" else CurrentIssuedTaskCustody(
@@ -519,17 +519,17 @@ def test_matrix_ports_share_actual_current_plan_and_refuse_changed_bytes(actual_
     from empirical_lawhood.api.domain_composition.matrix_protected_response import runtime as original
     from empirical_lawhood.api.matrix_sampling_runtime import MatrixSamplingRuntimeInputSupplier
     from empirical_lawhood.api.matrix_scheduled_programme_runtime import ProgrammeRuntimeInputSupplier
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_bindings import ENTRY_ORIGINAL_COMMITMENTS_KEY, operation_declarations
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_workers import SelectedProtectedWorker
-    from empirical_lawhood.adapters.methods.matrix_sampling_bindings import MatrixSamplingWorker
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_bindings import ENTRY_ORIGINAL_COMMITMENTS_KEY, operation_declarations
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_workers import SelectedProtectedWorker
+    from empirical_lawhood.domains.matrix.matrix_sampling_bindings import MatrixSamplingWorker
     from empirical_lawhood.api.matrix_selected_runtime import SelectedMatrixRuntimeInputSupplier
     from empirical_lawhood.api.matrix_selected_revision_runtime import RevisionRuntimeInputSupplier
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_bindings as revision
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_workers import SelectedRevisionWorker
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_bindings as revision
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_workers import SelectedRevisionWorker
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 
     f = actual_issued_current_task_controls
     plane = f.control.service.artifact_plane
@@ -569,8 +569,8 @@ def test_matrix_ports_share_actual_current_plan_and_refuse_changed_bytes(actual_
     elif route == "sampling":
         callbacks = tuple((value.prepare_matrix_sampling, MatrixSamplingWorker("E3")) for value in suppliers)
     elif route == "programme":
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history import revision_future_bindings as old_future
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_calibration_bindings import ScheduledRevisionCalibrationWorker
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history import revision_future_bindings as old_future
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_calibration_bindings import ScheduledRevisionCalibrationWorker
         future = old_future.operation_factories()[0].runner_factory()
         callbacks = ((suppliers[0].prepare_revision_future, future),
             (suppliers[1].prepare_revision_calibration, ScheduledRevisionCalibrationWorker()))

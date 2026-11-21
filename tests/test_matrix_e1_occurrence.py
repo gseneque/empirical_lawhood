@@ -7,10 +7,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import occurrence as owner
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import FactorObservation
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import occurrence as owner
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import FactorObservation
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 RULE = SimpleNamespace(risk_start_tick=0, lattice=tuple(range(9)),

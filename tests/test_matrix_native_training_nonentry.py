@@ -7,15 +7,15 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_bindings as bindings
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as r
-from empirical_lawhood.adapters.methods.matrix_factor_response.origin_mechanics import model_predictors
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseArrays, branch_census
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA, MatrixArrayMember
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_bindings as bindings
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as r
+from empirical_lawhood.domains.matrix.matrix_factor_response.origin_mechanics import model_predictors
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseArrays, branch_census
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA, MatrixArrayMember
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
 from tests.test_matrix_native_training_acquisition import fresh_training_metadata_case
 
 ROOT = Path(__file__).parents[1]
@@ -204,7 +204,7 @@ def test_training_nonentry_rejects_cross_family_operands(metadata, tmp_path):
 
 @pytest.mark.parametrize("defect", ("reason", "hash", "available-future"))
 def test_actual_training_science_rejects_nonentry_before_array_assessment(metadata, monkeypatch, defect):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_science as science
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_science as science
     causal, physical, response = _nonentry(metadata, "AVAILABLE",
         "AVAILABLE" if defect == "available-future" else "INSTRUMENT_UNRESOLVED")
     if defect == "reason":
@@ -239,7 +239,7 @@ def test_training_compact_partial_or_refused_read_does_not_open_scientific_produ
 
 def test_training_root_read_refuses_a_foreign_source_index_before_opening_products(metadata):
     from empirical_lawhood.api.matrix_native_training_read import _authenticate_root_records
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 
     case = metadata.case
     manifest = case.request.train_manifest

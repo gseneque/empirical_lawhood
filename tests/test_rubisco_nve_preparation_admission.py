@@ -6,15 +6,11 @@ import json
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as preparation
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import (
-    control_contracts, nve_contracts, nve_roster, nve_science,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.nve_preparation_admission import (
-    SerializedPreparationNVEControlPlan, decode_plan,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as preparation
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import control_contracts, nve_contracts, nve_roster, nve_science
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.nve_preparation_admission import SerializedPreparationNVEControlPlan, decode_plan
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_rubisco_nve_durable_controls import staged as staged, plan as plan
 from tests.test_rubisco_serialized_durable_chemical_admission import (
     durable_admitted as durable_admitted, reuse_admitted as reuse_admitted, original as original,
@@ -80,9 +76,8 @@ def test_original_nve_route_retains_exact_old_type_and_bytes(staged):
 def test_selected_decoder_is_used_at_actual_child_operand_boundary(selected_plan, monkeypatch):
     """Exercise the selected decoder, then stop before native prerequisites."""
     from types import SimpleNamespace
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import (
-        nve_native_entry, nve_preparation_admission,
-    )
+    from empirical_lawhood.adapters.rubisco.rubisco_insilico_sampling import nve_native_entry
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import nve_preparation_admission
 
     class DecodedOperand(Exception):
         pass

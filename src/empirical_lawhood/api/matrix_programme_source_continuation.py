@@ -9,21 +9,19 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from time import monotonic
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import source_continuation as domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import PHASES
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import (
-    CONTINUED_PROTOCOL_ID, MatrixContinuedProgrammeSpecification, MatrixResearchProgrammeSpecification,
-)
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import source_continuation as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import PHASES
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import CONTINUED_PROTOCOL_ID, MatrixContinuedProgrammeSpecification, MatrixResearchProgrammeSpecification
 from empirical_lawhood.api.matrix_researcher_programme_lineage import read_published_record
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticated_programme_inputs
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, canonical_json_document_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticated_programme_inputs
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, canonical_json_document_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
 
 def _pin(document):
@@ -32,9 +30,9 @@ def _pin(document):
 
 
 def _predecessor(service, specification, *, allow_completed=False):
-    from .matrix_researcher_programme import MatrixResearchProgrammeService, PLAN_FILENAME
-    from .selected_e4_bank_recipe import _publication_from_manifest
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixResearchProgrammePlan
+    from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService, PLAN_FILENAME
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixResearchProgrammePlan
     selection = specification.predecessor
     writer = service.artifact_writer
     plan = read_published_record(writer, selection.publication.materialization.relative_path,
@@ -78,8 +76,8 @@ def _require_future_namespaces_absent(context, run_id=None):
 
 
 def _unentered_future_packet(context):
-    from .recursive_authoring import load_authored_wave
-    from .recursive_execution import _retained_plans
+    from empirical_lawhood.api.recursive_authoring import load_authored_wave
+    from empirical_lawhood.api.recursive_execution import _retained_plans
     _require_future_namespaces_absent(context)
     _, specification = context.bound_specification(context.binding('train'))
     packet, draft, _, payloads = load_authored_wave(directory=context.child_directory('train'),
@@ -123,10 +121,8 @@ class _OriginalExecutionCustody:
 
 def _pin_original_selection(owner, context):
     """Keep the original plan, descriptor and bindings in the same byte guard."""
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding
-    from empirical_lawhood.runtime.experiment_programme import (
-        MAX_PROGRAMME_DESCRIPTOR_BYTES, PROGRAMME_DESCRIPTOR_FILENAME,
-    )
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding
+    from empirical_lawhood.execution.experiment_programme import MAX_PROGRAMME_DESCRIPTOR_BYTES, PROGRAMME_DESCRIPTOR_FILENAME
     if owner._plan(context.directory) != context.plan:
         raise PermissionError('source continuation changes its original programme plan')
     writer = context.writer
@@ -158,7 +154,7 @@ def _original_custody(owner, context):
     callbacks are checked again before publication and before this scope closes.
     No report or permission survives as a cache for another operation.
     """
-    from .recursive_execution import _custody_control_pins
+    from empirical_lawhood.api.recursive_execution import _custody_control_pins
     with context.writer.read_context() as writer, writer.verification_dependencies() as dependencies:
         service = replace(context.service, artifact_writer=writer)
         scoped_owner = type(owner)(service=service, descriptor=owner.descriptor)
@@ -196,7 +192,7 @@ def _original_custody(owner, context):
 def continued_context(owner, context, record):
     """Keep original input custody active while observing inherited E1/E2."""
     if isinstance(record, domain.MatrixProgrammeCompletedSourceContinuation):
-        from .matrix_programme_completed_continuation import continued_context as completed_context
+        from empirical_lawhood.api.matrix_programme_completed_continuation import continued_context as completed_context
         with completed_context(owner, context, record):
             yield
         return
@@ -228,7 +224,7 @@ def continued_context(owner, context, record):
 
 
 def _publish_inputs(original, provenance, publish, *, record_id, completed_source=None):
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.input_records import validate_programme_input_records
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.input_records import validate_programme_input_records
     provenance_publication = publish('producing-provenance', provenance, identity=provenance.identity)
     phases, handles = [], []
     for phase in original.phases:
@@ -248,7 +244,7 @@ def _publish_inputs(original, provenance, publish, *, record_id, completed_sourc
         support = tuple(sorted((*support, (completed_source.artifact, source_publication)), key=lambda row: row[0].artifact_id))
     commitments = replace(original.commitments, record_id=record_id, producing_provenance=provenance_publication,
         phases=tuple(handles), e6_policy=policy_publication, support_files=support)
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.input_records import ResolvedMatrixProgrammeInputs
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.input_records import ResolvedMatrixProgrammeInputs
     resolved = ResolvedMatrixProgrammeInputs(commitments, original.scientific_design,
         original.exposure_census, original.exposure_audit, provenance, original.scalar_definitions,
         tuple(phases), original.availability, policy)
@@ -256,7 +252,7 @@ def _publish_inputs(original, provenance, publish, *, record_id, completed_sourc
     if completed_source is None:
         domain.validate_continued_inputs(original, resolved)
     else:
-        from empirical_lawhood.adapters.methods.matrix_researcher_programme.completed_source import validate_completed_inputs
+        from empirical_lawhood.domains.matrix.matrix_researcher_programme.completed_source import validate_completed_inputs
         validate_completed_inputs(original, resolved, completed_source)
     return publish('commitments', commitments)
 
@@ -279,14 +275,14 @@ def _current_source_publications(root, admitted):
 def derive_inputs(*, specification, source_selection_path, project_root, artifact_writer,
         metadata_directory, output_selection_path, execution, read_access=None, _service=None):
     """Publish a source-only handoff; author and execute through ordinary owners."""
-    from .experiment_preparation import load_experiment_inputs, prepare_experiment
-    from .experiment_programme import ExperimentProgrammeService
-    from .matrix_numerical_provenance import capture_matrix_provenance
-    from .matrix_programme_allocations import _require_memory
-    from .matrix_researcher_programme import _publish
-    from .selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
+    from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
+    from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
+    from empirical_lawhood.api.matrix_programme_allocations import _require_memory
+    from empirical_lawhood.api.matrix_researcher_programme import _publish
+    from empirical_lawhood.api.selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 
     if type(specification) not in (domain.MatrixProgrammeSourceContinuationSpecification,
             domain.MatrixProgrammeOutputContinuationSpecification) or read_access is not None:
@@ -335,7 +331,7 @@ def derive_inputs(*, specification, source_selection_path, project_root, artifac
         return MatrixProgrammePublishedInput(pin, publication)
 
     from contextlib import ExitStack
-    from .matrix_programme_completed_continuation import original_completed_custody, require_numerical_continuity
+    from empirical_lawhood.api.matrix_programme_completed_continuation import original_completed_custody, require_numerical_continuity
     with original_owner._read_context(original_plan) as original, ExitStack() as lifetime:
         completed = 'e3' in original.bindings
         if completed:
@@ -354,11 +350,11 @@ def derive_inputs(*, specification, source_selection_path, project_root, artifac
         original_inputs = original.inputs
         original_commitment = original.plan.specification.input_commitments
         if completed:
-            from empirical_lawhood.adapters.methods.matrix_researcher_programme.completed_source import MatrixCompletedE3InputSource
-            from empirical_lawhood.infrastructure.matrix_completed_source import original_e3_commitment
+            from empirical_lawhood.domains.matrix.matrix_researcher_programme.completed_source import MatrixCompletedE3InputSource
+            from empirical_lawhood.adapters.matrix_storage.matrix_completed_source import original_e3_commitment
             original_commitment = original_e3_commitment(artifact_writer, original.inputs, original_commitment)
             if original_commitment != original.plan.specification.input_commitments:
-                from empirical_lawhood.infrastructure.matrix_recorded_inputs import recorded_programme_inputs
+                from empirical_lawhood.adapters.matrix_storage.matrix_recorded_inputs import recorded_programme_inputs
                 original_inputs = lifetime.enter_context(recorded_programme_inputs(writer=artifact_writer,
                     commitment=original_commitment, maximum_source_bytes=budget.source_scan_bytes))
             completed_source = MatrixCompletedE3InputSource('source.completed-e3.' + specification.fingerprint(),
@@ -392,7 +388,7 @@ def derive_inputs(*, specification, source_selection_path, project_root, artifac
             if completed_source is None:
                 domain.validate_continued_inputs(original.inputs, current)
             else:
-                from empirical_lawhood.adapters.methods.matrix_researcher_programme.completed_source import validate_completed_inputs
+                from empirical_lawhood.domains.matrix.matrix_researcher_programme.completed_source import validate_completed_inputs
                 validate_completed_inputs(original_inputs, current, completed_source)
             retained.require_current()
             require_admitted_target_source_current(root, admitted)

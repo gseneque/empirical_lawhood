@@ -7,27 +7,22 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal
 from empirical_lawhood.adapters.composition.preparation_applicability.inputs import PreparationApplicabilityRecordProvider
-from empirical_lawhood.adapters.composition.phase_inputs import config_input, dependency, upstream
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.records import ConstructedPreparationReport
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.qualification import require_qualified_constructor
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from .records import ConstructedPreparationNativePhase
-from empirical_lawhood.runtime.task_records import canonical_task_result
-from empirical_lawhood.runtime.execution import TaskContext, TaskProgressEmitter
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.config import (
-    ConstructedPreparationNativeConfig,
-    ConstructedPreparationSource,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.execution import WorkerInputKind
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.records import ConstructedPreparationSelection
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.records import (
-    ConstructedPreparationLowerSeal,
-)
-from empirical_lawhood.adapters.simulators.prepared_response.instruments import PreparedPortFrame
-from empirical_lawhood.adapters.simulators.six_matrix_response.response_observer import _decode
-from .records import ConstructedPreparationPrefix, ConstructedPreparationPanel, ConstructedPreparationParents
-from .native import acquire_phase, acquire_prefix
+from empirical_lawhood.execution.phase_inputs import config_input, dependency, upstream
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.records import ConstructedPreparationReport
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.qualification import require_qualified_constructor
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.phase_records import ConstructedPreparationNativePhase
+from empirical_lawhood.execution.task_records import canonical_task_result
+from empirical_lawhood.execution.execution import TaskContext, TaskProgressEmitter
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.config import ConstructedPreparationNativeConfig, ConstructedPreparationSource
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.execution import WorkerInputKind
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.records import ConstructedPreparationSelection
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.records import ConstructedPreparationLowerSeal
+from empirical_lawhood.domains.matrix.prepared_response.instruments import PreparedPortFrame
+from empirical_lawhood.domains.matrix.six_matrix_response.response_observer import _decode
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.phase_records import ConstructedPreparationPrefix, ConstructedPreparationPanel, ConstructedPreparationParents
+from empirical_lawhood.domains.matrix.preparation_applicability.dynamics import acquire_phase, acquire_prefix
 
 
 def native_progress_sink(
@@ -57,7 +52,7 @@ class ConstructedPreparationNativeRunner:
 
     @property
     def manifest(self) -> Any:
-        from .extension_bundle import CAPABILITY
+        from empirical_lawhood.adapters.simulators.constructed_preparation_applicability.extension import CAPABILITY
 
         return CAPABILITY
 
@@ -103,7 +98,7 @@ class ConstructedPreparationNativeRunner:
 
             value: CanonicalRecord
             if kind == "prefix":
-                value = acquire_prefix(stage.allocation.roots[index], source.fingerprint(), progress)
+                value = acquire_prefix(stage.allocation.roots[index], source.fingerprint(), progress, constructed=True)
             else:
                 prefix = dep(ConstructedPreparationPrefix, f"ap.prefix.{root}")
                 selection = dep(ConstructedPreparationSelection, f"ap.select.{root}")
@@ -122,6 +117,7 @@ class ConstructedPreparationNativeRunner:
                                 offset = sum(p.completed_intervals for p in phases)
                                 phases.append(
                                     acquire_phase(
+                                        constructed=True,
                                         phase_name="parent",
                                         allocation=stage.allocation.roots[index],
                                         refinement=v,
@@ -154,6 +150,7 @@ class ConstructedPreparationNativeRunner:
                             for f in (0, 1):
                                 for w in range(9):
                                     p = acquire_phase(
+                                        constructed=True,
                                         phase_name="future",
                                         allocation=stage.allocation.roots[index],
                                         refinement=parent.refinement,
@@ -185,7 +182,7 @@ class ConstructedPreparationNativeRunner:
 
 class ConstructedPreparationNativeProvider(PreparationApplicabilityRecordProvider):
     def __init__(self, registry: Any, runner: Any, inputs: Any) -> None:
-        from .extension_bundle import CAPABILITY, OUTPUT_RECORDS
+        from empirical_lawhood.adapters.simulators.constructed_preparation_applicability.extension import CAPABILITY, OUTPUT_RECORDS
 
         super().__init__(
             registry,

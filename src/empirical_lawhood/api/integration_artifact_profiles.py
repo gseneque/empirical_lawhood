@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: MPL-2.0
 """Closed artifact profiles shared by current public integration composition."""
 
-from empirical_lawhood.adapters.simulator_morphism_challenges.authoring import ARRAY_PAYLOAD_SCHEMA
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry, NumpyArrayContract
+from empirical_lawhood.domains.history.simulator_morphism_challenges.authoring import ARRAY_PAYLOAD_SCHEMA
+from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry, NumpyArrayContract
 from empirical_lawhood.api.recursive_operations import operation_storage_codecs
 
 

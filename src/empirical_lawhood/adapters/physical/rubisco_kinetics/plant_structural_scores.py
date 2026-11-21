@@ -17,11 +17,9 @@ from typing import ClassVar
 import xml.etree.ElementTree as ET
 import zipfile
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_decimal
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_decimal
 
-from .workbook import (
-    NS, NativeWorkbookCellV1, NativeWorkbookV1, decode_native_workbook,
-)
+from empirical_lawhood.adapters.physical.rubisco_kinetics.workbook import NS, NativeWorkbookCellV1, NativeWorkbookV1, decode_native_workbook
 
 S1_SHA256 = "01c58e35fa43a8cc1a363d58ca4e4c5e3ff2c262c5c4f3b10002ceb3c869ff26"
 STRUCTURAL_MEMBER = "xl/worksheets/sheet3.xml"

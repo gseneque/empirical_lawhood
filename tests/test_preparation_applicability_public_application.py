@@ -23,15 +23,15 @@ from empirical_lawhood.api.preparation_inputs import bind_ordinary_preparation_p
 from empirical_lawhood.api.integration_handoffs import load_integration_handoff, prove_integration_handoff, integration_api_inputs
 from empirical_lawhood.api.composition import create_cli_api
 from empirical_lawhood.api.results import CompileCandidateRequest, OperationStatus
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.records import ConstructedPreparationReport
-from empirical_lawhood.adapters.methods.preparation_applicability.exposure import effective_seed_ids
-from empirical_lawhood.adapters.methods.preparation_applicability.config import preparation_run_id
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile, OperatorStorageAccessMode
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.records import ConstructedPreparationReport
+from empirical_lawhood.domains.matrix.preparation_applicability.exposure import effective_seed_ids
+from empirical_lawhood.domains.matrix.preparation_applicability.config import preparation_run_id
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, OperatorStorageAccessMode
 from tests.finite_response_rerun_fixtures import publish_current_issue, publish_current_step_output
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -64,7 +64,7 @@ def _setup(tmp_path,monkeypatch,conformance):
         install_historical_source_capture(monkeypatch, application, closure)
         monkeypatch.setattr(application,"resolve_authoring_directory",lambda directory,**kwargs:(directory,plane.root.contract))
     from empirical_lawhood.api import composition, integration_handoffs
-    from empirical_lawhood.infrastructure import source_origin
+    from empirical_lawhood.storage import source_origin
     run_command=source_origin.run_bounded_command
     def current_fixture_metadata(arguments,**kwargs):
         result=run_command(arguments,**kwargs)
@@ -83,10 +83,12 @@ def _setup(tmp_path,monkeypatch,conformance):
         storage_root_id="synthetic.preparation-scratch",canonical_path=str(scratch)))
     def forbidden(*args,**kwargs):
         raise AssertionError("full-size author/load/provider/issue proof contacted native source")
-    for family in ("preparation_applicability","constructed_preparation_applicability"):
-        for owner in ("native","provider"):
-            for function in ("acquire_prefix","acquire_phase"):
-                monkeypatch.setattr(f"empirical_lawhood.adapters.simulators.{family}.{owner}.{function}",forbidden)
+    from empirical_lawhood.domains.matrix.preparation_applicability import dynamics
+    from empirical_lawhood.adapters.simulators.preparation_applicability import provider as ordinary_provider
+    from empirical_lawhood.adapters.simulators.constructed_preparation_applicability import provider as constructed_provider
+    for owner in (dynamics, ordinary_provider, constructed_provider):
+        for function in ("acquire_prefix", "acquire_phase"):
+            monkeypatch.setattr(owner, function, forbidden)
     return plane,publications,ordinary,constructed
 
 
@@ -217,12 +219,12 @@ def test_actual_public_full_size_author_load_provider_and_issue_route(tmp_path,m
 
 def _retained_ordinary_failure_fixture(selection,plane,issue):
     """Authenticate actual custody for explicitly fictional incomplete cells."""
-    from empirical_lawhood.adapters.simulators.preparation_applicability.records import PreparationApplicabilityNativePhase,PreparationApplicabilityStream,PreparationApplicabilityPrefix,PreparationApplicabilityPanel
-    from empirical_lawhood.adapters.methods.preparation_applicability.seals import PreparationApplicabilityLowerSeal
-    from empirical_lawhood.adapters.methods.preparation_applicability.records import PreparationApplicabilityMeasuredRoot
-    from empirical_lawhood.adapters.methods.preparation_applicability.readout import PreparationApplicabilityScreenReport
+    from empirical_lawhood.domains.matrix.preparation_applicability.phase_records import PreparationApplicabilityNativePhase, PreparationApplicabilityStream, PreparationApplicabilityPrefix, PreparationApplicabilityPanel
+    from empirical_lawhood.domains.matrix.preparation_applicability.seals import PreparationApplicabilityLowerSeal
+    from empirical_lawhood.domains.matrix.preparation_applicability.records import PreparationApplicabilityMeasuredRoot
+    from empirical_lawhood.domains.matrix.preparation_applicability.readout import PreparationApplicabilityScreenReport
     from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
     root=selection.stage.allocation.roots[0]
     phases=tuple(PreparationApplicabilityNativePhase(root.root_id,"prefix",None,None,None,view,
         selection.source.fingerprint(),None,0,4096,0,0,(Decimal(0),Decimal(0)),Decimal(0),Decimal(0),Decimal(0),

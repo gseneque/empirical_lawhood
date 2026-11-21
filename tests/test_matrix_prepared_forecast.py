@@ -1,16 +1,18 @@
 # SPDX-License-Identifier: MPL-2.0
 """Literal prepared-state mechanical methods and independent cold controls."""
 
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as _preparation_io_effect
 from dataclasses import replace
 from hashlib import sha256
 
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science, prepared_prefix
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_forecast as method
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast as shared_forecast
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_prefix
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as preparation_science_owner_0
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_forecast as method
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast as shared_forecast
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
 from tests import test_matrix_prepared_response_method as response_fixture
 
 
@@ -27,9 +29,9 @@ def case(tmp_path):
         artifact_id="array.literal-pauli-prepared-initial", sha256=sha256(initial).hexdigest(), size_bytes=len(initial)), members=members)
     source = replace(source, initial=state)
     innovations = np.zeros((source.total_ticks, 2, 3, 4, 4), dtype="<c16")
-    arrays = preparation_science.propagate_preparation(source, initial, coarse_innovations=innovations, bridge_innovations=innovations)
-    raw, preparation = preparation_science.preparation_array_product(source, initial, arrays, artifact_id="array.literal-pauli-preparation")
-    numerical = preparation_science.assess_preparation_arrays(source, initial, preparation, arrays, assessment_id="assessment.literal-pauli-preparation")
+    arrays = preparation_science_owner_0.propagate_preparation(source, initial, coarse_innovations=innovations, bridge_innovations=innovations)
+    raw, preparation = preparation_science_owner_0.preparation_array_product(source, initial, arrays, artifact_id="array.literal-pauli-preparation")
+    numerical = preparation_science_owner_0.assess_preparation_arrays(source, initial, preparation, arrays, assessment_id="assessment.literal-pauli-preparation")
     diagnostic_raw, witness = prepared_prefix.measure_prepared_prefix(source, initial, preparation, numerical, raw,
         artifact_id="array.literal-pauli-prepared-diagnostics")
     frames = prepared_prefix.check_prepared_frames(source, initial, preparation, numerical, witness, raw, diagnostic_raw)
@@ -61,7 +63,7 @@ def test_prepared_mechanical_forecast_preserves_five_methods_and_cold_independen
     monkeypatch.setattr(shared_forecast, "_hessian", forbidden)
     monkeypatch.setattr(np.linalg, "eigh", forbidden)
     monkeypatch.setattr(np.random, "Generator", forbidden)
-    monkeypatch.setattr(preparation_science, "acquire_preparation", forbidden)
+    monkeypatch.setattr(_preparation_io_effect, "acquire_preparation", forbidden)
     reloaded_raw, reloaded = method.forecast(*case, artifact_id=forecast.arrays.array_artifact.artifact_id, retained=retained, raw=raw)
     assert reloaded == forecast and reloaded_raw == raw
     changed = {name: value.copy() for name, value in retained.items()}
@@ -90,7 +92,7 @@ def test_prepared_mechanical_cold_reader_detects_changed_fine_prediction(case):
 
 
 def test_prepared_cold_forecast_reuses_only_its_exact_received_archive(case, monkeypatch):
-    from empirical_lawhood.infrastructure import matrix_array_io
+    from empirical_lawhood.adapters.matrix_storage import matrix_array_io
     raw, forecast = method.forecast(*case, artifact_id="array.literal-prepared-reuse")
     retained = decode_matrix_arrays(raw, forecast.arrays)
     expected_raw, expected = method.forecast(*case, artifact_id=forecast.arrays.array_artifact.artifact_id,

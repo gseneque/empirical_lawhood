@@ -6,14 +6,14 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api.execution import CampaignCapabilityError, CampaignExecutionService
-from empirical_lawhood.infrastructure.execution import ExecutionResourceCapacity, InjectedSchedulerCrash
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.compiler import compile_run_plan, lower_run_plan
-from empirical_lawhood.runtime.execution import TaskAttemptDisposition
-from empirical_lawhood.runtime.progress import progress_reporting
-from empirical_lawhood.runtime.providers import ExternalInputPayload
+from empirical_lawhood.execution.local.execution import ExecutionResourceCapacity, InjectedSchedulerCrash
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.compiler import compile_run_plan, lower_run_plan
+from empirical_lawhood.execution.execution import TaskAttemptDisposition
+from empirical_lawhood.execution.progress import progress_reporting
+from empirical_lawhood.execution.providers import ExternalInputPayload
 from tests.api.test_campaign_execution import PACKAGE
 from tests.approval_support import approval_service_for_path
 from tests.runtime_platform.conftest import build_protocol_fixture

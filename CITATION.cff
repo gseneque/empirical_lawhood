@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use Empirical Lawhood in your work, please cite this software and the published preprint."
 title: "Empirical Lawhood"
 type: software
-version: "0.3.0"
+version: "1.0.0"
 # Software DOI and publication date are supplied by the actual release record.
 authors:
   - family-names: "Seneque"

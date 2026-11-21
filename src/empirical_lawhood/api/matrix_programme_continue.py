@@ -5,8 +5,8 @@ from hashlib import sha256
 from pathlib import Path
 from time import monotonic
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 
 
 def continue_matrix_programme(service, *, predecessor_directory, output_dir, confirmed, maximum_parallel_tasks=None,
@@ -17,25 +17,22 @@ def continue_matrix_programme(service, *, predecessor_directory, output_dir, con
     no retrospective report is required. Every actual scientific task retains
     its ordinary source, current input access and resource entry boundaries.
     """
-    from .matrix_researcher_programme import MatrixResearchProgrammeService, _publish, PLAN_FILENAME
-    from .matrix_researcher_programme_lineage import read_published_record
-    from .selected_e4_bank_recipe import _publication_from_manifest
-    from .recursive_authoring import implementation_binding
-    from .retained_e3_evidence import retained_e3_evidence_context
-    from empirical_lawhood.infrastructure.matrix_programme_inputs import _input_record_scope
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixResearchProgrammePlan
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.source_continuation import (
-        MatrixProgrammeSourceContinuationSpecification, MatrixProgrammeOutputContinuationSpecification,
-        PROTOCOL_ID, OUTPUT_PROTOCOL_ID, require_separate_home,
-    )
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-    from empirical_lawhood.runtime.progress import report_progress
+    from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService, _publish, PLAN_FILENAME
+    from empirical_lawhood.api.matrix_researcher_programme_lineage import read_published_record
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.api.recursive_authoring import implementation_binding
+    from empirical_lawhood.api.retained_e3_evidence import retained_e3_evidence_context
+    from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import _input_record_scope
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixResearchProgrammePlan
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.source_continuation import MatrixProgrammeSourceContinuationSpecification, MatrixProgrammeOutputContinuationSpecification, PROTOCOL_ID, OUTPUT_PROTOCOL_ID, require_separate_home
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.progress import report_progress
     if type(confirmed) is not bool or not confirmed:
         raise ValueError('Matrix continuation requires --yes before authoring and ordinary execution')
-    if pure_output_bytes is not None and (type(pure_output_bytes) is not int or not 0 < pure_output_bytes <= 256 * 1024**2):
-        raise ValueError('future PURE output allowance must be a positive integer within 256 MiB')
+    if pure_output_bytes is not None and (type(pure_output_bytes) is not int or not pure_output_bytes > 0):
+        raise ValueError('future PURE output allowance must be a positive integer')
     if service.artifact_writer is None or service.storage_profile is None:
         raise ValueError('Matrix continuation requires its explicit operator profile and artifact destination')
     started = monotonic()

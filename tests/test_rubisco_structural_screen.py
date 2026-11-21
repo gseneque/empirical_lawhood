@@ -10,12 +10,10 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_prediction import records as r
-from empirical_lawhood.adapters.methods.rubisco_prediction import structural_screen as s
+from empirical_lawhood.domains.rubisco.rubisco_prediction import records as r
+from empirical_lawhood.domains.rubisco.rubisco_prediction import structural_screen as s
 from empirical_lawhood.adapters.physical.rubisco_kinetics import plant_structural_scores as native
-from empirical_lawhood.adapters.physical.rubisco_kinetics.mcdonald2026 import (
-    PlantContextV1, PlantProteinRecipeV1, PlantQuantityV1,
-)
+from empirical_lawhood.adapters.physical.rubisco_kinetics.mcdonald2026 import PlantContextV1, PlantProteinRecipeV1, PlantQuantityV1
 from empirical_lawhood.adapters.physical.rubisco_kinetics.workbook import NativeWorkbookCellV1
 
 
@@ -40,7 +38,7 @@ class Refuse(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in {'numpy', 'scipy', 'rapidfuzz', 'torch', 'transformers', 'esm'}:
             raise AssertionError('numerical import during cold discovery: ' + fullname)
 sys.meta_path.insert(0, Refuse())
-import empirical_lawhood.adapters.methods.rubisco_prediction.structural_screen
+import empirical_lawhood.domains.rubisco.rubisco_prediction.structural_screen
 """
     result = subprocess.run([sys.executable, "-B", "-c", script], cwd=Path(__file__).parent.parent,
                             capture_output=True, text=True, check=False)

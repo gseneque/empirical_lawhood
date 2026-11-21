@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Cold public API composition; static discovery starts no authentication."""
-from empirical_lawhood.adapters.methods.matrix_finite_dt_source_experiment import (
-    PROTOCOL_ID, MatrixFiniteDtSourceQualificationSpecification)
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_finite_dt_source_experiment import PROTOCOL_ID, MatrixFiniteDtSourceQualificationSpecification
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 
 
 def bind_handoff(*args, **kwargs):

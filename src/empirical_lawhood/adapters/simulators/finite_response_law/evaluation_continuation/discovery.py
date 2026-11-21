@@ -3,20 +3,20 @@
 from dataclasses import replace
 from hashlib import sha256
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.planning.source_qualification import ProspectiveRetainedSourceUse
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityPermission
-from empirical_lawhood.runtime.extension_bundles import ExtensionContributionKind
-from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignStageEnvelope
-from empirical_lawhood.runtime.source_qualification import ProspectiveRetainedSourceUseBinding
-from empirical_lawhood.adapters.composition.discovery import manifest, bundle
-from ..evaluation.discovery import SOURCE_CAPABILITY as ORIGINAL_SOURCE, SOURCE_COMPONENTS as ORIGINAL_COMPONENTS
-from ..assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
-from ..evaluation_retention import FiniteResponseLawEvaluationRetention
-from ..source_outputs import FiniteResponseLawAssignedEvaluationTaskResult
-from ..native_artifact import NATIVE_PAIR_SCHEMA
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.design.source_qualification import ProspectiveRetainedSourceUse
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityPermission
+from empirical_lawhood.execution.extension_bundles import ExtensionContributionKind
+from empirical_lawhood.execution.linked_campaigns import LinkedCampaignStageEnvelope
+from empirical_lawhood.execution.source_qualification import ProspectiveRetainedSourceUseBinding
+from empirical_lawhood.execution.declaration_helpers import manifest, bundle
+from empirical_lawhood.adapters.simulators.finite_response_law.evaluation.discovery import SOURCE_CAPABILITY as ORIGINAL_SOURCE, SOURCE_COMPONENTS as ORIGINAL_COMPONENTS
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
+from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_retention import FiniteResponseLawEvaluationRetention
+from empirical_lawhood.adapters.simulators.finite_response_law.source_outputs import FiniteResponseLawAssignedEvaluationTaskResult
+from empirical_lawhood.adapters.simulators.finite_response_law.native_artifact import NATIVE_PAIR_SCHEMA
 
 NAMESPACE = "finite-response-law.evaluation-continuation"
 SOURCE_CAPABILITY = replace(

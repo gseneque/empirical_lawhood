@@ -6,9 +6,9 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_experiment as public
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as owner
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_experiment as public
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as owner
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 from tests.test_matrix_selected_e3_e4_bridge import (
     selected_bridge, transfer, disclosed_operational_resources,  # noqa: F401 - disclosed fixture
@@ -31,7 +31,7 @@ def test_phase_config_requires_exact_complete_supported_reservations(damage):
 
 def test_public_input_binding_derives_every_task_without_operator_task_ids(selected_bridge):  # noqa: F811
     f, campaign = selected_bridge, campaign_fixture()[0].campaign
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
     spec = public.SelectedE3E4ExperimentSpecification("experiment.selected-e4.phase-reservations",
         f.programme.identity, f.bank.identity, f.evidence.identity, ObjectIdentity.from_record(campaign.campaign_id, campaign),
         *disclosed_structure(f.bank, budget=dict(disclosed_operational_resources().phase_budgets)["collect"]))
@@ -54,9 +54,9 @@ def test_public_input_binding_derives_every_task_without_operator_task_ids(selec
 
 
 def test_resources_configuration_validates_standalone_without_preparation(tmp_path, monkeypatch):
-    from pathlib import Path
+    from tests.numerical_provenance_fixtures import selected_test_mount
     from empirical_lawhood.api.configuration import validate_configuration
-    assert tmp_path.resolve().is_relative_to(Path("/media/chevre/EL/empirical-lawhood"))
+    selected_test_mount(tmp_path)
     selection = disclosed_operational_resources()
     path = tmp_path / "resources.json"
     path.write_bytes(selection.canonical_bytes())

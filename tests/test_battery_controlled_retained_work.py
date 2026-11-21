@@ -5,14 +5,14 @@ from decimal import Decimal
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import controlled_forecast_config_v1_1 as candidate
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import controlled_retained_work as owner
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryAttempt, InquiryAttemptStatus
-from empirical_lawhood.kernel.recursive_inquiry_policy import InquiryAttemptWorkBinding
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.domains.battery.battery_refined_inquiry import controlled_forecast_config_v1_1 as candidate
+from empirical_lawhood.domains.battery.battery_refined_inquiry import controlled_retained_work as owner
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryAttempt, InquiryAttemptStatus
+from empirical_lawhood.science.inquiry.recursive_inquiry_policy import InquiryAttemptWorkBinding
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 from tests.test_battery_forecast_step_control import selected as selected, config as config
 from tests.test_battery_controlled_binding import cold_scope as cold_scope
 from tests.test_battery_segmented_graph import stock as stock
@@ -153,7 +153,7 @@ def test_current_config_refuses_unknown_with_the_shared_recovery_reason(cold_sco
 def test_root_rechecks_the_shared_predicate_even_for_an_unvalidated_object(cold_scope):
     """Adversarial raw object cannot bypass the constructor's refusal."""
     from dataclasses import fields
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import controlled_operation_bindings_v1_1 as declaration
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import controlled_operation_bindings_v1_1 as declaration
     raw = object.__new__(candidate.ControlledForecastConfig)
     for field, value in zip(fields(candidate.ControlledForecastConfig), candidate_arguments(cold_scope), strict=True):
         object.__setattr__(raw, field.name, value)

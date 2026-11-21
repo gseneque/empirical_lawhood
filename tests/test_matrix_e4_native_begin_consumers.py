@@ -9,23 +9,22 @@ and late-stop cases. They confer no scientific execution or outcome authority.
 Physical producing-checkout and SQL lease mutation are separate acceptance cases;
 retiring the actual live creator below is not represented as a SQL lease test.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.infrastructure import execution as lifecycle
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.runtime.artifacts import ArtifactManifest
-from empirical_lawhood.runtime.native_subwork import (
-    NativeSubworkInputError, NativeSubworkState, NativeSubworkUncertainContact,
-)
-from empirical_lawhood.adapters.methods.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
+from empirical_lawhood.execution.local import execution as lifecycle
+
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
+from empirical_lawhood.execution.native_subwork import NativeSubworkInputError, NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.domains.matrix.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
 from tests.runtime_platform.test_native_subwork import _store
 from tests.test_matrix_e4_worker_preflight import (
     invoke, native_case, provenance, ready, scheduled, stock,  # noqa: F401
 )
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as owner
 
 
 PHASES = ('prefix', 'continue', 'responses')
@@ -99,7 +98,7 @@ def test_actual_e4_begin_replays_late_input_publication_damage(native_case, phas
     original = next(row for row in inputs if row.artifact_id.endswith('.source'))
     source_path = native_case.plane.root.resolve(original.materialization.relative_path, for_write=False)
     sidecar = source_path.with_name(source_path.name + '.manifest.json')
-    manifest = decode_artifact_manifest(sidecar.read_bytes())
+    manifest = resolve_artifact_sidecar_bytes(native_case.plane, sidecar.read_bytes())
     assert manifest.publication is not None
     target = (source_path if damage == 'source-body' else sidecar if damage == 'source-sidecar' else
         native_case.plane.root.resolve(manifest.publication.commit_marker_relative_path, for_write=False))

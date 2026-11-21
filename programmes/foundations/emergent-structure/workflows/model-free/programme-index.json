@@ -1,0 +1,88 @@
+{
+  "confirmation_policy": "Complete typed choices, authenticated parent readout, operator measured ceilings, family allocation and disjoint roots required before confirmatory authoring; planning definitions deliberately lack final pilot-dependent choices.",
+  "independent_unit": "seed/root, with recipes, coordinates, ports and future noise nested",
+  "order_policy": "Researcher selects an authored definition through the shared recursive service. This index is an inventory, not a scheduler.",
+  "public_entry": "scripts/examples/model_free_matrix.py",
+  "schema": "matrix-model-free-programme-index.v1",
+  "stages": [
+    {
+      "definition": "smoke.json",
+      "role": "software only, no scientific qualification"
+    },
+    {
+      "definition": "pilot.json",
+      "role": "bounded development"
+    },
+    {
+      "definition": "matched-exposure.json",
+      "role": "development timing/exposure separation"
+    },
+    {
+      "definition": "transfer.json",
+      "role": "development source/destination applicability"
+    },
+    {
+      "definition": "population-reveal-all.json",
+      "role": "reveal every target on the frozen frame; exact design variances; counterfactual savings only"
+    },
+    {
+      "definition": "population.json",
+      "operation": "deploy-population",
+      "parent_definition": "population-reveal-all.json",
+      "role": "fresh-root sparse deployment; authenticated complete reveal-all benchmark required"
+    },
+    {
+      "definition": "equilibrium-events.json",
+      "role": "equilibrium and entry-conditioned finite-horizon events"
+    },
+    {
+      "definition": "programme.json",
+      "role": "explicit union of pilot/population-reveal-all/equilibrium-events; do not duplicate roots"
+    },
+    {
+      "definition": "confirmation.json",
+      "role": "planning allocation; freeze after authenticated development parent"
+    },
+    {
+      "definition": "memory-confirmation.json",
+      "role": "separate memory confirmation; freeze after authenticated development parent"
+    },
+    {
+      "definition": "relation-benchmark.json",
+      "role": "optional learned historical comparator; classical_matrix_series.py entry"
+    },
+    {
+      "definition": "memory-reanalysis.json",
+      "role": "exposed M2 post-hoc bins/history using original pilot; reanalyse operation and authenticated parent required; no fresh inference"
+    },
+    {
+      "definition": "receiver-memory-reanalysis.json",
+      "operation": "reanalyse",
+      "parent_definition": "pilot.json",
+      "role": "one common H64 future on the sixteen exposed pilot M2 roots"
+    },
+    {
+      "definition": "receiver-foundations.json",
+      "operation": "prepare",
+      "role": "49 new roots for known laws, matched exposure and waiting, common-future memory, fixed-temperature thermodynamics and subsequent passage"
+    },
+    {
+      "definition": "receiver-response.json",
+      "operation": "confirm",
+      "parent_definition": "pilot.json",
+      "role": "16 new roots for the prespecified signed H64 FACTOR comparison and shifted single-query transfer"
+    },
+    {
+      "definition": "receiver-benchmark.json",
+      "operation": "prepare",
+      "role": "32 new paired roots, complete native reveal and repeated-SRS variance at equal precision"
+    },
+    {
+      "definition": "receiver-audit.json",
+      "operation": "deploy-population",
+      "parent_definition": "receiver-benchmark.json",
+      "role": "32 disjoint paired roots with eight randomized native audits for development cost and precision validation"
+    }
+  ],
+  "status": "RECEIVER_STUDY_V2_DEFINED_AFTER_THE_COMPLETED_EXPOSED_M0_M4_PILOT"
+}

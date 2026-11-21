@@ -6,19 +6,19 @@ from hashlib import sha256
 from types import SimpleNamespace as N
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_durable_inquiry import operation_bindings as ob, recursive_translation as rt
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, durable_roster as dr, prepared_qualification as pq, preparation_science as ps
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.preparation_contracts import PreparationProtocol
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, WorkerInputKind, WorkerOutputPort
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.battery.battery_durable_inquiry import operation_bindings as ob, recursive_translation as rt
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, durable_roster as dr, prepared_qualification as pq, preparation_science as ps
+from empirical_lawhood.domains.battery.battery_refined_inquiry.preparation_contracts import PreparationProtocol
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, WorkerInputKind, WorkerOutputPort
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.battery_obstruction_fixtures import load_retained_obstruction_source
 from tests.test_battery_diagnostic_obstruction import projected
 from tests.test_battery_durable_roster import selected54 as exposed_selection, uncertain
@@ -99,7 +99,7 @@ def test_condition_reuse_preserves_original_trace_and_counts_actual_cost_once(st
         for i, native in enumerate(stock.roster.configurations))
     rows = {c.identity(summary.configuration): summary for summary in summaries}
     comparisons = []
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import science
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import science
     for left, right in stock.roster.comparison_config_pairs:
         left_trace = original[(rows[left].condition_reuse.observed_configuration if rows[left].condition_reuse else rows[left].configuration).config_id][0]
         right_trace = original[(rows[right].condition_reuse.observed_configuration if rows[right].condition_reuse else rows[right].configuration).config_id][0]
@@ -137,7 +137,7 @@ def test_unknown_overlap_refuses_before_provider_contact(stock, monkeypatch):
         dependency_receipts=(DependencyReceiptBinding("receipt.exposed-gate", ob.node_id("validate"), tuple(sorted(dependency_ports))),),
         output_ports=tuple(WorkerOutputPort(node + "." + name, record.SCHEMA, ArtifactProfile.CANONICAL_JSON, ob.MEDIA)
             for name, record in ob.operation_outputs("forecast")))
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import prepared_native
+    from empirical_lawhood.adapters.battery.battery_refined_inquiry import prepared_native
     calls = []
     monkeypatch.setattr(prepared_native, "acquire_prepared", lambda *args, **kwargs: calls.append(args))
     with pytest.raises(ValueError, match="automatic replay"):
@@ -161,10 +161,9 @@ class RefuseNative(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in {'pybamm','numpy','flint'}:
             raise AssertionError('cold descriptor imports native numerical code')
 sys.meta_path.insert(0,RefuseNative())
-from empirical_lawhood.adapters.methods.battery_durable_inquiry.executable_binding import EXECUTABLE_BINDING_FACTORIES
-from empirical_lawhood.adapters.methods.battery_durable_inquiry.extension_bundle import EXTENSION_BUNDLE_CONTRIBUTION
-assert len(EXECUTABLE_BINDING_FACTORIES)==6
-assert tuple(row.manifest for row in EXECUTABLE_BINDING_FACTORIES)==EXTENSION_BUNDLE_CONTRIBUTION.capability_manifests
-assert all(row.inquiry_work_projector is not None for row in EXECUTABLE_BINDING_FACTORIES)
+from empirical_lawhood.domains.battery.battery_durable_inquiry.extension import EXTENSION
+assert len(EXTENSION.factories)==6
+assert tuple(row.manifest for row in EXTENSION.factories)==EXTENSION.discovery.capability_manifests
+assert all(row.inquiry_work_projector is not None for row in EXTENSION.factories)
 """
     subprocess.run([sys.executable, "-c", probe], check=True, capture_output=True, text=True)

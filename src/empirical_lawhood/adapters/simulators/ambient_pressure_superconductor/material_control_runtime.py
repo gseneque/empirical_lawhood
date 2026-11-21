@@ -1,105 +1,49 @@
-'Receipt-first material control control execution and conditional science freeze.'
+"""Native acquisition and external-format binding for the domain science."""
 
 from __future__ import annotations
-
 from dataclasses import fields
 from hashlib import sha256
 import tarfile
 from typing import Any, Callable, TypeVar, cast
-
 import numpy as np
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord, encode_scientific_adjudication
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import StreamingOutputEmitter, TaskContext, TaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, CampaignRuntimeProvider, ExternalInputPayload
+from empirical_lawhood.domains.materials.superconductivity.gauge_covariant_response_contracts import GaugeCovariantResponseConformanceResult, GaugeCovariantResponseResponseObservation
+from empirical_lawhood.domains.materials.superconductivity.synthetic_gauge_covariant_response import run_gauge_covariant_response_conformance
+from empirical_lawhood.domains.materials.superconductivity.material_control_contracts import MATERIAL_CONTROL_ADJUDICATION_SCHEMA, MATERIAL_CONTROL_CAPABILITY_VERSION, MATERIAL_CONTROL_CLOSEOUT_CAPABILITY_KEY, MATERIAL_CONTROL_CONFIG_SCHEMA, MATERIAL_CONTROL_CONFIG_VERSION, MATERIAL_CONTROL_METHOD_CAPABILITY_KEY, MATERIAL_CONTROL_PANEL_CAPABILITY_KEY, MATERIAL_CONTROL_SOURCE_CAPABILITY_KEY, MATERIAL_CONTROL_WORKFLOW_CAPABILITY_KEY, MATERIAL_CONTROL_SEARCH_WORLD_CAPABILITY_KEY, MaterialControlCloseout, MaterialControlConfig, MaterialControlControlBundleQualification, MaterialControlControlObservation, MaterialControlControlPanel, MaterialControlStageResult, MaterialControlTutorialReproduction, MaterialControlTruthWorldConformance, MaterialControlTruthWorldResult, BridgeDisposition, MultibandStrongCouplingMaterialCompatibility, MultibandStrongCouplingMaterialViewResult, MultibandStrongCouplingBridgeQualification, decode_material_control_config_bytes
+from empirical_lawhood.domains.materials.superconductivity.material_control_assessment import build_material_control_closeout, build_control_observation, build_control_panel, build_tutorial_reproduction
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_design import profile_source_identity
+from empirical_lawhood.domains.materials.superconductivity.material_operand_assessment import evaluate_material_view, unresolved_material_operands
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_material_operands import reduce_material_operands
+from empirical_lawhood.domains.materials.superconductivity.multiband_strong_coupling_response import qualify_multiband_bridge
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_raw import RAW_ARCHIVE_MEDIA_TYPE, RAW_ARCHIVE_SCHEMA
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_registration import material_control_metadata_task_budget, material_control_task_budget
+from empirical_lawhood.domains.materials.superconductivity.workflow_profiles import MATERIAL_CONTROL_WORKFLOW_PROFILES
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_solver import FileTaskOutputSource, FixedMaterialControlWorkflowExecutor, cleanup_material_control_workflow_scratch
+from empirical_lawhood.domains.materials.superconductivity.workflow_contracts import MaterialControlWorkflowProfile, MaterialControlWorkflowRequest, WorkflowKind, WorkflowSource
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_source import expected_material_control_control_bundle, inspect_material_control_control_bundle
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.constructive_search_conformance import run_constructive_search_conformance
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-    encode_scientific_adjudication,
+from empirical_lawhood.domains.materials.superconductivity.material_control_stages import (
+    CLOSEOUT_STEP as _science_CLOSEOUT_STEP,
+    CONFIG_ARTIFACT_ID as _science_CONFIG_ARTIFACT_ID,
+    CONSTRUCTIVE_SEARCH_CONFORMANCE_STEP as _science_CONSTRUCTIVE_SEARCH_CONFORMANCE_STEP,
+    METHOD_STEP as _science_METHOD_STEP,
+    PANEL_TASKS as _science_PANEL_TASKS,
+    PROFILE_TASKS as _science_PROFILE_TASKS,
+    SOURCE_CONTRACT_ARTIFACT_ID as _science_SOURCE_CONTRACT_ARTIFACT_ID,
+    SOURCE_STEP as _science_SOURCE_STEP,
+    WORKFLOW_TASKS as _science_WORKFLOW_TASKS,
 )
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityManifest,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.execution import (
-    StreamingOutputEmitter,
-    TaskContext,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-)
-
-from .gauge_covariant_response_contracts import GaugeCovariantResponseConformanceResult, GaugeCovariantResponseResponseObservation
-from .synthetic_gauge_covariant_response import run_gauge_covariant_response_conformance
-from .material_control_contracts import MATERIAL_CONTROL_ADJUDICATION_SCHEMA, MATERIAL_CONTROL_CAPABILITY_VERSION, MATERIAL_CONTROL_CLOSEOUT_CAPABILITY_KEY, MATERIAL_CONTROL_CONFIG_SCHEMA, MATERIAL_CONTROL_CONFIG_VERSION, MATERIAL_CONTROL_METHOD_CAPABILITY_KEY, MATERIAL_CONTROL_PANEL_CAPABILITY_KEY, MATERIAL_CONTROL_SOURCE_CAPABILITY_KEY, MATERIAL_CONTROL_WORKFLOW_CAPABILITY_KEY, MATERIAL_CONTROL_SEARCH_WORLD_CAPABILITY_KEY, MaterialControlCloseout, MaterialControlConfig, MaterialControlControlBundleQualification, MaterialControlControlObservation, MaterialControlControlPanel, MaterialControlStageResult, MaterialControlTutorialReproduction, MaterialControlTruthWorldConformance, MaterialControlTruthWorldResult, BridgeDisposition, MultibandStrongCouplingMaterialCompatibility, MultibandStrongCouplingMaterialViewResult, MultibandStrongCouplingBridgeQualification, decode_material_control_config_bytes
-from .material_control_design import build_material_control_closeout, build_control_observation, build_control_panel, build_tutorial_reproduction, profile_source_identity
-from .material_control_material_operands import evaluate_material_view, reduce_material_operands, unresolved_material_operands
-from .multiband_strong_coupling_response import qualify_multiband_bridge
-from .material_control_raw import RAW_ARCHIVE_MEDIA_TYPE, RAW_ARCHIVE_SCHEMA
-from .material_control_registration import material_control_metadata_task_budget, material_control_task_budget
-from .material_control_solver import MATERIAL_CONTROL_WORKFLOW_PROFILES, MaterialControlWorkflowProfile, MaterialControlWorkflowRequest, FileTaskOutputSource, FixedMaterialControlWorkflowExecutor, WorkflowKind, WorkflowSource, cleanup_material_control_workflow_scratch
-from .material_control_source import expected_material_control_control_bundle, inspect_material_control_control_bundle
-from .constructive_search_conformance import run_constructive_search_conformance
-
-
-CONFIG_ARTIFACT_ID = 'config-artifact.ambient-pressure-superconductor-material-control'
-SOURCE_CONTRACT_ARTIFACT_ID = 'source-contract.ambient-pressure-superconductor-material-control-control-bundle'
-SOURCE_STEP = 'material-control-source-qualification'
-METHOD_STEP = 'material-control-gauge-covariant-response-method-qualification'
-CONSTRUCTIVE_SEARCH_CONFORMANCE_STEP = 'material-control-constructive-search-search-world-conformance'
-CLOSEOUT_STEP = 'material-control-science-freeze-closeout'
-
-_WORKFLOW_SEQUENCE = (
-    'workflow.material-control-tutorial04-pb',
-    'workflow.material-control-tutorial04-mgb2',
-    'workflow.material-control-pbe-efficiency-base-calibration-pb-fcc',
-    'workflow.material-control-pbe-precision-refined-calibration-pb-fcc',
-    'workflow.material-control-pbe-efficiency-base-calibration-mgb2-alb2',
-    'workflow.material-control-pbe-precision-refined-calibration-mgb2-alb2',
-    'workflow.material-control-pbe-efficiency-base-calibration-cu-fcc',
-    'workflow.material-control-pbe-precision-refined-calibration-cu-fcc',
-    'workflow.material-control-pbe-efficiency-base-calibration-c-diamond',
-    'workflow.material-control-pbe-precision-refined-calibration-c-diamond',
-    'workflow.material-control-pbe-efficiency-base-calibration-pb-sc-compressed',
-    'workflow.material-control-pbe-precision-refined-calibration-pb-sc-compressed',
-)
-_PROFILE_BY_ID = {value.profile_id: value for value in MATERIAL_CONTROL_WORKFLOW_PROFILES}
-if set(_WORKFLOW_SEQUENCE) != set(_PROFILE_BY_ID):
-    raise ValueError(
-        'material control workflow execution sequence differs from its closed profile set'
-    )
-
-
-def _workflow_step_id(index: int, profile_id: str) -> str:
-    return f"material-control-workflow-{index:02d}-{profile_id.removeprefix('workflow.material-control-')}"
-
-
-WORKFLOW_TASKS = {
-    _workflow_step_id(index, profile_id): _PROFILE_BY_ID[profile_id]
-    for index, profile_id in enumerate(_WORKFLOW_SEQUENCE, start=1)
-}
-PROFILE_TASKS = {value.profile_id: key for key, value in WORKFLOW_TASKS.items()}
-PANEL_TASKS = {
-    'material-control-panel-c-diamond': 'structure.calibration-c-diamond',
-    'material-control-panel-cu-fcc': 'structure.calibration-cu-fcc',
-    'material-control-panel-mgb2-alb2': 'structure.calibration-mgb2-alb2',
-    'material-control-panel-pb-fcc': 'structure.calibration-pb-fcc',
-    'material-control-panel-pb-sc-compressed': 'structure.calibration-pb-sc-compressed',
-}
-
 
 def material_control_config_ref(config: MaterialControlConfig) -> CapabilityConfigRef:
     return CapabilityConfigRef(
@@ -107,7 +51,7 @@ def material_control_config_ref(config: MaterialControlConfig) -> CapabilityConf
         config_schema=MATERIAL_CONTROL_CONFIG_SCHEMA,
         config_schema_sha256=sha256(MATERIAL_CONTROL_CONFIG_SCHEMA.encode()).hexdigest(),
         content_sha256=config.payload_sha256,
-        artifact_id=CONFIG_ARTIFACT_ID,
+        artifact_id=_science_CONFIG_ARTIFACT_ID,
     )
 
 
@@ -177,7 +121,7 @@ def material_control_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=SOURCE_STEP,
+            step_id=_science_SOURCE_STEP,
             stage=ScientificStage.QUALIFY,
             capability_key=MATERIAL_CONTROL_SOURCE_CAPABILITY_KEY,
             dependencies=(),
@@ -191,7 +135,7 @@ def material_control_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=METHOD_STEP,
+            step_id=_science_METHOD_STEP,
             stage=ScientificStage.FALSIFY,
             capability_key=MATERIAL_CONTROL_METHOD_CAPABILITY_KEY,
             dependencies=(),
@@ -212,7 +156,7 @@ def material_control_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=CONSTRUCTIVE_SEARCH_CONFORMANCE_STEP,
+            step_id=_science_CONSTRUCTIVE_SEARCH_CONFORMANCE_STEP,
             stage=ScientificStage.FALSIFY,
             capability_key=MATERIAL_CONTROL_SEARCH_WORLD_CAPABILITY_KEY,
             dependencies=(),
@@ -229,7 +173,7 @@ def material_control_protocol(
             obligations=('material-control-six-world-three-policy-search-conformance',),
         ),
     ]
-    for task_id, profile in WORKFLOW_TASKS.items():
+    for task_id, profile in _science_WORKFLOW_TASKS.items():
         outputs: tuple[OutputTemplate, ...]
         if profile.source is WorkflowSource.EPW_SUPERCONDUCTING_REFERENCE:
             outputs = (
@@ -258,7 +202,7 @@ def material_control_protocol(
                 step_id=task_id,
                 stage=ScientificStage.ACQUIRE,
                 capability_key=MATERIAL_CONTROL_WORKFLOW_CAPABILITY_KEY,
-                dependencies=(SOURCE_STEP, METHOD_STEP),
+                dependencies=(_science_SOURCE_STEP, _science_METHOD_STEP),
                 outputs=outputs,
                 access=OutcomeAccess.DEVELOPMENT_VISIBLE,
                 visibility=VisibilityCeiling.DEVELOPMENT_ONLY,
@@ -270,10 +214,10 @@ def material_control_protocol(
             )
         )
 
-    for task_id, structure_id in PANEL_TASKS.items():
+    for task_id, structure_id in _science_PANEL_TASKS.items():
         profile_tasks = tuple(
             sorted(
-                PROFILE_TASKS[value.profile_id]
+                _science_PROFILE_TASKS[value.profile_id]
                 for value in MATERIAL_CONTROL_WORKFLOW_PROFILES
                 if value.source is WorkflowSource.SSSP_CONTROL
                 and value.structure_id == structure_id
@@ -300,13 +244,13 @@ def material_control_protocol(
         )
 
     positive_tasks = tuple(
-        PROFILE_TASKS[value.profile_id]
+        _science_PROFILE_TASKS[value.profile_id]
         for value in MATERIAL_CONTROL_WORKFLOW_PROFILES
         if value.source is WorkflowSource.SSSP_CONTROL
         and value.structure_id in {'structure.calibration-pb-fcc', 'structure.calibration-mgb2-alb2'}
     )
     tutorial_tasks = tuple(
-        PROFILE_TASKS[value.profile_id]
+        _science_PROFILE_TASKS[value.profile_id]
         for value in MATERIAL_CONTROL_WORKFLOW_PROFILES
         if value.source is WorkflowSource.EPW_SUPERCONDUCTING_REFERENCE
     )
@@ -314,18 +258,18 @@ def material_control_protocol(
         _step(
             registry=registry,
             config=config,
-            step_id=CLOSEOUT_STEP,
+            step_id=_science_CLOSEOUT_STEP,
             stage=ScientificStage.EVALUATE,
             capability_key=MATERIAL_CONTROL_CLOSEOUT_CAPABILITY_KEY,
             dependencies=tuple(
                 sorted(
                     (
-                        SOURCE_STEP,
-                        METHOD_STEP,
-                        CONSTRUCTIVE_SEARCH_CONFORMANCE_STEP,
+                        _science_SOURCE_STEP,
+                        _science_METHOD_STEP,
+                        _science_CONSTRUCTIVE_SEARCH_CONFORMANCE_STEP,
                         *tutorial_tasks,
                         *positive_tasks,
-                        *PANEL_TASKS,
+                        *_science_PANEL_TASKS,
                     )
                 )
             ),
@@ -546,7 +490,7 @@ class MaterialControlRunner:
             or bridge.fingerprint() != self.config.bridge_qualification_sha256
         ):
             raise ValueError('material control workflow gauge covariant response method qualification differs')
-        profile = WORKFLOW_TASKS[context.task_id]
+        profile = _science_WORKFLOW_TASKS[context.task_id]
         postprocessing_reserve = (
             12 * 3600
             if profile.kind is WorkflowKind.POSITIVE
@@ -650,7 +594,7 @@ class MaterialControlRunner:
         self, context: TaskContext, emitter: StreamingOutputEmitter
     ) -> tuple[ReceiptCheck, ...]:
         records = self._read(context)
-        if context.task_id == SOURCE_STEP:
+        if context.task_id == _science_SOURCE_STEP:
             contract = _one(records, MaterialControlControlBundleQualification)
             if contract != self.source_contract:
                 raise ValueError('material control source contract differs')
@@ -664,7 +608,7 @@ class MaterialControlRunner:
                 raise ValueError('material control physical control bundle differs')
             self._emit_record(context, emitter, "control-bundle", observed)
             checks = ('material-control-control-bundle-qualified',)
-        elif context.task_id == METHOD_STEP:
+        elif context.task_id == _science_METHOD_STEP:
             if records:
                 raise ValueError('material control method task received scientific inputs')
             bridge = qualify_multiband_bridge(
@@ -685,17 +629,17 @@ class MaterialControlRunner:
                     observation,
                 )
             checks = ('material-control-gauge-covariant-response-methods-qualified',)
-        elif context.task_id in WORKFLOW_TASKS:
+        elif context.task_id in _science_WORKFLOW_TASKS:
             return self._execute_workflow(context, emitter, records)
-        elif context.task_id in PANEL_TASKS:
+        elif context.task_id in _science_PANEL_TASKS:
             control_observations = _records(records, MaterialControlControlObservation)
             panel = build_control_panel(
-                structure_id=PANEL_TASKS[context.task_id],
+                structure_id=_science_PANEL_TASKS[context.task_id],
                 observations=control_observations,
             )
             self._emit_record(context, emitter, "control-panel", panel)
             checks = ('material-control-control-panel-adjudicated',)
-        elif context.task_id == CONSTRUCTIVE_SEARCH_CONFORMANCE_STEP:
+        elif context.task_id == _science_CONSTRUCTIVE_SEARCH_CONFORMANCE_STEP:
             if records:
                 raise ValueError('material control constructive search task received scientific inputs')
             conformance, worlds = run_constructive_search_conformance()
@@ -703,7 +647,7 @@ class MaterialControlRunner:
             for index, world in enumerate(worlds, start=1):
                 self._emit_record(context, emitter, f'constructive-search-world-{index:02d}', world)
             checks = ('material-control-constructive-search-conformance-adjudicated',)
-        elif context.task_id == CLOSEOUT_STEP:
+        elif context.task_id == _science_CLOSEOUT_STEP:
             source = _one(records, MaterialControlControlBundleQualification)
             closeout = build_material_control_closeout(
                 config=self.config,
@@ -835,7 +779,7 @@ class MaterialControlRuntimeProvider(CampaignRuntimeProvider):
             for task in plan.tasks
             for value in task.external_inputs
         }
-        if set(specs) != {CONFIG_ARTIFACT_ID, SOURCE_CONTRACT_ARTIFACT_ID}:
+        if set(specs) != {_science_CONFIG_ARTIFACT_ID, _science_SOURCE_CONTRACT_ARTIFACT_ID}:
             raise ValueError('material control plan external input set differs')
 
         def payload(
@@ -874,13 +818,13 @@ class MaterialControlRuntimeProvider(CampaignRuntimeProvider):
 
         return (
             payload(
-                CONFIG_ARTIFACT_ID,
+                _science_CONFIG_ARTIFACT_ID,
                 schema=MATERIAL_CONTROL_CONFIG_SCHEMA,
                 content=self.config_payload,
                 version=MATERIAL_CONTROL_CONFIG_VERSION,
             ),
             payload(
-                SOURCE_CONTRACT_ARTIFACT_ID,
+                _science_SOURCE_CONTRACT_ARTIFACT_ID,
                 schema=MaterialControlControlBundleQualification.SCHEMA,
                 content=self.source_contract.canonical_bytes(),
                 version=MaterialControlControlBundleQualification.VERSION,
@@ -938,26 +882,9 @@ class MaterialControlRuntimeProvider(CampaignRuntimeProvider):
         return ScientificAdjudicationOutputContract(
             capability_key=MATERIAL_CONTROL_CLOSEOUT_CAPABILITY_KEY,
             capability_version=MATERIAL_CONTROL_CAPABILITY_VERSION,
-            output_id=f'{CLOSEOUT_STEP}.scientific-adjudication',
+            output_id=f'{_science_CLOSEOUT_STEP}.scientific-adjudication',
             payload_schema=MATERIAL_CONTROL_ADJUDICATION_SCHEMA,
             maximum_bytes=128 * 1024,
             fixture_scope_id=None,
             plumbing_only=False,
         )
-
-
-__all__ = [
-    "CLOSEOUT_STEP",
-    "CONFIG_ARTIFACT_ID",
-    "METHOD_STEP",
-    "PANEL_TASKS",
-    "PROFILE_TASKS",
-    "SOURCE_CONTRACT_ARTIFACT_ID",
-    "SOURCE_STEP",
-    "WORKFLOW_TASKS",
-    'CONSTRUCTIVE_SEARCH_CONFORMANCE_STEP',
-    'MaterialControlRunner',
-    'MaterialControlRuntimeProvider',
-    'material_control_config_ref',
-    'material_control_protocol',
-]

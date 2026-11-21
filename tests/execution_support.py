@@ -11,8 +11,8 @@ from __future__ import annotations
 
 from dataclasses import replace
 
-from empirical_lawhood.infrastructure.execution import DirectTaskExecutor
-from empirical_lawhood.runtime.execution import ExecutorEnforcementCapability
+from empirical_lawhood.execution.local.execution import DirectTaskExecutor
+from empirical_lawhood.execution.execution import ExecutorEnforcementCapability
 
 
 ENFORCING_TEST_EXECUTOR_CAPABILITY = ExecutorEnforcementCapability(

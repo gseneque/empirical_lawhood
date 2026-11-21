@@ -13,19 +13,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_experiment_inputs import (
-    E3RequiredPublication, ProtectedE3SourceInputs,
-    project_protected_e3_allocation, require_e3_reserved_fit_inputs,
-)
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole as Role, MatrixProgrammeRoot
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled_records
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import MatrixParameterCoordinate
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.time import AvailabilitySpec, CausalPhase, InformationCutoff
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_experiment_inputs import E3RequiredPublication, ProtectedE3SourceInputs, project_protected_e3_allocation, require_e3_reserved_fit_inputs
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole as Role, MatrixProgrammeRoot
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled_records
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import MatrixParameterCoordinate
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase, InformationCutoff
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
 from tests.test_matrix_experiment_methods import fixture, selected_input_records
 from tests.test_matrix_factor_confirmation_eligibility import publish, stock as stock, provenance as provenance  # noqa: F401
 from tests.test_matrix_scheduled_history import CONSTRUCTION, scheduled as scheduled  # noqa: F401

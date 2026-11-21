@@ -15,17 +15,17 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods import isolated_native_conformance
-from empirical_lawhood.adapters.methods.isolated_native_conformance import ExposedIsolatedNativeRunner
-from empirical_lawhood.adapters.methods.rubisco_insilico_free_energy import prospective_xtb as xtb, raw_coupled_return as raw
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, TaskProcessError
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
-from empirical_lawhood.runtime.isolated_native_subwork import IsolatedNativeEntryReturn, IsolatedNativeEntrySelection
+from empirical_lawhood.adapters.conformance import isolated_native as isolated_native_conformance
+from empirical_lawhood.adapters.conformance.isolated_native import ExposedIsolatedNativeRunner
+from empirical_lawhood.domains.rubisco.rubisco_insilico_free_energy import prospective_xtb as xtb, raw_coupled_return as raw
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, TaskProcessError
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
+from empirical_lawhood.execution.isolated_native_subwork import IsolatedNativeEntryReturn, IsolatedNativeEntrySelection
 from tests.fixtures.rubisco import molecular_prepared_canary as child, molecular_prepared_canary_readback as independent, molecular_prepared_canary_control as control
 from tests.runtime_platform.test_native_subwork import _plane, _store, _process_context
 

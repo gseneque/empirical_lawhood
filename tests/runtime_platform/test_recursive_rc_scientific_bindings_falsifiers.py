@@ -6,20 +6,18 @@ from decimal import Decimal, localcontext
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain import operation_contracts as records
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain import operations, science
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.operation_bindings import (
-    operation_manifests, operation_registrations, output_codecs,
-)
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain import operation_contracts as records
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain import operations, science
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.operation_bindings import operation_manifests, operation_registrations, output_codecs
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
 from empirical_lawhood.adapters.composition.recursive_examples import rc_scientific_examples
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import ConditionRole, ContributionRole
-from empirical_lawhood.kernel.time import CausalPhase
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave, project_recursive_assessments
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import ConditionRole, ContributionRole
+from empirical_lawhood.science.models.time import CausalPhase
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave, project_recursive_assessments
 
 D = Decimal
 

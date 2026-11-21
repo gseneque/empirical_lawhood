@@ -7,17 +7,17 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import expected_members
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.continuation import ScheduledFullArrays
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledSource
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import expected_members
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.continuation import ScheduledFullArrays
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledSource
 from empirical_lawhood.api import derived_array_access as owner
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 from tests.runtime_platform.test_candidate_compiler import _fixture
 from tests.test_recursive_public_service import _plane
 

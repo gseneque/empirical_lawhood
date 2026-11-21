@@ -1,39 +1,29 @@
-"""Two-stage native source: preparation, then assays after a sealed-model barrier.
-
-The installed campaign provider must keep the private preparation out of the
-prediction task's input ports and verify the assay task's dependency receipt.
-This module has no authority to issue or run itself.
-"""
+"""Native acquisition, external-format translation and custody integration."""
 
 from __future__ import annotations
-
 from hashlib import sha256
 from typing import Callable
-
 import numpy as np
+from empirical_lawhood.domains.reactor.reactor_prepared_feed_qualification.records import FeedDomain
+from empirical_lawhood.domains.reactor.reactor_regime_response.config import ReactorRegimeResponseDesign
+from empirical_lawhood.domains.reactor.reactor_regime_response.records import RegimeAssayPanel, RegimeCausalPreparation, RegimePrivatePreparation
+from empirical_lawhood.domains.reactor.reactor_local_domain_qualification.records import LocalArrayPayload
+from empirical_lawhood.domains.reactor.reactor_regime_response.causal_preparation import causal_delivery_prefix
+from empirical_lawhood.domains.reactor.reactor_causal_response.measurements import ExplorationController, NativeEpisode, TapeController
+from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import acquire_episode, acquire_with_progress as _acquire_with_progress
+from empirical_lawhood.domains.reactor.reactor_causal_response.design import draw_scenario
+from empirical_lawhood.domains.reactor.reactor_prefix_response.batch_design import ReactorBatchSource
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.domains.reactor.reactor_regime_response.panel import FEED_WORDS, assay_tape, preparation_tape, select_anchors
 
-from empirical_lawhood.adapters.methods.reactor_prepared_feed_qualification.records import FeedDomain
-from empirical_lawhood.adapters.methods.reactor_regime_response.config import ROOTS, ReactorRegimeResponseDesign
-from empirical_lawhood.adapters.methods.reactor_regime_response.records import RegimeAssayPanel, RegimeCausalPreparation, RegimePrivatePreparation
-from empirical_lawhood.adapters.methods.reactor_local_domain_qualification.records import LocalArrayPayload
-from empirical_lawhood.adapters.methods.reactor_regime_response.causal_preparation import causal_delivery_prefix
-from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import ExplorationController, NativeEpisode, TapeController, acquire_episode, acquire_with_progress as _acquire_with_progress
-from empirical_lawhood.adapters.simulators.reactor_causal_response.design import draw_scenario
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_design import ReactorBatchSource
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-
-from .panel import FEED_WORDS, assay_tape, preparation_tape, select_anchors
+from empirical_lawhood.domains.reactor.reactor_regime_response.native_measurements import (
+    _episode,
+    _root_assignment,
+)
 
 Acquire = Callable[..., NativeEpisode]
+
 Progress = Callable[[int], None]
-
-
-def _root_assignment(root: str) -> tuple[str, int]:
-    found = [(role, seed) for name, role, _, seed in ROOTS if name == root]
-    if len(found) != 1:
-        raise ValueError("root is outside the frozen regime-response study assignment")
-    return found[0]
-
 
 def acquire_preparation(
     design: ReactorRegimeResponseDesign,
@@ -143,29 +133,6 @@ def acquire_preparation(
         tuple(failures),
     )
     return causal, private
-
-
-def _episode(
-    root: str,
-    key: str,
-    causal: dict[str, np.ndarray],
-    private: dict[str, np.ndarray],
-) -> NativeEpisode | None:
-    if f"{key}_observations" not in causal:
-        return None
-    return NativeEpisode(
-        root,
-        key,
-        0.5 if key.endswith("v1") else 1.0,
-        causal[f"{key}_observations"],
-        causal[f"{key}_requests"],
-        causal[f"{key}_stages"],
-        causal[f"{key}_exposure"],
-        private[f"{key}_grid"],
-        private[f"{key}_callback_cpu"],
-        None if len(causal[f"{key}_observations"]) == 2880 else "INCOMPLETE_NATIVE_BATCH",
-    )
-
 
 def acquire_assays(
     source: ReactorBatchSource,

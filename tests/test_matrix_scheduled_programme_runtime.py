@@ -15,26 +15,20 @@ import pytest
 
 from empirical_lawhood.api import matrix_scheduled_programme_runtime as api
 from empirical_lawhood.api import current_task_custody as custody
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import MatrixResponseErrorModel
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import (
-    calibration as legacy_calibration, forecast, programme_calibration_bindings as calibration,
-    programme_confirmation as confirmation,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_qualified_parent import ScheduledProgrammeQualifiedParentDeclaration
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import ContributionRole, ScientificConditionScope
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.scientific_contributions import ContributionManifest, ContributionProduct
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.execution import (
-    DependencyReceiptBinding, ParentPreparedTaskRunner, TaskContext, VerifiedArtifactInput, WorkerInputBinding,
-    WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort,
-)
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursiveQualifiedParentBinding
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import MatrixResponseErrorModel
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import calibration as legacy_calibration, forecast, programme_calibration_bindings as calibration, programme_confirmation as confirmation
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_qualified_parent import ScheduledProgrammeQualifiedParentDeclaration
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole, ScientificConditionScope
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, ParentPreparedTaskRunner, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.recursive_qualified_parents import RecursiveQualifiedParentBinding
 from tests.runtime_platform.test_recursive_prior_execution_replay import sealed_parent_fixture as sealed_parent_fixture
 from tests.test_matrix_scheduled_programme_reduction import declared as declared
 from tests.runtime_platform.test_native_subwork import _plane
@@ -49,7 +43,7 @@ class Unread:
 
 
 def _context(fixture, task_id='observe'):
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
     task = next(t for t in fixture.execution_plan.tasks if t.task_id == task_id)
     run = fixture.package.run_plan_id
     receipts = ExternalTaskReceiptStore(fixture.plane)
@@ -155,7 +149,7 @@ def test_current_input_materialization_substitution_refuses_exact_bindings(seale
 def test_metadata_input_rule_accepts_selected_subset_of_actual_multioutput_receipt(tmp_path, monkeypatch):
     """Pure selection control; this dummy plan is not a current issued programme."""
     from tests.runtime_platform.test_recursive_prior_native_replay import _blocked_progress, _stored
-    from empirical_lawhood.runtime.plans import BarrierKind, ScientificInputRole, ScientificInputSpec
+    from empirical_lawhood.execution.plans import BarrierKind, ScientificInputRole, ScientificInputSpec
     _blocked_progress(monkeypatch)
     fixture = _stored(tmp_path)
     inspection = fixture.inspections[0]
@@ -229,7 +223,7 @@ def test_missing_current_package_execute_or_reveal_refuses_before_protected_read
         # Exercise the actual issued REVEAL task with its complete original
         # configuration/ports/permissions. Relabelling observe would correctly
         # refuse at the preceding installed-task guard without testing reveal.
-        from empirical_lawhood.runtime.plans import BarrierKind
+        from empirical_lawhood.execution.plans import BarrierKind
         context, runner, task = _context(fixture, 'evaluate')
         assert task.barrier is BarrierKind.REVEAL and context.task_id == task.task_id
     with pytest.raises((PermissionError, FileNotFoundError), match='package absent|execution grant absent|reveal grant'):
@@ -345,7 +339,7 @@ def test_confirmation_static_records_remain_distinct_and_cannot_prepare_runtime(
         _pin('reveal.synthetic', 'empirical-lawhood/planning/study-operation-authority'), 'run.synthetic',
         api.CALIBRATE_TASK_ID, producer.object_id, api.QUALIFY_TASK_ID, 'receipt.synthetic.qualify',
         api.QUALIFY_TASK_ID+'.adjudication', adjudication)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_calibration import ScheduledProgrammeCalibrationEvidence
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_calibration import ScheduledProgrammeCalibrationEvidence
     declaration = ScheduledProgrammeQualifiedParentDeclaration('declaration.synthetic.parent', record, pub, contribution, binding,
         programme.identity, _pin('evidence.synthetic', ScheduledProgrammeCalibrationEvidence.SCHEMA), semantic.model,
         semantic.criterion, semantic.reservation, semantic.group_ids)

@@ -9,32 +9,12 @@ from decimal import Decimal
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.simulators.six_matrix_response.contracts import (
-    BetaCouplingRule,
-    SixMatrixResponseModelFamilyMember,
-    SixMatrixResponseNumericalView,
-    MatrixIntegratorKind,
-    MatrixPrecision,
-)
-from empirical_lawhood.adapters.simulators.six_matrix_response.gradients import (
-    SixMatrixParameters,
-    analytic_gradient_terms,
-)
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import ideal_state
-from empirical_lawhood.adapters.simulators.six_matrix_response.preparation_differential import (
-    NativeStateDifferential,
-    discrete_secant_step,
-    discrete_tangent_step,
-    preparation_force_step,
-    preparation_pulse_amplitude,
-    scalar_hold_tangent_step,
-    secant_hessian_image,
-)
-from empirical_lawhood.adapters.simulators.six_matrix_response.response_assay import (
-    ResponseGeometryNativeForcePulse,
-    force_step,
-)
-from empirical_lawhood.adapters.simulators.six_matrix_response.simulation import hermitian_noise
+from empirical_lawhood.domains.matrix.six_matrix_response.contracts import BetaCouplingRule, SixMatrixResponseModelFamilyMember, SixMatrixResponseNumericalView, MatrixIntegratorKind, MatrixPrecision
+from empirical_lawhood.domains.matrix.six_matrix_response.gradients import SixMatrixParameters, analytic_gradient_terms
+from empirical_lawhood.domains.matrix.six_matrix_response.model import ideal_state
+from empirical_lawhood.domains.matrix.six_matrix_response.preparation_differential import NativeStateDifferential, discrete_secant_step, discrete_tangent_step, preparation_force_step, preparation_pulse_amplitude, scalar_hold_tangent_step, secant_hessian_image
+from empirical_lawhood.domains.matrix.six_matrix_response.response_assay import ResponseGeometryNativeForcePulse, force_step
+from empirical_lawhood.domains.matrix.six_matrix_response.simulation import hermitian_noise
 
 
 @pytest.fixture

@@ -1,10 +1,11 @@
 """Outcome-blind source, equation, rank, negative-control, and resource canaries."""
 
 from __future__ import annotations
+from empirical_lawhood.domains.circuits.reference_oracles import _analytic_equilibrium, _brute_matching_rank, _rank_audit
 
-from empirical_lawhood.adapters.history_budget_fixed_scientific_inputs import fixed_history_budget_descriptor_input, fixed_history_budget_preparation_input, fixed_history_budget_unit_input
+from empirical_lawhood.domains.history.history_budget_fixed_scientific_inputs import fixed_history_budget_descriptor_input, fixed_history_budget_preparation_input, fixed_history_budget_unit_input
 
-from empirical_lawhood.adapters.history_budget_seed_constants import history_budget_fixed_seed
+from empirical_lawhood.domains.history.history_budget_seed_constants import history_budget_fixed_seed
 
 import ast
 from dataclasses import replace
@@ -13,43 +14,42 @@ from hashlib import sha256
 import resource
 from time import perf_counter, process_time
 from typing import Mapping
-from itertools import combinations, permutations
 
 import numpy as np
-from scipy.linalg import expm, svdvals
+from scipy.linalg import expm
 from scipy.sparse.linalg import expm_multiply
 from scipy.sparse.linalg import spsolve
 from threadpoolctl import threadpool_limits  # type: ignore[import-untyped]
 
-from empirical_lawhood.adapters.methods.history_budget_phase_diagram.evaluator import adjudicate_unit_scale
-from empirical_lawhood.adapters.methods.history_budget_phase_diagram.conditioning import dimensionless_history_operator
-from empirical_lawhood.adapters.methods.history_budget_phase_diagram.discrete_rank import residual_certified_rank_bracket
-from empirical_lawhood.adapters.methods.history_budget_phase_diagram.history import assemble_dense_operator, observe_and_nominate, coordinate_labels
-from empirical_lawhood.adapters.methods.history_budget_phase_diagram.preparation_sampler import charge_preservation_error, scale_coupled_initial_states
-from empirical_lawhood.adapters.methods.history_budget_phase_diagram.structural_rank import maximum_bipartite_matching_rank
-from empirical_lawhood.adapters.simulators.rc_ladder_history_budget.generator import assemble_sparse_operator, generate_outcomes, receiver_matrix
-from empirical_lawhood.kernel.evidence import OutcomeAccess
+from empirical_lawhood.domains.history.history_budget_phase_diagram.evaluator import adjudicate_unit_scale
+from empirical_lawhood.domains.history.history_budget_phase_diagram.conditioning import dimensionless_history_operator
+from empirical_lawhood.domains.history.history_budget_phase_diagram.discrete_rank import residual_certified_rank_bracket
+from empirical_lawhood.domains.history.history_budget_phase_diagram.history import assemble_dense_operator, observe_and_nominate, coordinate_labels
+from empirical_lawhood.domains.history.history_budget_phase_diagram.preparation_sampler import charge_preservation_error, scale_coupled_initial_states
+from empirical_lawhood.domains.history.history_budget_phase_diagram.structural_rank import maximum_bipartite_matching_rank
+from empirical_lawhood.domains.circuits.rc_ladder_history_budget.generator import assemble_sparse_operator, generate_outcomes, receiver_matrix
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
 
-from .contracts import HistoryBudgetPhaseDiagramDenominatorDescriptor, HistoryBudgetPhaseDiagramDisorderFamily, HistoryBudgetPhaseDiagramPhase
-from .authoring import HISTORY_BUDGET_PHASE_DIAGRAM_RESOURCE_PROFILE
-from .descriptors import default_config, generate_descriptor
-from .runtime_contracts import HistoryBudgetPhaseDiagramCanaryReport, HistoryBudgetPhaseDiagramDenominatorBundle, HistoryBudgetPhaseDiagramTaskOutputMeasurement
-from .workflow import adjudication_bundle, generator_bundle, history_bundle, targeter_bundle, untouched_bundle
+from empirical_lawhood.domains.history.history_budget_phase_diagram.contracts import HistoryBudgetPhaseDiagramDenominatorDescriptor, HistoryBudgetPhaseDiagramDisorderFamily, HistoryBudgetPhaseDiagramPhase
+from empirical_lawhood.domains.history.history_budget_phase_diagram.authoring import HISTORY_BUDGET_PHASE_DIAGRAM_RESOURCE_PROFILE
+from empirical_lawhood.domains.history.history_budget_phase_diagram.descriptors import default_config, generate_descriptor
+from empirical_lawhood.domains.history.history_budget_phase_diagram.runtime_contracts import HistoryBudgetPhaseDiagramCanaryReport, HistoryBudgetPhaseDiagramDenominatorBundle, HistoryBudgetPhaseDiagramTaskOutputMeasurement
+from empirical_lawhood.domains.history.history_budget_phase_diagram.workflow import adjudication_bundle, generator_bundle, history_bundle, targeter_bundle, untouched_bundle
 
 
-_GENERATOR_PATH = 'src/empirical_lawhood/adapters/simulators/rc_ladder_history_budget/generator.py'
+_GENERATOR_PATH = 'src/empirical_lawhood/domains/circuits/rc_ladder_history_budget/generator.py'
 _OBSERVER_PATHS = (
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/conditioning.py',
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/discrete_rank.py',
-    "src/empirical_lawhood/adapters/methods/_arb.py",
-    "src/empirical_lawhood/adapters/methods/certified_rank.py",
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/history.py',
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/preparation_sampler.py',
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/structural_rank.py',
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/targeting.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/conditioning.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/discrete_rank.py',
+    "src/empirical_lawhood/methods/_arb.py",
+    "src/empirical_lawhood/methods/certified_rank.py",
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/history.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/preparation_sampler.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/structural_rank.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/targeting.py',
 )
-_EVALUATOR_PATH = 'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/evaluator.py'
-_SHARED_PREFIX = 'src/empirical_lawhood/adapters/history_budget_phase_diagram/'
+_EVALUATOR_PATH = 'src/empirical_lawhood/domains/history/history_budget_phase_diagram/evaluator.py'
+_SHARED_PREFIX = 'src/empirical_lawhood/domains/history/history_budget_phase_diagram/'
 
 
 def _decimal(value: float) -> Decimal:
@@ -81,8 +81,8 @@ def audit_source_firewall(source_files: Mapping[str, bytes]) -> tuple[str, ...]:
     forbidden_generator = {
         value
         for value in generator_imports
-        if value.startswith("empirical_lawhood.adapters.methods")
-        or "rc_ladder_response" in value
+        if value.startswith("empirical_lawhood.methods")
+        or "rc_ladder_response" in value or value.startswith("empirical_lawhood.domains.circuits.rc_ladder")
         or "physical_scale_morphism" in value
         or "physical_scale_morphism.simulator_challenges" in value
         or "simulator_morphism_challenges" in value
@@ -98,15 +98,15 @@ def audit_source_firewall(source_files: Mapping[str, bytes]) -> tuple[str, ...]:
     if forbidden_generator or forbidden_observer:
         raise ValueError("history budget phase diagram generator--observer source firewall is violated")
     allowed_local_intersection = {
-        'empirical_lawhood.adapters.history_budget_phase_diagram.contracts',
-        "empirical_lawhood.kernel.serialization",
+        'empirical_lawhood.domains.history.history_budget_phase_diagram.contracts',
+        "empirical_lawhood.science.records.serialization",
     }
     local_intersection = {
         value for value in generator_imports & observer_imports if value.startswith("empirical_lawhood")
     }
     if local_intersection != allowed_local_intersection:
         raise ValueError("history budget phase diagram implementations share an undeclared scientific module")
-    if 'empirical_lawhood.adapters.simulators.rc_ladder_history_budget.generator' in evaluator_imports:
+    if 'empirical_lawhood.domains.circuits.rc_ladder_history_budget.generator' in evaluator_imports:
         raise ValueError("history budget phase diagram evaluator imports the generator implementation")
     shared_paths = tuple(sorted(path for path in source_files if path.startswith(_SHARED_PREFIX)))
     if not {
@@ -136,24 +136,6 @@ def _report(report_id: str, checks: set[str], started: float) -> HistoryBudgetPh
     )
 
 
-def _brute_matching_rank(support: np.ndarray) -> int:
-    rows, columns = support.shape
-    for rank in range(min(rows, columns), -1, -1):
-        for selected_rows in combinations(range(rows), rank):
-            for selected_columns in combinations(range(columns), rank):
-                if any(
-                    all(
-                        support[row, column]
-                        for row, column in zip(
-                            selected_rows,
-                            ordered_columns,
-                            strict=True,
-                        )
-                    )
-                    for ordered_columns in permutations(selected_columns)
-                ):
-                    return rank
-    return 0
 
 
 def run_structural_rank_canary() -> HistoryBudgetPhaseDiagramCanaryReport:
@@ -256,42 +238,8 @@ def _uniform_descriptor(scale_cells: int) -> HistoryBudgetPhaseDiagramDenominato
     )
 
 
-def _analytic_equilibrium(descriptor: HistoryBudgetPhaseDiagramDenominatorDescriptor, amplitude: float) -> np.ndarray:
-    left = float(descriptor.left_source_resistance_ohms)
-    right = float(descriptor.right_termination_resistance_ohms)
-    interior = np.asarray(descriptor.interior_resistances_ohms, dtype=np.float64)
-    current = amplitude / (left + float(np.sum(interior)) + right)
-    preceding = np.concatenate((np.zeros(1), np.cumsum(interior)))
-    return amplitude - current * (left + preceding)
 
 
-def _rank_audit(descriptor: HistoryBudgetPhaseDiagramDenominatorDescriptor) -> None:
-    config = default_config(HistoryBudgetPhaseDiagramPhase.CANARY)
-    operator = assemble_dense_operator(descriptor)
-    lag = float(config.history_lag_t_star) * float(descriptor.time_scale_seconds)
-    inverse = expm(-operator.state_matrix * lag)
-    blocks = []
-    current = operator.receiver.copy()
-    for depth in range(config.history_max_depth + 1):
-        if depth:
-            current = current @ inverse
-        blocks.append(current.copy())
-        stack = np.vstack(blocks)
-        numpy_values = np.linalg.svd(stack, compute_uv=False)
-        scipy_values = svdvals(stack)
-        if not np.allclose(numpy_values, scipy_values, atol=1e-10, rtol=1e-11):
-            raise ValueError("HISTORY_BUDGET_PHASE_DIAGRAM_CANARY_SVD_AUDIT_FAILED")
-        duplicated = np.vstack([operator.receiver] * (depth + 1))
-        if np.linalg.matrix_rank(duplicated, tol=1e-12) > 8:
-            raise ValueError("HISTORY_BUDGET_PHASE_DIAGRAM_DUPLICATE_PRESENT_CONTROL_FAILED")
-        shuffled = np.vstack(tuple(reversed(blocks)))
-        if not np.allclose(
-            np.linalg.svd(shuffled, compute_uv=False),
-            numpy_values,
-            atol=1e-10,
-            rtol=1e-11,
-        ):
-            raise ValueError("HISTORY_BUDGET_PHASE_DIAGRAM_SHUFFLED_LAG_CONTROL_FAILED")
 
 
 def _run_generator_canary() -> HistoryBudgetPhaseDiagramCanaryReport:
@@ -372,7 +320,11 @@ def _run_observer_canary() -> HistoryBudgetPhaseDiagramCanaryReport:
             raise ValueError("HISTORY_BUDGET_PHASE_DIAGRAM_OBSERVER_MANUFACTURED_SOLUTION_FAILED")
         if np.max(np.abs(operator.state_matrix @ equilibrium + operator.left_input)) > 1e-12:
             raise ValueError("HISTORY_BUDGET_PHASE_DIAGRAM_OBSERVER_CURRENT_BALANCE_RESIDUAL_FAILED")
-        _rank_audit(descriptor)
+        _rank_audit(
+            operator.state_matrix, operator.receiver,
+            lag=float(config.history_lag_t_star) * float(descriptor.time_scale_seconds),
+            maximum_depth=config.history_max_depth, error_prefix="HISTORY_BUDGET_PHASE_DIAGRAM",
+        )
         checks.update(
             {
                 f"n{scale_cells}-observer-manufactured-equilibrium",
@@ -447,7 +399,11 @@ def _run_cross_implementation_conformance(
         sparse_future = np.asarray(expm_multiply(sparse.state_matrix * duration, initial))
         if not np.allclose(dense_future, sparse_future, atol=1e-11, rtol=1e-11):
             raise ValueError("HISTORY_BUDGET_PHASE_DIAGRAM_CANARY_PROPAGATOR_MISMATCH")
-        _rank_audit(descriptor)
+        _rank_audit(
+            dense.state_matrix, dense.receiver,
+            lag=float(config.history_lag_t_star) * float(descriptor.time_scale_seconds),
+            maximum_depth=config.history_max_depth, error_prefix="HISTORY_BUDGET_PHASE_DIAGRAM",
+        )
 
         seed = history_budget_fixed_seed(programme_ordinal=1, scientific_role="conformance", numeric_index=scale_cells)
         challenge_descriptor = generate_descriptor(

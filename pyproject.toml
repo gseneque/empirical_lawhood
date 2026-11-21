@@ -4,12 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "empirical-lawhood"
-version = "0.3.0"
+version = "1.0.0"
 description = "Auditable empirical response-law research software"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 license = "MPL-2.0"
 authors = [{ name = "Gareth Seneque" }]
+dynamic = ["urls"]
 dependencies = [
   "alembic>=1.14,<2",
   "cryptography>=45,<47",
@@ -29,11 +30,6 @@ dependencies = [
 
 [project.scripts]
 empirical-lawhood = "empirical_lawhood.cli.entry:main"
-
-[project.urls]
-Repository = "https://github.com/gseneque/empirical_lawhood"
-Documentation = "https://github.com/gseneque/empirical_lawhood/blob/main/README.md"
-Issues = "https://github.com/gseneque/empirical_lawhood/issues"
 
 [dependency-groups]
 dev = [
@@ -82,12 +78,19 @@ virtual-cell = [
 ]
 standard-discovery = ["botorch==0.18.1", "scikit-learn>=1.6,<1.8"]
 rubisco-prediction = ["rapidfuzz==3.14.3", "numpy==2.4.6", "scipy==1.17.1"]
+rubisco-construction = [
+  "numpy==2.4.6",
+  "scipy==1.17.1",
+  "openmm==8.3.1",
+  "pdbfixer==1.11.0",
+]
 rubisco-electronic = [
   "pyscf==2.14.0; sys_platform == 'linux' and platform_machine == 'x86_64'",
   "numpy==2.4.6",
   "scipy==1.17.1",
   "h5py==3.14.0",
 ]
+
 mast-torax-response = [
   "botorch==0.18.1",
   "scikit-learn>=1.6,<1.8",
@@ -101,6 +104,7 @@ conflicts = [
 ]
 
 [tool.uv.sources]
+pdbfixer = { git = "https://github.com/openmm/pdbfixer.git", rev = "199f03df6c50f7cf6120de766f4ccce426fda4e9" }
 freegs4e = { git = "https://github.com/FusionComputingLab/freegs4e.git", rev = "4ee98af61a4e7ede7574c103a7275dddda8acb82" }
 freegsnke = { git = "https://github.com/FusionComputingLab/freegsnke.git", rev = "bd1c3398cf96cfae4550efa247ace2ce60ca0af0" }
 torch = [
@@ -116,6 +120,9 @@ explicit = true
 # Local operational records remain in the checkout. Current scientific
 # specifications live with their programmes and remain public source inputs.
 exclude = [
+  "/POSTRELEASE.md",
+  "/OPTIM.md",
+  "/EL-v0.3.0-REPOSITORY-AUDIT-2026-11-03.md",
   "/DOCSTRUCTCONSOL.md",
   "/APPLIED-EL-REVIEW-WORKING.md", "/CONSOLIDATE.md", "/CONSOLIDATION.md",
   "/ELSC.md", "/ELTOP5.md", "/MATRIX-FINALOPTIM.md", "/MATRIXAUDIT.md",
@@ -131,8 +138,19 @@ exclude = [
   "/PREPRINTNOVELTY.md", "/RECCHAIN-CURRENT.md", "/RECURARCH.md", "/RUBISCO-FINALSE.md", "/RUBISCO-FINALSE-UPDATED.md", "/RUBISCO-LOOP.md",
   "/RUBISCO-PRIZE-REFINED-PLAN.md", "/THEMATRIX-AUDIT-EXPDESIGN.md", "/THEMATRIX-LEAN.md",
   "/THEMATRIX-MIDFIXES.md", "/THEMATRIX-OPTIM-DEFERRED.md", "/THEMATRIX-OPTIM.md",
-  "/THEMATRIX.md", "/WTF.md", "/WTF-FINALDESIGN.md", "/WTF-OPTIMPRIO.md", "/docs/plans", "/PROREVIEW", "/docs/blog",
+  "/THEMATRIX.md", "/WTF.md", "/WTF-FINALDESIGN.md", "/WTF-OPTIMPRIO.md", "/docs/plans", "/PROREVIEW", "/docs/blog", "/notes",
   "/FINAL*.md", "/DERPCHAIN*.md", "/LOWFRICTION*.md", "/SCIREVIEW*.md", "/DOCFINALISE*.md",
+  "/docs/development/maintainer-environment.md",
+  "/docs/release/documentation-audit.md",
+  "/docs/release/in-repo-agent-handoff.md",
+  "/docs/release/model-free-completion-handoff.md",
+  "/docs/release/model-free-matrix-handoff.md",
+  "/docs/development/v1-completion-fusion.json",
+  "/docs/development/v1-completion-researcher-controls.json",
+  "/docs/development/v1-completion-substrates.json",
+  "/docs/release/documentation-python-symbols.json",
+  "/docs/release/documentation-scope-inventory.json",
+  "/frontend/ui-v2-prototype",
   "/docs/applied-el-handoff.md",
   "/docs/applied-el/architecture-finalisation.md",
   "/docs/applied-el/battery-controller-composition.md",
@@ -142,8 +160,9 @@ exclude = [
   "/docs/applied-el/matrix-factor-development-progress.md",
   "/docs/applied-el/battery-remediation-progress.md",
   "/docs/rubisco-inquiry/scientific-redirection-v1.md",
-  "/src/empirical_lawhood/adapters/methods/preparation_applicability/frozen_specification.md",
-  "/src/empirical_lawhood/adapters/methods/constructed_preparation_applicability/frozen_specification.md",
+  "/notes/rubisco-implementation-and-scientific-pathway-2026-11-07.md",
+  "/src/empirical_lawhood/domains/matrix/preparation_applicability/frozen_specification.md",
+  "/src/empirical_lawhood/domains/matrix/constructed_preparation_applicability/frozen_specification.md",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -152,10 +171,15 @@ packages = ["src/empirical_lawhood"]
 [tool.hatch.build.hooks.custom]
 path = "scripts/hatch_build.py"
 
+[tool.hatch.metadata.hooks.custom]
+path = "scripts/hatch_metadata.py"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--strict-markers --durations=10"
 markers = [
+  "conformance: software contract, custody or lifecycle control; no independent numerical-oracle claim",
+  "numerical(oracle): independent numerical correctness reference; no scientific qualification",
   "native(*distributions): requires the named optional installed scientific distributions",
   "held: requires explicitly selected authentic external source inputs",
 ]

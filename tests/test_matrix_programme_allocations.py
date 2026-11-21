@@ -10,16 +10,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.eligibility import MatrixFactorExposureCensus
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import PHASE_INPUT_ROLES
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_population import selected_e4_population_coordinates
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_streams import SelectedE4StreamRecipe, STREAM_RULE
+from empirical_lawhood.domains.matrix.matrix_factor_response.eligibility import MatrixFactorExposureCensus
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import PHASE_INPUT_ROLES
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_population import selected_e4_population_coordinates
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_streams import SelectedE4StreamRecipe, STREAM_RULE
 from empirical_lawhood.api import matrix_programme_allocations as compiler
-from empirical_lawhood.kernel.decoding import decode_canonical_record
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_record
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_matrix_programme_scientific_design import scientific_design  # noqa: F401
 from tests.test_matrix_programme_scientific_design import matched_scientific_design  # noqa: F401
 
@@ -92,8 +92,8 @@ def test_amended_source_plan_keeps_980_disjoint_groups_and_original_iid_family_d
 
 def test_phase_reader_retains_an_absent_iid_family_and_refuses_changed_draws_or_streams(
         matched_scientific_design, census, monkeypatch):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.input_records import _require_phase_science
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponsePanel
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.input_records import _require_phase_science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponsePanel
     _forbid_acquisition(monkeypatch)
     # Fixed exposed arithmetic vector: CAL20 has counts 7/4/0/9. It exercises
     # the legitimate absent-family branch without redrawing any scientific bank.
@@ -200,7 +200,7 @@ def test_current_stream_recipe_binds_explicit_family_material_and_four_purposes(
 
 
 def test_large_declared_population_refuses_before_proportional_construction(scientific_design, census, monkeypatch):  # noqa: F811
-    from empirical_lawhood.kernel.authority import ResourceBudget
+    from empirical_lawhood.science.identity.authority import ResourceBudget
 
     design = replace(scientific_design, e2=replace(scientific_design.e2, expected_units=10**9))
     calls = []
@@ -219,7 +219,7 @@ def test_large_declared_population_refuses_before_proportional_construction(scie
 
 
 def test_serialized_root_lower_bound_refuses_before_publication(scientific_design, census, monkeypatch):  # noqa: F811
-    from empirical_lawhood.kernel.authority import ResourceBudget
+    from empirical_lawhood.science.identity.authority import ResourceBudget
 
     monkeypatch.setattr(compiler, "_process_rss_bytes", lambda: 0)
     with pytest.raises(ValueError, match="output-byte lower bound"):
@@ -242,13 +242,13 @@ def _publisher_case(tmp_path, design, census):
     from empirical_lawhood.api.recursive_operations import operation_storage_codecs
     from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
     from empirical_lawhood.api.recursive_authoring import implementation_binding
-    from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-    from empirical_lawhood.kernel.authority import ResourceBudget
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+    from empirical_lawhood.science.identity.authority import ResourceBudget
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
     from tests.runtime_platform.test_native_subwork import _plane
 
     # This allocation precedes D because its existing criterion pins the exact
@@ -277,7 +277,7 @@ def _publisher_case(tmp_path, design, census):
     copied = Path(writer.root.contract.canonical_path) / "copied"
     copied.mkdir()
     normalization = design.training_protocol.full_factor_rule.scalar_closure.normalization_owner
-    original = ROOT / "src/empirical_lawhood/adapters/simulators/six_matrix_response/response_observer.py"
+    original = ROOT / "src/empirical_lawhood/package_data/scientific_originals/matrix_scalar_response_observer.py.txt"
     payload = original.read_bytes()
     assert (len(payload), sha256(payload).hexdigest()) == (normalization.size_bytes, normalization.sha256)
     (copied / "normalization.py").write_bytes(payload)
@@ -312,13 +312,13 @@ def _forbid_acquisition(monkeypatch):
 
     monkeypatch.setattr(np.random, "default_rng", forbidden)
     monkeypatch.setattr(np.linalg, "eigh", forbidden)
-    monkeypatch.setattr("empirical_lawhood.adapters.simulators.six_matrix_response.simulation.baoab_step_with_hermitian_noise", forbidden)
+    monkeypatch.setattr("empirical_lawhood.domains.matrix.six_matrix_response.simulation.baoab_step_with_hermitian_noise", forbidden)
 
 
 def test_current_publications_commit_all_known_inputs_before_train_and_reopen_exactly(
         scientific_design, census, tmp_path, monkeypatch):  # noqa: F811
-    from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticate_programme_inputs
-    from empirical_lawhood.planning.approval import SystemDecisionClock
+    from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticate_programme_inputs
+    from empirical_lawhood.design.approval import SystemDecisionClock
 
     writer, kwargs = _publisher_case(tmp_path, scientific_design, census)
     _forbid_acquisition(monkeypatch)
@@ -330,7 +330,7 @@ def test_current_publications_commit_all_known_inputs_before_train_and_reopen_ex
     source, publication = next(row for row in published.resolved.commitments.support_files if row[0] == normalization)
     assert source.media_type == publication.logical.media_type == "text/x-python"
     assert source.sha256 == publication.logical.content_sha256 == sha256(
-        (ROOT / "src/empirical_lawhood/adapters/simulators/six_matrix_response/response_observer.py").read_bytes()).hexdigest()
+        (ROOT / "src/empirical_lawhood/package_data/scientific_originals/matrix_scalar_response_observer.py.txt").read_bytes()).hexdigest()
     from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
     assert publication.logical.generic_validation == integration_artifact_profile_validators().generic_validation(
         profile=publication.logical.profile, payload_schema=source.payload_schema)
@@ -346,11 +346,9 @@ def test_current_publications_commit_all_known_inputs_before_train_and_reopen_ex
 
 def test_missing_original_source_codec_refuses_before_any_programme_publication(
         scientific_design, census, tmp_path, monkeypatch):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import (
-        MATRIX_PYTHON_SOURCE_CODEC, MATRIX_STORAGE_CODECS,
-    )
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_PYTHON_SOURCE_CODEC, MATRIX_STORAGE_CODECS
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
 
     writer, kwargs = _publisher_case(tmp_path, scientific_design, census)
     codecs = tuple(codec for codec in MATRIX_STORAGE_CODECS
@@ -367,7 +365,7 @@ def test_missing_original_source_codec_refuses_before_any_programme_publication(
 
 def test_interrupted_final_commitment_retains_all_children_and_original_availability(
         scientific_design, census, tmp_path, monkeypatch):  # noqa: F811
-    from empirical_lawhood.planning.approval import SystemDecisionClock
+    from empirical_lawhood.design.approval import SystemDecisionClock
 
     writer, kwargs = _publisher_case(tmp_path, scientific_design, census)
     _forbid_acquisition(monkeypatch)
@@ -397,9 +395,9 @@ def _crash_availability_publication(writer, kwargs, monkeypatch, *, after):
     import multiprocessing
     import os
     import traceback
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.runtime.artifacts import ArtifactPublicationIntent, artifact_publication_intent_relative_path
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactPublicationIntent, artifact_publication_intent_relative_path
 
     captured = []
     original = type(writer).write
@@ -464,9 +462,9 @@ def _crash_availability_publication(writer, kwargs, monkeypatch, *, after):
 @pytest.mark.parametrize("after", ("payload", "sidecar"))
 def test_availability_retry_completes_only_its_exact_durable_publication_intent(
         scientific_design, census, tmp_path, monkeypatch, after):  # noqa: F811
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.time import AvailabilitySpec
-    from empirical_lawhood.planning.approval import SystemDecisionClock
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.models.time import AvailabilitySpec
+    from empirical_lawhood.design.approval import SystemDecisionClock
 
     writer, kwargs = _publisher_case(tmp_path, scientific_design, census)
     _forbid_acquisition(monkeypatch)
@@ -495,10 +493,10 @@ def test_availability_retry_completes_only_its_exact_durable_publication_intent(
 def test_availability_retry_refuses_unowned_substituted_or_broken_committed_custody(
         scientific_design, census, tmp_path, monkeypatch, damage):  # noqa: F811
     from decimal import Decimal
-    from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.time import AvailabilitySpec
-    from empirical_lawhood.planning.approval import SystemDecisionClock
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.models.time import AvailabilitySpec
+    from empirical_lawhood.design.approval import SystemDecisionClock
 
     writer, kwargs = _publisher_case(tmp_path, scientific_design, census)
     _forbid_acquisition(monkeypatch)

@@ -1,21 +1,21 @@
 # SPDX-License-Identifier: MPL-2.0
 """Actual issued wave reads and full-phase state; no native/provider contact."""
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as p
-from empirical_lawhood.api.current_result_custody import authenticate_current_execution_plan,retained_output_artifact_plane
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as p
+from empirical_lawhood.api.current_result_custody import authenticate_current_execution_plan, retained_output_artifact_plane
 from empirical_lawhood.api.matrix_selected_runtime import _published_input
 from empirical_lawhood.api.matrix_training_provenance import original_comparator_training
-from empirical_lawhood.api.recursive_qualified_parents import _actual_package,_replay_parent_authority,_require_parent_authorities_current,MAX_PARENT_BYTES
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from empirical_lawhood.infrastructure.recursive_custody import read_execution_products
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-from empirical_lawhood.runtime.recovery import build_run_recovery_index
+from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _replay_parent_authority, _require_parent_authorities_current, MAX_PARENT_BYTES
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+from empirical_lawhood.storage.recursive_custody import read_execution_products
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
+from empirical_lawhood.execution.recovery import build_run_recovery_index
 
 
 def _inputs(writer,plan,run_id,*,require_current,external_contracts=()):
@@ -124,7 +124,7 @@ def _require_wave_graph(plan, external, links):
 
 def _native_case_products(writer,products,plan,entry,bank,case,configs,tasks,materializations,*,direct_operands,require_current):
     """Replay native scope against the actual retained task and carrier inputs."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import bind_selected_native_source
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import bind_selected_native_source
     kinds={"prefix":r.SelectedE4ProtectedPrefixHistory,"project":r.SelectedE4ProtectedCausalPrefix,
         "account":r.SelectedE4ProtectedAccountSeal,"mechanical":r.SelectedE4ProtectedMechanicalForecast,
         "continue":r.SelectedE4ProtectedFullHistory,"responses":r.SelectedE4ProtectedResponses}
@@ -223,7 +223,7 @@ def _read_selected_e4_wave(*,writer,declaration,locator,codecs,_consume_original
     require_current(writer)
     bank=_published_input(writer,locator.run_id,banks[0],p.SelectedE4PhaseBank)
     source_index=bank.source_index()
-    from .matrix_full_factor_secondary import authenticate_e4_secondary_target
+    from empirical_lawhood.api.matrix_full_factor_secondary import authenticate_e4_secondary_target
     require_current(writer)
     authenticate_e4_secondary_target(writer=writer, selection=entry.secondary_readout, bank=bank)
     require_current(writer)
@@ -272,7 +272,7 @@ def _read_selected_e4_wave(*,writer,declaration,locator,codecs,_consume_original
     require_current(semantic)
     original_inputs=_inputs(semantic,plan,locator.run_id,require_current=require_current,external_contracts=external)
     require_current(semantic)
-    from .recursive_execution import _read_only_custody_policy
+    from empirical_lawhood.api.recursive_execution import _read_only_custody_policy
     products=read_execution_products(plane=semantic,plan=plan,index=recovery_index,external_inputs=original_inputs,
         output_codecs=codecs,decode_products=False,_read_policy=_read_only_custody_policy(semantic))
     require_current(semantic)
@@ -284,7 +284,7 @@ def _read_selected_e4_wave(*,writer,declaration,locator,codecs,_consume_original
         revision_forecasts={}
     else:
         from empirical_lawhood.api.selected_e4_native_runtime import SelectedE4ParentEntry
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_science import entry_forecasts
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_science import entry_forecasts
         if actual_forecasts!=entry_forecasts(SelectedE4ParentEntry(entry,bank)):
             raise PermissionError("selected E4 wave substitutes actual before-native entry forecasts")
         revision_forecasts={v.case_id:v for v in actual_forecasts.forecasts}
@@ -325,7 +325,7 @@ def _read_selected_e4_wave(*,writer,declaration,locator,codecs,_consume_original
                 ("actual-no-success-native-product-contact-not-inferred",) if event is None else ()))
         refs=tuple(sorted((r.ScheduledProgrammeReceiptReference(v.receipt_id,v.task_id,tuple(sorted(q.materialization_id for q in v.output_materializations))) for k,v in products["receipts"].items()
             if k in {node(phase) for phase in owner.PHASES if phase not in ("entry","reduce")}),key=lambda v:v.receipt_id))
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import selected_target_shape
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import selected_target_shape
         contract = getattr(bank.forecast_design.package.specification.measurement, "target_contract", "PAIRED15")
         methods, point_count, target_count = selected_target_shape(contract)
         cases.append(r.SelectedE4NativeCaseResult(case.root_id,case.source,case.independent_group_id,
@@ -408,9 +408,9 @@ def _read_selected_e4_component(*,selected,artifact_writer,run_id,reveal_authori
     """Cold actual issued component science, with fresh reveal before payload."""
     from types import SimpleNamespace
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as preparation
-    from empirical_lawhood.runtime.prospective_experiment import SPECIFICATION_FILENAME
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as preparation
+    from empirical_lawhood.execution.prospective_experiment import SPECIFICATION_FILENAME
     if type(allow_partial) is not bool:raise TypeError("selected E4 read needs explicit partial selection")
     specification=decode_canonical_bytes(selected.payloads[SPECIFICATION_FILENAME],preparation.SelectedE4NativeComponentSpecification,
         maximum_bytes=MAX_PARENT_BYTES)
@@ -451,7 +451,7 @@ def _read_selected_e4_component(*,selected,artifact_writer,run_id,reveal_authori
         return {**state,"observation":observation.to_document(),"scientific_qualification":"NOT_ESTABLISHED"}
     # Current issue/reveal already authenticated. Reuse exact original generic
     # receipt/dependency/publication owner, without providers or native entry.
-    from empirical_lawhood.api.recursive_qualified_parents import _collect_receipt_closure,_verify_receipt_closure
+    from empirical_lawhood.api.recursive_qualified_parents import _collect_receipt_closure, _verify_receipt_closure
     semantic=retained_output_artifact_plane(package,plan,artifact_writer,codecs)
     prefixes=tuple(sorted(v.capability_key for v in package.registry.capabilities))
     with semantic.read_context() as writer:

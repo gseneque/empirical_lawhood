@@ -20,6 +20,48 @@ def _read_parent(kwargs):
     )
 
 
+def test_compact_parent_replay_authenticates_one_shared_commit_and_every_sidecar(tmp_path, monkeypatch):
+    from empirical_lawhood.storage.artifact_sidecars import decode_artifact_sidecar
+    from tests.test_artifact_publication_admission import _census, _plane, _requests
+
+    project = tmp_path / "project"
+    plane = _plane(project)
+    results = plane.write_batch(_requests(4))
+    roster = {project / name: pin for name, pin in _census(project).items()}
+    paths = [project / row.materialization.relative_path for row in results]
+    sidecars = [Path(str(path) + ".manifest.json") for path in paths]
+    reference = decode_artifact_sidecar(sidecars[0].read_bytes())
+    marker = project / reference.commit_marker_relative_path
+    owner = response_parent_custody
+    original_read = owner._read_member
+    reads = []
+
+    def observe(root, path, *, maximum_bytes):
+        reads.append(path)
+        return original_read(root, path, maximum_bytes=maximum_bytes)
+
+    monkeypatch.setattr(owner, "_read_member", observe)
+    shared = {}
+
+    def verify(index, census, publications):
+        return owner._manifest_publication(path=paths[index], project=project, root=tmp_path, roster=census,
+            expected_material=results[index].materialization.to_document()["value"],
+            expected_storage_root_id=plane.root.contract.storage_root_id, publications=publications)
+
+    for index in range(len(paths)):
+        assert verify(index, roster, shared) == marker
+    assert reads.count(marker) == 1 and all(reads.count(path) == 1 for path in sidecars)
+
+    with pytest.raises(ValueError, match="PUBLICATION_MISMATCH"):
+        verify(1, roster | {marker: (roster[marker][0], "f" * 64)}, shared)
+    assert reads.count(marker) == 1
+    original = marker.read_bytes()
+    marker.write_bytes(original[:-1] + b" ")
+    with pytest.raises(ValueError, match="PUBLICATION_MISMATCH"):
+        verify(0, roster, {})
+    assert reads.count(marker) == 2
+
+
 @pytest.mark.parametrize("replacement", ("member", "ancestor", "root"))
 def test_parent_replay_rejects_replacement_before_open(tmp_path, monkeypatch, replacement):
     kwargs, details = _fixture(tmp_path)

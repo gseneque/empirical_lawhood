@@ -6,13 +6,11 @@ from decimal import Decimal
 import pytest
 from tests.rubisco_candidate_programme_fixture import programme_report
 from tests.rubisco_inquiry_source_fixtures import candidate_source_operands
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition
-from empirical_lawhood.adapters.methods.rubisco_candidate_inquiry import science
-from empirical_lawhood.adapters.methods.rubisco_candidate_inquiry.operation_bindings import (
-    BUDGET, MAX_BYTES, operation_registrations, InquiryOperationConfig,
-)
-from empirical_lawhood.adapters.methods.rubisco_candidate_inquiry.recursive_translation import supply_draft, use_draft
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition
+from empirical_lawhood.domains.rubisco.rubisco_candidate_inquiry import science
+from empirical_lawhood.domains.rubisco.rubisco_candidate_inquiry.operation_bindings import BUDGET, MAX_BYTES, operation_registrations, InquiryOperationConfig
+from empirical_lawhood.domains.rubisco.rubisco_candidate_inquiry.recursive_translation import supply_draft, use_draft
 
 
 @pytest.fixture(scope='module')
@@ -140,8 +138,9 @@ def _payloads(draft, records):
 
 def test_registered_source_meaning_and_distinct_use_evidence(source, supplied, monkeypatch):
     from empirical_lawhood.api import recursive_inquiry_evidence as api
-    from empirical_lawhood.adapters.methods.rubisco_candidate_inquiry.executable_binding import EXECUTABLE_BINDING_FACTORIES
-    monkeypatch.setattr(api, 'operation_factories', lambda: EXECUTABLE_BINDING_FACTORIES)
+    from empirical_lawhood.domains.rubisco.rubisco_candidate_inquiry.extension import EXTENSION as _extension_owner_1
+    EXECUTABLE_BINDING_FACTORIES = _extension_owner_1.factories
+    monkeypatch.setattr(api, 'selected_operation_factories', lambda _selections: EXECUTABLE_BINDING_FACTORIES)
     draft = supply_draft(source)
     binding = api.project_wave_evidence_bindings(draft=draft, payloads=_payloads(draft, (source,)))
     assert len(binding) == 1
@@ -157,8 +156,8 @@ def test_registered_source_meaning_and_distinct_use_evidence(source, supplied, m
 
 def test_endpoint_and_authenticated_product_projection(source, supplied):
     from types import SimpleNamespace as N
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.adapters.methods.rubisco_candidate_inquiry.recursive_translation import inquiry_outcome_projector, inquiry_endpoint_validator
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.domains.rubisco.rubisco_candidate_inquiry.recursive_translation import inquiry_outcome_projector, inquiry_endpoint_validator
     for draft, record in ((supply_draft(source), supplied), (use_draft(supplied), science.assess(supplied, science.authentic_candidate(supplied)))):
         node = draft.operations[0].node_id
         spec = N(distinguishing_assessment=draft.operations[0].config_identity, endpoint=supplied.scope)
@@ -186,10 +185,10 @@ def test_frontier_preserves_adverse_and_distinct_hypotheses(supplied):
 
 def test_full_registered_source_and_portable_parent_successor_compilation(source, supplied):
     from tests.test_inquiry_successor_compilation import compile_complete_draft, portable_parent
-    from empirical_lawhood.adapters.methods.rubisco_candidate_inquiry import operation_bindings as owner
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
-    from empirical_lawhood.runtime.plans import ScientificInputRole
+    from empirical_lawhood.domains.rubisco.rubisco_candidate_inquiry import operation_bindings as owner
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
+    from empirical_lawhood.execution.plans import ScientificInputRole
     first = supply_draft(source)
     compile_complete_draft(first, owner)
     parent = portable_parent(supplied)

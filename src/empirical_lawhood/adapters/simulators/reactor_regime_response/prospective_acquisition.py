@@ -1,72 +1,35 @@
-"""One D root's precommitted, separate native cooling branches.
-
-This is an adapter component. The public D task and its immutable output
-contract must bind it before any fresh D source contact is authorized.
-"""
+"""Native acquisition, external-format translation and custody integration."""
 
 from __future__ import annotations
-
-from dataclasses import dataclass
 from decimal import Decimal as D
 from typing import Callable
-
 import numpy as np
+from empirical_lawhood.methods.law_assessment import CandidatePayloadReader
+from empirical_lawhood.domains.reactor.reactor_regime_response.control_math import REQUESTS_K
+from empirical_lawhood.domains.reactor.reactor_regime_response.control_owner import ControlRecordPublisher, prepare_request
+from empirical_lawhood.domains.reactor.reactor_regime_response.control_prospective_plan import ReactorRegimeResponsePreparedProspectivePlanBundle
+from empirical_lawhood.domains.reactor.reactor_regime_response.control_prospective_lock import freeze_prepared_request
+from empirical_lawhood.domains.reactor.reactor_regime_response.law_terminal import RegimeJointLawResult
+from empirical_lawhood.domains.reactor.reactor_regime_response.prospective_decision import CausalValidityRegimeAssignment
+from empirical_lawhood.domains.reactor.reactor_regime_response.records import RegimeCausalPreparation, RegimePrivatePreparation
+from empirical_lawhood.domains.reactor.reactor_causal_response.measurements import NativeEpisode
+from empirical_lawhood.domains.reactor.reactor_causal_response.design import draw_scenario
+from empirical_lawhood.domains.reactor.reactor_prefix_response.batch_design import ReactorBatchSource
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.execution.controller_runtime import DeliveryControllerTickReceipt, TickDisposition
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.controller_evaluation_nested import DurablePreparedExecutionEventStore, ProspectiveEvaluationBindingCoordinator
+from empirical_lawhood.domains.reactor.reactor_regime_response.native_measurements import _episode
+from empirical_lawhood.adapters.simulators.reactor_regime_response.committed_branch import acquire_committed_nominal_branch, acquire_committed_refined_replay, acquire_prepared_evaluator_chart
 
-from empirical_lawhood.adapters.methods.law_assessment import CandidatePayloadReader
-from empirical_lawhood.adapters.methods.reactor_regime_response.control_math import REQUESTS_K
-from empirical_lawhood.adapters.methods.reactor_regime_response.control_owner import ControlRecordPublisher, PreparedReactorRequest, prepare_request
-from empirical_lawhood.adapters.methods.reactor_regime_response.control_prospective_plan import ReactorRegimeResponsePreparedProspectivePlanBundle
-from empirical_lawhood.adapters.methods.reactor_regime_response.control_prospective_lock import RegimeDPreparedRequestLock, freeze_prepared_request
-from empirical_lawhood.adapters.methods.reactor_regime_response.law_terminal import RegimeJointLawResult
-from empirical_lawhood.adapters.methods.reactor_regime_response.prospective_decision import CausalValidityRegimeAssignment
-from empirical_lawhood.adapters.methods.reactor_regime_response.records import RegimeCausalPreparation, RegimePrivatePreparation
-from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import NativeEpisode
-from empirical_lawhood.adapters.simulators.reactor_causal_response.design import draw_scenario
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.batch_design import ReactorBatchSource
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.controller_runtime import DeliveryControllerTickReceipt, TickDisposition
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.controller_evaluation_nested import (
-    DurablePreparedExecutionEventStore,
-    ProspectiveEvaluationBindingCoordinator,
+from empirical_lawhood.domains.reactor.reactor_regime_response.native_acquisition_records import (
+    ProspectiveRootAcquisition as _science_ProspectiveRootAcquisition,
 )
-
-from .acquisition import _episode
-from .committed_branch import acquire_committed_nominal_branch, acquire_committed_refined_replay, acquire_prepared_evaluator_chart
-
 
 class _UnboundSession:
     def advance(self, command: object) -> None:
         raise RuntimeError("precontact admission commitment attempted a native delivery")
-
-
-@dataclass(frozen=True)
-class ProspectiveRootAcquisition:
-    root: str
-    prepared: tuple[PreparedReactorRequest | None, ...]
-    nominal: tuple[NativeEpisode | None, ...]
-    refined: tuple[NativeEpisode | None, ...]
-    evaluator_chart: tuple[NativeEpisode, ...]
-    ticks: tuple[DeliveryControllerTickReceipt | None, ...]
-    native_calls: int
-    reasons: tuple[str, ...]
-    locks: tuple[RegimeDPreparedRequestLock, ...] = ()
-
-    def __post_init__(self) -> None:
-        if (
-            len(self.prepared) != 4
-            or len(self.nominal) != 4
-            or len(self.refined) != 4
-            or len(self.ticks) != 4
-            or len(self.evaluator_chart) not in (0, 6)
-            or self.native_calls != sum(value is not None for value in (*self.nominal, *self.refined))
-            + len(self.evaluator_chart)
-            or self.native_calls > 14
-            or len(self.locks) not in (0, 4)
-        ):
-            raise ValueError("D action changes its four branches or six-word-view chart")
-
 
 def acquire_prospective_root(
     *,
@@ -87,7 +50,7 @@ def acquire_prospective_root(
     prepared_store: DurablePreparedExecutionEventStore,
     occurred_at_utc: str,
     progress: Callable[[int], None] | None = None,
-) -> ProspectiveRootAcquisition:
+) -> _science_ProspectiveRootAcquisition:
     "Commit all four requests first, then perform each independent branch.\n\n    Only the installed finite admission delivery port may supply a nominal primary\n    action. The complete chart remains postdecision evaluator evidence.\n    "
     root = causal.root
     if (
@@ -104,7 +67,7 @@ def acquire_prospective_root(
     if assigned.eligible != (decision is not None and decision.causal_preparation_valid):
         raise ValueError("D prepared census changed this root's admission eligibility")
     if not assigned.eligible:
-        return ProspectiveRootAcquisition(
+        return _science_ProspectiveRootAcquisition(
             root, (None,) * 4, (None,) * 4, (None,) * 4, (),
             (None,) * 4, 0, assigned.reason_codes,
         )
@@ -156,7 +119,7 @@ def acquire_prospective_root(
             or not np.isfinite(nominal_base.requests).all()):
         # The decisions and their locks survive. An unavailable exploration-unshifted tail cannot
         # retrospectively remove a contact or authorize an invented policy.
-        return ProspectiveRootAcquisition(
+        return _science_ProspectiveRootAcquisition(
             root, prepared, (None,) * 4, (None,) * 4, (), (None,) * 4, 0,
             ("DECLARED_DONOR_CONTINUATION_UNAVAILABLE",), locks,
         )
@@ -228,7 +191,7 @@ def acquire_prospective_root(
         progress=episode_progress(calls),
     )
     calls += len(chart)
-    return ProspectiveRootAcquisition(
+    return _science_ProspectiveRootAcquisition(
         root, prepared, tuple(nominal), tuple(refined), chart,
         tuple(ticks), calls, (), locks,
     )

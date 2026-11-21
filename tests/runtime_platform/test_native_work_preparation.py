@@ -6,13 +6,13 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain import operation_bindings as rc
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain import operation_contracts as rc_records, science as rc_science
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain import operation_bindings as rc
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain import operation_contracts as rc_records, science as rc_science
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind, WorkerInputPort
+from empirical_lawhood.execution.native_effects import NativeEffectContact
 
 
 def _parent(ports, task_id="exposed.task"):

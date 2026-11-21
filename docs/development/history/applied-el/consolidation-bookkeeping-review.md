@@ -118,7 +118,7 @@ ISSUE consumers have been independently checked for format coverage.
 The backup/filesystem-change hold applied at this checkpoint. On 17 October the
 researcher selected EL as the default external/run artifact storage, superseding
 the artifact prohibition for work there; use the
-[current storage guidance](../../maintainer-environment.md#storage-and-retained-evidence).
+[current storage guidance](../../../using/environments.md#select-storage-and-reuse-an-environment).
 Bookkeeping acceptance does not close the selected run's failed-history
 reconciliation, mixed-source continuation or assessment/read/recovery acceptance.
 

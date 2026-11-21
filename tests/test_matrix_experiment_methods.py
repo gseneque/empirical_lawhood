@@ -10,15 +10,15 @@ import json
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import experiment_methods as science
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_bindings import BUDGET, NAMESPACE, operation_declarations
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_lowering import lower_exposed_matrix_response_error
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_preparation import prepare_matrix_response_error
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_response import experiment_methods as science
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_bindings import BUDGET, NAMESPACE, operation_declarations
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_lowering import lower_exposed_matrix_response_error
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_preparation import prepare_matrix_response_error
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from empirical_lawhood.api import load_authoring
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_matrix_experiment_specification import PROTOCOL, alternative, execution, inputs, object_identity, selected
 
 
@@ -81,8 +81,8 @@ def selected_input_records(source_inputs, method_inputs):
 
 
 def write_source_selection(directory, source_inputs, method_inputs):
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
     directory.mkdir()
     bindings = []
     for index, (key, record) in enumerate(sorted(selected_input_records(source_inputs, method_inputs).items())):
@@ -132,8 +132,8 @@ def test_edit_only_specification_reuses_the_same_original_source_selection(tmp_p
 
 
 def test_closed_input_binding_prepares_complete_and_partial_source_banks():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_inputs import bind_matrix_response_inputs, input_record_types
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_inputs import bind_matrix_response_inputs, input_record_types
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
     specification, source_inputs, _, method_inputs = fixture()
     records = selected_input_records(source_inputs, method_inputs)
     assert {*{type(row) for row in records.values()}, ProtectedE3PreparationSelection} == set(input_record_types())
@@ -156,7 +156,7 @@ def test_closed_input_binding_prepares_complete_and_partial_source_banks():
 
 
 def test_selected64_uses_the_same_bank_binding_and_lowering_as_the_alternative():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_inputs import bind_matrix_response_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_inputs import bind_matrix_response_inputs
     specification, source_inputs, _, method_inputs = fixture(selected64=True,
         train_count=64, cal_count=64, eval_count=64, minimum_usable=58)
     resolved = bind_matrix_response_inputs(specification, selected_input_records(source_inputs, method_inputs))
@@ -172,7 +172,7 @@ def test_selected64_uses_the_same_bank_binding_and_lowering_as_the_alternative()
 
 
 def test_missing_campaign_retains_all_bound_banks_and_reports_a_typed_dependency():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_inputs import bind_matrix_response_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_inputs import bind_matrix_response_inputs
     specification, source_inputs, allocation, method_inputs = fixture()
     records = selected_input_records(source_inputs, method_inputs)
     del records["campaign"]
@@ -192,7 +192,7 @@ def test_missing_campaign_retains_all_bound_banks_and_reports_a_typed_dependency
 
 @pytest.mark.parametrize("failure", ("unknown-key", "wrong-type", "role-change", "prospective"))
 def test_closed_input_binding_refuses_substituted_keys_types_roles_and_protected_scope(failure):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_inputs import bind_matrix_response_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_inputs import bind_matrix_response_inputs
     specification, source_inputs, _, method_inputs = fixture()
     records = selected_input_records(source_inputs, method_inputs)
     if failure == "unknown-key":
@@ -332,7 +332,7 @@ def test_declarations_lower_complete_graph_and_refuse_future_port_bypass():
     assert dict(prepared.census.operation_counts) == {"fit": 1, "freeze": 2, "forecast": 28, "observe": 28, "calibrate": 1, "evaluate": 1}
     assert prepared.census.native_effect_count == 0
     declarations = operation_declarations()
-    from empirical_lawhood.runtime.plans import BarrierKind, ScientificStage
+    from empirical_lawhood.execution.plans import BarrierKind, ScientificStage
     exposed_evaluation = next(row for row in declarations if row.capability_key == NAMESPACE + ".evaluate")
     assert exposed_evaluation.stage is ScientificStage.FALSIFY
     assert exposed_evaluation.execution_properties.barrier is BarrierKind.NONE
@@ -352,7 +352,7 @@ def test_declarations_lower_complete_graph_and_refuse_future_port_bypass():
             implementation_commit="a" * 40, output_codecs=codecs)
     forecast_node = next(row.node_id for row in lowered.draft.operations if row.selection.capability_key == NAMESPACE + ".forecast")
     outcome_edge = next(row for row in lowered.draft.links if row.consumer_input_id == "outcome")
-    from empirical_lawhood.planning.recursive_authoring import RecursiveInputLink
+    from empirical_lawhood.design.recursive_authoring import RecursiveInputLink
     leaked = RecursiveInputLink("edge.fixture.illicit-future", forecast_node, "outcome", external_input_id=outcome_edge.external_input_id, scientific_role="OUTCOME")
     with pytest.raises(ValueError, match="undeclared|input|phase"):
         compile_recursive_wave(draft=replace(lowered.draft, links=tuple(sorted((*lowered.draft.links, leaked), key=lambda row: row.edge_id))),
@@ -360,7 +360,7 @@ def test_declarations_lower_complete_graph_and_refuse_future_port_bypass():
 
 
 def test_original_long_unit_identity_remains_exact_with_bounded_public_task_ids():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_bindings import MatrixE3OperationConfig, node_id
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_bindings import MatrixE3OperationConfig, node_id
     specification, _, allocation, _ = fixture()
     long_unit = "unit.original." + "a" * 1024
     node = node_id(specification.identity, "forecast", mode="calibration", unit_id=long_unit)
@@ -383,7 +383,7 @@ def test_shared_lookup_preserves_original_first_middle_last_and_missing_units():
 
 
 def test_instance_association_accepts_exact_graph_and_rejects_another_valid_experiment():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_preparation import validate_matrix_response_instance
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_preparation import validate_matrix_response_instance
     specification, source_inputs, allocation, method_inputs = fixture()
     prepared = prepare_matrix_response_error(specification, scientific_inputs=source_inputs, execution=execution(),
         protocol_bytes=PROTOCOL, method_inputs=method_inputs)
@@ -401,8 +401,8 @@ def test_instance_association_accepts_exact_graph_and_rejects_another_valid_expe
 
 @pytest.mark.parametrize("failure", ("config-allocation", "external-specification", "external-allocation", "forecast-future-link", "partial-selection", "root-units"))
 def test_instance_association_refuses_valid_typed_graph_binding_substitutions(failure):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_bindings import MatrixE3OperationConfig
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_preparation import validate_matrix_response_instance
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_bindings import MatrixE3OperationConfig
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_preparation import validate_matrix_response_instance
     specification, source_inputs, allocation, method_inputs = fixture()
     prepared = prepare_matrix_response_error(specification, scientific_inputs=source_inputs, execution=execution(),
         protocol_bytes=PROTOCOL, method_inputs=method_inputs)
@@ -414,7 +414,7 @@ def test_instance_association_refuses_valid_typed_graph_binding_substitutions(fa
         operations = tuple(replace(row, config_payload=changed.canonical_bytes().decode()) if row == operation else row for row in draft.operations)
         draft = replace(draft, operations=operations)
     elif failure.startswith("external-"):
-        from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_lowering import external_id
+        from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_lowering import external_id
         target = external_id(specification.identity, failure.removeprefix("external-"))
         draft = replace(draft, external_inputs=tuple(replace(row, expected_content_sha256="f" * 64)
             if row.input_id == target else row for row in draft.external_inputs))
@@ -520,10 +520,10 @@ def test_primary_comparison_requires_strict_margin_for_each_baseline_in_both_vie
 def test_actual_public_default_author_run_read_and_completed_recovery(tmp_path, monkeypatch, selected64):
     from empirical_lawhood.api import recursive_authoring as author, recursive_execution as execute
     from empirical_lawhood.api.recursive_operations import operation_factories
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.infrastructure import execution as execution_boundary
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local import execution as execution_boundary
     from empirical_lawhood.api.experiment_preparation import author_prepared_experiment, load_experiment_inputs, prepare_experiment
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
     from tests.test_recursive_public_service import _plane
     specification, source_inputs, _, method_inputs = fixture(selected64=selected64,
         train_count=64 if selected64 else 12, cal_count=64 if selected64 else 20,

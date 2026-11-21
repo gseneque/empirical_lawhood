@@ -5,35 +5,25 @@ from decimal import Decimal
 from hashlib import sha256
 from typing import Any, Callable, TypeVar, cast
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.linked_campaign import LinkedCampaignStageRole
-from empirical_lawhood.planning.source_qualification import FreshSourceQualificationExperiment
-from empirical_lawhood.planning.observation_order import ObservationPhysicalUnit
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityManifest, CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskProgressEmitter,
-    TaskRunner,
-    WorkerInputPort,
-)
-from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignDisposition, LinkedCampaignStageEnvelope
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
-from empirical_lawhood.runtime.source_qualification import FreshSourceQualificationSubstrateBinding
-from empirical_lawhood.adapters.simulators.six_matrix_response.response_qualification import ResponseGeometryAssayNativeConfig, ResponseGeometryAssayNativeSegment, ResponseGeometryAssayNativeSegmentResult, assay_segments
-from empirical_lawhood.adapters.simulators.six_matrix_response.response_source import ASSAY_HDF5_SCHEMA, execute_assay_segment
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.linked_campaign import LinkedCampaignStageRole
+from empirical_lawhood.design.source_qualification import FreshSourceQualificationExperiment
+from empirical_lawhood.design.observation_order import ObservationPhysicalUnit
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskProgressEmitter, TaskRunner, WorkerInputPort
+from empirical_lawhood.execution.linked_campaigns import LinkedCampaignDisposition, LinkedCampaignStageEnvelope
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
+from empirical_lawhood.execution.source_qualification import FreshSourceQualificationSubstrateBinding
+from empirical_lawhood.domains.matrix.six_matrix_response.response_qualification import ResponseGeometryAssayNativeConfig, ResponseGeometryAssayNativeSegment, ResponseGeometryAssayNativeSegmentResult, assay_segments
+from empirical_lawhood.domains.matrix.six_matrix_response.response_dynamics import ASSAY_HDF5_SCHEMA
+from empirical_lawhood.adapters.simulators.six_matrix_response.response_source import execute_assay_segment
 
-from .discovery import CANONICAL_MEDIA_TYPE
+from empirical_lawhood.adapters.simulators.response_geometry_prospective.discovery import CANONICAL_MEDIA_TYPE
 
 
 Record = TypeVar("Record", bound=CanonicalRecord)
@@ -43,7 +33,7 @@ def validate_response_geometry_assay_native_roster(
     config: ResponseGeometryAssayNativeConfig, carrier: FreshSourceQualificationExperiment
 ) -> None:
     """Bind the neutral carrier's unit, view, clock and action roles to assay."""
-    from empirical_lawhood.adapters.simulators.six_matrix_response.response_panel import assay_physical_unit_id
+    from empirical_lawhood.domains.matrix.six_matrix_response.response_panel import assay_physical_unit_id
 
     prefix = "response-geometry-assay"
     expected_units = tuple(

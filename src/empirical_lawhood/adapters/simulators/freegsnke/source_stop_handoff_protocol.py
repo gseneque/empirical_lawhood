@@ -6,56 +6,27 @@ from dataclasses import dataclass, fields
 from hashlib import sha256
 from typing import ClassVar, Final
 
-from empirical_lawhood.adapters.methods.independent_substrate_grounding import IndependentSubstrateIndependenceClass, IndependentSubstrateTargetKind, IndependentSubstrateTargetTerminalHandoff
-from empirical_lawhood.adapters.methods.structural_recurrence import TargetLevel
-from empirical_lawhood.adapters.methods.observed_structural_classes import EvidenceWorld
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    validate_semantic_version,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.kernel.status import AdmissionStatus, OperationalStatus, ScientificStatus
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-)
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    CanonicalTaskReceipt,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.candidate_compiler import CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityRegistration
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-)
+from empirical_lawhood.methods.independent_substrate_grounding import IndependentSubstrateIndependenceClass, IndependentSubstrateTargetKind, IndependentSubstrateTargetTerminalHandoff
+from empirical_lawhood.methods.structural_recurrence import TargetLevel
+from empirical_lawhood.methods.observed_structural_classes import EvidenceWorld
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_semantic_version, validate_sha256, validate_stable_id
+from empirical_lawhood.science.records.status import AdmissionStatus, OperationalStatus, ScientificStatus
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, CanonicalTaskReceipt, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.candidate_compiler import CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityRegistration
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, CampaignRuntimeProvider, ExternalInputPayload
 
-from .registry import FREEGSNKE_CAPABILITY_VERSION
-from .source_qualification_protocol import FREEGSNKE_SOURCE_QUALIFICATION_STEP_ID
-from .source_qualification import FreeGsnkeSourceQualificationDisposition, FreeGsnkeSourceQualificationResult
+from empirical_lawhood.adapters.simulators.freegsnke.registry import FREEGSNKE_CAPABILITY_VERSION
+from empirical_lawhood.adapters.simulators.freegsnke.source_qualification_protocol import FREEGSNKE_SOURCE_QUALIFICATION_STEP_ID
+from empirical_lawhood.domains.fusion.freegsnke.source_qualification import FreeGsnkeSourceQualificationDisposition, FreeGsnkeSourceQualificationResult
 
 
 FREEGSNKE_SOURCE_STOP_PROJECT_KEY: Final = "freegsnke.project-source-stop-handoff"

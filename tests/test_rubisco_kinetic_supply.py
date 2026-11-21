@@ -6,16 +6,13 @@ from fractions import Fraction
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_prediction import kinetic_assay_bridge as bridge
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_supply import (
-    ApparentKineticConstants, JointKineticSupply, KineticSupplyContext,
-    KineticSupplyMember, KineticSupportInterval, KineticTargetComparison,
-)
-from empirical_lawhood.adapters.simulators.rubisco_assay.core import Products
-from empirical_lawhood.adapters.simulators.rubisco_assay.records import AssayQuery
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as D
+from empirical_lawhood.domains.rubisco.rubisco_prediction import kinetic_assay_bridge as bridge
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_supply import ApparentKineticConstants, JointKineticSupply, KineticSupplyContext, KineticSupplyMember, KineticSupportInterval, KineticTargetComparison
+from empirical_lawhood.domains.rubisco.assay.core import Products
+from empirical_lawhood.domains.rubisco.assay.records import AssayQuery
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as D
 
 
 def identity(name):

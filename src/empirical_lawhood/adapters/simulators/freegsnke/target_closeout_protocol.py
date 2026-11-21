@@ -13,54 +13,29 @@ from enum import StrEnum
 from hashlib import sha256
 from typing import ClassVar, Final
 
-from empirical_lawhood.adapters.methods.independent_substrate_grounding import IndependentImplementationDossier, IndependentSubstrateTargetTerminalHandoff
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    validate_semantic_version,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    CanonicalTaskReceipt,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.candidate_compiler import CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityRegistration
-from empirical_lawhood.runtime.conditional_children import ConditionalChildInstantiation
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-)
+from empirical_lawhood.methods.independent_substrate_grounding import IndependentImplementationDossier, IndependentSubstrateTargetTerminalHandoff
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_semantic_version, validate_sha256, validate_stable_id
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, CanonicalTaskReceipt, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.candidate_compiler import CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityRegistration
+from empirical_lawhood.execution.conditional_children import ConditionalChildInstantiation
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, CampaignRuntimeProvider, ExternalInputPayload
 
-from .structural_recurrence_bridge import FreeGsnkeStructuralRecurrenceDesignCandidate
-from .registry import FREEGSNKE_CAPABILITY_VERSION
-from .target_evaluation import FreeGsnkeAdmissionEvaluationEvaluation
-from .target_lifecycle_protocol import FREEGSNKE_TARGET_FREEZE_STEP_ID, FREEGSNKE_ADMISSION_EVALUATION_STEP_ID, FreeGsnkeTargetPredictionFreeze
-from .target_terminal import FreeGsnkeTargetTerminal, build_freegsnke_target_terminal
-from .target_validation_protocol import FREEGSNKE_PROSPECTIVE_VALIDATION_EVALUATE_STEP_ID, FREEGSNKE_PROSPECTIVE_VALIDATION_ISSUE_STEP_ID
-from .target_validation import FreeGsnkeProspectiveValidationRequestRoster, FreeGsnkeTargetValidation, finalize_freegsnke_without_prospective
+from empirical_lawhood.domains.fusion.freegsnke.structural_recurrence_bridge import FreeGsnkeStructuralRecurrenceDesignCandidate
+from empirical_lawhood.adapters.simulators.freegsnke.registry import FREEGSNKE_CAPABILITY_VERSION
+from empirical_lawhood.domains.fusion.freegsnke.target_evaluation import FreeGsnkeAdmissionEvaluationEvaluation
+from empirical_lawhood.adapters.simulators.freegsnke.target_lifecycle_protocol import FREEGSNKE_TARGET_FREEZE_STEP_ID, FREEGSNKE_ADMISSION_EVALUATION_STEP_ID, FreeGsnkeTargetPredictionFreeze
+from empirical_lawhood.domains.fusion.freegsnke.target_terminal import FreeGsnkeTargetTerminal, build_freegsnke_target_terminal
+from empirical_lawhood.adapters.simulators.freegsnke.target_validation_protocol import FREEGSNKE_PROSPECTIVE_VALIDATION_EVALUATE_STEP_ID, FREEGSNKE_PROSPECTIVE_VALIDATION_ISSUE_STEP_ID
+from empirical_lawhood.domains.fusion.freegsnke.target_validation import FreeGsnkeProspectiveValidationRequestRoster, FreeGsnkeTargetValidation, finalize_freegsnke_without_prospective
 
 
 FREEGSNKE_NONISSUE_KEY: Final = 'freegsnke.finalize-prospective-validation-nonissue'

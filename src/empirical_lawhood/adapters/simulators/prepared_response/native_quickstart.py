@@ -10,12 +10,13 @@ from typing import ClassVar
 
 import numpy as np
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
 
-from .contracts import CONTEXTS, PARENTS, PreparedForceWord, PreparedNativeSpec, PreparedRootRandomness, prepared_native_member, prepared_numerical_view, validate_prepared_seed_census
-from .instruments import prepared_receiver
-from .source import bind_prepared_common_start, bind_prepared_native_handoff, execute_native_future, execute_native_parent, prepare_native_prefix
+from empirical_lawhood.domains.matrix.prepared_response.contracts import CONTEXTS, PARENTS, PreparedForceWord, PreparedNativeSpec, PreparedRootRandomness, prepared_native_member, prepared_numerical_view, validate_prepared_seed_census
+from empirical_lawhood.domains.matrix.prepared_response.instruments import prepared_receiver
+from empirical_lawhood.domains.matrix.prepared_response import source as prepared_scientific_source
+from empirical_lawhood.domains.matrix.prepared_response.source import bind_prepared_common_start, bind_prepared_native_handoff, execute_native_future, execute_native_parent, prepare_native_prefix
 
 
 @dataclass(frozen=True, slots=True)
@@ -62,7 +63,7 @@ class PreparedResponsePreparedCanary(CanonicalRecord):
 def _native_spec(config: PreparedResponsePreparedCanary) -> PreparedNativeSpec:
     """Bind a diagnostic source to its actual local code and lock bytes."""
 
-    source_path = Path(__file__).with_name("source.py")
+    source_path = Path(prepared_scientific_source.__file__)
     lock_path = Path(__file__).parents[5] / "uv.lock"
     # An installed wheel has no checkout lock. The wheel diagnostic still uses
     # its own explicit development marker; no clean-Git identity is asserted.

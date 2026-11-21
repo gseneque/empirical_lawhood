@@ -8,21 +8,14 @@ from hashlib import sha256
 import json
 from pathlib import Path
 
-from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256, read_bounded_bytes
-from empirical_lawhood.infrastructure.numerical_provenance import (
-    numerical_runtime_observation, observe_implementation_source,
-)
-from empirical_lawhood.infrastructure.read_checkpoint import (
-    authenticate_read_file_pins, verified_read_file_pins,
-)
-from empirical_lawhood.kernel.evidence import OutcomeAccess, inherited_visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, canonical_json_document_bytes
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, derived_outcome_access,
-    lineage_parent_sort_key,
-)
-from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+from empirical_lawhood.storage.bounded_io import bounded_file_sha256, read_bounded_bytes
+from empirical_lawhood.storage.numerical_provenance import numerical_runtime_observation, observe_implementation_source
+from empirical_lawhood.storage.read_checkpoint import authenticate_read_file_pins, verified_read_file_pins
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, inherited_visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, canonical_json_document_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, derived_outcome_access, lineage_parent_sort_key
+from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
 
 SCHEMA = 'empirical-lawhood/operational/matrix-export-checkpoint'
 MAX_CHECKPOINT_BYTES = 512 * 1024**2
@@ -30,7 +23,7 @@ MAX_CHECKPOINT_BYTES = 512 * 1024**2
 # update. All other package members, runtime, lock and operation bindings stay exact.
 _V1_WRITER_SHA256 = 'a7d67ee368fe1d05043699828cd411e0ccff6303bbe2efa2353ccfdfb2341142'
 _WRITER_MEMBER = 'api/matrix_programme_export_checkpoints.py'
-_POLICY_MEMBER = 'infrastructure/source_policy.py'
+_POLICY_MEMBER = 'storage/source_policy.py'
 _V1_POLICY_SHA256 = 'bdcceede975971cd9711d507ebac5a9eb71cdd4a881ae81f30c7c3373be6cf64'
 _V2_POLICY_SHA256 = '69686706b4aafb6359e62148822ae1273c6d46b86e52e8faf96e9a24384bb813'
 _V1_TRANSPORT_REPAIRS = (
@@ -38,7 +31,7 @@ _V1_TRANSPORT_REPAIRS = (
     ('api/matrix_programme_products.py', '2ea61fdb3946359241a5a4d579a20711ba8687ff2b18d0ab91a687d5ab5e8646', 'fe37e39e7c087a125d53faf0dd2a65285077cf0243f4dfb6d06caf0938339e9f'),
     ('api/matrix_programme_structural_prediction.py', '278a0cd0e523bccdfdb74f8f0eefa249d7f32c0a07b5b6b84d4fd0daf9cca69d', '044166496a8d64198959628cea92abb6485068574b052f5246208622e68d1479'),
     ('api/matrix_researcher_programme.py', '344cbc91633382b2bc3e018fc99084b6c393bb35aaa09deccd1c30e0500bb2bc', '58d7e5ffe5df64082f1a3d608077cd19735c1048ce91a4eaa8ee6a4554326ec5'),
-    ('infrastructure/read_checkpoint.py', '00d300a44cc47ce80e40ae38415411d07e4b86b388cc085963a8e35c39894618', '96250c48a209e942a1e17b291bd7c6271663a8cc40da3652121e72dc8d736701'),
+    ('storage/read_checkpoint.py', '00d300a44cc47ce80e40ae38415411d07e4b86b388cc085963a8e35c39894618', '96250c48a209e942a1e17b291bd7c6271663a8cc40da3652121e72dc8d736701'),
 )
 
 
@@ -194,10 +187,10 @@ class ProgrammeExportCheckpoints:
         opens and closes with reconstruction disabled; only already completed
         reports are delivered as full science within its yielded lifetime.
         """
-        from empirical_lawhood.adapters.methods.matrix_researcher_programme.source_continuation import COMPLETED_E4_PHASES
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import E4MatchedRelationSelection
+        from empirical_lawhood.domains.matrix.matrix_researcher_programme.source_continuation import COMPLETED_E4_PHASES
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import E4MatchedRelationSelection
         from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammeProjectionContext
-        from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+        from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
 
         supported = (*COMPLETED_E4_PHASES, 'e4.revision')
         if any(self.present(phase) for phase in supported):
@@ -217,7 +210,7 @@ class ProgrammeExportCheckpoints:
 
     def observe_completed(self, context, stage, report):
         """Restore an authenticated owner report without its acquisition hooks."""
-        from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import MatrixProgrammeObservation
+        from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import MatrixProgrammeObservation
         from empirical_lawhood.api.matrix_researcher_programme import _phase_complete
 
         if stage not in self.completed or not _phase_complete(stage, report):
@@ -231,13 +224,13 @@ class ProgrammeExportCheckpoints:
         every input byte. This consumer checks the exact original products;
         it does not call the acquisition replay or fit owner again.
         """
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as methods
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4DevelopmentProgramme
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4PublicRevisionDecision
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as methods
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4DevelopmentProgramme
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4PublicRevisionDecision
         from empirical_lawhood.api.matrix_researcher_programme_e4_lineage import MatrixProgrammeRevisionRead
-        from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-        from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-        from empirical_lawhood.kernel.status import OperationalStatus
+        from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+        from empirical_lawhood.science.records.status import OperationalStatus
 
         if not {'e4.development', 'e4.revision'}.issubset(self.completed):
             raise PermissionError('Matrix export revision requires both authenticated completed reports')
@@ -268,7 +261,7 @@ class ProgrammeExportCheckpoints:
                         (row['logical_artifact_id'], row['schema'], row['sha256'], row['size_bytes'])):
                 raise PermissionError('Matrix export revision changes its exact saved product custody')
             require_current()
-            from empirical_lawhood.infrastructure.canonical_record_read import read_verified_canonical_record
+            from empirical_lawhood.storage.canonical_record_read import read_verified_canonical_record
             record = read_verified_canonical_record(self.reading, manifest, kind,
                 maximum_bytes=manifest.materialization.size_bytes)
             require_current()
@@ -285,7 +278,7 @@ class ProgrammeExportCheckpoints:
         return MatrixProgrammeRevisionRead(None, None, development, nomination, frozen, decision)
 
     def load(self, stage, *, context, execution, require_current):
-        from empirical_lawhood.runtime.progress import report_progress
+        from empirical_lawhood.execution.progress import report_progress
         report_progress(phase='matrix_export.checkpoint.resume.' + stage)
         require_current()
         self.require_source_current()
@@ -330,7 +323,7 @@ class ProgrammeExportCheckpoints:
             'execution': ProgrammeExportCheckpoints._report_pin(execution) if compact else execution}
 
     def save(self, stage, report, *, context, execution, require_current):
-        from empirical_lawhood.runtime.progress import report_progress
+        from empirical_lawhood.execution.progress import report_progress
         report_progress(phase='matrix_export.checkpoint.seal.' + stage)
         require_current()
         self.require_source_current()

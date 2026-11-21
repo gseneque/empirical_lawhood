@@ -7,14 +7,9 @@ from html import escape
 
 import pytest
 
-from empirical_lawhood.adapters.physical.rubisco_kinetics.genbank import (
-    NativeTeParentConstructV1, decode_te_parent_genbank,
-)
-from empirical_lawhood.adapters.physical.rubisco_kinetics.wilson2017 import (
-    DOI, NativeWilsonTableV1, WilsonMutantPanelV1, apply_reported_edits,
-    build_wilson2017_panel, decode_wilson2017_html,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_record
+from empirical_lawhood.adapters.physical.rubisco_kinetics.genbank import NativeTeParentConstructV1, decode_te_parent_genbank
+from empirical_lawhood.adapters.physical.rubisco_kinetics.wilson2017 import DOI, NativeWilsonTableV1, WilsonMutantPanelV1, apply_reported_edits, build_wilson2017_panel, decode_wilson2017_html
+from empirical_lawhood.science.records.decoding import decode_canonical_record
 
 
 def parent_fixture():

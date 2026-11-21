@@ -7,7 +7,7 @@ from typing import ClassVar
 import pytest
 
 from empirical_lawhood.api.codecs import AuthoringCodecError, loads_registered_authoring
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
 
 @dataclass(frozen=True, slots=True)

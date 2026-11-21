@@ -7,11 +7,11 @@ import numpy as np
 import pytest
 
 from empirical_lawhood.api import derived_array_access as owner
-from empirical_lawhood.infrastructure.artifact_stream_primitives import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage.artifact_stream_primitives import ArtifactIdentityConflict
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 from tests.runtime_platform.test_candidate_compiler import _fixture
 from tests.test_matrix_selected_opportunity import opportunity, transfer  # noqa: F401
 from tests.test_matrix_source_evidence import source_case  # noqa: F401
@@ -43,7 +43,7 @@ def test_actual_array_access_authenticates_original_members_and_returns_only_new
         source_profile=profile, config=config, qualification=qualification)
     assert qualification.materialization.object_id == external.logical_artifact_id != initial.array_artifact.artifact_id
     assert qualification.content_sha256 == initial.array_artifact.sha256
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_NPZ_CODEC
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_NPZ_CODEC
     assert qualification.materialization.object_version == MATRIX_NPZ_CODEC.record_version
     assert qualification.observation_operator == profile.observation_operator
     assert qualification.outcome_access is OutcomeAccess.OUTCOME_BLIND
@@ -120,9 +120,9 @@ def test_actual_published_structure_must_match_original_complete_owned_array_con
 @pytest.fixture
 def scheduled_template_access(array_access):
     """Disclosed coefficient bytes, actual publication; no source eligibility claim."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseArrays
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledSource
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseArrays
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledSource
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
     writer, root, profile, initial, _, _ = array_access
     values = {
@@ -146,7 +146,7 @@ def scheduled_template_access(array_access):
 
 
 def test_actual_scheduled_template_owner_retains_source_members_and_access(scheduled_template_access):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseArrays
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseArrays
 
     writer, root, profile, arrays, external, publication, _ = scheduled_template_access
     original_bytes = arrays.canonical_bytes()

@@ -8,14 +8,12 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import curve_amendment as domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.curve_amendment_design import (
-    CURVE_MECHANISM_AMENDMENT, amend_curve_design,
-)
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.scientific_design import MatrixProgrammeScientificDesign
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import curve_amendment as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.curve_amendment_design import CURVE_MECHANISM_AMENDMENT, amend_curve_design
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.scientific_design import MatrixProgrammeScientificDesign
 from empirical_lawhood.api.matrix_amendment_evidence import evidence_snapshots, validate_evidence
 from empirical_lawhood.api.matrix_amendment_withdrawals import _future_absences
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 ROOT = Path(__file__).parents[1]
 
@@ -120,7 +118,7 @@ def test_changed_original_analysis_file_refuses_before_publication(evidence_case
 
 def test_complete_exposed_evidence_publishes_and_reopens_through_real_custody(evidence_case, tmp_path):
     from empirical_lawhood.api.matrix_amendment_evidence import publish_evidence, read_evidence
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
     from tests.test_artifact_publication_admission import _plane
     case = evidence_case
     writer = _plane(tmp_path / 'publication')
@@ -153,12 +151,12 @@ def test_superseded_derivation_partial_future_namespaces_refuse(tmp_path, relati
 
 @pytest.fixture(scope='module')
 def amended_metadata(tmp_path_factory):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.eligibility import MatrixFactorExposureCensus
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
+    from empirical_lawhood.domains.matrix.matrix_factor_response.eligibility import MatrixFactorExposureCensus
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
     from empirical_lawhood.api import matrix_programme_curve_amendment as owner
     from empirical_lawhood.api.matrix_researcher_programme import _publish
     from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
-    from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticate_programme_inputs
+    from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticate_programme_inputs
     from tests.test_matrix_programme_input_assembly import build_public_file_case, _derive, _forbid_acquisition
     census = decode_canonical_bytes((ROOT / 'programmes/foundations/emergent-structure/workflows/matrix-response-experiment/exposure-census.example.json').read_bytes(),
         MatrixFactorExposureCensus, maximum_bytes=None)
@@ -183,7 +181,7 @@ def amended_metadata(tmp_path_factory):
 
 
 def test_amended_full_roster_c_reopens_without_allocating_or_changing_native_selections(amended_metadata):
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.source_continuation import validate_continued_inputs
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.source_continuation import validate_continued_inputs
     original, amended = amended_metadata.original, amended_metadata.amended
     domain.validate_amended_inputs(original, amended)
     assert sum(dict(amended.scientific_design.phase_group_counts).values()) == 980
@@ -214,9 +212,7 @@ def test_amendment_refuses_changes_outside_fixed_prospective_rule(amended_metada
 
 
 def test_amended_plan_requires_selected_lineage_before_any_child_effect(amended_metadata, evidence_case, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import (
-        AMENDED_PROTOCOL_ID, MatrixCurveAmendedProgrammeSpecification, MatrixResearchProgrammePlan, prepare, programme_protocol,
-    )
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import AMENDED_PROTOCOL_ID, MatrixCurveAmendedProgrammeSpecification, MatrixResearchProgrammePlan, prepare, programme_protocol
     from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
     from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService
     from tests.test_matrix_programme_source_continuation import _plans

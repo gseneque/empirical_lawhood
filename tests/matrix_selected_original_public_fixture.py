@@ -12,29 +12,28 @@ from pathlib import Path
 from types import SimpleNamespace
 
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_package import adapt_e3_frozen_package
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as e3
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_experiment_inputs import ProtectedE3PreFitJoin
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_statistical_bindings import statistical_task_id
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseProtocol
-from empirical_lawhood.api.codecs import MAX_CAMPAIGN_PACKAGE_BYTES
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_package import adapt_e3_frozen_package
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as e3
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_experiment_inputs import ProtectedE3PreFitJoin
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_statistical_bindings import statistical_task_id
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseProtocol
 from empirical_lawhood.api.domain_composition.matrix_protected_response import scientific_read as original_reader
 from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
 from empirical_lawhood.api.matrix_selected_runtime import _published_input
 from empirical_lawhood.api.models import ExperimentPackage
 from empirical_lawhood.api.prospective_experiment import load_retained_prospective_experiment
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import validate_relative_locator, validate_sha256
-from empirical_lawhood.runtime.artifacts import ArtifactWriteResult, ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile, resolve_external_root_contract
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import validate_relative_locator, validate_sha256
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult, ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, resolve_external_root_contract
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
 
 
 SELECTION_KEYS = frozenset(('operator_profile_path', 'e3_authoring_relative_path', 'e3_package_path',
@@ -101,10 +100,10 @@ def original_selected_package(*, project_root, selection):
         raise ValueError('selected reader contract differs from the explicit profile paths or actual EL mount')
     writer = ExternalArtifactPlane(GuardedExternalRoot(contract), validators=integration_artifact_profile_validators())
     writer.root.verify(for_write=False)
-    raw = read_bounded_bytes(Path(selection['e3_package_path']), maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES)
+    raw = read_bounded_bytes(Path(selection['e3_package_path']), maximum_bytes=None)
     if sha256(raw).hexdigest() != selection['e3_package_sha256']:
         raise PermissionError('original E3 package changes the explicitly selected bytes')
-    package = decode_canonical_bytes(raw, ExperimentPackage, maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES)
+    package = decode_canonical_bytes(raw, ExperimentPackage, maximum_bytes=None)
     if package.canonical_bytes() != raw or package.implementation_commit != selection['e3_commit']:
         raise PermissionError('original E3 package/commit differs from actual retained control custody')
     retained = load_retained_prospective_experiment(directory=writer.root.resolve(selection['e3_authoring_relative_path'], for_write=False),

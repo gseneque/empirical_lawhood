@@ -1,75 +1,18 @@
-"""Read-only target predecessor compatibility.
-
-Historical bytes require a separately verified external export/import mapping
-to current descriptors, exact source interpretation and target custody. This
-reader transfers no original qualification or receipt grant.
-"""
+"""Native acquisition and external-format binding for the domain science."""
 
 from __future__ import annotations
-
-from dataclasses import dataclass
 from hashlib import sha256
 import json
 from pathlib import Path
-from typing import ClassVar, Mapping
+from typing import Mapping
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.domains.quantum.marked_record_identification.contracts import MAXIMUM_JSON_BYTES, Verdict
+from empirical_lawhood.domains.quantum.response_control.contracts import Verdict as ResponseControlVerdict
 
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    validate_relative_locator,
-    validate_sha256,
+from empirical_lawhood.domains.quantum.marked_record_identification.compatibility_records import (
+    CompatibilityResult as _science_CompatibilityResult,
+    PredecessorInputs as _science_PredecessorInputs,
 )
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-
-from .contracts import MAXIMUM_JSON_BYTES, Verdict
-from ..quantum_response_control.contracts import Verdict as ResponseControlVerdict
-
-
-_RESPONSE_CONTROL_PATHS = (
-    "controls/freeze.json",
-    "stages/source-compatibility/result.json",
-    "stages/instrument-conformance/result.json",
-    "stages/observation-order-evaluation/result.json",
-    "stages/observation-order-evaluation/result.json.receipt.json",
-    "closeout/result.json",
-    "closeout/result.json.receipt.json",
-    "controls/implementation-manifest.json",
-)
-_PREPARATION_QUALIFICATION_PATHS = ("closeout/result.json", "closeout/result.json.receipt.json")
-
-
-@dataclass(frozen=True, slots=True)
-class PredecessorInputs(CanonicalRecord):
-    """Caller-frozen predecessor bytes, never a shipped historical authority."""
-
-    SCHEMA: ClassVar[str] = 'empirical-lawhood/simulators/quantum-marked-record-identification/predecessor-inputs'
-    response_control_root: str
-    preparation_qualification_root: str
-    payload_sha256s: tuple[tuple[str, str], ...]
-    implementation_sha256: str
-
-    def __post_init__(self) -> None:
-        validate_relative_locator(self.response_control_root)
-        validate_relative_locator(self.preparation_qualification_root)
-        validate_sha256(self.implementation_sha256)
-        expected = tuple(
-            sorted(
-                [f"{self.response_control_root}/{p}" for p in _RESPONSE_CONTROL_PATHS]
-                + [f"{self.preparation_qualification_root}/{p}" for p in _PREPARATION_QUALIFICATION_PATHS]
-            )
-        )
-        if tuple(path for path, _ in self.payload_sha256s) != expected:
-            raise ValueError("predecessor input must bind every payload and receipt")
-        for _, digest in self.payload_sha256s:
-            validate_sha256(digest)
-
-
-@dataclass(frozen=True, slots=True)
-class CompatibilityResult:
-    verdict: Verdict
-    checked_sha256: Mapping[str, str]
-    reason_codes: tuple[str, ...]
-    field_classification: Mapping[str, str]
-
 
 def _bounded_json(path: Path) -> tuple[Mapping[str, object], bytes]:
     payload = read_bounded_bytes(path, maximum_bytes=MAXIMUM_JSON_BYTES)
@@ -97,12 +40,12 @@ def _validate_receipt(path: Path, payload_path: Path) -> None:
 
 
 def compare_predecessors(
-    storage_root: Path, *, inputs: PredecessorInputs
-) -> CompatibilityResult:
+    storage_root: Path, *, inputs: _science_PredecessorInputs
+) -> _science_CompatibilityResult:
     checked: dict[str, str] = {}
     reasons: list[str] = []
     try:
-        if type(inputs) is not PredecessorInputs:
+        if type(inputs) is not _science_PredecessorInputs:
             raise ValueError("typed predecessor inputs required")
         resolved_root = storage_root.resolve(strict=True)
         response_control_root, preparation_qualification_root = inputs.response_control_root, inputs.preparation_qualification_root
@@ -145,7 +88,7 @@ def compare_predecessors(
         ):
             reasons.append("quantum-response-control-terminal-semantics-differ")
     except (OSError, ValueError, TypeError, json.JSONDecodeError) as error:
-        return CompatibilityResult(
+        return _science_CompatibilityResult(
             verdict=Verdict.COMPATIBILITY_UNEVALUABLE,
             checked_sha256=checked,
             reason_codes=(f"bounded-predecessor-read-failed:{type(error).__name__}",),
@@ -167,16 +110,9 @@ def compare_predecessors(
         if reasons
         else Verdict.COMPATIBLE_RECEIVER_IDENTIFICATION_SOURCE_READY
     )
-    return CompatibilityResult(
+    return _science_CompatibilityResult(
         verdict=verdict,
         checked_sha256=checked,
         reason_codes=tuple(reasons),
         field_classification=classification,
     )
-
-
-__all__ = [
-    "CompatibilityResult",
-    'PredecessorInputs',
-    "compare_predecessors",
-]

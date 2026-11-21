@@ -1,64 +1,18 @@
-"""Strict decode and bounded placement over the held official 2025 top 100.
-
-This is an outcome-visible post-score input.  It is deliberately absent from
-model development and prediction commitments, and it never pretends that the
-unpublished ranks 101--337 are known.
-"""
+"""Native acquisition and external-format binding for the domain science."""
 
 from __future__ import annotations
-
 from decimal import Decimal
 from hashlib import sha256
 import json
-from typing import Final, cast
+from typing import cast
+from empirical_lawhood.domains.biology.virtual_cell.config import OFFICIAL_FINAL_RANKED_ENTRY_COUNT, OFFICIAL_FINAL_SUMMARY_COMPETITOR_COUNT, OFFICIAL_FINAL_TOP100_SHA256, OFFICIAL_FINAL_TOP100_SIZE_BYTES
+from empirical_lawhood.domains.biology.virtual_cell.contracts import LeaderboardEntry, LeaderboardSnapshot, VirtualCellContractError
 
-from .analysis import adjudicate_placement
-from .config import (
-    OFFICIAL_FINAL_RANKED_ENTRY_COUNT,
-    OFFICIAL_FINAL_SUMMARY_COMPETITOR_COUNT,
-    OFFICIAL_FINAL_TOP100_SHA256,
-    OFFICIAL_FINAL_TOP100_SIZE_BYTES,
+from empirical_lawhood.domains.biology.virtual_cell.leaderboard_assessment import (
+    OFFICIAL_FINAL_TOP100_CAPTURED_AT_UTC as _science_OFFICIAL_FINAL_TOP100_CAPTURED_AT_UTC,
+    OFFICIAL_FINAL_TOP100_SOURCE_URL as _science_OFFICIAL_FINAL_TOP100_SOURCE_URL,
+    _EXPECTED_FIELDS,
 )
-from .contracts import (
-    LeaderboardEntry,
-    LeaderboardSnapshot,
-    MetricContract,
-    PlacementAdjudication,
-    PredictionCommitment,
-    VirtualCellContractError,
-)
-
-
-OFFICIAL_FINAL_TOP100_SOURCE_URL: Final = "https://virtualcellchallenge.org/2025"
-OFFICIAL_FINAL_TOP100_CAPTURED_AT_UTC: Final = "2026-08-06T01:50:57Z"
-_EXPECTED_FIELDS: Final = frozenset(
-    {
-        "deScore",
-        "deSpearmanLfcSig",
-        "deSpearmanSig",
-        "description",
-        "errorInfo",
-        "id",
-        "isFinal",
-        "maeScore",
-        "modelName",
-        "noAbsPertScore",
-        "noAbsScoreAvg",
-        "organization",
-        "pearsonDelta",
-        "pertScore",
-        "prAuc",
-        "rank",
-        "scoreAvg",
-        "status",
-        "submissionCount",
-        "submissionDate",
-        "teamId",
-        "teamMembers",
-        "teamName",
-    }
-)
-
 
 def _reject_constant(value: str) -> None:
     raise ValueError(f"nonfinite JSON number is forbidden: {value}")
@@ -129,8 +83,8 @@ def decode_official_final_top100(
         )
     return LeaderboardSnapshot(
         snapshot_id="leaderboard.virtual-cell-2025-official-final-top100",
-        source_url=OFFICIAL_FINAL_TOP100_SOURCE_URL,
-        captured_at_utc=OFFICIAL_FINAL_TOP100_CAPTURED_AT_UTC,
+        source_url=_science_OFFICIAL_FINAL_TOP100_SOURCE_URL,
+        captured_at_utc=_science_OFFICIAL_FINAL_TOP100_CAPTURED_AT_UTC,
         total_ranked_entries=total_ranked_entries,
         summary_competitor_count=summary_competitor_count,
         entries=tuple(entries),
@@ -142,34 +96,3 @@ def decode_official_final_top100(
         ),
         source_sha256=observed_sha256,
     )
-
-
-def adjudicate_official_final_top100(
-    *,
-    prediction: PredictionCommitment,
-    metric_contract: MetricContract,
-    candidate_score: Decimal,
-    snapshot: LeaderboardSnapshot,
-) -> PlacementAdjudication:
-    """Adjudicate after scoring while enforcing frozen prediction/metric lineage."""
-
-    if prediction.metric_contract_sha256 != metric_contract.fingerprint():
-        raise ValueError("placement metric contract differs from prediction commitment")
-    if snapshot.source_sha256 != OFFICIAL_FINAL_TOP100_SHA256:
-        raise ValueError("placement snapshot is not the held official final top 100")
-    return adjudicate_placement(
-        adjudication_id="placement.virtual-cell-2025-official-final",
-        prediction_commitment_id=prediction.commitment_id,
-        metric_contract_sha256=metric_contract.fingerprint(),
-        leaderboard_snapshot_sha256=snapshot.fingerprint(),
-        candidate_score=candidate_score,
-        snapshot=snapshot,
-    )
-
-
-__all__ = [
-    "OFFICIAL_FINAL_TOP100_CAPTURED_AT_UTC",
-    "OFFICIAL_FINAL_TOP100_SOURCE_URL",
-    "adjudicate_official_final_top100",
-    "decode_official_final_top100",
-]

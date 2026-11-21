@@ -1,0 +1,502 @@
+{
+  "schema": "model-free-matrix-definition.v1",
+  "label": "Assigned structural service, common future, restrained material comparison and subsequent entrance-conditioned passage",
+  "roots": [
+    {
+      "seed": 1800001,
+      "modules": [
+        "M0"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800101,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800102,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800103,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800104,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800105,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800106,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800107,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800108,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800109,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800110,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800111,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800112,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800113,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800114,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800115,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800116,
+      "modules": [
+        "M2"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800201,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800202,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800203,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800204,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800205,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800206,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800207,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800208,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800209,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800210,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800211,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800212,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800213,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800214,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800215,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800216,
+      "modules": [
+        "M1",
+        "M7"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800301,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800302,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800303,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800304,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800305,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800306,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800307,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800308,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800309,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800310,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800311,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800312,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800313,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800314,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800315,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800316,
+      "modules": [
+        "M6"
+      ],
+      "role": "development"
+    }
+  ],
+  "settings": {
+    "resources": {
+      "memory_bytes": 4294967296,
+      "wall_time_seconds": 14400,
+      "output_bytes": 2147483648
+    },
+    "alpha": "0.05",
+    "inference": {
+      "module_alpha_weights": {
+        "M0": "0.15",
+        "M1": "0.20",
+        "M2": "0.20",
+        "M3": "0.01",
+        "M4": "0.01",
+        "M5": "0.01",
+        "M6": "0.20",
+        "M7": "0.22"
+      }
+    },
+    "native": {
+      "coordinates": [
+        {
+          "id": "nominal",
+          "temperature": "1",
+          "friction": "1",
+          "cross_coupling": "1"
+        },
+        {
+          "id": "high-temperature",
+          "temperature": "2",
+          "friction": "1",
+          "cross_coupling": "1"
+        },
+        {
+          "id": "high-coupling",
+          "temperature": "1",
+          "friction": "1",
+          "cross_coupling": "2"
+        }
+      ]
+    },
+    "formation": {
+      "exposure_matched_recipes": [
+        "x-first-exposure-matched",
+        "y-first-exposure-matched"
+      ],
+      "service_panels": 2
+    },
+    "memory": {
+      "protocol_age_ticks": [
+        8192,
+        16384
+      ]
+    },
+    "receiver_study": {
+      "revision": "matrix-receiver-study.v2",
+      "instrument": null,
+      "M0": {
+        "populations": 512,
+        "trials_per_stratum": 128,
+        "risk_budget": "0.10",
+        "false_delivery_limit": "0.05",
+        "power_minimum": "0.80",
+        "identity_tolerance": "0.0000000001"
+      },
+      "M1": {
+        "structural_service": true,
+        "coordinates": [
+          "nominal",
+          "high-temperature"
+        ],
+        "primary_coordinate": "high-temperature",
+        "primary_recipe": "joint-increasing",
+        "minimum_delivery": "0.75",
+        "maximum_coverage_loss": "0.0625",
+        "minimum_signed_impulse": "0.10",
+        "yoked_ticks": [
+          976,
+          null,
+          1120,
+          880,
+          832,
+          1024,
+          736,
+          880,
+          688,
+          null,
+          704,
+          800,
+          880,
+          880,
+          800,
+          912
+        ]
+      },
+      "M2": {
+        "coordinates": [
+          "nominal",
+          "high-temperature"
+        ],
+        "future_lag_ticks": 64,
+        "origin_record_age_ticks": 8192,
+        "history_lag_ticks": 64,
+        "risk_budget": "0.10"
+      },
+      "M6": {
+        "coordinates": [
+          "nominal",
+          "high-coupling",
+          "high-temperature"
+        ],
+        "primary_pair": [
+          "nominal",
+          "high-coupling"
+        ],
+        "energy_budget_kbt": "0.048790164169432003",
+        "initial_shift": "0.4",
+        "overlap_ess_fraction": "0.10"
+      },
+      "M7": {
+        "coordinates": [
+          "nominal",
+          "high-temperature"
+        ],
+        "primary_coordinate": "high-temperature",
+        "primary_histories": [
+          "baseline",
+          "joint-increasing"
+        ],
+        "interior_radius": "0.025",
+        "entry_window_ticks": 1024,
+        "dwell_ticks": 16,
+        "incidence_budget": "0.10",
+        "rmst_budget": "0.256"
+      }
+    }
+  }
+}

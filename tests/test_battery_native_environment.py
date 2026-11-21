@@ -9,8 +9,8 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import prepared_native as owner
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedWorkerEnvironment
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import prepared_native as owner
+from empirical_lawhood.execution.prepared_native_invocation import PreparedWorkerEnvironment
 
 PROBE = '''
 import hashlib,json,os,pathlib,sys,sysconfig

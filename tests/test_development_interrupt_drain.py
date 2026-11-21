@@ -10,25 +10,25 @@ from dataclasses import replace
 import pytest
 
 from empirical_lawhood.api.recursive_execution import _external_inputs
-from empirical_lawhood.infrastructure import execution
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, RunnerRegistry
-from empirical_lawhood.runtime.plans import PlanLane
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.local import execution
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry
+from empirical_lawhood.execution.plans import PlanLane
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform.test_execution_scheduler import StaticExternalInputResolver
 from tests.runtime_platform.test_recursive_compiler import Config, fixture
 from tests.runtime_platform.test_unlimited_recursive_execution import _ExposedOperandRunner
 from tests.test_recursive_public_service import _plane
 
 
-@pytest.mark.parametrize('mode', ('pure', 'native-lease', 'revoked-access'))
+@pytest.mark.parametrize('mode', ('pure', 'native-expired-catalog-lease', 'revoked-access'))
 def test_controller_sigint_drains_active_receipt_without_starting_its_descendant(tmp_path, monkeypatch, mode):
     draft, registrations, registry = fixture()
     if mode != 'pure':
@@ -51,9 +51,9 @@ def test_controller_sigint_drains_active_receipt_without_starting_its_descendant
         entered.set()
         assert finish.wait(10), 'controller did not release its active worker'
         if mode != 'pure':
-            # Inert work crosses a real attempt lease interval after SIGINT.
-            # Exercise the same lease boundary used before a native leaf;
-            # this fixture performs no native acquisition.
+            # Cross the catalog lease interval after SIGINT. Native entry
+            # retains current access and original-attempt checks, without
+            # treating that timestamp as a deadline. No native acquisition.
             time.sleep(3.2)
             scheduler._require_native_entry(context, runners[0], prepared_contract=None)
         return original(context)
@@ -79,6 +79,9 @@ def test_controller_sigint_drains_active_receipt_without_starting_its_descendant
     try:
         upgrade_catalog(engine)
         repository = SQLiteOperationalRepository(engine)
+        def forbidden_lease_renewal(**_):
+            pytest.fail('native drain must not depend on catalog lease renewal')
+        monkeypatch.setattr(repository, 'refresh_attempt_lease', forbidden_lease_renewal)
         contacts = ExternalNativeEffectContactStore(plane=plane,
             execution_plan=ObjectIdentity.from_record(plan.execution_plan_id, plan),
             visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY,

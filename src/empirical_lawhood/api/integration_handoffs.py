@@ -15,9 +15,9 @@ from empirical_lawhood.adapters._strict_json import loads_external_json
 from empirical_lawhood.api.authoring_handoff import resolve_authoring_directory
 from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
 from empirical_lawhood.api.integration_proof import prove_provider_projection
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.runtime.executable_bindings import LayeredCampaignRuntimeProviderResolver
-from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.execution.executable_bindings import LayeredCampaignRuntimeProviderResolver
+from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
 
 if TYPE_CHECKING:
     from empirical_lawhood.api.rc_challenge_authoring import RCChallengeApplicationHandoff
@@ -113,12 +113,12 @@ def integration_api_inputs(handoff: IntegrationApplicationHandoff) -> dict[str, 
     if handoff.family not in {'finite-response-law', 'preparation-applicability', 'constructed-preparation-applicability'}:
         raise ValueError('Unsupported integration family')
     if handoff.family == 'finite-response-law':
-        from empirical_lawhood.adapters.composition.response_geometry_prospective.design import ResponseGeometryAssayCandidateContextProvider
+        from empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.design import ResponseGeometryAssayCandidateContextProvider
         selected = cast('FiniteResponseLawApplicationHandoff', handoff.selected)
         bundle = selected.bundle
         context = ResponseGeometryAssayCandidateContextProvider(bundle)
     else:
-        from empirical_lawhood.adapters.composition.phase_authoring import PhaseContextProvider
+        from empirical_lawhood.execution.phase_authoring import PhaseContextProvider
         selected = cast('PreparationApplicabilityApplicationHandoff | ConstructedPreparationApplicabilityApplicationHandoff', handoff.selected)
         bundle = selected.bundle
         context = PhaseContextProvider(bundle)

@@ -16,20 +16,16 @@ from run_applied_el_broad_programme import SelectedProgramme, add_custody_locati
 
 
 def run(programme, args):
-    from empirical_lawhood.adapters.methods.rubisco_cycle_constraints.contracts import CycleUseProduct
-    from empirical_lawhood.adapters.methods.rubisco_cycle_constraints import recursive_translation as cycle_drafts
-    from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry import science as portfolio
-    from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.source_manifest import (
-        INITIAL_CANDIDATE_IDS, SOURCE_MANIFEST,
-    )
-    from empirical_lawhood.adapters.methods.rubisco_nomination_preparation.contracts import (
-        AssayPreparationProposal, NominationDossier, NominationSourceMember,
-    )
-    from empirical_lawhood.adapters.methods.rubisco_nomination_preparation import science, recursive_translation
+    from empirical_lawhood.domains.rubisco.rubisco_cycle_constraints.contracts import CycleUseProduct
+    from empirical_lawhood.domains.rubisco.rubisco_cycle_constraints import recursive_translation as cycle_drafts
+    from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry import science as portfolio
+    from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry.source_manifest import INITIAL_CANDIDATE_IDS, SOURCE_MANIFEST
+    from empirical_lawhood.domains.rubisco.rubisco_nomination_preparation.contracts import AssayPreparationProposal, NominationDossier, NominationSourceMember
+    from empirical_lawhood.domains.rubisco.rubisco_nomination_preparation import science, recursive_translation
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_contributions import authenticate_recursive_contribution
     from empirical_lawhood.api.recursive_execution import read_recursive_wave
-    from empirical_lawhood.kernel.decoding import decode_canonical_record
+    from empirical_lawhood.science.records.decoding import decode_canonical_record
 
     archive_members = {row['path']: row for row in programme.preflight['members']}
     this_name = 'scripts/run_applied_el_rubisco_nomination.py'

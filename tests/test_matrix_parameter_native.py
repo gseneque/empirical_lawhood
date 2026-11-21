@@ -7,27 +7,18 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_derivatives as derivatives
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history as history
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_response, simulation
-from empirical_lawhood.adapters.simulators.six_matrix_response.contracts import (
-    BetaCouplingRule, MatrixIntegratorKind, MatrixPrecision,
-    SixMatrixResponseModelFamilyMember, SixMatrixResponseNumericalView,
-)
-from empirical_lawhood.adapters.simulators.six_matrix_response.gradients import (
-    SixMatrixParameters, analytic_gradient_terms, coupling_derivative_density, reference_action_terms,
-)
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_source import (
-    advance_history_pair, history_native_parameters, initial_history_state,
-)
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import SixMatrixState, hermitian_part
-from empirical_lawhood.adapters.simulators.six_matrix_response.preparation_differential import (
-    NativeStateDifferential, preparation_force_step,
-)
-from empirical_lawhood.adapters.simulators.six_matrix_response.response_hessian import _hessian_image
-from empirical_lawhood.adapters.simulators.six_matrix_response.shooting import hermitian_basis
-from empirical_lawhood.adapters.simulators.six_matrix_response.simulation import BAOABGradientCache, hermitian_noise
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_derivatives as derivatives
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history as history
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_response, simulation
+from empirical_lawhood.domains.matrix.six_matrix_response.contracts import BetaCouplingRule, MatrixIntegratorKind, MatrixPrecision, SixMatrixResponseModelFamilyMember, SixMatrixResponseNumericalView
+from empirical_lawhood.domains.matrix.six_matrix_response.gradients import SixMatrixParameters, analytic_gradient_terms, coupling_derivative_density, reference_action_terms
+from empirical_lawhood.domains.matrix.six_matrix_response.history_source import advance_history_pair, history_native_parameters, initial_history_state
+from empirical_lawhood.domains.matrix.six_matrix_response.model import SixMatrixState, hermitian_part
+from empirical_lawhood.domains.matrix.six_matrix_response.preparation_differential import NativeStateDifferential, preparation_force_step
+from empirical_lawhood.domains.matrix.six_matrix_response.response_hessian import _hessian_image
+from empirical_lawhood.domains.matrix.six_matrix_response.shooting import hermitian_basis
+from empirical_lawhood.domains.matrix.six_matrix_response.simulation import BAOABGradientCache, hermitian_noise
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 REGIMES = (('.2','.3','.4','.25'),('.5','1','1','1'),('.9','2.2','1.8','2.4'))

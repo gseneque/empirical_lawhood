@@ -12,17 +12,12 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_prediction import knn as k
-from empirical_lawhood.adapters.methods.rubisco_prediction import records as r
+from empirical_lawhood.domains.rubisco.rubisco_prediction import knn as k
+from empirical_lawhood.domains.rubisco.rubisco_prediction import records as r
 from empirical_lawhood.adapters.physical.rubisco_kinetics import iqbal2023 as source
-from empirical_lawhood.adapters.physical.rubisco_kinetics.mcdonald2026 import (
-    PlantContextV1, PlantProteinRecipeV1, PlantQuantityV1,
-)
-from empirical_lawhood.adapters.physical.rubisco_kinetics.workbook import (
-    NativeArchiveMemberV1, NativeSheetCatalogEntryV1, NativeWorkbookCellV1, NativeWorkbookV1,
-    NativeWorksheetV1, SelectedWorkbookMemberV1,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.adapters.physical.rubisco_kinetics.mcdonald2026 import PlantContextV1, PlantProteinRecipeV1, PlantQuantityV1
+from empirical_lawhood.adapters.physical.rubisco_kinetics.workbook import NativeArchiveMemberV1, NativeSheetCatalogEntryV1, NativeWorkbookCellV1, NativeWorkbookV1, NativeWorksheetV1, SelectedWorkbookMemberV1
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def cell(address, token):
@@ -142,8 +137,8 @@ class Refuse(importlib.abc.MetaPathFinder):
         if fullname == 'rapidfuzz' or fullname.startswith('rapidfuzz.'):
             raise AssertionError('optional numerical import during discovery')
 sys.meta_path.insert(0, Refuse())
-import empirical_lawhood.adapters.methods.rubisco_prediction
-import empirical_lawhood.adapters.methods.rubisco_prediction.records
+import empirical_lawhood.domains.rubisco.rubisco_prediction
+import empirical_lawhood.domains.rubisco.rubisco_prediction.records
 assert 'rapidfuzz' not in sys.modules
 """
     completed = subprocess.run([sys.executable, "-c", script], cwd=Path(__file__).parent.parent,
@@ -310,7 +305,7 @@ def test_complete_global_barrier_and_truthful_distance_check_precede_any_label_i
         by_case[forecast.case_id, forecast.endpoint].distances == by_case[r.PREFIX + ".parent", forecast.endpoint].distances))
         if forecast.method != "parent" else forecast for forecast in commitment.forecasts.forecasts)
     forged = replace(commitment.forecasts, model_points=points, forecasts=coherent_forecasts)
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
     altered = replace(commitment, forecasts=forged,
                       forecast_identity=ObjectIdentity.from_record(forged.forecast_id, forged))
     with pytest.raises(ValueError, match="source-sequence distances"):

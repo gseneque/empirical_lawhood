@@ -9,14 +9,11 @@ from empirical_lawhood.api.configured_e3_closeout_custody import ClosedE3Custody
 from empirical_lawhood.api.configured_e3_retained_custody import RetainedE3Custody
 from empirical_lawhood.api.configured_e3_unfinished_custody import UnfinishedE3Custody
 from empirical_lawhood.api import configured_e3_retained_assembly as assembly
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactProfile, ArtifactSemanticValidation, ArtifactSemanticValidationRegistration,
-    ArtifactSemanticValidationRegistry, ArtifactWriteRequest,
-)
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactSemanticValidation, ArtifactSemanticValidationRegistration, ArtifactSemanticValidationRegistry, ArtifactWriteRequest
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 
 

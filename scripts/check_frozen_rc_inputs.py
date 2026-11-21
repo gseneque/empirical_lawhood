@@ -10,10 +10,8 @@ import platform
 import numpy as np
 from threadpoolctl import threadpool_info
 
-from empirical_lawhood.adapters.simulator_morphism_challenges.descriptors import (
-    deterministic_development_seed, development_unit_ids, family_from_unit_id, generate_descriptor,
-)
-from empirical_lawhood.adapters.simulator_morphism_challenges.numeric_inputs import original_numeric_definition
+from empirical_lawhood.domains.history.simulator_morphism_challenges.descriptors import deterministic_development_seed, development_unit_ids, family_from_unit_id, generate_descriptor
+from empirical_lawhood.domains.history.simulator_morphism_challenges.numeric_inputs import original_numeric_definition
 
 
 def main() -> None:

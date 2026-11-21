@@ -36,7 +36,7 @@ calibration and comparison criteria. The implementation derives allocations,
 operation graphs, bindings and identities. Storage, environment, workers and
 output destinations belong to a separate execution selection.
 
-The [specification owner](../../../../../src/empirical_lawhood/adapters/methods/matrix_factor_response/experiment_specification.py)
+The [specification owner](../../../../../src/empirical_lawhood/domains/matrix/matrix_factor_response/experiment_specification.py)
 defines `MatrixResponseErrorSpecification`. The selected example uses all64
 original de-anneal roots for TRAIN and requires independent CAL64/CONF64 plus
 genuine reservations for two E6 regimes. The completed software control instead
@@ -101,7 +101,7 @@ Use `scripts/generate_matrix_experiment_examples.py` to regenerate source-owned
 examples, with `--check` for drift. New selections do not allocate genuine units.
 
 To resolve exposed inputs, supply `--sources /absolute/selected/sources.json`.
-The closed [source selection](../../../../../src/empirical_lawhood/planning/experiment_inputs.py)
+The closed [source selection](../../../../../src/empirical_lawhood/design/experiment_inputs.py)
 binds the installed `matrix.response-error.origin-only` protocol, sorted keys,
 each member's exact identity, safe relative path and positive byte bound. Members
 reside beneath that selection's directory. Unknown codecs, changed bytes, links,
@@ -114,12 +114,12 @@ For the `EXPOSED_CONFORMANCE` saved-bank route, Matrix keys are the population
 `source_key` values, `campaign`, and the six
 `train-features`, `train-outcomes`, `calibration-features`, `calibration-outcomes`,
 `evaluation-features`, `evaluation-outcomes` banks. These use the code-owned
-[domain binding](../../../../../src/empirical_lawhood/adapters/methods/matrix_factor_response/experiment_inputs.py).
+[domain binding](../../../../../src/empirical_lawhood/domains/matrix/matrix_factor_response/experiment_inputs.py).
 Source rows keep their original identities; preparation derives selected immutable
 bank and graph projections. Missing inputs remain specific dependencies.
 
 For `PROSPECTIVE_REQUIRED`, including the selected `specification.json`, use the
-installed [protected preparation owner](../../../../../src/empirical_lawhood/adapters/methods/matrix_factor_response/protected_preparation.py).
+installed [protected preparation owner](../../../../../src/empirical_lawhood/domains/matrix/matrix_factor_response/protected_preparation.py).
 The only canonical binding key is `protected-selection`, containing one exact
 `ProtectedE3PreparationSelection`. Reuse the accepted original records for its
 fields:
@@ -212,7 +212,7 @@ Public prospective authoring now retains the manifest and a bound observation
 under the authoring directory's `provenance/`, beside the unchanged scientific
 packet. Loading checks both companions and their original closure binding.
 Before confirmed experiment worker entry, the
-[run-source owner](../../../../../src/empirical_lawhood/infrastructure/run_source_admission.py)
+[run-source owner](../../../../../src/empirical_lawhood/storage/run_source_admission.py)
 retains one content-addressed candidate census beneath
 `operational/source-candidates/`. Compact entries beneath
 `operational/run-source-entries/<run-id>/` bind that census, actual source
@@ -223,7 +223,7 @@ environment. These records confer no scientific authority. The release packet
 preserves the candidate source archive once; execution and current result reads
 do not reconstruct an old checkout or Git database. Keep the selected candidate,
 inputs and environment stable until every dependent process exits.
-Follow the [environment procedure](../../../../../docs/development/maintainer-environment.md) and
+Follow the [environment procedure](../../../../../docs/using/environments.md#select-storage-and-reuse-an-environment) and
 the numerical thread limits in [testing](../../../../../docs/development/testing.md).
 
 With the selected inputs and an explicit guarded operator profile, author through

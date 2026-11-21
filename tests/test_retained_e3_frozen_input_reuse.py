@@ -8,14 +8,14 @@ import pytest
 
 from empirical_lawhood.api.execution import CampaignExecutionService, _provider_input_location
 from empirical_lawhood.api.retained_e3_control_repair import reuse_frozen_provider_input
-from empirical_lawhood.infrastructure import artifact_validation
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactStreamWriteRequest
-from empirical_lawhood.runtime.plans import ExternalInputSpec
-from empirical_lawhood.runtime.providers import ExternalInputPayload
+from empirical_lawhood.storage import artifact_validation
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactStreamWriteRequest
+from empirical_lawhood.execution.plans import ExternalInputSpec
+from empirical_lawhood.execution.providers import ExternalInputPayload
 from tests.test_matrix_array_worker_delivery import _plane
 
 
@@ -90,12 +90,10 @@ def test_frozen_npz_reuses_actual_producing_stamp_and_refuses_changed_custody(tm
 
 def test_retained_control_scope_is_the_access_owner_without_a_generic_adapter(tmp_path):
     """Actual supplier/custody types with a disclosed non-scientific grant stub."""
-    from empirical_lawhood.api.configured_e3_retained_runtime import (
-        RetainedE3ExecutionScope, retained_e3_input_access_guard,
-    )
+    from empirical_lawhood.api.configured_e3_retained_runtime import RetainedE3ExecutionScope, retained_e3_input_access_guard
     from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.runtime import ProtectedE3RuntimeInputSupplier
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
     writer = _plane(tmp_path / 'owner')
     run = 'run.disclosed.retained-access'
     calls = 0

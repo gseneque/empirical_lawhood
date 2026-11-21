@@ -11,13 +11,11 @@ from importlib.resources import files
 from dataclasses import dataclass
 from typing import ClassVar
 
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.development_native_custody import (
-    DevelopmentNativeCustody, preflight_development_native_store, read_development_native_payload,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactManifest
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.development_native_custody import DevelopmentNativeCustody, preflight_development_native_store, read_development_native_payload
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
 
 
 def read_matrix_native_payload(writer: ExternalArtifactPlane, manifest: ArtifactManifest, *, maximum_bytes: int) -> bytes:
@@ -44,9 +42,7 @@ class MatrixNativeRuntimeObservation(CanonicalRecord):
     observation_json: str
 
     def __post_init__(self):
-        from empirical_lawhood.adapters.methods.matrix_response_study.numerical_runtime import (
-            validate_matrix_runtime_observation_json,
-        )
+        from empirical_lawhood.domains.matrix.matrix_response_study.numerical_runtime import validate_matrix_runtime_observation_json
         validate_matrix_runtime_observation_json(self.observation_json)
 
 
@@ -70,29 +66,11 @@ def retain_matrix_native_runtime(custody, observation):
 
 def matrix_scientific_code_sha256() -> str:
     """Exact scientific owner subset, distinct from a full checkout closure."""
-    owners = (
-        "adapters/methods/matrix_response_study/anisotropic_feasibility.py",
-        "adapters/methods/matrix_response_study/geometry_inputs.py",
-        "adapters/methods/matrix_response_study/numerical_qualification.py",
-        "adapters/methods/matrix_response_study/scientific_seed_inputs.py",
-        "adapters/methods/matrix_response_study/contracts.py",
-        "adapters/methods/matrix_response_study/shooting_committor.py",
-        "adapters/composition/matrix_response_study/design.py",
-        "adapters/composition/matrix_response_study/selected_event_inputs.py",
-        "adapters/simulators/six_matrix_response/contracts.py",
-        "adapters/simulators/six_matrix_response/history_preparation.py",
-        "adapters/simulators/six_matrix_response/scientific_inputs.py",
-        "adapters/simulators/six_matrix_response/provider.py",
-        "adapters/simulators/six_matrix_response/executable_binding.py",
-        "adapters/simulators/six_matrix_response/extension_bundle.py",
-        "adapters/simulators/six_matrix_response/shooting.py",
-        "adapters/simulators/six_matrix_response/simulation.py",
-        "adapters/simulators/six_matrix_response/gradients.py",
-        "adapters/simulators/six_matrix_response/spectral.py",
-        "adapters/simulators/six_matrix_response/model.py",
-        "infrastructure/development_native_custody.py",
-        "api/matrix_native_custody.py", "api/matrix_geometry.py", "api/selected_events.py",
-    )
+    owners = ('domains/matrix/matrix_response_study/anisotropic_feasibility.py', 'domains/matrix/matrix_response_study/geometry_inputs.py', 'domains/matrix/matrix_response_study/numerical_qualification.py', 'domains/matrix/matrix_response_study/scientific_seed_inputs.py', 'domains/matrix/matrix_response_study/contracts.py', 'domains/matrix/matrix_response_study/shooting_committor.py', 'domains/matrix/matrix_response_study/authoring/design.py', 'domains/matrix/matrix_response_study/selected_event_inputs.py', 'domains/matrix/six_matrix_response/contracts.py', 'domains/matrix/six_matrix_response/history_preparation.py', 'domains/matrix/six_matrix_response/scientific_inputs.py', 'adapters/simulators/six_matrix_response/provider.py', 'adapters/simulators/six_matrix_response/extension.py', 'domains/matrix/six_matrix_response/shooting.py', 'domains/matrix/six_matrix_response/simulation.py', 'domains/matrix/six_matrix_response/gradients.py', 'domains/matrix/six_matrix_response/spectral.py', 'domains/matrix/six_matrix_response/model.py', 'storage/development_native_custody.py', 'api/matrix_native_custody.py', 'api/matrix_geometry.py', 'api/selected_events.py')
+    owners = (*owners,
+        "domains/matrix/matrix_response_study/geometry_records.py",
+        "domains/matrix/matrix_response_study/selected_event_records.py",
+        "domains/matrix/matrix_response_study/selected_event_analysis.py")
     package = files("empirical_lawhood")
     rows = []
     for owner in owners:
@@ -109,6 +87,6 @@ def matrix_scientific_code_sha256() -> str:
 
 
 class MatrixNativeCustody(DevelopmentNativeCustody):
-    """Matrix compatibility wrapper preserving exact historical marker bytes."""
+    """Matrix-specific effect markers over the shared native custody lifecycle."""
 
     effect_input_type = MatrixNativeEffectInput

@@ -4,9 +4,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure.recursive_custody import _operational_census
-from empirical_lawhood.runtime.recovery import OperationalFailureDiagnostic
-from empirical_lawhood.runtime.execution import OperationalFailureClass
+from empirical_lawhood.storage.recursive_custody import _operational_census
+from empirical_lawhood.execution.recovery import OperationalFailureDiagnostic
+from empirical_lawhood.execution.execution import OperationalFailureClass
 
 
 class Event:
@@ -65,8 +65,8 @@ def test_incomplete_or_substituted_attempt_closure_refuses(tamper):
 
 
 def test_failed_attempt_then_success_keeps_failure_while_latest_can_succeed(monkeypatch):
-    from empirical_lawhood.infrastructure import recursive_custody
-    from empirical_lawhood.runtime.recovery import TaskRecoveryEvent
+    from empirical_lawhood.storage import recursive_custody
+    from empirical_lawhood.execution.recovery import TaskRecoveryEvent
 
     recovery, store, plan, index, terminal, events = _fixture()
     receipt = SimpleNamespace(receipt_id="receipt.success", fingerprint=lambda: "a"*64)
@@ -103,11 +103,8 @@ def test_nonattempt_dependency_block_retains_event_without_receipt_or_product():
 
 def test_typed_terminal_failure_ordinal_swap_refuses():
     from dataclasses import replace
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.recovery import (
-        DevelopmentRunRecoveryIndex, DevelopmentRunRecoveryTerminalEvent, RecoveryAttemptCandidate,
-        RecoveryTerminalAttempt, RecoveryTerminalDisposition, TaskRecoveryDisposition, TaskRecoveryEvent,
-    )
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex, DevelopmentRunRecoveryTerminalEvent, RecoveryAttemptCandidate, RecoveryTerminalAttempt, RecoveryTerminalDisposition, TaskRecoveryDisposition, TaskRecoveryEvent
 
     recovery, store, plan, index, _, _ = _fixture()
     identity = ObjectIdentity("index.one", DevelopmentRunRecoveryIndex.SCHEMA, "1.0.0", "a"*64)
@@ -207,8 +204,8 @@ def test_stock_resource_block_resume_terminal_census_is_read_only(tmp_path, monk
     from hashlib import sha256
     from tests.runtime_platform.conftest import build_protocol_fixture
     from tests.runtime_platform.test_execution_scheduler import _runtime
-    from empirical_lawhood.infrastructure.execution import LocalScheduler, ResourceLockManager
-    from empirical_lawhood.kernel.status import OperationalStatus
+    from empirical_lawhood.execution.local.execution import LocalScheduler, ResourceLockManager
+    from empirical_lawhood.science.records.status import OperationalStatus
 
     protocol = build_protocol_fixture()
     locks = ResourceLockManager()

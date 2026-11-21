@@ -8,11 +8,9 @@ import h5py
 import numpy as np
 import pytest
 
-from empirical_lawhood.infrastructure.matrix_hdf5_io import (
-    HDF5ReadLimits, HDF5DatasetSource, open_verified_hdf5, open_verified_hdf5_port,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.adapters.matrix_storage.matrix_hdf5_io import HDF5ReadLimits, HDF5DatasetSource, open_verified_hdf5, open_verified_hdf5_port
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 
 
 def limits(**changes):
@@ -136,7 +134,7 @@ def test_admitted_source_and_checked_cursor_bindings_cannot_be_replaced(tmp_path
 
 
 def test_operational_limits_are_one_canonical_contract_without_scientific_defaults():
-    from empirical_lawhood.runtime.array_datasets import HDF5ReadLimits as RuntimeLimits
+    from empirical_lawhood.execution.array_datasets import HDF5ReadLimits as RuntimeLimits
     selected = limits()
     assert RuntimeLimits is HDF5ReadLimits
     assert decode_canonical_bytes(selected.canonical_bytes(), RuntimeLimits, maximum_bytes=8192) == selected
@@ -145,7 +143,7 @@ def test_operational_limits_are_one_canonical_contract_without_scientific_defaul
 
 
 def test_unbounded_or_label_only_context_refuses_before_any_hdf5_value_admission(tmp_path):
-    from empirical_lawhood.infrastructure.execution import ResourceAdmissionError
+    from empirical_lawhood.execution.local.execution import ResourceAdmissionError
     artifact, _, _ = fixture(tmp_path, attribute="genuine original scalar string")
     with pytest.raises(ResourceAdmissionError, match="original prepared task"):
         with open_verified_hdf5_port(artifact, None, limits=limits(), task_context=None):
@@ -156,11 +154,11 @@ def test_unbounded_or_label_only_context_refuses_before_any_hdf5_value_admission
 
 @pytest.mark.parametrize("view", ("PRIMARY", "FINE"))
 def test_original_measurement_equations_accept_bounded_native_rows_without_whole_coercion(view):
-    from empirical_lawhood.adapters.methods.matrix_dataset_readers import MatrixArrayRows
-    from empirical_lawhood.adapters.methods.matrix_history_analysis import algebra
-    from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import measure_trace
-    from empirical_lawhood.infrastructure.dataset_readers import ArrayDatasetReader, AuthenticatedBlockByteSource
-    from empirical_lawhood.kernel.datasets import ArrayDatasetManifest, ArrayDatasetMember
+    from empirical_lawhood.domains.matrix.matrix_dataset_readers import MatrixArrayRows
+    from empirical_lawhood.domains.matrix.matrix_history_analysis import algebra
+    from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import measure_trace
+    from empirical_lawhood.storage.dataset_readers import ArrayDatasetReader, AuthenticatedBlockByteSource
+    from empirical_lawhood.science.models.datasets import ArrayDatasetManifest, ArrayDatasetMember
     from tests.test_matrix_factor_lifetime import root, spec
 
     positions = np.broadcast_to(np.stack((algebra.LEFT, algebra.RIGHT)), (97, 2, 3, 4, 4)).copy()

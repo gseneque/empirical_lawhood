@@ -20,14 +20,14 @@ by a fresh target material candidate or no-effect production route yet.
 
 ## Public formalism specifications
 
-The [formalism declarations](../../../../src/empirical_lawhood/adapters/simulators/ambient_pressure_superconductor/material_source_design_design.py) use the source label `source.plan.uniform-electron-gas-transverse-receiver-screen`.
+The [formalism declarations](../../../../src/empirical_lawhood/domains/materials/superconductivity/material_source_design_design.py) use the source label `source.plan.uniform-electron-gas-transverse-receiver-screen`.
 This label identifies those retained declarations.
 It is not a material archive, source qualification or operator grant.
 
 | Declared formalism | Public implementation | Evidence boundary |
 |---|---|---|
-| `formalism.gauge-closed-transverse-kubo` | [Signed-current SI reduction](../../../../src/empirical_lawhood/adapters/simulators/uniform_electron_gas_response/physics.py) and its [analytic panel check](../../../../src/empirical_lawhood/adapters/simulators/uniform_electron_gas_response/analytic_science.py). The [multiband material method](../../../../src/empirical_lawhood/adapters/simulators/ambient_pressure_superconductor/multiband_strong_coupling_response.py) gives the normal-referenced, gauge-closed finite-q calculation. | The analytic fixture supplies no qualified material operands. The same-gauge Hamiltonian, self-energy and position/projection checks stated below are necessary for material use. |
-| `formalism.finite-slab-receiver-admittance` | The [slab profile and inverse](../../../../src/empirical_lawhood/adapters/simulators/uniform_electron_gas_response/physics.py) and [analytic panel check](../../../../src/empirical_lawhood/adapters/simulators/uniform_electron_gas_response/analytic_science.py). | The analytic receiver map supplies no independent material measurement or control qualification. |
+| `formalism.gauge-closed-transverse-kubo` | [Signed-current SI reduction](../../../../src/empirical_lawhood/domains/materials/electron_gas/physics.py) and its [analytic panel check](../../../../src/empirical_lawhood/domains/materials/electron_gas/analytic_science.py). The [multiband material method](../../../../src/empirical_lawhood/domains/materials/superconductivity/multiband_strong_coupling_response.py) gives the normal-referenced, gauge-closed finite-q calculation. | The analytic fixture supplies no qualified material operands. The same-gauge Hamiltonian, self-energy and position/projection checks stated below are necessary for material use. |
+| `formalism.finite-slab-receiver-admittance` | The [slab profile and inverse](../../../../src/empirical_lawhood/domains/materials/electron_gas/physics.py) and [analytic panel check](../../../../src/empirical_lawhood/domains/materials/electron_gas/analytic_science.py). | The analytic receiver map supplies no independent material measurement or control qualification. |
 
 These links give the project specifications and implementations.
 They do not publish an earlier private plan or supply primary literature support.

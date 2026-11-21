@@ -4,10 +4,10 @@
 import sys
 from dataclasses import replace
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-from empirical_lawhood.runtime.execution import validate_runner_resource_interface
-from empirical_lawhood.runtime.providers import capability_semantic_validation_registry
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+from empirical_lawhood.execution.execution import validate_runner_resource_interface
+from empirical_lawhood.execution.providers import capability_semantic_validation_registry
 
 
 def prove_provider_projection(*, provider, registry, projection, resources, proof_id: str) -> dict[str, object]:

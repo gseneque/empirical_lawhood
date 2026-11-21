@@ -24,7 +24,7 @@ ROOT = Path(__file__).parents[1]
     ("brian2-native-check", 16 * 1024, 3),
 ))
 def test_native_check_oversize_refuses_without_contact(tmp_path, monkeypatch, command, limit, exit_code):
-    from empirical_lawhood.adapters.simulators.uniform_electron_gas_response import native_quickstart as electron_gas
+    from empirical_lawhood.domains.materials.electron_gas import native_quickstart as electron_gas
     from empirical_lawhood.adapters.simulators.rc_ladder_response import native_quickstart as rc
     from empirical_lawhood.adapters.simulators.brian2_neuron_current_response import native_quickstart as brian
 

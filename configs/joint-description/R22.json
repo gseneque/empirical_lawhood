@@ -1,0 +1,159 @@
+{
+  "actions": [
+    -0.1,
+    0.0,
+    0.1
+  ],
+  "calibration_unit_ids": [
+    "unit.r22.calibration.0000",
+    "unit.r22.calibration.0001",
+    "unit.r22.calibration.0002",
+    "unit.r22.calibration.0003",
+    "unit.r22.calibration.0004",
+    "unit.r22.calibration.0005",
+    "unit.r22.calibration.0006",
+    "unit.r22.calibration.0007",
+    "unit.r22.calibration.0008",
+    "unit.r22.calibration.0009",
+    "unit.r22.calibration.0010",
+    "unit.r22.calibration.0011"
+  ],
+  "descriptions": [
+    {
+      "features": [
+        "action",
+        "horizon",
+        "core_temperature_ev"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 3 coordinate accesses, 3 coordinate conversions, 0 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 6.0,
+      "id": "minimal",
+      "interface_dimension": 0,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "ridge",
+      "rationale": "Test whether one instantaneous state coordinate supports this action/receiver family.",
+      "state_dimension": 1
+    },
+    {
+      "features": [
+        "action",
+        "horizon",
+        "core_temperature_ev",
+        "density_1e19_m3",
+        "heating_power_w",
+        "history_temperature_ev"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 6 coordinate accesses, 6 coordinate conversions, 0 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 12.0,
+      "id": "additive",
+      "interface_dimension": 0,
+      "memory_dimension": 1,
+      "memory_samples": 1,
+      "model": "ridge",
+      "rationale": "Separate additive preparation and retained-history coordinates; no multiplicative interface.",
+      "state_dimension": 3
+    },
+    {
+      "features": [
+        "action",
+        "horizon",
+        "core_temperature_ev",
+        "density_1e19_m3",
+        "heating_power_w",
+        "history_temperature_ev",
+        "action_x_state",
+        "action_x_context"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 8 coordinate accesses, 8 coordinate conversions, 2 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 18.0,
+      "id": "interface",
+      "interface_dimension": 2,
+      "memory_dimension": 1,
+      "memory_samples": 1,
+      "model": "ridge",
+      "rationale": "Pay for explicit action/state and action/history interface dependence.",
+      "state_dimension": 3
+    },
+    {
+      "features": [
+        "action",
+        "horizon",
+        "core_temperature_ev",
+        "density_1e19_m3",
+        "heating_power_w",
+        "history_temperature_ev",
+        "action_x_state",
+        "action_x_context",
+        "state_x_context"
+      ],
+      "forecast_work_basis": "Authored per-receiver inference estimate: 9 coordinate accesses, 9 coordinate conversions, 3 explicit interface products; excludes final frozen predictor evaluation, shared raw/native acquisition and calibration fitting; not measured runtime.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 21.0,
+      "id": "joint",
+      "interface_dimension": 3,
+      "memory_dimension": 1,
+      "memory_samples": 1,
+      "model": "ridge",
+      "rationale": "Joint second-order description is an authored candidate, not an assertion of global minimality.",
+      "state_dimension": 3
+    }
+  ],
+  "economics": {
+    "accounting_unit": "authored-cost-unit",
+    "action_price": "0",
+    "compute_price": "0.0001",
+    "interface_price": "0.001",
+    "maximum_control_regret": "1",
+    "memory_price": "0.001",
+    "minimum_coverage": "0.9",
+    "missing_penalty": "1000000",
+    "reuse_count": 1,
+    "ridge_penalty": "0.001",
+    "safety_penalty": "1000000",
+    "state_price": "0.001"
+  },
+  "evaluation_unit_ids": [
+    "unit.r22.evaluation.0000",
+    "unit.r22.evaluation.0001",
+    "unit.r22.evaluation.0002",
+    "unit.r22.evaluation.0003",
+    "unit.r22.evaluation.0004",
+    "unit.r22.evaluation.0005"
+  ],
+  "family_id": "R22",
+  "horizons": [
+    0.02,
+    0.04
+  ],
+  "parameters": {
+    "expected_versions": {
+      "jax": "0.10.2",
+      "jaxlib": "0.10.2",
+      "torax": "1.4.2"
+    },
+    "internal_timestep_s": 0.002,
+    "radial_cells": 12
+  },
+  "question": "Which recorded-state information and declared transport assumptions preserve separate physical and simulated heating-response predictions?",
+  "receiver_policies": {
+    "archive_temperature_change_ev": {
+      "max_abs_error": 20,
+      "scale": 100,
+      "target": 10,
+      "units": "eV",
+      "weight": 1.0
+    },
+    "simulator_temperature_change_ev": {
+      "max_abs_error": 20,
+      "scale": 100,
+      "target": 10,
+      "units": "eV",
+      "weight": 1.0
+    }
+  },
+  "seed": 20261114
+}

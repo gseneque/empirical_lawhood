@@ -10,17 +10,11 @@ from typing import ClassVar, Protocol
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-from empirical_lawhood.kernel.authority import ResourceBudget, SourceAccessClass
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
-from empirical_lawhood.runtime.artifacts import ArtifactMaterialization, validate_relative_locator
-from empirical_lawhood.runtime.sources import (
-    SourceCapabilityManifest,
-    SourceMode,
-    SourceRequest,
-    SourceResult,
-    validate_source_result,
-)
+from empirical_lawhood.science.identity.authority import ResourceBudget, SourceAccessClass
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactMaterialization, validate_relative_locator
+from empirical_lawhood.execution.sources import SourceCapabilityManifest, SourceMode, SourceRequest, SourceResult, validate_source_result
 
 _SHA1 = re.compile(r"^[0-9a-f]{40}$")
 _COMMIT = re.compile(r"^[0-9a-f]{40}$")

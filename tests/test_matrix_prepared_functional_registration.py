@@ -1,19 +1,19 @@
 # SPDX-License-Identifier: MPL-2.0
 """In-memory declaration/provider/protocol checks, without native entry."""
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import executable_binding as executable
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import extension_bundle as extension
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_functional_bindings as method
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_functional_experiment as protocol
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import extension as executable
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import extension as extension
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_functional_bindings as method
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_functional_experiment as protocol
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_matrix_prepared_functional_contracts import reference
-from empirical_lawhood.planning.campaigns import CampaignSpec
+from empirical_lawhood.design.campaigns import CampaignSpec
 
 
 def test_complete_opportunity_uses_the_installed_declaration_and_provider_projections():
     manifests = {row.capability_key: row for row in extension.MANIFESTS}
-    providers = {row.binding.capability_key: row for row in executable.EXECUTABLE_BINDING_FACTORIES}
+    providers = {row.binding.capability_key: row for row in executable.EXTENSION.factories}
     for declaration in method.operation_declarations():
         assert manifests[declaration.capability_key] == declaration.manifest()
         factory = providers[declaration.capability_key]
@@ -24,11 +24,11 @@ def test_complete_opportunity_uses_the_installed_declaration_and_provider_projec
         assert runner.manifest.capability_key.startswith(method.NAMESPACE + ".")
         assert callable(getattr(runner, "execute_with_native_subwork", None)) == factory.registration.native_effect
     assert len(manifests) == len(extension.MANIFESTS)
-    assert len(providers) == len(executable.EXECUTABLE_BINDING_FACTORIES)
+    assert len(providers) == len(executable.EXTENSION.factories)
 
 
 def test_registered_protocol_reports_original_missing_files_and_complete_roster_without_lowering():
-    declaration = next(row for row in extension.EXPERIMENT_PROTOCOL_DECLARATIONS if row.protocol_id == protocol.PROTOCOL_ID)
+    declaration = next(row for row in extension.EXTENSION.protocols if row.protocol_id == protocol.PROTOCOL_ID)
     assert declaration.specification_type is protocol.MatrixPreparedFunctionalExperimentSpecification
     assert declaration.input_storage_codecs == MATRIX_STORAGE_CODECS
     specification = protocol.MatrixPreparedFunctionalExperimentSpecification("experiment.registered-missing",

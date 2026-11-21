@@ -3,12 +3,12 @@
 
 from dataclasses import replace
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_response_records import ProtectedE3ResponseNumericalProfile
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.compiler import compile_run_plan
-from empirical_lawhood.runtime.plans import OutputTemplate
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_response_records import ProtectedE3ResponseNumericalProfile
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.compiler import compile_run_plan
+from empirical_lawhood.execution.plans import OutputTemplate
 from tests.runtime_platform.conftest import build_protocol_fixture
 
 

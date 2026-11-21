@@ -12,7 +12,7 @@ import weakref
 import pytest
 
 from empirical_lawhood.api.domain_composition.matrix_configured_protected_response import scientific_read as owner
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 class Body(SimpleNamespace):
@@ -27,7 +27,7 @@ def _record(name, **fields):
 @pytest.mark.parametrize('original_products', (False, True))
 def test_finished_scientific_replay_releases_temporary_records_before_consumer(monkeypatch, original_products):
     from empirical_lawhood.api import configured_e3_primary_amendment, configured_e3_retained_read, protected_e3_secondary_read
-    from empirical_lawhood.infrastructure import study_issue
+    from empirical_lawhood.storage import study_issue
 
     specification = _record('specification.literal', measurement=SimpleNamespace(is_matched=True))
     allocation = _record('allocation.literal')

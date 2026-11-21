@@ -11,25 +11,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry import native, science
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import (
-    BatteryInquiryDelivery,
-    BatteryInquiryChargingAttempt,
-    BatteryInquiryInitializerAttempt,
-    BatteryInquirySource,
-    BatteryInquiryTrace,
-    BatteryInquiryTransition,
-    BACKEND_SOLVE_SCOPE,
-    CONTROL_RULE,
-    DEVELOPMENT_TEMPERATURES,
-    MODEL_VIEWS,
-    PROTOCOL_SHA256,
-    RECIPES,
-    TIER_TEMPERATURE,
-    TIER_EVENT,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition
+from empirical_lawhood.adapters.battery.battery_thermal_inquiry import native
+from empirical_lawhood.domains.battery.battery_thermal_inquiry import science
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquiryDelivery, BatteryInquiryChargingAttempt, BatteryInquiryInitializerAttempt, BatteryInquirySource, BatteryInquiryTrace, BatteryInquiryTransition, BACKEND_SOLVE_SCOPE, CONTROL_RULE, DEVELOPMENT_TEMPERATURES, MODEL_VIEWS, PROTOCOL_SHA256, RECIPES, TIER_TEMPERATURE, TIER_EVENT
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition
 
 D = Decimal
 
@@ -441,7 +427,10 @@ def test_protocol_and_sources_roundtrip_without_native_import():
         [
             sys.executable,
             "-c",
-            "import sys; from empirical_lawhood.adapters.methods.battery_thermal_inquiry import contracts,native,science; assert 'pybamm' not in sys.modules",
+            "import sys\n"
+            "from empirical_lawhood.domains.battery.battery_thermal_inquiry import contracts, science\n"
+            "from empirical_lawhood.adapters.battery.battery_thermal_inquiry import native\n"
+            "assert 'pybamm' not in sys.modules",
         ],
         check=True,
     )

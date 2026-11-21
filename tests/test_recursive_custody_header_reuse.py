@@ -6,10 +6,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure import recursive_custody as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ArtifactProfileValidatorRegistry
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.storage import recursive_custody as owner
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ArtifactProfileValidatorRegistry
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_recursive_custody_batched_members import _case
 
 
@@ -81,8 +81,8 @@ def test_changing_current_registry_does_not_skip_fresh_custody_or_reparse_an_exa
 
 def test_constructor_binary_member_cannot_inherit_json_header_proof_after_codec_change(tmp_path, monkeypatch):
     from pathlib import Path
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveWaveMember
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+    from empirical_lawhood.execution.recursive_handoff import RecursiveWaveMember
     from tests.test_matrix_array_worker_delivery import stock
     plane, _, manifest, _, raw, _ = stock(tmp_path)
     member = RecursiveWaveMember("selected.npz", ObjectIdentity("recursive-member.exposed-arrays", MATRIX_ARRAY_SCHEMA,

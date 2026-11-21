@@ -8,12 +8,12 @@ original preparation. Original attempts, sources and terminals remain intact.
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.development_structure_repair import DevelopmentStructureRepair
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex, TaskRecoveryDisposition
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.development_structure_repair import DevelopmentStructureRepair
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex, TaskRecoveryDisposition
 
 
 def _pin(value, field):
@@ -21,44 +21,34 @@ def _pin(value, field):
 
 
 def _relative(writer, directory):
-    from .selected_e4_structure import _directory
+    from empirical_lawhood.api.selected_e4_structure import _directory
     return (_directory(writer, directory) / 'repair.json').relative_to(writer.root.contract.canonical_path).as_posix()
 
 
 def _read_selection(writer, directory):
-    from .retained_e3_control_repair import _read_record
+    from empirical_lawhood.api.retained_e3_control_repair import _read_record
     return _read_record(writer, _relative(writer, directory), DevelopmentStructureRepair)
 
 
 def require_structural_source(original, replacement):
     """Keep all numerical owners and the kernel; permit the label correction."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import require_numerical_source_continuity
-    require_numerical_source_continuity(original, replacement)
-    metadata = frozenset((
-        'adapters/methods/matrix_scheduled_history/full_factor_records.py',
-        'adapters/methods/matrix_researcher_programme/source_continuation.py',
-        'adapters/methods/matrix_researcher_programme/extension_bundle.py',
-        'adapters/methods/matrix_researcher_programme/selection.py',
-        'adapters/methods/matrix_researcher_programme/completed_source.py',
-    ))
-    for prefix in ('adapters/', 'kernel/'):
-        before = {key: value for key, value in original.package_sources if key.startswith(prefix) and key not in metadata}
-        after = {key: value for key, value in replacement.package_sources if key.startswith(prefix) and key not in metadata}
-        if not before or before != after:
-            raise PermissionError('structural repair changes original numerical or kernel source: ' + prefix)
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import (
+        STRUCTURAL_REPAIR_METADATA, require_development_repair_source,
+    )
+    require_development_repair_source(original, replacement, mutable_metadata=STRUCTURAL_REPAIR_METADATA)
 
 
-def _original_controls(*, writer, directory, read_access=None):
-    from .experiment_execution_read import load_development_execution_controls, read_execution_records
-    from .recursive_execution import _custody_control_pins
-    from .recursive_operations import operation_catalog
-    from .selected_e4_structure import _directory
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_bindings as owner
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_preparation import ScheduledFullFactorDevelopmentSpecification
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4ExperimentSpecification
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.runtime.execution import OperationalFailureClass
+def _original_controls(*, writer, directory, read_access=None, historical=False):
+    from empirical_lawhood.api.experiment_execution_read import load_development_execution_controls, read_execution_records
+    from empirical_lawhood.api.recursive_execution import _custody_control_pins
+    from empirical_lawhood.api.recursive_operations import operation_catalog
+    from empirical_lawhood.api.selected_e4_structure import _directory
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_bindings as owner
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_preparation import ScheduledFullFactorDevelopmentSpecification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4ExperimentSpecification
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.execution.execution import OperationalFailureClass
 
     child = _directory(writer, directory) / 'analysis'
     acquisition = load_development_execution_controls(directory=directory, artifact_writer=writer, read_access=read_access)
@@ -87,8 +77,13 @@ def _original_controls(*, writer, directory, read_access=None):
         raise PermissionError('structural repair requires one settled original failed PURE child')
     registrations, registry, _ = operation_catalog()
     declarations = {row.selection.capability_key: row for row in registrations}
-    if plan.registry_sha256 != registry.fingerprint():
-        raise PermissionError('structural repair changes the original capability registry')
+    retained_registry = None
+    if historical:
+        from empirical_lawhood.api.experiment_execution_read import _authored_execution_registry
+        retained_registry = _authored_execution_registry(writer=writer,
+            prefix=child.relative_to(writer.root.contract.canonical_path).as_posix(),
+            members={row.filename: row for row in packet.members}, plan=plan, access=access)
+    _require_current_structural_registry(plan, registry, retained_registry=retained_registry)
     keys = {owner.key(False, phase) for phase in owner.PHASES}
     if {task.capability.capability_key for task in plan.tasks} != keys or any(
             declarations[task.capability.capability_key].native_effect or task.maximum_attempts != 1 for task in plan.tasks):
@@ -135,8 +130,28 @@ def _original_controls(*, writer, directory, read_access=None):
     return acquisition, structural, reports, controls, current
 
 
+def _require_current_structural_registry(plan, registry, *, retained_registry=None):
+    """Reading a recorded repair permits unrelated additions, never selected changes."""
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    if retained_registry is None:
+        if plan.registry_sha256 != registry.fingerprint():
+            raise PermissionError('structural repair changes the original capability registry')
+        return
+    if type(retained_registry) is not CapabilityRegistry or retained_registry.fingerprint() != plan.registry_sha256:
+        raise PermissionError('structural repair read changes its retained registry')
+    for task in plan.tasks:
+        key = task.capability.capability_key, task.capability.capability_version
+        try:
+            original = retained_registry.resolve(*key)
+            current = registry.resolve(*key)
+        except (KeyError, ValueError) as error:
+            raise PermissionError('structural repair read loses an original capability') from error
+        if current != original or original.implementation_sha256 != task.capability_implementation_sha256:
+            raise PermissionError('structural repair read changes an original capability')
+
+
 def _selection(writer, directory, original, *, instruction_sha256, replacement):
-    from empirical_lawhood.kernel.decoding import decode_canonical_record
+    from empirical_lawhood.science.records.decoding import decode_canonical_record
     acquisition, structural, reports, controls, _ = original
     require_structural_source(structural[4], replacement)
     return DevelopmentStructureRepair(Path(directory).relative_to(writer.root.contract.canonical_path).as_posix(),
@@ -148,8 +163,8 @@ def _selection(writer, directory, original, *, instruction_sha256, replacement):
 
 def _require_replacement(writer, selection, original):
     """A new compiler owns the plan; all original scientific members stay exact."""
-    from .recursive_authoring import load_authored_wave
-    from .recursive_execution import _retained_plans
+    from empirical_lawhood.api.recursive_authoring import load_authored_wave
+    from empirical_lawhood.api.recursive_execution import _retained_plans
     child = writer.root.resolve(selection.child_relative_path, for_write=False)
     if not (child / 'authored-wave.json').exists() and not (child / 'authored-wave.json').is_symlink():
         return child
@@ -162,7 +177,7 @@ def _require_replacement(writer, selection, original):
     # Only the implementation and the two compiler-produced execution plans
     # depend on the repaired source. Every other canonical member and FILE
     # must retain its exact original schema, version, size and digest.
-    from empirical_lawhood.infrastructure.recursive_control_read import CONTROL_VIEWS
+    from empirical_lawhood.storage.recursive_control_read import CONTROL_VIEWS
     excluded = {'implementation.json', 'run-plan.json', 'execution-plan.json', 'graph-preservation.json', *CONTROL_VIEWS.values()}
     old_members = tuple(member for member in old_packet.members if member.filename not in excluded)
     new_members = tuple(member for member in packet.members if member.filename not in excluded)
@@ -173,11 +188,11 @@ def _require_replacement(writer, selection, original):
 
 def selected_structure_directory(*, writer, directory):
     """Resolve an authenticated additive selection inside the caller's read scope."""
-    from .selected_e4_structure import _directory
+    from empirical_lawhood.api.selected_e4_structure import _directory
     selected = _read_selection(writer, directory)
     if selected is None:
         return _directory(writer, directory) / 'analysis', None, lambda: None
-    original = _original_controls(writer=writer, directory=directory)
+    original = _original_controls(writer=writer, directory=directory, historical=True)
     if selected != _selection(writer, directory, original,
             instruction_sha256=selected.owner_instruction_sha256, replacement=selected.replacement_source):
         raise PermissionError('structural repair changes its original complete custody binding')
@@ -191,22 +206,19 @@ def selected_structure_directory(*, writer, directory):
 
 
 def repair_development_structure(*, service, directory, owner_instruction_sha256, maximum_parallel_tasks, read_access=None):
-    from .recursive_authoring import implementation_binding, load_authored_wave
-    from .selected_e3_access import original_e3_authority_read_context
-    from .selected_e4_structure import (
-        _acquisition, _complete_structure, _development_inputs, _directory, _retained_structure_preparation,
-        _structural_companion, structural_measurement,
-    )
-    from .experiment_scientific_read import _development_runtime_context
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.numerical_provenance import observe_worker_environment
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.api.recursive_authoring import implementation_binding, load_authored_wave
+    from empirical_lawhood.api.selected_e3_access import original_e3_authority_read_context
+    from empirical_lawhood.api.selected_e4_structure import _acquisition, _complete_structure, _development_inputs, _directory, _retained_structure_preparation, _structural_companion, structural_measurement
+    from empirical_lawhood.api.experiment_scientific_read import _development_runtime_context
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.numerical_provenance import observe_worker_environment
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
     writer = service.artifact_writer
     directory = Path(directory)
     # Locate the real original run for its existing cross-process lock. The
     # complete census is read again while this lock is owned.
-    from .experiment_execution_read import load_development_execution_controls
+    from empirical_lawhood.api.experiment_execution_read import load_development_execution_controls
     with original_e3_authority_read_context(writer), writer.read_context() as reading:
         original_child = _directory(reading, directory) / 'analysis'
         _, run, plan, _, _, _ = load_development_execution_controls(directory=original_child, artifact_writer=reading)
@@ -227,8 +239,8 @@ def repair_development_structure(*, service, directory, owner_instruction_sha256
             _, specification, instance = binding
             inputs = _development_inputs(specification, instance, payloads)
             _, _, _, child_payloads = load_authored_wave(directory=original_child, artifact_writer=reading, lazy_payloads=True)
-            from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as original_workers
-            from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+            from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as original_workers
+            from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
             entry_id = original_workers.global_node(inputs.programme, 'entry')
             original_index = original[0][3]
             store = ExternalTaskReceiptStore(reading)

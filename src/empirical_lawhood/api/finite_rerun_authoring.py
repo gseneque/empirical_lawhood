@@ -5,6 +5,7 @@ Compilation and provider proof never execute a task or create an authority.
 Calibration parents are current authenticated publications, not the old
 development-only parent-import route. Fixed nomination bytes remain provenance.
 """
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 from collections import Counter
 from dataclasses import dataclass, fields
@@ -13,59 +14,50 @@ from hashlib import sha256
 import json
 from pathlib import Path
 
-from empirical_lawhood.adapters.composition.finite_response_law.consumer_input import build_consumer_authoring
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.consumer_input import build_consumer_authoring
 from empirical_lawhood.adapters.composition.finite_response_law.consumer_ports import FiniteResponseLawRuntimeContext, load_control_runtime
-from empirical_lawhood.adapters.composition.finite_response_law.exposure import native_seed_collisions, native_seed_ids
-from empirical_lawhood.adapters.composition.finite_response_law.method_authoring import method_resource_envelope
-from empirical_lawhood.adapters.composition.finite_response_law.resources import native_resource_envelope
-from empirical_lawhood.adapters.composition.finite_response_law.rerun_input import FiniteResponseLawCurrentAllocation, FiniteResponseLawCurrentExposure, FiniteResponseLawCurrentParent, FiniteResponseLawCurrentPublication, FiniteResponseLawCurrentResultInput, FiniteResponseLawRerunInput, original_development_exposure, public_rerun_sample_exposure
-from empirical_lawhood.adapters.composition.response_geometry_prospective.design import ResponseGeometryAssayCandidateContextProvider
-from empirical_lawhood.adapters.methods.finite_response_law.assigned_native_records import FiniteResponseLawAssignedCalibrationNativeEvaluation
-from empirical_lawhood.adapters.methods.finite_response_law.method_records import FiniteResponseLawAssignedQualificationReport
-from empirical_lawhood.adapters.methods.finite_response_law.nominated_package import CurrentNominationOperand
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.exposure import native_seed_collisions, native_seed_ids
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.method_authoring import method_resource_envelope
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.resources import native_resource_envelope
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.rerun_input import FiniteResponseLawCurrentAllocation, FiniteResponseLawCurrentExposure, FiniteResponseLawCurrentParent, FiniteResponseLawCurrentPublication, FiniteResponseLawCurrentResultInput, FiniteResponseLawRerunInput, original_development_exposure, public_rerun_sample_exposure
+from empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.design import ResponseGeometryAssayCandidateContextProvider
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_native_records import FiniteResponseLawAssignedCalibrationNativeEvaluation
+from empirical_lawhood.domains.matrix.finite_response_law.method_records import FiniteResponseLawAssignedQualificationReport
+from empirical_lawhood.domains.matrix.finite_response_law.nominated_package import CurrentNominationOperand
 from empirical_lawhood.api.authoring_handoff import create_authoring_api, preflight_authoring_output_directory, resolve_authoring_directory, write_exclusive_record
 from empirical_lawhood.api.authoring_output import report_incomplete_output
 from empirical_lawhood.api.finite_operands import current_nomination_operand_import
 from empirical_lawhood.api.results import CompileCandidateRequest
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import MAX_RUNTIME_PLAN_JSON_BYTES, file_matches_bytes, read_bounded_bytes
-from empirical_lawhood.infrastructure.candidate_payloads import ExternalCandidatePayloadPlane
-from empirical_lawhood.infrastructure.candidate_sources import ExternalContentAddressedInputResolver, ExternalCandidateInputPublisher
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.artifact_validation import ArtifactIdentityConflict
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError, file_matches_bytes, read_bounded_bytes
+from empirical_lawhood.storage.canonical_record_read import read_verified_canonical_record
+from empirical_lawhood.storage.candidate_payloads import ExternalCandidatePayloadPlane
+from empirical_lawhood.storage.candidate_sources import ExternalContentAddressedInputResolver, ExternalCandidateInputPublisher
 from empirical_lawhood.api.recursive_prospective_authoring import _capture_prospective_source, _publish_source_provenance
-from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
-from empirical_lawhood.infrastructure.source_closure import capture_clean_target_closure
+from empirical_lawhood.storage.study_issue import GitStudySourceClosureInspector
+from empirical_lawhood.storage.source_closure import capture_clean_target_closure
 from empirical_lawhood.api.authoring_handoff import authenticate_selected_authoring_source, require_authoring_source_kind_layout
-from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_ISSUE_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.study_issue import SourceClosureKind, StudyAuthorityKind, require_study_authority
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_run_plan
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort, LayeredCampaignRuntimeProviderResolver
-from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeSpec
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
-from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan, ExecutionPlan, RunPlan
-from empirical_lawhood.runtime.study_issue import MAX_COMPOSED_PROGRAMME_CONTROL_BYTES, MAX_ISSUE_PAYLOAD_BYTES, project_standard_study_extensions
-
-_LIMIT = 16 * 1024**2
-_GENERATED_CONTROL_FILENAMES = frozenset(('authoring.json', 'base-authoring.json', 'candidate-report.json', 'candidate.json', 'base-candidate.json', 'preissue-run-plan.json', 'preissue-execution-plan.json', 'resources.json'))
-
-
-def _record_byte_limit(filename: str) -> int:
-    limit = MAX_COMPOSED_PROGRAMME_CONTROL_BYTES if filename in _GENERATED_CONTROL_FILENAMES else _LIMIT
-    if filename in ('preissue-run-plan.json', 'preissue-execution-plan.json'):
-        limit = MAX_RUNTIME_PLAN_JSON_BYTES
-    return limit
-
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_ISSUE_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.study_issue import SourceClosureKind, StudyAuthorityKind, require_study_authority
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.compiler import compile_preissue_run_plan, lower_run_plan
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort, LayeredCampaignRuntimeProviderResolver
+from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeSpec
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
+from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
+from empirical_lawhood.execution.plans import CandidateExecutionPlan, ExecutionPlan, RunPlan
+from empirical_lawhood.execution.study_issue import project_standard_study_extensions
 
 def _read_record(directory: Path, filename: str, record_type):
-    limit = _record_byte_limit(filename)
+    limit = None
     return decode_canonical_bytes(read_bounded_bytes(directory / filename, maximum_bytes=limit), record_type, maximum_bytes=limit)
 
 
@@ -74,13 +66,17 @@ def _assert_expected_record(directory: Path, filename: str, expected: CanonicalR
     # expected. Exact canonical bytes preserve strict decode + equality without
     # constructing the same typed graph a second time. Each actual file remains
     # bounded, no-follow and stable, with no successful-read cache.
-    if not file_matches_bytes(directory / filename, expected.canonical_bytes(), maximum_bytes=_record_byte_limit(filename)):
+    try:
+        matches = file_matches_bytes(directory / filename, expected.canonical_bytes(), maximum_bytes=None)
+    except BoundedFileIOError as error:
+        raise ValueError(refusal) from error
+    if not matches:
         raise ValueError(refusal)
 
 
 def _load_current_issued(publication, plane, *, expected_run=None, expected_candidate=None):
     """Replay the existing issue publication, with no historical/development alias."""
-    from empirical_lawhood.runtime.study_issue import IssuedExecutableStudyManifest
+    from empirical_lawhood.execution.study_issue import IssuedExecutableStudyManifest
     store = ExternalStudyOperationAuthorityStore(plane)
     issued = ExternalIssuedStudyPublisher(artifact_plane=plane, authority_store=store, grantee_id=PROGRAMME_ISSUE_GRANTEE_ID).load_executable_study(publication.issued_study.object_id).manifest
     if type(issued) is not IssuedExecutableStudyManifest or ObjectIdentity.from_record(issued.issue_id, issued) != publication.issued_study or issued.base.visibility_ceiling is not VisibilityCeiling.PROSPECTIVE:
@@ -108,15 +104,24 @@ def _authenticate_current_publication(publication, plane, *, expected_run=None, 
 
 def _published_current_control(plane, run_id, name, record_type, maximum_bytes):
     relative = f'runs/{run_id}/plans/{name}.json'
-    manifest = decode_artifact_manifest(read_bounded_bytes(plane.root.resolve(relative + '.manifest.json', for_write=False), maximum_bytes=_LIMIT))
-    if manifest.publication is None or manifest.materialization.relative_path != relative or manifest.logical.logical_artifact_id != f'{name}.{run_id}' or manifest.logical.payload_schema != record_type.SCHEMA or manifest.logical.visibility_ceiling is not VisibilityCeiling.PROSPECTIVE or manifest.materialization.compression != 'none' or manifest.materialization.partition_selector is not None or manifest.materialization.size_bytes > maximum_bytes:
+    try:
+        manifest = plane.read_manifest(relative, maximum_bytes=plane.custody_limits.manifest_bytes)
+    except ArtifactIdentityConflict as error:
+        raise ValueError('FINITE_CURRENT_RUN_EXACT_PUBLISHED_CONTROL_REQUIRED') from error
+    material, logical = manifest.materialization, manifest.logical
+    if (manifest.publication is None or material.relative_path != relative
+            or material.storage_root_id != plane.root.contract.storage_root_id
+            or material.compression != 'none' or material.partition_selector is not None
+            or (maximum_bytes is not None and material.size_bytes > maximum_bytes)
+            or plane.custody_limits.exceeds('in_memory_payload_bytes', material.size_bytes)
+            or logical.logical_artifact_id != f'{name}.{run_id}' or logical.payload_schema != record_type.SCHEMA
+            or logical.profile is not ArtifactProfile.CANONICAL_JSON or logical.media_type != 'application/json'
+            or logical.visibility_ceiling is not VisibilityCeiling.PROSPECTIVE):
         raise ValueError('FINITE_CURRENT_RUN_EXACT_PUBLISHED_CONTROL_REQUIRED')
-    plane.verify_manifest(manifest)
-    raw = read_bounded_bytes(plane.root.resolve(relative, for_write=False), maximum_bytes=maximum_bytes)
-    record = decode_canonical_bytes(raw, record_type, maximum_bytes=maximum_bytes)
-    if len(raw) != manifest.materialization.size_bytes or raw != record.canonical_bytes() or sha256(raw).hexdigest() != manifest.materialization.physical_sha256 or manifest.logical.content_sha256 != record.fingerprint():
-        raise ValueError('FINITE_CURRENT_RUN_CONTROL_BYTE_IDENTITY_MISMATCH')
-    return record
+    try:
+        return read_verified_canonical_record(plane, manifest, record_type, maximum_bytes=material.size_bytes)
+    except ArtifactIdentityConflict as error:
+        raise ValueError('FINITE_CURRENT_RUN_CONTROL_BYTE_IDENTITY_MISMATCH') from error
 
 
 def _authenticate_current_run_controls(publication, issued, plane):
@@ -126,11 +131,10 @@ def _authenticate_current_run_controls(publication, issued, plane):
     the scientific preissue compiler and the package's exact approved identities;
     it grants no authorization and does not replace approval-service execution.
     """
-    from empirical_lawhood.api.codecs import MAX_CAMPAIGN_PACKAGE_BYTES
     from empirical_lawhood.api.models import ExperimentPackage
-    package = _published_current_control(plane, publication.run_id, 'campaign-package', ExperimentPackage, MAX_CAMPAIGN_PACKAGE_BYTES)
-    run = _published_current_control(plane, publication.run_id, 'run-plan', RunPlan, MAX_RUNTIME_PLAN_JSON_BYTES)
-    execution = _published_current_control(plane, publication.run_id, 'execution-plan', ExecutionPlan, MAX_RUNTIME_PLAN_JSON_BYTES)
+    package = _published_current_control(plane, publication.run_id, 'campaign-package', ExperimentPackage, None)
+    run = _published_current_control(plane, publication.run_id, 'run-plan', RunPlan, None)
+    execution = _published_current_control(plane, publication.run_id, 'execution-plan', ExecutionPlan, None)
     if package.issued_study != issued or package.run_plan_id != publication.run_id or ObjectIdentity.from_record(package.execution_authority.authority_id, package.execution_authority) != publication.execution_authority or execution.source_plan != ObjectIdentity.from_record(run.run_plan_id, run) or execution.execution_plan_id != package.execution_plan_id:
         raise ValueError('FINITE_CURRENT_RUN_ISSUED_PACKAGE_OR_PLAN_JOIN_MISMATCH')
     candidate = issued.candidate
@@ -144,27 +148,27 @@ def _authenticate_current_run_controls(publication, issued, plane):
 
 
 def _issued_member_bytes(plane, member):
-    raw = read_bounded_bytes(plane.root.resolve(member.relative_path, for_write=False), maximum_bytes=min(member.size_bytes, _LIMIT))
+    raw = read_bounded_bytes(plane.root.resolve(member.relative_path, for_write=False), maximum_bytes=member.size_bytes)
     if len(raw) != member.size_bytes or sha256(raw).hexdigest() != member.physical_sha256:
         raise ValueError('FINITE_CURRENT_ISSUED_SOURCE_MEMBER_BYTES_MISMATCH')
     return raw
 
 
 def _require_issued_source(issued, source, plane, *, nomination=None, expected_config=None):
-    from empirical_lawhood.adapters.methods.finite_response_law.control_records import FiniteResponseLawControlConfig
-    from empirical_lawhood.adapters.methods.finite_response_law.method_records import FiniteResponseLawAssignedCalibrationMethodConfig
+    from empirical_lawhood.domains.matrix.finite_response_law.control_records import FiniteResponseLawControlConfig
+    from empirical_lawhood.domains.matrix.finite_response_law.method_records import FiniteResponseLawAssignedCalibrationMethodConfig
     candidates = []
     matched_config = expected_config is None
     for member in issued.members:
         if member.payload_schema == type(source).SCHEMA:
-            candidates.append(decode_canonical_bytes(_issued_member_bytes(plane, member), type(source), maximum_bytes=_LIMIT))
+            candidates.append(decode_canonical_bytes(_issued_member_bytes(plane, member), type(source), maximum_bytes=None))
         elif member.payload_schema == FiniteResponseLawAssignedCalibrationMethodConfig.SCHEMA:
-            config = decode_canonical_bytes(_issued_member_bytes(plane, member), FiniteResponseLawAssignedCalibrationMethodConfig, maximum_bytes=_LIMIT)
+            config = decode_canonical_bytes(_issued_member_bytes(plane, member), FiniteResponseLawAssignedCalibrationMethodConfig, maximum_bytes=None)
             candidates.append(config.native_source)
             if nomination is not None and (config.development_report, config.coefficients, config.development_manifest) != nomination.current_artifacts:
                 raise ValueError('FINITE_CURRENT_PARENT_CHANGED_FIXED_NOMINATION')
         elif member.payload_schema == FiniteResponseLawControlConfig.SCHEMA:
-            config = decode_canonical_bytes(_issued_member_bytes(plane, member), FiniteResponseLawControlConfig, maximum_bytes=_LIMIT)
+            config = decode_canonical_bytes(_issued_member_bytes(plane, member), FiniteResponseLawControlConfig, maximum_bytes=None)
             candidates.append(config.source)
             matched_config = matched_config or config == expected_config
     if not candidates or any(candidate != source for candidate in candidates) or not matched_config:
@@ -230,18 +234,18 @@ def authenticate_finite_current_parent(parent: FiniteResponseLawCurrentParent, p
         path = plane.root.resolve(manifest.materialization.relative_path, for_write=False)
         if logical.logical_artifact_id in result or manifest.publication is None or manifest.materialization.compression != 'none' or manifest.materialization.partition_selector is not None:
             raise ValueError('FINITE_CURRENT_PARENT_EXACT_AUTHORIZED_MATERIALIZATION_REQUIRED')
-        raw = read_bounded_bytes(path, maximum_bytes=min(_LIMIT, manifest.materialization.size_bytes))
+        raw = read_bounded_bytes(path, maximum_bytes=manifest.materialization.size_bytes)
         if len(raw) != manifest.materialization.size_bytes or sha256(raw).hexdigest() != manifest.materialization.physical_sha256 or logical.content_sha256 != manifest.materialization.physical_sha256:
             raise ValueError('FINITE_CURRENT_PARENT_OPERAND_BYTE_IDENTITY_MISMATCH')
         result[logical.logical_artifact_id] = raw
     for receipt in receipts:
         result[receipt.receipt_id] = receipt.canonical_bytes()
-    from empirical_lawhood.adapters.methods.finite_response_law.method_records import FiniteResponseLawAssignedCalibrationMethodConfig
+    from empirical_lawhood.domains.matrix.finite_response_law.method_records import FiniteResponseLawAssignedCalibrationMethodConfig
     for issued, _ in publications.values():
         for member in issued.members:
             if member.payload_schema == FiniteResponseLawAssignedCalibrationMethodConfig.SCHEMA:
                 raw = _issued_member_bytes(plane, member)
-                method = decode_canonical_bytes(raw, FiniteResponseLawAssignedCalibrationMethodConfig, maximum_bytes=_LIMIT)
+                method = decode_canonical_bytes(raw, FiniteResponseLawAssignedCalibrationMethodConfig, maximum_bytes=None)
                 if method.config_id in result:
                     raise ValueError('FINITE_CURRENT_PARENT_AMBIGUOUS_ISSUED_METHOD_CONFIG')
                 result[method.config_id] = raw
@@ -273,21 +277,21 @@ def _validate_parent_operands(packet, parent, data):
     if primary.sha256 != packet.primary_parent_sha256:
         raise ValueError('FINITE_RERUN_PRIMARY_PARENT_MISMATCH')
     if packet.method is not None:
-        from empirical_lawhood.adapters.methods.finite_response_law.calibration_operands import authenticated_evaluation
-        from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-        native = authenticated_evaluation(data[primary.artifact_id], primary, decode_canonical_bytes(data[packet.method.native_receipt.artifact_id], CanonicalTaskReceipt, maximum_bytes=_LIMIT), expected_receipt=packet.method.expected_native_receipt, source=packet.source)
+        from empirical_lawhood.domains.matrix.finite_response_law.calibration_operands import authenticated_evaluation
+        from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+        native = authenticated_evaluation(data[primary.artifact_id], primary, decode_canonical_bytes(data[packet.method.native_receipt.artifact_id], CanonicalTaskReceipt, maximum_bytes=None), expected_receipt=packet.method.expected_native_receipt, source=packet.source)
         if native.config.projection.native_spec != packet.source or parent.native_source != packet.source:
             raise ValueError('FINITE_RERUN_CALIBRATION_NATIVE_SOURCE_MISMATCH')
     else:
-        from empirical_lawhood.adapters.methods.finite_response_law.control_inputs import authenticated_control_inputs
+        from empirical_lawhood.domains.matrix.finite_response_law.control_inputs import authenticated_control_inputs
         qualification, native = authenticated_control_inputs(packet.control, {artifact.artifact_id: data[artifact.artifact_id] for artifact in packet.control.inputs})
         if native.config.projection.native_spec != parent.native_source:
             raise ValueError('FINITE_RERUN_QUALIFICATION_NATIVE_CUSTODY_MISMATCH')
-        from empirical_lawhood.adapters.methods.finite_response_law.method_records import FiniteResponseLawAssignedCalibrationMethodConfig
+        from empirical_lawhood.domains.matrix.finite_response_law.method_records import FiniteResponseLawAssignedCalibrationMethodConfig
         raw = data.get(qualification.config.object_id)
         if raw is None:
             raise ValueError('FINITE_RERUN_QUALIFICATION_ISSUED_METHOD_CONFIG_REQUIRED')
-        method = decode_canonical_bytes(raw, FiniteResponseLawAssignedCalibrationMethodConfig, maximum_bytes=_LIMIT)
+        method = decode_canonical_bytes(raw, FiniteResponseLawAssignedCalibrationMethodConfig, maximum_bytes=None)
         if ObjectIdentity.from_record(method.config_id, method) != qualification.config or method.native_source != parent.native_source or method.native_evaluation != packet.control.calibration_native or method.native_receipt != packet.control.calibration_native_receipt or method.expected_native_receipt != packet.control.expected_calibration_native_receipt or (method.development_report, method.coefficients, method.development_manifest) != packet.nomination.current_artifacts:
             raise ValueError('FINITE_RERUN_QUALIFICATION_FIXED_NOMINATION_OR_ISSUED_SOURCE_MISMATCH')
         if set(root.physical_unit_id for root in parent.native_source.roots) & set(packet.allocation.physical_unit_ids) or native_seed_collisions(native_seed_ids(packet.source), native_seed_ids(parent.native_source)):
@@ -317,9 +321,6 @@ def _project_bundle(bundle, packet, closure, report):
     run_id = _packet_run_id(packet)
     projected = compile_preissue_run_plan(run_plan_id=run_id, candidate_record=base, candidate=ObjectIdentity.from_record(candidate.candidate_id, candidate), registry=bundle.standard_context.base.registry, implementation_commit=closure.implementation_commit, issued_extension_set=extensions, resource_envelope=resources, jit_census=None, jit_manifest=None, model_set=None if packet.control is None else packet.control.primary_model_set)
     execution = lower_run_plan(projected, bundle.standard_context.base.registry)
-    sizes = tuple(len(record.canonical_bytes()) for record in (projected, execution))
-    if any(size > MAX_RUNTIME_PLAN_JSON_BYTES for size in sizes):
-        raise ValueError(f'FINITE_RERUN_FULL_SIZE_RUNTIME_CONTROL_BYTE_BOUND: run={sizes[0]}, execution={sizes[1]}, limit={MAX_RUNTIME_PLAN_JSON_BYTES}')
     return candidate, resources, projected, execution
 
 
@@ -343,8 +344,6 @@ def author_finite_response_rerun(*, root: Path, packet: FiniteResponseLawRerunIn
         if not set(root.physical_unit_id for root in parent.native_source.roots) <= set(exposure.excluded_unit_ids) or not set(native_seed_ids(parent.native_source)) <= set(exposure.excluded_seed_ids):
             raise ValueError('FINITE_RERUN_CURRENT_CENSUS_OMITS_CALIBRATION_PARENT')
     bundle = _bundle(packet, exposure, closure.implementation_sha256)
-    if any(len(value.canonical_bytes()) > MAX_ISSUE_PAYLOAD_BYTES for value in (bundle.authoring, bundle.authoring.base)):
-        raise ValueError('FINITE_RERUN_FULL_SIZE_ISSUE_BYTE_BOUND')
     output_dir = preflight_authoring_output_directory(directory=output_dir, repo_root=root,
         artifact_writer=artifact_writer, allow_existing_empty=True)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -361,7 +360,7 @@ def author_finite_response_rerun(*, root: Path, packet: FiniteResponseLawRerunIn
             raw = read_bounded_bytes(nomination_directory / filename, maximum_bytes=artifact.size_bytes)
             publisher.publish(raw, maximum_bytes=artifact.size_bytes)
         for raw in data.values():
-            publisher.publish(raw, maximum_bytes=_LIMIT)
+            publisher.publish(raw, maximum_bytes=None)
         author = save('authoring.json', bundle.authoring)
         save('base-authoring.json', bundle.authoring.base)
         payloads = tuple(save(f'payload-{index:02d}.json', record) for index, record in enumerate(bundle.payloads))
@@ -405,7 +404,7 @@ class _CurrentCandidatePort:
 
     def read_candidate_payload(self, receipt):
         path = self.plane.root.resolve(receipt.authoritative_relative_locator + '.manifest.json', for_write=False)
-        manifest = decode_artifact_manifest(read_bounded_bytes(path, maximum_bytes=_LIMIT))
+        manifest = read_artifact_sidecar(self.plane, (path).relative_to(self.plane.root.contract.canonical_path).as_posix(), maximum_bytes=None)
         self.plane.verify_manifest(manifest)
         if manifest.publication is None or ObjectIdentity.from_record(manifest.publication.publication_batch_id, manifest.publication) != receipt.publication_receipt or manifest.logical.content_sha256 != receipt.content_sha256 or ObjectIdentity.from_record(manifest.materialization.materialization_id, manifest.materialization) != receipt.recovery_identity:
             raise ValueError('FINITE_RERUN_CANDIDATE_PUBLICATION_RECEIPT_MISMATCH')
@@ -449,7 +448,7 @@ def load_finite_response_rerun_handoff(*, directory: Path, root: Path, storage_p
     directory, _ = resolve_authoring_directory(directory, repo_root=root, storage_profile=storage_profile, escape_message='Finite rerun handoff is outside selected guarded storage')
     packet = _read_record(directory, 'rerun-input.json', FiniteResponseLawRerunInput)
     exposure = _read_record(directory, 'exposure.json', FiniteResponseLawCurrentExposure)
-    from empirical_lawhood.planning.study_issue import ImplementationSourceClosure
+    from empirical_lawhood.design.study_issue import ImplementationSourceClosure
     closure = _read_record(directory, 'source-closure.json', ImplementationSourceClosure)
     require_authoring_source_kind_layout(directory=directory, closure=closure)
     if closure.kind is SourceClosureKind.CLEAN_GIT_COMMIT:
@@ -475,14 +474,14 @@ def load_finite_response_rerun_handoff(*, directory: Path, root: Path, storage_p
     candidate, resources, projected, projection = _project_bundle(bundle, packet, closure, report)
     for filename, record in (('candidate-report.json', report), ('candidate.json', candidate), ('base-candidate.json', candidate.base_candidate), ('resources.json', resources), ('preissue-run-plan.json', projected), ('preissue-execution-plan.json', projection)):
         _assert_expected_record(directory, filename, record, 'FINITE_RERUN_EXACT_CURRENT_PROJECTION_RECONSTRUCTION_MISMATCH')
-    from empirical_lawhood.adapters.methods.finite_response_law.method_provider import CANDIDATE_PAYLOAD_PORT, INPUT_RESOLVER_PORT
+    from empirical_lawhood.domains.matrix.finite_response_law.method_provider import CANDIDATE_PAYLOAD_PORT, INPUT_RESOLVER_PORT
     ports = {
         CANDIDATE_PAYLOAD_PORT: _CurrentCandidatePort(artifact_writer, projection.source_plan.object_id, ArtifactLineageParent(ObjectIdentity.from_record(bundle.authoring.package_id, bundle.authoring), VisibilityCeiling.PROSPECTIVE if packet.evidence_role == 'PROPOSED_UNRUN' else VisibilityCeiling.DEVELOPMENT_ONLY, OutcomeAccess.OUTCOME_BLIND), VisibilityCeiling.PROSPECTIVE if packet.evidence_role == 'PROPOSED_UNRUN' else VisibilityCeiling.DEVELOPMENT_ONLY),
         INPUT_RESOLVER_PORT: ExternalContentAddressedInputResolver(artifact_writer.root),
     }
     bound = False
     if packet.control is not None:
-        from empirical_lawhood.adapters.methods.finite_response_law.control_ports import CONTROL_RUNTIME_PORT, REVEAL_CONTROL_PORT, SEALED_CONTROL_PORT, SOURCE_CONTROL_PORT
+        from empirical_lawhood.domains.matrix.finite_response_law.control_ports import CONTROL_RUNTIME_PORT, REVEAL_CONTROL_PORT, SEALED_CONTROL_PORT, SOURCE_CONTROL_PORT
         runtime = _UnissuedRuntime()
         if (directory / 'runtime-context-reference.json').exists():
             identity = _read_record(directory, 'runtime-context-reference.json', ObjectIdentity)
@@ -532,7 +531,7 @@ def read_finite_response_current_result(*, config: FiniteResponseLawCurrentResul
     The complete successful task receipt and all sibling output manifests remain
     compulsory. This is a bounded reader, not qualification or execution.
     """
-    from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
+    from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
     by_schema = {record.SCHEMA: record for record in _current_result_types().values()}
     selected = next(manifest for manifest in config.manifests if manifest.logical.logical_artifact_id == config.result_artifact_id)
     record_type = by_schema.get(selected.logical.payload_schema)
@@ -545,15 +544,15 @@ def read_finite_response_current_result(*, config: FiniteResponseLawCurrentResul
     if set(receipt.output_materializations) != {manifest.materialization for manifest in config.manifests} or set(receipt.output_logical_artifacts) != {manifest.logical for manifest in config.manifests} or any(manifest.publication is None for manifest in config.manifests):
         raise ValueError('FINITE_CURRENT_RESULT_COMPLETE_RECEIPT_PUBLICATION_REQUIRED')
     artifact_writer.verify_manifests(config.manifests)
-    raw = read_bounded_bytes(artifact_writer.root.resolve(selected.materialization.relative_path, for_write=False), maximum_bytes=min(_LIMIT, selected.materialization.size_bytes))
+    raw = read_bounded_bytes(artifact_writer.root.resolve(selected.materialization.relative_path, for_write=False), maximum_bytes=selected.materialization.size_bytes)
     if len(raw) != selected.materialization.size_bytes or sha256(raw).hexdigest() != selected.materialization.physical_sha256 or selected.logical.content_sha256 != selected.materialization.physical_sha256:
         raise ValueError('FINITE_CURRENT_RESULT_BYTE_IDENTITY_MISMATCH')
-    record = decode_canonical_bytes(raw, record_type, maximum_bytes=_LIMIT)
+    record = decode_canonical_bytes(raw, record_type, maximum_bytes=None)
     _require_current_result_binding(record, issued, task_id, artifact_writer)
     if isinstance(record, ScientificAdjudicationRecord):
         if record.run_id != run_id or record.adjudication_task_id != task_id or record.execution_plan != ObjectIdentity.from_record(execution.execution_plan_id, execution) or record.input_materialization_ids != receipt.input_materialization_ids or record.output_logical_artifact_ids != tuple(value.logical_artifact_id for value in receipt.output_logical_artifacts):
             raise ValueError('FINITE_CURRENT_RESULT_ADJUDICATION_RUN_PLAN_OR_CENSUS_MISMATCH')
-        from empirical_lawhood.runtime.adjudication import ScientificAdjudicationContext
+        from empirical_lawhood.execution.adjudication import ScientificAdjudicationContext
         output = next(value for value in task.outputs if value.logical_artifact_id == selected.logical.logical_artifact_id)
         context = ScientificAdjudicationContext(ObjectIdentity.from_record(execution.execution_plan_id, execution), package.system.world.world_id, package.system.world.kind, ObjectIdentity.from_record(package.experiment.relation.relation_id, package.experiment.relation), package.experiment.independent_unit_id, tuple(ObjectIdentity.from_record(cutoff.cutoff_id, cutoff) for cutoff in package.experiment.information_cutoffs), output.visibility_ceiling, output.outcome_access)
         if not record.matches_context(context):
@@ -589,24 +588,24 @@ def _require_receipt_execution_join(receipt, execution):
 
 def _require_current_result_binding(record, issued, task_id, plane):
     """Bind decoded scientific content to the selected issued source and task."""
-    from empirical_lawhood.adapters.methods.finite_response_law.control_closeout import FiniteResponseLawRootSealedControl
-    from empirical_lawhood.adapters.methods.finite_response_law.control_records import FiniteResponseLawControlConfig
-    from empirical_lawhood.adapters.methods.finite_response_law.control_reveal import FiniteResponseLawProspectiveRootEvaluation
-    from empirical_lawhood.adapters.methods.finite_response_law.evaluation_readout import FiniteResponseLawRootInferenceOperands
-    from empirical_lawhood.adapters.methods.finite_response_law.evaluation_results import FiniteResponseLawEvaluationCohort, FiniteResponseLawEvaluationRevealConfig
-    from empirical_lawhood.adapters.methods.finite_response_law.method_records import FiniteResponseLawAssignedCalibrationMethodConfig
-    from empirical_lawhood.adapters.simulators.finite_response_law.assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
+    from empirical_lawhood.domains.matrix.finite_response_law.control_closeout import FiniteResponseLawRootSealedControl
+    from empirical_lawhood.domains.matrix.finite_response_law.control_records import FiniteResponseLawControlConfig
+    from empirical_lawhood.domains.matrix.finite_response_law.control_reveal import FiniteResponseLawProspectiveRootEvaluation
+    from empirical_lawhood.domains.matrix.finite_response_law.evaluation_readout import FiniteResponseLawRootInferenceOperands
+    from empirical_lawhood.domains.matrix.finite_response_law.evaluation_results import FiniteResponseLawEvaluationCohort, FiniteResponseLawEvaluationRevealConfig
+    from empirical_lawhood.domains.matrix.finite_response_law.method_records import FiniteResponseLawAssignedCalibrationMethodConfig
+    from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
     if type(record) is FiniteResponseLawAssignedCalibrationNativeEvaluation:
         _require_issued_source(issued, record.config.projection.native_spec, plane)
         return
     if type(record) is FiniteResponseLawAssignedQualificationReport:
-        methods = tuple(decode_canonical_bytes(_issued_member_bytes(plane, member), FiniteResponseLawAssignedCalibrationMethodConfig, maximum_bytes=_LIMIT) for member in issued.members if member.payload_schema == FiniteResponseLawAssignedCalibrationMethodConfig.SCHEMA)
+        methods = tuple(decode_canonical_bytes(_issued_member_bytes(plane, member), FiniteResponseLawAssignedCalibrationMethodConfig, maximum_bytes=None) for member in issued.members if member.payload_schema == FiniteResponseLawAssignedCalibrationMethodConfig.SCHEMA)
         if len(methods) != 1 or record.config != ObjectIdentity.from_record(methods[0].config_id, methods[0]):
             raise ValueError('FINITE_CURRENT_RESULT_ISSUED_QUALIFICATION_CONFIG_MISMATCH')
         return
     if type(record) not in (FiniteResponseLawRootSealedControl, FiniteResponseLawProspectiveRootEvaluation, FiniteResponseLawRootInferenceOperands, FiniteResponseLawEvaluationCohort):
         return
-    controls = tuple(decode_canonical_bytes(_issued_member_bytes(plane, member), FiniteResponseLawControlConfig, maximum_bytes=_LIMIT) for member in issued.members if member.payload_schema == FiniteResponseLawControlConfig.SCHEMA)
+    controls = tuple(decode_canonical_bytes(_issued_member_bytes(plane, member), FiniteResponseLawControlConfig, maximum_bytes=None) for member in issued.members if member.payload_schema == FiniteResponseLawControlConfig.SCHEMA)
     if len(controls) != 1:
         raise ValueError('FINITE_CURRENT_RESULT_ONE_ISSUED_CONTROL_CONFIG_REQUIRED')
     control = controls[0]
@@ -632,11 +631,11 @@ def _require_current_result_binding(record, issued, task_id, plane):
 
 
 def _current_result_types():
-    from empirical_lawhood.adapters.methods.finite_response_law.control_closeout import FiniteResponseLawRootSealedControl
-    from empirical_lawhood.adapters.methods.finite_response_law.control_reveal import FiniteResponseLawProspectiveRootEvaluation
-    from empirical_lawhood.adapters.methods.finite_response_law.evaluation_readout import FiniteResponseLawRootInferenceOperands
-    from empirical_lawhood.adapters.methods.finite_response_law.evaluation_results import FiniteResponseLawEvaluationCohort
-    from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
+    from empirical_lawhood.domains.matrix.finite_response_law.control_closeout import FiniteResponseLawRootSealedControl
+    from empirical_lawhood.domains.matrix.finite_response_law.control_reveal import FiniteResponseLawProspectiveRootEvaluation
+    from empirical_lawhood.domains.matrix.finite_response_law.evaluation_readout import FiniteResponseLawRootInferenceOperands
+    from empirical_lawhood.domains.matrix.finite_response_law.evaluation_results import FiniteResponseLawEvaluationCohort
+    from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
     return dict(zip(('calibration-native', 'qualification', 'closeout', 'root-reveal', 'root-inference', 'cohort', 'terminal'), (FiniteResponseLawAssignedCalibrationNativeEvaluation, FiniteResponseLawAssignedQualificationReport, FiniteResponseLawRootSealedControl, FiniteResponseLawProspectiveRootEvaluation, FiniteResponseLawRootInferenceOperands, FiniteResponseLawEvaluationCohort, ScientificAdjudicationRecord), strict=True))
 
 
@@ -730,8 +729,8 @@ def prepare_finite_response_allocation(*, stage: str, cohort_namespace: str,
     The returned allocation is a proposal. Namespace, numeric novelty and role
     establish neither independence from prior exposure nor scientific authority.
     """
-    from empirical_lawhood.adapters.composition.finite_response_law.assignment import proposed_scientific_seeds
-    from empirical_lawhood.adapters.methods.finite_response_law.science import FiniteResponseLawScienceSpec
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment import proposed_scientific_seeds
+    from empirical_lawhood.domains.matrix.finite_response_law.science import FiniteResponseLawScienceSpec
     return FiniteResponseLawCurrentAllocation(stage, cohort_namespace, FiniteResponseLawScienceSpec().plan_sha256, 32 if stage == 'calibration' else 64, evidence_role, proposed_scientific_seeds(stage, master_seed))
 
 
@@ -750,7 +749,7 @@ def current_result_input_from_receipt(*, config_id: str, run_id: str,
     publication = FiniteResponseLawCurrentPublication(run_id, ObjectIdentity.from_record(issued.issue_id, issued), ObjectIdentity.from_record(execution.authority_id, execution), ObjectIdentity.from_record(reveal.authority_id, reveal))
     issued, _ = _authenticate_current_publication(publication, artifact_writer, expected_run=run_id)
     receipt = _exact_current_receipt(artifact_writer, issued, run_id, task_id, receipt_id)
-    manifests = tuple(sorted((decode_artifact_manifest(read_bounded_bytes(artifact_writer.root.resolve(value.relative_path + '.manifest.json', for_write=False), maximum_bytes=_LIMIT)) for value in receipt.output_materializations), key=lambda value: value.materialization.materialization_id))
+    manifests = tuple(sorted((read_artifact_sidecar(artifact_writer, (artifact_writer.root.resolve(value.relative_path + '.manifest.json', for_write=False)).relative_to(artifact_writer.root.contract.canonical_path).as_posix(), maximum_bytes=None) for value in receipt.output_materializations), key=lambda value: value.materialization.materialization_id))
     selected = tuple(value for value in manifests if value.logical.payload_schema == record_type.SCHEMA)
     if len(selected) != 1:
         raise ValueError('FINITE_CURRENT_RESULT_ONE_EXACT_KIND_REQUIRED')
@@ -791,14 +790,14 @@ def _parent_operand(parent, data, record_type, role):
     manifest = matches[0]
     raw = data[manifest.logical.logical_artifact_id]
     artifact = ArtifactIdentity(manifest.logical.logical_artifact_id, role, record_type.SCHEMA, sha256(raw).hexdigest(), manifest.logical.media_type, len(raw))
-    from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-    receipts = tuple(decode_canonical_bytes(data[receipt_id], CanonicalTaskReceipt, maximum_bytes=_LIMIT) for _, _, receipt_id in parent.receipt_bindings)
+    from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+    receipts = tuple(decode_canonical_bytes(data[receipt_id], CanonicalTaskReceipt, maximum_bytes=None) for _, _, receipt_id in parent.receipt_bindings)
     matching = tuple(receipt for receipt in receipts if manifest.materialization in receipt.output_materializations)
     if len(matching) != 1:
         raise ValueError('FINITE_RERUN_ONE_EXACT_PARENT_RECEIPT_REQUIRED')
     receipt = matching[0]
     receipt_artifact = ArtifactIdentity(receipt.receipt_id, role, receipt.SCHEMA, receipt.fingerprint(), 'application/json', len(receipt.canonical_bytes()))
-    return artifact, receipt_artifact, ObjectIdentity.from_record(receipt.receipt_id, receipt), decode_canonical_bytes(raw, record_type, maximum_bytes=_LIMIT)
+    return artifact, receipt_artifact, ObjectIdentity.from_record(receipt.receipt_id, receipt), decode_canonical_bytes(raw, record_type, maximum_bytes=None)
 
 
 def prepare_finite_response_rerun(*, config_id: str, stage: str, allocation: FiniteResponseLawCurrentAllocation,
@@ -830,7 +829,7 @@ def prepare_finite_response_rerun(*, config_id: str, stage: str, allocation: Fin
             raise ValueError('FINITE_RERUN_CURRENT_CENSUS_OMITS_CALIBRATION_PARENT')
         native_artifact, native_receipt, expected_native, _ = _parent_operand(parent, data, FiniteResponseLawAssignedCalibrationNativeEvaluation, 'current-calibration-native')
         if stage == 'calibration-method':
-            from empirical_lawhood.adapters.methods.finite_response_law.method_records import FiniteResponseLawAssignedCalibrationMethodConfig
+            from empirical_lawhood.domains.matrix.finite_response_law.method_records import FiniteResponseLawAssignedCalibrationMethodConfig
             method = FiniteResponseLawAssignedCalibrationMethodConfig('finite-response-law.calibration.method-config', parent.native_source, native_artifact, native_receipt, expected_native, *nomination.current_artifacts)
             primary_sha = native_artifact.sha256
             # The nonacquiring method act replays its original pre-calibration
@@ -838,10 +837,10 @@ def prepare_finite_response_rerun(*, config_id: str, stage: str, allocation: Fin
             units = tuple(sorted(set(units) - parent_units))
             seeds = tuple(sorted(set(seeds) - parent_seeds))
         else:
-            from empirical_lawhood.adapters.composition.finite_response_law.design import qualification_system
-            from empirical_lawhood.adapters.methods.finite_response_law.control_plan import qualified_model_set
-            from empirical_lawhood.adapters.methods.finite_response_law.control_records import FiniteResponseLawControlConfig
-            from empirical_lawhood.adapters.simulators.finite_response_law.assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
+            from empirical_lawhood.domains.matrix.finite_response_law.authoring.design import qualification_system
+            from empirical_lawhood.domains.matrix.finite_response_law.control_plan import qualified_model_set
+            from empirical_lawhood.domains.matrix.finite_response_law.control_records import FiniteResponseLawControlConfig
+            from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
             from empirical_lawhood.adapters.simulators.finite_response_law.evaluation.discovery import SOURCE_CAPABILITY
             qualification, qualification_receipt, expected_qualification, report = _parent_operand(parent, data, FiniteResponseLawAssignedQualificationReport, 'current-calibration-qualification')
             if not report.eligible_for_prospective_evaluation:

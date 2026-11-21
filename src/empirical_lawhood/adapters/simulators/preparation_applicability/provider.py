@@ -7,26 +7,20 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal
 from empirical_lawhood.adapters.composition.preparation_applicability.inputs import PreparationApplicabilityRecordProvider
-from empirical_lawhood.adapters.composition.phase_inputs import config_input, dependency
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from .records import PreparationApplicabilityNativePhase
-from empirical_lawhood.runtime.task_records import canonical_task_result
-from empirical_lawhood.runtime.execution import TaskContext, TaskProgressEmitter
-from empirical_lawhood.adapters.methods.preparation_applicability.config import (
-    PreparationApplicabilityNativeConfig,
-    PreparationApplicabilitySource,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.execution import WorkerInputKind
-from empirical_lawhood.adapters.methods.preparation_applicability.records import PreparationApplicabilitySelection
-from empirical_lawhood.adapters.methods.preparation_applicability.seals import (
-    PreparationApplicabilityParents,
-    PreparationApplicabilityLowerSeal,
-)
-from empirical_lawhood.adapters.simulators.prepared_response.instruments import PreparedPortFrame
-from empirical_lawhood.adapters.simulators.six_matrix_response.response_observer import _decode
-from .records import PreparationApplicabilityPrefix, PreparationApplicabilityPanel
-from .native import acquire_phase, acquire_prefix
+from empirical_lawhood.execution.phase_inputs import config_input, dependency
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.domains.matrix.preparation_applicability.phase_records import PreparationApplicabilityNativePhase
+from empirical_lawhood.execution.task_records import canonical_task_result
+from empirical_lawhood.execution.execution import TaskContext, TaskProgressEmitter
+from empirical_lawhood.domains.matrix.preparation_applicability.config import PreparationApplicabilityNativeConfig, PreparationApplicabilitySource
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.execution import WorkerInputKind
+from empirical_lawhood.domains.matrix.preparation_applicability.records import PreparationApplicabilitySelection
+from empirical_lawhood.domains.matrix.preparation_applicability.seals import PreparationApplicabilityParents, PreparationApplicabilityLowerSeal
+from empirical_lawhood.domains.matrix.prepared_response.instruments import PreparedPortFrame
+from empirical_lawhood.domains.matrix.six_matrix_response.response_observer import _decode
+from empirical_lawhood.domains.matrix.preparation_applicability.phase_records import PreparationApplicabilityPrefix, PreparationApplicabilityPanel
+from empirical_lawhood.domains.matrix.preparation_applicability.dynamics import acquire_phase, acquire_prefix
 
 
 def native_progress_sink(
@@ -56,7 +50,7 @@ class PreparationApplicabilityNativeRunner:
 
     @property
     def manifest(self) -> Any:
-        from .extension_bundle import CAPABILITY
+        from empirical_lawhood.adapters.simulators.preparation_applicability.extension import CAPABILITY
 
         return CAPABILITY
 
@@ -181,7 +175,7 @@ class PreparationApplicabilityNativeRunner:
 
 class PreparationApplicabilityNativeProvider(PreparationApplicabilityRecordProvider):
     def __init__(self, registry: Any, runner: Any, inputs: Any) -> None:
-        from .extension_bundle import CAPABILITY, OUTPUT_RECORDS
+        from empirical_lawhood.adapters.simulators.preparation_applicability.extension import CAPABILITY, OUTPUT_RECORDS
 
         super().__init__(
             registry,

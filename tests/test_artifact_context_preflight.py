@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifacts as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage import artifacts as owner
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 from tests.test_artifact_member_preflight import APIS, _consume
 

@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Lossless exposed returns through real AR3 custody; no molecular contact."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from decimal import Decimal
@@ -14,23 +15,21 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_free_energy import raw_coupled_return as m
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import (
-    NativeSubworkDefinition, NativeSubworkRoster, NativeSubworkUncertainContact,
-)
+from empirical_lawhood.domains.rubisco.rubisco_insilico_free_energy import raw_coupled_return as m
+from empirical_lawhood.storage.artifact_validation import ArtifactIdentityConflict
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition, NativeSubworkRoster, NativeSubworkUncertainContact
 from tests.runtime_platform.test_native_subwork import ExposedInput, _plane, _store
 
 
@@ -51,8 +50,7 @@ def custody(tmp_path):
         result = plane.write(ArtifactWriteRequest(name, "inputs/" + name + ".json", record.SCHEMA,
             ArtifactProfile.CANONICAL_JSON, "application/json", "exposed.raw.inputs", "inputs",
             record.canonical_bytes(), VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
-        inputs.append(decode_artifact_manifest(plane.root.resolve(
-            result.materialization.relative_path + ".manifest.json", for_write=False).read_bytes()))
+        inputs.append(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()))
     inputs = tuple(sorted(inputs, key=lambda row: row.materialization.materialization_id))
     parent = NativeEffectContact("exposed.raw", "coupled.return", "exposed.raw.coupled.return.attempt-001",
         ObjectIdentity("plan.exposed", "empirical-lawhood/runtime/development-execution-plan", "1.0.0", "1" * 64),
@@ -220,5 +218,5 @@ def test_large_source_serialization_has_bounded_buffers_and_complete_denominator
 
 
 def test_cold_capture_import_performs_no_scientific_import():
-    code = "from empirical_lawhood.adapters.methods.rubisco_insilico_free_energy import raw_coupled_return; import sys; assert not any(n.split('.')[0] in {'numpy','openmm','parmed','ash','pyscf'} for n in sys.modules)"
+    code = "from empirical_lawhood.domains.rubisco.rubisco_insilico_free_energy import raw_coupled_return; import sys; assert not any(n.split('.')[0] in {'numpy','openmm','parmed','ash','pyscf'} for n in sys.modules)"
     subprocess.run([sys.executable, "-c", code], check=True, capture_output=True)

@@ -1,19 +1,20 @@
 # SPDX-License-Identifier: MPL-2.0
 """Genuine authored DEV custody and original issued E3 product authentication."""
 
+from empirical_lawhood.storage.contracts.record_codecs import snapshot_record_codecs
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustodySupplier
 
 from functools import partial
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as owner, selected_e3_e4_records as science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_workers import SelectedE3E4Worker
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as owner, selected_e3_e4_records as science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_workers import SelectedE3E4Worker
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
 from empirical_lawhood.api.current_task_custody import CurrentDevelopmentTaskCustody
 from empirical_lawhood.api.matrix_selected_e3_family import selected_e3_product_family
-from .recursive_qualified_parents import MAX_PARENT_BYTES, _output_payload
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactProfile
+from empirical_lawhood.api.recursive_qualified_parents import MAX_PARENT_BYTES, _output_payload
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile
 
 
 def _authenticate_selected_projection(*, frozen, criterion, policies, preparation,
@@ -22,17 +23,17 @@ def _authenticate_selected_projection(*, frozen, criterion, policies, preparatio
     family = selected_e3_product_family(frozen.specification)
     preparation_types = (family.preparation_type,)
     if family.configured:
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import configured_preparation_types
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import configured_preparation_types
         preparation_types = configured_preparation_types()
     ProtectedE3ProtocolProjection = family.projection_type
     ProtectedE3ResponseNumericalProfile = family.numerical_type
     _selected_protocol = family.selected_protocol
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest
-    from empirical_lawhood.adapters.methods.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseProtocol
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest
+    from empirical_lawhood.domains.matrix.matrix_factor_response.response_frontier import MatrixResponseFrontierProtocol
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseProtocol
     from empirical_lawhood.api.matrix_selected_producer_scope import _installed_task, _read_config
-    from .matrix_selected_runtime import _published_input
+    from empirical_lawhood.api.matrix_selected_runtime import _published_input
 
     task, = (value for value in execution_plan.tasks if value.task_id == binding.task_id)
     declarations = {value.capability_key: value for value in family.operation_declarations()}
@@ -131,16 +132,16 @@ def _authenticate_selected_projection(*, frozen, criterion, policies, preparatio
 def authenticate_selected_e3_public_package(*, writer, public, upstream_products, codecs, summary_record_id=None,
         response_criterion=None, prefix_policies=(), original_preparation=None, downstream_coordinates=()):
     """Replay all four actual original producers before any downstream publication."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
     family = selected_e3_product_family(public.specification)
     ProtectedE3Calibration = family.calibration_type
     MatrixSelectedPublicPackage = family.public_type
     MatrixSelectedFrozenPackage = family.package_type
-    from .matrix_sampling_runtime import _original_products
+    from empirical_lawhood.api.matrix_sampling_runtime import _original_products
     from empirical_lawhood.api.matrix_selected_producer_scope import validate_selected_e3_original_product
 
     if summary_record_id is not None:
-        from empirical_lawhood.kernel.serialization import validate_stable_id
+        from empirical_lawhood.science.records.serialization import validate_stable_id
         validate_stable_id(summary_record_id)
     if type(public) is not MatrixSelectedPublicPackage:
         raise TypeError("selected E4 requires its exact original public E3 projection")
@@ -187,14 +188,14 @@ def authenticate_selected_e3_public_package(*, writer, public, upstream_products
     # Original CAL scores stay in this parent stack frame. Only the bounded
     # original radius/rank/scope projection may leave this read owner.
     if summary_record_id is not None:
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4OriginalCalibrationSummary
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4OriginalCalibrationSummary
         return SelectedE4OriginalCalibrationSummary.from_package(package, record_id=summary_record_id)
     return None
 
 
 def authenticate_original_products(writer, programme, bank, evidence, codecs, *, current_access=None):
-    from .domain_composition.matrix_selected_declarative.derivation import selected_produced_input_parents
-    from .selected_e3_access import selected_e3_originals
+    from empirical_lawhood.api.domain_composition.matrix_selected_declarative.derivation import selected_produced_input_parents
+    from empirical_lawhood.api.selected_e3_access import selected_e3_originals
     originals = selected_e3_originals(evidence.upstream_products, current_access)
     if selected_produced_input_parents(writer,originals=originals)!=evidence.produced_input_parents:
         raise PermissionError("selected E4 DEV substitutes its exact actual produced-parent census")
@@ -215,10 +216,10 @@ def authenticate_original_products(writer, programme, bank, evidence, codecs, *,
 
 class SelectedE3E4DevelopmentRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
     def __init__(self, supplier, *, writer, directory, plan, output_codecs, payloads=None, read_access=None):
-        from .recursive_authoring import load_authored_wave
-        from .selected_e3_access import SelectedE3OriginalInputAccess
+        from empirical_lawhood.api.recursive_authoring import load_authored_wave
+        from empirical_lawhood.api.selected_e3_access import SelectedE3OriginalInputAccess
 
-        self.supplier, self.writer, self.output_codecs = supplier, writer, dict(output_codecs)
+        self.supplier, self.writer, self.output_codecs = supplier, writer, snapshot_record_codecs(output_codecs)
         self.read_access = read_access
         if payloads is None:
             _, _, _, payloads = load_authored_wave(directory=directory, artifact_writer=writer,
@@ -270,8 +271,8 @@ class SelectedE3E4DevelopmentRuntimeInputSupplier(CurrentIssuedTaskCustodySuppli
                 or config.config_id != context.config.config_id):
             raise PermissionError("selected E4 leaf substitutes exact parent-derived full-bank source/phase selection")
         if type(config) is owner.SelectedE3E4CompactConfig:
-            from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-            from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import bind_selected_native_source
+            from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+            from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import bind_selected_native_source
             rows = tuple(value for value in controls.values() if value.logical.payload_schema == NumericalProducingProvenance.SCHEMA)
             if len(rows) != 1:
                 raise PermissionError("selected E4 leaf loses one exact standalone original provenance input")
@@ -291,7 +292,7 @@ class SelectedE3E4DevelopmentRuntimeInputSupplier(CurrentIssuedTaskCustodySuppli
                 raise PermissionError("selected E4 substitutes original evidence identity or byte bound")
             if evidence.produced_input_parents!=config.produced_input_parents:
                 raise PermissionError("selected E4 DEV entry changes its exact original produced-parent census")
-            from .matrix_full_factor_secondary import authenticate_e4_secondary_target
+            from empirical_lawhood.api.matrix_full_factor_secondary import authenticate_e4_secondary_target
             authenticate_e4_secondary_target(writer=self.writer, selection=config.secondary_readout, bank=config.bank)
             authenticate_original_products(self.writer, config.programme, config.bank, evidence,
                 self.output_codecs, current_access=self.read_access)
@@ -337,15 +338,15 @@ def authenticate_selected_e3_assay(*, public, upstream_products, assay, assay_pu
         template_publication, criterion, writer):
     """Join the assay/template to its real installed original E3 task inputs."""
     from empirical_lawhood.api.matrix_selected_e3_family import selected_e3_product_family
-    from .current_result_custody import authenticate_current_execution_plan
+    from empirical_lawhood.api.current_result_custody import authenticate_current_execution_plan
     from empirical_lawhood.api.matrix_selected_producer_scope import _installed_task, _read_config
-    from .matrix_selected_runtime import _published_input
-    from .recursive_qualified_parents import _actual_package, _replay_parent_authority
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
+    from empirical_lawhood.api.matrix_selected_runtime import _published_input
+    from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _replay_parent_authority
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
 
     selected, = (value for value in upstream_products if value.record == science.identity(public.models))
     binding = selected.prior_execution
-    from .retained_e3_evidence import current_e3_evidence
+    from empirical_lawhood.api.retained_e3_evidence import current_e3_evidence
     evidence = current_e3_evidence(writer)
     reader = None if evidence is None else evidence.reader
     if evidence is None:
@@ -384,7 +385,7 @@ def authenticate_selected_e3_assay(*, public, upstream_products, assay, assay_pu
     if len(criteria) != 1:
         raise PermissionError("selected E4 assay loses its exact original mathematical criterion")
     relative, _, _ = provider_input_location(writer, binding.run_id, criteria[0].logical_artifact_id)
-    from .selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
     criterion_publication = _publication_from_manifest(writer, writer.read_manifest(relative))
     for publication, kind in ((assay_publication, assay), (template_publication, None),
             (criterion_publication, criterion)):
@@ -417,15 +418,15 @@ def authenticate_selected_e3_training_banks(*, public, upstream_products, traini
     TRAIN controls. This join prevents substitution of another completed TRAIN
     acquisition that happened to use the same scientific protocol.
     """
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native
-    from .current_result_custody import authenticate_current_execution_plan
-    from .matrix_selected_runtime import _published_input
-    from .recursive_qualified_parents import _actual_package, _replay_parent_authority
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native
+    from empirical_lawhood.api.current_result_custody import authenticate_current_execution_plan
+    from empirical_lawhood.api.matrix_selected_runtime import _published_input
+    from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _replay_parent_authority
 
     native.validate_request(training_specification, training_request)
     selected, = (value for value in upstream_products if value.record == science.identity(public.models))
     binding = selected.prior_execution
-    from .retained_e3_evidence import current_e3_evidence
+    from empirical_lawhood.api.retained_e3_evidence import current_e3_evidence
     evidence = current_e3_evidence(writer)
     if evidence is None:
         package = _actual_package(writer, binding.run_id)

@@ -6,15 +6,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_specification import (
-    matched_e3_estimators, matched_e3_measurement,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.matched_response_prediction import (
-    MatchedResponseViewOutcome, matched_calibration_score, matched_duration_loss, postprocess_log_points,
-    MATCHED_METHODS, matched_forecast_policy, matched_model_calibration, matched_primary_inference,
-    matched_root_decision, admission_risk,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_specification import matched_e3_estimators, matched_e3_measurement
+from empirical_lawhood.domains.matrix.matrix_factor_response.matched_response_prediction import MatchedResponseViewOutcome, matched_calibration_score, matched_duration_loss, postprocess_log_points, MATCHED_METHODS, matched_forecast_policy, matched_model_calibration, matched_primary_inference, matched_root_decision, admission_risk
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def test_matched_contract_keeps_equal_feature_budgets_and_complete_paired_targets():
@@ -33,9 +27,9 @@ def test_matched_contract_keeps_equal_feature_budgets_and_complete_paired_target
 
 def test_public_matched_sampling_and_transport_use_factor_forecasts_without_diagnostic_endpoints():
     from pathlib import Path
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_adjudication import e3_sampling_endpoint_ids
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.e6_transport_science import _endpoint_order
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.scientific_design import MatrixProgrammeScientificDesign
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_adjudication import e3_sampling_endpoint_ids
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.e6_transport_science import _endpoint_order
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.scientific_design import MatrixProgrammeScientificDesign
 
     path = Path(__file__).resolve().parents[1] / 'programmes/foundations/emergent-structure/workflows/matrix-programme/scientific-design.example.json'
     design = decode_canonical_bytes(path.read_bytes(), MatrixProgrammeScientificDesign, maximum_bytes=None)
@@ -144,7 +138,7 @@ def test_admission_risk_retains_unknown_outcomes_and_zero_coverage_is_undefined(
 
 
 def test_unrepresentable_upper_curve_keeps_log_domain_duration_loss_and_refuses_admission():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.matched_response_prediction import matched_duration_error_count
+    from empirical_lawhood.domains.matrix.matrix_factor_response.matched_response_prediction import matched_duration_error_count
     points = (D('1e10'),) * 58
     policy = matched_forecast_policy('SR', points, D(0), calibrated=True)
     assert policy.bound_kind == 'UNAVAILABLE' and policy.admissions == (None,) * 29

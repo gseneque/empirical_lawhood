@@ -9,25 +9,25 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import MatrixFactorAction, MatrixFactorResponseModel
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_bindings as rb, response_records as rr, response_science as rs, response_selection as sel
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import commitment as c, forecast as f, records as r, retained, science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import operation_bindings as b
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.calibration_bindings import CALIBRATION_PHASES, ScheduledCalibrationConfig, ScheduledCalibrator
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays, decode_matrix_arrays
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_record, decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest, ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import MatrixFactorAction, MatrixFactorResponseModel
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_bindings as rb, response_records as rr, response_science as rs, response_selection as sel
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import commitment as c, forecast as f, records as r, retained, science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import operation_bindings as b
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.calibration_bindings import CALIBRATION_PHASES, ScheduledCalibrationConfig, ScheduledCalibrator
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays, decode_matrix_arrays
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_record, decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
 from tests.test_matrix_factor_confirmation_eligibility import publish
 from tests.test_matrix_scheduled_history_bindings import bank as bank, scheduled as scheduled, provenance as provenance, stock as stock
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 from tests.test_matrix_scheduled_history_bindings import TEST_BUDGET, actual_plan, context, finish, pipeline, write, shared_manifest
 
 
@@ -255,9 +255,9 @@ def test_actual_stock_pulse_then_full_independent_scores_and_retained_no_effects
             monkeypatch.setattr(owner, name, blocked)
     assert rs.assess_responses(source, products['project'], products['prefix'], prefix, products['forecast'], products['physical-forecast'], frozen,
         protocol, panels, products['responses'], arrays, score_id=score.score_id) == score
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.retained_bindings import read_response
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source, parameter_history_segments, parameter_derivatives
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.retained_bindings import read_response
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source, parameter_history_segments, parameter_derivatives
     for owner, names in ((science, ('measure_prefix',)), (response_forecast, ('_hessian',)),
             (parameter_derivatives, ('hessian_image', 'scheduled_force_step')),
             (parameter_source, ('acquire_parameter_history',)), (parameter_history_segments, ('acquire_parameter_segment',)),
@@ -311,8 +311,8 @@ def test_actual_whole_two_coordinate_group_calibration_uses_original_receipted_s
 
 def test_whole_group_calibration_does_not_omit_unavailable_coordinate(response_bank):
     # Pure reduction control complements the actual pulse/score route above.
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.calibration import reduce_cases
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledCalibrationCase
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.calibration import reduce_cases
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledCalibrationCase
     source = next(s for s in response_bank[1] if s.root_id == response_bank[2].selected_root_ids[0])
     value = ScheduledCalibrationCase(source.root_id, source.root.root.independent_group_id, r.identity(source),
         ObjectIdentity.from_record(source.coordinate.coordinate_id, source.coordinate), D('.006'),

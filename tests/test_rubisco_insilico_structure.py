@@ -5,7 +5,7 @@ from decimal import Decimal as D
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_structure import science
+from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import science
 
 
 def test_cif_lexical_multiline_quotes_and_loop_shape():
@@ -153,10 +153,8 @@ def test_expanded_cif_preserves_every_atom_column_and_independent_maps(monkeypat
     from hashlib import sha256
     from typing import ClassVar
 
-    from empirical_lawhood.kernel.serialization import CanonicalRecord
-    from empirical_lawhood.adapters.methods.rubisco_insilico_structure import (
-        contracts as c,
-    )
+    from empirical_lawhood.science.records.serialization import CanonicalRecord
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import contracts as c
 
     @dataclass(frozen=True, slots=True)
     class ExposedSourceFixture(CanonicalRecord):
@@ -246,10 +244,8 @@ def test_expanded_cif_preserves_every_atom_column_and_independent_maps(monkeypat
     # Exposed callback fixture: canonical values retain geometry, but not the
     # original Decimal spelling used by the observed coordinate export.
     from types import SimpleNamespace
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.adapters.methods.rubisco_insilico_structure import (
-        recursive_translation as rt,
-    )
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import recursive_translation as rt
 
     reconstructed = replace(
         inventory,
@@ -282,7 +278,7 @@ def test_expanded_cif_preserves_every_atom_column_and_independent_maps(monkeypat
     monkeypatch.setattr(rt, '_actual_outputs', lambda *_: (config, records))
     monkeypatch.setattr(rt, 'decode_canonical_bytes', lambda *_args, **_kwargs: source)
     monkeypatch.setattr(science, 'validate_source', lambda *_: None)
-    from empirical_lawhood.adapters.methods.rubisco_insilico_structure import independent_assessment as independent
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import independent_assessment as independent
 
     def fixture_independent_inventory(_source, _dossier, actual):
         if actual != reconstructed:
@@ -320,11 +316,11 @@ class RefuseNative(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in {'pybamm', 'openmm'}:
             raise AssertionError('cold structure registration imports a native engine')
 sys.meta_path.insert(0, RefuseNative())
-from empirical_lawhood.adapters.methods.rubisco_insilico_structure import (
-    executable_binding as eb,
+from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import (
+    extension as eb,
     operation_bindings as ob,
 )
-assert len(eb.EXECUTABLE_BINDING_FACTORIES) == 2
+assert len(eb.EXTENSION.factories) == 2
 registrations = tuple(declaration.registration() for declaration in ob.operation_declarations())
 assert all(not r.native_effect for r in registrations)
 assert tuple(name for name, _ in ob.operation_outputs('analyze')) == (
@@ -338,14 +334,10 @@ assert not {'pybamm', 'openmm'}.intersection(sys.modules)
 def test_registered_assessment_projects_all_phases_with_sorted_limits():
     from dataclasses import replace
     from types import SimpleNamespace
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.recursive_requirements import AssessmentPhase
-    from empirical_lawhood.kernel.scientific_contributions import ContributionManifest
-    from empirical_lawhood.adapters.methods.rubisco_insilico_structure import (
-        contracts as c,
-        operation_bindings as ob,
-        recursive_translation as rt,
-    )
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentPhase
+    from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import contracts as c, operation_bindings as ob, recursive_translation as rt
 
     scope = c.scope(
         SimpleNamespace(input_id="source.exposed-fixture", fingerprint=lambda: "0" * 64)
@@ -405,14 +397,10 @@ def test_exposed_two_pure_compile_joins_actual_prerequisite_world_and_source_end
     qualification. The compiler and owner validators remain unmocked.
     """
     from dataclasses import replace
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-    from empirical_lawhood.adapters.methods.rubisco_insilico_structure import (
-        contracts as c,
-        operation_bindings as ob,
-        recursive_translation as rt,
-    )
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import contracts as c, operation_bindings as ob, recursive_translation as rt
     from tests.test_rubisco_nomination_preparation import parent
     from tests.rubisco_nomination_fixture import nominee, structural_source
 
@@ -469,7 +457,7 @@ def test_exposed_two_pure_compile_joins_actual_prerequisite_world_and_source_end
             config.nomination_scope, receiver_id="receiver.exposed-substitution"
         ),
     )
-    from empirical_lawhood.planning.recursive_authoring import RecursiveOperationSpec
+    from empirical_lawhood.design.recursive_authoring import RecursiveOperationSpec
 
     changed = RecursiveOperationSpec.from_config(
         node_id=operation.node_id,

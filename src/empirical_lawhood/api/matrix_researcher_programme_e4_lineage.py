@@ -3,7 +3,7 @@
 from contextlib import contextmanager
 from dataclasses import dataclass
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 @contextmanager
@@ -14,10 +14,10 @@ def programme_e3_originals(context, *, publish=False):
     export. Inspect-only callers require that exact retained edition and never
     publish or recover it. Neither path makes a blind copy of protected models.
     """
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_exports import ConfiguredProtectedE3ProductExportSelection
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammeProducedInput, MatrixProgrammePublishedInput
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_exports import ConfiguredProtectedE3ProductExportSelection
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammeProducedInput, MatrixProgrammePublishedInput
     from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.product_export import _PRODUCTS, _original_product, _write_request
     from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.scientific_read import ConfiguredE3OriginalProducts
     from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammeE3Originals, MatrixProgrammePrerequisite
@@ -87,8 +87,8 @@ def programme_e3_originals(context, *, publish=False):
                 context.writer.root.contract.canonical_path).as_posix()
             checkpoint()
             if publish:
-                from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-                from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+                from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+                from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
                 publication = context.writer.write(ArtifactWriteRequest(pin.object_id, relative_input, record.SCHEMA,
                     ArtifactProfile.CANONICAL_JSON, 'application/json', selection.record_id, relative,
                     record.canonical_bytes(), VisibilityCeiling.PROSPECTIVE, (), OutcomeAccess.OUTCOME_BLIND))
@@ -126,15 +126,15 @@ def programme_revision_products(context):
 
 def programme_revision_read(context):
     """Read both original DEV revision producers, keeping adverse decisions."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as methods
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4DevelopmentProduct
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as methods
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4DevelopmentProduct
     from empirical_lawhood.api.matrix_researcher_programme_prepared_lineage import retained_development_products
     nomination, frozen = retained_development_products(context, 'e4.revision',
         (methods.SelectedE4RevisionNomination, methods.SelectedE4FrozenRevision),
         locator_type=SelectedE4DevelopmentProduct)
     from empirical_lawhood.api.selected_e4_native_runtime import development_products
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4PublicRevisionDecision
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4PublicRevisionDecision
     (development, selected), (original, freeze) = development_products(context.writer,
         ((nomination, 'revision-fit'), (frozen, 'revision-freeze')), operation_catalog()[2])
     if development != original:
@@ -146,7 +146,7 @@ def programme_revision_read(context):
 
 def programme_downstream_choice(context):
     """Project complete original CONF science, retaining an actual absent choice."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as methods
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as methods
     from empirical_lawhood.api.matrix_researcher_programme_lineage import _issued_e4_record
     record, _ = _issued_e4_record(context, 'e4.confirmation', methods.SelectedE4DownstreamNomination.SCHEMA)
     scope = context.method_inputs('e4.confirmation').plan.tail.confirmation

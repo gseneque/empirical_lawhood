@@ -11,7 +11,7 @@ import pytest
 
 from scripts import release_check as release
 from scripts import release_portable_evidence as evidence
-from empirical_lawhood.infrastructure import source_policy
+from empirical_lawhood.storage import source_policy
 
 
 SOURCE_METADATA = b'{"software_fixture":"complete-source-owner-stub"}\n'
@@ -77,14 +77,18 @@ def test_release_scope_covers_actual_code_test_documentation_and_environment_inp
 
 
 def test_release_scope_excludes_complete_work_plan_categories_but_keeps_current_scientific_protocols(tmp_path, monkeypatch):
-    protocols = ("programmes/foundations/emergent-structure/records/matrix-history-analysis-v1.md",
+    protocols = ("docs/plans-reference/accepted.json", "programmes/foundations/emergent-structure/records/matrix-history-analysis-v1.md",
                  "programmes/foundations/emergent-structure/records/empirical-lawhood.preparation-applicability.md",
-                 "src/empirical_lawhood/adapters/methods/finite_response_law/specification.md")
+                 "src/empirical_lawhood/domains/matrix/finite_response_law/specification.md")
     plans = (*sorted(source_policy.ROOT_WORK_PLAN_NAMES), "docs/plans/matrix-history-analysis-v1.md",
+             "docs/plans/data/plot.svg", "PROREVIEW/closure.zip", "frontend/ui-v2-prototype/serve.py",
+             *sorted(source_policy.RETIRED_AUDIT_FILES),
              "docs/plans/future-operational-plan.md", "PROREVIEW/THEMATRIX-FINALDESIGN-UPDATED.md", "FINALISEARCH.md",
              *sorted(source_policy.NESTED_WORK_PLAN_PATHS | source_policy.DOCUMENT_WORK_PLAN_PATHS))
     index(monkeypatch, {name: ("100644", b"tracked") for name in (*protocols, *plans)})
     assert evidence.release_input_paths(tmp_path) == tuple(sorted(protocols))
+    with pytest.raises(ValueError, match="working plans or private directories"):
+        evidence.release_input_paths(tmp_path, require_exportable=True)
 
 
 def test_new_root_markdown_requires_explicit_release_classification(tmp_path, monkeypatch):
@@ -110,7 +114,7 @@ def test_candidate_source_read_refuses_oversized_census_before_reading(tmp_path,
 
 
 def test_candidate_source_read_refuses_symbolic_member(tmp_path, monkeypatch):
-    from empirical_lawhood.infrastructure.repository_identity import RepositoryIdentityError
+    from empirical_lawhood.storage.repository_identity import RepositoryIdentityError
 
     (tmp_path / "original.py").write_bytes(b"source\n")
     (tmp_path / "selected.py").symlink_to(tmp_path / "original.py")
@@ -124,7 +128,7 @@ def test_candidate_source_read_refuses_symbolic_member(tmp_path, monkeypatch):
     "?? nested/MATRIXAUDIT.md\0", "?? docs/THEMATRIX-AUDIT-EXPDESIGN.md\0",
     "?? MATRIX-FINALOPTIM-copy.md\0", "?? docs/MATRIX-FINALOPTIM.md\0"])
 def test_local_plan_disclosure_admits_exact_root_notes_and_refuses_undeclared_inputs(tmp_path, monkeypatch, extra):
-    from empirical_lawhood.infrastructure import source_closure, source_origin
+    from empirical_lawhood.storage import source_closure, source_origin
 
     notes = tuple(sorted(source_policy.ROOT_WORK_PLAN_NAMES))
     for name in notes:
@@ -150,11 +154,21 @@ def test_local_plan_disclosure_admits_exact_root_notes_and_refuses_undeclared_in
             assert row["sha256"] == hashlib.sha256((tmp_path / row["path"]).read_bytes()).hexdigest()
 
 
-@pytest.mark.parametrize("name", ("CONSOLIDATION.md", "RECURARCH.md", "docs/plans/preserved.md",
-    *sorted(source_policy.NESTED_WORK_PLAN_PATHS | source_policy.DOCUMENT_WORK_PLAN_PATHS)))
-@pytest.mark.parametrize("kind", ("executable", "symlink", "directory"))
+WORK_PLAN_MODE_EXAMPLES = (
+    "CONSOLIDATION.md",
+    "docs/plans/preserved.md",
+    "docs/applied-el-handoff.md",
+    "src/empirical_lawhood/domains/matrix/preparation_applicability/frozen_specification.md",
+)
+
+
+@pytest.mark.parametrize("kind,name", [
+    *(("executable", name) for name in ("CONSOLIDATION.md", "RECURARCH.md", "docs/plans/preserved.md",
+        *sorted(source_policy.NESTED_WORK_PLAN_PATHS | source_policy.DOCUMENT_WORK_PLAN_PATHS))),
+    *((kind, name) for kind in ("symlink", "directory") for name in WORK_PLAN_MODE_EXAMPLES),
+])
 def test_audit_note_exception_requires_regular_nonexecutable_root_data(tmp_path, monkeypatch, name, kind):
-    from empirical_lawhood.infrastructure import source_closure, source_origin
+    from empirical_lawhood.storage import source_closure, source_origin
 
     note = tmp_path / name
     note.parent.mkdir(parents=True, exist_ok=True)
@@ -176,12 +190,12 @@ def test_audit_note_exception_requires_regular_nonexecutable_root_data(tmp_path,
 
 @pytest.mark.parametrize("name", sorted(source_policy.DOCUMENT_WORK_PLAN_PATHS))
 def test_documentary_plan_inventory_refuses_symlink_parent(tmp_path, monkeypatch, name):
-    from empirical_lawhood.infrastructure import source_closure, source_origin
+    from empirical_lawhood.storage import source_closure, source_origin
 
     plan = tmp_path / name
     plan.parent.mkdir(parents=True)
     plan.write_bytes(b"archival work queue\n")
-    directory = tmp_path / "docs"
+    directory = tmp_path / name.split("/", 1)[0]
     directory.rename(tmp_path / "elsewhere")
     directory.symlink_to(tmp_path / "elsewhere", target_is_directory=True)
     monkeypatch.setattr(source_origin, "require_executing_target_source", lambda root: None)
@@ -192,7 +206,7 @@ def test_documentary_plan_inventory_refuses_symlink_parent(tmp_path, monkeypatch
 
 
 def test_untracked_executable_has_no_operational_prose_exception(tmp_path, monkeypatch):
-    from empirical_lawhood.infrastructure import source_closure, source_origin
+    from empirical_lawhood.storage import source_closure, source_origin
 
     path = tmp_path / "unrelated.txt"
     path.write_bytes(b"executable input\n")
@@ -208,9 +222,10 @@ def test_wheel_and_sdist_share_the_complete_work_plan_exclusion_policy():
     config = tomllib.loads((release.ROOT / "pyproject.toml").read_text())
     build = config["tool"]["hatch"]["build"]
     assert set(build["exclude"]) == {"/" + name for name in source_policy.ROOT_WORK_PLAN_NAMES
-        | source_policy.NESTED_WORK_PLAN_PATHS | source_policy.DOCUMENT_WORK_PLAN_PATHS} | {
-        *("/" + name for name in source_policy.WORK_PLAN_DIRECTORIES),
-        "/docs/blog", "/FINAL*.md", "/DERPCHAIN*.md", "/LOWFRICTION*.md",
+        | source_policy.NESTED_WORK_PLAN_PATHS | source_policy.DOCUMENT_WORK_PLAN_PATHS
+        | source_policy.RETIRED_AUDIT_FILES} | {
+        *("/" + name for name in source_policy.RELEASE_EXCLUDED_DIRECTORIES),
+        "/docs/blog", "/notes", "/FINAL*.md", "/DERPCHAIN*.md", "/LOWFRICTION*.md",
         "/SCIREVIEW*.md", "/DOCFINALISE*.md"}
     assert all("exclude" not in target for target in build["targets"].values())
 
@@ -225,33 +240,43 @@ def test_actual_build_backend_excludes_work_records_and_preserves_supported_scie
     assert all(excluded.match_file(name) for name in source_policy.ROOT_WORK_PLAN_NAMES)
     assert all(excluded.match_file(name) for name in source_policy.NESTED_WORK_PLAN_PATHS)
     assert all(excluded.match_file(name) for name in source_policy.DOCUMENT_WORK_PLAN_PATHS)
+    assert all(excluded.match_file(name) for name in source_policy.RETIRED_AUDIT_FILES)
+    assert excluded.match_file("frontend/ui-v2-prototype/serve.py")
     assert excluded.match_file("docs/plans/preserved-specification.md")
     assert excluded.match_file("PROREVIEW/THEMATRIX-FINALDESIGN-UPDATED.md")
+    assert excluded.match_file("notes/retained-report.pdf")
+    assert excluded.match_file("notes/_support/build_report.py")
     assert not excluded.match_file("docs/protocols/current-specification.md")
     assert not excluded.match_file("programmes/shared-records/applied-el/reopened-results.md")
     assert not excluded.match_file("programmes/biology/photosynthesis/records/branch-sensitivity-protocol-v3.md")
     assert not excluded.match_file("docs/applied-el/unclassified-record.md")
     assert not excluded.match_file(
-        "src/empirical_lawhood/adapters/methods/finite_response_law/specification.md")
+        "src/empirical_lawhood/domains/matrix/finite_response_law/specification.md")
     assert not excluded.match_file(
-        "src/empirical_lawhood/adapters/methods/unclassified/frozen_specification.md")
+        "src/empirical_lawhood/methods/unclassified/frozen_specification.md")
 
 
 @pytest.mark.parametrize("name", (*sorted(source_policy.ROOT_WORK_PLAN_NAMES), "docs/plans/preserved.md", "PROREVIEW/review.md",
+    "docs/plans/results.json", "PROREVIEW/history.zip", "docs/plans",
+    "frontend/ui-v2-prototype/serve.py", *sorted(source_policy.RETIRED_AUDIT_FILES),
     *sorted(source_policy.NESTED_WORK_PLAN_PATHS | source_policy.DOCUMENT_WORK_PLAN_PATHS)))
 def test_even_committed_work_plans_are_refused_in_the_source_distribution(tmp_path, monkeypatch, name):
     monkeypatch.setattr(evidence, "_selected_entries", lambda *args: {name: ("100644", blob(b"plan"))})
     path = tmp_path / "leaked.tar.gz"
     with tarfile.open(path, "w:gz") as archive:
         member = tarfile.TarInfo("distribution/" + name)
-        member.size = 4
-        archive.addfile(member, io.BytesIO(b"plan"))
+        if name == "docs/plans":
+            member.type = tarfile.DIRTYPE
+            archive.addfile(member)
+        else:
+            member.size = 4
+            archive.addfile(member, io.BytesIO(b"plan"))
     with pytest.raises(RuntimeError, match="working plan"):
         release.compare_sdist_committed_source(tmp_path, path)
 
 
 def test_release_disclosure_inventories_nested_and_documentary_archival_plans(tmp_path,monkeypatch):
-    from empirical_lawhood.infrastructure import source_closure, source_origin
+    from empirical_lawhood.storage import source_closure, source_origin
 
     plans=source_policy.NESTED_WORK_PLAN_PATHS | source_policy.DOCUMENT_WORK_PLAN_PATHS | {"PROREVIEW/review.md"}
     for name in plans:
@@ -301,8 +326,8 @@ def test_wheel_refuses_documentary_work_plan_outside_the_package(tmp_path, monke
 @pytest.mark.parametrize("name",sorted(source_policy.NESTED_WORK_PLAN_PATHS))
 @pytest.mark.parametrize("kind",("regular","executable","symlink","directory","symlink-parent"))
 def test_source_inventories_ignore_only_explicit_nonexecutable_regular_plans(tmp_path,name,kind):
-    from empirical_lawhood.infrastructure.source_closure import _source_path_census
-    from empirical_lawhood.infrastructure.numerical_provenance import numerical_package_sources
+    from empirical_lawhood.storage.source_closure import _source_path_census
+    from empirical_lawhood.storage.numerical_provenance import numerical_package_sources
 
     package=tmp_path/"src/empirical_lawhood";package.mkdir(parents=True)
     (tmp_path/"scripts").mkdir()

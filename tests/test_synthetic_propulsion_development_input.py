@@ -8,9 +8,9 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods import synthetic_propulsion_discovery as base
-from empirical_lawhood.adapters.methods import synthetic_propulsion_exact_comparator as corrected
-from empirical_lawhood.adapters.methods.synthetic_propulsion_development_input import SyntheticPropulsionDevelopmentInput, run_native_development_check
+from empirical_lawhood.domains.propulsion import synthetic_propulsion_discovery as base
+from empirical_lawhood.domains.propulsion import synthetic_propulsion_exact_comparator as corrected
+from empirical_lawhood.domains.propulsion.synthetic_propulsion_development_input import SyntheticPropulsionDevelopmentInput, run_native_development_check
 from empirical_lawhood.api.codecs import load_registered_authoring
 
 STARTER = Path("programmes/foundations/measurement-and-response/workflows/propulsion-reliability-reference/config.json")

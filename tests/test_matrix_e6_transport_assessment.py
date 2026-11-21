@@ -17,27 +17,27 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import e6_transport_records as records
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import e6_transport_science as science
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_package import POINT_ONLY
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as e3
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_records import NativeTrainingFeatureBank, NativeTrainingOutcomeBank
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_specification as configured
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_inputs import ConfiguredProtectedE3PreFitJoin
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
-from empirical_lawhood.adapters.methods.matrix_factor_response import e3_numerical_methods as original
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial import FAMILY_IDS
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity as scheduled_identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledResponseSelection
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import MatrixParameterCoordinate
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.time import AvailabilitySpec
-from empirical_lawhood.runtime.experimental_statistics import split_upper_calibration
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, lineage_parent_sort_key
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import e6_transport_records as records
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import e6_transport_science as science
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_package import POINT_ONLY
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as e3
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_records import NativeTrainingFeatureBank, NativeTrainingOutcomeBank
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_specification as configured
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_inputs import ConfiguredProtectedE3PreFitJoin
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
+from empirical_lawhood.domains.matrix.matrix_factor_response import e3_numerical_methods as original
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial import FAMILY_IDS
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity as scheduled_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledResponseSelection
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import MatrixParameterCoordinate
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.time import AvailabilitySpec
+from empirical_lawhood.methods.statistics.experimental_statistics import split_upper_calibration
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, lineage_parent_sort_key
 from tests.test_matrix_selected_package import reference
 from tests.test_matrix_selected_protected import transfer_case
 from tests.test_matrix_selected_opportunity import literal_observations
@@ -147,7 +147,7 @@ def assess(case, *, observations=None, decisions=None):
 
 def with_cells(readout, cells, *, disposition=None):
     """Exact literal PRIMARY projection, independently assembled for a control."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.records import PREDICTORS
+    from empirical_lawhood.domains.matrix.matrix_factor_response.records import PREDICTORS
     cumulative = []
     for predictor in PREDICTORS:
         for horizon in (16, 64, 128):
@@ -289,9 +289,9 @@ def test_retained_mechanical_source_cannot_be_substituted_when_future_is_missing
 
 
 def test_known_nonuse_keeps_original_root_and_every_unentered_branch(finite):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_point import forecast_selected_point
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import MatrixSelectedPointPayload
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_point import forecast_selected_point
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import MatrixSelectedPointPayload
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census
     case_id, (point, mechanical, readout) = next(iter(finite.observations.items()))
     feature = replace(point.feature, disposition="NO_CAUSAL_ORIGIN", frame_sha256=None, values=())
     point = forecast_selected_point(MatrixSelectedPointPayload.from_design(finite.programme.point_design),
@@ -380,8 +380,8 @@ def test_original_n64_calibration_keeps_rank62_and_missing_scores_in_whole_roste
 
 
 def test_expanded_contract_cache_repeats_cold_decimal_policy_refusals(finite):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_protected_bindings as owner
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_protected_bindings as owner
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
     public = MatrixSelectedPublicProgramme.from_programme(finite.programme)
     args = public, reference("evidence.e6.disclosed-cache", owner.MatrixSelectedEntryEvidenceV3), 1
     kwargs = {"transport_policy": finite.policy, "transport_calibration": finite.projection,

@@ -8,7 +8,7 @@ import pytest
 from empirical_lawhood.api import experiment_execution_read, experiment_programme
 from empirical_lawhood.api import selected_e4_structure as structure
 from empirical_lawhood.api.selected_e4_revision_programme import SelectedE4RevisionAcquisitionService
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 @pytest.mark.parametrize('mode', ('run', 'recover'))

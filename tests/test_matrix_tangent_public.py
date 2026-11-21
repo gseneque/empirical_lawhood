@@ -13,19 +13,23 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+
 from tests.numerical_provenance_fixtures import PROJECT_ROOT, numerical_plane
 
 from empirical_lawhood.api.matrix_preparation_analysis import tangent_analysis_read, tangent_preparation_configuration, tangent_preparation_source_export, tangent_response_analysis
-from empirical_lawhood.adapters.methods.matrix_preparation.projection import PROJECTION_SHAPES
-from empirical_lawhood.adapters.methods.matrix_preparation_analysis.tangent import acquire_tangent_root, tangent_analysis
-from empirical_lawhood.adapters.methods.matrix_preparation_analysis.tangent_records import TangentNativeResult, TangentPrefixResult, TangentPrefixSegment
-from empirical_lawhood.adapters.simulators.matrix_preparation.contracts import NATIVE_SCHEMA, PARENTS, PreparationDelivery, preparation_actions
-from empirical_lawhood.adapters.simulators.matrix_preparation.contracts import PreparationRoot, SEED_SHA256
-from empirical_lawhood.adapters.simulators.matrix_preparation.scientific_inputs import preparation_scientific_root_inputs
-from empirical_lawhood.adapters.simulators.matrix_preparation.source import innovation_bundle
-from empirical_lawhood.adapters.simulators.six_matrix_response.response_qualification import ResponseGeometryAssayNativeDelivery, ResponseGeometryAssayNativeViewSegment
-from empirical_lawhood.adapters.simulators.six_matrix_response.response_source import _checkpoint, _rng, _start, response_hdf5_text, response_hdf5_writer
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.matrix_preparation.projection import PROJECTION_SHAPES
+from empirical_lawhood.adapters.simulators.matrix_preparation.tangent import acquire_tangent_root
+from empirical_lawhood.domains.matrix.matrix_preparation_analysis.tangent import tangent_analysis
+from empirical_lawhood.domains.matrix.matrix_preparation_analysis.tangent_records import TangentNativeResult, TangentPrefixResult, TangentPrefixSegment
+from empirical_lawhood.domains.matrix.matrix_preparation.native_inputs import NATIVE_SCHEMA, PARENTS, PreparationDelivery, preparation_actions
+from empirical_lawhood.domains.matrix.matrix_preparation.native_inputs import PreparationRoot, SEED_SHA256
+from empirical_lawhood.domains.matrix.matrix_preparation.scientific_inputs import preparation_scientific_root_inputs
+from empirical_lawhood.domains.matrix.matrix_preparation_analysis.preparation_dynamics import innovation_bundle
+from empirical_lawhood.domains.matrix.six_matrix_response.response_qualification import ResponseGeometryAssayNativeDelivery, ResponseGeometryAssayNativeViewSegment
+from empirical_lawhood.domains.matrix.six_matrix_response.response_dynamics import _checkpoint, _rng, _start
+from empirical_lawhood.adapters.simulators.six_matrix_response.response_source import response_hdf5_text, response_hdf5_writer
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 
 
 def _synthetic_prefix(config, root):
@@ -83,7 +87,7 @@ def _software_source(config, root, progress=None):
 
 def test_full128_public_source_analysis_read_negative_and_recovery(tmp_path, monkeypatch):
     config = tangent_preparation_configuration(config_id="test.tangent", namespace="test.current", master_seed=90217, project_root=PROJECT_ROOT)
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.matrix_preparation_analysis.tangent.acquire_tangent_root", _software_source)
+    monkeypatch.setattr("empirical_lawhood.adapters.simulators.matrix_preparation.tangent.acquire_tangent_root", _software_source)
     source = tangent_preparation_source_export(tmp_path / "source", config=config, artifact_writer=numerical_plane(tmp_path), project_root=PROJECT_ROOT)
     assert source.disposition == "COMPLETE" and len(source.root_ids) == 128 and source.qualification == "NONE"
     result = tangent_response_analysis(tmp_path / "analysis", config=config, source_directory=tmp_path / "source", artifact_writer=numerical_plane(tmp_path), project_root=PROJECT_ROOT)
@@ -113,10 +117,10 @@ def test_full128_public_source_analysis_read_negative_and_recovery(tmp_path, mon
 
 def test_current_real_orchestration_keeps_failed_prefix_and_every_unentered_action(monkeypatch):
     config = tangent_preparation_configuration(config_id="test.tangent-failure", namespace="test.failed", master_seed=90218, project_root=PROJECT_ROOT)
-    def failure(config, segment, refinement, previous, group, progress=None):
+    def failure(config, segment, refinement, previous, progress=None):
         delivery = ResponseGeometryAssayNativeDelivery(True, 0, 0, 0, Decimal(0), "a" * 64, None)
-        return ResponseGeometryAssayNativeViewSegment(refinement, "NUMERICAL_FAILURE", 0, None, "NATIVE_NUMERICAL_FAILURE", Decimal(0), Decimal(0), delivery)
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.matrix_preparation_analysis.tangent._run_view", failure)
+        return ResponseGeometryAssayNativeViewSegment(refinement, "NUMERICAL_FAILURE", 0, None, "NATIVE_NUMERICAL_FAILURE", Decimal(0), Decimal(0), delivery), {}
+    monkeypatch.setattr("empirical_lawhood.adapters.simulators.matrix_preparation.tangent._run_view", failure)
     root = next(root for root in config.roots if root.numerical_semantics)
     prefix, _, result, _, arrays = acquire_tangent_root(config, root)
     assert all(view.disposition == "NUMERICAL_FAILURE" for view in prefix.views)
@@ -187,11 +191,11 @@ def test_interrupted_tangent_source_never_has_completed_manifest(tmp_path, monke
         if calls == 2:
             raise KeyboardInterrupt
         return _software_source(*args, **kwargs)
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.matrix_preparation_analysis.tangent.acquire_tangent_root", interrupt)
+    monkeypatch.setattr("empirical_lawhood.adapters.simulators.matrix_preparation.tangent.acquire_tangent_root", interrupt)
     with pytest.raises(KeyboardInterrupt):
         tangent_preparation_source_export(tmp_path / "partial", config=config, artifact_writer=numerical_plane(tmp_path), project_root=PROJECT_ROOT)
     assert (tmp_path / "partial" / (config.roots[0].root_id + ".native.h5")).is_file()
     assert not (tmp_path / "partial" / "analysis-report.canonical.json").exists()
     assert not (tmp_path / "partial" / "arrays.canonical.json").exists()
-    with pytest.raises(ValueError, match="(cannot be read|completed publication)"):
+    with pytest.raises(ArtifactIdentityConflict, match="artifact sidecar metadata is invalid"):
         tangent_analysis_read(tmp_path / "partial", artifact_writer=numerical_plane(tmp_path))

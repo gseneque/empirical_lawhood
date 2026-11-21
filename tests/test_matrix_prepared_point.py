@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Prepared source scopes never acquire original E4 calibration authority."""
 
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as _preparation_io_effect
 from dataclasses import replace
 from decimal import Decimal as D, localcontext
 from hashlib import sha256
@@ -8,13 +9,14 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science, prepared_prefix
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_point as method
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.records import PACKAGE_ROLES, MatrixFrozenConsumerPackage
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_population_statistics import STRATA
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_prefix
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as preparation_science_owner_0
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_point as method
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.records import PACKAGE_ROLES, MatrixFrozenConsumerPackage
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_population_statistics import STRATA
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
 from tests import test_matrix_coupling_preparation as preparation_fixture
 from tests import test_matrix_scheduled_history_bindings as original_fixture
 from tests.test_matrix_factor_confirmation_eligibility import stock
@@ -43,9 +45,9 @@ def selected_scope(tmp_path):
 def case(tmp_path):
     source, initial, coarse, bridge, _, design, _ = selected_scope(tmp_path)
     public = method.MatrixPreparedPublicSource.from_source(source)
-    arrays = preparation_science.propagate_preparation(source, initial, coarse_innovations=coarse, bridge_innovations=bridge)
-    raw, preparation = preparation_science.preparation_array_product(source, initial, arrays, artifact_id="array.literal-point-preparation")
-    numerical = preparation_science.assess_preparation_arrays(source, initial, preparation, arrays, assessment_id="numerical.literal-point")
+    arrays = preparation_science_owner_0.propagate_preparation(source, initial, coarse_innovations=coarse, bridge_innovations=bridge)
+    raw, preparation = preparation_science_owner_0.preparation_array_product(source, initial, arrays, artifact_id="array.literal-point-preparation")
+    numerical = preparation_science_owner_0.assess_preparation_arrays(source, initial, preparation, arrays, assessment_id="numerical.literal-point")
     diagnostic_raw, witness = prepared_prefix.measure_prepared_prefix(source, initial, preparation, numerical, raw,
         artifact_id="array.literal-point-diagnostics")
     frames = prepared_prefix.check_prepared_frames(source, initial, preparation, numerical, witness, raw, diagnostic_raw)
@@ -58,10 +60,10 @@ def test_prepared_point_is_seedless_frozen_and_unbounded_with_complete_nonuse(ca
     def forbidden(*args, **kwargs):
         raise AssertionError("prepared point feature entered a fit, native producer, RNG or eigensolve")
 
-    from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_prediction
+    from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_prediction
     monkeypatch.setattr(np.linalg, "eigh", forbidden)
     monkeypatch.setattr(np.random, "Generator", forbidden)
-    monkeypatch.setattr(preparation_science, "acquire_preparation", forbidden)
+    monkeypatch.setattr(_preparation_io_effect, "acquire_preparation", forbidden)
     monkeypatch.setattr(response_error_prediction, "fit_error_model", forbidden)
     monkeypatch.setattr(response_error_prediction, "fit_scheduled_error_model", forbidden)
     feature = method.causal_feature(*case, record_id="feature.literal-prepared-point")
@@ -121,7 +123,7 @@ def test_prepared_point_authenticates_selected_causal_and_diagnostic_bytes(case)
 def available_prepared_operands(tmp_path, *, future_ticks=128, origin_sector=None):
     """Literal supplied-noise history shared by causal and dense method controls."""
     from types import SimpleNamespace
-    from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
+    from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
     from tests.test_matrix_factor_confirmation_eligibility import publish
 
     source, _, _, _, _, design, plane = selected_scope(tmp_path)
@@ -153,9 +155,9 @@ def available_prepared_operands(tmp_path, *, future_ticks=128, origin_sector=Non
     design = replace(design, package=package, original_forecast=frozen, sources=(public,),
         interpretations=(replace(design.interpretations[0], recipe=recipe.identity),))
     innovations = np.zeros((32, 2, 3, 4, 4), dtype="<c16")
-    arrays = preparation_science.propagate_preparation(source, initial, coarse_innovations=innovations, bridge_innovations=innovations)
-    raw, preparation = preparation_science.preparation_array_product(source, initial, arrays, artifact_id="array.literal-point-available-preparation")
-    numerical = preparation_science.assess_preparation_arrays(source, initial, preparation, arrays, assessment_id="assessment.literal-point-available")
+    arrays = preparation_science_owner_0.propagate_preparation(source, initial, coarse_innovations=innovations, bridge_innovations=innovations)
+    raw, preparation = preparation_science_owner_0.preparation_array_product(source, initial, arrays, artifact_id="array.literal-point-available-preparation")
+    numerical = preparation_science_owner_0.assess_preparation_arrays(source, initial, preparation, arrays, assessment_id="assessment.literal-point-available")
     diagnostic_raw, witness = prepared_prefix.measure_prepared_prefix(source, initial, preparation, numerical, raw,
         artifact_id="array.literal-point-available-diagnostics")
     frames = prepared_prefix.check_prepared_frames(source, initial, preparation, numerical, witness, raw, diagnostic_raw)

@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from empirical_lawhood.infrastructure import bounded_io
+from empirical_lawhood.storage import bounded_io
 from tests.matrix_workflow_measurements import WorkflowMeasurements
 
 

@@ -5,18 +5,12 @@ from __future__ import annotations
 import os
 from typing import Sequence
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
-from .preparation import FreeGsnkePreparationWorkerInput, FreeGsnkePreparedUnit
-from .runtime import (
-    FREEGSNKE_MAX_REQUEST_BYTES,
-    FREEGSNKE_MAX_STDERR_BYTES,
-    FREEGSNKE_PREPARATION_TIMEOUT_SECONDS,
-    FreeGsnkeWorkerInvocation,
-    task_local_freegsnke_invocation,
-)
-from .worker_process import FreeGsnkeProgressSink, run_freegsnke_canonical_process
+from empirical_lawhood.domains.fusion.freegsnke.preparation import FreeGsnkePreparationWorkerInput, FreeGsnkePreparedUnit
+from empirical_lawhood.adapters.simulators.freegsnke.runtime import FREEGSNKE_MAX_REQUEST_BYTES, FREEGSNKE_MAX_STDERR_BYTES, FREEGSNKE_PREPARATION_TIMEOUT_SECONDS, FreeGsnkeWorkerInvocation, task_local_freegsnke_invocation
+from empirical_lawhood.adapters.simulators.freegsnke.worker_process import FreeGsnkeProgressSink, run_freegsnke_canonical_process
 
 
 def run_freegsnke_preparation_worker(

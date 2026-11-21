@@ -5,8 +5,8 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability import diagnostics as d
-from empirical_lawhood.adapters.methods.preparation_applicability.science import CAPS, DELTA
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability import diagnostics as d
+from empirical_lawhood.domains.matrix.preparation_applicability.science import CAPS, DELTA
 from empirical_lawhood.api import preparation_diagnostics as api
 from tests.test_preparation_applicability_reducers import _SyntheticLower
 
@@ -141,9 +141,9 @@ def test_owned_source_identity_is_actual_byte_bound():
 
 
 def test_strict_result_census_and_analysis_ceiling():
-    from empirical_lawhood.adapters.methods.constructed_preparation_applicability.diagnostic_records import PreparationDiagnosticReport,PreparationDiagnosticInput
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.domains.matrix.constructed_preparation_applicability.diagnostic_records import PreparationDiagnosticReport, PreparationDiagnosticInput
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
     identity=ObjectIdentity("test.input",PreparationDiagnosticInput.SCHEMA,"1.0.0","1"*64)
     with pytest.raises(ValueError,match="denominators"):
         PreparationDiagnosticReport("test.analysis",identity,(identity,),canonical_json_bytes({"Q":{"n_independent_roots":8},"E":{"n_independent_roots":31}}).decode())
@@ -153,12 +153,12 @@ def test_strict_result_census_and_analysis_ceiling():
 
 def test_opaque_diagnostic_tables_preserve_finite_numeric_json_without_weakening_inputs():
     import json
-    from empirical_lawhood.adapters.methods.constructed_preparation_applicability.diagnostic_records import diagnostic_json_payload
+    from empirical_lawhood.domains.matrix.constructed_preparation_applicability.diagnostic_records import diagnostic_json_payload
     value = {"Q": {"n_independent_roots": 8, "interval": [0.125, 0.875]}, "E": {"n_independent_roots": 32}}
     encoded = diagnostic_json_payload(value)
     assert json.loads(encoded) == value and diagnostic_json_payload(json.loads(encoded)) == encoded
     with pytest.raises(ValueError):
         diagnostic_json_payload({"unexpected_nonfinite": float("nan")})
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
     with pytest.raises(ValueError):
         canonical_json_bytes(0.125)

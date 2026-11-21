@@ -12,7 +12,7 @@ import subprocess
 import tarfile
 from typing import Final
 
-from .contracts import ExcludedSolverControlConfig, ExcludedSolverControlSourceManifest, SOURCE_MANIFEST_SOURCE_ID
+from empirical_lawhood.domains.materials.superconductivity.solver_control_contracts import ExcludedSolverControlConfig, ExcludedSolverControlSourceManifest, SOURCE_MANIFEST_SOURCE_ID
 
 
 DOCKER_EXECUTABLE: Final = "/usr/bin/docker"

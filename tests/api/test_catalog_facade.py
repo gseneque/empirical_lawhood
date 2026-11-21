@@ -10,29 +10,15 @@ import pytest
 from sqlalchemy import event
 
 import empirical_lawhood.api.facade as api_facade
-from empirical_lawhood.api import (
-    CatalogQueryRequest,
-    CatalogRebuildRequest,
-    EmpiricalLawhoodApi,
-)
-from empirical_lawhood.infrastructure.catalog_projection import encode_catalog_snapshot
-from empirical_lawhood.infrastructure.dataset_projection import encode_unified_catalog_snapshot
-from empirical_lawhood.infrastructure.sql import (
-    CatalogSchemaAuditLimitExceeded,
-    CatalogSchemaAuditLimitReason,
-)
-from empirical_lawhood.kernel.evidence import VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.catalog import (
-    ArtifactLocatorRecord,
-    CatalogSnapshot,
-    CatalogVerificationStatus,
-    LogicalArtifactRecord,
-    ScientificObjectKind,
-    ScientificObjectRecord,
-    StorageRootRecord,
-)
-from empirical_lawhood.runtime.datasets import DatasetCatalogSnapshot, UnifiedCatalogSnapshot
+from empirical_lawhood.api import CatalogQueryRequest, CatalogRebuildRequest, EmpiricalLawhoodApi
+from empirical_lawhood.storage.catalog_projection import encode_catalog_snapshot, decode_catalog_snapshot
+from empirical_lawhood.science.records.serialization import CanonicalizationError
+from empirical_lawhood.storage.dataset_projection import encode_unified_catalog_snapshot
+from empirical_lawhood.storage.sql import CatalogSchemaAuditLimitExceeded, CatalogSchemaAuditLimitReason
+from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.storage.contracts.catalog import ArtifactLocatorRecord, CatalogSnapshot, CatalogVerificationStatus, LogicalArtifactRecord, ScientificObjectKind, ScientificObjectRecord, StorageRootRecord
+from empirical_lawhood.execution.datasets import DatasetCatalogSnapshot, UnifiedCatalogSnapshot
 
 
 def _snapshot(external: Path) -> CatalogSnapshot:
@@ -210,7 +196,7 @@ def test_unified_catalog_rebuild_requires_dedicated_dataset_authority(
     assert not repository.joinpath(".empirical-lawhood").exists()
 
 
-def test_catalog_rebuild_returns_typed_failure_before_decoding_oversized_projection(
+def test_catalog_rebuild_returns_typed_failure_for_invalid_projection(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
@@ -219,10 +205,8 @@ def test_catalog_rebuild_returns_typed_failure_before_decoding_oversized_project
     repository.joinpath(".git").mkdir()
     external = tmp_path / "external"
     external.mkdir()
-    projection = external / "oversized-projection.json"
-    with projection.open("wb") as handle:
-        handle.truncate(api_facade.MAX_CATALOG_PROJECTION_BYTES + 1)
-    monkeypatch.setattr(api_facade, "rebuild_production_catalog", lambda *_args, **_kwargs: 1 / 0)
+    projection = external / "invalid-projection.json"
+    projection.write_bytes(b"not canonical JSON")
     api = EmpiricalLawhoodApi(repo_root=repository, external_root=external)
 
     result = api.rebuild_catalog(CatalogRebuildRequest(projection, confirmed=True))
@@ -352,3 +336,17 @@ def test_catalog_cursor_is_stable_filter_bound_and_strict(
     assert exhausted.payload is None
     assert exhausted.reason_codes == ("CATALOG_QUERY_WORK_LIMIT_EXCEEDED",)
     assert exhausted.errors[0].category.value == "CAPABILITY"
+
+
+def test_catalog_projection_uses_only_explicit_byte_allowances():
+    snapshot = CatalogSnapshot.empty()
+    payload = encode_catalog_snapshot(snapshot)
+    assert decode_catalog_snapshot(payload) == snapshot
+    assert encode_catalog_snapshot(snapshot, maximum_bytes=len(payload)) == payload
+    assert decode_catalog_snapshot(payload, maximum_bytes=len(payload)) == snapshot
+    with pytest.raises(ValueError, match="budget"):
+        encode_catalog_snapshot(snapshot, maximum_bytes=len(payload) - 1)
+    with pytest.raises(CanonicalizationError, match="byte size"):
+        decode_catalog_snapshot(payload, maximum_bytes=len(payload) - 1)
+    with pytest.raises(CanonicalizationError):
+        decode_catalog_snapshot(payload + b" ")

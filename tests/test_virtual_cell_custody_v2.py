@@ -8,19 +8,22 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.adapters.physical.virtual_cell import analysis, custody_views_v2 as views, development, runtime
-from empirical_lawhood.adapters.physical.virtual_cell.contracts import PredictionCommitment, SplitCardinality, VirtualCellSourceManifest, VirtualCellSourceObject, VirtualCellSourcePart, VirtualCellSplit
-from empirical_lawhood.adapters.physical.virtual_cell.correction_records_v2 import OfficialMetricGaugeV2, OfficialMetricSetV2, MetricSourceSemantics
-from empirical_lawhood.adapters.physical.virtual_cell.metric_correction_v2 import score_corrected_metrics
-from empirical_lawhood.adapters.physical.virtual_cell.prediction import PredictionRoster, PredictionTargetAllocation
-from empirical_lawhood.adapters.physical.virtual_cell.prediction_payload_v2 import encode_raw_prediction_deltas_v2, decode_raw_prediction_deltas_v2
-from empirical_lawhood.adapters.physical.virtual_cell.receiver_observation_v2 import ReceiverObservation, CandidateValidationObservationV2
-from empirical_lawhood.adapters.physical.virtual_cell.records import ResponseSummaryRecord, ModelArtifactBinding, FalsifierPanel
-from empirical_lawhood.adapters.physical.virtual_cell.records_v2 import CandidateValidationRecordV2, ModelDevelopmentRecordV2, ModelSelectionRecordV2, PredictionFreezeRecordV2, OfficialEvaluationRecordV2, RAW_PREDICTION_DELTAS_SCHEMA, MODEL_SCHEMA, ROSTER_SCHEMA, ENVELOPE_SCHEMA, registry_sha256
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+import empirical_lawhood.domains.biology.virtual_cell.custody_views_v2 as views
+import empirical_lawhood.domains.biology.virtual_cell.development as development
+from empirical_lawhood.adapters.physical.virtual_cell import runtime
+from empirical_lawhood.domains.biology.virtual_cell import analysis
+from empirical_lawhood.domains.biology.virtual_cell.contracts import PredictionCommitment, SplitCardinality, VirtualCellSourceManifest, VirtualCellSourceObject, VirtualCellSourcePart, VirtualCellSplit
+from empirical_lawhood.domains.biology.virtual_cell.correction_records_v2 import OfficialMetricGaugeV2, OfficialMetricSetV2, MetricSourceSemantics
+from empirical_lawhood.domains.biology.virtual_cell.metric_interpretation_v2 import score_corrected_metrics
+from empirical_lawhood.domains.biology.virtual_cell.prediction import PredictionRoster, PredictionTargetAllocation
+from empirical_lawhood.domains.biology.virtual_cell.prediction_payload_v2 import encode_raw_prediction_deltas_v2, decode_raw_prediction_deltas_v2
+from empirical_lawhood.domains.biology.virtual_cell.receiver_observation_v2 import ReceiverObservation, CandidateValidationObservationV2
+from empirical_lawhood.domains.biology.virtual_cell.records import ResponseSummaryRecord, ModelArtifactBinding, FalsifierPanel
+from empirical_lawhood.domains.biology.virtual_cell.records_v2 import CandidateValidationRecordV2, ModelDevelopmentRecordV2, ModelSelectionRecordV2, PredictionFreezeRecordV2, OfficialEvaluationRecordV2, RAW_PREDICTION_DELTAS_SCHEMA, MODEL_SCHEMA, ROSTER_SCHEMA, ENVELOPE_SCHEMA, registry_sha256
 from tests.test_virtual_cell_runtime_v2 import _original_config, _selection, _build_receipt
 
 
@@ -179,7 +182,7 @@ def test_raw_action_encoding_is_the_exact_existing_receipt_digest_preimage():
 
 
 def test_actual_receiver_observation_and_bootstrap_preserve_unequal_score_math():
-    from empirical_lawhood.adapters.physical.virtual_cell.evaluation import OfficialEvaluatorRunV2, bootstrap_official_score_standard_error
+    from empirical_lawhood.domains.biology.virtual_cell.evaluation_statistics import OfficialEvaluatorRunV2, bootstrap_official_score_standard_error
     case = fixture()
     metrics = next(value for value in case.records.values() if type(value) is OfficialMetricSetV2)
     score = score_corrected_metrics(metrics, metric_contract=case.original.model_selection.validation_metric_contract)
@@ -189,8 +192,8 @@ def test_actual_receiver_observation_and_bootstrap_preserve_unequal_score_math()
     assert observed.des == (D('.2'),) and observed.pds == (D('.8'),)
     candidate = CandidateValidationObservationV2('candidate.exposed', observed, D(0))
     assert not hasattr(candidate, 'metrics_arrow') and candidate.metrics_schema == OfficialMetricSetV2.SCHEMA
-    runner = object.__new__(runtime.VirtualCellTaskRunner)
+    runner = runtime.VirtualCellTaskExecutionBase
     with pytest.raises(ValueError, match='historical candidate'):
-        runner._candidate_validation(candidate_id='candidate.exposed', receiver=observed, score_standard_error=D(0))
+        runner._candidate_validation(None, candidate_id='candidate.exposed', receiver=observed, score_standard_error=D(0))
     kwargs = dict(metric_contract=case.original.model_selection.validation_metric_contract, resamples=7, seed=17)
     assert bootstrap_official_score_standard_error(des=np.asarray(observed.des, dtype=float), pds=np.asarray(observed.pds, dtype=float), mae=np.asarray(observed.mae, dtype=float), **kwargs) == bootstrap_official_score_standard_error(des=np.asarray([.2]), pds=np.asarray([.8]), mae=np.asarray([.01]), **kwargs)

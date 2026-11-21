@@ -1,15 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Compatibility observation exports and registered scientific admissibility."""
 
-from empirical_lawhood.infrastructure.numerical_provenance import (
-    authenticate_recorded_numerical_provenance,
-    capture_numerical_provenance,
-    immutable_json,
-    numerical_package_code_sha256,
-    numerical_package_sources,
-    numerical_runtime_observation,
-    selected_dependency_lock_sha256,
-)
+from empirical_lawhood.storage.numerical_provenance import authenticate_recorded_numerical_provenance, capture_numerical_provenance, immutable_json, numerical_package_code_sha256, numerical_package_sources, numerical_runtime_observation, selected_dependency_lock_sha256
 
 __all__ = (
     "authenticate_recorded_numerical_provenance", "capture_numerical_provenance",

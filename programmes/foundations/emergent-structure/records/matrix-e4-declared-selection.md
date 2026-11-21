@@ -12,7 +12,7 @@ For the supported E1–E6 programme and its conditional calibration/confirmation
 The older selections below do not define that programme's inputs.
 
 Author a
-[`ScheduledRevisionExperimentSpecification`](../../../../src/empirical_lawhood/adapters/methods/matrix_scheduled_history/selection_specification.py).
+[`ScheduledRevisionExperimentSpecification`](../../../../src/empirical_lawhood/domains/matrix/matrix_scheduled_history/selection_specification.py).
 Select the original programme and criterion, paired target definition, inadequacy
 trigger, whole-group folds, finite fit budget, candidate tunings and tie orders
 explicitly. Each candidate embeds its scientific tuning. Changing its penalty
@@ -45,7 +45,7 @@ the same information, whole-group splits and fitting budget.
 
 Select the existing Matrix environment, actual frozen source binding and guarded
 output root separately, following the
-[environment procedure](../../../../docs/development/maintainer-environment.md). Then use
+[environment procedure](../../../../docs/using/environments.md#select-storage-and-reuse-an-environment). Then use
 `campaign experiment-explain` or `experiment-prepare` with `--input`, `--sources`,
 `--source-snapshot`, `--environment-id` and `--output-root`, as documented for
 [E3](../workflows/matrix-response-experiment/guide.md). No additional
@@ -63,7 +63,7 @@ The report distinguishes those scientific dispositions from operational success.
 The installed `matrix.e4.exposed-factorial` protocol uses the same four original
 records, input selection and public programme commands for the conditional
 factorial calculation. Its editable
-[`ScheduledFactorialSpecification`](../../../../src/empirical_lawhood/adapters/methods/matrix_scheduled_history/programme_factorial.py)
+[`ScheduledFactorialSpecification`](../../../../src/empirical_lawhood/domains/matrix/matrix_scheduled_history/programme_factorial.py)
 selects the explicit comparison nulls/directions, interaction scale, alpha and
 descriptive practical thresholds. Consumer `matrix-e4-factorial` validates this
 specification. Preparation derives the single assessment operation, complete

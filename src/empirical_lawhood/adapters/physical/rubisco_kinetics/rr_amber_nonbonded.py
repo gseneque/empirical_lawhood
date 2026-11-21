@@ -15,7 +15,7 @@ from hashlib import sha256
 import re
 from typing import ClassVar, Iterator
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256
 
 
 SOURCE_ID = "rubisco-rr.amber-wt-hid91-keto-original"

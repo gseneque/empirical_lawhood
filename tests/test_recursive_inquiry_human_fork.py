@@ -4,16 +4,10 @@
 from pathlib import Path
 from types import SimpleNamespace as N
 import pytest
-from empirical_lawhood.api import (
-    recursive_inquiry as service,
-    recursive_contributions as contributions,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.recursive_inquiry import (
-    InquiryStateSources,
-    InquiryWaveSource,
-)
-from empirical_lawhood.kernel.recursive_inquiry import identity
+from empirical_lawhood.api import recursive_inquiry as service, recursive_contributions as contributions
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.recursive_inquiry import InquiryStateSources, InquiryWaveSource
+from empirical_lawhood.science.inquiry.recursive_inquiry import identity
 
 
 class Record:
@@ -65,6 +59,13 @@ def fork(tmp_path, monkeypatch):
         return ((None, None, parent, None, None, None),)
 
     monkeypatch.setattr(contributions, "authenticate_recursive_parents", authenticated)
+    def retained(**kwargs):
+        current, actual, _, _ = service.load_authored_wave(directory=kwargs['directory'])
+        if identity(current, current.packet_id) != kwargs['expected']:
+            raise ValueError('human inquiry fork supplier is absent from its exact retained decision sources')
+        report, products, _, _ = service.read_recursive_wave(directory=kwargs['directory'])
+        return N(packet=current, draft=actual, report=report, products=products)
+    reading = N(writer=plane, wave=retained)
     return N(
         root=root,
         supplier=supplier,
@@ -74,6 +75,7 @@ def fork(tmp_path, monkeypatch):
         parent=parent,
         origins=origins,
         plane=plane,
+        reading=reading,
         records=records,
         calls=calls,
     )
@@ -86,7 +88,7 @@ def validate(fork, **changes):
         supplier_directory=fork.supplier,
         contribution_dir=fork.root / "portable",
         origins=fork.origins,
-        artifact_writer=fork.plane,
+        reading=fork.reading,
     )
     params.update(changes)
     return service._validate_human_fork(**params)
@@ -150,7 +152,7 @@ def test_human_fork_does_not_accept_source_only_initial_or_unselected_supplier(
         "menu.json": N(alternatives=(N(alternative_id="act", reuse_completion=None),))}
     monkeypatch.setattr(
         service,
-        "read_inquiry_decision",
+        "_read_inquiry_decision",
         lambda **kw: (fork.packet, records),
     )
     for supplier, initial in ((None, None), (fork.supplier, N())):

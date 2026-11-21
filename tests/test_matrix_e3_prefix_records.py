@@ -8,27 +8,25 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_records as p
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_source_records as source_owner
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import (
-    ScheduledCompactBank, ScheduledCompactConfig, compact_identity,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledNativeSourceContext, ScheduledSourceIndex
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments as segments
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion, NativeSubworkContact, NativeSubworkDefinition, NativeSubworkOutput
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_records as p
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_source_records as source_owner
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import ScheduledCompactBank, ScheduledCompactConfig, compact_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledNativeSourceContext, ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments as segments
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion, NativeSubworkContact, NativeSubworkDefinition, NativeSubworkOutput
 from tests.test_matrix_e3_prefix_science_extraction import (
     blocked, literal_segment,
     provenance as provenance, scheduled as scheduled, stock as stock,
@@ -308,7 +306,7 @@ def test_current_prefix_cannot_substitute_typed_current_binding(current, damage)
     elif damage == "manifest":
         args["manifest"] = replace(c.manifest, record_id="manifest.literal.foreign")
     elif damage == "historical-type":
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import ScheduledCommitmentConfig
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import ScheduledCommitmentConfig
         args["config"] = r.ScheduledConfig("config." + r.NAMESPACE + "." + c.source.root_id + ".prefix", "prefix", c.source.reference,
             ObjectIdentity("commitment.literal.historical", ScheduledCommitmentConfig.SCHEMA, ScheduledCommitmentConfig.VERSION, "a"*64))
     else:

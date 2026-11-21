@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import numpy as np
 
-from empirical_lawhood.adapters.physical.mastu_freegsnke_response.canary import ACTIVE_LABELS, FRACTIONS, HORIZONS_S, VIEWS, action_roster, select_canary, select_preparation_slice
+from empirical_lawhood.adapters.physical.mastu_freegsnke_response.canary import ACTIVE_LABELS
+from empirical_lawhood.domains.fusion.mastu_freegsnke_response.canary_assessment import FRACTIONS, HORIZONS_S, VIEWS
+from empirical_lawhood.domains.fusion.mastu_freegsnke_response.canary_assessment import action_roster, select_canary, select_preparation_slice
 
 
 def _episodes(*, contrast: float, invalid: bool = False) -> list[dict[str, object]]:

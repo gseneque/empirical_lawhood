@@ -5,8 +5,8 @@ import os
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.runtime.artifacts import ArtifactSemanticValidationRegistry
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage.contracts.artifacts import ArtifactSemanticValidationRegistry
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 from tests.test_artifact_read_context import _work
 

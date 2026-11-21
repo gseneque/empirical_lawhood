@@ -202,8 +202,8 @@ refusal is not evidence of useful service, and marginal calibration does not
 establish low risk conditional on admission.
 
 The implementation owners are
-[`matched_response_prediction.py`](../../../../src/empirical_lawhood/adapters/methods/matrix_factor_response/matched_response_prediction.py),
-[`matched_response_fitting.py`](../../../../src/empirical_lawhood/adapters/methods/matrix_factor_response/matched_response_fitting.py)
+[`matched_response_prediction.py`](../../../../src/empirical_lawhood/domains/matrix/matrix_factor_response/matched_response_prediction.py),
+[`matched_response_fitting.py`](../../../../src/empirical_lawhood/domains/matrix/matrix_factor_response/matched_response_fitting.py)
 and the existing configured protected/native TRAIN bindings. The
 [workflow guide](../workflows/matrix-response-experiment/guide.md) describes
 public preparation, execution, reads and export.
@@ -253,7 +253,7 @@ replays causal features from their original prefix, diagnostic and mechanical
 archives. Its supplementary dense products project the already dense original
 predictions and retain the exact original cells. The shared relation arithmetic
 lives in
-[`e4_structural_prediction.py`](../../../../src/empirical_lawhood/adapters/methods/matrix_scheduled_history/e4_structural_prediction.py).
+[`e4_structural_prediction.py`](../../../../src/empirical_lawhood/domains/matrix/matrix_scheduled_history/e4_structural_prediction.py).
 These component contracts do not establish completion of the public SR/BR
 freeze, calibration and downstream lifecycle; that lifecycle must retain the
 actual original model and forecast products before any prospective result is

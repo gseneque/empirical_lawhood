@@ -1,14 +1,10 @@
 # SPDX-License-Identifier: MPL-2.0
 """Cold public API composition; static discovery starts no authentication."""
-from empirical_lawhood.adapters.methods.matrix_prepared_source_experiment import (
-    PROTOCOL_ID, MatrixPreparedSourceQualificationSpecification)
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.adapters.methods.matrix_prepared_source_experiment import locator_record_types
-from empirical_lawhood.api.prepared_source_access import (
-    bootstrap_selected_input_access, bootstrap_authoring_input_access,
-    bootstrap_prospective_input_access,
-)
+from empirical_lawhood.domains.matrix.matrix_prepared_source_experiment import PROTOCOL_ID, MatrixPreparedSourceQualificationSpecification
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.domains.matrix.matrix_prepared_source_experiment import locator_record_types
+from empirical_lawhood.api.prepared_source_access import bootstrap_selected_input_access, bootstrap_authoring_input_access, bootstrap_prospective_input_access
 from empirical_lawhood.api.selected_prepared_access import select_current_prepared_access
 
 

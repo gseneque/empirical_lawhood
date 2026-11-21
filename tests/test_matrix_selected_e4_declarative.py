@@ -7,28 +7,28 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_declarative as domain
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as native
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_bindings as acquisition
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as scientific
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_operational_resources import SelectedE4OperationalResources
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_declarative as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as native
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_bindings as acquisition
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as scientific
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_operational_resources import SelectedE4OperationalResources
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
 from empirical_lawhood.api import selected_e4_declarative as public
 from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.runtime_platform.test_artifact_verification_scope import _publication
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.time import CausalPhase
-from empirical_lawhood.kernel.worlds import NumericalCoordinateKind
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.execution_envelope import ChildResourceTokenLimit, ProgressHeartbeat, ProgressLivenessContract
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-from empirical_lawhood.runtime.experiment_resources import ExecutionResourceSelection
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.time import CausalPhase
+from empirical_lawhood.science.models.worlds import NumericalCoordinateKind
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.execution_envelope import ChildResourceTokenLimit, ProgressHeartbeat, ProgressLivenessContract
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.experiment_resources import ExecutionResourceSelection
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
 from tests.experiment_entry_support import entry_package_for_draft
 from tests.runtime_platform.test_candidate_compiler import _fixture
 from tests.runtime_platform.test_standard_formal_candidate import _standard_fixture
@@ -286,9 +286,9 @@ def test_knowable_public_preparation_refusal_precedes_any_metadata_publication(t
 
 def test_development_product_locator_preserves_actual_development_plan_and_refuses_issued_plan():
     """Pure constructor/codec control; these descriptors confer no custody."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4DevelopmentProgramme
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4FrozenRevision, SelectedE4RevisionNomination
-    from empirical_lawhood.runtime.plans import ExecutionPlan
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4DevelopmentProgramme
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4FrozenRevision, SelectedE4RevisionNomination
+    from empirical_lawhood.execution.plans import ExecutionPlan
 
     frozen = SelectedE4FrozenRevision("frozen.disclosed-plan-locator",
         pin("programme.disclosed-plan-locator", SelectedE3E4DevelopmentProgramme),
@@ -303,7 +303,7 @@ def test_development_product_locator_preserves_actual_development_plan_and_refus
 
 @pytest.mark.parametrize("retired_version", ("1.0.0", "2.0.0", "3.0.0", "4.0.0", "5.0.0"))
 def test_e4_request_codec_requires_current_component_aware_contract(declarative_case, retired_version):
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
     current=declarative_case.request
     assert current.VERSION=="6.0.0"
     assert decode_canonical_bytes(current.canonical_bytes(),domain.SelectedE4DeclarativeRequest,maximum_bytes=None)==current
@@ -318,8 +318,8 @@ def test_e4_request_codec_requires_current_component_aware_contract(declarative_
 
 def _protected_parent_roles(case):
     """Unpublished locators test owner routing, never issued CAL acceptance."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4Calibration
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4Calibration
     from tests.test_matrix_sampling_follow_on import prior_product
     original=prior_product(pin("calibration.disclosed-parent-roster",SelectedE4Calibration))
     return (case.request.upstream_products,MatrixSelectedOriginalProduct(original.prior_execution,original.reveal_authority),
@@ -369,7 +369,7 @@ def test_protected_parent_owner_refuses_wrong_roles_before_metadata_or_bodies(de
 
 
 def test_protected_five_parent_route_enters_existing_fresh_metadata_owner(declarative_case,tmp_path,monkeypatch):
-    from empirical_lawhood.api import selected_prepared_access as access,matrix_sampling_runtime
+    from empirical_lawhood.api import selected_prepared_access as access, matrix_sampling_runtime
     from tests.test_recursive_public_service import _plane
     upstream,calibration,development=_protected_parent_roles(declarative_case)
     seen=[]
@@ -385,7 +385,7 @@ def test_protected_five_parent_route_enters_existing_fresh_metadata_owner(declar
 
 
 def test_protected_component_guards_use_the_same_full_parent_authenticator(declarative_case,monkeypatch):
-    from empirical_lawhood.api import selected_prepared_access as access,selected_e4_native_preparation as preparation
+    from empirical_lawhood.api import selected_prepared_access as access, selected_e4_native_preparation as preparation
     upstream,calibration,development=_protected_parent_roles(declarative_case)
     parents=declarative_case.request.produced_input_parents
     calls=[];writer=object()

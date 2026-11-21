@@ -7,13 +7,13 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.api.configuration import validate_configuration
-from empirical_lawhood.api.recursive_authoring import author_recursive_wave, implementation_binding, load_recursive_draft
+from empirical_lawhood.api.recursive_authoring import author_recursive_wave, load_recursive_draft
 from empirical_lawhood.api.recursive_execution import read_recursive_wave, run_recursive_wave
 from empirical_lawhood.api import matrix_numerical_provenance as provenance_owner
 from empirical_lawhood.api.workflows import show_workflow
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_assay_bridge import KineticJointTargetAssessment
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_assay_bridge import KineticJointTargetAssessment
 from scripts.generate_rubisco_kinetic_example import examples
 from tests.test_recursive_public_service import _plane
 
@@ -23,6 +23,9 @@ EXAMPLE = ROOT / "programmes/biology/photosynthesis/workflows/rubisco-kinetic-jo
 
 def test_public_inputs_are_strict_declared_and_exposed_not_measured():
     workflow = show_workflow("rubisco-kinetic-join")
+    assert tuple(sorted(Path(row.path).name for row in workflow.inputs)) == (
+        "assumptions.json", "campaign.json", "comparison.json", "draft.json",
+        "experiment-sources.json", "experiment.json", "query.json", "supply.json")
     assert {str(EXAMPLE / name) for name in examples()} <= {str(ROOT / row.path) for row in workflow.inputs}
     assert "zero fresh biological units" in workflow.scientific_ceiling
     for name, payload in examples().items():
@@ -34,13 +37,8 @@ def test_public_inputs_are_strict_declared_and_exposed_not_measured():
 
 
 def test_installed_service_keeps_complete_adverse_roster_and_recovers(tmp_path, monkeypatch):
-    # One frozen exposed software source snapshot; current-owner substitutions
-    # are separately refused. This seam creates no fresh scientific qualification.
-    source = implementation_binding(ROOT)
-    from empirical_lawhood.api import recursive_authoring as author, recursive_execution as execute
+    # Stabilize numerical metadata while retaining actual committed-source admission.
     observed = provenance_owner.capture_matrix_provenance(project_root=ROOT)
-    monkeypatch.setattr(author, "implementation_binding", lambda root, **kwargs: source)
-    monkeypatch.setattr(execute, "implementation_binding", lambda root, **kwargs: source)
     monkeypatch.setattr(provenance_owner, "capture_matrix_provenance", lambda **kwargs: observed)
     plane = _plane(tmp_path / "custody")
     directory = tmp_path / "custody/w1"

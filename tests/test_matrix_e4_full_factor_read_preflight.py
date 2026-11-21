@@ -9,15 +9,15 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_bindings as owner
-from empirical_lawhood.api import matrix_full_factor_derivation as derive,matrix_full_factor_authoring as author,matrix_full_factor_read as reader
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_bindings as owner
+from empirical_lawhood.api import matrix_full_factor_derivation as derive, matrix_full_factor_authoring as author, matrix_full_factor_read as reader
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
-from empirical_lawhood.api.recursive_authoring import implementation_binding,load_authored_wave
-from empirical_lawhood.api.recursive_execution import _external_inputs,_retained_plans
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.api.recursive_authoring import implementation_binding, load_authored_wave
+from empirical_lawhood.api.recursive_execution import _external_inputs, _retained_plans
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_matrix_e4_full_factor_public import ROOT,_copied,_real_plane,_published_secondary,_development_access_seam,selected  # noqa: F401
 from tests.test_matrix_e4_full_factor_values import scopes  # noqa: F401
 from tests.test_matrix_selected_e4_bank_recipe import literal_recipe_source_inputs  # noqa: F401
@@ -57,8 +57,8 @@ def test_actual_public_compile_and_consumed_scope_pass_read_preflight_before_wor
     # The ordinary public reader supplies this already authenticated tuple.
     # The domain callback must use it without re-enumerating/hash-scanning it.
     from empirical_lawhood.api import recursive_execution
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
     instance=decode_canonical_bytes(payloads['experiment-instance.json'],ExperimentInstanceBinding,maximum_bytes=None)
     with monkeypatch.context() as check:
         check.setattr(recursive_execution,'_external_inputs',lambda **kwargs:pytest.fail('domain reader repeated shared external input hashing'))
@@ -67,7 +67,7 @@ def test_actual_public_compile_and_consumed_scope_pass_read_preflight_before_wor
             observed.append(kwargs['reconstruct'])
             return kwargs['current_inputs']
         check.setattr(reader,'_replay',consume)
-        from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+        from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
         for mode in ('off','full'):
             with scientific_reconstruction_operation(mode):
                 actual=reader.read_development_result(directory=directory,artifact_writer=plane,specification=result.target_specification,

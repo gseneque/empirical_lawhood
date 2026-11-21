@@ -9,15 +9,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry import operation_bindings as ob
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry.runner import prepare_native_work
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, segmented_native as native
-from empirical_lawhood.infrastructure.artifact_stream_primitives import _anonymous_input_descriptor, _PreopenedBoundedReader, _seal_anonymous_input
-from empirical_lawhood.infrastructure.execution import _prepare_native_work
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.runtime.execution import TaskContext, WorkerInputBinding, WorkerInputPort, WorkerIsolationProfile
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
+from empirical_lawhood.domains.battery.battery_segmented_inquiry import operation_bindings as ob
+from empirical_lawhood.adapters.battery.battery_segmented_inquiry.runner import prepare_native_work
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import segmented_native as native
+from empirical_lawhood.storage.artifact_stream_primitives import _anonymous_input_descriptor, _PreopenedBoundedReader, _seal_anonymous_input
+from empirical_lawhood.execution.local.execution import _prepare_native_work
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.execution import TaskContext, WorkerInputBinding, WorkerInputPort, WorkerIsolationProfile
+from empirical_lawhood.execution.native_effects import NativeEffectContact
 from tests.test_battery_segmented_graph import context_for, stock as stock
 
 
@@ -59,7 +60,7 @@ def selected_context(stock):
 
 
 def test_installed_forecast_alone_registers_the_same_initial_native_preparer():
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry.prepared_native import native_worker_environment
+    from empirical_lawhood.adapters.battery.battery_refined_inquiry.prepared_native import native_worker_environment
     registrations = ob.operation_registrations()
     forecast, = (row for row in registrations if row.selection.capability_key == ob.NAMESPACE + '.forecast')
     assert forecast.native_work_preparer is prepare_native_work

@@ -1,0 +1,30 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Inspect original EL investigations, requirements, findings and reusable knowledge.">
+  <title>EL · Research explorer</title>
+  <link rel="icon" type="image/svg+xml" href="/el-equal-circles.svg">
+  <link rel="stylesheet" href="/explorer.css">
+  <script type="module" src="/explorer.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to investigation</a>
+  <header class="masthead">
+    <a class="brand" href="/" aria-label="Empirical Lawhood home"><img src="/el-equal-circles.svg" alt="" width="64" height="50"><span>empirical lawhood<small>RESEARCH EXPLORER</small></span></a>
+    <nav class="primary-nav" aria-label="Main navigation"><button data-view="current">Current experiment</button><button data-view="results" aria-current="page">Results</button><button data-view="knowledge">Knowledge</button></nav>
+    <a class="preview-label" href="/tools.html">Tools <span aria-hidden="true">↗</span></a>
+  </header>
+  <div class="context-bar"><label class="engine-selector">Selected engine <select id="context" disabled><option>Connecting…</option></select></label><span class="context-note" id="context-note">Local session · original evidence</span><button class="quiet-button" id="source-button">Source &amp; session ↗</button></div>
+  <div id="notice" class="session-notice" role="status" aria-live="polite">Connecting to the selected engines…</div>
+  <div id="error" class="session-error" role="alert" hidden></div>
+  <main id="main" tabindex="-1"><div class="empty-state"><h1>Your research collection</h1><p>Opening the selected local session…</p></div></main>
+  <footer class="app-footer"><span id="footer-scope">Original records · explicit current reads</span><a href="/tools.html">Original paths, workflows &amp; operational tools ↗</a><span class="footer-edition" id="contract-version"></span></footer>
+  <dialog id="modal" aria-labelledby="modal-title"><div class="modal-head"><div><p class="eyebrow" id="modal-kicker">ORIGINAL RECORD</p><h2 id="modal-title"></h2></div><button class="icon-button" id="modal-close" aria-label="Close dialog">×</button></div><div id="modal-body"></div></dialog>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+  <noscript>The research explorer needs JavaScript. Use the supported terminal application for original reads and registration.</noscript>
+</body>
+</html>

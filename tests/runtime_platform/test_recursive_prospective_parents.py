@@ -9,19 +9,16 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.api.recursive_qualified_parents import authenticate_recursive_qualified_parents
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import (
-    ConditionRole, ContributionRole, ScientificConditionScope, ScientificConnectionSpec,
-    ScientificRequirementSpec,
-)
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.scientific_contributions import ContributionManifest, ContributionProduct
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
-from empirical_lawhood.runtime.recursive_compiler import RecursivePortContract
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursiveQualifiedParentBinding
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import ConditionRole, ContributionRole, ScientificConditionScope, ScientificConnectionSpec, ScientificRequirementSpec
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
+from empirical_lawhood.execution.recursive_compiler import RecursivePortContract
+from empirical_lawhood.execution.recursive_qualified_parents import RecursiveQualifiedParentBinding
 from tests.runtime_platform.test_recursive_prospective_workflow import (
     _factories, _issue_public_handoff, _public_run_handoff_fixture, _registrations, _run_public_handoff,
 )
@@ -48,7 +45,7 @@ def _assess_synthetic_parent(*, requirement, connection, contribution, product, 
 
 @pytest.fixture(scope='module')
 def parent_fixture(tmp_path_factory):
-    from empirical_lawhood.adapters.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
+    from empirical_lawhood.domains.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
     positive = replace(REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE,
         fixture_id='fixture.synthetic-parent-supported', scientific_status=ScientificStatus.SUPPORTED,
         admission_status=AdmissionStatus.ADMITTED, reason_codes=('SYNTHETIC_PARENT_SUPPORTED',))
@@ -161,7 +158,7 @@ def test_domain_assessor_rejects_changed_unit_quantity_and_false_return(parent_f
 
 def test_missing_actual_dependency_receipt_refuses_before_scientific_payload(parent_fixture, monkeypatch):
     from empirical_lawhood.api import recursive_qualified_parents as owner
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
     actual = ExternalTaskReceiptStore.read_by_receipt_id
     monkeypatch.setattr(ExternalTaskReceiptStore, 'read_by_receipt_id',
         lambda self, run, task, receipt: None if task == 'prepare' else actual(self, run, task, receipt))
@@ -201,7 +198,7 @@ def test_parent_scope_cannot_extend_prior_qualification_by_matching_output(paren
 
 def test_parent_reveal_grant_replayed_before_scientific_payload(parent_fixture, monkeypatch):
     from empirical_lawhood.api import recursive_qualified_parents as owner
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
     actual = ExternalStudyOperationAuthorityStore.load
     def absent(self, authority_id):
         if authority_id == parent_fixture.reveal.authority_id:
@@ -215,16 +212,14 @@ def test_parent_reveal_grant_replayed_before_scientific_payload(parent_fixture, 
 
 def test_changed_complete_external_input_census_refuses_before_parent_payload(parent_fixture, monkeypatch):
     from empirical_lawhood.api import recursive_qualified_parents as owner
-    from empirical_lawhood.infrastructure.artifacts import _ScopedArtifactPlane
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
+    from empirical_lawhood.storage.artifacts import _ScopedArtifactPlane
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
     actual = _ScopedArtifactPlane.read_manifest
     logical_id = 'materialization.reference-medium'
     selected_path, _, _ = provider_input_location(parent_fixture.plane, parent_fixture.package.run_plan_id, logical_id)
     intercepted = []
     def substituted(self, relative_path, *, maximum_bytes=None):
-        from empirical_lawhood.runtime.artifacts import (
-            artifact_publication_batch_id, artifact_publication_commit_relative_path, artifact_publication_member,
-        )
+        from empirical_lawhood.storage.contracts.artifacts import artifact_publication_batch_id, artifact_publication_commit_relative_path, artifact_publication_member
         manifest = actual(self, relative_path, maximum_bytes=maximum_bytes)
         if relative_path == selected_path:
             assert manifest.logical.logical_artifact_id == logical_id
@@ -268,14 +263,14 @@ def _later_public_handoff(parent, tmp_path, monkeypatch):
     from empirical_lawhood.api.facade import EmpiricalLawhoodApi
     from empirical_lawhood.api.results import CompileCandidateRequest
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring.executable_binding import REGISTRATION
-    from empirical_lawhood.adapters.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
-    from empirical_lawhood.infrastructure.recursive_prospective_inputs import RecursiveContentInputSupplier
-    from empirical_lawhood.planning.study_issue import HumanProposerAttestation, ImplementationSourceClosure, StudyOperationAuthority
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-    from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec, RecursiveProspectiveOperand
-    from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig, SourceReadMode
-    from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
+    from empirical_lawhood.methods.recursive_scientific_authoring.extension import REGISTRATION
+    from empirical_lawhood.domains.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
+    from empirical_lawhood.storage.recursive_prospective_inputs import RecursiveContentInputSupplier
+    from empirical_lawhood.design.study_issue import HumanProposerAttestation, ImplementationSourceClosure, StudyOperationAuthority
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec, RecursiveProspectiveOperand
+    from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
+    from empirical_lawhood.execution.study_issue import project_standard_study_extensions
     from tests.experiment_entry_support import standard_authoring_for_draft
     from tests.prospective_source_capture_fixture import synthetic_capture
     from tests.runtime_platform.test_recursive_prospective_workflow import FixtureCanonicalSource
@@ -370,7 +365,7 @@ def _later_public_handoff(parent, tmp_path, monkeypatch):
         path.write_bytes(payload)
         bindings.append((key, path))
     # Resolve the new candidate source through the actual immutable publisher.
-    from empirical_lawhood.infrastructure.candidate_sources import ExternalCandidateInputPublisher
+    from empirical_lawhood.storage.candidate_sources import ExternalCandidateInputPublisher
     publisher = ExternalCandidateInputPublisher(plane.root)
     for payload in (*payloads.values(), *(row.payload for row in compilation.config_inputs), qualification.canonical_bytes()):
         publisher.publish(payload, maximum_bytes=16 * 1024**2)
@@ -453,8 +448,8 @@ def test_exposed_method_nomination_fresh_qualification_then_genuine_later_parent
 
 def test_complete_multioutput_dependency_custody_joins_exact_logical_ids(tmp_path, monkeypatch):
     from empirical_lawhood.api.facade import EmpiricalLawhoodApi
-    from empirical_lawhood.adapters.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.domains.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     from tests.experiment_entry_support import standard_authoring_for_draft
     from tests.runtime_platform import test_recursive_prospective_workflow as workflow
     actual_source = workflow._actual_source

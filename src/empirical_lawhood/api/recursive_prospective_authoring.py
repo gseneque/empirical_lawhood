@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Shared prospective exports consumed by the existing public campaign API."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, replace
@@ -11,39 +12,32 @@ from typing import ClassVar
 import json
 
 from empirical_lawhood.api.authoring_handoff import create_authoring_api, preflight_authoring_output_directory, read_authoring_source_companion, resolve_authoring_directory
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.candidate_sources import ExternalCandidateInputPublisher, ExternalContentAddressedInputResolver
-from empirical_lawhood.infrastructure.recursive_prospective_inputs import RecursiveContentInputSupplier
-from empirical_lawhood.infrastructure.source_closure import AdmittedTargetSource, CapturedTargetClosure, capture_target_closure
-from empirical_lawhood.infrastructure.selected_candidate import canonical_source_metadata_bytes
-from empirical_lawhood.infrastructure.source_policy import (
-    CheckoutSourceAdmission, InstalledSourceAdmission, LocalPlanDisclosure, require_unchanged_source_admission,
-)
-from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_entry import ExecutableStudyDefinition, ProposedStudyExtensionSet, StudyDefinition
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SelectedSourceManifest, SourceClosureKind
-from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_json_bytes, canonical_json_document_bytes, validate_relative_locator, validate_sha256, validate_stable_id
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, artifact_custody_limits
-from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_run_plan
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort, LayeredCampaignRuntimeProviderResolver
-from empirical_lawhood.runtime.input_payloads import InputBytes
-from empirical_lawhood.runtime.progress import report_progress
-from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
-from empirical_lawhood.runtime.recursive_prospective import DRAFT128_RECURSIVE_SELECTION_DECODER_KEY, DRAFT128_RECURSIVE_DRAFT_MAXIMUM_BYTES, LARGE_RECURSIVE_SELECTION_MAXIMUM_BYTES, LARGE_RECURSIVE_RETAINED_MEMBER_MAXIMUM_BYTES, RecursiveCandidateContextProvider, RecursiveProspectiveAuthoringSpec, RecursiveProspectiveCandidatePreview, RecursiveProspectiveDesignInputs, RecursiveProspectiveOperand
-from empirical_lawhood.runtime.recursive_prospective_envelope import (
-    MAXIMUM_LARGE_OPERATIONAL_ENVELOPE_BYTES, MAXIMUM_OPERATIONAL_ENVELOPE_BYTES, MAXIMUM_LARGEST_OPERATIONAL_ENVELOPE_BYTES,
-    RecursiveProspectiveAuthoringEnvelope, RecursiveProspectiveAuthoringEnvelopeV3, RecursiveProspectiveAuthoringEnvelopeV4,
-)
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort, recursive_input_port_key
-from empirical_lawhood.runtime.recursive_record_codecs import validate_declared_recursive_input_payload
-from empirical_lawhood.runtime.source_resolution import CandidateSourceResolutionService
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.candidate_sources import ExternalCandidateInputPublisher, ExternalContentAddressedInputResolver
+from empirical_lawhood.storage.recursive_prospective_inputs import RecursiveContentInputSupplier
+from empirical_lawhood.storage.source_closure import AdmittedTargetSource, CapturedTargetClosure, capture_target_closure
+from empirical_lawhood.storage.selected_candidate import canonical_source_metadata_bytes
+from empirical_lawhood.storage.source_policy import CheckoutSourceAdmission, InstalledSourceAdmission, LocalPlanDisclosure, require_unchanged_source_admission
+from empirical_lawhood.storage.study_issue import GitStudySourceClosureInspector
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_entry import ExecutableStudyDefinition, ProposedStudyExtensionSet, StudyDefinition
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SelectedSourceManifest, SourceClosureKind
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes, canonical_json_document_bytes, validate_relative_locator, validate_sha256, validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, artifact_custody_limits
+from empirical_lawhood.execution.compiler import compile_preissue_run_plan, lower_run_plan
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort, LayeredCampaignRuntimeProviderResolver
+from empirical_lawhood.execution.input_payloads import InputBytes
+from empirical_lawhood.execution.progress import report_progress
+from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
+from empirical_lawhood.execution.recursive_prospective import RecursiveCandidateContextProvider, RecursiveProspectiveAuthoringSpec, RecursiveProspectiveCandidatePreview, RecursiveProspectiveDesignInputs, RecursiveProspectiveOperand
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort, recursive_input_port_key
+from empirical_lawhood.storage.contracts.recursive_record_codecs import validate_declared_recursive_input_payload
+from empirical_lawhood.execution.source_resolution import CandidateSourceResolutionService
 
-MAXIMUM_SPEC_BYTES = 16 * 1024**2
 SOURCE_PROVENANCE_MEMBERS = ('selected-source-manifest.json', 'source-observation.json')
 
 
@@ -254,108 +248,38 @@ def _validate_source_disclosure(closure, manifest, value):
 
 
 def load_recursive_prospective_spec(path):
-    return decode_canonical_bytes(read_bounded_bytes(Path(path), maximum_bytes=MAXIMUM_SPEC_BYTES),
-                                  RecursiveProspectiveAuthoringSpec, maximum_bytes=MAXIMUM_SPEC_BYTES)
+    return decode_canonical_bytes(read_bounded_bytes(Path(path), maximum_bytes=None),
+                                  RecursiveProspectiveAuthoringSpec, maximum_bytes=None)
 
 
-def load_recursive_prospective_envelope(path, *, version=RecursiveProspectiveAuthoringEnvelope.VERSION):
-    """Read only the explicitly selected additive operational envelope codec."""
-    codecs = {RecursiveProspectiveAuthoringEnvelope.VERSION:
-        (RecursiveProspectiveAuthoringEnvelope, MAXIMUM_OPERATIONAL_ENVELOPE_BYTES),
-        RecursiveProspectiveAuthoringEnvelopeV3.VERSION:
-        (RecursiveProspectiveAuthoringEnvelopeV3, MAXIMUM_LARGE_OPERATIONAL_ENVELOPE_BYTES),
-        RecursiveProspectiveAuthoringEnvelopeV4.VERSION:
-        (RecursiveProspectiveAuthoringEnvelopeV4, MAXIMUM_LARGEST_OPERATIONAL_ENVELOPE_BYTES)}
-    if version not in codecs:
-        raise ValueError('prospective operational envelope revision is not installed')
-    kind, maximum = codecs[version]
-    record = decode_canonical_bytes(read_bounded_bytes(Path(path), maximum_bytes=maximum),
-        kind, maximum_bytes=maximum)
-    return record.reconstruct()
-
-
-def _bounded_selection_decoder(registration):
-    """Match the entire installed descriptor before granting physical capacity."""
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring.executable_binding import REGISTRATION
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring_bounded32.executable_binding import REGISTRATION as BOUNDED
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring_bounded64.executable_binding import REGISTRATION as LARGE
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring_draft128.executable_binding import REGISTRATION as EXTENDED
-    from empirical_lawhood.runtime.study_issue import StudyExtensionDecoderRegistration
-
-    if registration is None:
-        return False
-    if type(registration) is not StudyExtensionDecoderRegistration or registration not in (REGISTRATION, BOUNDED, LARGE, EXTENDED):
+def _require_selection_decoder(registration):
+    """Match the complete installed scientific decoder without a size ladder."""
+    from empirical_lawhood.methods.recursive_scientific_authoring.extension import REGISTRATION
+    from empirical_lawhood.execution.study_issue import StudyExtensionDecoderRegistration
+    if registration is not None and (type(registration) is not StudyExtensionDecoderRegistration or registration != REGISTRATION):
         raise ValueError('prospective selection decoder is outside its exact installed allowlist')
-    return registration in (BOUNDED, LARGE, EXTENDED)
-
-
-def _large_selection_decoder(registration):
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring_bounded64.executable_binding import REGISTRATION as LARGE
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring_draft128.executable_binding import REGISTRATION as EXTENDED
-    _bounded_selection_decoder(registration)
-    return registration in (LARGE, EXTENDED)
 
 
 def _selection_decoder_registration(selection, *, retained_records=()):
-    """Select a new profile from actual science and retained carrier bytes."""
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring.executable_binding import REGISTRATION
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring_bounded32.executable_binding import REGISTRATION as BOUNDED
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring_bounded64.executable_binding import REGISTRATION as LARGE
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring_draft128.executable_binding import REGISTRATION as EXTENDED
-    from empirical_lawhood.planning.recursive_authoring import RecursiveScientificSelection
-
+    from empirical_lawhood.methods.recursive_scientific_authoring.extension import REGISTRATION
+    from empirical_lawhood.design.recursive_authoring import RecursiveScientificSelection
     if type(selection) is not RecursiveScientificSelection:
         raise TypeError('prospective decoder selection requires its exact scientific projection')
-    size = selection.canonical_size_bytes()
-    members = []
     for name, record in retained_records:
-        members.append(RecursiveWaveMember(name, ObjectIdentity('preflight.' + name.removesuffix('.json'),
-            record.SCHEMA, record.VERSION, record.fingerprint()), record.canonical_size_bytes()))
-    capacity_error = None
-    for registration in (REGISTRATION, BOUNDED, LARGE, EXTENDED):
-        if size > registration.maximum_payload_bytes:
-            continue
-        try:
-            for member in members:
-                _prospective_member_codec(member, decoder_registration=registration)
-        except ValueError as error:
-            capacity_error = error
-            continue
-        return registration
-    if capacity_error is not None:
-        raise capacity_error
-    raise ValueError('prospective scientific selection exceeds its installed capacity allocation')
-
-
-def _stored_prospective_spec(spec, *, decoder_registration):
-    """Choose the smallest exact carrier without changing legacy allocations."""
-    bounded = _bounded_selection_decoder(decoder_registration)
-    if type(spec) is not RecursiveProspectiveAuthoringSpec:
-        raise TypeError('prospective carrier requires its exact original specification')
-    if spec.canonical_size_bytes() <= MAXIMUM_SPEC_BYTES:
-        return spec
-    try:
-        return RecursiveProspectiveAuthoringEnvelope.from_spec(spec)
-    except ValueError:
-        if not bounded:
-            raise
-    try:
-        return RecursiveProspectiveAuthoringEnvelopeV3.from_spec(spec)
-    except ValueError:
-        if not _large_selection_decoder(decoder_registration):
-            raise
-    return RecursiveProspectiveAuthoringEnvelopeV4.from_spec(spec)
+        member = RecursiveWaveMember(name, ObjectIdentity.from_record('preflight.' + name.removesuffix('.json'), record), record.canonical_size_bytes())
+        _prospective_member_codec(member, decoder_registration=REGISTRATION)
+    return REGISTRATION
 
 
 def _prospective_member_codec(member, *, decoder_registration=None):
     """A closed physical carrier allocation, independent of semantic science."""
-    from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft, RecursiveScientificSelection
-    from empirical_lawhood.runtime.plans import CandidateExecutionPlan, CandidateRunPlan
-    from empirical_lawhood.runtime.candidate_compiler import StudyTemplate
-    from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCompilationReport, ExecutableStudyCandidate
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeSpec
-    from empirical_lawhood.runtime.study_issue import StudyExtensionDecoderRegistration
+    from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft, RecursiveScientificSelection
+    from empirical_lawhood.execution.plans import CandidateExecutionPlan, CandidateRunPlan
+    from empirical_lawhood.execution.candidate_compiler import StudyTemplate
+    from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCompilationReport, ExecutableStudyCandidate
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeSpec
+    from empirical_lawhood.execution.study_issue import StudyExtensionDecoderRegistration
     types = {'draft.json': RecursiveStudyDraft, 'implementation.json': ImplementationSourceClosure,
         'recursive-prospective.json': RecursiveProspectiveAuthoringSpec, 'authoring.json': ExecutableStudyDefinition,
         'scientific-projection.json': RecursiveScientificSelection, 'decoder.json': StudyExtensionDecoderRegistration,
@@ -366,32 +290,10 @@ def _prospective_member_codec(member, *, decoder_registration=None):
     record_type = types.get(member.filename)
     if record_type is None:
         raise ValueError('prospective retained member is outside its closed allowlist')
-    bounded = _bounded_selection_decoder(decoder_registration)
-    maximum = 64*1024**2 if member.filename in ('candidate-report.json', 'candidate.json', 'preissue-run-plan.json', 'preissue-execution-plan.json') else MAXIMUM_SPEC_BYTES
-    if bounded and member.filename in ('draft.json', 'scientific-projection.json', 'template.json'):
-        maximum = 32*1024**2
-    if bounded and member.filename == 'candidate-report.json':
-        maximum = 128*1024**2
-    large = _large_selection_decoder(decoder_registration)
-    if large and member.filename in ('draft.json', 'scientific-projection.json', 'template.json'):
-        maximum = LARGE_RECURSIVE_SELECTION_MAXIMUM_BYTES
-    if large and decoder_registration.decoder_key == DRAFT128_RECURSIVE_SELECTION_DECODER_KEY and member.filename == 'draft.json':
-        maximum = DRAFT128_RECURSIVE_DRAFT_MAXIMUM_BYTES
-    if large and member.filename in ('authoring.json', 'candidate-report.json', 'candidate.json', 'preissue-run-plan.json', 'preissue-execution-plan.json'):
-        maximum = LARGE_RECURSIVE_RETAINED_MEMBER_MAXIMUM_BYTES
-    if member.filename == 'recursive-prospective.json' and member.identity.object_schema == RecursiveProspectiveAuthoringEnvelope.SCHEMA:
-        if member.identity.object_version == RecursiveProspectiveAuthoringEnvelopeV4.VERSION and large:
-            record_type, maximum = RecursiveProspectiveAuthoringEnvelopeV4, MAXIMUM_LARGEST_OPERATIONAL_ENVELOPE_BYTES
-        elif member.identity.object_version == RecursiveProspectiveAuthoringEnvelopeV3.VERSION and bounded:
-            record_type, maximum = RecursiveProspectiveAuthoringEnvelopeV3, MAXIMUM_LARGE_OPERATIONAL_ENVELOPE_BYTES
-        else:
-            record_type, maximum = RecursiveProspectiveAuthoringEnvelope, MAXIMUM_OPERATIONAL_ENVELOPE_BYTES
-    if (member.identity.object_schema != record_type.SCHEMA or member.identity.object_version != record_type.VERSION
-            or member.size_bytes > maximum):
-        raise ValueError('prospective retained member changes its allowlisted schema/version or byte allocation: '
-            + member.filename + ' has ' + member.identity.object_schema + '@' + member.identity.object_version
-            + ' and ' + str(member.size_bytes) + ' bytes; expected ' + record_type.SCHEMA + '@' + record_type.VERSION
-            + ' within ' + str(maximum) + ' bytes')
+    _require_selection_decoder(decoder_registration)
+    if (member.identity.object_schema != record_type.SCHEMA or member.identity.object_version != record_type.VERSION):
+        raise ValueError('prospective retained member changes its allowlisted schema/version: ' + member.filename)
+    maximum = member.size_bytes
     return record_type, maximum
 
 
@@ -411,7 +313,7 @@ class _ConfigDecoder:
 
 def _compile(spec, closure, *, composition=None):
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.runtime.recursive_prospective import recursive_selection_proposal
+    from empirical_lawhood.execution.recursive_prospective import recursive_selection_proposal
 
     registrations, registry, codecs = operation_catalog() if composition is None else composition
     selected_capabilities = {(operation.selection.capability_key, operation.selection.capability_version)
@@ -468,7 +370,7 @@ def _operands(spec, compilation):
 
 def _context(spec, compilation, registrations, root, candidate_catalog=None):
     if candidate_catalog is None:
-        from empirical_lawhood.adapters.composition.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+        from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
         candidate_catalog = GENERATED_EXTENSION_BUNDLE_AGGREGATE.candidate_capability_catalog
     static = {row.registration_id: row for row in candidate_catalog.registrations}
     by_selection = {registration.selection.selection_id: registration for registration in registrations}
@@ -561,7 +463,7 @@ def _compile_outer_candidate(*, directory, authoring, compilation, decoder, cont
 
 
 def _input_payload(binding, *, maximum_bytes, original_input_access=None):
-    from .prospective_experiment import _require_original_inputs
+    from empirical_lawhood.api.prospective_experiment import _require_original_inputs
     _require_original_inputs(original_input_access)
     raw = (binding.bounded_bytes(maximum_bytes=maximum_bytes) if type(binding) is InputBytes else
         read_bounded_bytes(Path(binding), maximum_bytes=maximum_bytes))
@@ -572,38 +474,26 @@ def _input_payload(binding, *, maximum_bytes, original_input_access=None):
 def _require_prospective_public_member_capacity(name, size_bytes, *, artifact_writer=None):
     """Preflight newly produced records against their next public consumer.
 
-    Historical retained-member codec allocations stay unchanged. These checks
-    concern newly rendered authoring/candidate/runtime controls, not referenced data.
+    Actual record size is observable, not a scientific admissibility threshold.
+    Only explicitly selected artifact custody allowances constrain publication.
     """
-    from .codecs import MAX_EXECUTABLE_STUDY_AUTHORING_BYTES
-    from empirical_lawhood.runtime.study_issue import MAX_COMPOSED_PROGRAMME_CONTROL_BYTES, MAX_ISSUE_PAYLOAD_BYTES
-    maximum = {'authoring.base.json': MAX_ISSUE_PAYLOAD_BYTES,
-        'authoring.json': MAX_EXECUTABLE_STUDY_AUTHORING_BYTES,
-        'candidate.json': MAX_COMPOSED_PROGRAMME_CONTROL_BYTES}.get(name)
-    if name in ('preissue-run-plan.json', 'preissue-execution-plan.json'):
-        limits = artifact_custody_limits(artifact_writer)
-        for allowance in ('control_record_bytes', 'in_memory_payload_bytes'):
-            if limits.exceeds(allowance, size_bytes):
-                raise ValueError('prospective ' + name + ' exceeds its selected custody runtime-plan byte allowance '
-                    + allowance)
-    if maximum is not None and size_bytes > maximum:
-        role = 'standard-base-issue' if name == 'authoring.base.json' else 'composed-control'
-        raise ValueError('prospective ' + name + ' exceeds its exact public ' + role + ' byte allocation')
+    limits = artifact_custody_limits(artifact_writer)
+    for allowance in ('control_record_bytes', 'in_memory_payload_bytes'):
+        if limits.exceeds(allowance, size_bytes):
+            raise ValueError('prospective ' + name + ' exceeds its selected custody byte allowance ' + allowance)
 
 
 def _prepare_prospective_candidate(*, design_inputs, project_root, artifact_writer, input_bindings=(),
         composition=None, api_factory=None, candidate_catalog=None, compilation_directory=None, prospective_spec=None, retained_closure=None,
         original_input_access=None, _prepared=None):
     """One owner for exact input publication and actual outer compilation."""
-    from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
+    from empirical_lawhood.execution.study_issue import project_standard_study_extensions
 
     if type(design_inputs) is not RecursiveProspectiveDesignInputs:
         raise TypeError('prospective candidate preparation requires exact resource-free design inputs')
     design_inputs.__post_init__()
-    from .prospective_experiment import _require_original_inputs
+    from empirical_lawhood.api.prospective_experiment import _require_original_inputs
     _require_original_inputs(original_input_access)
-    if design_inputs.draft.canonical_size_bytes() > DRAFT128_RECURSIVE_DRAFT_MAXIMUM_BYTES:
-        raise ValueError('prospective scientific draft exceeds its maximum installed capacity allocation')
     artifact_writer.root.verify(for_write=True)
     source_capture = _capture_prospective_source(project_root, design_inputs.spec_id + '.source-closure',
         retained_closure=retained_closure, artifact_writer=artifact_writer)
@@ -619,7 +509,7 @@ def _prepare_prospective_candidate(*, design_inputs, project_root, artifact_writ
     if prospective_spec is not None:
         if RecursiveProspectiveDesignInputs.from_spec(prospective_spec) != design_inputs:
             raise ValueError('prospective carrier changes its original candidate design inputs')
-        stored_spec = _stored_prospective_spec(prospective_spec, decoder_registration=decoder)
+        stored_spec = prospective_spec
         retained_records = (('recursive-prospective.json', stored_spec), ('resources.json', prospective_spec.resources))
     _require_prospective_public_member_capacity('authoring.base.json', authoring.base.canonical_size_bytes())
     for name, record in (*retained_records, ('draft.json', design_inputs.draft),
@@ -633,7 +523,7 @@ def _prepare_prospective_candidate(*, design_inputs, project_root, artifact_writ
     from empirical_lawhood.api.recursive_publications import authenticate_registered_publications
     authenticate_registered_publications(draft=design_inputs.draft, config_inputs=compilation.config_inputs,
         registrations=registrations, artifact_writer=artifact_writer)
-    from .recursive_qualified_parents import authenticate_recursive_qualified_parents
+    from empirical_lawhood.api.recursive_qualified_parents import authenticate_recursive_qualified_parents
     authenticate_recursive_qualified_parents(spec_bindings=design_inputs.qualified_parent_bindings, draft=design_inputs.draft,
                 artifact_writer=artifact_writer, registrations=registrations, output_codecs=compilation.output_codecs)
     operands = _operands(design_inputs, compilation)
@@ -664,7 +554,7 @@ def _prepare_prospective_candidate(*, design_inputs, project_root, artifact_writ
         validated_inputs += 1
         report_progress(phase='validate_inputs', done=validated_inputs, total=input_total)
     for digest in required_config_hashes:
-        raw = _input_payload(bindings[digest], maximum_bytes=1024**2, original_input_access=original_input_access)
+        raw = _input_payload(bindings[digest], maximum_bytes=None, original_input_access=original_input_access)
         if sha256(raw).hexdigest() != digest:
             raise ValueError('prospective source config changes its declared exact bytes')
         pending[digest] = raw
@@ -737,10 +627,8 @@ def author_recursive_prospective(*, spec, project_root, artifact_writer, output_
     """Publish a frozen candidate handoff; issue and execution retain their authorities."""
     if _capture_roots is not None and not callable(_capture_roots):
         raise TypeError('prospective root retention requires an operation-local callback')
-    if type(spec) in (RecursiveProspectiveAuthoringEnvelope, RecursiveProspectiveAuthoringEnvelopeV3, RecursiveProspectiveAuthoringEnvelopeV4):
-        spec = spec.reconstruct()
     if type(spec) is not RecursiveProspectiveAuthoringSpec:
-        raise ValueError('prospective authoring requires its exact legacy semantic specification')
+        raise ValueError('prospective authoring requires its exact semantic specification')
     spec.__post_init__()
     design_inputs = RecursiveProspectiveDesignInputs.from_spec(spec)
     if expected_preview is not None:
@@ -798,9 +686,9 @@ def author_recursive_prospective(*, spec, project_root, artifact_writer, output_
     if reused is None:
         for name in ('authoring.json', 'scientific-projection.json', 'decoder.json'):
             (destination / name).unlink()
-    from .experiment_runtime_bindings import original_input_record_publication
-    from .prospective_experiment import _require_original_inputs
-    from empirical_lawhood.runtime.artifacts import lineage_parent_sort_key
+    from empirical_lawhood.api.experiment_runtime_bindings import original_input_record_publication
+    from empirical_lawhood.api.prospective_experiment import _require_original_inputs
+    from empirical_lawhood.storage.contracts.artifacts import lineage_parent_sort_key
     # Graph containers embed canonical config strings. Derive their exact
     # ancestry from actual typed config rows, not an opaque string scan.
     graph_parents = (() if original_input_access is None else tuple(sorted({
@@ -838,7 +726,7 @@ class RecursiveProspectiveApplicationHandoff:
 
 def _prospective_selection_decoder(packet, read):
     """Authenticate the small pinned descriptor before reading larger members."""
-    from empirical_lawhood.runtime.study_issue import StudyExtensionDecoderRegistration
+    from empirical_lawhood.execution.study_issue import StudyExtensionDecoderRegistration
 
     member, = (row for row in packet.members if row.filename == 'decoder.json')
     kind, maximum = _prospective_member_codec(member)
@@ -846,7 +734,7 @@ def _prospective_selection_decoder(packet, read):
     if (len(raw), sha256(raw).hexdigest()) != (member.size_bytes, member.identity.object_fingerprint):
         raise ValueError('prospective decoder differs from its exact packet member')
     decoder = decode_canonical_bytes(raw, StudyExtensionDecoderRegistration, maximum_bytes=maximum)
-    _bounded_selection_decoder(decoder)
+    _require_selection_decoder(decoder)
     return decoder, raw
 
 
@@ -860,13 +748,13 @@ def _load_recursive_prospective_members(*, directory, root, storage_profile, art
 
 def _read_recursive_prospective_members(*, directory, artifact_writer, original_input_access=None):
     """Use the same closed parser after actual writer-root read admission."""
-    from .prospective_experiment import _directory
+    from empirical_lawhood.api.prospective_experiment import _directory
     directory = _directory(directory, artifact_writer)
     # Both paths authenticate the same member receipts; prospective exports use
     # a genuine closure rather than the development producing-source record.
-    from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-    def read(name, maximum=MAXIMUM_SPEC_BYTES, *, expected_schema=None):
-        manifest = decode_artifact_manifest(read_bounded_bytes(directory / (name + '.manifest.json'), maximum_bytes=1024**2))
+
+    def read(name, maximum=None, *, expected_schema=None):
+        manifest = resolve_artifact_sidecar_bytes(artifact_writer, read_bounded_bytes(directory / (name + '.manifest.json'), maximum_bytes=artifact_custody_limits(artifact_writer).manifest_bytes))
         if manifest.materialization.relative_path != (directory / name).relative_to(Path(artifact_writer.root.contract.canonical_path)).as_posix():
             raise ValueError('prospective retained member changes its exact path')
         if ((original_input_access is None and (
@@ -874,23 +762,24 @@ def _read_recursive_prospective_members(*, directory, artifact_writer, original_
                 or manifest.logical.visibility_ceiling is not VisibilityCeiling.PROSPECTIVE))
             or manifest.logical.profile is not ArtifactProfile.CANONICAL_JSON
             or manifest.logical.media_type != 'application/json'
-            or manifest.materialization.size_bytes > maximum
+            or (maximum is not None and manifest.materialization.size_bytes > maximum)
             or expected_schema is not None and manifest.logical.payload_schema != expected_schema):
             raise ValueError('prospective handoff member changes its access role or allocation')
         if name in ('preissue-run-plan.json', 'preissue-execution-plan.json'):
             _require_prospective_public_member_capacity(name, manifest.materialization.size_bytes,
                 artifact_writer=artifact_writer)
-        from .prospective_experiment import _require_original_inputs
+        from empirical_lawhood.api.prospective_experiment import _require_original_inputs
         options = {} if original_input_access is None else {"before_member": original_input_access.require_issued_member}
         artifact_writer.verify_manifest(manifest, **options)
         _require_original_inputs(original_input_access)
-        raw = read_bounded_bytes(artifact_writer.root.resolve(manifest.materialization.relative_path, for_write=False), maximum_bytes=maximum)
-        if (len(raw) != manifest.materialization.size_bytes or sha256(raw).hexdigest() != manifest.logical.content_sha256
-            or sha256(raw).hexdigest() != manifest.materialization.physical_sha256):
+        raw = read_bounded_bytes(artifact_writer.root.resolve(manifest.materialization.relative_path, for_write=False), maximum_bytes=manifest.materialization.size_bytes)
+        digest = sha256(raw).hexdigest()
+        if (len(raw) != manifest.materialization.size_bytes or digest != manifest.logical.content_sha256
+            or digest != manifest.materialization.physical_sha256):
             raise ValueError('prospective member bytes changed after exact manifest authentication')
         _require_original_inputs(original_input_access)
         return raw
-    packet = decode_canonical_bytes(read('authored-wave.json', 1024**2, expected_schema=AuthoredRecursiveWave.SCHEMA), AuthoredRecursiveWave, maximum_bytes=1024**2)
+    packet = decode_canonical_bytes(read('authored-wave.json', artifact_custody_limits(artifact_writer).control_record_bytes, expected_schema=AuthoredRecursiveWave.SCHEMA), AuthoredRecursiveWave, maximum_bytes=artifact_custody_limits(artifact_writer).control_record_bytes)
     expected_names = {'draft.json', 'implementation.json', 'recursive-prospective.json', 'authoring.json',
         'scientific-projection.json', 'decoder.json', 'source-closure.json', 'template.json', 'registry.json', 'resources.json',
         'candidate-report.json', 'candidate.json', 'preissue-run-plan.json', 'preissue-execution-plan.json'}
@@ -908,12 +797,9 @@ def _read_recursive_prospective_members(*, directory, artifact_writer, original_
         payloads[member.filename] = raw
     spec_member = next(member for member in packet.members if member.filename == 'recursive-prospective.json')
     kind, maximum = _prospective_member_codec(spec_member, decoder_registration=decoder)
-    if kind in (RecursiveProspectiveAuthoringEnvelope, RecursiveProspectiveAuthoringEnvelopeV3, RecursiveProspectiveAuthoringEnvelopeV4):
-        envelope = decode_canonical_bytes(payloads['recursive-prospective.json'], kind, maximum_bytes=maximum)
-        spec = envelope.reconstruct()
-    else:
-        spec = decode_canonical_bytes(payloads['recursive-prospective.json'], RecursiveProspectiveAuthoringSpec, maximum_bytes=MAXIMUM_SPEC_BYTES)
-    closure = decode_canonical_bytes(payloads['source-closure.json'], ImplementationSourceClosure, maximum_bytes=MAXIMUM_SPEC_BYTES)
+    spec = decode_canonical_bytes(payloads['recursive-prospective.json'], RecursiveProspectiveAuthoringSpec,
+        maximum_bytes=spec_member.size_bytes)
+    closure = decode_canonical_bytes(payloads['source-closure.json'], ImplementationSourceClosure, maximum_bytes=None)
     if (not spec.draft.canonical_equals(payloads['draft.json'])
         or not closure.canonical_equals(payloads['implementation.json'])
         or packet.draft != ObjectIdentity.from_record(spec.draft.draft_id, spec.draft)
@@ -998,7 +884,7 @@ def _retained_recursive_prospective_from_members(*, directory, packet, payloads,
     plan = decode_member('preissue-run-plan.json')
     projection = decode_member('preissue-execution-plan.json')
     registry = decode_member('registry.json')
-    from empirical_lawhood.runtime.recursive_compiler import derive_recursive_scientific_selection
+    from empirical_lawhood.execution.recursive_compiler import derive_recursive_scientific_selection
 
     if (base.implementation_sha256 != closure.implementation_sha256
             or selected != derive_recursive_scientific_selection(spec.draft)
@@ -1035,9 +921,9 @@ def _load_recursive_prospective_handoff_with_roots(*, directory, root, storage_p
     The public wrapper discards the extra records. No retained handoff field or
     caller-supplied cache can carry authentication into another invocation.
     """
-    from empirical_lawhood.runtime.plans import CandidateExecutionPlan, CandidateRunPlan
-    from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCompilationReport
-    from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
+    from empirical_lawhood.execution.plans import CandidateExecutionPlan, CandidateRunPlan
+    from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCompilationReport
+    from empirical_lawhood.execution.study_issue import project_standard_study_extensions
 
     if type(require_current_source) is not bool:
         raise TypeError('prospective handoff source validation requires an explicit boolean selection')
@@ -1053,7 +939,7 @@ def _load_recursive_prospective_handoff_with_roots(*, directory, root, storage_p
     from empirical_lawhood.api.recursive_publications import authenticate_registered_publications
     authenticate_registered_publications(draft=spec.draft, config_inputs=compilation.config_inputs,
         registrations=registrations, artifact_writer=artifact_writer)
-    from .recursive_qualified_parents import authenticate_recursive_qualified_parents
+    from empirical_lawhood.api.recursive_qualified_parents import authenticate_recursive_qualified_parents
     authenticate_recursive_qualified_parents(spec_bindings=spec.qualified_parent_bindings, draft=spec.draft,
                 artifact_writer=artifact_writer, registrations=registrations, output_codecs=compilation.output_codecs)
     if (not authoring.canonical_equals(payloads['authoring.json'])
@@ -1085,7 +971,7 @@ def _load_recursive_prospective_handoff_with_roots(*, directory, root, storage_p
     if retained_plan != expected_plan or projection != lower_run_plan(expected_plan, compilation.registry):
         raise ValueError('prospective retained executable projection changes its actual authored scientific graph')
     context = _context(spec, compilation, registrations, artifact_writer.root, candidate_catalog)
-    from empirical_lawhood.runtime.recursive_storage_codecs import storage_codec_census
+    from empirical_lawhood.storage.contracts.recursive_storage_codecs import storage_codec_census
     supplier = RecursiveContentInputSupplier(root=artifact_writer.root, operands=_operands(spec, compilation),
         storage_codecs=storage_codec_census(registrations),
         validate_payload=partial(validate_declared_recursive_input_payload, draft=spec.draft,

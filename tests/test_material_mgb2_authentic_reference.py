@@ -18,7 +18,8 @@ import pytest
 
 pytestmark = pytest.mark.held
 
-from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_material_operands import PAIRING_PROJECTION_LIMIT, _anisotropic_slices, parse_epw_egnv, parse_wannier_hr, reduce_material_operands
+from empirical_lawhood.domains.materials.superconductivity.material_operand_assessment import PAIRING_PROJECTION_LIMIT, _anisotropic_slices
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_material_operands import parse_epw_egnv, parse_wannier_hr, reduce_material_operands
 from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_solver import parse_epw_a2f_integrated_lambda, resolve_material_control_workflow_profile
 
 

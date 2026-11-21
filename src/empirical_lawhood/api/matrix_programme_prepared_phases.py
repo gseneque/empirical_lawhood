@@ -10,31 +10,29 @@ from hashlib import sha256
 from pathlib import Path
 from types import SimpleNamespace
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_initialization as initialization
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as declarative
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_experiment import MatrixPreparationSourceBank
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import is_baseline_recipe
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.protected_preparation_records import MatrixConfirmationSources, MatrixReservedTransferSources
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import (
-    MatrixPreparedOriginalCommitments, MatrixSelectedEntryEvidenceV3, prepared_original_panel,
-)
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_point import MatrixSelectedPointDesign
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedProtectedSpecification
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import MatrixSelectedNominationSelection
-from empirical_lawhood.adapters.methods.matrix_factor_response.exposure import MatrixScheduledPhysicalExclusion
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.prepared_operations import MatrixProgrammePreparedAccess
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import ScheduledExposureAudit, corpus_artifact, exposure_support
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, canonical_json_document_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, lineage_parent_sort_key
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import preparation_initialization as initialization
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as declarative
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_experiment import MatrixPreparationSourceBank
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import is_baseline_recipe
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.protected_preparation_records import MatrixConfirmationSources, MatrixReservedTransferSources
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixPreparedOriginalCommitments, MatrixSelectedEntryEvidenceV3, prepared_original_panel
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_point import MatrixSelectedPointDesign
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedProtectedSpecification
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedProtectedProgramme, MatrixSelectedPublicProgramme
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import MatrixSelectedNominationSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.exposure import MatrixScheduledPhysicalExclusion
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.prepared_operations import MatrixProgrammePreparedAccess
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import ScheduledExposureAudit, corpus_artifact, exposure_support
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, canonical_json_document_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, lineage_parent_sort_key
 
 
 PHASES = ('e5.initialize-development', 'e5.development', 'e5.initialize-confirmation',
@@ -107,8 +105,8 @@ def _record(context, phase, name, record, original, *, inherited=False, identity
     if not inherited:
         publication=context.publish_record(phase,name,record,identity=identity,require_current=original.require_current)
     else:
-        from .matrix_programme_projection import record_identity
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
+        from empirical_lawhood.api.matrix_programme_projection import record_identity
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
         pin=record_identity(record) if identity is None else identity
         raw=record.canonical_bytes();budget=context.plan.specification.operations.metadata_budget
         if (len(raw)>min(budget.output_bytes,budget.memory_bytes) or type(pin) is not ObjectIdentity
@@ -333,11 +331,10 @@ def _revision_originals(context, original):
     from empirical_lawhood.api.matrix_researcher_programme_e4_lineage import programme_revision_read
     from empirical_lawhood.api.matrix_sampling_runtime import _original_product
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as methods
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import (
-        SelectedE4RevisionExport, SelectedE4PublicCalibration)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import MatrixRevisionSelectedPackage
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as methods
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4RevisionExport, SelectedE4PublicCalibration
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import MatrixRevisionSelectedPackage
     from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammePrerequisite
     revision = programme_revision_read(context)
     fit, freeze, decision = revision.nomination_locator, revision.frozen_locator, revision.decision
@@ -388,8 +385,8 @@ def _nomination(context, package, original):
     from empirical_lawhood.api.matrix_selected_opportunity_runtime import authenticate_selected_development_nomination
     locator = _development_locator(context, original)
     if context.design.downstream_account == 'REVISION':
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_results import MatrixRevisionProgrammeAssessment
-        from .matrix_programme_decisions import development_assessment
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_results import MatrixRevisionProgrammeAssessment
+        from empirical_lawhood.api.matrix_programme_decisions import development_assessment
         report = development_assessment(context)
         result = _decode(report['assessment'], MatrixRevisionProgrammeAssessment)
         if result.identity != locator.record or result.functional.disposition != 'NOMINATED':
@@ -447,7 +444,7 @@ def _protected_science(context, phase, original, *, sources=None):
     interpretations = tuple(value for value in context.design.recipe_interpretations if value.arm_id in dict(specification.arms))
     rows = tuple(sorted(((arm, MatrixPreparedPublicSource.from_source(source)) for arm, source in sources.source_arms()),
         key=lambda row: row[1].source.object_id))
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_point import MatrixPreparedRecipeInterpretation
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_point import MatrixPreparedRecipeInterpretation
     recipe_interpretations = tuple(sorted((MatrixPreparedRecipeInterpretation(dict(specification.arms)[value.arm_id].identity,
         value.family_id, value.scientific_premise) for value in interpretations), key=lambda value: value.recipe.object_id))
     design = MatrixSelectedPointDesign('design.' + specification.fingerprint(), package, specification.phase,
@@ -460,7 +457,7 @@ def _protected_science(context, phase, original, *, sources=None):
 
 
 def _revision_programme(context, specification, sources, original, *, nomination=None):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import MatrixRevisionPreparedProgramme
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import MatrixRevisionPreparedProgramme
     revision = _revision_originals(context, original)
     groups = set(revision.excluded_groups)
     if nomination is not None:
@@ -478,11 +475,11 @@ def _revision_programme(context, specification, sources, original, *, nomination
 
 
 def _revision_evidence(context, programme, original, *, report=None, nomination=None):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import MatrixRevisionEntryEvidenceV2
-    from empirical_lawhood.adapters.methods.matrix_source_evidence import MatrixSourcePipelineEvidence
-    from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceQualificationResult, ScientificSourceQualificationSpec
-    from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixRevisionEntryEvidenceV2
+    from empirical_lawhood.domains.matrix.matrix_source_evidence import MatrixSourcePipelineEvidence
+    from empirical_lawhood.design.scientific_source_qualification import ScientificSourceQualificationResult, ScientificSourceQualificationSpec
+    from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
     revision = _revision_originals(context, original)
     return MatrixRevisionEntryEvidenceV2('evidence.' + programme.fingerprint(), programme.identity,
         revision.fit, revision.freeze, revision.downstream, revision.calibration, revision.export.identity,
@@ -513,7 +510,7 @@ def _copy_files(context, phase, artifacts, original):
                 publication.logical.visibility_ceiling) != (ArtifactProfile.MATRIX_ARRAY_NPZ,
                     OutcomeAccess.OUTCOME_BLIND, VisibilityCeiling.PROSPECTIVE):
             raise PermissionError('prepared inputs lack the exact original blind initialization/template publication')
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
         authenticate_publication(context.writer, publication)
         raw = read_bounded_bytes(context.writer.root.resolve(publication.materialization.relative_path, for_write=False),
             maximum_bytes=artifact.size_bytes)
@@ -531,8 +528,7 @@ def _derive(context, phase, specification, records, original, *, files=(), selec
     from empirical_lawhood.api.experiment_preparation import _protocol
     directory = context.metadata_directory(phase)
     publications, bindings = [], []
-    from empirical_lawhood.adapters.methods.matrix_prepared_source_assembly import (
-        MatrixPreparedSourceAssemblySpecification, MatrixPreparedRetainedE3AssemblySpecification)
+    from empirical_lawhood.domains.matrix.matrix_prepared_source_assembly import MatrixPreparedSourceAssemblySpecification, MatrixPreparedRetainedE3AssemblySpecification
     source_assembly = type(specification) in (MatrixPreparedSourceAssemblySpecification, MatrixPreparedRetainedE3AssemblySpecification)
     if source_assembly and phase not in ('e5.source', 'e6.source'):
         raise PermissionError('prepared source assembly changes its exact programme phase')
@@ -543,7 +539,7 @@ def _derive(context, phase, specification, records, original, *, files=(), selec
         name = 'input.' + key + '.json'
         identity=ObjectIdentity.from_record(key,record) if key.startswith(('original.','development.')) else record.identity
         if source_assembly and key == 'prepared-programme':
-            from .matrix_programme_e4_inputs import prepared_source_lineage
+            from empirical_lawhood.api.matrix_programme_e4_inputs import prepared_source_lineage
             model_parents = prepared_source_lineage(original_e3=original.original_e3,
                 development_product=records['development-product'])
         else:
@@ -595,13 +591,10 @@ def _development(context, phase, original):
 
 
 def _source(context, phase, original):
-    from empirical_lawhood.adapters.methods.matrix_prepared_source_assembly import (
-        MatrixPreparedSourceAssemblyRequest, MatrixPreparedSourceAssemblySpecification,
-        MatrixPreparedRetainedE3AssemblyRequest, MatrixPreparedRetainedE3AssemblySpecification,
-    )
+    from empirical_lawhood.domains.matrix.matrix_prepared_source_assembly import MatrixPreparedSourceAssemblyRequest, MatrixPreparedSourceAssemblySpecification, MatrixPreparedRetainedE3AssemblyRequest, MatrixPreparedRetainedE3AssemblySpecification
     _, programme, _ = _protected_science(context, phase, original)
     settings = context.plan.specification.operations.source_metadata
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection, ConfiguredE3UnfinishedPreparationSelection, ConfiguredE3ClosedPreparationSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection, ConfiguredE3UnfinishedPreparationSelection, ConfiguredE3ClosedPreparationSelection
     continued = original.original_preparation.record.object_schema in (ConfiguredE3ContinuedPreparationSelection.SCHEMA,
         ConfiguredE3UnfinishedPreparationSelection.SCHEMA, ConfiguredE3ClosedPreparationSelection.SCHEMA)
     kind = MatrixPreparedRetainedE3AssemblyRequest if continued else MatrixPreparedSourceAssemblyRequest
@@ -626,11 +619,11 @@ def _decode(document, kind):
 
 
 def _protected(context, phase, original):
-    from empirical_lawhood.adapters.methods.matrix_prepared_source_experiment import MatrixPreparedSourceInputs, validate_input_companions
-    from empirical_lawhood.adapters.methods.matrix_source_evidence import MatrixSourcePipelineEvidence
-    from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceQualificationResult, ScientificSourceQualificationSpec
-    from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
+    from empirical_lawhood.domains.matrix.matrix_prepared_source_experiment import MatrixPreparedSourceInputs, validate_input_companions
+    from empirical_lawhood.domains.matrix.matrix_source_evidence import MatrixSourcePipelineEvidence
+    from empirical_lawhood.design.scientific_source_qualification import ScientificSourceQualificationResult, ScientificSourceQualificationSpec
+    from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
     operations = _operations(context)
     access = None if context.operation is None else context.operation.access_for(phase)
     if type(access) is not MatrixProgrammePreparedAccess:
@@ -644,7 +637,7 @@ def _protected(context, phase, original):
         raise TypeError('prepared protected phase needs its exact actual source selection and companions')
     validate_input_companions(inputs)
     selected = inputs.selection
-    from .matrix_programme_decisions import source_assessment
+    from empirical_lawhood.api.matrix_programme_decisions import source_assessment
     report = source_assessment(context, source_phase)
     specification, programme, nomination = _protected_science(context, phase, original, sources=selected.bank.sources)
     closure = programme.sources.closure

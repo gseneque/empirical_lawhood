@@ -2,6 +2,11 @@
 
 SPDX-License-Identifier: CC-BY-4.0
 
+**Historical execution record.** Current recursive migration acceptance is defined
+for [all 22 preprint families](../release/preprint-recursive-migration.md).
+The results below belong to their stated historical source and are not acceptance
+of the current v1.0 candidate or a substitute for the missing family protocols.
+
 This record documents reproduction on the local `paper_repro` branch.
 It tracks scientific results and the failures encountered during reproduction.
 Use the result summaries below to identify the original procedure and evidence limits.

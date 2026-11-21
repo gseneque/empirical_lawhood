@@ -50,7 +50,7 @@ Edit the copied JSON before running it. Keep schema
 `empirical-lawhood/simulators/torax-native/native-torax-quickstart`, all nested
 record schemas, version `1.0.0` and the `value` envelopes. Decimal fields use
 `{"decimal":"..."}`; `radial_cells` is an integer. Unknown fields, duplicate keys
-and bare fractional numbers refuse. The [typed records](../../../../../src/empirical_lawhood/adapters/simulators/torax_native/contracts.py)
+and bare fractional numbers refuse. The [typed records](../../../../../src/empirical_lawhood/domains/fusion/torax_native/contracts.py)
 and [bounded quickstart](../../../../../src/empirical_lawhood/adapters/simulators/torax_native/native_quickstart.py)
 permit these changes within one synthetic development preparation:
 
@@ -74,7 +74,7 @@ bounded to 32 KiB. A config satisfying these input relations can still refuse
 during native execution or fail the response-order check; decoding is not a
 promise of a successful simulation.
 
-The [operational admission owner](../../../../../src/empirical_lawhood/adapters/simulators/_native_admission.py)
+The [operational admission owner](../../../../../src/empirical_lawhood/execution/native_time_grid.py)
 permits at most 100,000 updates per arm and 1,000,000 retained radial history
 cells. A partial final timestep counts as a full update; the initial sample is
 also retained. With `S` admitted samples and `R` radial cells, the history

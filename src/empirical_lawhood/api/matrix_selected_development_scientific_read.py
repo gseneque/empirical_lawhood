@@ -6,23 +6,20 @@ instance, graph, plan and receipt closure. Original protected parents still
 use their existing current issue/reveal owners once. No nomination/headroom
 predicate authorizes this read; adverse and no-opportunity outcomes are kept.
 """
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_prepared_choices as scientific_choices
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity as opportunity
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_bindings as original
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_bindings as revision
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as declarative
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.functional_case_reduction import native_functional_case
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_secondary_readout import prepared_secondary_projection
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import MatrixSelectedOpportunityRootConfigV2,MatrixSelectedOpportunityEvidenceV2
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_results import assess_revision_programme
-from .matrix_selected_opportunity_runtime import _authenticate_original_products
-from .matrix_selected_scientific_read import (
-    _pin,_decode,_configuration,_consumed,_product,_original_source_operands,revision_entry_seal,_science_edges,
-    _replay_matched_revision_case,
-)
-from .matrix_selected_runtime import _published_input
-from empirical_lawhood.kernel.experimental_design import UnitAllocation
-from empirical_lawhood.runtime.prospective_experiment import source_filename
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_prepared_choices as scientific_choices
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity as opportunity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_bindings as original
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_bindings as revision
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as declarative
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.functional_case_reduction import native_functional_case
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_secondary_readout import prepared_secondary_projection
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixSelectedOpportunityRootConfigV2, MatrixSelectedOpportunityEvidenceV2
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_results import assess_revision_programme
+from empirical_lawhood.api.matrix_selected_opportunity_runtime import _authenticate_original_products
+from empirical_lawhood.api.matrix_selected_scientific_read import _pin, _decode, _configuration, _consumed, _product, _original_source_operands, revision_entry_seal, _science_edges, _replay_matched_revision_case
+from empirical_lawhood.api.matrix_selected_runtime import _published_input
+from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+from empirical_lawhood.execution.prospective_experiment import source_filename
 
 
 def _selected_programme(specification,instance,payloads,entry,is_revision):
@@ -45,7 +42,7 @@ def _selected_programme(specification,instance,payloads,entry,is_revision):
 
 
 def _evidence(writer,run_id,task,entry,is_revision,*,custody=None):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import MatrixRevisionEntryEvidenceV2
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixRevisionEntryEvidenceV2
     pin=entry.entry_evidence if is_revision else entry.evidence
     kinds=(MatrixRevisionEntryEvidenceV2,) if is_revision else (MatrixSelectedOpportunityEvidenceV2,)
     kinds=tuple(kind for kind in kinds if (kind.SCHEMA,kind.VERSION)==(pin.object_schema,pin.object_version))
@@ -118,7 +115,7 @@ def _science(writer,run_id,programme,entry_task,entry,is_revision,products,plan,
     native=tuple(native_functional_case(programme.criterion,case,source_by_case[case.case_id],observations[case.case_id][2],
         protocol=programme.protocol(source_by_case[case.case_id]),panels=dict(programme.panels)[case.unit_id]) for case in programme.roster.cases)
     groups=(('opportunity',tuple(group for group,_ in programme.panels)),)
-    from .matrix_mechanism_read import prepared_mechanism_projection
+    from empirical_lawhood.api.matrix_mechanism_read import prepared_mechanism_projection
     return {**retained,
         **(prepared_mechanism_projection(programme,mechanism) if is_revision else {}),
         'native_functional_diagnostic':{'scope':'NATIVE_ASSAY_ONLY_NO_POINT_OR_ADMISSION_CLAIM',
@@ -148,8 +145,8 @@ def read_development_result(*,directory,artifact_writer,specification,instance,p
     access=getattr(payloads,'original_input_access',None)
     custody=None
     if access is not None:
-        from .selected_prepared_access import validate_development_read_access
-        from .current_task_custody import CurrentDevelopmentTaskCustody
+        from empirical_lawhood.api.selected_prepared_access import validate_development_read_access
+        from empirical_lawhood.api.current_task_custody import CurrentDevelopmentTaskCustody
         validate_development_read_access(payloads=payloads,read_access=read_access)
         custody=CurrentDevelopmentTaskCustody(writer=artifact_writer,directory=directory,plan=plan,
             payloads=payloads,original_input_access=access,read_access=read_access)

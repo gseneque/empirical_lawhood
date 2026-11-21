@@ -18,6 +18,11 @@ dist/
 example-output/
 *.egg-info/
 
+# Browser tooling and operational output belong in an explicitly selected external directory.
+node_modules/
+playwright-report/
+test-results/
+
 # Rebuildable local operational catalog; scientific custody is external.
 .empirical-lawhood/
 
@@ -49,6 +54,7 @@ env/
 # archival scientific artifacts are intended to be tracked explicitly.
 
 # Local release working plans; retain outside version control.
+/OPTIM.md
 /FINALISERELEASE.md
 /FINALAUDIT.md
 /FINALISENAMING.md
@@ -58,3 +64,8 @@ env/
 /DOCFINALISE.md
 /RUBCAND-1.md
 /RUBCAND-1-LINEAGE.md
+
+# Local research plans, review material and notes; preserve their original bytes.
+/PROREVIEW/
+/docs/plans/
+/notes/

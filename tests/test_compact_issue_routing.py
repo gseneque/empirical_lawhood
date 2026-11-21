@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-"""Compact ISSUE routing uses the custody owner and preserves legacy controls.
+"""Canonical ISSUE routing uses the custody owner for every publication.
 
 All issues and grants here are disclosed synthetic software fixtures. These
 checks create no scientific qualification, real authority or native work.
@@ -11,20 +11,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure import catalog_rebuild
-from empirical_lawhood.infrastructure import publication_metadata
-from empirical_lawhood.infrastructure import study_issue
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.bounded_io import MAX_ARTIFACT_MANIFEST_BYTES
-from empirical_lawhood.infrastructure.publication_metadata import read_publication_metadata
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.runtime.artifact_sidecar import ArtifactManifestReference
-from empirical_lawhood.runtime.artifacts import ArtifactManifest
-from empirical_lawhood.runtime.catalog import (
-    ArtifactLocatorRecord, CatalogSnapshot, CatalogVerificationStatus,
-    LogicalArtifactRecord, StorageRootRecord,
-)
+from empirical_lawhood.storage import catalog_rebuild
+from empirical_lawhood.storage import publication_metadata
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage.publication_metadata import read_publication_metadata
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.storage.contracts.artifact_sidecar import ArtifactManifestReference
+from empirical_lawhood.storage.contracts.catalog import ArtifactLocatorRecord, CatalogSnapshot, CatalogVerificationStatus, LogicalArtifactRecord, StorageRootRecord
 from tests.numerical_provenance_fixtures import numerical_plane
 from tests.runtime_platform.test_study_issue import _issue_api_fixture, _issue_request
 from tests.test_publication_metadata import _block_payload_access, _requests
@@ -57,11 +51,11 @@ def _snapshot(plane, publication):
     )
 
 
-def test_public_standard_issue_uses_compact_batch_and_owner_reads_but_keeps_receipt_legacy(
+def test_public_standard_issue_and_receipt_use_canonical_publication(
         tmp_path, monkeypatch):
     api, paths, external, _ = _issue_api_fixture(tmp_path)
     plane = api._study_issue_publisher.artifact_plane
-    original_write, original_read = plane.write_compact_batch, plane.read_manifest
+    original_write, original_read = plane.write_batch, plane.read_manifest
     writes, reads = [], []
 
     def write(requests):
@@ -72,7 +66,7 @@ def test_public_standard_issue_uses_compact_batch_and_owner_reads_but_keeps_rece
         reads.append((relative, maximum_bytes))
         return original_read(relative, maximum_bytes=maximum_bytes)
 
-    monkeypatch.setattr(plane, "write_compact_batch", write)
+    monkeypatch.setattr(plane, "write_batch", write)
     monkeypatch.setattr(plane, "read_manifest", read)
     preview = api.issue_study(_issue_request(paths, confirmed=False))
     assert preview.reason_codes == ("WRITE_CONFIRMATION_REQUIRED",)
@@ -80,49 +74,28 @@ def test_public_standard_issue_uses_compact_batch_and_owner_reads_but_keeps_rece
     issued = api.issue_study(_issue_request(paths, confirmed=True))
     assert issued.succeeded, (issued.reason_codes, issued.errors)
     manifest, receipt = issued.payload.manifest, issued.payload.publication_receipt
-    assert receipt is not None and len(writes) == 1
+    assert receipt is not None
     main = f"issued-programmes/{manifest.issue_id}/manifest.json"
-    assert set(writes[0]) == {main, *(member.relative_path for member in manifest.members)}
+    assert sum(set(paths) == {main, *(member.relative_path for member in manifest.members)}
+        for paths in writes) == 1
     assert json.loads((external / (main + ".manifest.json")).read_bytes())["schema"] == ArtifactManifestReference.SCHEMA
     receipt_path = external / f"issued-programmes/{manifest.issue_id}/publication-receipt.json"
     receipt_raw = receipt_path.with_name(receipt_path.name + ".manifest.json").read_bytes()
-    assert json.loads(receipt_raw)["schema"] == ArtifactManifest.SCHEMA
-    assert decode_artifact_manifest(receipt_raw).logical.logical_artifact_id == receipt.receipt_id
+    assert json.loads(receipt_raw)["schema"] == ArtifactManifestReference.SCHEMA
+    assert resolve_artifact_sidecar_bytes(plane, receipt_raw).logical.logical_artifact_id == receipt.receipt_id
     replayed = api._study_issue_publisher.load_study(manifest.issue_id)
     assert replayed.manifest.canonical_bytes() == manifest.canonical_bytes()
     assert replayed.publication_receipt.canonical_bytes() == receipt.canonical_bytes()
-    assert (main, study_issue.MAX_PROGRAMME_AUTHORITY_BYTES) in reads
+    assert (main, None) in reads
     # The issue consumer's own calls retain its bound. Receipt read paths stay
     # with their original decoder; custody may inspect them independently.
     assert not any(path.endswith("/publication-receipt.json") for path, _ in reads)
 
 
-@pytest.mark.parametrize("write_hook", ("absent", "noncallable"))
-def test_alternate_plane_keeps_original_write_and_decode_fallback(tmp_path, write_hook):
-    api, paths, external, _ = _issue_api_fixture(tmp_path)
-    publisher = api._study_issue_publisher
-    hidden = {"read_manifest", "verify_manifest_members", "write_compact_batch"}
-    hooks = {}
-    if write_hook == "noncallable":
-        hidden.remove("write_compact_batch")
-        hooks["write_compact_batch"] = None
-    publisher._artifact_plane = _AlternatePlane(publisher.artifact_plane, missing=hidden, **hooks)
-    issued = api.issue_study(_issue_request(paths, confirmed=True))
-    assert issued.succeeded, (issued.reason_codes, issued.errors)
-    manifest, receipt = issued.payload.manifest, issued.payload.publication_receipt
-    replayed = publisher.load_study(manifest.issue_id)
-    assert replayed.manifest == manifest and replayed.publication_receipt == receipt
-    for member in manifest.members:
-        raw = (external / (member.relative_path + ".manifest.json")).read_bytes()
-        assert json.loads(raw)["schema"] == ArtifactManifest.SCHEMA
-        assert decode_artifact_manifest(raw).publication == receipt.publication
-
-
 @pytest.mark.parametrize("access", (OutcomeAccess.OUTCOME_BLIND, OutcomeAccess.EVALUATION_SEALED))
-@pytest.mark.parametrize("compact", (False, True))
-def test_metadata_normalizes_every_sidecar_without_payload_access(tmp_path, monkeypatch, access, compact):
+def test_metadata_normalizes_every_sidecar_without_payload_access(tmp_path, monkeypatch, access):
     plane = numerical_plane(tmp_path / "metadata")
-    writer = plane.write_compact_batch if compact else plane.write_batch
+    writer = plane.write_batch
     first, second = writer(_requests(access))
     read = plane.read_manifest
     reads = []
@@ -142,10 +115,9 @@ def test_metadata_normalizes_every_sidecar_without_payload_access(tmp_path, monk
     assert all(bound == plane.custody_limits.manifest_bytes for _, bound in reads)
 
 
-@pytest.mark.parametrize("compact", (False, True))
-def test_catalog_verifies_normalized_manifest_without_requiring_its_raw_encoding(tmp_path, monkeypatch, compact):
+def test_catalog_verifies_normalized_manifest_without_requiring_its_raw_encoding(tmp_path, monkeypatch):
     plane = numerical_plane(tmp_path / "catalog")
-    writer = plane.write_compact_batch if compact else plane.write_batch
+    writer = plane.write_batch
     first, _ = writer(_requests(OutcomeAccess.OUTCOME_BLIND))
     snapshot = _snapshot(plane, first)
     original = plane.read_manifest
@@ -157,14 +129,14 @@ def test_catalog_verifies_normalized_manifest_without_requiring_its_raw_encoding
 
     monkeypatch.setattr(plane, "read_manifest", observed)
     catalog_rebuild._verify_projected_artifacts(snapshot, plane)
-    assert reads == [(first.materialization.relative_path, MAX_ARTIFACT_MANIFEST_BYTES)]
+    assert reads == [(first.materialization.relative_path, None)]
     substituted = replace(snapshot, artifact_locators=(replace(snapshot.artifact_locators[0],
         physical_sha256="f" * 64),))
     with pytest.raises(catalog_rebuild.CatalogRebuildError, match="locator differs"):
         catalog_rebuild._verify_projected_artifacts(substituted, plane)
 
 
-def test_metadata_and_catalog_legacy_fallback_still_authenticate_siblings(tmp_path):
+def test_metadata_and_catalog_alternate_plane_still_authenticate_siblings(tmp_path):
     plane = numerical_plane(tmp_path / "fallback")
     first, second = plane.write_batch(_requests(OutcomeAccess.OUTCOME_BLIND))
     alternate = _AlternatePlane(plane, missing={"read_manifest"})
@@ -179,7 +151,7 @@ def test_metadata_and_catalog_legacy_fallback_still_authenticate_siblings(tmp_pa
 
 
 @pytest.mark.parametrize("consumer", ("issue", "metadata", "catalog"))
-def test_present_noncallable_reader_refuses_instead_of_using_a_legacy_decoder(tmp_path, consumer):
+def test_present_noncallable_reader_refuses_instead_of_ignoring_the_selected_reader(tmp_path, consumer):
     api, paths, _, _ = _issue_api_fixture(tmp_path)
     issued = api.issue_study(_issue_request(paths, confirmed=True))
     assert issued.succeeded
@@ -200,7 +172,7 @@ def test_present_noncallable_reader_refuses_instead_of_using_a_legacy_decoder(tm
 
 def test_compact_metadata_corruption_refuses_before_payload_access(tmp_path, monkeypatch):
     plane = numerical_plane(tmp_path / "corrupt-metadata")
-    first, second = plane.write_compact_batch(_requests(OutcomeAccess.EVALUATION_SEALED))
+    first, second = plane.write_batch(_requests(OutcomeAccess.EVALUATION_SEALED))
     actual = plane.read_manifest(first.materialization.relative_path)
     plane.root.resolve(actual.publication.commit_marker_relative_path, for_write=False).unlink()
     _block_payload_access(monkeypatch, plane, (first, second))
@@ -208,10 +180,9 @@ def test_compact_metadata_corruption_refuses_before_payload_access(tmp_path, mon
         read_publication_metadata(plane, first)
 
 
-@pytest.mark.parametrize("compact", (False, True))
-def test_metadata_rechecks_exact_commit_after_resolving_siblings(tmp_path, monkeypatch, compact):
+def test_metadata_rechecks_exact_commit_after_resolving_siblings(tmp_path, monkeypatch):
     plane = numerical_plane(tmp_path / "changed-marker")
-    writer = plane.write_compact_batch if compact else plane.write_batch
+    writer = plane.write_batch
     first, second = writer(_requests(OutcomeAccess.EVALUATION_SEALED))
     actual = plane.read_manifest(first.materialization.relative_path)
     marker = plane.root.resolve(actual.publication.commit_marker_relative_path, for_write=False)

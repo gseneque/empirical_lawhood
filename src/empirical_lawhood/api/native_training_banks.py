@@ -10,22 +10,20 @@ from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as records
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_acquisition import (
-    entry_task_id, export_training_banks, task_id,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import authenticate_request
-from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as records
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_acquisition import entry_task_id, export_training_banks, task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_request
+from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
 from empirical_lawhood.api.recursive_execution import _read_recursive_wave_with_roots
 from empirical_lawhood.api.recursive_operations import development_output_contracts, operation_catalog
 from empirical_lawhood.api.recursive_qualified_parents import _output_payload
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experimental_design import UnitAllocation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult, lineage_parent_sort_key
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult, lineage_parent_sort_key
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
 
 
 @dataclass(frozen=True, slots=True)
@@ -115,7 +113,7 @@ def _export_authored_preflight(*, directory, artifact_writer, expected_locator):
     def validate_authored(*, packet, draft, source, payloads, run, plan, index):
         specification, request, instance = _read_instance(payloads)
         if expected_locator is not None:
-            from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+            from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
             if type(expected_locator) is not MatrixFiniteDtTrainingLocator:
                 raise TypeError('native TRAIN export substitutes its exact authored locator')
             expected_locator.__post_init__()
@@ -137,7 +135,7 @@ def _collect_export_records(*, writer, products, plan, specification, get_produc
     acquisition, receipt = get_product(entry_task_id(specification),
         records.NativeTrainingAcquisitionSeal)
     from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
-    from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+    from empirical_lawhood.execution.execution import VerifiedArtifactInput
     logical, = (value for value in receipt.output_logical_artifacts if value.payload_schema == records.NativeTrainingAcquisitionSeal.SCHEMA)
     retained = products["outputs"][logical.logical_artifact_id]
     # The generic reader projects receipt-bound logical/materialized identities;
@@ -168,7 +166,7 @@ def export_native_training_banks(*, directory, artifact_writer, output_directory
     Output publication is last, after complete custody and pure scientific joins.
     Original scientific products, task receipts and source bytes remain exact.
     """
-    from empirical_lawhood.kernel.serialization import validate_stable_id
+    from empirical_lawhood.science.records.serialization import validate_stable_id
     validate_stable_id(record_id)
     target = Path(output_directory)
     if not target.is_absolute() or target != target.resolve(strict=False):
@@ -184,8 +182,8 @@ def export_native_training_banks(*, directory, artifact_writer, output_directory
     for name in ("allocation", "features", "outcomes"):
         artifact_writer.root.resolve(relative + "/" + name + ".json", for_write=True)
     from contextlib import nullcontext
-    from .recursive_execution import _read_only_custody_policy
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.api.recursive_execution import _read_only_custody_policy
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
     bounded = (type(artifact_writer) is ExternalArtifactPlane
         and _read_only_custody_policy(artifact_writer) is not None)
     scope = artifact_writer.read_context() if bounded else nullcontext(artifact_writer)
@@ -234,8 +232,8 @@ def export_native_training_banks(*, directory, artifact_writer, output_directory
 
 def export_selected_native_training_banks(*, directory, artifact_writer, selection_path):
     """Public registered export transition over the ordinary authenticated owner."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_exports import NativeTrainingBankExportSelection
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_exports import NativeTrainingBankExportSelection
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
     path = Path(selection_path)
     if any(value.is_symlink() for value in (path,*path.parents)):
         raise ValueError('native TRAIN export refuses a linked selection')

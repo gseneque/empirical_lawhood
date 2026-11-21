@@ -11,7 +11,7 @@ import pytest
 import yaml
 
 from empirical_lawhood.api import codecs
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
 
 @dataclass(frozen=True)
@@ -103,9 +103,8 @@ def test_node_budget_counts_repeated_occurrences(monkeypatch: pytest.MonkeyPatch
             stack.extend(value.values())
         elif isinstance(value, list):
             stack.extend(value)
-    monkeypatch.setattr(codecs, "MAX_AUTHORING_NODES", count - 1)
     with pytest.raises(codecs.AuthoringCodecError, match="node limit"):
-        load(document())
+        codecs._parse_json(text, maximum_nodes=count - 1)
     assert codecs._authoring_parse.get() is None
 
 

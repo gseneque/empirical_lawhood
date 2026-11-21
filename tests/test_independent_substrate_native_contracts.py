@@ -9,18 +9,18 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from empirical_lawhood.adapters.methods.selective_dependence_response.contracts import SelectiveDependenceResponsePhase
-from empirical_lawhood.adapters.simulators.cantera_reaction_response.design import cantera_design, cantera_preparation_freeze
-from empirical_lawhood.adapters.methods.selective_dependence_response.preparation_inputs import SelectiveDependenceResponsePreparationInput
-from empirical_lawhood.adapters.simulators.cantera_reaction_response.preparation_inputs import DRAW_VARIABLE_IDS as CANTERA_DRAW_VARIABLE_IDS, cantera_preparation_input
-from empirical_lawhood.adapters.simulators.fipy_reaction_diffusion_response.preparation_inputs import DRAW_VARIABLE_IDS as FIPY_DRAW_VARIABLE_IDS, fipy_preparation_input
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.methods.selective_dependence_response.contracts import SelectiveDependenceResponsePhase
+from empirical_lawhood.domains.chemistry.chemical_reactor.design import cantera_design, cantera_preparation_freeze
+from empirical_lawhood.methods.selective_dependence_response.preparation_inputs import SelectiveDependenceResponsePreparationInput
+from empirical_lawhood.domains.chemistry.chemical_reactor.preparation_inputs import DRAW_VARIABLE_IDS as CANTERA_DRAW_VARIABLE_IDS, cantera_preparation_input
+from empirical_lawhood.domains.chemistry.reaction_diffusion.preparation_inputs import DRAW_VARIABLE_IDS as FIPY_DRAW_VARIABLE_IDS, fipy_preparation_input
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from empirical_lawhood.adapters.simulators.cantera_reaction_response.runtime import execute_cantera_complete_unit
-from empirical_lawhood.adapters.simulators.fipy_reaction_diffusion_response.design import fipy_design, fipy_preparation_freeze
+from empirical_lawhood.domains.chemistry.reaction_diffusion.design import fipy_design, fipy_preparation_freeze
 from empirical_lawhood.adapters.simulators.fipy_reaction_diffusion_response.runtime import execute_fipy_complete_unit
 from empirical_lawhood.adapters.simulators.reaction_diffusion_development_input import ReactionDiffusionDevelopmentInput
 from empirical_lawhood.cli.app import app
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -85,7 +85,8 @@ def test_fipy_native_canary_binds_version_action_and_receivers() -> None:
 @pytest.mark.native('fipy')
 def test_fipy_source_mass_balance_and_outside_action_refusal() -> None:
     pytest.importorskip("fipy")
-    from empirical_lawhood.adapters.simulators.fipy_reaction_diffusion_response.runtime import _condition, _preparation
+    from empirical_lawhood.adapters.simulators.fipy_reaction_diffusion_response.runtime import _condition
+    from empirical_lawhood.domains.chemistry.reaction_diffusion.response import preparation as _preparation
 
     design = _shipped_config("fipy").design
     preparation = _preparation(_fixture_preparation(design, "unit.public-fipy-science-check", 318843877258697519703146587715971708824))
@@ -123,7 +124,8 @@ def test_fipy_source_mass_balance_and_outside_action_refusal() -> None:
 @pytest.mark.native('cantera')
 def test_cantera_flow_integral_temperature_response_and_outside_refusal() -> None:
     pytest.importorskip("cantera")
-    from empirical_lawhood.adapters.simulators.cantera_reaction_response.runtime import _condition, _preparation
+    from empirical_lawhood.adapters.simulators.cantera_reaction_response.runtime import _condition
+    from empirical_lawhood.domains.chemistry.chemical_reactor.response_assessment import _preparation
 
     design = _shipped_config("cantera").design
     preparation = _preparation(_fixture_preparation(design, "unit.public-cantera-science-check", 78329071824047932297957754850949812751))

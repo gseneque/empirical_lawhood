@@ -5,47 +5,33 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import Any, cast
 
-from empirical_lawhood.kernel.authority import AuthorityAction, ResourceBudget
-from empirical_lawhood.kernel.evidence import (
-    EvidenceCeiling,
-    OutcomeAccess,
-    VisibilityCeiling,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import LifecycleStatus, ReadinessStatus
-from empirical_lawhood.kernel.worlds import EvidenceUnitScope
-from empirical_lawhood.planning.campaigns import (
-    CampaignLane,
-    CampaignNode,
-    CampaignNodeKind,
-    CampaignSpec,
-    DecisionRight,
-)
-from empirical_lawhood.planning.experiment_entry import ExperimentEntryChecklist, ExperimentEntryPackage, ExperimentEntryRequirement, ExperimentEntryRequirementBinding, ExperimentEntryTransition, ExperimentTerminalClass, StudyDefinition
-from empirical_lawhood.planning.formal_analysis import (
-    FormalGapSourceCapabilityInventory,
-)
-from empirical_lawhood.planning.formal_gaps import FormalGapCoverage, FormalGapRegister
-from empirical_lawhood.planning.study_authoring import CapabilitySelection, DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, MaterializationQualificationReceipt, StudyDraft, StudyDraftLifecycle, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
-from empirical_lawhood.runtime.candidate_compiler import CandidateCompilationContext, StudyTemplate
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityCatalog
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.plans import ProtocolTemplate
-from empirical_lawhood.runtime.source_resolution import (
-    SourceMaterializationConfig,
-    SourceReadMode,
-)
+from empirical_lawhood.science.identity.authority import AuthorityAction, ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import LifecycleStatus, ReadinessStatus
+from empirical_lawhood.science.models.worlds import EvidenceUnitScope
+from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
+from empirical_lawhood.design.experiment_entry import ExperimentEntryChecklist, ExperimentEntryPackage, ExperimentEntryRequirement, ExperimentEntryRequirementBinding, ExperimentEntryTransition, ExperimentTerminalClass, StudyDefinition
+from empirical_lawhood.design.formal_analysis import FormalGapSourceCapabilityInventory
+from empirical_lawhood.design.formal_gaps import FormalGapCoverage, FormalGapRegister
+from empirical_lawhood.design.study_authoring import CapabilitySelection, DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, MaterializationQualificationReceipt, StudyDraft, StudyDraftLifecycle, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
+from empirical_lawhood.execution.candidate_compiler import CandidateCompilationContext, StudyTemplate
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.plans import ProtocolTemplate
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
 
-from .gauge_covariant_response_authoring import build_gauge_covariant_response_authoring_bundle
-from .gauge_covariant_response_contracts import GaugeCovariantResponseConfig
-from .material_source_design_contracts import MaterialSourceDesignConfig
-from .material_control_candidate import material_control_candidate_catalog, material_control_template
-from .material_control_contracts import MATERIAL_CONTROL_METHOD_CAPABILITY_KEY, MATERIAL_CONTROL_SOURCE_CAPABILITY_KEY, MaterialControlConfig, MaterialControlControlBundleQualification, decode_material_control_config_bytes
-from .multiband_strong_coupling_response import qualify_multiband_bridge
-from .material_control_registration import material_control_metadata_task_budget, material_control_registry, material_control_task_budget
-from .material_control_runtime import SOURCE_CONTRACT_ARTIFACT_ID, material_control_protocol
-from .material_control_solver import MATERIAL_CONTROL_WORKFLOW_PROFILES
-from .material_control_source import expected_material_control_control_bundle
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.gauge_covariant_response_authoring import build_gauge_covariant_response_authoring_bundle
+from empirical_lawhood.domains.materials.superconductivity.gauge_covariant_response_contracts import GaugeCovariantResponseConfig
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_contracts import MaterialSourceDesignConfig
+from empirical_lawhood.domains.materials.superconductivity.material_control_candidate import material_control_candidate_catalog, material_control_template
+from empirical_lawhood.domains.materials.superconductivity.material_control_contracts import MATERIAL_CONTROL_METHOD_CAPABILITY_KEY, MATERIAL_CONTROL_SOURCE_CAPABILITY_KEY, MaterialControlConfig, MaterialControlControlBundleQualification, decode_material_control_config_bytes
+from empirical_lawhood.domains.materials.superconductivity.multiband_strong_coupling_response import qualify_multiband_bridge
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_registration import material_control_metadata_task_budget, material_control_registry, material_control_task_budget
+from empirical_lawhood.domains.materials.superconductivity.material_control_stages import SOURCE_CONTRACT_ARTIFACT_ID
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_runtime import material_control_protocol
+from empirical_lawhood.domains.materials.superconductivity.workflow_profiles import MATERIAL_CONTROL_WORKFLOW_PROFILES
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_control_source import expected_material_control_control_bundle
 
 MATERIAL_CONTROL_SCOPE_ID = 'scope.ambient-pressure-superconductor-material-control-control-science-freeze'
 

@@ -2,6 +2,24 @@
 
 SPDX-License-Identifier: CC-BY-4.0
 
+## 1.0.0 (unreleased)
+
+The [v1.0 release notes](docs/release/1.0.0.md) describe contributor interfaces, source migration and preservation boundaries.
+
+- Established complete public guides and working starters for investigations, reusable calculations and domains.
+- Added an investigation entry that composes the existing preparation, execution, custody and recovery services from explicit paths.
+- Added a minimal pure-calculation contract and one authoritative routine extension declaration with generated registry projections.
+- Moved source into responsibility-named scientific, design, method, domain, execution, storage and packaged-asset owners.
+- Removed superseded Python paths without aliases or compatibility wrappers.
+- Added authored-operation tracing, shared structured diagnostics and automatic resource selection within declared constraints.
+- Preserved original scientific formats, evidence bytes, outcome meaning and existing acceptance boundaries.
+- Implemented 22 new preprint-inspired joint-description experiments with editable recipes, six shared causal operations and nine assessed supplier requirements.
+- Added calibration-root crossfit, sealed forecast/action choice, complete paired outcome accounting, explicit interface/memory/forecast-work economics, and per-root native custody/recovery.
+- Added physical-cohort input validation and native CPU and JAX/TORAX GPU selection. Twenty families have verified primary CPU results. R14 and R16 await physical inputs, and R17 and R22 await separate GPU qualification. [Study findings](programmes/shared-records/joint-description-results.md)
+
+The delivery's exact source and verification packet determine software acceptance.
+A version number does not establish a hosted publication or new scientific qualification.
+
 ## 0.3.0
 
 The [release notes](docs/release/0.3.0.md) summarise changes, migration and verification limits.

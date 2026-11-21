@@ -1,51 +1,34 @@
 # SPDX-License-Identifier: MPL-2.0
 """Replay actual qualification custody before a prospective parent is consumed."""
 
-from dataclasses import dataclass, field, fields, replace
+from dataclasses import dataclass, fields, replace
 from datetime import UTC, datetime
 from hashlib import sha256
 from types import MappingProxyType
 
-from .codecs import MAX_CAMPAIGN_PACKAGE_BYTES
-from .current_result_custody import (
-    CurrentResultPlanReader, _current_control,
-    authenticate_historical_execution_authority, require_current_result_receipt_outputs, retained_output_artifact_plane,
-)
+from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader, _current_control, authenticate_historical_execution_authority, require_current_result_receipt_outputs, retained_output_artifact_plane
 from empirical_lawhood.api.models import EnvelopeExperimentPackage, ExperimentPackage
-from empirical_lawhood.runtime.artifacts import artifact_custody_limits
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from ..infrastructure.execution import LocalScheduler
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from ..infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.study_issue import (
-    ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore,
-    PROGRAMME_ISSUE_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID,
-)
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-from empirical_lawhood.kernel.status import AdmissionStatus, OperationalStatus, ScientificStatus
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, require_study_authority
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability, MAX_ADJUDICATION_BYTES, ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactLineageParent, MAX_ARTIFACT_PUBLICATION_MEMBERS, lineage_parent_sort_key
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-from empirical_lawhood.runtime.plans import ExecutionPlan
-from empirical_lawhood.runtime.recovery import (
-    EnvelopeRunRecoveryIndex, RunRecoveryIndex, build_run_recovery_index,
-)
-from empirical_lawhood.runtime.recursive_qualified_parents import (
-    QualifiedParentAdditionalProduct, QualifiedParentEvidence, QualifiedParentPriorExecution, QualifiedParentPriorNative,
-    RecursivePriorExecutionBinding, RecursiveQualifiedParentBinding,
-)
-
-MAX_PARENT_BYTES = 16 * 1024**2
-MAX_PARENT_BINDINGS = 32
-MAX_PRIOR_EXECUTIONS = 32
+from empirical_lawhood.storage.contracts.artifacts import artifact_custody_limits
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.execution.local.execution import LocalScheduler
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+from empirical_lawhood.science.records.status import AdmissionStatus, OperationalStatus, ScientificStatus
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, require_study_authority
+from empirical_lawhood.design.study_authoring import CapabilitySelection
+from empirical_lawhood.storage.contracts.record_codecs import resolve_operation_output_codec, resolve_record_codec
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, MAX_ADJUDICATION_BYTES, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactLineageParent, lineage_parent_sort_key
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
+from empirical_lawhood.execution.plans import ExecutionPlan
+from empirical_lawhood.execution.recovery import EnvelopeRunRecoveryIndex, RunRecoveryIndex, build_run_recovery_index
+from empirical_lawhood.execution.recursive_qualified_parents import MAX_PARENT_BYTES as MAX_PARENT_BYTES, MAX_PARENT_BINDINGS as MAX_PARENT_BINDINGS, MAX_PRIOR_EXECUTIONS as MAX_PRIOR_EXECUTIONS, MAX_PRIOR_COMPANION_SCHEMAS, QualifiedParentAdditionalProduct, QualifiedParentEvidence, QualifiedParentPriorExecution, QualifiedParentPriorNative, RecursivePriorExecutionBinding, RecursiveQualifiedParentBinding, require_prior_execution_bindings
 
 
 def _actual_package(writer, run_id, *, control_reader=None):
@@ -56,7 +39,7 @@ def _actual_package(writer, run_id, *, control_reader=None):
     if record_type is None:
         raise PermissionError('qualified parent lacks its actual current issued package')
     return _current_control(writer=writer, run_id=run_id, name='campaign-package',
-                            record_type=record_type, maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES, control_reader=control_reader)
+                            record_type=record_type, maximum_bytes=None, control_reader=control_reader)
 
 
 def _exact_output(receipt, logical_id):
@@ -99,7 +82,6 @@ class _ParentReceiptClosure:
     manifests: tuple
     operational_summaries: MappingProxyType
     recovery_index: RunRecoveryIndex | EnvelopeRunRecoveryIndex
-    _manifest_batches: tuple = field(init=False, repr=False)
 
     def __post_init__(self):
         unique = {}
@@ -109,9 +91,6 @@ class _ParentReceiptClosure:
                 raise PermissionError('qualified parent closure aliases an exact immutable input')
         manifests = tuple(unique.values())
         object.__setattr__(self, 'manifests', manifests)
-        object.__setattr__(self, '_manifest_batches', tuple(
-            manifests[start:start + MAX_ARTIFACT_PUBLICATION_MEMBERS]
-            for start in range(0, len(manifests), MAX_ARTIFACT_PUBLICATION_MEMBERS)))
 
 
 class _ParentReadScope:
@@ -157,7 +136,7 @@ def _collect_receipt_closure(package, plan, writer, reveal, prefixes, *, control
     if index != expected_index:
         raise PermissionError('qualified parent changes its actual recovery plan or authority census')
     if type(index) is RunRecoveryIndex:
-        from .retained_e3_control_repair import selected_repair_index
+        from empirical_lawhood.api.retained_e3_control_repair import selected_repair_index
         index = selected_repair_index(writer=writer, plan=plan, predecessor=index)
     terminal = recovery.read_terminal(index)
     task_ids = tuple(task.task_id for task in plan.tasks)
@@ -176,7 +155,7 @@ def _collect_receipt_closure(package, plan, writer, reveal, prefixes, *, control
         if set(latest) - set(task_ids) or not allow_partial and set(latest) != set(task_ids):
             raise PermissionError('retained parent terminal changes its complete assigned task census')
     if allow_partial:
-        from empirical_lawhood.infrastructure.recursive_custody import _partial_operational_census, _execution_operational_census
+        from empirical_lawhood.storage.recursive_custody import _partial_operational_census, _execution_operational_census
         if type(plan) is not ExecutionPlan:
             raise TypeError('partial scientific custody requires the exact supported execution plan')
         if terminal is None:
@@ -256,9 +235,8 @@ def _collect_receipt_closure(package, plan, writer, reveal, prefixes, *, control
 def _verify_receipt_closure(writer, closure, *, before_member=None):
     # The original closure owns its immutable deduplicated census once. Keep
     # those exact tuples, rather than rebuilding/hashing ancestry per consumer.
-    for manifests in closure._manifest_batches:
-        writer.verify_manifests(manifests,
-            **({} if before_member is None else {'before_member': before_member}))
+    writer.verify_manifests(closure.manifests,
+        **({} if before_member is None else {'before_member': before_member}))
     return closure.by_task
 
 
@@ -282,7 +260,14 @@ def _complete_receipts(package, plan, writer, reveal, prefixes, *, verify_payloa
     return _verify_receipt_closure(writer, closure) if verify_payloads else closure.by_task
 
 
-def _additional_products(writer, producing, schemas, output_codecs, *, outcome_access=OutcomeAccess.EVALUATION_SEALED):
+def _producer_selection(plan, task_id, plan_reader):
+    task = plan_reader.execution_task(execution_plan=plan, task_id=task_id)
+    return CapabilitySelection(task.capability.capability_key, task.capability.capability_version,
+        task.capability_implementation_sha256)
+
+
+def _additional_products(writer, producing, schemas, output_codecs, *, producer_selection,
+        outcome_access=OutcomeAccess.EVALUATION_SEALED):
     """Read only installed, declared outputs of this actual successful producer.
 
     The caller has already replayed original issue, execution, reveal, plan,
@@ -291,14 +276,16 @@ def _additional_products(writer, producing, schemas, output_codecs, *, outcome_a
     """
     if not schemas:
         return ()
-    if (type(schemas) is not tuple or len(schemas) > 4 or schemas != tuple(sorted(set(schemas)))
+    if (type(schemas) is not tuple or len(schemas) > MAX_PRIOR_COMPANION_SCHEMAS or schemas != tuple(sorted(set(schemas)))
             or producing.operational_status is not OperationalStatus.SUCCEEDED):
         raise PermissionError('qualified parent companion requires an exact bounded declaration and successful producer')
     prepared, aggregate = [], 0
     for schema in schemas:
-        record_type = output_codecs.get(schema)
-        if record_type is None or record_type.SCHEMA != schema:
-            raise PermissionError('qualified parent companion lacks its installed typed scientific codec')
+        try:
+            record_type = resolve_operation_output_codec(output_codecs, producer_selection, schema,
+                allow_unbound_unique=True)
+        except (ValueError, KeyError) as error:
+            raise PermissionError(f'qualified parent companion lacks its exact installed typed scientific codec: {error}') from error
         logicals = tuple(value for value in producing.output_logical_artifacts if value.payload_schema == schema)
         if len(logicals) != 1:
             raise PermissionError('qualified parent companion output is absent or duplicated in the actual producer receipt')
@@ -359,9 +346,11 @@ def _prior_execution_entry(binding, writer, output_codecs, read_scope, required_
             or receipt.operational_status is not OperationalStatus.SUCCEEDED):
         raise PermissionError('prior execution lacks its exact successful original producing receipt')
     logical = _exact_output(receipt, binding.logical_artifact_id)
-    codec = output_codecs.get(binding.record.object_schema)
-    if (codec is None or (codec.SCHEMA, codec.VERSION) != (binding.record.object_schema, binding.record.object_version)
-            or logical.payload_schema != binding.record.object_schema
+    try:
+        codec = resolve_record_codec(output_codecs, binding.record.object_schema, binding.record.object_version)
+    except (ValueError, KeyError) as error:
+        raise PermissionError(f'prior execution lacks its exact installed record revision: {error}') from error
+    if (logical.payload_schema != binding.record.object_schema
             or logical.content_sha256 != binding.record.object_fingerprint
             or not owned and (logical.outcome_access is not required_outcome_access
                 or logical.visibility_ceiling is not VisibilityCeiling.PROSPECTIVE)
@@ -372,6 +361,11 @@ def _prior_execution_entry(binding, writer, output_codecs, read_scope, required_
         logical=logical, capability_prefixes=prefixes)
     if type(plan) is not ExecutionPlan or ObjectIdentity.from_record(plan.execution_plan_id, plan) != binding.execution_plan:
         raise PermissionError('prior execution substitutes its exact original issued execution plan')
+    selected_codec = resolve_operation_output_codec(output_codecs,
+        _producer_selection(plan, binding.task_id, read_scope.plan_reader), binding.record.object_schema,
+        allow_unbound_unique=True)
+    if selected_codec is not codec:
+        raise PermissionError('prior execution record revision differs from its original selected producer')
     if owned:
         _require_owned_product_binding(product_custody, read_scope, package, plan)
     return package, plan, receipt, logical, codec, prefixes
@@ -421,6 +415,7 @@ def _authenticate_prior_execution(binding, writer, output_codecs, *, scope_valid
             prepared.append((schema, producers[0]))
         products = tuple(product for schema, producer in prepared
             for product in _additional_products(writer, producer, (schema,), output_codecs,
+                producer_selection=_producer_selection(plan, producer.task_id, read_scope.plan_reader),
                 outcome_access=OutcomeAccess.OUTCOME_BLIND))
         scope_parent = replace(parent_evidence, prior_scope_products=products)
     verdict = scope_validator(parent_evidence=scope_parent, binding=binding, package=package, execution_plan=plan)
@@ -458,6 +453,7 @@ def _authenticate_prior_execution(binding, writer, output_codecs, *, scope_valid
         requested.append((schema, producers[0]))
     for schema, producer in requested:
         values = _additional_products(writer, producer, (schema,), output_codecs,
+            producer_selection=_producer_selection(plan, producer.task_id, read_scope.plan_reader),
             outcome_access=OutcomeAccess.OUTCOME_BLIND)
         additional.extend(values)
     native = _prior_native_subwork(writer, binding, plan, by_task, control_reader=read_scope.plan_reader)
@@ -470,7 +466,7 @@ def _owned_product_options(custody, validator):
     """A code-owned product callback always accompanies a live exact custody."""
     if custody is None and validator is None:
         return False
-    from .current_task_custody import CurrentIssuedTaskCustody
+    from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
     if type(custody) is not CurrentIssuedTaskCustody or not callable(validator):
         raise PermissionError("owned prior product requires paired current custody and installed validator")
     return True
@@ -540,10 +536,10 @@ def _prior_native_subwork(writer, binding, plan, by_task, *, control_reader=None
 
 
 def _read_prior_native_subwork(writer, binding, plan, by_task, *, control_reader, task_index):
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-    from empirical_lawhood.runtime.artifacts import verify_artifact_manifests
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.storage.contracts.artifacts import verify_artifact_manifests
+    from empirical_lawhood.execution.native_subwork import NativeSubworkState
     tasks = ({task.task_id: task for task in plan.tasks} if task_index is None else task_index) if control_reader is None else None
     result = []
     for request in binding.native_subwork:
@@ -590,11 +586,11 @@ def _require_parent_authorities_current(entries, writer):
     # Singular preparation also accepts a plain artifact plane. Own a finite
     # verification lifetime rather than assuming a caller entered one.
     entries = tuple(entries)
-    from .selected_e3_access import _current_authority_reader
+    from empirical_lawhood.api.selected_e3_access import _current_authority_reader
     authority_reader = _current_authority_reader(writer)
     if authority_reader is not None:
         return _validate_parent_authorities_now(entries, _load_parent_authorities_in_scope(entries, authority_reader))
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, _ScopedArtifactPlane, _has_stock_manifest_reads
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, _ScopedArtifactPlane, _has_stock_manifest_reads
     if type(writer) is _ScopedArtifactPlane and _has_stock_manifest_reads(writer):
         # Grant refresh owns only the grant's publication. It must not traverse
         # all scientific bytes accumulated by the caller's immutable read.
@@ -730,7 +726,7 @@ def _authenticate(binding, contribution, product, writer, output_codecs, *, qual
         or adjudication.visibility_ceiling is not VisibilityCeiling.OUTCOME_VISIBLE):
         raise PermissionError('qualified parent has no actual supported, admitted and revealed qualification')
     # Reuse the actual issued evaluator context rather than trust matching labels.
-    from .execution import CampaignExecutionService
+    from empirical_lawhood.api.execution import CampaignExecutionService
     task = qualification_task
     output = next(value for value in task.outputs if value.logical_artifact_id == qualification_logical.logical_artifact_id)
     context = CampaignExecutionService._bind_scientific_adjudication(package, plan,
@@ -746,7 +742,8 @@ def _authenticate(binding, contribution, product, writer, output_codecs, *, qual
     product_payload = _output_payload(writer, producing, logical, min(MAX_PARENT_BYTES, product.artifact.size_bytes))
     if len(product_payload) != product.artifact.size_bytes or sha256(product_payload).hexdigest() != product.record.object_fingerprint:
         raise PermissionError('qualified parent contribution changes its actual supplied record')
-    additional = _additional_products(writer, producing, qualified_parent_evidence_schema_ids, output_codecs)
+    additional = _additional_products(writer, producing, qualified_parent_evidence_schema_ids, output_codecs,
+        producer_selection=_producer_selection(plan, producing.task_id, read_scope.plan_reader))
     _require_parent_authorities_current(((binding, package),), writer)
     return QualifiedParentEvidence(binding, package, plan, producing, qualifying, adjudication, product_payload, additional)
 
@@ -814,7 +811,7 @@ def _authenticate_recursive_qualified_parents(*, spec_bindings, draft, artifact_
     schemas_by_external = {}
     for binding, _, _, _, _, _, schemas, _, _ in prepared:
         combined = tuple(sorted(set((*schemas_by_external.get(binding.external_input_id, ()), *schemas))))
-        if len(combined) > 4:
+        if len(combined) > MAX_PRIOR_COMPANION_SCHEMAS:
             raise PermissionError('qualified parent companion declarations exceed their finite combined census')
         schemas_by_external[binding.external_input_id] = combined
     evidence = {}
@@ -831,11 +828,7 @@ def _authenticate_recursive_qualified_parents(*, spec_bindings, draft, artifact_
             artifact_writer.require_verification_context()
         if prior_projection is not None:
             requests = prior_projection(parent)
-            if (type(requests) is not tuple or not requests or len(requests) > MAX_PRIOR_EXECUTIONS
-                    or any(type(value) is not RecursivePriorExecutionBinding for value in requests)
-                    or len({value.binding_id for value in requests}) != len(requests)
-                    or len({(value.run_id, value.task_id) for value in requests}) != len(requests)):
-                raise PermissionError('qualified parent prior executions lack their bounded exhaustive exact locator census')
+            require_prior_execution_bindings(requests)
             prior = []
             for request in requests:
                 key = request.fingerprint()

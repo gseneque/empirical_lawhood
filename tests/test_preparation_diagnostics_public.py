@@ -16,21 +16,21 @@ import pytest
 from empirical_lawhood.api import preparation_diagnostics as api
 from empirical_lawhood.api.preparation_inputs import bind_constructed_preparation_q
 from empirical_lawhood.api.preparation_result_access import preparation_result_access
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.diagnostic_records import PreparationDiagnosticInput
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.records import ConstructedPreparationSelection, ConstructedPreparationLowerSeal, numbers
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.measurement import measure_root
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.readout import report, constructor_crossing
-from empirical_lawhood.adapters.methods.preparation_applicability import measurement
-from empirical_lawhood.adapters.simulators.constructed_preparation_applicability.records import ConstructedPreparationNativePhase, ConstructedPreparationStream, ConstructedPreparationPrefix, ConstructedPreparationParents, ConstructedPreparationPanel, nominal_digest
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus, ScientificStatus, AdmissionStatus
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord, AdjudicationEvaluability
-from empirical_lawhood.runtime.execution import OperationalAttempt, TaskAttemptDisposition
-from empirical_lawhood.runtime.recovery import build_run_recovery_index
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.diagnostic_records import PreparationDiagnosticInput
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.records import ConstructedPreparationSelection, ConstructedPreparationLowerSeal, numbers
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.measurement import measure_root
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.readout import report, constructor_crossing
+from empirical_lawhood.domains.matrix.preparation_applicability import measurement
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.phase_records import ConstructedPreparationNativePhase, ConstructedPreparationStream, ConstructedPreparationPrefix, ConstructedPreparationParents, ConstructedPreparationPanel, nominal_digest
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus, ScientificStatus, AdmissionStatus
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord, AdjudicationEvaluability
+from empirical_lawhood.execution.execution import OperationalAttempt, TaskAttemptDisposition
+from empirical_lawhood.execution.recovery import build_run_recovery_index
 from tests.finite_response_rerun_fixtures import publish_current_issue, publish_current_step_output
 from tests.test_preparation_applicability_public_application import _setup, _selection, _author_load_prove, actual_short_conformance as _actual_short_conformance
 
@@ -148,7 +148,7 @@ def test_complete_current_q8_e32_issue_receipts_diagnostics_recovery_and_prebyte
         assert len(panel.phases) == 114
         return _engineered_arrays(lower)
     monkeypatch.setattr(measurement, "reduce_panel", engineered_read)
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.constructed_preparation_applicability.measurement.reduce_panel", engineered_read)
+    monkeypatch.setattr("empirical_lawhood.domains.matrix.constructed_preparation_applicability.measurement.reduce_panel", engineered_read)
     monkeypatch.setattr(api, "reduce_panel", engineered_read)
     q = _selection("Q", True, publications)
     q_handoff = _author_load_prove(boundary, q, plane, True)

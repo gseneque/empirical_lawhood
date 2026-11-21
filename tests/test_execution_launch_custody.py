@@ -10,14 +10,12 @@ import threading
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.execution import DurableExecutionResourceEnvelopeCoordinator, LocalScheduler
-from empirical_lawhood.infrastructure.execution_resource_envelopes import (
-    ExternalExecutionResourceEnvelopeStore, execution_launch_relative_path, read_execution_launch_event,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest
-from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeEventKind
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.execution.local.execution import DurableExecutionResourceEnvelopeCoordinator, LocalScheduler
+from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore, execution_launch_relative_path, read_execution_launch_event
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest
+from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeEventKind
 from tests.runtime_platform.test_execution_scheduler import _plane
 from tests.test_current_result_custody import actual_issued_current_task_controls as actual_issued_current_task_controls
 
@@ -82,7 +80,7 @@ def test_normal_launch_publishes_exact_primary_bytes_before_return_without_read_
 def test_retained_publication_reader_reuses_issue_decode_and_keeps_final_byte_guard(
         actual_issued_current_task_controls, monkeypatch):
     from empirical_lawhood.api.protected_e3_read_custody import _publication
-    from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID
+    from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID
     f = actual_issued_current_task_controls
     plane = f.control.service.artifact_plane
     publisher = ExternalIssuedStudyPublisher(artifact_plane=plane,

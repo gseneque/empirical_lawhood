@@ -11,15 +11,15 @@ from typing import ClassVar
 import pytest
 
 from empirical_lawhood.api import recursive_authoring, recursive_operations
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.recursive_compiler import RecursivePortContract, compile_recursive_wave
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationProviderFactory, recursive_operation_binding
-from empirical_lawhood.runtime.recursive_storage_codecs import RecursiveStorageCodec
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.recursive_compiler import RecursivePortContract, compile_recursive_wave
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationProviderFactory, recursive_operation_binding
+from empirical_lawhood.storage.contracts.recursive_storage_codecs import RecursiveStorageCodec
 from tests.runtime_platform.test_recursive_compiler import Config, SourceConfig, UseConfig, fixture
 from tests.test_recursive_public_service import _plane
 from tests.test_rubisco_serialized_nve_custody import (
@@ -147,7 +147,7 @@ def test_unselected_later_alternative_does_not_narrow_selected_source_revision(t
 
 
 def test_explicit_vendor_json_record_uses_same_strict_public_input_contract(tmp_path, monkeypatch):
-    from empirical_lawhood.runtime.recursive_record_codecs import validate_declared_recursive_input_payload
+    from empirical_lawhood.storage.contracts.recursive_record_codecs import validate_declared_recursive_input_payload
     raw = EarlierInput("original.old", Decimal("1.2300")).canonical_bytes()
     media = "application/vnd.empirical-lawhood.exposed-record+json"
     draft, registrations, _, codecs = _shared_source(raw, media=media)
@@ -194,8 +194,9 @@ def test_global_output_fallback_cannot_widen_explicit_selected_input_revision(tm
 
 def test_fallback_consumer_must_itself_accept_original_revision(tmp_path, monkeypatch):
     raw = CurrentInput("original.current", Decimal("1.23"), Decimal(".01")).canonical_bytes()
-    with pytest.raises(ValueError, match="installed strict schema/revision codec"):
+    with pytest.raises(ValueError, match="unsupported record revision") as error:
         _author_shared(tmp_path, monkeypatch, raw, consumer_types=(), fallback=EarlierInput)
+    assert f"{CurrentInput.SCHEMA}@{CurrentInput.VERSION}; installed revisions: {EarlierInput.VERSION}" in str(error.value)
     assert not (tmp_path / "selected/authored").exists()
 
 
@@ -252,7 +253,7 @@ def test_public_author_accepts_current_internal_revision_explicitly_declared_by_
 
 
 def _sampling_config(admitted, tmp_path):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.operation_bindings import SamplingOperationConfig
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.operation_bindings import SamplingOperationConfig
     environment = dict(os.environ)
     environment.update(PYTHONDONTWRITEBYTECODE="1", PYTHONPATH=str(ROOT / "src"),
         OPENMM_PLUGIN_DIR=str(tmp_path / "unentered-plugins"), OPENMM_CPU_THREADS="1",
@@ -264,9 +265,9 @@ def _sampling_config(admitted, tmp_path):
 
 
 def test_installed_current_nve_public_author_retains_original_older_chemical_bytes(tmp_path, admitted):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import operation_bindings as ob
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_preparation_admission import SerializedDurableChemicalForcePlan
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.recursive_translation import sampling_control_draft
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import operation_bindings as ob
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_preparation_admission import SerializedDurableChemicalForcePlan
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.recursive_translation import sampling_control_draft
     config = _sampling_config(admitted, tmp_path)
     chemical = admitted.plan.chemical_controls
     assert type(chemical) is SerializedDurableChemicalForcePlan and chemical.VERSION == "1.2.0"
@@ -311,7 +312,7 @@ def test_installed_current_nve_public_author_retains_original_older_chemical_byt
 
 def test_public_current_nve_refuses_retained_chemical11_engine_source_disagreement_without_rewriting(tmp_path, reuse_admitted):
     from tests.test_rubisco_serialized_nve_custody import admitted as original_custody_fixture
-    from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import operation_bindings as ob
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import operation_bindings as ob
     selected = original_custody_fixture.__wrapped__(reuse_admitted)
     chemical = selected.plan.chemical_controls
     assert chemical.VERSION == "1.1.0"
@@ -366,7 +367,7 @@ def _revisioned_prospective_fixture(monkeypatch, raw, *, input_record_types=(Pro
         kwargs["input_bindings"] = tuple((key, path) for key, path in kwargs["input_bindings"] if key not in aliases)
         # The existing scaffold publishes its disclosed fixtures for preview.
         # From this actual public call onward, a refusal must precede publication.
-        from empirical_lawhood.infrastructure.candidate_sources import ExternalCandidateInputPublisher
+        from empirical_lawhood.storage.candidate_sources import ExternalCandidateInputPublisher
         original_publish = ExternalCandidateInputPublisher.publish
         original_publish_many = ExternalCandidateInputPublisher.publish_many
         publications = []

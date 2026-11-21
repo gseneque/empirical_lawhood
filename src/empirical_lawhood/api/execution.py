@@ -1,8 +1,9 @@
 """Receipt-first campaign execution composed behind the public facade."""
 
 from __future__ import annotations
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
-from empirical_lawhood.kernel.retrospective_prediction_experiments import RetrospectiveExperimentSpec
+from empirical_lawhood.science.experiments.retrospective_prediction_experiments import RetrospectiveExperimentSpec
 
 from empirical_lawhood.api.models import RetrospectiveCampaignPackage
 
@@ -20,146 +21,66 @@ from typing import Callable, Final, Protocol
 from sqlalchemy import Engine
 from sqlalchemy.exc import NoResultFound, SQLAlchemyError
 
-from empirical_lawhood.api.models import (
-    CampaignMaintenanceInterruptionSummary,
-    CampaignMaintenanceStopSummary,
-)
+from empirical_lawhood.api.models import CampaignMaintenanceInterruptionSummary, CampaignMaintenanceStopSummary
 
-from empirical_lawhood.infrastructure.artifacts import (
-    ArtifactIdentityConflict,
-    ArtifactPlaneError,
-    ExternalArtifactPlane,
-    ExternalStorageDiagnostic,
-)
-from empirical_lawhood.infrastructure.bounded_io import (
-    BoundedFileIOError,
-    MAX_ARTIFACT_MANIFEST_BYTES,
-    MAX_CONTROL_PLANE_JSON_BYTES,
-    MAX_RUNTIME_PLAN_JSON_BYTES,
-    file_matches_bytes,
-    read_bounded_bytes,
-)
-from empirical_lawhood.infrastructure.bounded_process import (
-    BoundedProcessError,
-    run_bounded_command,
-)
-from empirical_lawhood.infrastructure.catalog_projection import decode_catalog_snapshot
-from empirical_lawhood.infrastructure.maintenance import ReceiptBoundaryStopper
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.execution import DurableExecutionEnvelopeCoordinator, DurableExecutionResourceEnvelopeCoordinator, ExecutionResourceAdmission, ExecutionErrorKind, FailureInjector, LocalExecutionResourceAdmitter, LocalProcessExecutor, LocalScheduler
-from empirical_lawhood.infrastructure.native_parent_finalization import NativeParentFinalizationPending
-from empirical_lawhood.runtime.native_effects import NativeEntryRefused
-from ..infrastructure.execution import execution_error_types
-from ..infrastructure.recovery import recovery_error_types
-from empirical_lawhood.infrastructure.campaign_elapsed_budgets import (
-    ExternalCampaignElapsedBudgetStore,
-)
-from empirical_lawhood.infrastructure.study_issue import PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID, StudyOperationAuthorityStore
-from empirical_lawhood.infrastructure.recovery import (
-    ExternalRunRecoveryStore,
-    RunRecoveryError,
-)
-from empirical_lawhood.infrastructure.sql import (
-    DEFAULT_ATTEMPT_HISTORY_LIMIT,
-    DEFAULT_OPERATIONAL_QUERY_WORK_LIMIT,
-    MAX_ATTEMPT_HISTORY_LIMIT,
-    MAX_OPERATIONAL_QUERY_WORK_LIMIT,
-    OperationalAttemptCursor,
-    OperationalQueryWorkLimitExceeded,
-    OperationalWriteConflict,
-    SQLiteOperationalRepository,
-    catalog_query_preflight,
-    create_read_only_catalog_engine,
-)
-from empirical_lawhood.infrastructure.task_receipts import (
-    ExternalTaskReceiptStore,
-    decode_artifact_manifest,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.planning.discovery import SkepticReport
-from empirical_lawhood.planning.exploration import ExploratoryFinding, HypothesisSet
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, StudyOperationAuthority, SourceClosureKind, require_study_authority
-from empirical_lawhood.planning.observation_order import ObservationOrderExperimentExtension
-from empirical_lawhood.planning.retrospective_prediction import RetrospectivePredictionExperiment, RetrospectivePredictionRole
-from empirical_lawhood.runtime.retrospective_prediction import RetrospectivePredictionBinding, derive_retained_prediction_topology
-from empirical_lawhood.planning.response_experiment import ResponseExperimentExtensionSet
-from empirical_lawhood.planning.native_source import NativeLawQualificationExperiment
-from empirical_lawhood.planning.source_qualification import FreshSourceQualificationExperiment, PredecessorBoundSourceQualificationExperiment, QualifiedSourceUseExperiment, ProspectiveRetainedSourceUse
-from empirical_lawhood.runtime.source_qualification import FreshSourceQualificationSubstrateBinding, PredecessorBoundSourceQualificationSubstrateBinding, QualifiedSourceUseSubstrateBinding, ProspectiveRetainedSourceUseBinding, derive_source_qualification_topology
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactManifest,
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ArtifactSemanticValidationRegistration,
-    ArtifactSemanticValidationRegistry,
-    ArtifactStreamWriteRequest,
-    CanonicalTaskReceipt,
-    MAX_ARTIFACT_SEMANTIC_VALIDATION_REGISTRATIONS,
-    lineage_parent_sort_key,
-    most_restrictive_outcome_access,
-)
-from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeSpec, RosterCapacityDecision
-from empirical_lawhood.runtime.campaign_elapsed_budget import CampaignElapsedReservationPlan, DurableCampaignElapsedBudgetCoordinator
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    AdjudicationReadoutState,
-    ScientificAdjudicationContext,
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-    decode_scientific_adjudication,
-)
-from empirical_lawhood.runtime.execution import validate_runner_resource_interface, ExecutionAssuranceProfile, ExecutorEnforcementCapability, ExternalInputResolver, OperationalAttempt, OperationalFailureClass, RunnerRegistry, SchedulerResult, TaskExecutor, TaskBlockReason, VerifiedArtifactInput
-from empirical_lawhood.runtime.executable_bindings import CampaignRuntimeProviderResolver, ExecutableBindingRole, ExecutablePlatformPort, GeneratedExecutableBindingAggregate
-from empirical_lawhood.runtime.exploration import (
-    ExplorationWaveResult,
-    validate_exploration_wave_result,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityRegistry
-from empirical_lawhood.runtime.input_access import validate_planned_input_access
-from empirical_lawhood.runtime.catalog import (
-    CatalogVerificationStatus,
-)
-from empirical_lawhood.runtime.compiler import (
-    compile_exploration_wave_execution_plan,
-    compile_run_plan,
-    lower_run_plan,
-)
-from empirical_lawhood.runtime.conditional_children import ConditionalChildInstantiation, FrozenParentInputBinding
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, CandidateExecutionPlan, EnvelopeExecutionPlan, ExecutionPlan, ProtocolExecutionTask, ExternalInputSpec, ProtocolRunPlan, ScientificStage
-from empirical_lawhood.runtime.response_experiment import derive_response_experiment_topology
-from empirical_lawhood.runtime.observation_order import ObservationOrderSubstrateBinding, derive_observation_order_topology
-from empirical_lawhood.runtime.response_experiment_ports import NativeInteractionKind, ResponseSubstrateBinding
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CampaignRuntimeProviderRegistry,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-    capability_semantic_validation_registry,
-    validate_worker_preparations,
-)
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
-from empirical_lawhood.runtime.issued_extension_payloads import AuthenticatedExecutableRecord, ExecutableProviderReconstructionReceipt, RetrospectiveProviderReconstruction, ExecutableProviderRecoveryReceipt, IssuedExtensionPayloadResolver, reconstruct_executable_provider, verify_executable_provider_recovery
-from empirical_lawhood.runtime.study_issue import StudySourceClosureInspector
-from empirical_lawhood.runtime.progress import report_progress
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location as _provider_input_location
-from empirical_lawhood.runtime.preexecution_contract import ExperimentContractApplicability, ExperimentContractChronologyEvent, ExperimentContractChronologyKind, ExperimentContractClosureMatrix, ExperimentContractEvidence, ExperimentContractNativeConformance, ExperimentContractNativeDisposition, ExperimentContractPublicationBatch, ExperimentContractStageApplicability, derive_experiment_contract_applicability, validate_experiment_contract_closure
-from empirical_lawhood.runtime.recovery import RecoveryTerminalAttempt, RecoveryTerminalDisposition, ProtocolRunRecoveryIndex, CandidateRunRecoveryIndex, EnvelopeRunRecoveryIndex, RunRecoveryIndex, ProtocolRunRecoveryTerminalEvent, TaskRecoveryEvent, build_run_recovery_index
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    canonical_json_bytes,
-    validate_stable_id,
-)
-from empirical_lawhood.kernel.status import AdmissionStatus, OperationalStatus, ScientificStatus
-from empirical_lawhood.planning.approval import CompleteApprovalService
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ArtifactPlaneError, ExternalArtifactPlane, ExternalStorageDiagnostic
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError, file_matches_bytes, read_bounded_bytes
+from empirical_lawhood.execution.local.bounded_process import BoundedProcessError, run_bounded_command
+from empirical_lawhood.storage.catalog_projection import decode_catalog_snapshot
+from empirical_lawhood.storage.maintenance import ReceiptBoundaryStopper
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.execution.local.execution import DurableExecutionEnvelopeCoordinator, DurableExecutionResourceEnvelopeCoordinator, ExecutionResourceAdmission, ExecutionErrorKind, FailureInjector, LocalExecutionResourceAdmitter, LocalProcessExecutor, LocalScheduler
+from empirical_lawhood.storage.native_parent_finalization import NativeParentFinalizationPending
+from empirical_lawhood.execution.native_effects import NativeEntryRefused
+from empirical_lawhood.execution.local.execution import execution_error_types
+from empirical_lawhood.storage.recovery import recovery_error_types
+from empirical_lawhood.execution.resources.campaign_elapsed_budgets import ExternalCampaignElapsedBudgetStore
+from empirical_lawhood.storage.study_issue import PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID, StudyOperationAuthorityStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore, RunRecoveryError
+from empirical_lawhood.storage.sql import DEFAULT_ATTEMPT_HISTORY_LIMIT, DEFAULT_OPERATIONAL_QUERY_WORK_LIMIT, MAX_ATTEMPT_HISTORY_LIMIT, MAX_OPERATIONAL_QUERY_WORK_LIMIT, OperationalAttemptCursor, OperationalQueryWorkLimitExceeded, OperationalWriteConflict, SQLiteOperationalRepository, catalog_query_preflight, create_read_only_catalog_engine
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.design.discovery import SkepticReport
+from empirical_lawhood.design.exploration import ExploratoryFinding, HypothesisSet
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, StudyOperationAuthority, SourceClosureKind, require_study_authority
+from empirical_lawhood.design.observation_order import ObservationOrderExperimentExtension
+from empirical_lawhood.design.retrospective_prediction import RetrospectivePredictionExperiment, RetrospectivePredictionRole
+from empirical_lawhood.execution.retrospective_prediction import RetrospectivePredictionBinding, derive_retained_prediction_topology
+from empirical_lawhood.design.response_experiment import ResponseExperimentExtensionSet
+from empirical_lawhood.design.native_source import NativeLawQualificationExperiment
+from empirical_lawhood.design.source_qualification import FreshSourceQualificationExperiment, PredecessorBoundSourceQualificationExperiment, QualifiedSourceUseExperiment, ProspectiveRetainedSourceUse
+from empirical_lawhood.execution.source_qualification import FreshSourceQualificationSubstrateBinding, PredecessorBoundSourceQualificationSubstrateBinding, QualifiedSourceUseSubstrateBinding, ProspectiveRetainedSourceUseBinding, derive_source_qualification_topology
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactLineageParent, ArtifactProfile, ArtifactSemanticValidationRegistration, ArtifactSemanticValidationRegistry, ArtifactStreamWriteRequest, CanonicalTaskReceipt, MAX_ARTIFACT_SEMANTIC_VALIDATION_REGISTRATIONS, lineage_parent_sort_key, most_restrictive_outcome_access
+from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeSpec, RosterCapacityDecision
+from empirical_lawhood.execution.campaign_elapsed_budget import CampaignElapsedReservationPlan, DurableCampaignElapsedBudgetCoordinator
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, AdjudicationReadoutState, ScientificAdjudicationContext, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord, decode_scientific_adjudication
+from empirical_lawhood.execution.execution import validate_runner_resource_interface, ExecutionAssuranceProfile, ExecutorEnforcementCapability, ExternalInputResolver, OperationalAttempt, OperationalFailureClass, RunnerRegistry, SchedulerResult, TaskExecutor, TaskBlockReason, VerifiedArtifactInput
+from empirical_lawhood.execution.executable_bindings import CampaignRuntimeProviderResolver, ExecutableBindingRole, ExecutablePlatformPort, GeneratedExecutableBindingAggregate
+from empirical_lawhood.execution.exploration import ExplorationWaveResult, validate_exploration_wave_result
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityRegistry
+from empirical_lawhood.execution.input_access import validate_planned_input_access
+from empirical_lawhood.storage.contracts.catalog import CatalogVerificationStatus
+from empirical_lawhood.execution.compiler import compile_exploration_wave_execution_plan, compile_run_plan, lower_run_plan
+from empirical_lawhood.execution.conditional_children import ConditionalChildInstantiation, FrozenParentInputBinding
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, CandidateExecutionPlan, EnvelopeExecutionPlan, ExecutionPlan, ProtocolExecutionTask, ExternalInputSpec, ProtocolRunPlan, ScientificStage
+from empirical_lawhood.execution.response_experiment import derive_response_experiment_topology
+from empirical_lawhood.execution.observation_order import ObservationOrderSubstrateBinding, derive_observation_order_topology
+from empirical_lawhood.execution.response_experiment_ports import NativeInteractionKind, ResponseSubstrateBinding
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CampaignRuntimeProviderRegistry, CapabilityOutputSemanticContract, ExternalInputPayload, capability_semantic_validation_registry, validate_worker_preparations
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.execution.issued_extension_payloads import AuthenticatedExecutableRecord, ExecutableProviderReconstructionReceipt, RetrospectiveProviderReconstruction, ExecutableProviderRecoveryReceipt, IssuedExtensionPayloadResolver, reconstruct_executable_provider, verify_executable_provider_recovery
+from empirical_lawhood.execution.study_issue import StudySourceClosureInspector
+from empirical_lawhood.execution.progress import report_progress
+from empirical_lawhood.storage.provider_input_custody import provider_input_location as _provider_input_location
+from empirical_lawhood.execution.preexecution_contract import ExperimentContractApplicability, ExperimentContractChronologyEvent, ExperimentContractChronologyKind, ExperimentContractClosureMatrix, ExperimentContractEvidence, ExperimentContractNativeConformance, ExperimentContractNativeDisposition, ExperimentContractPublicationBatch, ExperimentContractStageApplicability, derive_experiment_contract_applicability, validate_experiment_contract_closure
+from empirical_lawhood.execution.recovery import RecoveryTerminalAttempt, RecoveryTerminalDisposition, ProtocolRunRecoveryIndex, CandidateRunRecoveryIndex, EnvelopeRunRecoveryIndex, RunRecoveryIndex, ProtocolRunRecoveryTerminalEvent, TaskRecoveryEvent, build_run_recovery_index
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes, validate_stable_id
+from empirical_lawhood.science.records.status import AdmissionStatus, OperationalStatus, ScientificStatus
+from empirical_lawhood.design.approval import CompleteApprovalService
 
-from empirical_lawhood.api.codecs import (
-    MAX_AUTHORING_BYTES,
-    MAX_CAMPAIGN_PACKAGE_BYTES,
-    AuthoringCodecError,
-    loads_campaign_package_authoring,
-)
+from empirical_lawhood.api.codecs import AuthoringCodecError, loads_campaign_package_authoring
 from empirical_lawhood.api.models import CampaignPackage, DualLoopPackage, ExplorationExecutionPackage, IssuedCampaignPackage, IssuedCampaignPackageRoot, IssuedStudyPackage, EnvelopeExperimentPackage, ExperimentPackage, ElapsedExperimentPackage, issued_base_candidate, issued_standard_candidate
 
 
@@ -498,12 +419,8 @@ MAX_CATALOG_REBUILD_SEMANTIC_SOURCE_BYTES: Final[int] = 64 * 1024 * 1024
 # 38,642,100 bytes, so that pair cannot share the compact 64 MiB budget. Keep
 # independent per-record caps and a finite aggregate; unrelated replay retains
 # MAX_CATALOG_REBUILD_SEMANTIC_SOURCE_BYTES.
-MAX_CATALOG_REBUILD_PLAN_PACKAGE_SOURCE_BYTES: Final[int] = (
-    MAX_CATALOG_REBUILD_SEMANTIC_SOURCE_BYTES
-    + MAX_CAMPAIGN_PACKAGE_BYTES
-    + MAX_RUNTIME_PLAN_JSON_BYTES
-    + 3 * MAX_ARTIFACT_MANIFEST_BYTES
-)
+MAX_CATALOG_REBUILD_PLAN_PACKAGE_SOURCE_BYTES: Final[None] = None
+
 MAX_CATALOG_REBUILD_SEMANTIC_LOGICAL_ID_BYTES: Final[int] = 2_048
 MAX_CATALOG_REBUILD_SEMANTIC_LOGICAL_ID_SEGMENTS: Final[int] = 64
 MAX_CATALOG_REBUILD_RUN_CANDIDATES_PER_LOGICAL_ID: Final[int] = 32
@@ -576,7 +493,7 @@ class CampaignOperationalQueryWorkLimitError(CampaignExecutionError):
 
 @dataclass(slots=True)
 class _CatalogSemanticReplayBudget:
-    remaining_bytes: int = MAX_CATALOG_REBUILD_SEMANTIC_SOURCE_BYTES
+    remaining_bytes: int | None = None
     source_count: int = 0
 
     def begin_source(self) -> None:
@@ -587,18 +504,20 @@ class _CatalogSemanticReplayBudget:
             )
 
     def charge_bytes(self, size_bytes: int) -> None:
-        if size_bytes < 0 or size_bytes > self.remaining_bytes:
+        if size_bytes < 0 or self.remaining_bytes is not None and size_bytes > self.remaining_bytes:
             raise CampaignCapabilityError(
                 "catalog semantic registry exceeds its aggregate byte limit"
             )
-        self.remaining_bytes -= size_bytes
+        if self.remaining_bytes is not None:
+            self.remaining_bytes -= size_bytes
 
-    def read_limit(self, maximum_bytes: int) -> int:
-        if maximum_bytes < 0:
+    def read_limit(self, maximum_bytes: int | None) -> int | None:
+        if maximum_bytes is not None and maximum_bytes < 0:
             raise CampaignCapabilityError(
                 "catalog semantic registry source has an invalid byte limit"
             )
-        return min(maximum_bytes, self.remaining_bytes)
+        from empirical_lawhood.execution.operational_limits import minimum_byte_limit
+        return minimum_byte_limit(maximum_bytes, self.remaining_bytes)
 
 
 def _logical_semantic_run_candidates(logical_artifact_id: str) -> tuple[str, ...]:
@@ -934,7 +853,7 @@ class CampaignExecutionService:
         self.engine_factory = engine_factory
         self.catalog_path = catalog_path
         if catalog_access is not None:
-            from empirical_lawhood.infrastructure.guarded_catalog import GuardedCatalogAccess
+            from empirical_lawhood.storage.guarded_catalog import GuardedCatalogAccess
             if type(catalog_access) is not GuardedCatalogAccess or catalog_access.database_path != catalog_path:
                 raise ValueError('execution catalog differs from its exact guarded selection')
         self.catalog_access = catalog_access
@@ -1191,7 +1110,7 @@ class CampaignExecutionService:
                     )
                 )
             ),
-            maximum_bytes=MAX_CONTROL_PLANE_JSON_BYTES,
+            maximum_bytes=None,
             budget=budget or _CatalogSemanticReplayBudget(),
         )
         receipt = decode_canonical_bytes(
@@ -1199,7 +1118,7 @@ class CampaignExecutionService:
             RetrospectiveProviderReconstruction
             if payload_schema == RetrospectiveProviderReconstruction.SCHEMA
             else ExecutableProviderReconstructionReceipt,
-            maximum_bytes=MAX_CONTROL_PLANE_JSON_BYTES,
+            maximum_bytes=None,
         )
         if (
             payload_schema != receipt.SCHEMA
@@ -1361,10 +1280,10 @@ class CampaignExecutionService:
         try:
             manifest_payload = read_bounded_bytes(
                 manifest_path,
-                maximum_bytes=budget.read_limit(MAX_ARTIFACT_MANIFEST_BYTES),
+                maximum_bytes=budget.read_limit(self.artifact_plane.custody_limits.manifest_bytes),
             )
             budget.charge_bytes(len(manifest_payload))
-            manifest = decode_artifact_manifest(manifest_payload)
+            manifest = resolve_artifact_sidecar_bytes(self.artifact_plane, manifest_payload)
             materialization = manifest.materialization
             identity = manifest.logical
             if (
@@ -1372,7 +1291,7 @@ class CampaignExecutionService:
                 or materialization.storage_root_id
                 != self.artifact_plane.root.contract.storage_root_id
                 or materialization.relative_path != relative_path
-                or materialization.size_bytes > maximum_bytes
+                or maximum_bytes is not None and materialization.size_bytes > maximum_bytes
                 or identity.logical_artifact_id != logical_artifact_id
                 or identity.payload_schema not in payload_schemas
                 or identity.profile is not ArtifactProfile.CANONICAL_JSON
@@ -1382,13 +1301,13 @@ class CampaignExecutionService:
                     "catalog semantic registry source violates its frozen identity"
                 )
             payload_read_limit = budget.read_limit(maximum_bytes)
-            if materialization.size_bytes > payload_read_limit:
+            if payload_read_limit is not None and materialization.size_bytes > payload_read_limit:
                 raise CampaignCapabilityError(
                     "catalog semantic registry exceeds its aggregate byte limit"
                 )
             port = self.artifact_plane.open(
                 VerifiedArtifactInput(identity, materialization),
-                maximum_bytes=payload_read_limit,
+                maximum_bytes=materialization.size_bytes if payload_read_limit is None else payload_read_limit,
             )
             try:
                 payload = port.read()
@@ -1550,7 +1469,7 @@ class CampaignExecutionService:
                     )
                 )
             ),
-            maximum_bytes=MAX_RUNTIME_PLAN_JSON_BYTES,
+            maximum_bytes=None,
             budget=budget,
         )
         plan: ProtocolExecutionPlan
@@ -1558,25 +1477,25 @@ class CampaignExecutionService:
             plan = decode_canonical_bytes(
                 plan_payload,
                 ExecutionPlan,
-                maximum_bytes=MAX_RUNTIME_PLAN_JSON_BYTES,
+                maximum_bytes=None,
             )
         elif plan_schema == EnvelopeExecutionPlan.SCHEMA:
             plan = decode_canonical_bytes(
                 plan_payload,
                 EnvelopeExecutionPlan,
-                maximum_bytes=MAX_RUNTIME_PLAN_JSON_BYTES,
+                maximum_bytes=None,
             )
         elif plan_schema == CandidateExecutionPlan.SCHEMA:
             plan = decode_canonical_bytes(
                 plan_payload,
                 CandidateExecutionPlan,
-                maximum_bytes=MAX_RUNTIME_PLAN_JSON_BYTES,
+                maximum_bytes=None,
             )
         else:
             plan = decode_canonical_bytes(
                 plan_payload,
                 ProtocolExecutionPlan,
-                maximum_bytes=MAX_RUNTIME_PLAN_JSON_BYTES,
+                maximum_bytes=None,
             )
         if plan.source_plan.object_id != run_id or plan.fingerprint() != plan_sha256:
             raise CampaignIdentityError(
@@ -1617,9 +1536,9 @@ class CampaignExecutionService:
             relative_path=f"runs/{run_id}/plans/{package_name}.json",
             payload_schemas=package_schemas,
             maximum_bytes=(
-                MAX_CAMPAIGN_PACKAGE_BYTES
+                None
                 if package_name == "campaign-package"
-                else MAX_AUTHORING_BYTES
+                else None
             ),
             budget=budget,
         )
@@ -1628,50 +1547,50 @@ class CampaignExecutionService:
                 decode_canonical_bytes(
                     package_payload,
                     CampaignPackage,
-                    maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
+                    maximum_bytes=None,
                 )
             )
         elif package_schema == IssuedCampaignPackage.SCHEMA:
             package = decode_canonical_bytes(
                 package_payload,
                 IssuedCampaignPackage,
-                maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
+                maximum_bytes=None,
             )
         elif package_schema == IssuedStudyPackage.SCHEMA:
             package = decode_canonical_bytes(
                 package_payload,
                 IssuedStudyPackage,
-                maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
+                maximum_bytes=None,
             )
         elif package_schema == ElapsedExperimentPackage.SCHEMA:
             package = decode_canonical_bytes(
                 package_payload,
                 ElapsedExperimentPackage,
-                maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
+                maximum_bytes=None,
             )
         elif package_schema == RetrospectiveCampaignPackage.SCHEMA:
             package = decode_canonical_bytes(
                 package_payload,
                 RetrospectiveCampaignPackage,
-                maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
+                maximum_bytes=None,
             )
         elif package_schema == ExperimentPackage.SCHEMA:
             package = decode_canonical_bytes(
                 package_payload,
                 ExperimentPackage,
-                maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
+                maximum_bytes=None,
             )
         elif package_schema == EnvelopeExperimentPackage.SCHEMA:
             package = decode_canonical_bytes(
                 package_payload,
                 EnvelopeExperimentPackage,
-                maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES,
+                maximum_bytes=None,
             )
         else:
             package = decode_canonical_bytes(
                 package_payload,
                 ExplorationExecutionPackage,
-                maximum_bytes=MAX_AUTHORING_BYTES,
+                maximum_bytes=None,
             )
         if (
             package.fingerprint() != package_sha256
@@ -2418,12 +2337,7 @@ class CampaignExecutionService:
             )
             if not path.is_file() or not manifest_path.is_file():
                 raise CampaignIdentityError("persisted exploration freeze is absent")
-            manifest = decode_artifact_manifest(
-                read_bounded_bytes(
-                    manifest_path,
-                    maximum_bytes=MAX_CONTROL_PLANE_JSON_BYTES,
-                )
-            )
+            manifest = resolve_artifact_sidecar_bytes(self.artifact_plane, read_bounded_bytes(manifest_path, maximum_bytes=None))
             if (
                 manifest.materialization.relative_path != relative_path
                 or manifest.materialization.size_bytes != len(expected_bytes)
@@ -2521,12 +2435,7 @@ class CampaignExecutionService:
                     f"{relative_path}.manifest.json",
                     for_write=False,
                 )
-                manifest = decode_artifact_manifest(
-                    read_bounded_bytes(
-                        manifest_path,
-                        maximum_bytes=MAX_CONTROL_PLANE_JSON_BYTES,
-                    )
-                )
+                manifest = resolve_artifact_sidecar_bytes(self.artifact_plane, read_bounded_bytes(manifest_path, maximum_bytes=None))
                 logical = manifest.logical
                 materialization = manifest.materialization
                 if (
@@ -2632,7 +2541,7 @@ class CampaignExecutionService:
             or logical.media_type != "application/json"
             or logical.visibility_ceiling is not visibility_ceiling
             or logical.outcome_access is not outcome_access
-            or materialization.size_bytes > maximum_bytes
+            or maximum_bytes is not None and materialization.size_bytes > maximum_bytes
         ):
             raise CampaignValidationError(
                 "exploration receipt output violates its bounded contract"
@@ -2752,7 +2661,7 @@ class CampaignExecutionService:
             """
         if not self.enforce_git_identity or type(package) not in (ExperimentPackage, ElapsedExperimentPackage, EnvelopeExperimentPackage):
             return None
-        from empirical_lawhood.infrastructure.run_source_admission import ensure_run_source_entry
+        from empirical_lawhood.storage.run_source_admission import ensure_run_source_entry
         repair_index = getattr(self, '_retained_e3_control_repair', None)
         if repair_index is not None and repair_index.run_id == package.run_plan_id:
             admission = getattr(self, '_retained_e3_controller_admission', None)
@@ -2803,10 +2712,7 @@ class CampaignExecutionService:
         self.artifact_plane.root.verify(for_write=True, operation_minimum_free_bytes=operation_minimum_free_bytes)
         if self.catalog_access is not None:
             self.catalog_access.verify(for_write=True)
-        from empirical_lawhood.api.current_task_custody import (
-            CurrentIssuedTaskCustody, current_issued_original_input_accesses, current_issued_task_custodies,
-            current_issued_task_control_scope,
-        )
+        from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody, current_issued_original_input_accesses, current_issued_task_custodies, current_issued_task_control_scope
         original_accesses = current_issued_original_input_accesses(self)
         custody = (CurrentIssuedTaskCustody(writer=semantic_plane,
             reveal_authority_id=reveal_authority_id, original_input_access=original_accesses)
@@ -2881,7 +2787,7 @@ class CampaignExecutionService:
                 raise CampaignValidationError('ExperimentPackage did not compile an ExecutionPlan')
             resource_envelope_coordinator = self.execution_resource_envelope_coordinator
             if repair_index is not None and repair_index.run_id == source_plan_id:
-                from .retained_e3_control_repair import repair_resource_coordinator
+                from empirical_lawhood.api.retained_e3_control_repair import repair_resource_coordinator
                 resource_envelope_coordinator = repair_resource_coordinator(writer=semantic_plane,
                     package=package, plan=execution_plan, index=repair_index)
             if resource_envelope_coordinator is None:
@@ -2944,14 +2850,14 @@ class CampaignExecutionService:
         repair = getattr(self, '_retained_e3_control_repair', None)
         frozen_specs = None
         if retained_repair_plan is not None:
-            from .current_task_custody import _provider_input_specs
+            from empirical_lawhood.api.current_task_custody import _provider_input_specs
             if (repair is None or repair.run_id != run_id
                     or repair.execution_plan != ObjectIdentity.from_record(
                         retained_repair_plan.execution_plan_id, retained_repair_plan)):
                 raise CampaignIdentityError('retained E3 input reuse lacks its exact active repair plan')
             repair.validate_plan(retained_repair_plan)
             frozen_specs = _provider_input_specs(retained_repair_plan)
-            from .configured_e3_retained_runtime import retained_e3_input_access_guard
+            from empirical_lawhood.api.configured_e3_retained_runtime import retained_e3_input_access_guard
             retained_guard = retained_e3_input_access_guard(self, run_id)
             generic_guard = access_guard
             def access_guard():
@@ -2992,7 +2898,7 @@ class CampaignExecutionService:
                 if frozen_specs is None:
                     result = self.artifact_plane.write_stream(request)
                 else:
-                    from .retained_e3_control_repair import reuse_frozen_provider_input
+                    from empirical_lawhood.api.retained_e3_control_repair import reuse_frozen_provider_input
                     result = reuse_frozen_provider_input(writer=self.artifact_plane, run_id=run_id,
                         spec=frozen_specs[value.logical_artifact_id], request=request,
                         require_access=access_guard)
@@ -3018,7 +2924,7 @@ class CampaignExecutionService:
     def interrupt_for_maintenance(
         self, authority_path: Path, *, confirmed: bool
     ) -> CampaignMaintenanceInterruptionSummary:
-        from empirical_lawhood.runtime.maintenance import ContinuationBoundInterruptionAuthority, InterruptionAuthority
+        from empirical_lawhood.execution.maintenance import ContinuationBoundInterruptionAuthority, InterruptionAuthority
 
         root = self.artifact_plane.root.verify(for_write=confirmed)
         relative = authority_path.absolute().relative_to(root).as_posix()
@@ -3061,7 +2967,7 @@ class CampaignExecutionService:
     def stop_at_receipt_boundary(
         self, authority_path: Path, *, confirmed: bool
     ) -> CampaignMaintenanceStopSummary:
-        from empirical_lawhood.runtime.maintenance import MaintenanceStopAuthority
+        from empirical_lawhood.execution.maintenance import MaintenanceStopAuthority
 
         root = self.artifact_plane.root.verify(for_write=confirmed)
         relative = authority_path.absolute().relative_to(root).as_posix()
@@ -3098,7 +3004,7 @@ class CampaignExecutionService:
         """
         from contextlib import contextmanager
         from copy import copy
-        from empirical_lawhood.infrastructure.artifacts import _has_stock_manifest_reads
+        from empirical_lawhood.storage.artifacts import _has_stock_manifest_reads
 
         @contextmanager
         def selected():
@@ -3197,7 +3103,7 @@ class CampaignExecutionService:
     def _load_status_execution_plan(self, run_id: str) -> ProtocolExecutionPlan:
         # The authenticated publication supplies the complete finite body size;
         # an explicitly selected custody ceiling remains independently binding.
-        from empirical_lawhood.infrastructure.publication_metadata import read_publication_metadata
+        from empirical_lawhood.storage.publication_metadata import read_publication_metadata
 
         relative = f"runs/{run_id}/plans/execution-plan.json"
         try:
@@ -3225,7 +3131,8 @@ class CampaignExecutionService:
             ),
             maximum_bytes=maximum,
             budget=_CatalogSemanticReplayBudget(
-                remaining_bytes=maximum + MAX_ARTIFACT_MANIFEST_BYTES,
+                remaining_bytes=maximum + self.artifact_plane.root.resolve(
+                    relative + ".manifest.json", for_write=False).stat().st_size,
             ),
         )
         record_type: type[ProtocolExecutionPlan]
@@ -3286,7 +3193,7 @@ class CampaignExecutionService:
         ):
             raise CampaignIdentityError("persisted recovery status binds another run version")
         if type(index) is RunRecoveryIndex:
-            from .retained_e3_control_repair import selected_repair_index
+            from empirical_lawhood.api.retained_e3_control_repair import selected_repair_index
             index = selected_repair_index(writer=self.artifact_plane, plan=plan, predecessor=index)
         return plan, index, store
 
@@ -3662,14 +3569,14 @@ class CampaignExecutionService:
     def _check_identity(self, package: ExecutionPackage) -> str | None:
         repair_index = getattr(self, '_retained_e3_control_repair', None)
         if repair_index is not None and repair_index.run_id == package.run_plan_id:
-            from .recursive_authoring import implementation_binding
+            from empirical_lawhood.api.recursive_authoring import implementation_binding
             admission = getattr(self, '_retained_e3_controller_admission', None)
             controller = repair_index.repair.controller if admission is None else admission.controller
             if (implementation_binding(self.repo_root) != controller
                     or package.implementation_commit != repair_index.repair.worker.observed_git_head):
                 raise CampaignIdentityError('retained E3 repair substitutes its controller or frozen worker source')
             return
-        from empirical_lawhood.infrastructure.source_origin import observe_selected_implementation
+        from empirical_lawhood.storage.source_origin import observe_selected_implementation
         try:
             package_root, candidate = observe_selected_implementation(self.repo_root)
         except PermissionError as error:
@@ -3732,13 +3639,6 @@ class CampaignExecutionService:
         require_original()
         report_progress(phase="execution.plan-validation", done=0, total=2)
         for completed, plan in enumerate((source_plan, execution_plan), start=1):
-            if (
-                isinstance(plan, (ProtocolRunPlan, ProtocolExecutionPlan))
-                and plan.canonical_size_bytes() > MAX_RUNTIME_PLAN_JSON_BYTES
-            ):
-                raise CampaignValidationError(
-                    "runtime plan exceeds its finite serialized byte envelope"
-                )
             report_progress(phase="execution.plan-validation", done=completed, total=2)
         run_id = execution_plan.source_plan.object_id
         package_parents = self._package_lineage_parents(package)
@@ -3987,19 +3887,13 @@ class CampaignExecutionService:
         if not path.is_file() or not manifest.is_file():
             raise KeyError(run_id)
         try:
-            manifest_record = decode_artifact_manifest(
-                read_bounded_bytes(
-                    manifest,
-                    maximum_bytes=MAX_CONTROL_PLANE_JSON_BYTES,
-                )
-            )
+            manifest_record = resolve_artifact_sidecar_bytes(self.artifact_plane, read_bounded_bytes(manifest, maximum_bytes=None))
         except (BoundedFileIOError, OSError, ValueError) as error:
             raise CampaignIdentityError("persisted campaign manifest is invalid") from error
         if manifest_record.materialization.relative_path != relative:
             raise CampaignIdentityError("persisted campaign manifest points elsewhere")
         if (
-            manifest_record.materialization.size_bytes > MAX_CAMPAIGN_PACKAGE_BYTES
-            or manifest_record.logical.logical_artifact_id != f"campaign-package.{run_id}"
+            manifest_record.logical.logical_artifact_id != f"campaign-package.{run_id}"
             or manifest_record.logical.payload_schema
             not in {
                 CampaignPackage.SCHEMA,
@@ -4018,7 +3912,7 @@ class CampaignExecutionService:
             )
         self.artifact_plane.verify_manifest(manifest_record)
         if read is not None:
-            from empirical_lawhood.kernel.decoding import decimal_context_key
+            from empirical_lawhood.science.records.decoding import decimal_context_key
             read.require(self)
             entry = read.entry
             if (entry is not None and entry[0] == manifest_record
@@ -4026,7 +3920,7 @@ class CampaignExecutionService:
                 read.require(self)
                 return entry[2]
         try:
-            payload = read_bounded_bytes(path, maximum_bytes=MAX_CAMPAIGN_PACKAGE_BYTES)
+            payload = read_bounded_bytes(path, maximum_bytes=manifest_record.materialization.size_bytes)
         except (BoundedFileIOError, OSError) as error:
             raise CampaignIdentityError("persisted campaign package exceeds its bound") from error
         try:

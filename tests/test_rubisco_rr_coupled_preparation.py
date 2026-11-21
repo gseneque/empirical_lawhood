@@ -17,7 +17,7 @@ import tarfile
 
 import pytest
 
-from empirical_lawhood.adapters.physical.rubisco_kinetics import rr_coupled_preparation as rr
+import empirical_lawhood.domains.rubisco.kinetics.rr_coupled_preparation as rr
 
 
 FIXTURE = Path(__file__).parent / 'fixtures/rubisco/rr_coupled'
@@ -345,7 +345,7 @@ class Refuse(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in {'Bio','openmm','parmed','pdbfixer','pyscf','numpy','scipy','h5py'}:
             raise AssertionError(fullname)
 sys.meta_path.insert(0, Refuse())
-from empirical_lawhood.adapters.physical.rubisco_kinetics import rr_coupled_preparation
+from empirical_lawhood.domains.rubisco.kinetics import rr_coupled_preparation
 assert len(rr_coupled_preparation.CONTEXT_ROSTER)==6
 assert not any(n.split('.')[0] in {'Bio','openmm','parmed','pdbfixer','pyscf','numpy','scipy','h5py'} for n in sys.modules)
 '''

@@ -10,7 +10,7 @@ to produce this package.
 
 ## Source-preserving operators
 
-The maintained [coupling owner](../../../../src/empirical_lawhood/adapters/methods/rubisco_insilico_free_energy/native_coupling.py)
+The maintained [coupling owner](../../../../src/empirical_lawhood/adapters/rubisco/rubisco_insilico_free_energy/native_coupling.py)
 adapts the authenticated original helper with SHA-256
 `0cbef06a873c745279d6525f6a697ae91b8adaa73bb8d8b5e7e0f256465e3765`.
 It imports no scientific/native library during discovery and has no sibling
@@ -35,7 +35,7 @@ valid protocol digest supplies no execution authority.
 
 ## Retain first, assess independently
 
-The additive [raw-return seam](../../../../src/empirical_lawhood/adapters/methods/rubisco_insilico_free_energy/raw_coupled_return.py)
+The additive [raw-return seam](../../../../src/empirical_lawhood/domains/rubisco/rubisco_insilico_free_energy/raw_coupled_return.py)
 accepts the actual returned scalar energy and native gradient. The exact request
 binds protocol, prepared material, full physical coordinates, producing
 provenance, atom denominator, units and coordinate frame. Its three output slots

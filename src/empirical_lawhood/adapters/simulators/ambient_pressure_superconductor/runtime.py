@@ -1,51 +1,34 @@
-'Receipt-first ambient pressure superconductor excluded solver control protocol, runners and runtime provider.'
+"""Native acquisition and external-format binding for the domain science."""
 
 from __future__ import annotations
-
 from dataclasses import fields
 from hashlib import sha256
 from typing import Any, TypeVar, cast
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.design.study_issue import StudyOperationAuthority
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord, encode_scientific_adjudication
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, CampaignRuntimeProvider, ExternalInputPayload
+from empirical_lawhood.domains.materials.superconductivity.solver_control_contracts import ADJUDICATION_SCHEMA, ExcludedSolverControlConfig, ExcludedSolverControlSolverSmokeResult, CAPABILITY_VERSION, CONFIG_SCHEMA, CONFIG_VERSION, EVALUATOR_CAPABILITY_KEY, MaterialPreparationRecord, NumericalViewRecord, PREPARATION_CAPABILITY_KEY, SOLVER_CAPABILITY_KEY, SolverControlInputRecord, SolverRunObservation, SolverSmokeDisposition, ExcludedSolverControlSourceManifest, SOURCE_MANIFEST_SOURCE_ID, decode_config_bytes
+from empirical_lawhood.domains.materials.superconductivity.domain import adjudicate_solver_smoke, build_control_input
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.solver import MaterialSolverExecutor, SolverExecutionRequest, extract_qe_observation
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.source import expected_excluded_solver_control_source_manifest
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.system import task_budget
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.planning.study_issue import StudyOperationAuthority
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-    encode_scientific_adjudication,
+from empirical_lawhood.domains.materials.superconductivity.stages import (
+    CONFIG_ARTIFACT_ID as _science_CONFIG_ARTIFACT_ID,
+    EVALUATOR_STEP as _science_EVALUATOR_STEP,
+    PREPARATION_STEP as _science_PREPARATION_STEP,
+    SOLVER_STEP as _science_SOLVER_STEP,
+    SOURCE_MANIFEST_ARTIFACT_ID as _science_SOURCE_MANIFEST_ARTIFACT_ID,
 )
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityManifest,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-)
-
-from .contracts import ADJUDICATION_SCHEMA, ExcludedSolverControlConfig, ExcludedSolverControlSolverSmokeResult, CAPABILITY_VERSION, CONFIG_SCHEMA, CONFIG_VERSION, EVALUATOR_CAPABILITY_KEY, MaterialPreparationRecord, NumericalViewRecord, PREPARATION_CAPABILITY_KEY, SOLVER_CAPABILITY_KEY, SolverControlInputRecord, SolverRunObservation, SolverSmokeDisposition, ExcludedSolverControlSourceManifest, SOURCE_MANIFEST_SOURCE_ID, decode_config_bytes
-from .domain import adjudicate_solver_smoke, build_control_input
-from .solver import MaterialSolverExecutor, SolverExecutionRequest, extract_qe_observation
-from .source import expected_excluded_solver_control_source_manifest
-from .system import task_budget
-
-
-CONFIG_ARTIFACT_ID = 'config-artifact.ambient-pressure-superconductor-excluded-solver-control'
-SOURCE_MANIFEST_ARTIFACT_ID = SOURCE_MANIFEST_SOURCE_ID
-
-PREPARATION_STEP = "material-preparation"
-SOLVER_STEP = "qe-solver-smoke"
-EVALUATOR_STEP = "solver-smoke-evaluator"
-
 
 def config_ref(config: ExcludedSolverControlConfig) -> CapabilityConfigRef:
     return CapabilityConfigRef(
@@ -53,7 +36,7 @@ def config_ref(config: ExcludedSolverControlConfig) -> CapabilityConfigRef:
         config_schema=CONFIG_SCHEMA,
         config_schema_sha256=sha256(CONFIG_SCHEMA.encode()).hexdigest(),
         content_sha256=config.payload_sha256,
-        artifact_id=CONFIG_ARTIFACT_ID,
+        artifact_id=_science_CONFIG_ARTIFACT_ID,
     )
 
 
@@ -107,7 +90,7 @@ def excluded_solver_control_protocol(*, registry: CapabilityRegistry, config: Ex
 
     steps = (
         step(
-            step_id=PREPARATION_STEP,
+            step_id=_science_PREPARATION_STEP,
             stage=ScientificStage.ACQUIRE,
             capability_key=PREPARATION_CAPABILITY_KEY,
             dependencies=(),
@@ -122,10 +105,10 @@ def excluded_solver_control_protocol(*, registry: CapabilityRegistry, config: Ex
             obligations=('excluded-solver-control-exact-held-control-preparation',),
         ),
         step(
-            step_id=SOLVER_STEP,
+            step_id=_science_SOLVER_STEP,
             stage=ScientificStage.ACQUIRE,
             capability_key=SOLVER_CAPABILITY_KEY,
-            dependencies=(PREPARATION_STEP,),
+            dependencies=(_science_PREPARATION_STEP,),
             outputs=(("solver-observation", SolverRunObservation.SCHEMA),),
             outcome_access=OutcomeAccess.EVALUATION_SEALED,
             visibility=VisibilityCeiling.PROSPECTIVE,
@@ -136,10 +119,10 @@ def excluded_solver_control_protocol(*, registry: CapabilityRegistry, config: Ex
             ),
         ),
         step(
-            step_id=EVALUATOR_STEP,
+            step_id=_science_EVALUATOR_STEP,
             stage=ScientificStage.EVALUATE,
             capability_key=EVALUATOR_CAPABILITY_KEY,
-            dependencies=(PREPARATION_STEP, SOLVER_STEP),
+            dependencies=(_science_PREPARATION_STEP, _science_SOLVER_STEP),
             outputs=(
                 ("scientific-adjudication", ADJUDICATION_SCHEMA),
                 ("solver-smoke-result", ExcludedSolverControlSolverSmokeResult.SCHEMA),
@@ -273,7 +256,7 @@ class ExcludedSolverControlRunner:
         self.execution_count += 1
         records = self._read(context)
         outputs: dict[str, CanonicalRecord | bytes]
-        if context.task_id == PREPARATION_STEP:
+        if context.task_id == _science_PREPARATION_STEP:
             observed_source = _one(records, ExcludedSolverControlSourceManifest)
             if observed_source != self.source_manifest:
                 raise ValueError('excluded solver control held solver-environment manifest differs')
@@ -283,7 +266,7 @@ class ExcludedSolverControlRunner:
                 "numerical-view": view,
                 "solver-control-input": control,
             }
-        elif context.task_id == SOLVER_STEP:
+        elif context.task_id == _science_SOLVER_STEP:
             preparation = _one(records, MaterialPreparationRecord)
             view = _one(records, NumericalViewRecord)
             control = _one(records, SolverControlInputRecord)
@@ -311,7 +294,7 @@ class ExcludedSolverControlRunner:
                     observation_id=f'observation.{context.run_id}.{context.attempt_id}',
                 )
             }
-        elif context.task_id == EVALUATOR_STEP:
+        elif context.task_id == _science_EVALUATOR_STEP:
             result = adjudicate_solver_smoke(
                 self.config,
                 _one(records, SolverControlInputRecord),
@@ -423,7 +406,7 @@ class ExcludedSolverControlRuntimeProvider(CampaignRuntimeProvider):
             for task in plan.tasks
             for value in task.external_inputs
         }
-        expected = {CONFIG_ARTIFACT_ID, SOURCE_MANIFEST_ARTIFACT_ID}
+        expected = {_science_CONFIG_ARTIFACT_ID, _science_SOURCE_MANIFEST_ARTIFACT_ID}
         if set(specs) != expected:
             raise ValueError('excluded solver control plan external input set differs')
 
@@ -463,14 +446,14 @@ class ExcludedSolverControlRuntimeProvider(CampaignRuntimeProvider):
 
         return (
             payload(
-                CONFIG_ARTIFACT_ID,
+                _science_CONFIG_ARTIFACT_ID,
                 payload_schema=CONFIG_SCHEMA,
                 content=self.config_payload,
-                object_id=CONFIG_ARTIFACT_ID,
+                object_id=_science_CONFIG_ARTIFACT_ID,
                 object_version=CONFIG_VERSION,
             ),
             payload(
-                SOURCE_MANIFEST_ARTIFACT_ID,
+                _science_SOURCE_MANIFEST_ARTIFACT_ID,
                 payload_schema=ExcludedSolverControlSourceManifest.SCHEMA,
                 content=self.source_manifest.canonical_bytes(),
                 object_id=SOURCE_MANIFEST_SOURCE_ID,
@@ -518,22 +501,9 @@ class ExcludedSolverControlRuntimeProvider(CampaignRuntimeProvider):
         return ScientificAdjudicationOutputContract(
             capability_key=EVALUATOR_CAPABILITY_KEY,
             capability_version=CAPABILITY_VERSION,
-            output_id=f'{EVALUATOR_STEP}.scientific-adjudication',
+            output_id=f'{_science_EVALUATOR_STEP}.scientific-adjudication',
             payload_schema=ADJUDICATION_SCHEMA,
             maximum_bytes=128 * 1024,
             fixture_scope_id=None,
             plumbing_only=False,
         )
-
-
-__all__ = [
-    'ExcludedSolverControlRunner',
-    'ExcludedSolverControlRuntimeProvider',
-    "CONFIG_ARTIFACT_ID",
-    "EVALUATOR_STEP",
-    "SOURCE_MANIFEST_ARTIFACT_ID",
-    "PREPARATION_STEP",
-    "SOLVER_STEP",
-    'excluded_solver_control_protocol',
-    "config_ref",
-]

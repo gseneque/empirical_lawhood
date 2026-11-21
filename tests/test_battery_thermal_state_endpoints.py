@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.native import differential_state_endpoints
+from empirical_lawhood.adapters.battery.battery_thermal_inquiry.native import differential_state_endpoints
 
 
 class ExposedSegmentedSolution:

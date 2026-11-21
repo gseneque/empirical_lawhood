@@ -8,18 +8,18 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.api.codecs import AuthoringCodecError, MAX_AUTHORING_BYTES, load_authoring, load_standard_issued_study, load_standard_study_candidate
+from empirical_lawhood.api.codecs import AuthoringCodecError, load_authoring, load_standard_issued_study, load_standard_study_candidate
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
 from empirical_lawhood.api.results import CompileCandidateRequest, IssueExtensionsRequest, OperationStatus
-from empirical_lawhood.infrastructure.study_issue import ExternalIssuedExtensionPayloadSource
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.experiment_entry import ExecutableStudyDefinition, ProposedStudyExtension, ProposedStudyExtensionSet
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, StudyOperationAuthority
-from empirical_lawhood.runtime.candidate_compiler import bind_standard_candidate_extensions
-from empirical_lawhood.runtime.study_issue import StudyExtensionDecoderRegistration
-from empirical_lawhood.runtime.static_codecs import build_canonical_record_codec_registry
+from empirical_lawhood.storage.study_issue import ExternalIssuedExtensionPayloadSource
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.experiment_entry import ExecutableStudyDefinition, ProposedStudyExtension, ProposedStudyExtensionSet
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, StudyOperationAuthority
+from empirical_lawhood.execution.candidate_compiler import bind_standard_candidate_extensions
+from empirical_lawhood.execution.study_issue import StudyExtensionDecoderRegistration
+from empirical_lawhood.execution.static_codecs import build_canonical_record_codec_registry
 from tests.approval_support import FixedDecisionClock
 from tests.issued_study_support import _extension_plan
 from tests.runtime_platform.test_study_issue import _issue_api_fixture, _issue_request, _publisher
@@ -162,24 +162,11 @@ def test_public_compile_preview_publish_restart_and_hostile_identity(
     assert compiled.payload.report.extension_materializations[0].payload == proposal.payload
 
     candidate_bytes = paths["candidate"].read_bytes()
-    paths["candidate"].write_bytes(
-        candidate_bytes + b" " * (MAX_AUTHORING_BYTES + 1 - len(candidate_bytes))
-    )
-    with pytest.raises(AuthoringCodecError, match="byte limit"):
-        load_authoring(paths["candidate"])
+    paths["candidate"].write_bytes(candidate_bytes + b" " * 17)
+    assert load_authoring(paths["candidate"]) == executable_candidate
     assert load_standard_study_candidate(paths["candidate"]) == executable_candidate
     with pytest.raises(AuthoringCodecError, match="unsupported authoring root"):
         load_standard_study_candidate(paths["authoring"])
-    with monkeypatch.context() as limits:
-        limits.setattr("empirical_lawhood.api.codecs.MAX_COMPOSED_PROGRAMME_CONTROL_BYTES", 1)
-        with pytest.raises(AuthoringCodecError, match="byte limit"):
-            load_standard_study_candidate(paths["candidate"])
-    with monkeypatch.context() as limits:
-        limits.setattr("empirical_lawhood.api.codecs.MAX_AUTHORING_NODES", 1)
-        assert load_standard_study_candidate(paths["candidate"]) == executable_candidate
-        limits.setattr("empirical_lawhood.api.codecs.MAX_COMPOSED_CONTROL_NODES", 1)
-        with pytest.raises(AuthoringCodecError, match="node limit"):
-            load_standard_study_candidate(paths["candidate"])
 
     issue_request = IssueExtensionsRequest(
         authoring_package_path=paths["authoring"],
@@ -207,20 +194,11 @@ def test_public_compile_preview_publish_restart_and_hostile_identity(
     assert issued.payload.publication_receipt is not None
     composed_path = tmp_path / "composed-manifest.json"
     manifest_bytes = issued.payload.manifest.canonical_bytes()
-    composed_path.write_bytes(
-        manifest_bytes + b" " * (MAX_AUTHORING_BYTES + 1 - len(manifest_bytes))
-    )
-    with pytest.raises(AuthoringCodecError, match="byte limit"):
-        load_authoring(composed_path)
+    composed_path.write_bytes(manifest_bytes + b" " * 17)
+    assert load_authoring(composed_path) == issued.payload.manifest
     assert load_standard_issued_study(composed_path) == issued.payload.manifest
     with pytest.raises(AuthoringCodecError, match="unsupported authoring root"):
         load_standard_issued_study(paths["authoring"])
-    with monkeypatch.context() as limits:
-        limits.setattr("empirical_lawhood.api.codecs.MAX_AUTHORING_NODES", 1)
-        assert load_standard_issued_study(composed_path) == issued.payload.manifest
-        limits.setattr("empirical_lawhood.api.codecs.MAX_COMPOSED_CONTROL_NODES", 1)
-        with pytest.raises(AuthoringCodecError, match="node limit"):
-            load_standard_issued_study(composed_path)
     assert issued.payload.publication_receipt.declared_member_ids == tuple(
         value.member_id for value in issued.payload.manifest.members
     )

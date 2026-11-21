@@ -13,23 +13,20 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods import matrix_prepared_source_experiment as domain
+from empirical_lawhood.domains.matrix import matrix_prepared_source_experiment as domain
 from empirical_lawhood.api import prepared_source_replay as owner
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
-from empirical_lawhood.planning.campaigns import CampaignSpec
-from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft, RecursiveScientificSelection
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCandidate
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
-from empirical_lawhood.runtime.prospective_experiment import (
-    ALLOCATION_FILENAME, ASSOCIATION_FILENAME, INSTANCE_FILENAME, SPECIFICATION_FILENAME,
-    ProspectiveExperimentAssociation, instance_identity, source_filename,
-)
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
+from empirical_lawhood.design.campaigns import CampaignSpec
+from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft, RecursiveScientificSelection
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCandidate
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
+from empirical_lawhood.execution.prospective_experiment import ALLOCATION_FILENAME, ASSOCIATION_FILENAME, INSTANCE_FILENAME, SPECIFICATION_FILENAME, ProspectiveExperimentAssociation, instance_identity, source_filename
 from tests.test_current_result_custody import actual_issued_current_task_controls  # noqa: F401
 from tests.test_prepared_source_access import source_literals  # noqa: F401
 from tests.test_matrix_finite_dt_source_assembly import c_backed_source_case  # noqa: F401
@@ -182,8 +179,8 @@ def test_association_control_bound_refuses_before_even_its_body(tmp_path, source
 
 
 def _binding(package, plan):
-    from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-    from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceGateEvidence
+    from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+    from empirical_lawhood.design.scientific_source_qualification import ScientificSourceGateEvidence
     return RecursivePriorExecutionBinding("binding.disclosed-source-package-join",
         ObjectIdentity.from_record(package.issued_study.issue_id, package.issued_study),
         ObjectIdentity.from_record(package.execution_authority.authority_id, package.execution_authority),
@@ -233,9 +230,7 @@ def test_writer_only_parser_keeps_real_directory_admission(tmp_path, monkeypatch
 def _provenance_case(tmp_path, monkeypatch, *, damage=None):
     from empirical_lawhood.api import selected_prepared_access as access_owner
     from empirical_lawhood.api.recursive_prospective_authoring import ProspectiveSourceObservation
-    from empirical_lawhood.planning.study_issue import (
-        ImplementationSourceClosure, SelectedSourceManifest, SelectedSourceManifestMember, SourceClosureKind,
-    )
+    from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SelectedSourceManifest, SelectedSourceManifestMember, SourceClosureKind
     plane = _plane(tmp_path / "closed-source-provenance")
     manifest = SelectedSourceManifest("manifest.disclosed.operational", "a" * 40, "b" * 64, "c" * 64,
         (SelectedSourceManifestMember("README.md", "100644", 1, "d" * 64),))
@@ -332,7 +327,7 @@ def test_source_provenance_foreign_role_or_publication_refuses_before_body(tmp_p
 
 
 def test_source_provenance_bound_facts_do_not_admit_unknown_or_expired_members(tmp_path, monkeypatch):
-    from empirical_lawhood.runtime.artifacts import ArtifactManifest
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
     case = _provenance_case(tmp_path, monkeypatch)
     _forbid_provenance_bodies(case, monkeypatch)
     bound = case.scope.bind_source_provenance(packet=case.packet, directory=case.directory)

@@ -15,23 +15,19 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_PYTHON_SOURCE_CODEC
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_PYTHON_SOURCE_CODEC
 from empirical_lawhood.api import experiment_preparation as owner
 from empirical_lawhood.api import experiment_runtime_bindings as bindings
 from empirical_lawhood.api import recursive_qualified_parents as authority
 from empirical_lawhood.api import selected_e3_access as access_owner
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.experiment_inputs import (
-    ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import (
-    ExperimentProtocolDeclaration, ExperimentRuntimeBinding, PreparedExperimentInputs,
-)
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExperimentProtocolDeclaration, ExperimentRuntimeBinding, PreparedExperimentInputs
 from tests.test_current_result_custody import actual_issued_current_task_controls  # noqa: F401
 from tests.test_current_result_historical_access import later_reveal
 from tests.test_rubisco_gas_contrast import _real_plane
@@ -65,7 +61,7 @@ class Specification(CanonicalRecord):
 
 def _scope(directory, monkeypatch, *, guard, bootstrap=None, hooked=True, after_bind=None):
     """Real selected bytes; callbacks only expose the shared loader boundary."""
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
 
     directory.mkdir(parents=True, exist_ok=True)
     model = Model('model.disclosed.bootstrap', (2, 3, 5))
@@ -184,7 +180,7 @@ def test_permission_is_refreshed_at_later_reads_and_after_binder(tmp_path, monke
     if target == 'model.json':
         # The locator may be read without exposing its referenced model. Expiry
         # after that metadata read must refuse before the model is opened.
-        from empirical_lawhood.infrastructure import bounded_io
+        from empirical_lawhood.storage import bounded_io
         read = bounded_io.read_bounded_bytes
         def locator_read(path, **kwargs):
             raw = read(path, **kwargs)
@@ -330,13 +326,11 @@ def test_derived_target_access_precedes_actual_publication_sibling_hash(tmp_path
 
 @pytest.fixture(scope='module')
 def domain_locator_case():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as records
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorResources
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import (
-        PROTOCOL_ID, SelectedE3E4ExperimentSpecification,
-    )
-    from empirical_lawhood.kernel.authority import ResourceBudget
-    from empirical_lawhood.planning.campaigns import CampaignSpec
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as records
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorResources
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import PROTOCOL_ID, SelectedE3E4ExperimentSpecification
+    from empirical_lawhood.science.identity.authority import ResourceBudget
+    from empirical_lawhood.design.campaigns import CampaignSpec
     from tests.test_matrix_programme_scientific_design import build_scientific_design
     value = evidence(literal_originals())
     design = build_scientific_design()

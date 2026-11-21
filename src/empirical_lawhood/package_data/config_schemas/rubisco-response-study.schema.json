@@ -1,0 +1,2147 @@
+{
+  "$defs": {
+    "ActiveSiteSelection_538a9894101a": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/active-site-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "carbamylated": {
+              "description": "carbamylated; constructor checks semantics and units.",
+              "type": "boolean"
+            },
+            "catalytic_lysine_position_1based": {
+              "description": "catalytic lysine position 1based; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "ligand_chemical_graph": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "ligand chemical graph; constructor checks semantics and units."
+            },
+            "ligand_state": {
+              "description": "ligand state; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "lsu_chain_id": {
+              "description": "lsu chain id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "magnesium_bound": {
+              "description": "magnesium bound; constructor checks semantics and units.",
+              "type": "boolean"
+            },
+            "metal_coordination": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "metal coordination; constructor checks semantics and units."
+            },
+            "protonation_and_tautomers": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "protonation and tautomers; constructor checks semantics and units."
+            },
+            "site_id": {
+              "description": "site id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "site_id",
+            "lsu_chain_id",
+            "catalytic_lysine_position_1based",
+            "carbamylated",
+            "magnesium_bound",
+            "ligand_state",
+            "protonation_and_tautomers",
+            "metal_coordination",
+            "ligand_chemical_graph"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ChemicalProtocol_bd013aa532ae": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/chemical-protocol"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "interpretation": {
+              "description": "interpretation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "other_site_model": {
+              "description": "other site model; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "protocol_id": {
+              "description": "protocol id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sites": {
+              "description": "sites; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ActiveSiteSelection_538a9894101a"
+              },
+              "type": "array"
+            },
+            "solvent_and_ions": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "solvent and ions; constructor checks semantics and units."
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "unresolved_requirement_ids": {
+              "description": "unresolved requirement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "protocol_id",
+            "sites",
+            "other_site_model",
+            "solvent_and_ions",
+            "sources",
+            "unresolved_requirement_ids",
+            "interpretation"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "DissolvedGasQuery_46cb112f3fc1": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/dissolved-gas-query"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "co2_um": {
+              "additionalProperties": false,
+              "description": "co2 um; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "concentration_convention": {
+              "description": "concentration convention; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "o2_um": {
+              "additionalProperties": false,
+              "description": "o2 um; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "co2_um",
+            "o2_um",
+            "concentration_convention"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "EndpointValues_b89c6005e080": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/endpoint-values"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "kcat_c_s_inv": {
+              "$ref": "#/$defs/Exact_26f197d3a564",
+              "description": "kcat c s inv; constructor checks semantics and units."
+            },
+            "specificity": {
+              "$ref": "#/$defs/Exact_26f197d3a564",
+              "description": "specificity; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "kcat_c_s_inv",
+            "specificity"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "Exact_26f197d3a564": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-insilico-mechanism/exact-rational"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "denominator": {
+              "description": "denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "numerator": {
+              "description": "numerator; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "numerator",
+            "denominator"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "FourStateRates_e6e015e13081": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/four-state-rates"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "a": {
+              "additionalProperties": false,
+              "description": "a; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "b": {
+              "additionalProperties": false,
+              "description": "b; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "c": {
+              "additionalProperties": false,
+              "description": "c; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "clock_unit": {
+              "description": "clock unit; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "closure": {
+              "description": "closure; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "concentration_convention": {
+              "description": "concentration convention; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "d_c": {
+              "additionalProperties": false,
+              "description": "d c; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "d_o": {
+              "additionalProperties": false,
+              "description": "d o; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "o": {
+              "additionalProperties": false,
+              "description": "o; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "r_c": {
+              "additionalProperties": false,
+              "description": "r c; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "r_o": {
+              "additionalProperties": false,
+              "description": "r o; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "a",
+            "b",
+            "c",
+            "d_c",
+            "d_o",
+            "o",
+            "r_c",
+            "r_o",
+            "concentration_convention",
+            "clock_unit",
+            "closure"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "IndependentUnit_27490163936b": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/experimental-design/independent-unit"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "exposed": {
+              "description": "exposed; constructor checks semantics and units.",
+              "type": "boolean"
+            },
+            "family_id": {
+              "description": "family id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "numerical_view_ids": {
+              "description": "numerical view ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "source_id": {
+              "description": "source id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "unit_id": {
+              "description": "unit id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "unit_id",
+            "source_id",
+            "family_id",
+            "numerical_view_ids",
+            "exposed"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "NominatedPrediction_33f3044c1403": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/nominated-prediction"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "case": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "case; constructor checks semantics and units."
+            },
+            "exposure_group": {
+              "description": "exposure group; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "meaning": {
+              "description": "meaning; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "nominated_turnover_log_ratio_interval": {
+              "anyOf": [
+                {
+                  "items": false,
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "decimal": {
+                          "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "decimal"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "decimal": {
+                          "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "decimal"
+                      ],
+                      "type": "object"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "nominated turnover log ratio interval; constructor checks semantics and units."
+            },
+            "prediction_id": {
+              "description": "prediction id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "specificity_direction": {
+              "description": "specificity direction; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "turnover_direction": {
+              "description": "turnover direction; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "prediction_id",
+            "case",
+            "turnover_direction",
+            "specificity_direction",
+            "nominated_turnover_log_ratio_interval",
+            "sources",
+            "exposure_group",
+            "meaning"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "PairedDecisionRegion_83baa6951caf": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/paired-decision-region"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "absolute_specificity_floor": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "absolute specificity floor; constructor checks semantics and units."
+            },
+            "absolute_turnover_floor_s_inv": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "absolute turnover floor s inv; constructor checks semantics and units."
+            },
+            "case": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "case; constructor checks semantics and units."
+            },
+            "context": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "context; constructor checks semantics and units."
+            },
+            "decision_id": {
+              "description": "decision id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "endpoint_view": {
+              "description": "endpoint view; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "minimum_specificity_ratio": {
+              "additionalProperties": false,
+              "description": "minimum specificity ratio; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "minimum_turnover_ratio": {
+              "additionalProperties": false,
+              "description": "minimum turnover ratio; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "next_action": {
+              "description": "next action; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "purpose": {
+              "description": "purpose; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "specificity_claim": {
+              "description": "specificity claim; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "strict_turnover_increase": {
+              "description": "strict turnover increase; constructor checks semantics and units.",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "decision_id",
+            "case",
+            "context",
+            "minimum_turnover_ratio",
+            "minimum_specificity_ratio",
+            "absolute_turnover_floor_s_inv",
+            "absolute_specificity_floor",
+            "endpoint_view",
+            "next_action",
+            "sources",
+            "purpose",
+            "strict_turnover_increase",
+            "specificity_claim"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "PairedRatePoint_738f9bc6f1be": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/paired-rate-point"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "anchor_source": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "anchor source; constructor checks semantics and units."
+            },
+            "anchor_wild_type": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/EndpointValues_b89c6005e080"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "anchor wild type; constructor checks semantics and units."
+            },
+            "mutant": {
+              "$ref": "#/$defs/FourStateRates_e6e015e13081",
+              "description": "mutant; constructor checks semantics and units."
+            },
+            "point_id": {
+              "description": "point id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "wild_type": {
+              "$ref": "#/$defs/FourStateRates_e6e015e13081",
+              "description": "wild type; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "point_id",
+            "wild_type",
+            "mutant",
+            "sources",
+            "anchor_wild_type",
+            "anchor_source"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "PairedRateScenario_408577b984ec": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/paired-rate-scenario"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "closure_alternative": {
+              "description": "closure alternative; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "ledger": {
+              "$ref": "#/$defs/ParameterEvidenceLedger_55b281070e23",
+              "description": "ledger; constructor checks semantics and units."
+            },
+            "original_state": {
+              "description": "original state; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "points": {
+              "description": "points; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/PairedRatePoint_738f9bc6f1be"
+              },
+              "type": "array"
+            },
+            "scenario_id": {
+              "description": "scenario id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "unresolved_requirement_ids": {
+              "description": "unresolved requirement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "scenario_id",
+            "original_state",
+            "ledger",
+            "points",
+            "closure_alternative",
+            "sources",
+            "unresolved_requirement_ids"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "PairedRateSupply_80cc333b911c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/paired-rate-supply"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "biological_predictive_calibration": {
+              "description": "biological predictive calibration; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "case": {
+              "$ref": "#/$defs/RubiscoPairedCase_3ae0a7bf3b13",
+              "description": "case; constructor checks semantics and units."
+            },
+            "context": {
+              "$ref": "#/$defs/RubiscoAssayContext_0473261550b2",
+              "description": "context; constructor checks semantics and units."
+            },
+            "expected_scenario_ids": {
+              "description": "expected scenario ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "prerequisite_requirement_ids": {
+              "description": "prerequisite requirement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "query": {
+              "$ref": "#/$defs/DissolvedGasQuery_46cb112f3fc1",
+              "description": "query; constructor checks semantics and units."
+            },
+            "scenarios": {
+              "description": "scenarios; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/PairedRateScenario_408577b984ec"
+              },
+              "type": "array"
+            },
+            "shared_sources": {
+              "description": "shared sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "supply_id": {
+              "description": "supply id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "supply_id",
+            "case",
+            "context",
+            "query",
+            "expected_scenario_ids",
+            "scenarios",
+            "shared_sources",
+            "prerequisite_requirement_ids",
+            "biological_predictive_calibration"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ParameterEvidenceLedger_55b281070e23": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/parameter-evidence-ledger"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "bindings": {
+              "description": "bindings; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/RateEvidenceBinding_2401671a0fd9"
+              },
+              "type": "array"
+            },
+            "case": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "case; constructor checks semantics and units."
+            },
+            "concentration_standard_state_um": {
+              "additionalProperties": false,
+              "description": "concentration standard state um; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "context": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "context; constructor checks semantics and units."
+            },
+            "interpretation": {
+              "description": "interpretation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "ledger_id": {
+              "description": "ledger id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "ledger_id",
+            "case",
+            "context",
+            "bindings",
+            "concentration_standard_state_um",
+            "interpretation"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RateEvidenceBinding_2401671a0fd9": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/rate-evidence-binding"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "applicability_limits": {
+              "description": "applicability limits; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "assessments": {
+              "description": "assessments; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "dependence_group_id": {
+              "description": "dependence group id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "evidence_kind": {
+              "description": "evidence kind; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "mutant_bounds": {
+              "anyOf": [
+                {
+                  "items": false,
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "decimal": {
+                          "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "decimal"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "decimal": {
+                          "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "decimal"
+                      ],
+                      "type": "object"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "mutant bounds; constructor checks semantics and units."
+            },
+            "mutation_dependence": {
+              "description": "mutation dependence; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "native_unit": {
+              "description": "native unit; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "parameter": {
+              "description": "parameter; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "required_relative_accuracy": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "required relative accuracy; constructor checks semantics and units."
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "supplier_route": {
+              "description": "supplier route; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "transition": {
+              "description": "transition; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "unresolved_requirement_ids": {
+              "description": "unresolved requirement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "wild_type_bounds": {
+              "anyOf": [
+                {
+                  "items": false,
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "decimal": {
+                          "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "decimal"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "decimal": {
+                          "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "decimal"
+                      ],
+                      "type": "object"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "wild type bounds; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "parameter",
+            "transition",
+            "native_unit",
+            "evidence_kind",
+            "supplier_route",
+            "wild_type_bounds",
+            "mutant_bounds",
+            "mutation_dependence",
+            "dependence_group_id",
+            "applicability_limits",
+            "sources",
+            "assessments",
+            "unresolved_requirement_ids",
+            "required_relative_accuracy"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ResidueSubstitution_8774e58cc4f5": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/residue-substitution"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "after": {
+              "description": "after; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "before": {
+              "description": "before; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "chain_id": {
+              "description": "chain id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "position_1based": {
+              "description": "position 1based; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "chain_id",
+            "position_1based",
+            "before",
+            "after"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ResponseAcceptance_82cc41629ccc": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/acceptance"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "absolute_log_endpoint_tolerances": {
+              "description": "absolute log endpoint tolerances; constructor checks semantics and units.",
+              "items": false,
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                }
+              ],
+              "type": "array"
+            },
+            "acceptance_id": {
+              "description": "acceptance id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "checkpoint_rule": {
+              "description": "checkpoint rule; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "conventional_baseline": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "conventional baseline; constructor checks semantics and units."
+            },
+            "cost_metric": {
+              "description": "cost metric; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "cost_unit": {
+              "description": "cost unit; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "criterion_admission_requirement_ids": {
+              "description": "criterion admission requirement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "gp_applicability_requirement_id": {
+              "description": "gp applicability requirement id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "interpretation": {
+              "description": "interpretation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "joint_coverage_level": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "joint coverage level; constructor checks semantics and units."
+            },
+            "matrix_handoff_requirement_id": {
+              "description": "matrix handoff requirement id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "maximum_false_admission": {
+              "additionalProperties": false,
+              "description": "maximum false admission; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "maximum_native_acquisitions": {
+              "description": "maximum native acquisitions; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "maximum_refinements": {
+              "description": "maximum refinements; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "minimum_useful_service": {
+              "additionalProperties": false,
+              "description": "minimum useful service; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "paired_log_endpoint_tolerances": {
+              "description": "paired log endpoint tolerances; constructor checks semantics and units.",
+              "items": false,
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                }
+              ],
+              "type": "array"
+            },
+            "permitted_refinement_ids": {
+              "description": "permitted refinement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "planned_reuse_count": {
+              "description": "planned reuse count; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "predictive_evidence_requirement_ids": {
+              "description": "predictive evidence requirement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "reference_fallback": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "reference fallback; constructor checks semantics and units."
+            },
+            "reference_method": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "reference method; constructor checks semantics and units."
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "stopping_conditions": {
+              "description": "stopping conditions; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "uncertainty_interpretation": {
+              "description": "uncertainty interpretation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "uncertainty_procedure": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "uncertainty procedure; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "acceptance_id",
+            "absolute_log_endpoint_tolerances",
+            "paired_log_endpoint_tolerances",
+            "uncertainty_interpretation",
+            "joint_coverage_level",
+            "uncertainty_procedure",
+            "minimum_useful_service",
+            "maximum_false_admission",
+            "reference_method",
+            "conventional_baseline",
+            "cost_metric",
+            "cost_unit",
+            "planned_reuse_count",
+            "permitted_refinement_ids",
+            "maximum_refinements",
+            "maximum_native_acquisitions",
+            "checkpoint_rule",
+            "stopping_conditions",
+            "reference_fallback",
+            "predictive_evidence_requirement_ids",
+            "gp_applicability_requirement_id",
+            "matrix_handoff_requirement_id",
+            "criterion_admission_requirement_ids",
+            "sources",
+            "interpretation"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RubiscoAssayContext_0473261550b2": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/assay-context"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "chemistry": {
+              "$ref": "#/$defs/ChemicalProtocol_bd013aa532ae",
+              "description": "chemistry; constructor checks semantics and units."
+            },
+            "context_id": {
+              "description": "context id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "gas_convention": {
+              "description": "gas convention; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "normalization": {
+              "description": "normalization; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "ph_interval": {
+              "description": "ph interval; constructor checks semantics and units.",
+              "items": false,
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                }
+              ],
+              "type": "array"
+            },
+            "ph_treatment": {
+              "description": "ph treatment; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "physical_clock_unit": {
+              "description": "physical clock unit; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "product_handling": {
+              "description": "product handling; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "rubp_regime": {
+              "description": "rubp regime; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "temperature_conversion_assessment": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "temperature conversion assessment; constructor checks semantics and units."
+            },
+            "temperature_k": {
+              "additionalProperties": false,
+              "description": "temperature k; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "temperature_selection": {
+              "description": "temperature selection; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "context_id",
+            "temperature_k",
+            "ph_interval",
+            "ph_treatment",
+            "chemistry",
+            "product_handling",
+            "sources",
+            "temperature_selection",
+            "temperature_conversion_assessment",
+            "rubp_regime",
+            "gas_convention",
+            "normalization",
+            "physical_clock_unit"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RubiscoCaseSet_e408ab4557c5": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/case-set"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "cases": {
+              "description": "cases; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/RubiscoPairedCase_3ae0a7bf3b13"
+              },
+              "type": "array"
+            },
+            "exposure": {
+              "description": "exposure; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "independent_biological_units": {
+              "description": "independent biological units; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "selection_id": {
+              "description": "selection id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "selection_id",
+            "cases",
+            "sources",
+            "exposure",
+            "independent_biological_units"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RubiscoMaterial_3184b0ad7642": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/material"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "assembly_scope": {
+              "description": "assembly scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "chains": {
+              "description": "chains; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/SubunitChain_03d69756d43d"
+              },
+              "type": "array"
+            },
+            "material_id": {
+              "description": "material id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "organism": {
+              "description": "organism; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "processing_view": {
+              "description": "processing view; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "material_id",
+            "organism",
+            "processing_view",
+            "chains",
+            "sources",
+            "assembly_scope"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RubiscoPairedCase_3ae0a7bf3b13": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/paired-case"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "applicability": {
+              "description": "applicability; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "case_id": {
+              "description": "case id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "case_role": {
+              "description": "case role; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "exposure_group": {
+              "description": "exposure group; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "mutant": {
+              "$ref": "#/$defs/RubiscoMaterial_3184b0ad7642",
+              "description": "mutant; constructor checks semantics and units."
+            },
+            "parent": {
+              "$ref": "#/$defs/RubiscoMaterial_3184b0ad7642",
+              "description": "parent; constructor checks semantics and units."
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "substitutions": {
+              "description": "substitutions; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ResidueSubstitution_8774e58cc4f5"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "case_id",
+            "parent",
+            "mutant",
+            "substitutions",
+            "case_role",
+            "exposure_group",
+            "sources",
+            "applicability"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RubiscoResponseStudy_5224498df0f0": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/study"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "acceptance": {
+              "$ref": "#/$defs/ResponseAcceptance_82cc41629ccc",
+              "description": "acceptance; constructor checks semantics and units."
+            },
+            "allocation": {
+              "$ref": "#/$defs/UnitAllocation_9ec70902f442",
+              "description": "allocation; constructor checks semantics and units."
+            },
+            "biological_predictive_calibration": {
+              "description": "biological predictive calibration; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "cases": {
+              "$ref": "#/$defs/RubiscoCaseSet_e408ab4557c5",
+              "description": "cases; constructor checks semantics and units."
+            },
+            "decisions": {
+              "description": "decisions; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/PairedDecisionRegion_83baa6951caf"
+              },
+              "type": "array"
+            },
+            "evidence_scope": {
+              "description": "evidence scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "independent_biological_units": {
+              "description": "independent biological units; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "nominated_predictions": {
+              "description": "nominated predictions; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/NominatedPrediction_33f3044c1403"
+              },
+              "type": "array"
+            },
+            "question": {
+              "description": "question; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "study_id": {
+              "description": "study id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "supplies": {
+              "description": "supplies; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/PairedRateSupply_80cc333b911c"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "study_id",
+            "cases",
+            "supplies",
+            "decisions",
+            "nominated_predictions",
+            "acceptance",
+            "allocation",
+            "evidence_scope",
+            "question",
+            "independent_biological_units",
+            "biological_predictive_calibration"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "SubunitChain_03d69756d43d": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/subunit-chain"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "chain_id": {
+              "description": "chain id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sequence": {
+              "description": "sequence; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "subunit": {
+              "description": "subunit; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "chain_id",
+            "subunit",
+            "sequence"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "UnitAllocation_9ec70902f442": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/experimental-design/unit-allocation"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "allocation_id": {
+              "description": "allocation id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "roles": {
+              "description": "roles; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/UnitRoleAssignment_82a856903be8"
+              },
+              "type": "array"
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "units": {
+              "description": "units; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/IndependentUnit_27490163936b"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "allocation_id",
+            "sources",
+            "units",
+            "roles"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "UnitRoleAssignment_82a856903be8": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/experimental-design/unit-role-assignment"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "role": {
+              "description": "role; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "unit_id": {
+              "description": "unit id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "unit_id",
+            "role"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:rubisco-response-study",
+  "$ref": "#/$defs/RubiscoResponseStudy_5224498df0f0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Rubisco Response Study",
+  "x-consumer": "rubisco-response-study",
+  "x-consumer-maximum-bytes": 33554432,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

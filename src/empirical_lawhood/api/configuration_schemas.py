@@ -16,10 +16,10 @@ import types
 from typing import Union, get_args, get_origin
 
 from empirical_lawhood.api.configuration_registry import CONSUMERS, ConfigurationConsumer
-from empirical_lawhood.kernel.decoding import record_annotations
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.science.records.decoding import record_annotations
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
-RESOURCE_PACKAGE = "empirical_lawhood.resources.config_schemas"
+RESOURCE_PACKAGE = "empirical_lawhood.package_data.config_schemas"
 DIALECT = "https://json-schema.org/draft/2020-12/schema"
 _CENSUS_FIELDS = ("excluded_unit_ids", "excluded_seed_ids", "proposed_unit_ids", "proposed_seed_ids")
 _UNITS = {"seconds": "s", "volts": "V", "amperes": "A", "farads": "F", "ohms": "ohm",

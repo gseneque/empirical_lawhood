@@ -7,40 +7,41 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_experiment as original
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_revision_transition as domain
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_experiment as original
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_revision_transition as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
 from empirical_lawhood.api import selected_e4_method_runtime as runtime
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.recursive_authoring import implementation_binding
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputSelection, ExperimentInputBinding
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_matrix_selected_e4_methods import selected_revision, selected_e4_populations, selected_bridge, transfer, pin  # noqa: F401
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
+from tests.numerical_provenance_fixtures import selected_test_mount
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def _real_plane(path):
-    assert path.resolve().is_relative_to(Path("/media/chevre/EL/empirical-lawhood"))
+    mount = selected_test_mount(path)
     path.mkdir()
     contract = ExternalRootContract("matrix-transition-public-control", "Exposed transition software custody",
-        str(path.resolve()), "/media/chevre/EL", "empirical-lawhood/testing/matrix-transition", 1,
-        allowed_filesystem_types=("ext4",))
+        str(path.resolve()), str(mount), "empirical-lawhood/testing/matrix-transition", 1,
+        allowed_filesystem_types=("ext4", "tmpfs"))
     plane = ExternalArtifactPlane(GuardedExternalRoot(contract))
     assert plane.root.diagnostic().write_ready
     return plane
 
 
 def transition_files(f, directory, writer, selection_type=ExperimentInputSelection):
-    assert directory.resolve().is_relative_to(Path("/media/chevre/EL/empirical-lawhood"))
+    assert selected_test_mount(directory) == Path(writer.root.contract.required_mount_path)
     directory.mkdir(exist_ok=True)
     editable = replace(f.editable, trigger=replace(f.editable.trigger, threshold=Decimal("999")))
     specification = domain.SelectedE4RevisionAcquisitionSpecification("specification.transition.public", editable)
@@ -176,10 +177,10 @@ def test_complete_revision_derivation_uses_one_disclosed_reader_and_refuses_chan
     """One public derivation over disclosed decoded products, not native custody acceptance."""
     from types import SimpleNamespace
     from empirical_lawhood.api import matrix_selected_e3_e4_read as original_reader
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as acquisition
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as records
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
-    from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as acquisition
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as records
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
+    from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
     f = selected_revision
     writer = _real_plane(tmp_path / "selected")
     directory = Path(writer.root.contract.canonical_path) / "original-dev"
@@ -249,7 +250,7 @@ def test_complete_revision_derivation_uses_one_disclosed_reader_and_refuses_chan
 def test_partial_revision_derivation_preserves_original_separate_custody_route(selected_revision, tmp_path, monkeypatch):  # noqa: F811
     """Disclosed call-order seam only; no complete reader context admitted to partial science."""
     from types import SimpleNamespace
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as acquisition
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as acquisition
     f = selected_revision
     calls, locator = [], object()
     operation = SimpleNamespace(selection=SimpleNamespace(capability_key=acquisition.NAMESPACE + ".entry"))

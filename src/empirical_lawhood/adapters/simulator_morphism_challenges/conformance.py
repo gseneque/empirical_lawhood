@@ -1,10 +1,11 @@
 """Outcome-blind source, equation, rank, negative-control, and resource canaries."""
 
 from __future__ import annotations
+from empirical_lawhood.domains.circuits.reference_oracles import _analytic_equilibrium, _rank_audit
 
-from empirical_lawhood.adapters.history_budget_fixed_scientific_inputs import fixed_history_budget_descriptor_input
+from empirical_lawhood.domains.history.history_budget_fixed_scientific_inputs import fixed_history_budget_descriptor_input
 
-from empirical_lawhood.adapters.history_budget_seed_constants import history_budget_fixed_seed
+from empirical_lawhood.domains.history.history_budget_seed_constants import history_budget_fixed_seed
 
 import ast
 from dataclasses import replace
@@ -15,26 +16,26 @@ from time import perf_counter, process_time
 from typing import Mapping
 
 import numpy as np
-from scipy.linalg import expm, svdvals
+from scipy.linalg import expm
 from scipy.sparse.linalg import expm_multiply
 from scipy.sparse.linalg import spsolve
 from threadpoolctl import threadpool_limits  # type: ignore[import-untyped]
 
-from empirical_lawhood.adapters.methods.simulator_morphism_challenges.evaluator import adjudicate_unit_scale
-from empirical_lawhood.adapters.methods.simulator_morphism_challenges.observer import assemble_dense_operator, observe_and_nominate
-from empirical_lawhood.adapters.simulators.rc_ladder_morphism_challenges.generator import assemble_sparse_operator, generate_outcomes, receiver_matrix
-from empirical_lawhood.kernel.evidence import OutcomeAccess
+from empirical_lawhood.domains.history.simulator_morphism_challenges.evaluator import adjudicate_unit_scale
+from empirical_lawhood.domains.history.simulator_morphism_challenges.observer import assemble_dense_operator, observe_and_nominate
+from empirical_lawhood.domains.circuits.rc_ladder_morphism_challenges.generator import assemble_sparse_operator, generate_outcomes, receiver_matrix
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
 
-from .array_io import simulator_morphism_challenges_array_semantics, pack_arrays
-from .contracts import SimulatorMorphismChallengeDenominatorDescriptor, SimulatorMorphismChallengeDisorderFamily, SimulatorMorphismChallengePhase
-from .descriptors import default_config, generate_descriptor
-from .runtime_contracts import SimulatorMorphismChallengeCanaryReport
+from empirical_lawhood.domains.history.simulator_morphism_challenges.array_codec import simulator_morphism_challenges_array_semantics, pack_arrays
+from empirical_lawhood.domains.history.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeDenominatorDescriptor, SimulatorMorphismChallengeDisorderFamily, SimulatorMorphismChallengePhase
+from empirical_lawhood.domains.history.simulator_morphism_challenges.descriptors import default_config, generate_descriptor
+from empirical_lawhood.domains.history.simulator_morphism_challenges.runtime_contracts import SimulatorMorphismChallengeCanaryReport
 
 
-_GENERATOR_PATH = 'src/empirical_lawhood/adapters/simulators/rc_ladder_morphism_challenges/generator.py'
-_OBSERVER_PATH = 'src/empirical_lawhood/adapters/methods/simulator_morphism_challenges/observer.py'
-_EVALUATOR_PATH = 'src/empirical_lawhood/adapters/methods/simulator_morphism_challenges/evaluator.py'
-_SHARED_PREFIX = 'src/empirical_lawhood/adapters/simulator_morphism_challenges/'
+_GENERATOR_PATH = 'src/empirical_lawhood/domains/circuits/rc_ladder_morphism_challenges/generator.py'
+_OBSERVER_PATH = 'src/empirical_lawhood/domains/history/simulator_morphism_challenges/observer.py'
+_EVALUATOR_PATH = 'src/empirical_lawhood/domains/history/simulator_morphism_challenges/evaluator.py'
+_SHARED_PREFIX = 'src/empirical_lawhood/domains/history/simulator_morphism_challenges/'
 
 
 def _decimal(value: float) -> Decimal:
@@ -66,7 +67,7 @@ def audit_source_firewall(source_files: Mapping[str, bytes]) -> tuple[str, ...]:
     forbidden_generator = {
         value
         for value in generator_imports
-        if value.startswith("empirical_lawhood.adapters.methods") or "rc_ladder_response" in value
+        if value.startswith("empirical_lawhood.methods") or "rc_ladder_response" in value or value.startswith("empirical_lawhood.domains.circuits.rc_ladder")
     }
     forbidden_observer = {
         value
@@ -75,13 +76,13 @@ def audit_source_firewall(source_files: Mapping[str, bytes]) -> tuple[str, ...]:
     }
     if forbidden_generator or forbidden_observer:
         raise ValueError("simulator morphism challenges generator--observer source firewall is violated")
-    allowed_local_intersection = {'empirical_lawhood.adapters.simulator_morphism_challenges.contracts'}
+    allowed_local_intersection = {'empirical_lawhood.domains.history.simulator_morphism_challenges.contracts'}
     local_intersection = {
         value for value in generator_imports & observer_imports if value.startswith("empirical_lawhood")
     }
     if local_intersection != allowed_local_intersection:
         raise ValueError("simulator morphism challenges implementations share an undeclared scientific module")
-    if 'empirical_lawhood.adapters.simulators.rc_ladder_morphism_challenges.generator' in evaluator_imports:
+    if 'empirical_lawhood.domains.circuits.rc_ladder_morphism_challenges.generator' in evaluator_imports:
         raise ValueError("simulator morphism challenges evaluator imports the generator implementation")
     shared_paths = tuple(sorted(path for path in source_files if path.startswith(_SHARED_PREFIX)))
     if not {
@@ -112,42 +113,8 @@ def _uniform_descriptor(scale_cells: int) -> SimulatorMorphismChallengeDenominat
     )
 
 
-def _analytic_equilibrium(descriptor: SimulatorMorphismChallengeDenominatorDescriptor, amplitude: float) -> np.ndarray:
-    left = float(descriptor.left_source_resistance_ohms)
-    right = float(descriptor.right_termination_resistance_ohms)
-    interior = np.asarray(descriptor.interior_resistances_ohms, dtype=np.float64)
-    current = amplitude / (left + float(np.sum(interior)) + right)
-    preceding = np.concatenate((np.zeros(1), np.cumsum(interior)))
-    return amplitude - current * (left + preceding)
 
 
-def _rank_audit(descriptor: SimulatorMorphismChallengeDenominatorDescriptor) -> None:
-    config = default_config(SimulatorMorphismChallengePhase.CANARY)
-    operator = assemble_dense_operator(descriptor)
-    lag = float(config.history_lag_t_star) * float(descriptor.time_scale_seconds)
-    inverse = expm(-operator.state_matrix * lag)
-    blocks = []
-    current = operator.receiver.copy()
-    for depth in range(config.history_max_depth + 1):
-        if depth:
-            current = current @ inverse
-        blocks.append(current.copy())
-        stack = np.vstack(blocks)
-        numpy_values = np.linalg.svd(stack, compute_uv=False)
-        scipy_values = svdvals(stack)
-        if not np.allclose(numpy_values, scipy_values, atol=1e-10, rtol=1e-11):
-            raise ValueError("SIMULATOR_MORPHISM_CHALLENGE_CANARY_SVD_AUDIT_FAILED")
-        duplicated = np.vstack([operator.receiver] * (depth + 1))
-        if np.linalg.matrix_rank(duplicated, tol=1e-12) > 8:
-            raise ValueError("SIMULATOR_MORPHISM_CHALLENGE_DUPLICATE_PRESENT_CONTROL_FAILED")
-        shuffled = np.vstack(tuple(reversed(blocks)))
-        if not np.allclose(
-            np.linalg.svd(shuffled, compute_uv=False),
-            numpy_values,
-            atol=1e-10,
-            rtol=1e-11,
-        ):
-            raise ValueError("SIMULATOR_MORPHISM_CHALLENGE_SHUFFLED_LAG_CONTROL_FAILED")
 
 
 def _run_generator_canary() -> SimulatorMorphismChallengeCanaryReport:
@@ -228,7 +195,11 @@ def _run_observer_canary() -> SimulatorMorphismChallengeCanaryReport:
             raise ValueError("SIMULATOR_MORPHISM_CHALLENGE_OBSERVER_MANUFACTURED_SOLUTION_FAILED")
         if np.max(np.abs(operator.state_matrix @ equilibrium + operator.left_input)) > 1e-12:
             raise ValueError("SIMULATOR_MORPHISM_CHALLENGE_OBSERVER_CURRENT_BALANCE_RESIDUAL_FAILED")
-        _rank_audit(descriptor)
+        _rank_audit(
+            operator.state_matrix, operator.receiver,
+            lag=float(config.history_lag_t_star) * float(descriptor.time_scale_seconds),
+            maximum_depth=config.history_max_depth, error_prefix="SIMULATOR_MORPHISM_CHALLENGE",
+        )
         checks.update(
             {
                 f"n{scale_cells}-observer-manufactured-equilibrium",
@@ -303,7 +274,11 @@ def _run_cross_implementation_conformance(
         sparse_future = np.asarray(expm_multiply(sparse.state_matrix * duration, initial))
         if not np.allclose(dense_future, sparse_future, atol=1e-11, rtol=1e-11):
             raise ValueError("SIMULATOR_MORPHISM_CHALLENGE_CANARY_PROPAGATOR_MISMATCH")
-        _rank_audit(descriptor)
+        _rank_audit(
+            dense.state_matrix, dense.receiver,
+            lag=float(config.history_lag_t_star) * float(descriptor.time_scale_seconds),
+            maximum_depth=config.history_max_depth, error_prefix="SIMULATOR_MORPHISM_CHALLENGE",
+        )
 
         seed = history_budget_fixed_seed(programme_ordinal=0, scientific_role="conformance", numeric_index=scale_cells)
         challenge_descriptor = generate_descriptor(

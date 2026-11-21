@@ -10,14 +10,14 @@ from threading import Barrier, Event
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_historical.recursive_translation import historical_recursive_draft
+from empirical_lawhood.domains.rubisco.rubisco_historical.recursive_translation import historical_recursive_draft
 from empirical_lawhood.api import numerical_provenance as provenance_owner
 from empirical_lawhood.api import recursive_authoring as author
 from empirical_lawhood.api import recursive_execution as execution
 from empirical_lawhood.api import experiment_scientific_read
-from empirical_lawhood.infrastructure import execution as scheduler_owner
-from empirical_lawhood.infrastructure.execution import DirectTaskExecutor, ExecutionResourceCapacity, WorkerPreflightError
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, WorkerPreflightMismatch, WorkerPreflightResult
+from empirical_lawhood.execution.local import execution as scheduler_owner
+from empirical_lawhood.execution.local.execution import DirectTaskExecutor, ExecutionResourceCapacity, WorkerPreflightError
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, WorkerPreflightMismatch, WorkerPreflightResult
 from tests.test_recursive_public_service import _plane
 from tests.test_rubisco_historical_recursive import _inputs
 

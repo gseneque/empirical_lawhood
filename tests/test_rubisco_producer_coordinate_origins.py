@@ -7,10 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.parameter_audit import (
-    realized_atom_origins,
-    realized_atom_origins_from_coordinates,
-)
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.parameter_audit import realized_atom_origins, realized_atom_origins_from_coordinates
 
 
 def fixture():

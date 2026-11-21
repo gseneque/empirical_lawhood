@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from empirical_lawhood.kernel.retrospective_prediction_experiments import RetrospectiveExperimentSpec
-from empirical_lawhood.planning.approval import FrozenRetrospectiveApproval
-from empirical_lawhood.runtime.study_issue import RetrospectiveIssuedBase, RetrospectiveIssuedStudy, RetrospectivePublicationReceipt
-from empirical_lawhood.runtime.candidate_compiler import RetrospectiveExtensionReport, RetrospectiveStandardReport
+from empirical_lawhood.science.experiments.retrospective_prediction_experiments import RetrospectiveExperimentSpec
+from empirical_lawhood.design.approval import FrozenRetrospectiveApproval
+from empirical_lawhood.execution.study_issue import RetrospectiveIssuedBase, RetrospectiveIssuedStudy, RetrospectivePublicationReceipt
+from empirical_lawhood.execution.candidate_compiler import RetrospectiveExtensionReport, RetrospectiveStandardReport
 
 import re
 import hashlib
@@ -13,48 +13,35 @@ from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from typing import ClassVar, TypeAlias
 
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experiments import ExperimentSpec
-from empirical_lawhood.kernel.models import ViewModelSetSpec, ModelSetSpec
-from empirical_lawhood.kernel.provenance import EvidenceSnapshot, ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    canonical_json_bytes,
-    validate_relative_locator,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.kernel.status import ReadinessStatus
-from empirical_lawhood.kernel.systems import SystemSpec
-from empirical_lawhood.planning.approval import DurableAuthorizationRecord, FrozenApprovalProposal, FrozenIssuedStudyApprovalProposal, validate_durable_authorization_structure
-from empirical_lawhood.planning.authority import ApprovalRequest
-from empirical_lawhood.planning.campaigns import CampaignSpec
-from empirical_lawhood.planning.exploration import (
-    ExplorationPlan,
-    ExploratoryFinding,
-    HypothesisSet,
-    ProposalDisposition,
-)
-from empirical_lawhood.planning.linked_campaign import LinkedCampaignPackageRole
-from empirical_lawhood.planning.prospective import ProspectiveDesignContext
-from empirical_lawhood.runtime.capabilities import CapabilityPermission, CapabilityRegistry
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityRegistration
-from empirical_lawhood.runtime.exploration import (
-    ExplorationExecutionPackage as ExplorationExecutionPackage,
-)
-from empirical_lawhood.runtime.datasets import DatasetCatalogRecordKind
-from empirical_lawhood.runtime.extension_bundles import CapabilityBundleBinding
-from empirical_lawhood.runtime.executable_bindings import CapabilityExecutionAvailability
-from empirical_lawhood.runtime.plans import ProtocolTemplate, SnapshotVerification
-from empirical_lawhood.runtime.candidate_compiler import DraftStudyCandidate, StudyCompilationReport, ExecutableStudyCompilationReport, StudyCandidate, ExecutableStudyCandidate
-from empirical_lawhood.runtime.execution_envelope import ExecutionEnvelopeSpec, ExecutionResourceEnvelopeSpec, JitGraphSignatureManifest, PredevelopmentJitSignatureCensus, validate_execution_jit_evidence
-from empirical_lawhood.runtime.campaign_elapsed_budget import CampaignElapsedBudgetSpec, CampaignElapsedReservationPlan
-from empirical_lawhood.runtime.study_issue import IssuedDraftManifest, StudyPublicationReceipt, ExtensionPublicationReceipt, IssuedStudyManifest, IssuedExecutableStudyManifest
-from empirical_lawhood.runtime.multi_world_study_issue import MultiWorldStudyIssueManifest, MultiWorldStudyPublicationReceipt
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experiments import ExperimentSpec
+from empirical_lawhood.science.models.models import ViewModelSetSpec, ModelSetSpec
+from empirical_lawhood.science.identity.provenance import EvidenceSnapshot, ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes, validate_relative_locator, validate_sha256, validate_stable_id
+from empirical_lawhood.science.records.status import ReadinessStatus
+from empirical_lawhood.science.models.systems import SystemSpec
+from empirical_lawhood.design.approval import DurableAuthorizationRecord, FrozenApprovalProposal, FrozenIssuedStudyApprovalProposal, validate_durable_authorization_structure
+from empirical_lawhood.design.authority import ApprovalRequest
+from empirical_lawhood.design.campaigns import CampaignSpec
+from empirical_lawhood.design.exploration import ExplorationPlan, ExploratoryFinding, HypothesisSet, ProposalDisposition
+from empirical_lawhood.design.linked_campaign import LinkedCampaignPackageRole
+from empirical_lawhood.design.prospective import ProspectiveDesignContext
+from empirical_lawhood.execution.capabilities import CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityRegistration
+from empirical_lawhood.execution.exploration import ExplorationExecutionPackage as ExplorationExecutionPackage
+from empirical_lawhood.execution.datasets import DatasetCatalogRecordKind
+from empirical_lawhood.execution.extension_bundles import CapabilityBundleBinding
+from empirical_lawhood.execution.executable_bindings import CapabilityExecutionAvailability
+from empirical_lawhood.execution.plans import ProtocolTemplate, SnapshotVerification
+from empirical_lawhood.execution.candidate_compiler import DraftStudyCandidate, StudyCompilationReport, ExecutableStudyCompilationReport, StudyCandidate, ExecutableStudyCandidate
+from empirical_lawhood.execution.execution_envelope import ExecutionEnvelopeSpec, ExecutionResourceEnvelopeSpec, JitGraphSignatureManifest, PredevelopmentJitSignatureCensus, validate_execution_jit_evidence
+from empirical_lawhood.execution.campaign_elapsed_budget import CampaignElapsedBudgetSpec, CampaignElapsedReservationPlan
+from empirical_lawhood.execution.study_issue import IssuedDraftManifest, StudyPublicationReceipt, ExtensionPublicationReceipt, IssuedStudyManifest, IssuedExecutableStudyManifest
+from empirical_lawhood.execution.multi_world_study_issue import MultiWorldStudyIssueManifest, MultiWorldStudyPublicationReceipt
 
 
-from empirical_lawhood.runtime.study_bundle_compiler import StudyBundleCompilationReport
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, StudyOperationAuthority, require_study_authority
+from empirical_lawhood.execution.study_bundle_compiler import StudyBundleCompilationReport
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, StudyOperationAuthority, require_study_authority
 
 
 ProgrammePublicationReceipt: TypeAlias = (

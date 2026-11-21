@@ -16,15 +16,15 @@ import pytest
 
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
 from empirical_lawhood.api.results import OperationStatus
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.study_authoring import MaterializationQualificationReceipt
-from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits, ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.candidate_compiler import ContentIdentityPolicy
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.study_authoring import MaterializationQualificationReceipt
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.candidate_compiler import ContentIdentityPolicy
 from tests.approval_support import FixedDecisionClock
 from tests.experiment_entry_support import standard_authoring_for_draft
 from tests.numerical_provenance_fixtures import numerical_plane

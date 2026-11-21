@@ -13,22 +13,14 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import ClassVar
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import (
-    NAMESPACE as COMPACT_NAMESPACE, ScheduledCompactBank, ScheduledCompactCommitmentConfig,
-    authenticate_prior_publications, compact_identity,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import (
-    MAXIMUM_PROGRAMME_BYTES, ScheduledProgramme, validate_programme_bank,
-)
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord, require_sorted_unique_strings, validate_relative_locator,
-    validate_sha256, validate_stable_id,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import NAMESPACE as COMPACT_NAMESPACE, ScheduledCompactBank, ScheduledCompactCommitmentConfig, authenticate_prior_publications, compact_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import MAXIMUM_PROGRAMME_BYTES, ScheduledProgramme, validate_programme_bank
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_strings, validate_relative_locator, validate_sha256, validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
 
 MAXIMUM_PACKAGE_BYTES = 512*1024**2
 MAXIMUM_MANIFEST_BYTES = 1024**2
@@ -117,9 +109,9 @@ def _authenticate_original_bank(plane, bank):
 
 def _authenticate_blind_bank(plane, bank):
     """Authenticate original blind operands without opening a sealed parent."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_global import source_publications
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_global import source_publications
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
     for record, publication in source_publications(bank):
         if publication.logical.outcome_access is not OutcomeAccess.OUTCOME_BLIND or publication.logical.visibility_ceiling is not VisibilityCeiling.PROSPECTIVE:
             raise PermissionError('programme source preparation requires original blind prospective operands')
@@ -131,7 +123,8 @@ def _authenticate_blind_bank(plane, bank):
 
 
 def _programme_codecs():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_programme.executable_binding import EXECUTABLE_BINDING_FACTORIES
+    from empirical_lawhood.domains.matrix.matrix_scheduled_programme.extension import EXTENSION as _extension_owner_1
+    EXECUTABLE_BINDING_FACTORIES = _extension_owner_1.factories
     return {schema: cls for factory in EXECUTABLE_BINDING_FACTORIES for schema, cls in factory.output_codecs.items()}
 
 
@@ -148,7 +141,7 @@ def _templates(bank, values):
 
 
 def _proof(programme, bank, plans):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_composition import ScheduledProgrammeWavePlan
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_composition import ScheduledProgrammeWavePlan
     if (tuple(p.wave.wave_id for p in plans) != tuple(w.wave_id for w in programme.waves)
             or any(type(p) is not ScheduledProgrammeWavePlan for p in plans)):
         raise ValueError('programme proof drops or reorders a frozen whole-group wave')
@@ -176,7 +169,7 @@ def author_scheduled_programme_preflight(*, programme, bank, wave_plans, templat
     All wave plans are checked before the first write. Shared scientific inputs
     occur once in the package. This function performs no issue or native call.
     """
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_composition import validate_programme_wave
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_composition import validate_programme_wave
     validate_programme_bank(programme, bank)
     expected_templates = _templates(bank, template_bytes)
     _authenticate_original_bank(artifact_plane, bank)
@@ -210,7 +203,7 @@ def author_scheduled_programme_preflight(*, programme, bank, wave_plans, templat
 
 def load_scheduled_programme_preflight(*, directory, artifact_plane):
     """Cold authenticate every closed member, original publication and wave join."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_composition import ScheduledProgrammeWavePlan, validate_programme_wave
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_composition import ScheduledProgrammeWavePlan, validate_programme_wave
     directory = Path(directory)
     if directory.is_symlink() or not directory.is_dir():
         raise ValueError('programme preflight directory must be an actual selected directory')
@@ -277,7 +270,7 @@ def _actual_programme_entry(programme, bank, artifact_plane, global_parent_bindi
     authenticated_parent = None
     if confirmation:
         from empirical_lawhood.api.matrix_scheduled_programme_runtime import authenticate_programme_qualified_parent
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_qualified_parent import validate_qualified_parent_declaration
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_qualified_parent import validate_qualified_parent_declaration
         validate_qualified_parent_declaration(bank, qualified_parent)
         _authenticate_blind_bank(artifact_plane, bank)
         authenticated_parent = authenticate_programme_qualified_parent(artifact_plane, bank, qualified_parent, _programme_codecs())
@@ -287,22 +280,18 @@ def _actual_programme_entry(programme, bank, artifact_plane, global_parent_bindi
         _authenticate_original_bank(artifact_plane, bank)
     if global_parent_binding is not None:
         if confirmation:
-            from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_confirmation import authenticate_confirmation_parent
+            from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_confirmation import authenticate_confirmation_parent
             parent = authenticate_confirmation_parent(artifact_plane, global_parent_binding)
             if global_parent_binding.configuration.qualified_parent != qualified_parent:
                 raise ValueError('programme entry changes its authenticated original qualified-parent declaration')
         else:
-            from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_parent import authenticate_global_parent
+            from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_parent import authenticate_global_parent
             parent = authenticate_global_parent(artifact_plane, global_parent_binding)
         if parent.programme != programme.identity or parent.bank != programme.bank:
             raise ValueError('programme entry substitutes its actual global parent scientific scope')
     if wave_custody:
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_calibration import (
-            ScheduledProgrammeWaveCustody, authenticate_wave_custody_metadata,
-        )
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition_custody import (
-            ScheduledProgrammeAcquisitionWaveCustody, authenticate_acquisition_wave_custody_metadata,
-        )
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_calibration import ScheduledProgrammeWaveCustody, authenticate_wave_custody_metadata
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition_custody import ScheduledProgrammeAcquisitionWaveCustody, authenticate_acquisition_wave_custody_metadata
         if (type(wave_custody) is not tuple or len(wave_custody) != len(programme.waves)
                 or any(type(value) not in (ScheduledProgrammeWaveCustody, ScheduledProgrammeAcquisitionWaveCustody) for value in wave_custody)
                 or len({type(value) for value in wave_custody}) != 1
@@ -319,15 +308,13 @@ def _actual_programme_entry(programme, bank, artifact_plane, global_parent_bindi
 
 
 def _assert_actual_declaration(draft, programme, bank, global_parent_binding, wave_custody=(), qualified_parent=None):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_global import ScheduledProgrammeGlobalCommitConfig
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_bindings import ScheduledProgrammeWaveAdmissionConfig
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_calibration import ScheduledProgrammeCalibrationConfig
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_confirmation import ScheduledProgrammeConfirmationGlobalConfig
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition import ScheduledProgrammeAcquisitionAdmissionConfig
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_tail_freeze import ScheduledProgrammeTailFreezeConfig, TASK_ID as TAIL_FREEZE_TASK_ID
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial_confirmation import (
-        ScheduledFactorialCriteriaConfig, ScheduledFactorialConfirmationConfig, ScheduledFactorialConfirmationSealConfig,
-    )
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_global import ScheduledProgrammeGlobalCommitConfig
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_bindings import ScheduledProgrammeWaveAdmissionConfig
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_calibration import ScheduledProgrammeCalibrationConfig
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_confirmation import ScheduledProgrammeConfirmationGlobalConfig
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition import ScheduledProgrammeAcquisitionAdmissionConfig
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_tail_freeze import ScheduledProgrammeTailFreezeConfig, TASK_ID as TAIL_FREEZE_TASK_ID
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial_confirmation import ScheduledFactorialCriteriaConfig, ScheduledFactorialConfirmationConfig, ScheduledFactorialConfirmationSealConfig
     factorial_types = (ScheduledFactorialCriteriaConfig, ScheduledFactorialConfirmationConfig, ScheduledFactorialConfirmationSealConfig)
     declarations = []
     for operation in draft.operations:
@@ -353,8 +340,8 @@ def _assert_actual_declaration(draft, programme, bank, global_parent_binding, wa
             else config.criteria.record.configuration.qualified_parent)
         if qualified_parent != expected_parent:
             raise ValueError('protected factorial entry changes its original qualified calibration parent')
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial_confirmation_composition import validate_factorial_prospective_draft
-        from empirical_lawhood.kernel.references import ArtifactIdentity
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial_confirmation_composition import validate_factorial_prospective_draft
+        from empirical_lawhood.science.identity.references import ArtifactIdentity
         bank_artifact = ArtifactIdentity(programme.bank.object_id, 'original-compact-bank', bank.SCHEMA,
             bank.fingerprint(), 'application/json', len(bank.canonical_bytes()))
         validate_factorial_prospective_draft(config, draft, bank_artifact)
@@ -396,8 +383,7 @@ def author_scheduled_programme_prospective(*, programme, bank, global_parent_bin
     retain the standard authority boundaries and are not performed here.
     """
     from empirical_lawhood.api.recursive_prospective_authoring import author_recursive_prospective
-    from empirical_lawhood.runtime.recursive_prospective_envelope import RecursiveProspectiveAuthoringEnvelope, RecursiveProspectiveAuthoringEnvelopeV3, RecursiveProspectiveAuthoringEnvelopeV4
-    spec = arguments['spec'].reconstruct() if type(arguments['spec']) in (RecursiveProspectiveAuthoringEnvelope, RecursiveProspectiveAuthoringEnvelopeV3, RecursiveProspectiveAuthoringEnvelopeV4) else arguments['spec']
+    spec = arguments['spec']
     _assert_actual_declaration(spec.draft, programme, bank, global_parent_binding, wave_custody, qualified_parent)
     _actual_programme_entry(programme, bank, arguments['artifact_writer'], global_parent_binding, wave_custody, qualified_parent)
     return author_recursive_prospective(**arguments)

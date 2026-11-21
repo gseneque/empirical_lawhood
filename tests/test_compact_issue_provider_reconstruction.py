@@ -5,8 +5,8 @@ The original synthetic authority/source fixture is explicit. This establishes
 no genuine authority, acquisition, clean-source qualification or scientific result.
 """
 
-from empirical_lawhood.infrastructure.artifact_sidecars import decode_artifact_sidecar
-from empirical_lawhood.runtime.artifact_sidecar import ArtifactManifestReference
+from empirical_lawhood.storage.artifact_sidecars import decode_artifact_sidecar
+from empirical_lawhood.storage.contracts.artifact_sidecar import ArtifactManifestReference
 from tests.runtime_platform.test_compact_artifact_publication import _census
 from tests.runtime_platform.test_recursive_prospective_workflow import (
     _public_issued_handoff_fixture, _run_public_handoff,

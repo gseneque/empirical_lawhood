@@ -12,12 +12,12 @@ import shutil
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_assembly as domain
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_assembly as domain
 from empirical_lawhood.api.configuration import validate_configuration
-from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs,load_experiment_inputs,load_experiment_specification,prepare_experiment
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection,ExperimentInputBinding
+from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs, load_experiment_inputs, load_experiment_specification, prepare_experiment
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 from tests.test_matrix_native_training_assembly import assembly_case
 
 ROOT=Path(__file__).parents[1]
@@ -35,7 +35,7 @@ def test_copied_configured_assembly_examples_validate_and_report_real_missing_in
         assert report['status']=='VALIDATED' and report['authority_granted'] is False
     specification=load_experiment_specification(paths['spec'])
     inputs=load_experiment_inputs(specification,paths['sources'])
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
     prepared=prepare_experiment(specification,method_inputs=inputs.method_inputs,execution=ExecutionSelection(workers=4))
     assert not prepared.executable and prepared.census.native_effect_count==0
     assert 'configured-assembly.scientific-protocol' in {value.code for value in prepared.dependencies}
@@ -46,9 +46,9 @@ def test_copied_configured_assembly_examples_validate_and_report_real_missing_in
 
 
 def _case(tmp_path, *, training_count=1):
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
     old,native_assembly,native_request,native_spec_path,native_sources,execution=assembly_case(tmp_path, training_count=training_count)
     plane=old.plane;root=Path(plane.root.contract.canonical_path);pretrain=root/'native-derived'
     predecessor=derive_experiment_inputs(specification_path=native_spec_path,source_selection_path=native_sources,
@@ -67,9 +67,9 @@ def _case(tmp_path, *, training_count=1):
     rule=next(value.target for value in mathematical.factor_rule_compatibilities if value.target.identity==mathematical.factor_rule)
     normalization=rule.scalar_closure.normalization_owner
     member=copied/'normalization.original.py'
-    shutil.copyfile(ROOT/'src/empirical_lawhood/adapters/simulators/six_matrix_response/response_observer.py',member)
+    shutil.copyfile(ROOT/'src/empirical_lawhood/package_data/scientific_originals/matrix_scalar_response_observer.py.txt',member)
     assert (member.stat().st_size,sha256(member.read_bytes()).hexdigest())==(normalization.size_bytes,normalization.sha256)
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
     locator=MatrixFiniteDtTrainingLocator('unexecuted/disclosed-training','run.disclosed-unexecuted-training',
         ObjectIdentity('packet.disclosed-unexecuted-training',AuthoredRecursiveWave.SCHEMA,AuthoredRecursiveWave.VERSION,'a'*64),
         ObjectIdentity('plan.disclosed-unexecuted-training',DevelopmentExecutionPlan.SCHEMA,DevelopmentExecutionPlan.VERSION,'b'*64))
@@ -94,9 +94,9 @@ def _case(tmp_path, *, training_count=1):
 
 
 def test_public_configured_assembly_refuses_uncommitted_panels_and_changed_original_publications(tmp_path,monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native
     from empirical_lawhood.api import native_training_banks
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
     old,_,actual,request,_,kwargs=_case(tmp_path)
     monkeypatch.setattr(native_training_banks,'export_native_training_banks',lambda **kw:pytest.fail('refused metadata entered TRAIN export'))
     inputs=old.plane.root.resolve(request.pretrain_inputs_relative_directory,for_write=False)
@@ -134,14 +134,14 @@ def test_public_configured_assembly_real_metadata_owners_target_reopen_and_exact
     Native products below are complete adverse TEST rows. The stub supplies no
     actual native acquisition receipts and is not genuine successful custody.
     """
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native,native_training_acquisition as acquisition
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_methods import MatrixE3ViewOutcome
-    from empirical_lawhood.api import native_training_banks,recursive_authoring
-    from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile,ArtifactWriteRequest,CanonicalTaskReceipt
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-    from empirical_lawhood.adapters.composition import experiment_authoring
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_preparation
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native, native_training_acquisition as acquisition
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_methods import MatrixE3ViewOutcome
+    from empirical_lawhood.api import native_training_banks, recursive_authoring
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+    from empirical_lawhood.execution import experiment_authoring
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_preparation
     formal_entries=[]
     formal_entry=experiment_authoring.formal_entry
     def current_formal_entry(*args,**kwargs):
@@ -155,7 +155,7 @@ def test_public_configured_assembly_real_metadata_owners_target_reopen_and_exact
         original_post(selection)
     monkeypatch.setattr(configured_protected_preparation.ConfiguredProtectedE3PreparationSelection,'__post_init__',current_entry_only)
     old,predecessor,actual,request,_,kwargs=_case(tmp_path, training_count=training_count)
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
     pretrain_inputs = old.plane.root.resolve(request.pretrain_inputs_relative_directory, for_write=False)
     handle_raw = (pretrain_inputs / 'train-unit-allocation-publication.json').read_bytes()
     original_training_publication = decode_canonical_bytes(handle_raw, ArtifactWriteResult, maximum_bytes=len(handle_raw))
@@ -166,7 +166,7 @@ def test_public_configured_assembly_real_metadata_owners_target_reopen_and_exact
     assert {role:actual.candidate_specification.population(role).expected_units for role in expected_counts}==expected_counts
     amendment=None
     if amend_primary:
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_primary_amendment import MatrixE3PrimaryFamilyAmendment
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_primary_amendment import MatrixE3PrimaryFamilyAmendment
         family=tuple(sorted((*actual.candidate_specification.assessment.comparison_ids,'disclosed.extra-primary-one','disclosed.extra-primary-two')))
         assessment=actual.candidate_specification.assessment
         alpha=assessment.alpha*assessment.comparison_slots/len(family)
@@ -231,7 +231,7 @@ def test_public_configured_assembly_real_metadata_owners_target_reopen_and_exact
     assert first.target_specification_path.read_bytes()==first.target_specification.canonical_bytes()
     loaded_inputs=load_experiment_inputs(first.target_specification,first.source_selection_path)
     loaded=loaded_inputs.method_inputs.selection
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_originals import load_protected_e3_originals
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_originals import load_protected_e3_originals
     originals = loaded.fit_config.original_publications
     assert originals.training_allocation_publication == original_training_publication
     original_manifest, original_training = load_protected_e3_originals(old.plane, originals)
@@ -257,7 +257,7 @@ def test_public_configured_assembly_real_metadata_owners_target_reopen_and_exact
     assert 'source-profile' not in {row.key for row in decode_canonical_bytes(
         kwargs['source_selection_path'].read_bytes(),ExperimentFileInputSelection,maximum_bytes=None).bindings}
     if amendment is not None:
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import ConfiguredProtectedE3PreparationSelection
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import ConfiguredProtectedE3PreparationSelection
         from empirical_lawhood.api.configured_e3_primary_amendment import authenticate_primary_amendment
         assert type(loaded) is ConfiguredProtectedE3PreparationSelection
         assert loaded.primary_amendment.amendment==amendment
@@ -302,7 +302,7 @@ def test_public_configured_assembly_real_metadata_owners_target_reopen_and_exact
         for external in first.preparation.draft.external_inputs)
     assert {row.kind.value for row in first.preparation.dependencies}<={'AUTHORITY','SCIENTIFIC_EVIDENCE','SOFTWARE'}
     assert 'matrix.e3.resource-projection' in {row.code for row in first.preparation.dependencies}
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import bind_protected_e3_experiment_inputs
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import bind_protected_e3_experiment_inputs
     from tests.test_matrix_e3_protected_public_lowering import assert_parallel_authority_preflight
     assert_parallel_authority_preflight(specification=first.target_specification, selection=loaded,
         files=dict(loaded_inputs.method_inputs.files), execution=kwargs['execution'],
@@ -312,11 +312,11 @@ def test_public_configured_assembly_real_metadata_owners_target_reopen_and_exact
 def test_configured_scientific_root_preserves_actual_physical_boundary_and_causal_scope(tmp_path):
     """Declare real kernel contracts over disclosed metadata, without derive/native."""
     from empirical_lawhood.api.domain_composition.matrix_configured_protected_assembly.assembly import scientific_root
-    from empirical_lawhood.kernel.evidence import OutcomeAccess
-    from empirical_lawhood.kernel.experiments import validate_experiment_against_system
-    from empirical_lawhood.kernel.quantities import QuantityKind
-    from empirical_lawhood.kernel.systems import SystemBoundaryKind
-    from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+    from empirical_lawhood.science.experiments.experiments import validate_experiment_against_system
+    from empirical_lawhood.science.models.quantities import QuantityKind
+    from empirical_lawhood.science.models.systems import SystemBoundaryKind
+    from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
     from tests.test_matrix_configured_protected_e3 import selected
     from tests.test_matrix_e3_protected_public_lowering import original_case
 
@@ -385,9 +385,9 @@ def pretrain_allocation_control(tmp_path_factory):
 def test_configured_assembly_refuses_changed_pretrain_allocation_before_native_export(
         pretrain_allocation_control, monkeypatch, damage):
     from empirical_lawhood.api import native_training_banks
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult
     old, predecessor, actual, request, specification, kwargs = pretrain_allocation_control
     plane = old.plane
     directory = plane.root.resolve(request.pretrain_inputs_relative_directory, for_write=False)

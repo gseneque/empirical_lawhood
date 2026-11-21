@@ -7,9 +7,9 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.simulators.staged_hybrid_response import StagedHybridResponseTrancheFreeze
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.fusion.staged_hybrid_response import StagedHybridResponseTrancheFreeze
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def _identity(label: str) -> ObjectIdentity:

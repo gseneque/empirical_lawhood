@@ -1,0 +1,38 @@
+{
+  "schema": "el-v1/scientific-module-extraction/1",
+  "partial_modules": {
+    "empirical_lawhood.adapters.simulators.fipy_reaction_diffusion_response.runtime": {
+      "scientific_owner": "empirical_lawhood.domains.chemistry.reaction_diffusion.response",
+      "functions": [
+        "preparation_rng",
+        "preparation",
+        "as_decimal",
+        "initial_field",
+        "condition_parameters",
+        "source_mask",
+        "field_mass",
+        "FieldBalance",
+        "receiver_margins",
+        "condition_result",
+        "complete_unit_result",
+        "source_qualification"
+      ],
+      "remaining_native_owner": [
+        "FiPy Grid1D/CellVariable/equation construction",
+        "native equation.solve integration loop",
+        "native version binding",
+        "complete-unit and canary native orchestration"
+      ]
+    }
+  },
+  "body_preservation_exceptions": [
+    {
+      "function": "condition_result",
+      "change": "On native solver failure, preserve zero gate margins (no scientific assessment available) instead of zipping five margin IDs against an empty tuple with strict=True. Preserve complete invalid receiver census, stopped=True, native failure reason, fibre_admitted=None and UNEVALUABLE classification; no zero-valued synthetic margins."
+    },
+    {
+      "function": "source_qualification",
+      "change": "Invalid receiver placeholders from a failed solver cannot establish balance qualification. Require observation.valid along with the existing balance-error ceiling; successful native-scientific semantics unchanged."
+    }
+  ]
+}

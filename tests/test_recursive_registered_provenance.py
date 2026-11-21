@@ -5,9 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_response_study.numerical_runtime import (
-    MATRIX_PROVENANCE_REQUIREMENT,
-)
+from empirical_lawhood.domains.matrix.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
 from empirical_lawhood.api.numerical_provenance import validate_registered_provenance
 from empirical_lawhood.api.recursive_operations import operation_factories
 from tests.test_rubisco_kinetic_declaration import _profile_provenance
@@ -20,7 +18,19 @@ def _matrix_factories():
 
 
 def test_every_installed_matrix_operation_retains_its_explicit_profile_requirement():
-    factories = _matrix_factories()
+    # These two independent study families declare per-study numerical settings.
+    # The selected Matrix response programme owns the shared profile checked here.
+    from empirical_lawhood.domains.matrix.classical_series.records import NAMESPACE as classical
+    from empirical_lawhood.domains.matrix.model_free.records import NAMESPACE as model_free
+    installed = _matrix_factories()
+    for family, phases in ((classical, {"acquire", "analyse", "calibrate", "summarise", "synthesise"}),
+                           (model_free, {"acquire", "analyse", "synthesise"})):
+        selected = {factory.manifest.capability_key: factory.registration for factory in installed
+                    if factory.manifest.capability_key.startswith(family + ".")}
+        assert set(selected) == {family + "." + phase for phase in phases}
+        assert all("settings_json" in item.config_record_type.__dataclass_fields__ for item in selected.values())
+    factories = tuple(factory for factory in installed
+        if factory.manifest.capability_key.split(".", 1)[0] not in (classical, model_free))
     assert len(factories) >= 154
     retained_or_metadata = {
         *("matrix-e3-configured-protected.retained-" + phase for phase in (

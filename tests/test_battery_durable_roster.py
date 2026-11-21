@@ -6,12 +6,12 @@ from decimal import Decimal as D
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, science
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import durable_roster as durable
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import prepared_qualification as prepared
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.preparation_science import assess_initial_preparation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, science
+from empirical_lawhood.domains.battery.battery_refined_inquiry import durable_roster as durable
+from empirical_lawhood.domains.battery.battery_refined_inquiry import prepared_qualification as prepared
+from empirical_lawhood.domains.battery.battery_refined_inquiry.preparation_science import assess_initial_preparation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_battery_dfn_precision_diagnostic import config_rows
 from tests.test_battery_refined_inquiry import selected as historical_selection, table
 

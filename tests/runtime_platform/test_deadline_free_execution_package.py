@@ -15,48 +15,25 @@ import pytest
 
 from empirical_lawhood.api.models import EnvelopeExperimentPackage, ExperimentPackage, ElapsedExperimentPackage, assemble_experiment_package, bind_issued_execution_package_elapsed_budget
 from empirical_lawhood.api.codecs import loads_campaign_package_authoring
-from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
-from empirical_lawhood.infrastructure.campaign_elapsed_budgets import (
-    ExternalCampaignElapsedBudgetStore,
-)
-from empirical_lawhood.infrastructure.execution import DurableExecutionResourceEnvelopeCoordinator, LocalProcessExecutor, LocalScheduler
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane,
-    FilesystemState,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.sql import (
-    SQLiteOperationalRepository,
-    create_catalog_engine,
-    upgrade_catalog,
-)
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ArtifactWriteRequest,
-    ExternalRootContract,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityManifest
-from empirical_lawhood.runtime.compiler import compile_run_plan, lower_run_plan
-from empirical_lawhood.runtime.execution_envelope import ChildResourceTokenLimit, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec, JitCellSignatureProjection, JitExpressionFieldValue, JitGraphSignatureManifest, JitGraphSignatureObservation, NonTimeResourceBudget, PredevelopmentJitSignatureCensus, ProgressHeartbeat, ProgressLivenessContract, RunExecutionResourceEnvelope, jit_graph_signature_sha256
-from empirical_lawhood.runtime.campaign_elapsed_budget import CampaignElapsedBudgetSpec, CampaignElapsedReservationPlan, CampaignElapsedTaskProjection, DurableCampaignElapsedBudgetCoordinator
-from empirical_lawhood.runtime.plans import ExecutionPlan, RunPlan
-from empirical_lawhood.runtime.execution import (
-    ExternalInputResolver,
-    RunnerRegistry,
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    VerifiedArtifactInput,
-)
-from empirical_lawhood.runtime.recovery import RunRecoveryIndex, RunRecoveryTerminalEvent, build_run_recovery_index
-from empirical_lawhood.runtime.scientific_graph_preservation import ResourceGraphPreservationReceipt, prove_scientific_graph_parity
+from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+from empirical_lawhood.execution.resources.campaign_elapsed_budgets import ExternalCampaignElapsedBudgetStore
+from empirical_lawhood.execution.local.execution import DurableExecutionResourceEnvelopeCoordinator, LocalProcessExecutor, LocalScheduler
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, FilesystemState, GuardedExternalRoot
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, ExternalRootContract, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityManifest
+from empirical_lawhood.execution.compiler import compile_run_plan, lower_run_plan
+from empirical_lawhood.execution.execution_envelope import ChildResourceTokenLimit, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec, JitCellSignatureProjection, JitExpressionFieldValue, JitGraphSignatureManifest, JitGraphSignatureObservation, NonTimeResourceBudget, PredevelopmentJitSignatureCensus, ProgressHeartbeat, ProgressLivenessContract, RunExecutionResourceEnvelope, jit_graph_signature_sha256
+from empirical_lawhood.execution.campaign_elapsed_budget import CampaignElapsedBudgetSpec, CampaignElapsedReservationPlan, CampaignElapsedTaskProjection, DurableCampaignElapsedBudgetCoordinator
+from empirical_lawhood.execution.plans import ExecutionPlan, RunPlan
+from empirical_lawhood.execution.execution import ExternalInputResolver, RunnerRegistry, RunnerResult, TaskContext, TaskOutputPayload, VerifiedArtifactInput
+from empirical_lawhood.execution.recovery import RunRecoveryIndex, RunRecoveryTerminalEvent, build_run_recovery_index
+from empirical_lawhood.execution.scientific_graph_preservation import ResourceGraphPreservationReceipt, prove_scientific_graph_parity
 from tests.issued_study_support import IssuedStudyFixture, build_issued_study_fixture
 
 

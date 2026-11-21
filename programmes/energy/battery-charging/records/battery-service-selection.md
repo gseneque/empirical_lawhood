@@ -113,7 +113,7 @@ The current command is `campaign battery-native-check` with schema
 `empirical-lawhood/simulators/py-ba-mm-development-input`, version `1.0.0`.
 Its [input owner](../../../../src/empirical_lawhood/adapters/simulators/pybamm_development_input.py)
 allows only SPMe/isothermal/CasADi and excludes the 300.15 K preparation.
-The [recursive source contract](../../../../src/empirical_lawhood/adapters/methods/battery_recursive_construction/contracts.py)
+The [recursive source contract](../../../../src/empirical_lawhood/domains/battery/battery_recursive_construction/contracts.py)
 fixes isothermal 293.15 K and its old finite words.
 The retained [electrothermal factory](../../../../src/empirical_lawhood/adapters/simulators/pybamm_electrothermal_hierarchy.py)
 supports lumped SPMe/DFN, but its strict denominator and `_source_options` require pouch geometry.

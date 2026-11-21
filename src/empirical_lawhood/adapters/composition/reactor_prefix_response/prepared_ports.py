@@ -3,33 +3,27 @@
 """Shared prepared-campaign custody over the existing external artifact stores."""
 
 from __future__ import annotations
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import ClassVar
 
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.canonical_record_archive import (
-    ExternalCanonicalRecordArchive,
-)
-from empirical_lawhood.infrastructure.prepared_execution_events import (
-    ExternalPreparedExecutionEventStore,
-)
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
-from empirical_lawhood.kernel.time import parse_utc_timestamp
-from empirical_lawhood.planning.nested_controller_evaluation import PreparedFutureSlot
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.canonical_record_archive import CanonicalRecordArchive
-from empirical_lawhood.runtime.controller_compiler import CompiledDeliveryControllerStudy
-from empirical_lawhood.runtime.controller_evaluation_nested import PreparedCommonStartBinding, PreparedDesignBindingReceipt, PreparedExecutionCensus, PreparedForecastParentCommitment, PreparedFutureCompletion, PreparedInstanceBindingReceipt, PreparedParentReturn, PreparedProbeCommitment
-from empirical_lawhood.runtime.controller_runtime import DeliveryControllerDecisionCommitment, DeliveryControllerTickReceipt
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.canonical_record_archive import ExternalCanonicalRecordArchive
+from empirical_lawhood.execution.local.prepared_execution_events import ExternalPreparedExecutionEventStore
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.science.models.time import parse_utc_timestamp
+from empirical_lawhood.design.nested_controller_evaluation import PreparedFutureSlot
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage.contracts.canonical_record_archive import CanonicalRecordArchive
+from empirical_lawhood.execution.controller_compiler import CompiledDeliveryControllerStudy
+from empirical_lawhood.execution.controller_evaluation_nested import PreparedCommonStartBinding, PreparedDesignBindingReceipt, PreparedExecutionCensus, PreparedForecastParentCommitment, PreparedFutureCompletion, PreparedInstanceBindingReceipt, PreparedParentReturn, PreparedProbeCommitment
+from empirical_lawhood.execution.controller_runtime import DeliveryControllerDecisionCommitment, DeliveryControllerTickReceipt
 
 
 @dataclass(frozen=True, slots=True)
@@ -112,7 +106,7 @@ class PreparedControlCustodyPorts:
                 raise ValueError(
                     "prepared event clock publication is incomplete; recover exact identity"
                 )
-            manifest = decode_artifact_manifest(sidecar.read_bytes())
+            manifest = resolve_artifact_sidecar_bytes(plane, sidecar.read_bytes())
             plane.verify_manifest(manifest)
             if decision_id is None:
                 record = decode_canonical_bytes(

@@ -17,9 +17,7 @@ from io import StringIO
 import re
 from typing import ClassVar
 
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord, require_sorted_unique_strings, validate_decimal, validate_sha256,
-)
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_strings, validate_decimal, validate_sha256
 
 MAX_INPUT_BYTES = 8 * 1024**2
 MAX_ROWS = 10000

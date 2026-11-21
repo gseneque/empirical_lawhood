@@ -13,21 +13,20 @@ from threading import local
 import pytest
 from threadpoolctl import threadpool_limits
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as acquisition
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as records
-from empirical_lawhood.adapters.methods.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as acquisition
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as records
+from empirical_lawhood.domains.matrix.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
 from empirical_lawhood.api.recursive_authoring import implementation_binding
-from empirical_lawhood.api.recursive_operations import development_output_contracts, operation_catalog
+from empirical_lawhood.api.recursive_operations import development_output_contracts, operation_catalog_for_draft
 from empirical_lawhood.api.selected_e4_native_runtime import development_output_plane
-from empirical_lawhood.infrastructure import execution as lifecycle
-from empirical_lawhood.infrastructure.numerical_provenance import selected_worker_environment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import (
-    DependencyReceiptBinding, ParentPreparedTaskRunner, TaskContext, VerifiedArtifactInput,
-    WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort)
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.local import execution as lifecycle
+from empirical_lawhood.storage.contracts.record_codecs import UnsupportedRecordRevision
+from empirical_lawhood.storage.numerical_provenance import selected_worker_environment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, ParentPreparedTaskRunner, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_matrix_native_training_public_lifecycle import _actual_case, _copied_preparation
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,7 +43,7 @@ def observe_native_preflight_controls(monkeypatch, native_owner):
     # their own settings independently before any native contact.
     for name, value in selected_worker_environment():
         monkeypatch.setenv(name, value)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_array_preparation as array_owner
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_array_preparation as array_owner
     original = lifecycle._prepare_parent_native_runner
     observed = []
     probes = local()
@@ -129,7 +128,7 @@ def observe_native_preflight_controls(monkeypatch, native_owner):
 
 
 def prefix_context(case, preparation):
-    registrations, registry, codecs = operation_catalog()
+    registrations, registry, codecs = operation_catalog_for_draft(preparation.draft)
     implementation = implementation_binding(ROOT)
     compiled = compile_recursive_wave(draft=preparation.draft, registrations=registrations, registry=registry,
         implementation_commit=implementation.observed_git_head, output_codecs=codecs)
@@ -169,7 +168,7 @@ def prefix_context(case, preparation):
         bindings,ports,outputs,task.capability.required_permissions,owner.DEV,task.capability.requested_resources,
         WorkerIsolationProfile.TRUSTED_LOCAL,dependencies)
     declaration = next(value for value in owner.operation_declarations() if value.capability_key == records.NAMESPACE + ".prefix")
-    return compiled, task, declaration, context, verified, implementation
+    return compiled, task, declaration, context, verified, implementation, codecs
 
 
 def test_native_parent_initial_bound_and_actual_worker_preflight_have_exact_direct_operands(tmp_path, monkeypatch):
@@ -182,8 +181,7 @@ def test_native_parent_initial_bound_and_actual_worker_preflight_have_exact_dire
     with threadpool_limits(limits=1):
         case = _actual_case(tmp_path,monkeypatch)
         preparation = _copied_preparation(case,tmp_path/"copied")
-        compiled,task,declaration,context,verified,implementation = prefix_context(case,preparation)
-        codecs = operation_catalog()[2]
+        compiled,task,declaration,context,verified,implementation,codecs = prefix_context(case,preparation)
         original_semantics = case.plane.semantic_validations
         assert development_output_plane(case.plane, compiled.execution_plan, codecs) is case.plane
         assert case.plane.semantic_validations == original_semantics
@@ -193,7 +191,7 @@ def test_native_parent_initial_bound_and_actual_worker_preflight_have_exact_dire
             else value for value in compiled.execution_plan.tasks))
         with pytest.raises(PermissionError, match="installed producer"):
             development_output_contracts(changed_plan, codecs)
-        with pytest.raises(PermissionError, match="typed codec"):
+        with pytest.raises(UnsupportedRecordRevision, match="exact codec binding"):
             development_output_contracts(compiled.execution_plan, {})
         manifest_decodes = []
         decode = owner.decode_canonical_bytes

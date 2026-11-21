@@ -9,9 +9,9 @@ import numpy as np
 import pytest
 
 from empirical_lawhood.api.finite_operands import saved_matrix_arrays_export, saved_matrix_arrays_import
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_NATIVE_PURPOSES, MatrixAllocation, MatrixArrayMember, MatrixPurposeSeed, MatrixRootAllocation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_NATIVE_PURPOSES, MatrixAllocation, MatrixArrayMember, MatrixPurposeSeed, MatrixRootAllocation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def allocation(count=2):
@@ -42,7 +42,7 @@ def test_allocation_requires_complete_purposes_and_generator():
 
 
 def test_native_probe_draws_follow_numeric_seed_and_not_allocation_labels():
-    from empirical_lawhood.adapters.simulators.six_matrix_response.passive_probe import derive_probe_roster
+    from empirical_lawhood.domains.matrix.six_matrix_response.passive_probe import derive_probe_roster
     root = allocation().roots[0]
     renamed = replace(root, root_id="test.renamed-root")
     def draw(selected):

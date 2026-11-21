@@ -9,10 +9,10 @@ import pytest
 
 from empirical_lawhood.api.finite_operands import original_f_operand_export, saved_matrix_arrays_export
 from empirical_lawhood.api.preparation_screens import ordinary_preparation_screens
-from empirical_lawhood.adapters.methods.preparation_applicability.headroom import opportunity, prefix_forecast
-from empirical_lawhood.adapters.methods.preparation_applicability.records import numbers
-from empirical_lawhood.adapters.methods.preparation_applicability.readout import PreparationApplicabilityScreenReport
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.preparation_applicability.headroom import opportunity, prefix_forecast
+from empirical_lawhood.domains.matrix.preparation_applicability.records import numbers
+from empirical_lawhood.domains.matrix.preparation_applicability.readout import PreparationApplicabilityScreenReport
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_preparation_applicability_authoring import ordinary_stage
 
 
@@ -103,7 +103,7 @@ def test_saved_screens_reject_missing_roles_law_and_modified_report(tmp_path,fau
     elif fault=="wrong-law":
         lower=replace(lower,payload_id="test.substituted.lower")
     else:
-        from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
         path=evaluation/"screen-report.canonical.json"
         summary=decode_canonical_bytes(path.read_bytes(),PreparationApplicabilityScreenReport,maximum_bytes=4*1024**2)
         path.write_bytes(replace(summary,joint_counts=(0,0,0),covered_counts=(0,0,0)).canonical_bytes())

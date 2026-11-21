@@ -10,26 +10,21 @@ from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import PurePosixPath
 
-from empirical_lawhood.adapters.methods.matrix_finite_dt_source_pipeline import (
-    MatrixFiniteDtPendingSourceRows, MatrixFiniteDtSourceValidationRule, MatrixFiniteDtSourceVerification,
-)
-from empirical_lawhood.adapters.methods.matrix_prepared_source_pipeline import (
-    MatrixPreparedPendingSourceRows, MatrixPreparedSourceValidationRule, MatrixPreparedSourceVerification,
-)
-from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import BLIND, PROSPECTIVE
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
-from empirical_lawhood.adapters.methods.matrix_source_evidence import MatrixSourcePipelineConfig
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.authority import AuthorityAction
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import validate_relative_locator, validate_stable_id
-from empirical_lawhood.planning.dataset_authority import replay_dataset_operation_authorization
-from empirical_lawhood.planning.source_pipelines import SourcePipelineArtifactProfile, SourcePipelineEdgeAccounting
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult
-from empirical_lawhood.runtime.source_pipelines import (SourcePipelineExecutionEvidence, SourcePipelineValidatorEvidence,
-    compile_source_pipeline, plan_source_pipeline_resume)
-from empirical_lawhood.runtime.sources import SourceResult, validate_source_result
+from empirical_lawhood.domains.matrix.matrix_finite_dt_source_pipeline import MatrixFiniteDtPendingSourceRows, MatrixFiniteDtSourceValidationRule, MatrixFiniteDtSourceVerification
+from empirical_lawhood.domains.matrix.matrix_prepared_source_pipeline import MatrixPreparedPendingSourceRows, MatrixPreparedSourceValidationRule, MatrixPreparedSourceVerification
+from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import BLIND, PROSPECTIVE
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
+from empirical_lawhood.domains.matrix.matrix_source_evidence import MatrixSourcePipelineConfig
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.identity.authority import AuthorityAction
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import validate_relative_locator, validate_stable_id
+from empirical_lawhood.design.dataset_authority import replay_dataset_operation_authorization
+from empirical_lawhood.design.source_pipelines import SourcePipelineArtifactProfile, SourcePipelineEdgeAccounting
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult
+from empirical_lawhood.execution.source_pipelines import SourcePipelineExecutionEvidence, SourcePipelineValidatorEvidence, compile_source_pipeline, plan_source_pipeline_resume
+from empirical_lawhood.execution.sources import SourceResult, validate_source_result
 
 
 @dataclass(frozen=True, slots=True)
@@ -133,8 +128,7 @@ def materialize_finite_dt_source(*, writer, programme, bank, rows, rule, source_
     # Resolve selected paths and recheck actual authority before publication.
     writer.root.resolve(profile.output_relative_locator, for_write=True)
     writer.root.resolve(verification_relative_path, for_write=True)
-    from empirical_lawhood.api.matrix_finite_dt_dataset_metadata import (
-        authenticate_dataset_contract, inspect_pending_source)
+    from empirical_lawhood.api.matrix_finite_dt_dataset_metadata import authenticate_dataset_contract, inspect_pending_source
     authenticate_dataset_contract(writer=writer, profile=profile, registry=dataset_registry,
         capabilities=capability_registry, request=dataset_operation_request, rows=rows, rule=rule,
         source_publication=source_publication)
@@ -187,8 +181,7 @@ def authenticate_finite_dt_source_materialization(*, writer, programme, bank, ro
     rows_owner.validate_source_rows(programme, bank, rows, rule)
     config, receipt = pipeline.pipeline_config, pipeline.receipt
     _require_profile(config.profile, rows, rule, source_publication, writer=writer)
-    from empirical_lawhood.api.matrix_finite_dt_dataset_metadata import (
-        authenticate_dataset_contract, inspect_pending_source)
+    from empirical_lawhood.api.matrix_finite_dt_dataset_metadata import authenticate_dataset_contract, inspect_pending_source
     authenticate_dataset_contract(writer=writer, profile=config.profile, registry=config.dataset_registry,
         capabilities=config.capability_registry, request=config.dataset_operation_request, rows=rows, rule=rule,
         source_publication=source_publication)
@@ -265,8 +258,8 @@ def authenticate_installed_finite_dt_source_materialization(*, writer, programme
     No publication, task receipt, source acquisition or authority is created.
     """
     from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_records as prepared_records
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseBank
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_records as prepared_records
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4PhaseBank
     if type(bank) is prepared_records.MatrixPreparedSourceBank:
         row_kind = MatrixPreparedPendingSourceRows
         rule_kind = MatrixPreparedSourceValidationRule

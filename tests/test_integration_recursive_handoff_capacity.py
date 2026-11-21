@@ -1,25 +1,20 @@
 # SPDX-License-Identifier: MPL-2.0
 """Public handoff composition over exposed, nonqualifying recursive custody."""
 
-from dataclasses import fields
 from pathlib import Path
 
 import pytest
 
 from empirical_lawhood.api import integration_handoffs, recursive_prospective_authoring as owner
-from empirical_lawhood.runtime import recursive_prospective_envelope as envelopes
-from empirical_lawhood.runtime.experiment_resources import ExecutionResourceSelection, bind_execution_resources
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveDesignInputs
 from tests import test_prospective_experiment as fixtures
 from tests.test_recursive_prospective_bounded_capacity import _publish_decoder_bootstrap_case
-from tests.test_recursive_prospective_resource_preview import _arguments
 
 
 selected = fixtures.selected
 
 
 def _select_fixture_composition(selected, monkeypatch):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles
+    import empirical_lawhood.execution.generated_extension_bundles as generated_extension_bundles
 
     # Select the existing disclosed fixture's mount and static operation roster.
     # The public dispatcher, closed member reader and compiler remain actual.
@@ -29,29 +24,10 @@ def _select_fixture_composition(selected, monkeypatch):
         selected.original_parts[2])
 
 
-@pytest.mark.parametrize('carrier', (None, envelopes.RecursiveProspectiveAuthoringEnvelope,
-    envelopes.RecursiveProspectiveAuthoringEnvelopeV3, envelopes.RecursiveProspectiveAuthoringEnvelopeV4),
-    ids=('semantic-v1', 'envelope-v2', 'envelope-v3', 'envelope-v4'))
-def test_generic_handoff_reopens_every_installed_recursive_carrier(selected, monkeypatch, carrier):
+def test_generic_handoff_reopens_exact_recursive_spec(selected, monkeypatch):
     _select_fixture_composition(selected, monkeypatch)
     original = selected.prospective_spec
-    if carrier is None:
-        directory = selected.original.directory
-    else:
-        # Select a supported larger profile around honest tiny records, then
-        # retain the requested installed wrapper. Scientific bytes stay fixed.
-        monkeypatch.setattr(owner, 'MAXIMUM_SPEC_BYTES', len(original.draft.canonical_bytes()) - 1)
-        monkeypatch.setattr(owner, '_stored_prospective_spec',
-            lambda spec, *, decoder_registration: carrier.from_spec(spec))
-        design = RecursiveProspectiveDesignInputs.from_spec(original)
-        preview = owner.preview_recursive_prospective_candidate(design_inputs=design, **_arguments(selected))
-        controls = ExecutionResourceSelection(**{field.name: getattr(original.resources, field.name)
-            for field in fields(ExecutionResourceSelection)})
-        spec = design.bind_resources(bind_execution_resources(controls, issued_extensions=preview.issued_extensions))
-        directory = Path(selected.plane.root.contract.canonical_path) / ('generic-carrier-' + carrier.VERSION)
-        report = owner.author_recursive_prospective(spec=spec, output_dir=directory,
-            expected_preview=preview, **_arguments(selected))
-        assert report['native_contact'] == 'none' and report['scientific_authority'] == 'NONE'
+    directory = selected.original.directory
     handoff = integration_handoffs.load_integration_handoff(directory=directory,
         root=selected.root / 'checkout', storage_profile=object(), artifact_writer=selected.plane)
     assert handoff.family == 'recursive-inquiry'

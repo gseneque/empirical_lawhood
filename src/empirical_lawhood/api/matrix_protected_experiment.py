@@ -13,36 +13,28 @@ from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import ScheduledCompactBank
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition import ScheduledProgrammeAcquisitionAdmissionConfig
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_confirmation import ScheduledProgrammeAuthenticatedParent
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial_confirmation import ScheduledFactorialConfirmationConfig
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_inputs import (
-    ProtectedFactorialOriginalSource, ProtectedFactorialPreparationRequest, ProtectedFactorialPreparationSelection,
-    bind_protected_factorial_preparation_request, validate_protected_factorial_request_binding,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_preparation import (
-    PAIRED_TYPES, ProtectedFactorialExperimentInputs, derive_protected_factorial_design_inputs,
-    prepare_protected_factorial_experiment, validate_protected_experiment_handoff_selection,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_specification import ProtectedFactorialExperimentSpecification
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.candidate_sources import ExternalContentAddressedInputResolver
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import validate_stable_id
-from empirical_lawhood.planning.experiment_entry import validate_experiment_entry
-from empirical_lawhood.planning.study_authoring import DesignInputRole
-from empirical_lawhood.runtime.source_resolution import (
-    CandidateSourceResolutionService, ContentAddressedInputKind, ContentAddressedInputRequirement, ResolvedContent,
-)
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExperimentPreparation
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import ScheduledCompactBank
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition import ScheduledProgrammeAcquisitionAdmissionConfig
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_confirmation import ScheduledProgrammeAuthenticatedParent
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial_confirmation import ScheduledFactorialConfirmationConfig
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_inputs import ProtectedFactorialOriginalSource, ProtectedFactorialPreparationRequest, ProtectedFactorialPreparationSelection, bind_protected_factorial_preparation_request, validate_protected_factorial_request_binding
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_preparation import PAIRED_TYPES, ProtectedFactorialExperimentInputs, derive_protected_factorial_design_inputs, prepare_protected_factorial_experiment, validate_protected_experiment_handoff_selection
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_specification import ProtectedFactorialExperimentSpecification
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.candidate_sources import ExternalContentAddressedInputResolver
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import validate_stable_id
+from empirical_lawhood.design.experiment_entry import validate_experiment_entry
+from empirical_lawhood.design.study_authoring import DesignInputRole
+from empirical_lawhood.execution.source_resolution import CandidateSourceResolutionService, ContentAddressedInputKind, ContentAddressedInputRequirement, ResolvedContent
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExperimentPreparation
 
-from . import matrix_scheduled_factorial_runtime as factorial
-from . import matrix_scheduled_programme as programme
-from .current_result_custody import CurrentResultPlanReader
-from .matrix_scheduled_programme_runtime import authenticate_programme_qualified_parent, bind_programme_runtime_handoff
+from empirical_lawhood.api import matrix_scheduled_factorial_runtime as factorial
+from empirical_lawhood.api import matrix_scheduled_programme as programme
+from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
+from empirical_lawhood.api.matrix_scheduled_programme_runtime import authenticate_programme_qualified_parent, bind_programme_runtime_handoff
 
 
 def prepare_protected_factorial_experiment_authoring(preparation, *, project_root, artifact_writer, output_dir):
@@ -51,9 +43,9 @@ def prepare_protected_factorial_experiment_authoring(preparation, *, project_roo
     All original entry/custody/current calibration authority remains mandatory at
     the owning handoff and each worker. This step neither issues nor reveals.
     """
-    from .experiment_preparation import _protocol
-    from .experiment_runtime_bindings import experiment_runtime_binding
-    from .prospective_experiment import preview_prepared_prospective_experiment_candidate
+    from empirical_lawhood.api.experiment_preparation import _protocol
+    from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding
+    from empirical_lawhood.api.prospective_experiment import preview_prepared_prospective_experiment_candidate
 
     if (type(preparation) is not ExperimentPreparation
             or type(preparation.specification_record) is not ProtectedFactorialExperimentSpecification
@@ -103,7 +95,7 @@ def prepare_protected_factorial_experiment_authoring(preparation, *, project_roo
         if getattr(baseline, name) != getattr(preparation, name):
             raise ValueError("protected authoring changes its original scientific preparation or input bindings")
     _, _, _, design = derive_protected_factorial_design_inputs(preparation.specification_record, original, selection)
-    from .authoring_handoff import preflight_authoring_output_directory
+    from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
 
     preflight_authoring_output_directory(directory=Path(output_dir), repo_root=Path(project_root), artifact_writer=artifact_writer)
     preview = preview_prepared_prospective_experiment_candidate(preparation=preparation, design_inputs=design,
@@ -187,7 +179,7 @@ def bind_protected_factorial_experiment_handoff(handoff, *, specification, alloc
     parent authority through prepare_factorial_task. The seal worker remains
     outcome-blind; historical calibration replay retains its original scope.
     """
-    from .recursive_prospective_authoring import RecursiveProspectiveApplicationHandoff
+    from empirical_lawhood.api.recursive_prospective_authoring import RecursiveProspectiveApplicationHandoff
 
     if type(handoff) is not RecursiveProspectiveApplicationHandoff or not isinstance(artifact_writer, ExternalArtifactPlane):
         raise TypeError("protected experiment binding requires the actual owning prospective handoff and artifact custody")

@@ -5,27 +5,27 @@ The certificate is deliberately reconstructed from real public development
 products. Publishing a same-schema record does not satisfy this boundary.
 No native execution, fit, new receipt or authority is created here.
 """
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support as current_exposure_support
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support as current_exposure_support
 
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustodySupplier
 
-from empirical_lawhood.adapters.methods import matrix_finite_dt_source_records as r
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as train
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_acquisition import contracts, entry_task_id, task_id
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import authenticate_request
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census, validate_response_native_evidence
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix import matrix_finite_dt_source_records as r
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as train
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_acquisition import contracts, entry_task_id, task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_request
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census, validate_response_native_evidence
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 from empirical_lawhood.api.native_training_banks import _read_instance, _receipt_product
 from empirical_lawhood.api.recursive_authoring import load_authored_wave
 from empirical_lawhood.api.recursive_execution import _read_recursive_wave_with_roots
 from empirical_lawhood.api.recursive_operations import development_output_contracts, operation_catalog
 from empirical_lawhood.api.recursive_qualified_parents import _output_payload
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
 
 
 def _named_score(writer, products, plan, root_id):
@@ -144,7 +144,7 @@ def _certify_native_training_instrument(*, writer, locator, future_bank, future_
                    (source_pin, train.identity(causal), train.identity(physical), train.identity(responses), acquisition.identity,
                     root_id, source.root.root.independent_group_id, source.root.root.role.value, protocol.criterion)):
             raise PermissionError("finite-dt instrument changes actual original source/control/causal/assay/producer joins")
-        from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_science import admit_response
+        from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_science import admit_response
         admit_response(source, protocol, panels, acquisition, causal, physical, responses)
         if responses.native:
             validate_response_native_evidence(responses, source, specification.identity, history, causal, physical, acquisition,
@@ -163,7 +163,7 @@ def _certify_native_training_instrument(*, writer, locator, future_bank, future_
             raise PermissionError("finite-dt nonuse invents exercised native response controls")
         for value in (*numerical.controls, *frames.controls, *score.controls):
             value.__post_init__()
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_methods import paired_response_view_values
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_methods import paired_response_view_values
         paired_response_view_values(specification, source, protocol, panels, score)
         rows.append(r.MatrixFiniteDtRootControl(root_id, source.root.root.independent_group_id, source_pin,
             train.identity(history), train.identity(numerical), train.identity(causal), train.identity(frames),
@@ -199,8 +199,8 @@ def _certify_native_training_instrument(*, writer, locator, future_bank, future_
 def certify_native_training_instrument(*, writer, locator, programme, bank, original_future_reservation,
         cutoff, record_id):
     """Reconstruct actual controls, after the real future source scope is validated."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import validate_selected_phase_bank
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import require_e4_reserved_physical_exclusion
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import validate_selected_phase_bank
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import require_e4_reserved_physical_exclusion
     validate_selected_phase_bank(programme, bank)
     require_e4_reserved_physical_exclusion(bank.reservation.allocation.coordinates, original_future_reservation)
     _authenticate_bank_publications(writer, bank)
@@ -210,8 +210,8 @@ def certify_native_training_instrument(*, writer, locator, programme, bank, orig
 
 
 def _authenticate_bank_publications(writer, bank, exposure_support=None):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_originals import _authenticate_artifact
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_originals import _authenticate_artifact
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
     required = {artifact for artifact, _ in current_exposure_support(bank.audit)}
     if exposure_support is not None and ({value for value, _ in exposure_support} != required or len(exposure_support) != len(required)):
         raise PermissionError("finite-dt source omits its actual complete exposure supporting bytes")
@@ -237,7 +237,7 @@ def _native_training_file_supports(writer, locator, request_pin):
     packet and request pin to the supplied certificate. The independent full
     reconstruction must still reproduce that exact certificate before use.
     """
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
     directory = writer.root.resolve(locator.authored_directory, for_write=False)
     packet, _, _, payloads = load_authored_wave(directory=directory, artifact_writer=writer, lazy_payloads=True)
     _, request, _ = _read_instance(payloads)
@@ -249,7 +249,7 @@ def _native_training_file_supports(writer, locator, request_pin):
 
 def _verify_file_supports(writer, supports):
     """FILE custody has no publication snapshot; its actual bytes stay fresh."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_originals import _authenticate_artifact
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_originals import _authenticate_artifact
     for artifact, custody in supports:
         _authenticate_artifact(writer, artifact, custody)
 
@@ -262,7 +262,7 @@ def authenticate_instrument_certificate(*, writer, certificate, programme, bank,
     hits and expiry. Outside that explicit lifetime all original custody is read.
     """
     from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
-    from empirical_lawhood.kernel.decoding import decimal_context_key
+    from empirical_lawhood.science.records.decoding import decimal_context_key
     if type(certificate) is not r.MatrixFiniteDtInstrumentCertificate:
         raise TypeError("finite-dt source requires its exact receipt-backed instrument certificate")
     certificate.__post_init__()
@@ -318,7 +318,7 @@ class MatrixFiniteDtRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
             return self._prepare_matrix_finite_dt_gate(context, runner)
 
     def _prepare_matrix_finite_dt_gate(self, context, runner):
-        from empirical_lawhood.adapters.methods import matrix_finite_dt_source_bindings as bindings
+        from empirical_lawhood.domains.matrix import matrix_finite_dt_source_bindings as bindings
         if type(runner) is not bindings.MatrixFiniteDtGateWorker:
             raise PermissionError("finite-dt source refuses a foreign prepared runner")
         _, _, task = self.custody.current_task(context, runner)
@@ -350,8 +350,8 @@ class MatrixFiniteDtRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
 def bind_finite_dt_source_handoff(handoff, *, writer, reveal_authority_id=None):
     from dataclasses import replace
     from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
     custody = CurrentIssuedTaskCustody(writer=writer, reveal_authority_id=reveal_authority_id)
     ports = []
     for platform in handoff.platform_ports:
@@ -364,8 +364,8 @@ def bind_finite_dt_source_handoff(handoff, *, writer, reveal_authority_id=None):
 
 def authenticate_installed_source_prerequisite(*, writer, result, pipeline, publications, read_scope):
     """Reconstruct original TRAIN at the actual E4 consumer, including direct SDK use."""
-    from empirical_lawhood.adapters.methods import matrix_finite_dt_source_bindings as bindings
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix import matrix_finite_dt_source_bindings as bindings
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
     from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
     declared = {bindings.gate_declaration(kind).capability_key: kind for kind in r.GATES}
     selected_keys = {gate.method.capability_key for gate in result.gate_evidence}

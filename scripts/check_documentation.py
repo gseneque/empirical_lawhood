@@ -23,7 +23,7 @@ FROZEN_EDITION_DOCUMENTS = frozenset((
 ))
 # The curated current scientific specification binds its exact recipe bytes.
 # Only this removed bibliography target is exempt; other navigation is checked.
-FINITE_SCIENCE_DOCUMENT = "src/empirical_lawhood/adapters/methods/finite_response_law/specification.md"
+FINITE_SCIENCE_DOCUMENT = "src/empirical_lawhood/domains/matrix/finite_response_law/specification.md"
 FINITE_SCIENCE_SHA256 = "90baf62da60fd3f925f9212429e5b724184d6ea29da33a4da6d5bc42aa825d5f"
 FINITE_SCIENCE_LEGACY_TARGET = "../../../../../paper/sources/Empirical_Lawhood_Methods_and_Evidence_v0.9.1.pdf"
 
@@ -240,7 +240,7 @@ def current_paper_citation_errors(
 
 
 def main() -> None:
-    from empirical_lawhood.infrastructure.source_policy import is_work_plan_path
+    from empirical_lawhood.storage.source_policy import is_work_plan_path
 
     root = Path(__file__).resolve().parents[1]
     inventory = set(

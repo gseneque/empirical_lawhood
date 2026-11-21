@@ -5,53 +5,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import ClassVar
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    validate_relative_locator,
-    validate_stable_id,
-)
-from empirical_lawhood.kernel.time import CausalPhase
-from empirical_lawhood.planning.dataset_authority import (
-    DATASET_EXTERNAL_ROOT_CONTRACT_SCHEMA,
-    DatasetControlLimits,
-    DatasetFileLimits,
-    DatasetStorageScope,
-    DatasetWorkEnvelope,
-)
-from empirical_lawhood.planning.dataset_manifests import (
-    DatasetAuthoringExceptionCode,
-    DatasetCapabilityBinding,
-    DatasetCapabilityKind,
-    DatasetDirectorySelectorManifest,
-    DatasetExpectedInvariant,
-    DatasetFamilyInput,
-    DatasetFieldContract,
-    DatasetFieldDataType,
-    DatasetFieldRole,
-    DatasetInvariantKind,
-    DatasetOutputContract,
-    DatasetOutputRole,
-    DatasetRegistrationManifest,
-    DatasetReleaseInput,
-)
-from empirical_lawhood.planning.datasets import (
-    DatasetEvidenceClass,
-    DatasetMaterializationClass,
-    DatasetSelectorKind,
-    DatasetSelectorRef,
-    ReleaseResolutionClass,
-)
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_relative_locator, validate_stable_id
+from empirical_lawhood.science.models.time import CausalPhase
+from empirical_lawhood.design.dataset_authority import DATASET_EXTERNAL_ROOT_CONTRACT_SCHEMA, DatasetControlLimits, DatasetFileLimits, DatasetStorageScope, DatasetWorkEnvelope
+from empirical_lawhood.design.dataset_manifests import DatasetAuthoringExceptionCode, DatasetCapabilityBinding, DatasetCapabilityKind, DatasetDirectorySelectorManifest, DatasetExpectedInvariant, DatasetFamilyInput, DatasetFieldContract, DatasetFieldDataType, DatasetFieldRole, DatasetInvariantKind, DatasetOutputContract, DatasetOutputRole, DatasetRegistrationManifest, DatasetReleaseInput
+from empirical_lawhood.design.datasets import DatasetEvidenceClass, DatasetMaterializationClass, DatasetSelectorKind, DatasetSelectorRef, ReleaseResolutionClass
 
-from .lineage import SimulatorGenerationLineageManifest
-from .registry import (
-    SIMULATOR_DIRECTORY_FORMAT_PROFILE_ID,
-    SIMULATOR_DIRECTORY_MEDIA_TYPE,
-    SIMULATOR_MAX_METADATA_BYTES,
-    SIMULATOR_MAX_SINGLE_FILE_BYTES,
-)
+from empirical_lawhood.adapters.simulators.lineage import SimulatorGenerationLineageManifest
+from empirical_lawhood.adapters.simulators.registry import SIMULATOR_DIRECTORY_FORMAT_PROFILE_ID, SIMULATOR_DIRECTORY_MEDIA_TYPE, SIMULATOR_MAX_METADATA_BYTES, SIMULATOR_MAX_SINGLE_FILE_BYTES
 
 
 _REQUIRED_CAPABILITY_KINDS = frozenset(

@@ -8,12 +8,12 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_ou_domain import validate_parameter_ou_domain
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import split_parameter_innovations
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.adapters.methods.matrix_parameter_history.operation_bindings import development_draft, operation_factories, operation_registrations, output_codecs
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_ou_domain import validate_parameter_ou_domain
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import split_parameter_innovations
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_parameter_history.operation_bindings import development_draft, operation_factories, operation_registrations, output_codecs
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_matrix_parameter_history import source
 
 
@@ -23,7 +23,7 @@ def changed(gamma):
     c = replace(c, primary_view=replace(c.primary_view, friction_gamma=D(gamma)),
                 fine_view=replace(c.fine_view, friction_gamma=D(gamma)))
     a = replace(s.allocation, coordinates=(c,), roots=(replace(s.root, coordinate=__import__(
-        'empirical_lawhood.adapters.methods.matrix_parameter_history.records', fromlist=['coordinate_identity']).coordinate_identity(c)),))
+        'empirical_lawhood.domains.matrix.matrix_parameter_history.records', fromlist=['coordinate_identity']).coordinate_identity(c)),))
     return replace(s, allocation=a)
 
 
@@ -63,9 +63,9 @@ def test_supported_small_and_large_decay_keep_bath_and_weighted_bridge(gamma):
 def test_legacy_native_entry_refuses_without_begin_contact_or_draws(gamma, tmp_path, monkeypatch):
     from tests.test_matrix_parameter_history import context, provider, object_id
     from tests.runtime_platform.test_native_subwork import _plane
-    from empirical_lawhood.runtime.native_effects import NativeEffectContact
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkState
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.execution.native_effects import NativeEffectContact
+    from empirical_lawhood.execution.native_subwork import NativeSubworkState
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
     s = changed(gamma)
     _, ctx, manifests, factory = context(_plane(tmp_path / 'unsupported'), s, 'history')
     counts = {'begin': 0, 'contact': 0, 'draws': 0}

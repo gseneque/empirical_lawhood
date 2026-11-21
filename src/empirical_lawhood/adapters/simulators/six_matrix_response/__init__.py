@@ -1,18 +1,5 @@
-"""Six-matrix response six-matrix simulator contracts and implementation."""
+"""Native bindings and external artifact conversion for the six-matrix world.
 
-from .contracts import AnisotropicSixMatrixConstitutiveModel, BetaCouplingRule, SixMatrixResponseArtifactDataset, SixMatrixResponseArtifactProfileConfig, SixMatrixResponseFeasibilityEnvelope, SixMatrixResponseSizeCompatibility, SixMatrixResponseModelFamilyMember, SixMatrixResponseNumericalThresholds, SixMatrixResponseNumericalView, SixMatrixResponsePreparationSchedule, SixMatrixResponseSixMatrixSourceConfig, CanonicalSixMatrixIsotropicModel
-
-__all__ = [
-    'AnisotropicSixMatrixConstitutiveModel',
-    'BetaCouplingRule',
-    'SixMatrixResponseArtifactDataset',
-    'SixMatrixResponseArtifactProfileConfig',
-    'SixMatrixResponseFeasibilityEnvelope',
-    'SixMatrixResponseSizeCompatibility',
-    'SixMatrixResponseModelFamilyMember',
-    'SixMatrixResponseNumericalThresholds',
-    'SixMatrixResponseNumericalView',
-    'SixMatrixResponsePreparationSchedule',
-    'SixMatrixResponseSixMatrixSourceConfig',
-    'CanonicalSixMatrixIsotropicModel',
-]
+Scientific contracts and calculations live in the named domain package.
+SPDX-License-Identifier: MPL-2.0
+"""

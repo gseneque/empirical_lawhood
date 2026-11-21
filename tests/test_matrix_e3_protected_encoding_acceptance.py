@@ -17,21 +17,21 @@ import tracemalloc
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_records as records
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_science as science
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast, response_records
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_science as original_science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledNativeEvidence
-from empirical_lawhood.infrastructure import dataset_readers
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_records as records
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_science as science
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast, response_records
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_science as original_science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledNativeEvidence
+from empirical_lawhood.storage import dataset_readers
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion
 from tests.test_matrix_e3_response_lifecycle_available import available as available
 from tests.test_matrix_e3_response_preparation import case as case, original_case as original_case
 from tests.test_matrix_e3_response_science import LIMITS, blocked, byte_fetch, context, no_native as no_native, score_config, store
@@ -41,8 +41,8 @@ from tests.test_matrix_e3_scheduled_datasets import BLOCK, physical_dataset
 @pytest.fixture(autouse=True)
 def no_response_production(monkeypatch, no_native):  # noqa: F811
     """Cold consumers may not acquire, fit, draw or perform native contact."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods
-    from empirical_lawhood.runtime import experimental_statistics
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods
+    from empirical_lawhood.methods.statistics import experimental_statistics
 
     for owner, names in ((original_science, ("native_responses", "panel_innovations", "native_scheduled_branch", "hermitian_noise")),
             (protected_experiment_methods, ("fit_protected_e3_models",)),

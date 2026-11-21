@@ -10,11 +10,11 @@ from pathlib import Path
 import pytest
 from scipy.integrate import simpson
 
-from empirical_lawhood.adapters.simulators.rc_ladder_response.contracts import ResistorCapacitorLadderActionSegment, ResistorCapacitorLadderModelConfig
-from empirical_lawhood.adapters.simulators.rc_ladder_response.matrix_exponential import solve_matrix_exponential
+from empirical_lawhood.domains.circuits.rc_ladder.contracts import ResistorCapacitorLadderActionSegment, ResistorCapacitorLadderModelConfig
+from empirical_lawhood.domains.circuits.rc_ladder.matrix_exponential import solve_matrix_exponential
 from empirical_lawhood.adapters.simulators.rc_ladder_response.native_quickstart import check_native_model
-from empirical_lawhood.adapters.simulators.rc_ladder_response.refinement import solve_backward_euler
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.circuits.rc_ladder.refinement import solve_backward_euler
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def _scalar_circuit() -> ResistorCapacitorLadderModelConfig:
@@ -36,6 +36,7 @@ def _scalar_circuit() -> ResistorCapacitorLadderModelConfig:
     )
 
 
+@pytest.mark.numerical(oracle='Kirchhoff equation dV/dt=1-2V gives V=(1-exp(-2t))/2 and current balance exp(-2t)')
 def test_one_cell_solution_matches_closed_form_voltage_and_charge_balance() -> None:
     # KCL: C dV/dt = (V_left-V)/R_left - V/R_right = 1 - 2V.
     # Thus V(t) = (1-exp(-2t))/2 for the frozen 1 F, 1 ohm circuit.
@@ -80,6 +81,7 @@ def test_quickstart_model_has_four_cells_and_frozen_native_units() -> None:
     assert abs(omitted.voltages_volts[-1, 0] - exact.voltages_volts[-1, 0]) > 0.1
 
 
+@pytest.mark.numerical(oracle='Independent Simpson integration of boundary current equals total capacitor charge change')
 def test_shipped_model_boundary_current_integrates_to_stored_charge() -> None:
     path = Path("programmes/foundations/measurement-and-response/workflows/rc-ladder-response/model.json")
     model = decode_canonical_bytes(

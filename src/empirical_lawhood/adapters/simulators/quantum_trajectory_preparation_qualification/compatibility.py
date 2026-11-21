@@ -12,9 +12,9 @@ import json
 from pathlib import Path
 from typing import Mapping, cast
 
-from .fixtures import run_fixtures
-from .schemas import QuantumTrajectoryPreparationQualificationConfig
-from .types import Stage, Validity, Verdict
+from empirical_lawhood.domains.quantum.trajectory_preparation_qualification.fixtures import run_fixtures
+from empirical_lawhood.domains.quantum.trajectory_preparation_qualification.schemas import QuantumTrajectoryPreparationQualificationConfig
+from empirical_lawhood.domains.quantum.trajectory_preparation_qualification.types import Stage, Validity, Verdict
 
 
 SOURCE_BEARING_FILES = (

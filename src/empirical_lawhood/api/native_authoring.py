@@ -5,11 +5,12 @@ SPDX-License-Identifier: MPL-2.0
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from empirical_lawhood.adapters.composition.prepared_response.native_authoring import PreparedResponseNativeAuthoringInput, prepare_prepared_response_native_authoring
+from empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring import PreparedResponseNativeAuthoringInput
+from empirical_lawhood.adapters.composition.prepared_response.native_authoring import prepare_prepared_response_native_authoring
 from empirical_lawhood.api.authoring_handoff import create_authoring_api
 from empirical_lawhood.api.authoring_output import report_incomplete_output
 from empirical_lawhood.api.results import CompileCandidateRequest
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
 
 def _write_records(

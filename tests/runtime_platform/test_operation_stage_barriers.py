@@ -7,20 +7,14 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityPermission
-from empirical_lawhood.runtime.plans import (
-    BarrierKind, OutputTemplate, ProtocolStepTemplate, ScientificStage,
-    validate_scientific_stage_barrier,
-)
-from empirical_lawhood.runtime.recursive_compiler import RegisteredPublicationRequirement
-from empirical_lawhood.runtime.recursive_provider import (
-    RecursiveExecutionProperties, RecursiveInquiryHooks, RecursiveOperationDeclaration,
-    RecursiveScientificHooks,
-)
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityPermission
+from empirical_lawhood.execution.plans import BarrierKind, OutputTemplate, ProtocolStepTemplate, ScientificStage, validate_scientific_stage_barrier
+from empirical_lawhood.execution.recursive_compiler import RegisteredPublicationRequirement
+from empirical_lawhood.execution.recursive_provider import RecursiveExecutionProperties, RecursiveInquiryHooks, RecursiveOperationDeclaration, RecursiveScientificHooks
 
 
 @dataclass(frozen=True, slots=True)
@@ -63,7 +57,9 @@ def _declaration(stage=ScientificStage.TRANSFORM, barrier=BarrierKind.NONE):
         resources=BUDGET, conformance_check_ids=("check.stage-barrier",), runner_factory=_forbidden,
         record_codecs={BarrierConfig.SCHEMA: BarrierConfig},
         scientific_hooks=RecursiveScientificHooks(scientific_root_validator=_forbidden),
-        inquiry_hooks=RecursiveInquiryHooks(inquiry_work_projector=_forbidden),
+        inquiry_hooks=RecursiveInquiryHooks(inquiry_work_projector=_forbidden,
+            inquiry_work_batch_projector=_forbidden, inquiry_endpoint_validator=_forbidden,
+            inquiry_endpoint_projector=_forbidden, inquiry_selection_scope=_forbidden),
         execution_properties=RecursiveExecutionProperties(barrier=barrier,
             runner_preparation_factory=_forbidden),
         publication_requirements=(RegisteredPublicationRequirement("publication.stage-barrier", _forbidden),),
@@ -142,9 +138,24 @@ def test_valid_stage_barriers_project_without_calling_runner_or_domain_hooks(sta
     assert factory.registration == registration
     assert factory.runner_factory is _forbidden
     assert factory.runner_preparation_factory is _forbidden
+    assert factory.inquiry_work_batch_projector is _forbidden
+    assert factory.inquiry_selection_scope is _forbidden
+    assert factory.inquiry_endpoint_projector is _forbidden
     assert declaration.scientific_hooks.scientific_root_validator is _forbidden
     assert declaration.publication_requirements[0].validate is _forbidden
     assert step.stage is stage and step.barrier is barrier
+
+
+def test_batch_work_declaration_requires_the_single_task_owner_without_invoking_it():
+    declaration = _declaration()
+    with pytest.raises(ValueError, match='matching single-task projector'):
+        replace(declaration, inquiry_hooks=replace(declaration.inquiry_hooks, inquiry_work_projector=None))
+    with pytest.raises(TypeError, match='code-owned callables'):
+        replace(declaration, inquiry_hooks=replace(declaration.inquiry_hooks, inquiry_work_batch_projector=False))
+    with pytest.raises(TypeError, match='code-owned callables'):
+        replace(declaration, inquiry_hooks=replace(declaration.inquiry_hooks, inquiry_selection_scope=False))
+    with pytest.raises(ValueError, match='matching exact-scope validator'):
+        replace(declaration, inquiry_hooks=replace(declaration.inquiry_hooks, inquiry_endpoint_validator=None))
 
 
 @pytest.mark.parametrize("stage,barrier", (
@@ -175,11 +186,11 @@ def test_non_sensitive_stages_retain_the_existing_none_barrier_contract(stage):
 
 def test_installed_recursive_operations_agree_with_lifecycle_and_both_compilers():
     from empirical_lawhood.adapters.composition.generated_executable_bindings import _EXECUTABLE_FACTORIES
-    from empirical_lawhood.runtime.candidate_compiler import _ALLOWED_STAGE_KINDS
-    from empirical_lawhood.runtime.compiler import _validate_stage_capability
-    from empirical_lawhood.runtime.plans import PlanLane
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationProviderFactory
-    from empirical_lawhood.runtime.stage_contracts import stage_kind_allowed
+    from empirical_lawhood.execution.candidate_compiler import _ALLOWED_STAGE_KINDS
+    from empirical_lawhood.execution.compiler import _validate_stage_capability
+    from empirical_lawhood.execution.plans import PlanLane
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationProviderFactory
+    from empirical_lawhood.execution.stage_contracts import stage_kind_allowed
 
     factories = tuple(value for value in _EXECUTABLE_FACTORIES
                       if isinstance(value, RecursiveOperationProviderFactory))
@@ -206,9 +217,9 @@ def test_installed_recursive_operations_agree_with_lifecycle_and_both_compilers(
 
 
 def test_development_kind_exceptions_never_become_prospective_support():
-    from empirical_lawhood.runtime.compiler import ProtocolCompilationError, _validate_stage_capability
-    from empirical_lawhood.runtime.plans import PlanLane
-    from empirical_lawhood.runtime.stage_contracts import stage_kind_allowed
+    from empirical_lawhood.execution.compiler import ProtocolCompilationError, _validate_stage_capability
+    from empirical_lawhood.execution.plans import PlanLane
+    from empirical_lawhood.execution.stage_contracts import stage_kind_allowed
 
     assert stage_kind_allowed(ScientificStage.PREPARE, CapabilityKind.ANALYSIS, lifecycle=PlanLane.DEVELOPMENT)
     assert not stage_kind_allowed(ScientificStage.PREPARE, CapabilityKind.ANALYSIS)
@@ -221,8 +232,8 @@ def test_development_kind_exceptions_never_become_prospective_support():
 
 
 def test_development_provenance_does_not_relabel_blind_sealed_or_revealed_access():
-    from empirical_lawhood.runtime.plans import PlanLane
-    from empirical_lawhood.runtime.stage_contracts import operation_lifecycle, stage_kind_allowed
+    from empirical_lawhood.execution.plans import PlanLane
+    from empirical_lawhood.execution.stage_contracts import operation_lifecycle, stage_kind_allowed
 
     assert operation_lifecycle(outcome_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
         visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY) is PlanLane.DEVELOPMENT

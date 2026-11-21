@@ -5,6 +5,7 @@ Initial/admission/native-return metadata are explicitly authored test inputs.
 Constant received trajectories are not an integration or qualification: the
 unchanged literal independent equations must retain their measured negatives.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from hashlib import sha256
@@ -14,19 +15,19 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_records as records
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import science as prefix_science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_bindings, response_forecast
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_records as records
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import science as prefix_science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_bindings, response_forecast
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.execution.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
 from tests.test_matrix_e3_response_preparation import case as case, original_case as original_case, forbid_native as forbid_native  # noqa: F401
 from tests.test_matrix_e3_response_preparation import close, prepared
 from tests.test_matrix_e3_response_records import error_operands, publication, qualification
@@ -52,7 +53,7 @@ def authored_available(case):
     template_raw, template_operand = response_forecast.array_product(case.protocol, templates, role="TEMPLATES",
         artifact_id="aaa.literal.available.templates", producers=(case.protocol.public_source.source,),
         access=Access.OUTCOME_BLIND, visibility=Visibility.PROSPECTIVE)
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
     template_pub = case.plane.write(ArtifactWriteRequest(template_operand.array_artifact.artifact_id, "available/templates.npz",
         template_operand.array_artifact.payload_schema, ArtifactProfile.MATRIX_ARRAY_NPZ, "application/x-npz", "literal.available",
         "available", template_raw, Visibility.PROSPECTIVE, (), Access.OUTCOME_BLIND))
@@ -131,7 +132,7 @@ def test_available_actual_forecast_literal_native_relay_recovery_and_full_indepe
     monkeypatch.setattr(response_bindings, "native_responses", literal)
     selected = prepared(case)
     try:
-        manifests = tuple(decode_artifact_manifest(selected.plane.root.resolve(row.materialization.relative_path + ".manifest.json", for_write=False).read_bytes())
+        manifests = tuple(resolve_artifact_sidecar_bytes(selected.plane, selected.plane.root.resolve(row.materialization.relative_path + '.manifest.json', for_write=False).read_bytes())
             for row in selected.verified)
         contacts = ExternalNativeEffectContactStore(plane=selected.plane, execution_plan=selected.parent.execution_plan,
             visibility_ceiling=Visibility.DEVELOPMENT_ONLY, outcome_access=Access.EVALUATION_SEALED)
@@ -175,7 +176,7 @@ def test_available_unfinished_native_contact_keeps_custody_and_cannot_reenter(ca
     selected = prepared(case)
     original.response_lifecycle_counter = case.response_lifecycle_counter
     try:
-        manifests = tuple(decode_artifact_manifest(selected.plane.root.resolve(row.materialization.relative_path + ".manifest.json", for_write=False).read_bytes())
+        manifests = tuple(resolve_artifact_sidecar_bytes(selected.plane, selected.plane.root.resolve(row.materialization.relative_path + '.manifest.json', for_write=False).read_bytes())
             for row in selected.verified)
         contacts = ExternalNativeEffectContactStore(plane=selected.plane, execution_plan=selected.parent.execution_plan,
             visibility_ceiling=Visibility.DEVELOPMENT_ONLY, outcome_access=Access.EVALUATION_SEALED)

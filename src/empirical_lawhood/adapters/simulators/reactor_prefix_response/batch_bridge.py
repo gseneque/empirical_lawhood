@@ -5,9 +5,10 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any
 
-from .bridge import ReactorBridge, _Boundary, _decimal
-from .batch_design import ReactorAssignedScenario
-from .contracts import ReactorCommand, ReactorDelivery, ReactorExposure, ReactorFinalDelivery
+from empirical_lawhood.adapters.simulators.reactor_prefix_response.bridge import ReactorBridge, _Boundary
+from empirical_lawhood.domains.reactor.reactor_prefix_response.numeric_values import _decimal
+from empirical_lawhood.domains.reactor.reactor_prefix_response.batch_design import ReactorAssignedScenario
+from empirical_lawhood.domains.reactor.reactor_prefix_response.contracts import ReactorCommand, ReactorDelivery, ReactorExposure, ReactorFinalDelivery
 
 
 class ReactorBatchBridge(ReactorBridge):

@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import ExternalRootUnavailable
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage.artifacts import ExternalRootUnavailable
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 
 

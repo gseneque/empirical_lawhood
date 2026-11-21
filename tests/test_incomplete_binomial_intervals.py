@@ -9,10 +9,8 @@ from itertools import combinations, product
 import pytest
 from scipy.stats import binom
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.experimental_statistics import (
-    BINOMIAL_COMPLETION_STATES, binomial_probability_interval, incomplete_binomial_interval,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.methods.statistics.experimental_statistics import BINOMIAL_COMPLETION_STATES, binomial_probability_interval, incomplete_binomial_interval
 
 
 TAIL = Fraction(1, 2560)

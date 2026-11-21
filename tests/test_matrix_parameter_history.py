@@ -1,4 +1,5 @@
 """Exposed E4 software conformance; no ROOT programme acquisition or authority."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from decimal import Decimal as D
@@ -9,40 +10,33 @@ import shutil
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_parameter_history import independent, science
-from empirical_lawhood.adapters.methods.matrix_parameter_history.operation_bindings import (
-    BUDGET, NAMESPACE, MatrixParameterOperationConfig, operation_factories,
-    development_draft, native_definition, operation_registrations, output_codecs, prepare_native_work,
-)
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import (
-    MatrixParameterAllocation, MatrixParameterHistoryAssessment, MatrixParameterHistoryProduct,
-    MatrixParameterHistorySource, MatrixParameterNumericalDesign, MatrixParameterRoot,
-    coordinate_identity, expected_members, identity,
-)
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
-from empirical_lawhood.adapters.simulators.six_matrix_response.gradients import SixMatrixParameters, reference_action_terms
-from empirical_lawhood.adapters.simulators.six_matrix_response.shooting import hermitian_basis
-from empirical_lawhood.infrastructure.execution import LocalScheduler, ResourceAdmissionError
-from empirical_lawhood.infrastructure.native_subwork_inputs import validate_native_subwork_inputs
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind, WorkerOutputPort
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.native_subwork import NativeSubworkInputError, NativeSubworkRoster, NativeSubworkState, NativeSubworkUncertainContact
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_parameter_history import independent, science
+from empirical_lawhood.domains.matrix.matrix_parameter_history.operation_bindings import BUDGET, NAMESPACE, MatrixParameterOperationConfig, operation_factories, development_draft, native_definition, operation_registrations, output_codecs, prepare_native_work
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import MatrixParameterAllocation, MatrixParameterHistoryAssessment, MatrixParameterHistoryProduct, MatrixParameterHistorySource, MatrixParameterNumericalDesign, MatrixParameterRoot, coordinate_identity, expected_members, identity
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
+from empirical_lawhood.domains.matrix.six_matrix_response.gradients import SixMatrixParameters, reference_action_terms
+from empirical_lawhood.domains.matrix.six_matrix_response.shooting import hermitian_basis
+from empirical_lawhood.execution.local.execution import LocalScheduler, ResourceAdmissionError
+from empirical_lawhood.execution.local.native_subwork_inputs import validate_native_subwork_inputs
+
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind, WorkerOutputPort
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.native_subwork import NativeSubworkInputError, NativeSubworkRoster, NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 from tests.matrix_native_invocation_support import prepared_native_store
 from tests.runtime_platform.test_native_subwork import _plane, _store
 from tests.test_matrix_parameter_native import REGIMES, coordinate
@@ -77,7 +71,7 @@ def publish(plane,name,schema,raw):
         ArtifactProfile.MATRIX_ARRAY_NPZ if array else ArtifactProfile.CANONICAL_JSON,
         'application/x-npz' if array else 'application/json','test.e4.software','inputs',raw,
         VisibilityCeiling.DEVELOPMENT_ONLY,(),OutcomeAccess.DEVELOPMENT_VISIBLE))
-    return decode_artifact_manifest(plane.root.resolve(result.materialization.relative_path+'.manifest.json',for_write=False).read_bytes())
+    return resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes())
 
 
 def provider(factory):
@@ -235,7 +229,7 @@ def test_receipt_only_recovery_cold_relocation_and_independent_reproof(retained_
     def blocked(*args,**kwargs):
         pytest.fail('retained source reading must not reacquire states or innovations')
     monkeypatch.setattr(parameter_source,'acquire_parameter_history',blocked)
-    monkeypatch.setattr('empirical_lawhood.adapters.methods.matrix_parameter_history.operation_bindings.acquire_parameter_history',blocked)
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.matrix_parameter_history.operation_bindings.acquire_parameter_history',blocked)
     monkeypatch.setattr(np.random,'Generator',blocked)
     _,ctx,_,_ = context(relocated,s,'history')
     result = provider(factory).execute_with_native_subwork(ctx,recovered)
@@ -366,7 +360,7 @@ def test_actual_uncertain_or_failed_native_receipt_never_repeats(tmp_path,monkey
     else:
         def failure(*args,**kwargs):
             raise ValueError('explicit exposed numerical failure')
-        monkeypatch.setattr('empirical_lawhood.adapters.methods.matrix_parameter_history.operation_bindings.acquire_parameter_history',failure)
+        monkeypatch.setattr('empirical_lawhood.domains.matrix.matrix_parameter_history.operation_bindings.acquire_parameter_history',failure)
         with pytest.raises(ValueError,match='exposed numerical failure'):
             provider(factory).execute_with_native_subwork(ctx,store)
         observed = store.inspect(definition)
@@ -375,7 +369,7 @@ def test_actual_uncertain_or_failed_native_receipt_never_repeats(tmp_path,monkey
         _,ctx,_,_ = context(plane,s,'history')
     def blocked(*args,**kwargs):
         pytest.fail('negative or UNKNOWN contact must not reacquire innovations')
-    monkeypatch.setattr('empirical_lawhood.adapters.methods.matrix_parameter_history.operation_bindings.acquire_parameter_history',blocked)
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.matrix_parameter_history.operation_bindings.acquire_parameter_history',blocked)
     with pytest.raises((ValueError,NativeSubworkUncertainContact)):
         provider(factory).execute_with_native_subwork(ctx,store)
     assert store.inspect(definition).state is (NativeSubworkState.UNKNOWN_COMPLETION if state == 'uncertain' else NativeSubworkState.COMPLETED)

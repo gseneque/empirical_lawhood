@@ -8,29 +8,24 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_bindings as bindings
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science as science
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import (
-    APPLICABILITY, MatrixCouplingRecipe, MatrixPreparationInitialState, MatrixPreparationSource,
-)
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_experiment import (
-    MatrixPreparationExperimentSpecification, MatrixPreparationSourceBank, bind_preparation_inputs,
-    prepare_preparation_experiment, validate_preparation_instance,
-)
-from empirical_lawhood.adapters.methods.matrix_parameter_history import independent
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.infrastructure.execution import _prepare_native_work
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRegistry
-from empirical_lawhood.runtime.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, PreparedExperimentFile
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import preparation_bindings as bindings
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as science_owner_0
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import APPLICABILITY, MatrixCouplingRecipe, MatrixPreparationInitialState, MatrixPreparationSource
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_experiment import MatrixPreparationExperimentSpecification, MatrixPreparationSourceBank, bind_preparation_inputs, prepare_preparation_experiment, validate_preparation_instance
+from empirical_lawhood.domains.matrix.matrix_parameter_history import independent
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.execution.local.execution import _prepare_native_work
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRegistry
+from empirical_lawhood.execution.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, PreparedExperimentFile
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 from tests import test_matrix_later_programme as later
 from tests.test_matrix_later_programme import ref
@@ -71,9 +66,9 @@ def selected(metadata):
 def test_complete_half_tick_recipe_original_independent_equations_and_denominators(selected):
     source, initial, coarse, bridge, allocation = selected
     source.validate_allocation(allocation)
-    arrays = science.propagate_preparation(source, initial, coarse_innovations=coarse, bridge_innovations=bridge)
-    raw, operand = science.preparation_array_product(source, initial, arrays, artifact_id="array.literal-preparation")
-    result = science.assess_preparation_arrays(source, initial, operand, arrays, assessment_id="assessment.literal-preparation")
+    arrays = science_owner_0.propagate_preparation(source, initial, coarse_innovations=coarse, bridge_innovations=bridge)
+    raw, operand = science_owner_0.preparation_array_product(source, initial, arrays, artifact_id="array.literal-preparation")
+    result = science_owner_0.assess_preparation_arrays(source, initial, operand, arrays, assessment_id="assessment.literal-preparation")
     n = source.total_ticks
     assert result.numerical_pass and tuple(row.denominator_steps for row in result.controls) == (n, 2 * n, n, n)
     assert tuple(row.denominator_real_coordinates for row in result.controls) == (192, 192, 192, 96)
@@ -81,14 +76,14 @@ def test_complete_half_tick_recipe_original_independent_equations_and_denominato
     assert arrays["primary_positions"].shape[0] == n + 1 and arrays["fine_positions"].shape[0] == 2 * n + 1
     assert np.array_equal(arrays["primary_innovations"], coarse)
     assert np.array_equal(arrays["bridge_innovations"], bridge)
-    assert len(science.consume_preparation_arrays(source, initial, operand, raw)) == 11
+    assert len(science_owner_0.consume_preparation_arrays(source, initial, operand, raw)) == 11
     assert decode_canonical_bytes(source.canonical_bytes(), type(source), maximum_bytes=None) == source
     assert "APPLICABILITY_BOUND" in result.standing
 
 
 def test_original_literal_trace_derivative_at_prepared_state(selected):
     source, raw, _, _, _ = selected
-    state = science.initial_state(source.initial, raw)
+    state = science_owner_0.initial_state(source.initial, raw)
     alpha = np.asarray(source.recipe.half_tick_couplings[1], dtype=float)
     gradient = independent.potential_gradient(state.positions, source.member, alpha)
     # Every diagonal and real/imaginary off-diagonal direction in both sectors.
@@ -109,7 +104,7 @@ def test_original_literal_trace_derivative_at_prepared_state(selected):
 @pytest.mark.parametrize("damage", ("member", "fine-state", "half-schedule", "clock", "bridge", "census", "initial"))
 def test_preparation_refuses_complete_census_or_independent_native_mutations(selected, damage):
     source, initial, coarse, bridge, _ = selected
-    arrays = science.propagate_preparation(source, initial, coarse_innovations=coarse, bridge_innovations=bridge)
+    arrays = science_owner_0.propagate_preparation(source, initial, coarse_innovations=coarse, bridge_innovations=bridge)
     if damage == "member":
         arrays["primary_positions"] = arrays["primary_positions"][:-1]
     elif damage == "fine-state":
@@ -125,14 +120,14 @@ def test_preparation_refuses_complete_census_or_independent_native_mutations(sel
     else:
         arrays["primary_positions"][0, 0, 0, 0, 0] += 0.01
     if damage in ("fine-state", "bridge"):
-        _, operand = science.preparation_array_product(source, initial, arrays, artifact_id="array.mutated-literal")
-        result = science.assess_preparation_arrays(source, initial, operand, arrays, assessment_id="assessment.mutated-literal")
+        _, operand = science_owner_0.preparation_array_product(source, initial, arrays, artifact_id="array.mutated-literal")
+        result = science_owner_0.assess_preparation_arrays(source, initial, operand, arrays, assessment_id="assessment.mutated-literal")
         assert not result.numerical_pass
         assert sum(row.denominator_steps for row in result.controls) == 5 * source.total_ticks
         assert any(row.failed_steps for row in result.controls)
     else:
         with pytest.raises(ValueError, match="geometry|initial|schedule|clock|members"):
-            science.preparation_array_product(source, initial, arrays, artifact_id="array.forbidden-literal")
+            science_owner_0.preparation_array_product(source, initial, arrays, artifact_id="array.forbidden-literal")
 
 
 @pytest.mark.parametrize("damage", ("hold", "duration", "restored", "initial-coupling", "applicability"))
@@ -259,7 +254,7 @@ def test_same_public_preparation_seam_retains_original_file_census_and_full_inst
 
 
 def test_exposed_source_checkpoint_refuses_protected_original_role(selected):
-    from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole
+    from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole
 
     source, _, _, _, _ = selected
     root = replace(source.root.root, role=MatrixProgrammeRole.CONFIRMATION)

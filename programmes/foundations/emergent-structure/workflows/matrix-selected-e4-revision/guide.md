@@ -37,8 +37,8 @@ not establish eligible development observations.
 
 Configuration validation grants no original source custody or scientific eligibility.
 
-Copy inputs beneath a selected directory on the default EL disk, following
-[environment reuse](../../../../../docs/development/maintainer-environment.md). Keep the producing
+Copy inputs beneath a selected directory on the selected storage mount, following
+[environment reuse](../../../../../docs/using/environments.md#select-storage-and-reuse-an-environment). Keep the producing
 checkout and selected locked environment stable throughout dependent execution.
 Select worker concurrency from the operator profile, or pass its exact selected
 value explicitly. Neither the programme nor the CLI supplies a scientific resource

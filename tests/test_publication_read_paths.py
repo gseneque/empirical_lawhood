@@ -7,9 +7,9 @@ import sys
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 
 

@@ -7,20 +7,17 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_acquisition_bindings as original
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import revision_forecast_bindings as forecast
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import revision_future_bindings as future
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_public import ScheduledRevisionPublicCalibration
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_acquisition_bindings as original
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import revision_forecast_bindings as forecast
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import revision_future_bindings as future
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_public import ScheduledRevisionPublicCalibration
 from empirical_lawhood.api import matrix_revision_runtime
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteResult,
-    CanonicalTaskReceipt, LogicalArtifactIdentity, ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.runtime.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteResult, CanonicalTaskReceipt, LogicalArtifactIdentity, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
 from tests.test_matrix_e4_programme_workflow import complete  # noqa: F401
 from tests.test_matrix_revision_calibration import calibrated  # noqa: F401
 from tests.test_matrix_programme_selection import exposed, pin  # noqa: F401
@@ -113,9 +110,9 @@ def test_installed_additive_factories_keep_original_native_mathematical_configur
 
 
 def test_installed_discovery_contains_the_actual_new_declarations():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_programme import executable_binding, extension_bundle
+    from empirical_lawhood.domains.matrix.matrix_scheduled_programme import extension as executable_binding, extension as extension_bundle
     expected = {row.manifest.capability_key for row in (*forecast.operation_factories(), *future.operation_factories())}
-    assert expected <= {row.manifest.capability_key for row in executable_binding.EXECUTABLE_BINDING_FACTORIES}
+    assert expected <= {row.manifest.capability_key for row in executable_binding.EXTENSION.factories}
     assert expected <= {row.capability_key for row in extension_bundle.MANIFESTS}
 
 

@@ -1,0 +1,12 @@
+{
+  "schema": "empirical-lawhood/periodic-pyscf-build",
+  "version": "1.0.0",
+  "upstream_wheel": "pyscf-2.14.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+  "url": "https://files.pythonhosted.org/packages/88/30/8e48717aff32f11fd78f981192d0b567971eb285ea048414b7dac2a211cf/pyscf-2.14.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+  "size_bytes": 52848663,
+  "sha256": "37b0bccc55450311a55318cd643e851353331ddeab4fc0c0065e83c905e41502",
+  "upstream_c_source_sha256": "9c181daa8ce689e312e548694f47a2935105094fab1e685e82b4bf485e0639c4",
+  "patched_c_source_sha256": "9075547f10c395c87dc55df95bbe6e616c5f5adfe63ab1f0c8db685378b009cf",
+  "local_version": "2.14.0+el.cvhf.1",
+  "wheel_tag": "py3-none-linux_x86_64"
+}

@@ -13,14 +13,10 @@ from typing import BinaryIO, ClassVar
 
 import pyarrow as pa  # type: ignore[import-untyped]
 
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_ids,
-    validate_sha256,
-)
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_ids, validate_sha256
 
-from .contracts import CANONICAL_COLUMNS, GlennAdapterError
-from .transform import canonical_table_logical_sha256, glenn_arrow_schema
+from empirical_lawhood.adapters.physical.glenn.contracts import CANONICAL_COLUMNS, GlennAdapterError
+from empirical_lawhood.adapters.physical.glenn.transform import canonical_table_logical_sha256, glenn_arrow_schema
 
 
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")

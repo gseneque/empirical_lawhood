@@ -10,15 +10,15 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as domain
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_opportunity import MatrixSelectedOpportunityEvidence
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as domain
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_opportunity import MatrixSelectedOpportunityEvidence
 from empirical_lawhood.api import selected_prepared_access as access_owner
-from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding,ExperimentInputSelection
-from empirical_lawhood.runtime.artifacts import ArtifactManifest,ArtifactProfile,ArtifactWriteRequest
-from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
 from tests.test_matrix_selected_opportunity import opportunity,transfer  # noqa: F401
 from tests.test_matrix_selected_declarative_preparation import science,request,selection
 from tests.test_recursive_public_service import _plane
@@ -100,7 +100,7 @@ def test_current_grant_is_refreshed_on_every_boundary_and_rebound_writer(literal
 def test_original_member_guard_refuses_false_custody_without_reading_body(literal,tmp_path,monkeypatch,mutation):
     plane=_plane(tmp_path/'members');scope=_access(literal,plane)
     monkeypatch.setattr(access_owner.SelectedPreparedOriginalInputAccess,'require_current',lambda self,**kwargs:None)
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
     parents=literal.parents
     pair=produced_access(declared_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
         declared_visibility=VisibilityCeiling.DEVELOPMENT_ONLY,parents=parents)
@@ -119,7 +119,7 @@ def test_original_member_guard_refuses_false_custody_without_reading_body(litera
 
 def test_selected_request_manifest_preflight_precedes_model_body_hash(literal,tmp_path,monkeypatch):
     plane=_plane(tmp_path/'selected');scope=_access(literal,plane)
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
     parents=literal.parents[:-1]
     pair=produced_access(declared_access=OutcomeAccess.DEVELOPMENT_VISIBLE,
         declared_visibility=VisibilityCeiling.DEVELOPMENT_ONLY,parents=parents)
@@ -145,8 +145,8 @@ def test_selected_request_manifest_preflight_precedes_model_body_hash(literal,tm
 
 
 def test_expiry_at_publication_verify_return_refuses_direct_body_open(literal,tmp_path,monkeypatch):
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
     plane=_plane(tmp_path/'body-boundary');scope=_access(literal,plane)
     raw=b'{"schema":"empirical-lawhood/tests/literal","value":{"literal":"exposed metadata"},"version":"1.0.0"}\n'
     pub=plane.write(ArtifactWriteRequest('output.literal','output.json','empirical-lawhood/tests/literal',
@@ -163,7 +163,7 @@ def test_expiry_at_publication_verify_return_refuses_direct_body_open(literal,tm
         original_verify(*args,**kwargs)
         state['allowed']=False
     monkeypatch.setattr(plane,'verify_manifest',verify)
-    from empirical_lawhood.infrastructure import bounded_io
+    from empirical_lawhood.storage import bounded_io
     monkeypatch.setattr(bounded_io,'read_bounded_bytes',lambda *args,**kwargs:opens.append(args))
     with pytest.raises(PermissionError,match='revoked during verify'):
         access_owner.guarded_output_payload(plane,receipt,pub.logical,len(raw),scope)
@@ -218,7 +218,7 @@ def test_committed_projection_refuses_mixed_root_and_empty_census(literal):
 def test_issued_guard_refuses_even_correct_custody_without_exact_frozen_membership(literal,tmp_path,monkeypatch):
     plane=_plane(tmp_path/'closed-issued');scope=_access(literal,plane)
     monkeypatch.setattr(access_owner.SelectedPreparedOriginalInputAccess,'require_current',lambda self,**kwargs:None)
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
     pair=produced_access(declared_access=OutcomeAccess.EVALUATOR_REVEAL,
         declared_visibility=VisibilityCeiling.OUTCOME_VISIBLE,parents=literal.parents)
     pub=plane.write(ArtifactWriteRequest('issued.evaluator-config','config.json',literal.request.SCHEMA,
@@ -238,13 +238,13 @@ def test_issued_guard_refuses_even_correct_custody_without_exact_frozen_membersh
 
 def test_issued_model_input_binds_exact_packet_members_not_an_access_pair(literal,transfer,tmp_path,monkeypatch):  # noqa: F811
     """Literal unissued metadata tests custody membership, not a valid issue."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedProtectedSpecification
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave,RecursiveWaveMember,RecursiveImplementationBinding
-    from empirical_lawhood.runtime.prospective_experiment import ProspectiveExperimentAssociation,instance_identity
-    from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCandidate
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedProtectedSpecification
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember, RecursiveImplementationBinding
+    from empirical_lawhood.execution.prospective_experiment import ProspectiveExperimentAssociation, instance_identity
+    from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCandidate
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
     from tests.test_matrix_selected_protected import confirmation_case
     programme=confirmation_case(transfer)
     specification=SelectedPreparedProtectedSpecification('specification.literal.issued','ORIGINAL_E3','E5_CONFIRMATION',
@@ -263,7 +263,7 @@ def test_issued_model_input_binds_exact_packet_members_not_an_access_pair(litera
     by_name={row.filename:row.identity for row in members}
     packet=AuthoredRecursiveWave('packet.literal.unissued',by_name['draft.json'],by_name['implementation.json'],members)
     allocation=domain.allocation(literal.selected.programme)
-    from empirical_lawhood.runtime.prospective_experiment import source_filename
+    from empirical_lawhood.execution.prospective_experiment import source_filename
     model_pin=ObjectIdentity.from_record('selection.literal.input',config)
     model_name=source_filename(model_pin)
     instance=ExperimentInstanceBinding(specification.identity,allocation.identity,packet.draft,
@@ -311,9 +311,9 @@ def test_issued_model_input_binds_exact_packet_members_not_an_access_pair(litera
 
 def test_guarded_result_refuses_alien_same_parent_sealed_publication_sibling(literal,tmp_path,monkeypatch):
     import os
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
     plane=_plane(tmp_path/'sibling-boundary')
     parents=tuple(replace(row,outcome_access=OutcomeAccess.EVALUATION_SEALED,
         visibility_ceiling=VisibilityCeiling.PROSPECTIVE) for row in literal.parents)

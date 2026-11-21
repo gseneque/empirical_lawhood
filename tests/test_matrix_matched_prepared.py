@@ -8,22 +8,20 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_forecast, prepared_point
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_response_science as response
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.functional_case_reduction import native_functional_case
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
-from empirical_lawhood.adapters.methods.matrix_factor_response.origin_mechanics import MatrixIO48Construction, MatrixOriginResponseModel
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import ACTION_ROLES, MatrixFactorAction
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import (
-    ScheduledResponseArrays, ScheduledResponseProtocol, physical_forecast_implementation,
-)
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays, DecodedMatrixArrayInput
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_forecast, prepared_point
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_response_science as response
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.functional_case_reduction import native_functional_case
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
+from empirical_lawhood.domains.matrix.matrix_factor_response.origin_mechanics import MatrixIO48Construction, MatrixOriginResponseModel
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import ACTION_ROLES, MatrixFactorAction
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseArrays, ScheduledResponseProtocol, physical_forecast_implementation
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays, DecodedMatrixArrayInput
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 from tests.test_matrix_functional_outcome_reduction import matched_criterion
 from tests.test_matrix_prepared_point import available_prepared_operands
 from tests.test_matrix_e4_matched_lifecycle import fitted, populations, observations, pin  # noqa: F401
@@ -83,7 +81,7 @@ def test_dense_prepared_feature_mechanics_native_assay_and_cold_replay(native, m
     monkeypatch.setattr(response, 'native_scheduled_branch', forbidden)
     monkeypatch.setattr(np.linalg, 'eigh', forbidden)
     monkeypatch.setattr(np.linalg, 'svd', forbidden)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast
     monkeypatch.setattr(response_forecast, '_hessian', forbidden)
     raw, mechanical = prepared_forecast.forecast(f.source, f.protocol, f.causal, f.causal_raw, f.template_raw,
         artifact_id=f.mechanical.arrays.array_artifact.artifact_id,
@@ -106,13 +104,13 @@ def test_dense_prepared_feature_mechanics_native_assay_and_cold_replay(native, m
 
 
 def test_frozen_matched_handoff_retains_e3_references_vacuous_cal_and_native_adequacy(native, fitted, monkeypatch):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as p
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as methods
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import RELATION_SCORE_RULE
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels, forecast_revision_prepared
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import MatrixRevisionSelectedPackage, MatrixRevisionPreparedProgramme
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_results import _case
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_secondary_readout import prepared_secondary_projection
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as p
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as methods
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import RELATION_SCORE_RULE
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels, forecast_revision_prepared
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import MatrixRevisionSelectedPackage, MatrixRevisionPreparedProgramme
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_results import _case
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_secondary_readout import prepared_secondary_projection
     f, population = native, fitted.populations
     cal = population.calibration
     reduction, data, forecasts = observations(cal, population.calibration_bank, export=fitted.export, missing_groups=cal.group_ids[:1])
@@ -173,8 +171,8 @@ def test_frozen_matched_handoff_retains_e3_references_vacuous_cal_and_native_ade
     # Disclosed post-custody API seam: actual raw mathematical reproof, without
     # claiming that these placeholders establish receipts or current authority.
     from empirical_lawhood.api import matrix_selected_scientific_read as reader
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_bindings as bindings
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_future as future
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_bindings as bindings
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_future as future
     programme.phase = 'E6_TRANSFER'
     tasks = {future.node_id(f.source, phase): SimpleNamespace(task_id=future.node_id(f.source, phase), phase=phase,
         capability=SimpleNamespace(capability_key=bindings.capability_key(phase, 'PROTECTED', bindings.phase_version(phase)),

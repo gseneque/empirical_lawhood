@@ -6,16 +6,13 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import (
-    NAMESPACE, ScheduledCompactBank, ScheduledCompactCommitmentConfig,
-    authenticate_prior_publications, compact_committed, compact_identity, compact_native_contract,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import committed
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_bindings import require_committed_bank
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.infrastructure.artifact_stream_primitives import ArtifactIdentityConflict
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import NAMESPACE, ScheduledCompactBank, ScheduledCompactCommitmentConfig, authenticate_prior_publications, compact_committed, compact_identity, compact_native_contract
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import committed
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_bindings import require_committed_bank
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.artifact_stream_primitives import ArtifactIdentityConflict
 from tests.test_matrix_scheduled_history_bindings import (
     bank as bank, provenance as provenance, scheduled as scheduled, stock as stock,
 )

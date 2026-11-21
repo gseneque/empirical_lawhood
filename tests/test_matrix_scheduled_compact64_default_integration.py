@@ -8,25 +8,21 @@ is obtained from the operational envelope or these tests.
 """
 
 from dataclasses import replace
-import json
 from hashlib import sha256
 from pathlib import Path
 
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import (
-    NAMESPACE, ScheduledCompactCommitmentConfig,
-)
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import NAMESPACE, ScheduledCompactCommitmentConfig
 from empirical_lawhood.api import recursive_prospective_authoring as author
 from empirical_lawhood.api.recursive_operations import operation_factories
-from empirical_lawhood.infrastructure.artifacts import ArtifactPlaneError
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec
-from empirical_lawhood.runtime.study_issue import StudyExtensionDecoderRegistration
+from empirical_lawhood.storage.artifacts import ArtifactPlaneError
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec
+from empirical_lawhood.execution.study_issue import StudyExtensionDecoderRegistration
 from tests.test_matrix_scheduled_calibration import (
     TEST_BUDGET, bank as bank, provenance as provenance, response_bank as response_bank,
     scheduled as scheduled, stock as stock,
@@ -37,9 +33,9 @@ from tests.test_matrix_scheduled_default_integration import _application, _load
 
 @pytest.fixture
 def application64(response_bank, tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_prediction
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast, response_science
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments, parameter_source
+    from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_prediction
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast, response_science
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments, parameter_source
 
     def blocked(*args, **kwargs):
         pytest.fail('public authoring, loading or provider proof for 707 tasks entered numerical science')
@@ -64,7 +60,6 @@ def test_public_calibration64_author_load_proof_preserves_complete_semantics(app
     spec = args['spec']
     original_bytes = spec.canonical_bytes()
     assert type(spec) is RecursiveProspectiveAuthoringSpec
-    assert len(original_bytes) <= author.MAXIMUM_SPEC_BYTES
     assert len(compilation.selected_scientific_projection.canonical_bytes()) <= 16*1024**2
     factories = tuple(factory for factory in operation_factories() if factory.manifest.capability_key.startswith(NAMESPACE+'.'))
     assert len(factories) == 19
@@ -85,14 +80,14 @@ def test_public_calibration64_author_load_proof_preserves_complete_semantics(app
     raw = (destination/member.filename).read_bytes()
     assert member.identity.object_schema == RecursiveProspectiveAuthoringSpec.SCHEMA
     assert member.identity.object_version == RecursiveProspectiveAuthoringSpec.VERSION
-    assert member.size_bytes == len(raw) <= author.MAXIMUM_SPEC_BYTES
+    assert member.size_bytes == len(raw)
     assert member.identity.object_fingerprint == sha256(raw).hexdigest()
     assert raw == original_bytes
     decoded = author.load_recursive_prospective_spec(destination/member.filename)
     assert type(decoded) is RecursiveProspectiveAuthoringSpec
     assert decoded.canonical_bytes() == original_bytes and decoded.fingerprint() == spec.fingerprint()
     decoder = decode_canonical_bytes((destination/'decoder.json').read_bytes(), StudyExtensionDecoderRegistration, maximum_bytes=16*1024**2)
-    assert decoder.maximum_payload_bytes == 16*1024**2
+    assert decoder.maximum_payload_bytes is None
 
     handoff = _load(application64, destination, monkeypatch)
     assert handoff.compilation.draft.canonical_bytes() == spec.draft.canonical_bytes()
@@ -111,51 +106,23 @@ def test_public_calibration64_author_load_proof_preserves_complete_semantics(app
         _load(application64, destination, monkeypatch)
 
 
-def test_operational_envelope_preserves_closed_semantic_and_member_bounds(application64, tmp_path):
-    from empirical_lawhood.planning.recursive_authoring import RecursiveScientificSelection
-    from empirical_lawhood.runtime.recursive_prospective_envelope import RecursiveProspectiveAuthoringEnvelope
+def test_exact_spec_and_authenticated_member_sizes_have_no_tier(application64, tmp_path):
+    from empirical_lawhood.design.recursive_authoring import RecursiveScientificSelection
 
     spec = application64[0]['spec']
-    legacy_path = tmp_path/'complete-legacy-spec.json'
-    legacy_path.write_bytes(spec.canonical_bytes())
-    assert author.load_recursive_prospective_spec(legacy_path) == spec
-
-    envelope = RecursiveProspectiveAuthoringEnvelope.from_spec(spec)
-    path = tmp_path/'forged-operational-envelope.json'
-    for mutation in ('semantic-hash', 'inner-spec', 'schema'):
-        document = json.loads(envelope.canonical_bytes())
-        if mutation == 'semantic-hash':
-            document['value']['semantic_spec']['value']['object_fingerprint'] = 'f'*64
-        elif mutation == 'inner-spec':
-            document['value']['original_spec']['value']['spec_id'] += '.substituted'
-        else:
-            document['schema'] = RecursiveProspectiveAuthoringSpec.SCHEMA
-        path.write_text(json.dumps(document, allow_nan=False, ensure_ascii=True, sort_keys=True, separators=(',', ':'))+'\n')
-        with pytest.raises(ValueError):
-            author.load_recursive_prospective_envelope(path)
-
+    path = tmp_path / 'complete-spec.json'
+    path.write_bytes(spec.canonical_bytes())
+    assert author.load_recursive_prospective_spec(path) == spec
     root = spec.draft.prospective_draft
-    world = replace(root.system.world, label='software-envelope-bound-'+('x'*(32*1024**2 - len(spec.canonical_bytes()) + 1024)))
-    oversized = replace(spec, draft=replace(spec.draft, prospective_draft=replace(root,
-        system=replace(root.system, world=world))))
-    assert len(oversized.canonical_bytes()) > 32*1024**2
-    legacy_path.write_bytes(oversized.canonical_bytes())
-    with pytest.raises(BoundedFileIOError, match='byte limit'):
-        author.load_recursive_prospective_spec(legacy_path)
-    with pytest.raises(ValueError, match='32 MiB allocation'):
-        RecursiveProspectiveAuthoringEnvelope.from_spec(oversized)
-
+    world = replace(root.system.world, label='software-observed-size-'+('x'*(32*1024**2 - len(spec.canonical_bytes()) + 1024)))
+    larger = replace(spec, draft=replace(spec.draft, prospective_draft=replace(root, system=replace(root.system, world=world))))
+    assert len(larger.canonical_bytes()) > 32*1024**2
+    path.write_bytes(larger.canonical_bytes())
+    assert author.load_recursive_prospective_spec(path) == larger
     scientific = application64[1].selected_scientific_projection
     member = RecursiveWaveMember('scientific-projection.json', ObjectIdentity.from_record(scientific.selection_id, scientific),
         len(scientific.canonical_bytes()))
-    assert author._prospective_member_codec(member) == (RecursiveScientificSelection, 16*1024**2)
-    for foreign in (replace(member, size_bytes=16*1024**2+1),
-            replace(member, identity=ObjectIdentity.from_record(envelope.envelope_id, envelope)),
-            replace(member, identity=replace(member.identity, object_version='2.0.0'))):
-        with pytest.raises(ValueError, match='schema/version|byte allocation'):
-            author._prospective_member_codec(foreign)
-    carrier = RecursiveWaveMember('recursive-prospective.json', ObjectIdentity.from_record(envelope.envelope_id, envelope),
-        len(envelope.canonical_bytes()))
-    assert author._prospective_member_codec(carrier) == (RecursiveProspectiveAuthoringEnvelope, 32*1024**2)
-    with pytest.raises(ValueError, match='byte allocation'):
-        author._prospective_member_codec(replace(carrier, size_bytes=32*1024**2+1))
+    assert author._prospective_member_codec(member) == (RecursiveScientificSelection, member.size_bytes)
+    assert author._prospective_member_codec(replace(member, size_bytes=256*1024**2+1)) == (RecursiveScientificSelection, 256*1024**2+1)
+    with pytest.raises(ValueError, match='schema/version'):
+        author._prospective_member_codec(replace(member, identity=replace(member.identity, object_version='9.0.0')))

@@ -10,14 +10,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as science
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_response_records as records
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_prefix_records import ConfiguredProtectedE3PrefixHistory
-from empirical_lawhood.adapters.methods.matrix_factor_response.origin_mechanics import MatrixIO48Construction, MatrixOriginResponseModel, model_predictors
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_records
-from empirical_lawhood.kernel.matrix_inputs import MatrixArrayMember
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as science
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_response_records as records
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_prefix_records import ConfiguredProtectedE3PrefixHistory
+from empirical_lawhood.domains.matrix.matrix_factor_response.origin_mechanics import MatrixIO48Construction, MatrixOriginResponseModel, model_predictors
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_records
+from empirical_lawhood.domains.matrix.input_contracts import MatrixArrayMember
 from tests.test_matrix_configured_unknown_response import (
     case as metadata_case, configured_prefix_case, original_case as prefix_original_case,  # noqa: F401
 )
@@ -61,7 +61,7 @@ def operands(original, fitted, template, role):
     prefix_config = replace(old['prefix-config'],
         record_id='config.' + records.NAMESPACE + '.' + source.root_id + '.prefix',
         specification=fitted.specification.identity, source_manifest=science.identity(manifest), source=source.reference)
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_prefix_records import protected_prefix_native_contract
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_prefix_records import protected_prefix_native_contract
     _, configuration, task, operation, closure, _ = protected_prefix_native_contract(
         prefix_config, manifest, specification=fitted.specification)
     _, arrays, checkpoint, native = literal_history(original.plane, source,

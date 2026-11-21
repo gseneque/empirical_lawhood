@@ -5,11 +5,11 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from empirical_lawhood.adapters.physical.virtual_cell import runtime
-from empirical_lawhood.adapters.physical.virtual_cell.config import SELECTION_CAPABILITY_KEY
-from empirical_lawhood.adapters.physical.virtual_cell.custody_transport_v2 import CanonicalEvidenceV2
-from empirical_lawhood.adapters.physical.virtual_cell.records_v2 import ModelDevelopmentRecordV2, ModelSelectionRecordV2
+from empirical_lawhood.domains.biology.virtual_cell.config import SELECTION_CAPABILITY_KEY
+from empirical_lawhood.domains.biology.virtual_cell.custody_transport_v2 import CanonicalEvidenceV2
+from empirical_lawhood.domains.biology.virtual_cell.records_v2 import ModelDevelopmentRecordV2, ModelSelectionRecordV2
 from empirical_lawhood.adapters.physical.virtual_cell import task_runner_v2 as tasks
 from tests.test_virtual_cell_custody_v2 import fixture
 from tests.test_virtual_cell_task_runner_v2 import _context, _runner

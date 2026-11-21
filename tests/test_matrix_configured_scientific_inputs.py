@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_assembly as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import CanonicalizationError, canonical_json_document_bytes
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_assembly as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import CanonicalizationError, canonical_json_document_bytes
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
 EXAMPLES = Path(__file__).parents[1] / 'programmes/foundations/emergent-structure/workflows/matrix-response-experiment'
 

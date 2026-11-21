@@ -6,40 +6,32 @@ are distinct products. This reader executes no provider or native operation.
 """
 from types import SimpleNamespace
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_prepared_choices as scientific_choices
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as declarative
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_protected_bindings as original
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_bindings as revision
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_e6_transport_config import (
-    ENTRY_TRANSPORT_KEY, MatrixSelectedTransportRootConfig, MatrixSelectedTransportPointConfig,
-    MatrixSelectedTransportFutureConfig, MatrixSelectedTransportScoreConfig,
-)
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.e6_transport_records import (
-    MatrixE6TransportDecision, MatrixE6EmpiricalTransportAssessment, MatrixE6TransportManifest,
-)
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.e6_transport_science import assess_e6_transport
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.functional_case_reduction import native_functional_case
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_secondary_readout import prepared_secondary_projection
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_results import assess_selected_programme, entry_seal
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_results import assess_revision_programme, revision_transfer_regimes
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import entry_seal as revision_entry_seal
-from .current_result_custody import CurrentResultPlanReader, retained_output_artifact_plane
-from .matrix_selected_runtime import _authenticate_entry, _current_source_qualifications, _published_input
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_prepared_choices as scientific_choices
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as declarative
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_protected_bindings as original
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_bindings as revision
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_e6_transport_config import ENTRY_TRANSPORT_KEY, MatrixSelectedTransportRootConfig, MatrixSelectedTransportPointConfig, MatrixSelectedTransportFutureConfig, MatrixSelectedTransportScoreConfig
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.e6_transport_records import MatrixE6TransportDecision, MatrixE6EmpiricalTransportAssessment, MatrixE6TransportManifest
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.e6_transport_science import assess_e6_transport
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.functional_case_reduction import native_functional_case
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_secondary_readout import prepared_secondary_projection
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_results import assess_selected_programme, entry_seal
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_results import assess_revision_programme, revision_transfer_regimes
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import entry_seal as revision_entry_seal
+from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader, retained_output_artifact_plane
+from empirical_lawhood.api.matrix_selected_runtime import _authenticate_entry, _current_source_qualifications, _published_input
 from empirical_lawhood.api.matrix_selected_revision_runtime import authenticate_revision_entry
-from .recursive_qualified_parents import (
-    MAX_PARENT_BYTES, _actual_package, _output_payload,
-    _replay_parent_authority, _verify_receipt_closure,
-)
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experimental_design import UnitAllocation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import validate_stable_id
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.adjudication import AdjudicationEvaluability, ScientificAdjudicationRecord
-from empirical_lawhood.runtime.prospective_experiment import ALLOCATION_FILENAME, SPECIFICATION_FILENAME, source_filename
+from empirical_lawhood.api.recursive_qualified_parents import MAX_PARENT_BYTES, _actual_package, _output_payload, _replay_parent_authority, _verify_receipt_closure
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import validate_stable_id
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationRecord
+from empirical_lawhood.execution.prospective_experiment import ALLOCATION_FILENAME, SPECIFICATION_FILENAME, source_filename
 
 
 def _pin(value, field="record_id"):
@@ -120,7 +112,7 @@ def _validate_design(selected, specification, allocation, entry, is_revision):
 
 
 def _entry_evidence(writer, run_id, task, entry, is_revision,*,custody=None):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import MatrixSelectedEntryEvidenceV3, MatrixRevisionEntryEvidenceV2
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixSelectedEntryEvidenceV3, MatrixRevisionEntryEvidenceV2
     kinds = (MatrixRevisionEntryEvidenceV2,) if is_revision else (MatrixSelectedEntryEvidenceV3,)
     kinds = tuple(kind for kind in kinds if (kind.SCHEMA, kind.VERSION) ==
         (entry.entry_evidence.object_schema, entry.entry_evidence.object_version))
@@ -146,7 +138,7 @@ def _original_source_operands(writer, entry, evidence, is_revision, codecs, *, s
 
 def _science_edges(task):
     """Authenticate the frozen CONFIG edge before returning all science edges."""
-    from empirical_lawhood.runtime.input_access import validated_task_scientific_input_edges
+    from empirical_lawhood.execution.input_access import validated_task_scientific_input_edges
     return validated_task_scientific_input_edges(task)
 
 
@@ -162,7 +154,7 @@ def _product_bytes(writer, receipts, task, output, schema, maximum, *, original_
     if original_input_access is None:
         raw = _output_payload(writer, receipt, logical, maximum)
     else:
-        from .selected_prepared_access import guarded_output_payload
+        from empirical_lawhood.api.selected_prepared_access import guarded_output_payload
         raw=guarded_output_payload(writer,receipt,logical,maximum,original_input_access)
     custody = {"receipt": _pin(receipt, "receipt_id").to_document(), "logical_artifact": logical.to_document(),
         "materialization": next(row for row in receipt.output_materializations if row.logical_artifact_id == logical.logical_artifact_id).to_document()}
@@ -207,7 +199,7 @@ def _consumed(writer, receipts, tasks, terminal, name, kind, *, producer=None, o
 def _consumed_array(writer, receipts, tasks, terminal, name, operand, *, original_input_access=None):
     """Open only the exact array archive actually consumed from its producer."""
     from hashlib import sha256
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA, MAXIMUM_MATRIX_ARRAY_BYTES
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA, MAXIMUM_MATRIX_ARRAY_BYTES
     task = _consumed_producer(tasks, terminal, name, output="arrays")
     artifact = operand.array_artifact
     raw, logical, _ = _product_bytes(writer, receipts, task, "arrays", MATRIX_ARRAY_SCHEMA,
@@ -221,9 +213,9 @@ def _consumed_array(writer, receipts, tasks, terminal, name, operand, *, origina
 def _external_array(writer, run_id, task, name, artifact, *, original_input_access=None):
     """Read a frozen external array under the existing provider-copy boundary."""
     from hashlib import sha256
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-    from .current_task_custody import _require_provider_input_manifest
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
+    from empirical_lawhood.api.current_task_custody import _require_provider_input_manifest
 
     edges = tuple(edge for edge in _science_edges(task) if edge.consumer_input_id == name)
     if len(edges) != 1 or edges[0].producer_task_id is not None:
@@ -257,13 +249,13 @@ def _replay_matched_revision_case(writer, run_id, programme, source, observation
         original_input_access=None, control_custody=None, allow_missing_future=False):
     """Cold reproof of actual feature, pre-future points and full native score."""
     from functools import partial
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_future as future
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_forecast import forecast_public
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource, matched_causal_feature
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_prefix import MatrixPreparedCausalPrefix, MatrixPreparedFactorWitness
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import MatrixPreparationHistory
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_point import forecast_revision_prepared
-    from empirical_lawhood.infrastructure.matrix_array_io import DecodedMatrixArrayInput
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_future as future
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_forecast import forecast_public
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource, matched_causal_feature
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_prefix import MatrixPreparedCausalPrefix, MatrixPreparedFactorWitness
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixPreparationHistory
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_point import forecast_revision_prepared
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import DecodedMatrixArrayInput
 
     consumed = partial(_consumed, original_input_access=original_input_access)
     array = partial(_consumed_array, original_input_access=original_input_access)
@@ -342,8 +334,8 @@ def _replay_matched_revision_case(writer, run_id, programme, source, observation
     if checked != readout:
         raise PermissionError("MATCHED_PREPARED_INDEPENDENT_NATIVE_SCORE_REPROOF_FAILED")
     if package.models.relation_fit.selection.is_curve_primary:
-        from .matrix_mechanism_read import bound_mechanism
-        from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
+        from empirical_lawhood.api.matrix_mechanism_read import bound_mechanism
+        from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
         return bound_mechanism(protocol=protocol, source=source.identity, causal_record=causal,
             physical_record=mechanical, response_record=response, causal_arrays=decode_matrix_arrays(causal_raw, causal.arrays),
             frozen_arrays=frozen.for_operand(frozen_raw, mechanical.arrays),
@@ -359,10 +351,10 @@ def _transport_products(writer, package, plan, tasks, receipts, entry, source,*,
     consumed=bind(_consumed,original_input_access=original_input_access) if original_input_access is not None else _consumed
     configuration=bind(_configuration,custody=control_custody) if control_custody is not None else _configuration
     """Follow the actual pre-future decision through response and score custody."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_future as future
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import MatrixPreparationHistory
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_prefix import MatrixPreparedCausalPrefix
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_future as future
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixPreparationHistory
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_prefix import MatrixPreparedCausalPrefix
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_point import MatrixPreparedPublicSource
     expected = (entry.transport_policy, entry.transport_calibration)
     ids = {phase: original.NAMESPACE + "." + source.source_id + "." + phase
         for phase in ("point", "mechanical", "response-score", "responses")}
@@ -411,8 +403,8 @@ def _transport_products(writer, package, plan, tasks, receipts, entry, source,*,
         causal = consumed(writer, receipts, tasks, response_task, "causal", MatrixPreparedCausalPrefix, product_cache=cache)
         future.validate_future_history(response_config, history, causal, point, mechanical, response)
         if response.native:
-            from .recursive_qualified_parents import _prior_native_subwork
-            from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorNativeBinding
+            from empirical_lawhood.api.recursive_qualified_parents import _prior_native_subwork
+            from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorNativeBinding
             native, = response.native
             definition, completion, nested_receipt = native.definition, native.completion, native.receipt
             parent, receipt = definition.parent_contact, receipts[response_task.task_id]
@@ -450,8 +442,8 @@ def _transport_predicted_lifetimes(policy, cases, observations):
     A missing value before a later observed predicted failure prevents a
     complete first-failure or right-censoring statement.
     """
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.e6_transport_records import METHODS
-    from empirical_lawhood.adapters.methods.matrix_factor_response.e3_numerical_methods import original_units
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.e6_transport_records import METHODS
+    from empirical_lawhood.domains.matrix.matrix_factor_response.e3_numerical_methods import original_units
 
     rows = []
     descriptions = tuple(dict.fromkeys(description for description, _ in policy.endpoint_order))
@@ -640,7 +632,7 @@ def _partial_matched_revision_science(writer, package, plan, receipts, entry_tas
         'assessed_cases': sum(case.functional.unit_id in units and case.readout is not None for case in assessment.cases),
         'conditionally_admitted_cases': sum(case.unit_id in units and case.conditional_admission for case in assessment.functional.cases)}
         for role, units in groups}
-    from .matrix_mechanism_read import prepared_mechanism_projection
+    from empirical_lawhood.api.matrix_mechanism_read import prepared_mechanism_projection
     return {'manifest': manifest.to_document(), 'assessment': assessment.to_document(), 'adjudication': None,
         **prepared_mechanism_projection(programme, mechanism),
         'assessment_custody': 'UNPUBLISHED_PARTIAL_REDUCTION', 'custody': custody, 'denominators': denominators,
@@ -740,7 +732,7 @@ def _terminal_science(writer, package, plan, receipts, entry_task, entry, is_rev
             "native_functional_usable_cases": sum(row.actual_error is not None for row in native),
             "native_functional_reliable_cases": sum(row.functional_reliable for row in native),
             "conditionally_admitted_cases": sum(row.conditional_admission for row in cases)}
-    from .matrix_mechanism_read import prepared_mechanism_projection
+    from empirical_lawhood.api.matrix_mechanism_read import prepared_mechanism_projection
     return {**{name: value.to_document() for name, value in products.items()},
         **(prepared_mechanism_projection(programme, mechanism) if is_revision else {}),
         "native_functional_diagnostic": {"scope": "NATIVE_ASSAY_ONLY_NO_POINT_OR_ADMISSION_CLAIM",
@@ -766,8 +758,8 @@ class _CurrentPreparedScientificRead:
         self.writer,self.original,self.binding,self.package=writer,original,binding,package
 
     def require_current(self,*,artifact_writer=None):
-        from .selected_prepared_access import _ordinary
-        from .recursive_qualified_parents import _require_parent_authorities_current
+        from empirical_lawhood.api.selected_prepared_access import _ordinary
+        from empirical_lawhood.api.recursive_qualified_parents import _require_parent_authorities_current
         writer=_ordinary(self.writer if artifact_writer is None else artifact_writer)
         if writer.root.contract!=self.writer.root.contract:
             raise PermissionError('prepared scientific read changes its actual guarded root')
@@ -846,7 +838,7 @@ def read_selected_protected_result(*, selected, artifact_writer, run_id, reveal_
         # from the completed campaign and from the point-only terminal adjudication.
         scientific_access=_CurrentPreparedScientificRead(artifact_writer,access,binding,package)
         scientific_access.require_current()
-        from .current_task_custody import CurrentIssuedTaskCustody
+        from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
         control_custody=CurrentIssuedTaskCustody(writer=semantic,reveal_authority_id=reveal_authority_id,original_input_access=access)
         with control_custody.retained_binding(package=package, execution_plan=plan,
                 control_reader=reader, receipt_closure=closure,

@@ -7,11 +7,11 @@ import numpy as np
 import pytest
 from scipy.stats import binom
 
-from empirical_lawhood.adapters.methods.reactor_selected_action_response.config import ROOTS, ClassicalDesign
-from empirical_lawhood.adapters.methods.reactor_selected_action_response.measurement import measure_root, qualify_operands
-from empirical_lawhood.adapters.methods.reactor_selected_action_response.records import ClassicalAssay, ClassicalCausal, ClassicalDecision
-from empirical_lawhood.adapters.methods.reactor_local_domain_qualification.records import LocalArrayPayload
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.reactor.reactor_selected_action_response.config import ROOTS, ClassicalDesign
+from empirical_lawhood.domains.reactor.reactor_selected_action_response.measurement import measure_root, qualify_operands
+from empirical_lawhood.domains.reactor.reactor_selected_action_response.records import ClassicalAssay, ClassicalCausal, ClassicalDecision
+from empirical_lawhood.domains.reactor.reactor_local_domain_qualification.records import LocalArrayPayload
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def _paired_selected_action():

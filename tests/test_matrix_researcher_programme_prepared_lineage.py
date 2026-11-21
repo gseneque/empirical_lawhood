@@ -11,7 +11,7 @@ import pytest
 
 from empirical_lawhood.api.matrix_researcher_programme_lineage import programme_original_product
 from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammeProjectionContext
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_sampling_follow_on import prior_product
 
 
@@ -60,9 +60,9 @@ def test_missing_or_ambiguous_original_source_product_never_supplies_a_locator()
 @pytest.mark.parametrize('damage', ('packet-kind', 'plan-kind', 'different-c'))
 def test_train_locator_keeps_original_retained_packet_plan_and_exact_c(tmp_path, monkeypatch, damage):
     from empirical_lawhood.api import native_training_banks, recursive_authoring, recursive_execution
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
     from tests.test_recursive_public_service import _plane
     plane = _plane(tmp_path / 'actual-guarded-plane')
     packet_pin = ObjectIdentity('packet.literal-original', AuthoredRecursiveWave.SCHEMA, AuthoredRecursiveWave.VERSION, 'a' * 64)
@@ -77,7 +77,7 @@ def test_train_locator_keeps_original_retained_packet_plan_and_exact_c(tmp_path,
     directory = plane.root.resolve('children/train', for_write=False)
     context = SimpleNamespace(writer=plane, child_directory=lambda phase: directory, phase_origins={},
         plan=SimpleNamespace(specification=SimpleNamespace(input_commitments=c)))
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
     def locate():
         with scientific_reconstruction_operation('full'):
             return MatrixProgrammeProjectionContext.native_training_locator(context)

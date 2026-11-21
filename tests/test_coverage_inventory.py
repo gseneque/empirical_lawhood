@@ -27,12 +27,22 @@ def test_missing_literal_source_refuses(inventory, tmp_path):
         inventory.validate_configuration(tmp_path)
 
 
-def test_glob_requires_a_source_match(inventory, tmp_path):
+def test_glob_requires_a_source_match(inventory, tmp_path, monkeypatch):
+    monkeypatch.setattr(inventory, "CRITICAL_MEASURED_MODULES", frozenset({"owner_present.py"}))
     (tmp_path / ".coveragerc").write_text("[run]\ninclude = owner_*.py\n")
     with pytest.raises(ValueError, match="no source match"):
         inventory.validate_configuration(tmp_path)
     (tmp_path / "owner_present.py").write_text("pass\n")
     inventory.validate_configuration(tmp_path)
+
+
+def test_existing_sources_cannot_omit_a_declared_critical_owner(inventory, tmp_path, monkeypatch):
+    monkeypatch.setattr(inventory, "CRITICAL_MEASURED_MODULES", frozenset({"critical.py"}))
+    (tmp_path / ".coveragerc").write_text("[run]\ninclude = incidental.py\n")
+    (tmp_path / "incidental.py").write_text("pass\n")
+    (tmp_path / "critical.py").write_text("pass\n")
+    with pytest.raises(ValueError, match="required coverage owners excluded"):
+        inventory.validate_configuration(tmp_path)
 
 
 @pytest.mark.parametrize("absolute", [False, True])

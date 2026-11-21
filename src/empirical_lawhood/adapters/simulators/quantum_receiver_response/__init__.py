@@ -1,12 +1,6 @@
-"""Bounded quantum receiver response simulator, receiver-law and evaluator package."""
+# SPDX-License-Identifier: MPL-2.0
+"""Quantum source integration, retained transport and explicit configuration access."""
 
-from .contracts import Action, Denominator, PLAN_ID, QuantumReceiverResponseConfig, Stage, load_config
+from empirical_lawhood.adapters.simulators.quantum_receiver_response.configuration import load_config
 
-__all__ = [
-    "Action",
-    "Denominator",
-    "PLAN_ID",
-    'QuantumReceiverResponseConfig',
-    "Stage",
-    "load_config",
-]
+__all__ = ["load_config"]

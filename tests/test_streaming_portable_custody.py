@@ -8,8 +8,8 @@ import shutil
 import pytest
 
 from empirical_lawhood.api import recursive_contributions as contributions
-from empirical_lawhood.infrastructure import bounded_io
-from empirical_lawhood.infrastructure.recursive_custody import iter_exact_custody_file_chunks
+from empirical_lawhood.storage import bounded_io
+from empirical_lawhood.storage.recursive_custody import iter_exact_custody_file_chunks
 from tests.test_battery_recursive_construction import battery_wave_a_draft
 from tests.test_recursive_contribution_custody import (
     ROOT,

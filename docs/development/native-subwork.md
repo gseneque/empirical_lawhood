@@ -11,7 +11,7 @@ Subwork records provide no issue, execution, reveal, qualification or retry perm
 
 ## Prepare available inputs before parent contact
 
-The [prepared invocation helper](../../src/empirical_lawhood/infrastructure/prepared_native_invocation.py)
+The [prepared invocation helper](../../src/empirical_lawhood/storage/prepared_native_invocation.py)
 publishes explicitly selected canonical controls through the existing guarded
 artifact plane. `NativeInputPublication` retains the scientific record ID,
 record bytes, optional transport alias and exact lineage parents. Already
@@ -184,6 +184,35 @@ An independently retained completion receipt also prevents missing definition
 or roster directories from being mistaken for a new unentered slot.
 Closing the process transport retires its creating task token.
 
+### Recover a complete returned stream after publication failure
+
+`ExternalNativeSubworkStore.recover_returned_publication` takes the original execution lock before publication repair.
+It requires an authenticated successful raw return and no live creating publisher.
+The complete received stream must match its original expected length and SHA-256.
+Only a stream refused during output publication is eligible.
+An interrupted, shortened or changed stream remains incomplete.
+
+An adapter can reconstruct missing canonical metadata from the authenticated original bytes.
+It must preserve the original definition, output contracts and scientific inputs.
+The Rubisco periodic-control API supplies this adapter-specific assembly.
+The repair retains the original prefix and publication-refusal record beside the completed output.
+The completion receipt includes these original records.
+Missing call-wide timing and peak-memory observations remain unknown.
+
+This operation restores no creator token and performs no native acquisition.
+Ordinary completed-parent finalization and independent scientific assessment remain separate steps.
+
+For an older producing installation, use
+`api.recursive_execution.finalize_returned_recursive_tasks` with the original
+authored directory and custody writer, the current controller checkout, and
+the frozen worker interpreter and source root. It authenticates both sources
+independently and preserves the original invocation's GPU and numerical thread settings.
+It uses the ordinary scheduler's completed-parent publication path.
+The worker receives only read-only native progress. The full original
+graph remains selected; uncontacted tasks receive no attempt or terminal event.
+Incomplete or unknown native work refuses before parent finalization. Resume
+remaining acquisition separately through the original admitted lifecycle.
+
 ## Supply complete retained outputs to an ordinary assessor
 
 `resolve_completed_definition(identity)` reads the original full definition
@@ -209,6 +238,10 @@ completed nested bytes into its declared ordinary output, which a separate PURE
 assessment task can consume through normal compiler dependencies. Neither relay
 nor publication assesses those bytes or grants later-use admission.
 
+Use the [work cost account](work-cost-accounting.md) to combine original parent and nested measurements.
+Its exact coverage prevents double counting and retains unknown overhead, failed attempts and shared bills.
+The original completion and receipt formats remain unchanged.
+
 The selected finite parent output allowance covers both retained native outputs
 and ordinary output copies. Unrestricted selections acquire no new numeric ceiling.
 If the ordinary worker is lost after nested completion, the original nested
@@ -217,6 +250,9 @@ unknown at its own scope. Exposed relay allocation checks measure transport
 buffers, not a scientific native engine's working-memory requirement.
 
 ## Run a selected isolated interpreter
+
+Use the [editable isolated starter](isolated-native-starter.md) for a bounded end-to-end development example.
+It uses the ordinary experiment lifecycle and the launcher described below.
 
 `IsolatedNativeEntrySelection` pins the actual interpreter, entry source,
 invocation bytes and exact environment. The adapter supplies authenticated
@@ -242,6 +278,25 @@ handshake. The path-free port supports selected read sizes and chunk iteration;
 changing the original file cannot change the entered operands. The anonymous
 backing retains every byte and consumes physical memory. Domain input size and
 engine working memory still need actual resource assessment.
+
+`IsolatedInvocationMemory` reserves the complete backing and two 1 MiB transfer
+frames per simultaneous copy (smaller frames for a smaller input). It adds a
+separately measured worker peak when available; otherwise the combined peak
+remains unknown. Worker peaks in this calculation exclude the backing and copy
+frames. Interpreter, operating-system and other transport allocations still
+need profile-specific assessment. Scratch and retained output are separate
+storage quantities. The prepared child checks its known reservation against
+the selected task memory ceiling before allocating anonymous backing. Passing
+that check does not establish capacity for an unmeasured native engine. Legacy
+entry and return records retain their original bytes and meaning.
+
+The shared `progress_resource_envelope` helper names its optional input
+`summed_wall_time_ceiling_seconds`. It checks the sum of task reservations,
+independently of core count and concurrency. This is neither measured CPU use
+nor elapsed execution time and creates no deadline. An unlimited task requires
+an unlimited sum. The older fixed one-core reactor and preparation records keep
+their canonical `cpu_seconds` field; their existing wall-reservation use is
+explicit at each caller. New templates must select the actual quantity.
 
 The caller retains complete stdout/stderr through explicitly selected streams
 and publishes their available bytes before scientific return guards. A known
@@ -312,7 +367,7 @@ full state and stochastic continuation contract.
 
 ## Evidence and remaining scientific work
 
-The [installed exposed adapter](../../src/empirical_lawhood/adapters/methods/native_subwork_conformance.py)
+The [installed exposed adapter](../../src/empirical_lawhood/methods/native_subwork_conformance.py)
 and [spawned crash/recovery checks](../../tests/runtime_platform/test_native_subwork.py)
 exercise positive, negative and unevaluable returned bytes, complete frozen
 operands, live derived conditional configuration, process loss, caught memory

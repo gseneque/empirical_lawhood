@@ -6,12 +6,10 @@ from decimal import Decimal as D, localcontext
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.functional_outcome_reduction import (
-    _confirmation_comparisons, _nominate_functional_cases, _transfer_comparisons,
-)
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.science import MatrixFunctionalCaseResult, MatrixPreparationNomination
-from empirical_lawhood.adapters.methods.matrix_primary_family import AMENDED_PRIMARY_FAMILY
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.functional_outcome_reduction import _confirmation_comparisons, _nominate_functional_cases, _transfer_comparisons
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.science import MatrixFunctionalCaseResult, MatrixPreparationNomination
+from empirical_lawhood.domains.matrix.matrix_primary_family import AMENDED_PRIMARY_FAMILY
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_matrix_later_programme import criterion, ref
 
 
@@ -109,7 +107,7 @@ def matched_operands(outcomes, efforts=None):
 @pytest.mark.parametrize('wins, expected', ((42, False), (43, True)))
 def test_matched_transfer_uses64_assigned_roots_and43_duration_wins_despite_no_admission(wins, expected):
     from scipy.stats import binomtest
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import RELATION_METHODS
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import RELATION_METHODS
     regimes = tuple((name, tuple('unit.' + name + '.%02d' % index for index in range(64))) for name in ('nearby', 'shifted'))
     cases = []
     for _, groups in regimes:
@@ -131,9 +129,9 @@ def test_matched_transfer_uses64_assigned_roots_and43_duration_wins_despite_no_a
 @pytest.mark.parametrize('wins, expected', ((42, False), (43, True)))
 def test_curve_transport_has_its_own_primary_and_preserves_unknown_and_K_results(wins, expected):
     from scipy.stats import binomtest
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_prediction import MatchedCurveDecision
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import RELATION_METHODS
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.science import MatrixCurveFunctionalComparison
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_prediction import MatchedCurveDecision
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import RELATION_METHODS
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.science import MatrixCurveFunctionalComparison
 
     regimes = tuple((name, tuple('unit.' + name + '.%02d' % index for index in range(64))) for name in ('nearby', 'shifted'))
     cases, decisions = [], []

@@ -9,7 +9,7 @@ import tarfile
 import pytest
 
 from scripts import release_check as owner
-from empirical_lawhood.infrastructure.source_closure import _archive_census
+from empirical_lawhood.storage.source_closure import _stream_archive_census
 
 
 def git(root, *args):
@@ -26,7 +26,7 @@ def source_identity(root):
     archive = git(root, "archive", "HEAD")
     return {"commit": git(root, "rev-parse", "HEAD").decode().strip(),
         "tree_inventory_sha256": sha256(tree).hexdigest(), "archive_sha256": sha256(archive).hexdigest(),
-        "tracked_files": [row.to_mapping() for row in _archive_census(tree, archive)]}
+        "tracked_files": [row.to_mapping() for row in _stream_archive_census(tree, io.BytesIO(archive))[0]]}
 
 
 @pytest.fixture
@@ -61,7 +61,9 @@ def test_release_retains_exact_current_archive_without_git_history_or_ancestor_p
 
 
 @pytest.mark.parametrize("name", ("WTF.md", "WTF-FINALDESIGN.md", "WTF-OPTIMPRIO.md", "docs/plans/old.md", "PROREVIEW/review.md", "docs/applied-el-handoff.md",
-    "src/empirical_lawhood/adapters/methods/preparation_applicability/frozen_specification.md"))
+    "OPTIM.md", "docs/plans/nested/results.json", "docs/plans/inputs.zip", "PROREVIEW/returns.bin",
+    "notes/rubisco-implementation-and-scientific-pathway-2026-11-07.md",
+    "src/empirical_lawhood/domains/matrix/preparation_applicability/frozen_specification.md"))
 def test_even_committed_work_plan_is_refused_before_archive_publication(archive_case, name):
     root, packet = archive_case
     path = root / name

@@ -17,9 +17,9 @@ from empirical_lawhood.api import prospective_experiment as experiment
 from empirical_lawhood.api import recursive_prospective_authoring as recursive
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.results import ApiResult, CampaignStatusRequest, OperationStatus, RunCampaignRequest
-from empirical_lawhood.infrastructure.artifact_stream_primitives import ArtifactIdentityConflict
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.prospective_experiment import ALLOCATION_FILENAME, SPECIFICATION_FILENAME
+from empirical_lawhood.storage.artifact_stream_primitives import ArtifactIdentityConflict
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.prospective_experiment import ALLOCATION_FILENAME, SPECIFICATION_FILENAME
 from tests.test_prospective_experiment import _load, selected  # noqa: F401
 
 
@@ -47,7 +47,7 @@ def test_retained_read_authenticates_originals_without_current_source_or_operati
     monkeypatch.setattr(recursive, "_compile", lambda *_args, **_kwargs:
         pytest.fail("retained read recompiled current operation declarations"))
     from empirical_lawhood.api import experiment_preparation, recursive_operations
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     monkeypatch.setattr(recursive_operations, "operation_catalog", lambda:
         pytest.fail("retained read inspected changed current operation declarations"))
     # Static code-owned protocol metadata selects the closed original-access

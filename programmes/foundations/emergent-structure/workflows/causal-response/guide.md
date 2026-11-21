@@ -65,7 +65,7 @@ separately from those later native outcomes. No 64-root causal result follows.
 
 ## Retained development assembly
 
-The [causal-response development assembler](../../../../../src/empirical_lawhood/adapters/methods/causal_response/retained_development.py)
+The [causal-response development assembler](../../../../../src/empirical_lawhood/domains/matrix/causal_response/retained_development.py)
 retains the original 200-scalar cache layout and reconstructs all transition
 labels from the authenticated retained prepared native inputs. It returns the two separately
 validated 16-root contexts for the existing fitted-bank development methods.

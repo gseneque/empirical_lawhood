@@ -12,12 +12,12 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import physical_preparation_geometry as g
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.amber_parameters import assigned_census, read_prmtop
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.preparation_integrity import assess
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import physical_preparation_geometry as g
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.amber_parameters import assigned_census, read_prmtop
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.preparation_integrity import assess
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_rubisco_preparation_integrity import amber_text, exposed_preparation, topology
 
 
@@ -318,11 +318,11 @@ import importlib.abc
 import sys
 class Refuse(importlib.abc.MetaPathFinder):
     def find_spec(self, fullname, path=None, target=None):
-        blocked = ('numpy','parmed','openmm','pdbfixer','empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.native','empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.parameter_audit','empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.science','empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.coordinate_plan')
+        blocked = ('numpy','parmed','openmm','pdbfixer','empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics.native','empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.parameter_audit','empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.science','empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.coordinate_plan')
         if any(fullname == name or fullname.startswith(name+'.') for name in blocked):
             raise RuntimeError('producer/native import refused: '+fullname)
 sys.meta_path.insert(0,Refuse())
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.physical_preparation_geometry import SOURCE_PINS, METHOD
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.physical_preparation_geometry import SOURCE_PINS, METHOD
 assert len(SOURCE_PINS)==3
 assert METHOD.object_schema.endswith('/physical-preparation-geometry-method')
 '''

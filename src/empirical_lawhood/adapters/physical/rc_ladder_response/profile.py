@@ -6,16 +6,10 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import ClassVar
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_ids,
-    require_sorted_unique_strings,
-    validate_nonempty,
-    validate_stable_id,
-)
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_ids, require_sorted_unique_strings, validate_nonempty, validate_stable_id
 
-from empirical_lawhood.adapters.methods.physical_scale_morphism.governance import PhysicalScaleMorphismConstructQualification, PhysicalScaleMorphismConstructTerminal
+from empirical_lawhood.domains.circuits.physical_scale_morphism.governance import PhysicalScaleMorphismConstructQualification, PhysicalScaleMorphismConstructTerminal
 
 
 class RcLadderResponseStatusMeaning(StrEnum):

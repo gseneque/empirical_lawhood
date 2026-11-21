@@ -16,11 +16,12 @@ from pathlib import Path
 import platform
 from typing import Any
 
-from empirical_lawhood.adapters.methods.reactor_prefix_response.design import reactor_science_design, reactor_system
-from empirical_lawhood.adapters.methods.reactor_prefix_response.words import action_words
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.contracts import PARAMS_SHA256, PLANT_SHA256, PUBLIC_SCENARIOS_SHA256, UPSTREAM_COMMIT
+from empirical_lawhood.domains.reactor.reactor_prefix_response.design import reactor_science_design, reactor_system
+from empirical_lawhood.domains.reactor.reactor_prefix_response.words import action_words
+from empirical_lawhood.domains.reactor.reactor_prefix_response.contracts import PARAMS_SHA256, PLANT_SHA256, PUBLIC_SCENARIOS_SHA256, UPSTREAM_COMMIT
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.packaged_source import load_packaged_reactor_source
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.panel import BRANCHES, SCENARIOS, VIEWS, ReactorPrefixEpisode, ReactorPrefixPanel, ReactorSourceBundle, acquire_prefix_branch
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_panel import BRANCHES, SCENARIOS, VIEWS, ReactorPrefixEpisode, ReactorPrefixPanel, ReactorSourceBundle
+from empirical_lawhood.adapters.simulators.reactor_prefix_response.panel import acquire_prefix_branch
 
 
 CLAIM_LABEL = "demonstration only / unqualified local measurement"

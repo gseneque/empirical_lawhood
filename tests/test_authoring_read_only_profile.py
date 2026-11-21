@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.api.authoring_handoff import resolve_authoring_directory
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile, resolve_external_root_contract
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile, resolve_external_root_contract
 
 ROOT = Path(__file__).resolve().parents[1]
 

@@ -17,10 +17,8 @@ from empirical_lawhood.api.configuration import ConfigurationError, validate_con
 from empirical_lawhood.api.configuration_registry import CONSUMERS
 from empirical_lawhood.api.configuration_schemas import RESOURCE_PACKAGE, configuration_schema, generated_resources, project_record
 from empirical_lawhood.cli.configuration import config_app
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.recursive_inquiry import (
-    InquiryDecisionRequest, InquiryStateSources, RobustInquiryDecisionRequest, WorkBoundInquiryDecisionRequest,
-)
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.execution.recursive_inquiry import InquiryDecisionRequest, InquiryStateSources, RobustInquiryDecisionRequest, WorkBoundInquiryDecisionRequest
 from tests.test_recursive_inquiry import episode as episode
 from tests.test_recursive_inquiry_policy import policy_case, work_bound_case
 

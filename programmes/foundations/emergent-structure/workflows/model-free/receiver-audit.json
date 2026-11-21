@@ -1,0 +1,323 @@
+{
+  "schema": "model-free-matrix-definition.v1",
+  "label": "Disjoint development audit of the signed H64 finite-frame mean",
+  "roots": [
+    {
+      "seed": 1800601,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800602,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800603,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800604,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800605,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800606,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800607,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800608,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800609,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800610,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800611,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800612,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800613,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800614,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800615,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800616,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800617,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800618,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800619,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800620,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800621,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800622,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800623,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800624,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800625,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800626,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800627,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800628,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800629,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800630,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800631,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800632,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    }
+  ],
+  "settings": {
+    "resources": {
+      "memory_bytes": 4294967296,
+      "wall_time_seconds": 14400,
+      "output_bytes": 2147483648
+    },
+    "alpha": "0.05",
+    "inference": {
+      "module_alpha_weights": {
+        "M0": "0.01",
+        "M1": "0.04",
+        "M2": "0.01",
+        "M3": "0.01",
+        "M4": "0.01",
+        "M5": "0.90",
+        "M6": "0.01",
+        "M7": "0.01"
+      }
+    },
+    "native": {
+      "coordinates": [
+        {
+          "id": "nominal",
+          "temperature": "1",
+          "friction": "1",
+          "cross_coupling": "1"
+        }
+      ],
+      "horizon_ticks": 64
+    },
+    "population": {
+      "mode": "sparse",
+      "frame_size": 32,
+      "audit_size": 8,
+      "sampling_seed": 2026111806,
+      "auxiliary_rank": 4
+    },
+    "response": {
+      "selection_tick": 32
+    },
+    "receiver_study": {
+      "revision": "matrix-receiver-study.v2",
+      "instrument": "SELECT_ORIGINAL_SCI02C",
+      "M1": {
+        "structural_service": false
+      },
+      "M5": {
+        "individual_halfwidth_actuator": "0.001",
+        "numerical_allowance_actuator": "0.0001",
+        "mean_rms_budget_actuator": "0.00025",
+        "mean_halfwidth_actuator": "0.00025",
+        "mean_error_risk": "0.05",
+        "panels": [
+          5000,
+          5001
+        ],
+        "sparse_use": "DISJOINT_DEVELOPMENT_AUDIT",
+        "sparse_supplier": "auxiliary"
+      }
+    }
+  }
+}

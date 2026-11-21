@@ -13,28 +13,28 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial as factorial
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial_confirmation as method
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial_confirmation_custody as custody
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledCalibration
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition_custody import acquisition_phase_roles
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_calibration import ScheduledProgrammeCalibrationEvidence
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_qualified_parent import ScheduledProgrammeQualifiedParentDeclaration
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_selection import ScheduledRevisionTarget
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial as factorial
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial_confirmation as method
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial_confirmation_custody as custody
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledCalibration
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition_custody import acquisition_phase_roles
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_calibration import ScheduledProgrammeCalibrationEvidence
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_qualified_parent import ScheduledProgrammeQualifiedParentDeclaration
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_selection import ScheduledRevisionTarget
 from empirical_lawhood.api import matrix_scheduled_factorial_runtime as api
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import ContributionRole, ScientificConditionScope
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.scientific_contributions import ContributionManifest, ContributionProduct
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteResult, CanonicalTaskReceipt, LogicalArtifactIdentity
-from empirical_lawhood.runtime.execution import ParentPreparedTaskRunner
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.experimental_factorial import PairInteractionScale
-from empirical_lawhood.runtime.experimental_statistics import PairedMeanTAlternative
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, CandidateExecutionPlan, ExecutionTask, PlanLane, ScientificInputRole, ScientificInputSpec, ScientificStage
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursiveQualifiedParentBinding
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole, ScientificConditionScope
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteResult, CanonicalTaskReceipt, LogicalArtifactIdentity
+from empirical_lawhood.execution.execution import ParentPreparedTaskRunner
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.experimental_factorial import PairInteractionScale
+from empirical_lawhood.methods.statistics.experimental_statistics import PairedMeanTAlternative
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, CandidateExecutionPlan, ExecutionTask, PlanLane, ScientificInputRole, ScientificInputSpec, ScientificStage
+from empirical_lawhood.execution.recursive_qualified_parents import RecursiveQualifiedParentBinding
 from tests.test_matrix_scheduled_programme_reduction import declared as declared
 
 
@@ -260,9 +260,9 @@ def test_declared_runtime_view_without_complete_original_worker_contract_refuses
 @pytest.fixture(scope="module")
 def declared_acquisition_plan(criteria):
     """Registered operation metadata only, with no receipt or issued authority."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition_bindings import operation_factories
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition import NAMESPACE
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import NAMESPACE as COMPACT
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition_bindings import operation_factories
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition import NAMESPACE
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import NAMESPACE as COMPACT
     programme = criteria.configuration.programme
     wave = programme.waves[0]
     factories = {value.manifest.capability_key: value for value in operation_factories()}
@@ -299,7 +299,7 @@ def declared_acquisition_plan(criteria):
 
 @pytest.mark.parametrize("damage", (None, "missing-task", "config-schema", "config-hash", "implementation", "collector", "foreign-wave"))
 def test_partial_acquisition_census_reuses_exact_registered_contracts_without_inventing_collector_receipt(criteria, declared_acquisition_plan, damage):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_acquisition_custody import validate_acquisition_operation_census
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_acquisition_custody import validate_acquisition_operation_census
     programme, plan = criteria.configuration.programme, declared_acquisition_plan
     wave, operation = programme.waves[0], "collect"
     if damage is None:
@@ -335,11 +335,11 @@ def test_readonly_recovery_retains_uncertain_contact_and_refuses_full_contact_su
     The unissued candidate is deliberately incapable of passing the public
     protected preparation route. No engine or registered worker is entered.
     """
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.runtime.native_effects import NativeEffectContact
-    from empirical_lawhood.runtime.execution import OperationalFailureClass
-    from empirical_lawhood.runtime.recovery import OperationalFailureDiagnostic, TaskRecoveryDisposition, TaskRecoveryEvent, build_run_recovery_index
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.execution.native_effects import NativeEffectContact
+    from empirical_lawhood.execution.execution import OperationalFailureClass
+    from empirical_lawhood.execution.recovery import OperationalFailureDiagnostic, TaskRecoveryDisposition, TaskRecoveryEvent, build_run_recovery_index
     from tests.runtime_platform.test_native_subwork import _plane
 
     original = next(row for row in declared_acquisition_plan.tasks if row.task_id.endswith(".prefix"))

@@ -11,11 +11,11 @@ import zipfile
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime import products
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import measure_trace
-from empirical_lawhood.adapters.methods.matrix_history_analysis import algebra
-from empirical_lawhood.adapters.methods.matrix_dataset_readers import bridge_factor_diagnostics
-from empirical_lawhood.infrastructure.matrix_array_io import MatrixArtifactSource, MatrixNPZSource, NPZMemberSelection, NPZMemberSource, encode_matrix_arrays
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime import products
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import measure_trace
+from empirical_lawhood.domains.matrix.matrix_history_analysis import algebra
+from empirical_lawhood.domains.matrix.matrix_dataset_readers import bridge_factor_diagnostics
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import MatrixArtifactSource, MatrixNPZSource, NPZMemberSelection, NPZMemberSource, encode_matrix_arrays
 from tests.test_matrix_factor_lifetime import artifact, population_result, root, spec
 
 

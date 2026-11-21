@@ -7,6 +7,7 @@ the fixed metadata digests or issued identities of earlier MAST experiments.
 """
 
 from __future__ import annotations
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 import json
 import os
@@ -20,26 +21,18 @@ from typing import ClassVar, Protocol
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.study_issue import StudyOperationAuthorityStore
-from empirical_lawhood.infrastructure.source_origin import (
-    require_executing_target_source,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_ids,
-    validate_relative_locator,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.kernel.time import InformationCutoff, parse_utc_timestamp
-from empirical_lawhood.planning.study_authoring import DesignInputRecord, DesignInputRole
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, StudyOperationAuthority, require_study_authority
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.study_issue import StudyOperationAuthorityStore
+from empirical_lawhood.storage.source_origin import require_executing_target_source
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_ids, validate_relative_locator, validate_sha256, validate_stable_id
+from empirical_lawhood.science.models.time import InformationCutoff, parse_utc_timestamp
+from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, StudyOperationAuthority, require_study_authority
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 
 REST_BASE = "https://mastapp.site/json"
 ZARR_BASE = "https://s3.echo.stfc.ac.uk/mast/level2/shots"
@@ -47,7 +40,6 @@ PUBLISHER_PAGE = "https://www.ukaea.org/service/fair-mast/"
 LICENCE = "CC-BY-SA-4.0"
 _ARRAY_PATH = re.compile(r"[a-z][a-z0-9_]*/[a-z][a-z0-9_]*\Z")
 _MAX_CONFIG_BYTES = 64 * 1024
-_MAX_CONTROL_BYTES = 1024 * 1024
 SOURCE_GRANTEE = "operator.fair-mast-source-service"
 
 
@@ -281,6 +273,8 @@ class BoundedFairMastHttpGateway:
             if length is not None and int(length) > maximum_bytes:
                 raise ValueError("FAIR-MAST member exceeds its declared byte bound")
             payload = bytes(response.read(maximum_bytes + 1))
+            if length is not None and len(payload) != int(length):
+                raise ValueError("FAIR-MAST transfer differs from the publisher's declared length")
         if not payload or len(payload) > maximum_bytes:
             raise ValueError("FAIR-MAST response is empty or exceeds its bound")
         return payload
@@ -376,17 +370,13 @@ class FairMastPublicSourceService:
             return None
         if not path.is_file() or not sidecar.is_file():
             raise ValueError("FAIR-MAST control record is partially published")
-        from empirical_lawhood.infrastructure.task_receipts import (
-            decode_artifact_manifest,
-        )
 
-        manifest = decode_artifact_manifest(
-            read_bounded_bytes(sidecar, maximum_bytes=_MAX_CONTROL_BYTES)
-        )
+
+        manifest = read_artifact_sidecar(self.plane, (sidecar).relative_to(self.plane.root.contract.canonical_path).as_posix(), maximum_bytes=None)
         self.plane.verify_manifest(manifest)
-        payload = read_bounded_bytes(path, maximum_bytes=_MAX_CONTROL_BYTES)
+        payload = read_bounded_bytes(path, maximum_bytes=None)
         record = decode_canonical_bytes(
-            payload, record_type, maximum_bytes=_MAX_CONTROL_BYTES
+            payload, record_type, maximum_bytes=None
         )
         if record.fingerprint() != manifest.logical.content_sha256:
             raise ValueError("FAIR-MAST control record differs from its manifest")

@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Exposed total-Hamiltonian derivatives; no molecular task or native engine."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
@@ -11,14 +12,12 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_free_energy import (
-    derivative_controls as d, derivative_native as seam, prospective_xtb as x, raw_coupled_return as raw,
-)
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest
+from empirical_lawhood.domains.rubisco.rubisco_insilico_free_energy import derivative_controls as d, derivative_native as seam, prospective_xtb as x, raw_coupled_return as raw
+
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest
 from tests.runtime_platform.test_native_subwork import _plane
 from tests.test_rubisco_rr_qmmm_xtb import native_capture, original_inputs
 
@@ -55,7 +54,7 @@ def publisher(tmp_path):
                 spec.profile, spec.media_type, "exposed.derivatives", "outputs", payload,
                 VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
             self.calls.append((output_id, len(payload)))
-            return decode_artifact_manifest(plane.root.resolve(result.materialization.relative_path+".manifest.json", for_write=False).read_bytes())
+            return resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes())
     def reader(manifest):
         plane.verify_manifest(manifest)
         return plane.root.resolve(manifest.materialization.relative_path, for_write=False).open("rb")
@@ -295,7 +294,7 @@ def test_prospective_complete_native_atom_and_field_denominators_exceed_old_caps
 
 
 def test_existing_ethane_constructor_seam_full_coordinates_profile_and_pre_guard_capture(tmp_path, publisher, monkeypatch):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_free_energy import native_coupling
+    from empirical_lawhood.adapters.rubisco.rubisco_insilico_free_energy import native_coupling
     callback, _ = theory()
     original = np.arange(24,dtype=np.float64).reshape(8,3)/10
     prmtop = b"DISCLOSED_EXPOSED_ETHANE_SOURCE;NO_NATIVE_CONSTRUCTION"

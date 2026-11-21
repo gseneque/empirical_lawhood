@@ -1,5 +1,6 @@
-"""quantum marked record identification passive receiver-identification adapter."""
+# SPDX-License-Identifier: MPL-2.0
+"""Quantum source integration, retained transport and explicit configuration access."""
 
-from .contracts import QuantumMarkedRecordIdentificationConfig, Verdict, load_config
+from empirical_lawhood.adapters.simulators.quantum_marked_record_identification.configuration import load_config
 
-__all__ = ['QuantumMarkedRecordIdentificationConfig', "Verdict", "load_config"]
+__all__ = ["load_config"]

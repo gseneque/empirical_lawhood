@@ -12,18 +12,15 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.kernel.authority import AuthorityAction
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.exploration import (
-    Hypothesis, HypothesisDisposition, HypothesisSet, OutcomeInterpretation,
-    OutcomeInterpretationKind, ProspectiveNomination,
-)
-from empirical_lawhood.planning.study_authoring import DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind
-from empirical_lawhood.runtime.execution import RunnerRegistry, RunnerResult, TaskOutputPayload
-from empirical_lawhood.runtime.artifacts import ReceiptCheck
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.science.identity.authority import AuthorityAction
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.exploration import Hypothesis, HypothesisDisposition, HypothesisSet, OutcomeInterpretation, OutcomeInterpretationKind, ProspectiveNomination
+from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind
+from empirical_lawhood.execution.execution import RunnerRegistry, RunnerResult, TaskOutputPayload
+from empirical_lawhood.storage.contracts.artifacts import ReceiptCheck
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform.test_recursive_compiler import Config, fixture as development_fixture
 from tests.runtime_platform import test_recursive_prospective_workflow as public
 
@@ -53,7 +50,7 @@ class _MethodRunner:
         self.manifest = manifest
 
     def execute(self, context):
-        from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
         from tests.runtime_platform.test_recursive_compiler import SourceConfig, UseConfig
 
         config_type = SourceConfig if context.task_id == 'source' else UseConfig
@@ -201,9 +198,9 @@ def _install_nomination(monkeypatch, method, destination, *, change=None):
 
 def _nominated_public_run(tmp_path, monkeypatch, *, sealed_fixture=None, reveal_terminal=True):
     """Return the actual nomination-derived public run for later parent reuse."""
-    from empirical_lawhood.adapters.reference_worlds.runtime import ReferenceAdjudicationFixture
-    from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-    from empirical_lawhood.runtime.adjudication import AdjudicationEvaluability
+    from empirical_lawhood.domains.reference_worlds.runtime import ReferenceAdjudicationFixture
+    from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+    from empirical_lawhood.execution.adjudication import AdjudicationEvaluability
 
     method, original_directory, products, preserved = _develop_method(tmp_path, monkeypatch)
     fresh = tmp_path / 'fresh'
@@ -220,7 +217,7 @@ def _nominated_public_run(tmp_path, monkeypatch, *, sealed_fixture=None, reveal_
 
 
 def test_exposed_development_method_nomination_qualifies_only_distinct_protected_test_world_evidence(tmp_path, monkeypatch):
-    from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
+    from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
 
     run, method, original_directory, products, preserved, captured = _nominated_public_run(tmp_path, monkeypatch)
     candidate = run.handoff.compilation.candidate_report.candidate
@@ -250,7 +247,7 @@ def test_exposed_development_method_nomination_qualifies_only_distinct_protected
 
 @pytest.mark.parametrize('case', ['no-fresh-child', 'exposed-unit', 'tuning-seed', 'claim-from-exposed-outcomes'])
 def test_nomination_cannot_make_exposed_evidence_fresh_before_publication(tmp_path, monkeypatch, case):
-    from empirical_lawhood.runtime.candidate_compiler import CandidateDiagnosticCode
+    from empirical_lawhood.execution.candidate_compiler import CandidateDiagnosticCode
 
     method, _, _, _ = _develop_method(tmp_path, monkeypatch)
     def change(study):

@@ -16,9 +16,9 @@ from run_applied_el_broad_programme import SelectedProgramme, add_custody_locati
 
 
 def run(programme, args):
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import BatteryInquirySupply, scope
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry import recursive_translation as prior_translation
-    from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic import contracts, science, recursive_translation
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquirySupply, scope
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry import recursive_translation as prior_translation
+    from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic import contracts, science, recursive_translation
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_execution import read_recursive_wave
 

@@ -6,10 +6,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.constructed_preparation_applicability.qualification import (
-    constructor_crossing,
-    qualify_constructor,
-)
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.qualification import constructor_crossing, qualify_constructor
 
 
 class _SyntheticLower:

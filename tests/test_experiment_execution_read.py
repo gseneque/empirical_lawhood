@@ -6,9 +6,9 @@ import pytest
 
 from empirical_lawhood.api import experiment_execution_read as owner
 from empirical_lawhood.api import recursive_execution as execution
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.runtime.artifacts import artifact_publication_commit_relative_path
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.storage.contracts.artifacts import artifact_publication_commit_relative_path
 from tests.test_recursive_report_projection import wave  # noqa: F401
 from tests.test_recursive_report_projection import ROOT
 
@@ -22,7 +22,7 @@ def _roots(wave):  # noqa: F811
 
 
 def test_execution_records_keep_actual_census_without_body_replay_or_dispatch(wave, monkeypatch):  # noqa: F811
-    from empirical_lawhood.infrastructure import recursive_custody
+    from empirical_lawhood.storage import recursive_custody
     monkeypatch.setattr(recursive_custody, 'read_recursive_products',
         lambda **kwargs: pytest.fail('execution observation opened scientific products'))
     controls = []
@@ -38,6 +38,41 @@ def test_execution_records_keep_actual_census_without_body_replay_or_dispatch(wa
     assert report['new_native_contact_count'] == 0
     assert len(controls) == 1 and controls[0][0] == index
     assert controls[0][1] == execution._custody_control_pins(wave.plane, index)
+
+
+def test_execution_control_read_supplies_original_registry_on_cold_and_reused_repair_path(wave, monkeypatch):  # noqa: F811
+    """Registry handoff only; the presence probe/repair selector are disclosed seams."""
+    from empirical_lawhood.api import development_output_repair, native_continuation_execution
+    from empirical_lawhood.api.retained_e3_evidence import retained_e3_evidence_context
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    root = wave.plane.root.contract.canonical_path
+    prefix = wave.directory.relative_to(root).as_posix()
+    original = (wave.directory/'registry.json').read_bytes()
+    registry = decode_canonical_bytes(original, CapabilityRegistry, maximum_bytes=len(original))
+    monkeypatch.setattr(native_continuation_execution, 'continuation_relative_path',
+        lambda run_id: prefix+'/authored-wave.json')
+    observed = []
+    def select(**kwargs):
+        assert kwargs['retained_registry'] == registry
+        assert kwargs['retained_registry'].fingerprint() == kwargs['plan'].registry_sha256
+        observed.append(kwargs['predecessor'])
+        return kwargs['predecessor']
+    monkeypatch.setattr(development_output_repair, 'select_development_output_repair', select)
+    with retained_e3_evidence_context(wave.plane):
+        for _ in range(2):
+            with wave.plane.read_context() as writer:
+                owner.load_development_execution_controls(directory=wave.directory, artifact_writer=writer)
+                writer.require_verification_snapshot()
+    assert len(observed) == 2 and observed[0] is observed[1]
+    try:
+        (wave.directory/'registry.json').write_bytes(bytes([original[0]^1])+original[1:])
+        with pytest.raises(ArtifactIdentityConflict, match='artifact bytes differ from their identity'):
+            owner.load_development_execution_controls(directory=wave.directory, artifact_writer=wave.plane)
+        assert len(observed) == 2
+    finally:
+        (wave.directory/'registry.json').write_bytes(original)
 
 
 def test_continuation_reuses_exact_authored_controls_and_retains_final_mutation_refusal(wave):  # noqa: F811
@@ -59,7 +94,7 @@ def test_continuation_reuses_exact_authored_controls_and_retains_final_mutation_
 
 def test_partial_input_namespace_is_unentered_without_changing_or_erasing_it(wave):  # noqa: F811
     from dataclasses import replace
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
     _, original, _ = _roots(wave)
     run_id = 'run.partial-input-control'
     plan = replace(original, source_plan=replace(original.source_plan, object_id=run_id))

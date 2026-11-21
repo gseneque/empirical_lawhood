@@ -18,13 +18,13 @@ from empirical_lawhood.api import current_result_custody, execution as execution
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody, current_issued_task_control_scope
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.prospective_experiment import load_prepared_prospective_experiment
-from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExecutionSelection
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile, resolve_external_root_contract
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile, resolve_external_root_contract
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 from tests.test_current_result_custody import _DisclosedCustodySupplier
 from tests.test_matrix_e3_public_programme import ROOT, _execution, _selected_case
 
@@ -51,11 +51,9 @@ def test_population_profile_resolves_actual_mount_and_original_fixture_namespace
 
 def _issued_e3(directory, design, monkeypatch):
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
-    from empirical_lawhood.adapters.composition.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import (
-        RESOURCE_BINDING_DEPENDENCY, bind_protected_e3_experiment_inputs,
-    )
-    from empirical_lawhood.infrastructure.source_closure import capture_target_closure
+    from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import RESOURCE_BINDING_DEPENDENCY, bind_protected_e3_experiment_inputs
+    from empirical_lawhood.storage.source_closure import capture_target_closure
     from tests.runtime_platform.test_recursive_prospective_workflow import _issue_public_handoff
     from tests.runtime_platform.test_study_issue import _issue_api_fixture
 
@@ -63,7 +61,7 @@ def _issued_e3(directory, design, monkeypatch):
     # Refuse a mismatched profile before the expensive scientific fixture setup.
     profile, selected_contract = _population_profile(directory)
     case = _selected_case(directory / "originals", design, maximum_parallel_tasks=4)
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
     original = case.plane
     assert original.root.contract.canonical_path == selected_contract.canonical_path
     # Keep actual publication storage IDs and paths; select the real EL mount
@@ -147,7 +145,7 @@ def test_actual_e3_two_root_populations_bound_static_controls_and_replay_current
         validate_plan = current_result_custody._require_prepared_plan_bindings
         load_issue = ExternalIssuedStudyPublisher._load_executable_study
         load_grant = ExternalStudyOperationAuthorityStore.load
-        from empirical_lawhood.infrastructure import canonical_record_read
+        from empirical_lawhood.storage import canonical_record_read
         decode_control = canonical_record_read._SelectedCanonicalRecordRead.decode
         def counted_validation(**kwargs):
             validations.append(kwargs["run_plan"].run_plan_id)
@@ -210,12 +208,12 @@ def test_actual_e3_two_root_populations_bound_static_controls_and_replay_current
 
 @pytest.mark.parametrize("phase", ("E5_CONFIRMATION", "E6_TRANSFER"))
 def test_selected_two_actual_root_populations_keep_complete_graph_and_current_declarative_entry_hold(monkeypatch, phase):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_protected_bindings as graph
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as public
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedProtectedSpecification
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import MatrixSelectedEntryEvidenceV3
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_results import assess_selected_programme
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_protected_bindings as graph
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as public
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedProtectedSpecification
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixSelectedEntryEvidenceV3
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_results import assess_selected_programme
     from tests.test_matrix_selected_package import reference
     from tests.test_matrix_selected_protected import transfer_case, confirmation_case, root_inputs, validate_recursive_scientific_roots
 

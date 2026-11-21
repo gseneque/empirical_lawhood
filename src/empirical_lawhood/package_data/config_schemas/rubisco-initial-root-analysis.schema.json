@@ -1,0 +1,1645 @@
+{
+  "$defs": {
+    "ActiveSiteSelection_538a9894101a": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/active-site-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "carbamylated": {
+              "description": "carbamylated; constructor checks semantics and units.",
+              "type": "boolean"
+            },
+            "catalytic_lysine_position_1based": {
+              "description": "catalytic lysine position 1based; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "ligand_chemical_graph": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "ligand chemical graph; constructor checks semantics and units."
+            },
+            "ligand_state": {
+              "description": "ligand state; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "lsu_chain_id": {
+              "description": "lsu chain id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "magnesium_bound": {
+              "description": "magnesium bound; constructor checks semantics and units.",
+              "type": "boolean"
+            },
+            "metal_coordination": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "metal coordination; constructor checks semantics and units."
+            },
+            "protonation_and_tautomers": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "protonation and tautomers; constructor checks semantics and units."
+            },
+            "site_id": {
+              "description": "site id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "site_id",
+            "lsu_chain_id",
+            "catalytic_lysine_position_1based",
+            "carbamylated",
+            "magnesium_bound",
+            "ligand_state",
+            "protonation_and_tautomers",
+            "metal_coordination",
+            "ligand_chemical_graph"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ChemicalProtocol_bd013aa532ae": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/chemical-protocol"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "interpretation": {
+              "description": "interpretation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "other_site_model": {
+              "description": "other site model; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "protocol_id": {
+              "description": "protocol id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sites": {
+              "description": "sites; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ActiveSiteSelection_538a9894101a"
+              },
+              "type": "array"
+            },
+            "solvent_and_ions": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "solvent and ions; constructor checks semantics and units."
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "unresolved_requirement_ids": {
+              "description": "unresolved requirement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "protocol_id",
+            "sites",
+            "other_site_model",
+            "solvent_and_ions",
+            "sources",
+            "unresolved_requirement_ids",
+            "interpretation"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "Exact_26f197d3a564": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-insilico-mechanism/exact-rational"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "denominator": {
+              "description": "denominator; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "numerator": {
+              "description": "numerator; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "numerator",
+            "denominator"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialCaseEvidence_4c97bfbdde89": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-case-evidence"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "alternatives": {
+              "description": "alternatives; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/InitialChemicalAlternative_e9d050fbcf10"
+              },
+              "type": "array"
+            },
+            "case": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "case; constructor checks semantics and units."
+            },
+            "case_id": {
+              "description": "case id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "context": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "context; constructor checks semantics and units."
+            },
+            "state_selection": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "state selection; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "case_id",
+            "case",
+            "context",
+            "state_selection",
+            "alternatives"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialChemicalAlternative_e9d050fbcf10": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-chemical-alternative"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "alternative_id": {
+              "description": "alternative id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "expected_realization_ids": {
+              "description": "expected realization ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "original_state": {
+              "description": "original state; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "realizations": {
+              "description": "realizations; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/InitialJointRealization_02043ed9c75b"
+              },
+              "type": "array"
+            },
+            "unresolved_requirement_ids": {
+              "description": "unresolved requirement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "alternative_id",
+            "expected_realization_ids",
+            "realizations",
+            "original_state",
+            "unresolved_requirement_ids"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialContrastDependency_6bc5cfef7bce": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-contrast-dependency"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "applicability_limits": {
+              "description": "applicability limits; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "contrast": {
+              "description": "contrast; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "inherited_evidence": {
+              "description": "inherited evidence; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "native_unit": {
+              "description": "native unit; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "supplier_route": {
+              "description": "supplier route; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "targeted_quantities": {
+              "description": "targeted quantities; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "transfer_assumptions": {
+              "description": "transfer assumptions; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "contrast",
+            "inherited_evidence",
+            "transfer_assumptions",
+            "targeted_quantities",
+            "supplier_route",
+            "applicability_limits",
+            "native_unit"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialContrastEvidence_ad44bf835713": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-contrast-evidence"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "applicability_review": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "applicability review; constructor checks semantics and units."
+            },
+            "bounds": {
+              "anyOf": [
+                {
+                  "items": false,
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "$ref": "#/$defs/Exact_26f197d3a564"
+                    },
+                    {
+                      "$ref": "#/$defs/Exact_26f197d3a564"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "bounds; constructor checks semantics and units."
+            },
+            "contrast": {
+              "description": "contrast; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "evidence_kind": {
+              "description": "evidence kind; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "unresolved_requirement_ids": {
+              "description": "unresolved requirement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "contrast",
+            "bounds",
+            "evidence_kind",
+            "sources",
+            "applicability_review",
+            "unresolved_requirement_ids"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialContrastReview_9ce30ae1de13": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-contrast-review"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "case": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "case; constructor checks semantics and units."
+            },
+            "conditional_support": {
+              "description": "conditional support; constructor checks semantics and units.",
+              "enum": [
+                "SATISFIED",
+                "FALSIFIED",
+                "REFUSED",
+                "UNEVALUABLE",
+                "UNSUPPORTED",
+                "NOT_ATTEMPTED"
+              ],
+              "type": "string"
+            },
+            "context": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "context; constructor checks semantics and units."
+            },
+            "contrast": {
+              "description": "contrast; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "covered_bounds": {
+              "description": "covered bounds; constructor checks semantics and units.",
+              "items": false,
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "$ref": "#/$defs/Exact_26f197d3a564"
+                },
+                {
+                  "$ref": "#/$defs/Exact_26f197d3a564"
+                }
+              ],
+              "type": "array"
+            },
+            "review_id": {
+              "description": "review id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "scientific_argument": {
+              "description": "scientific argument; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "scope": {
+              "description": "scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "state_selection": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "state selection; constructor checks semantics and units."
+            },
+            "supporting_sources": {
+              "description": "supporting sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "unresolved_requirement_ids": {
+              "description": "unresolved requirement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "review_id",
+            "case",
+            "context",
+            "state_selection",
+            "contrast",
+            "covered_bounds",
+            "supporting_sources",
+            "scientific_argument",
+            "conditional_support",
+            "unresolved_requirement_ids",
+            "scope"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialJointRealization_02043ed9c75b": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-joint-realization"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "contrasts": {
+              "description": "contrasts; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/InitialContrastEvidence_ad44bf835713"
+              },
+              "type": "array"
+            },
+            "dependence_group_id": {
+              "description": "dependence group id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "joint_support_source": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "joint support source; constructor checks semantics and units."
+            },
+            "realization_id": {
+              "description": "realization id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "support_kind": {
+              "description": "support kind; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "waiting_fraction_evidence": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "waiting fraction evidence; constructor checks semantics and units."
+            },
+            "wild_type_formation_wait_fraction": {
+              "description": "wild type formation wait fraction; constructor checks semantics and units.",
+              "items": false,
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "$ref": "#/$defs/Exact_26f197d3a564"
+                },
+                {
+                  "$ref": "#/$defs/Exact_26f197d3a564"
+                }
+              ],
+              "type": "array"
+            }
+          },
+          "required": [
+            "realization_id",
+            "dependence_group_id",
+            "joint_support_source",
+            "support_kind",
+            "contrasts",
+            "wild_type_formation_wait_fraction",
+            "waiting_fraction_evidence"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialJointSupportReview_716be7ff20b3": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-joint-support-review"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "case": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "case; constructor checks semantics and units."
+            },
+            "conditional_support": {
+              "description": "conditional support; constructor checks semantics and units.",
+              "enum": [
+                "SATISFIED",
+                "FALSIFIED",
+                "REFUSED",
+                "UNEVALUABLE",
+                "UNSUPPORTED",
+                "NOT_ATTEMPTED"
+              ],
+              "type": "string"
+            },
+            "context": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "context; constructor checks semantics and units."
+            },
+            "covered_contrasts": {
+              "description": "covered contrasts; constructor checks semantics and units.",
+              "items": {
+                "anyOf": [
+                  {
+                    "items": false,
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "prefixItems": [
+                      {
+                        "$ref": "#/$defs/Exact_26f197d3a564"
+                      },
+                      {
+                        "$ref": "#/$defs/Exact_26f197d3a564"
+                      }
+                    ],
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "dependence_group_id": {
+              "description": "dependence group id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "realization_id": {
+              "description": "realization id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "review_id": {
+              "description": "review id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "scientific_argument": {
+              "description": "scientific argument; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "state_selection": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "state selection; constructor checks semantics and units."
+            },
+            "support_kind": {
+              "description": "support kind; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "supporting_sources": {
+              "description": "supporting sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "unresolved_requirement_ids": {
+              "description": "unresolved requirement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "waiting_fraction": {
+              "description": "waiting fraction; constructor checks semantics and units.",
+              "items": false,
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "$ref": "#/$defs/Exact_26f197d3a564"
+                },
+                {
+                  "$ref": "#/$defs/Exact_26f197d3a564"
+                }
+              ],
+              "type": "array"
+            }
+          },
+          "required": [
+            "review_id",
+            "case",
+            "context",
+            "state_selection",
+            "realization_id",
+            "dependence_group_id",
+            "support_kind",
+            "covered_contrasts",
+            "waiting_fraction",
+            "supporting_sources",
+            "scientific_argument",
+            "conditional_support",
+            "unresolved_requirement_ids"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialModelCase_4eab3dd84f56": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-model-case"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "case": {
+              "$ref": "#/$defs/RubiscoPairedCase_3ae0a7bf3b13",
+              "description": "case; constructor checks semantics and units."
+            },
+            "case_id": {
+              "description": "case id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "context": {
+              "$ref": "#/$defs/RubiscoAssayContext_0473261550b2",
+              "description": "context; constructor checks semantics and units."
+            },
+            "dependencies": {
+              "description": "dependencies; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/InitialContrastDependency_6bc5cfef7bce"
+              },
+              "type": "array"
+            },
+            "expected_alternative_ids": {
+              "description": "expected alternative ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "focal_site_id": {
+              "description": "focal site id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "preparation_sources": {
+              "description": "preparation sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "state_selection": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "state selection; constructor checks semantics and units."
+            },
+            "unresolved_requirement_ids": {
+              "description": "unresolved requirement ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "case_id",
+            "case",
+            "context",
+            "focal_site_id",
+            "state_selection",
+            "expected_alternative_ids",
+            "dependencies",
+            "preparation_sources",
+            "unresolved_requirement_ids"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialModelEvidence_50a62b655bc0": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-model-evidence"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "cases": {
+              "description": "cases; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/InitialCaseEvidence_4c97bfbdde89"
+              },
+              "type": "array"
+            },
+            "evidence_id": {
+              "description": "evidence id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "interpretation": {
+              "description": "interpretation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "selection": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "selection; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "evidence_id",
+            "selection",
+            "cases",
+            "interpretation"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialModelSelection_54e6295b4f63": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-model-selection"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "cases": {
+              "description": "cases; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/InitialModelCase_4eab3dd84f56"
+              },
+              "type": "array"
+            },
+            "closure": {
+              "description": "closure; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "closure_assumptions": {
+              "description": "closure assumptions; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "closure_source": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "closure source; constructor checks semantics and units."
+            },
+            "independent_biological_units": {
+              "description": "independent biological units; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "interpretation": {
+              "description": "interpretation; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "maximum_analysis_bytes": {
+              "description": "maximum analysis bytes; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "protocol": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "protocol; constructor checks semantics and units."
+            },
+            "selection_id": {
+              "description": "selection id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "source_evidence": {
+              "description": "source evidence; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "selection_id",
+            "protocol",
+            "cases",
+            "closure_source",
+            "closure_assumptions",
+            "source_evidence",
+            "maximum_analysis_bytes",
+            "interpretation",
+            "closure",
+            "independent_biological_units"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialRootAnalysisInputs_4f84a76ec8dd": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-root-analysis-inputs"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "inputs": {
+              "$ref": "#/$defs/InitialModelEvidence_50a62b655bc0",
+              "description": "inputs; constructor checks semantics and units."
+            },
+            "model": {
+              "$ref": "#/$defs/InitialModelSelection_54e6295b4f63",
+              "description": "model; constructor checks semantics and units."
+            },
+            "request": {
+              "$ref": "#/$defs/InitialRootRequest_3b93ff28432f",
+              "description": "request; constructor checks semantics and units."
+            },
+            "reviews": {
+              "$ref": "#/$defs/InitialRootReviewInputs_7ddaec44193f",
+              "description": "reviews; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "request",
+            "model",
+            "inputs",
+            "reviews"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialRootDomainLimit_e412f747e203": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-root-domain-limit"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "alternative_id": {
+              "description": "alternative id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "case_id": {
+              "description": "case id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "contrast": {
+              "description": "contrast; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "original_source": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "original source; constructor checks semantics and units."
+            },
+            "reason": {
+              "description": "reason; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "requirement_id": {
+              "description": "requirement id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "case_id",
+            "alternative_id",
+            "contrast",
+            "reason",
+            "requirement_id",
+            "original_source"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialRootRequest_3b93ff28432f": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-root-request"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "alternative_policy": {
+              "description": "alternative policy; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "closure_policy": {
+              "description": "closure policy; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "domain_limits": {
+              "description": "domain limits; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/InitialRootDomainLimit_e412f747e203"
+              },
+              "type": "array"
+            },
+            "model": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "model; constructor checks semantics and units."
+            },
+            "processing_policy": {
+              "description": "processing policy; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "request_id": {
+              "description": "request id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "scope": {
+              "description": "scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "specificity_criterion": {
+              "description": "specificity criterion; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "turnover_criterion": {
+              "description": "turnover criterion; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "uncertainty_policy": {
+              "description": "uncertainty policy; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "request_id",
+            "model",
+            "alternative_policy",
+            "processing_policy",
+            "domain_limits",
+            "turnover_criterion",
+            "specificity_criterion",
+            "uncertainty_policy",
+            "closure_policy",
+            "scope"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InitialRootReviewInputs_7ddaec44193f": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/initial-root-review-inputs"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "contrast_reviews": {
+              "description": "contrast reviews; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/InitialContrastReview_9ce30ae1de13"
+              },
+              "type": "array"
+            },
+            "inputs": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "inputs; constructor checks semantics and units."
+            },
+            "joint_reviews": {
+              "description": "joint reviews; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/InitialJointSupportReview_716be7ff20b3"
+              },
+              "type": "array"
+            },
+            "model": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "model; constructor checks semantics and units."
+            },
+            "original_sources": {
+              "description": "original sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "scope": {
+              "description": "scope; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "model",
+            "inputs",
+            "original_sources",
+            "contrast_reviews",
+            "joint_reviews",
+            "scope"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ResidueSubstitution_8774e58cc4f5": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/residue-substitution"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "after": {
+              "description": "after; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "before": {
+              "description": "before; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "chain_id": {
+              "description": "chain id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "position_1based": {
+              "description": "position 1based; constructor checks semantics and units.",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "chain_id",
+            "position_1based",
+            "before",
+            "after"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RubiscoAssayContext_0473261550b2": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/assay-context"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "chemistry": {
+              "$ref": "#/$defs/ChemicalProtocol_bd013aa532ae",
+              "description": "chemistry; constructor checks semantics and units."
+            },
+            "context_id": {
+              "description": "context id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "gas_convention": {
+              "description": "gas convention; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "normalization": {
+              "description": "normalization; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "ph_interval": {
+              "description": "ph interval; constructor checks semantics and units.",
+              "items": false,
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                }
+              ],
+              "type": "array"
+            },
+            "ph_treatment": {
+              "description": "ph treatment; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "physical_clock_unit": {
+              "description": "physical clock unit; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "product_handling": {
+              "description": "product handling; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "rubp_regime": {
+              "description": "rubp regime; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "temperature_conversion_assessment": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "temperature conversion assessment; constructor checks semantics and units."
+            },
+            "temperature_k": {
+              "additionalProperties": false,
+              "description": "temperature k; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "temperature_selection": {
+              "description": "temperature selection; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "context_id",
+            "temperature_k",
+            "ph_interval",
+            "ph_treatment",
+            "chemistry",
+            "product_handling",
+            "sources",
+            "temperature_selection",
+            "temperature_conversion_assessment",
+            "rubp_regime",
+            "gas_convention",
+            "normalization",
+            "physical_clock_unit"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RubiscoMaterial_3184b0ad7642": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/material"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "assembly_scope": {
+              "description": "assembly scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "chains": {
+              "description": "chains; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/SubunitChain_03d69756d43d"
+              },
+              "type": "array"
+            },
+            "material_id": {
+              "description": "material id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "organism": {
+              "description": "organism; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "processing_view": {
+              "description": "processing view; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "material_id",
+            "organism",
+            "processing_view",
+            "chains",
+            "sources",
+            "assembly_scope"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RubiscoPairedCase_3ae0a7bf3b13": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/paired-case"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "applicability": {
+              "description": "applicability; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "case_id": {
+              "description": "case id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "case_role": {
+              "description": "case role; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "exposure_group": {
+              "description": "exposure group; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "mutant": {
+              "$ref": "#/$defs/RubiscoMaterial_3184b0ad7642",
+              "description": "mutant; constructor checks semantics and units."
+            },
+            "parent": {
+              "$ref": "#/$defs/RubiscoMaterial_3184b0ad7642",
+              "description": "parent; constructor checks semantics and units."
+            },
+            "sources": {
+              "description": "sources; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "substitutions": {
+              "description": "substitutions; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ResidueSubstitution_8774e58cc4f5"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "case_id",
+            "parent",
+            "mutant",
+            "substitutions",
+            "case_role",
+            "exposure_group",
+            "sources",
+            "applicability"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "SubunitChain_03d69756d43d": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/rubisco-response/subunit-chain"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "chain_id": {
+              "description": "chain id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "sequence": {
+              "description": "sequence; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "subunit": {
+              "description": "subunit; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "chain_id",
+            "subunit",
+            "sequence"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:rubisco-initial-root-analysis",
+  "$ref": "#/$defs/InitialRootAnalysisInputs_4f84a76ec8dd",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Rubisco Initial Root Analysis",
+  "x-consumer": "rubisco-initial-root-analysis",
+  "x-consumer-maximum-bytes": 67108864,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

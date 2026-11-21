@@ -7,23 +7,20 @@ from __future__ import annotations
 
 from dataclasses import replace
 from decimal import Decimal
+from hashlib import sha256
 import importlib.util
+import json
 import math
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rc_ladder_numerical_comparison.contracts import (
-    ResistorCapacitorLadderEvaluationConfig,
-)
-from empirical_lawhood.adapters.simulators.rc_ladder_response.campaign import (
-    check_native_views,
-)
-from empirical_lawhood.adapters.simulators.rc_ladder_response.contracts import (
-    ResistorCapacitorLadderNativePanel,
-    ResistorCapacitorLadderStudyConfig,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.circuits.rc_ladder_numerical_comparison.contracts import ResistorCapacitorLadderEvaluationConfig
+from empirical_lawhood.domains.circuits.rc_ladder.campaign import check_native_views
+from empirical_lawhood.domains.circuits.rc_ladder.contracts import ResistorCapacitorLadderNativePanel, ResistorCapacitorLadderStudyConfig
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -91,15 +88,15 @@ def test_method_only_consumes_exposed_typed_panels_without_new_source(
 
     monkeypatch.setattr(module, "run_native_view", refuse)
     monkeypatch.setattr(
-        "empirical_lawhood.adapters.simulators.rc_ladder_response.campaign.run_native_view",
+        "empirical_lawhood.domains.circuits.rc_ladder.campaign.run_native_view",
         refuse,
     )
     monkeypatch.setattr(
-        "empirical_lawhood.adapters.simulators.rc_ladder_response.matrix_exponential.solve_matrix_exponential",
+        "empirical_lawhood.domains.circuits.rc_ladder.matrix_exponential.solve_matrix_exponential",
         refuse,
     )
     monkeypatch.setattr(
-        "empirical_lawhood.adapters.simulators.rc_ladder_response.refinement.solve_backward_euler",
+        "empirical_lawhood.domains.circuits.rc_ladder.refinement.solve_backward_euler",
         refuse,
     )
     config = ResistorCapacitorLadderEvaluationConfig(
@@ -134,3 +131,54 @@ def test_invalid_component_refuses_before_solver(local_boundary, monkeypatch):
     with pytest.raises(ValueError, match="must be positive"):
         invalid_model = replace(study.model, capacitances_farads=(Decimal(0),))
         module.local_panels(replace(study, model=invalid_model))
+
+
+@pytest.mark.parametrize("broken", (False, True))
+def test_documented_command_verifies_the_selected_file_and_retains_its_identity(local_boundary, tmp_path, broken):
+    original, _, _, _ = local_boundary
+    source = (original / "local_rc_extension.py").read_text()
+    if broken:
+        source = source.replace('capacitances_farads=(Decimal("1"),)', 'capacitances_farads=(Decimal("2"),)')
+    # This copy refuses a second preparation even if a verifier obtains a
+    # correct first result. It tests actual calls, not a reported count alone.
+    source += '''\n_original_study = local_study
+_preparations = 0
+def local_study():
+    global _preparations
+    _preparations += 1
+    if _preparations != 1:
+        raise AssertionError("model prepared more than once")
+    return _original_study()
+'''
+    selected = tmp_path / "actual_contributor_file.py"
+    selected.write_text(source)
+    output = tmp_path / "selected-results"
+    result = subprocess.run([sys.executable, str(ROOT / "scripts/check_worked_rc_extension.py"),
+                             "--module", str(selected), "--output-dir", str(output)],
+                            cwd=ROOT, capture_output=True, text=True)
+    report = json.loads((output / "verification.json").read_text())
+    assert report["module_path"] == str(selected)
+    assert report["module_sha256"] == sha256(selected.read_bytes()).hexdigest()
+    assert report["model_preparation_calls"] == 1
+    assert not (tmp_path / "__pycache__").exists()
+    if broken:
+        assert result.returncode == 1 and report["status"] == "FAILED"
+        assert "independent circuit equation" in report["error"]["message"]
+    else:
+        assert result.returncode == 0, result.stderr
+        assert report["status"] == "PASSED" and report["independent_unit_count"] == 1
+        assert (output / "method-check.json").is_file() and (output / "negative-check.json").is_file()
+
+
+def test_selected_file_verifier_disables_native_calls_during_evaluation(local_boundary, tmp_path, monkeypatch):
+    from scripts import check_worked_rc_extension as verifier
+
+    original, _, _, _ = local_boundary
+    selected = original / "local_rc_extension.py"
+
+    def illicit_evaluator(study, panels):
+        verifier.campaign.run_native_view(study, verifier.campaign.VIEWS[0])
+
+    monkeypatch.setattr(verifier.campaign, "check_native_views", illicit_evaluator)
+    with pytest.raises(RuntimeError, match="evaluation-only"):
+        verifier.verify_selected_file(selected, tmp_path / "failed-evaluator")

@@ -8,12 +8,9 @@ in task_runner_v2 and performs software admission before held data or scratch.
 
 from dataclasses import dataclass
 
-from .config_v2 import VirtualCellPipelineSelectionV2
-from .contracts import (
-    ProvenanceBoundVirtualCellPipelineConfig,
-    VirtualCellContractError,
-)
-from .receiver_readiness_v2 import require_receiver_ready_v2
+from empirical_lawhood.domains.biology.virtual_cell.config_v2 import VirtualCellPipelineSelectionV2
+from empirical_lawhood.domains.biology.virtual_cell.contracts import ProvenanceBoundVirtualCellPipelineConfig, VirtualCellContractError
+from empirical_lawhood.adapters.physical.virtual_cell.receiver_readiness_v2 import require_receiver_ready_v2
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,9 +43,9 @@ class VirtualCellSelectedMethodsV2:
     ):
         """Delegate raw actions to the selected donor, retaining original budgets."""
         self.preflight()
-        from .dataset import ControlReservoirArrays
-        from .prediction import PredictionRoster
-        from .prediction_v2 import write_shared_template_shift_v2_prediction_h5ad
+        from empirical_lawhood.domains.biology.virtual_cell.response_summary import ControlReservoirArrays
+        from empirical_lawhood.domains.biology.virtual_cell.prediction import PredictionRoster
+        from empirical_lawhood.adapters.physical.virtual_cell.prediction_v2 import write_shared_template_shift_v2_prediction_h5ad
 
         if (
             type(roster) is not PredictionRoster
@@ -97,7 +94,7 @@ class VirtualCellSelectedMethodsV2:
     def evaluate_validation(self, *, predicted, real, scratch_directory, num_threads):
         """Evaluate already-admitted development arrays with the original baseline."""
         self.preflight()
-        from .evaluation import evaluate_official_2025_v2
+        from empirical_lawhood.adapters.physical.virtual_cell.evaluation import evaluate_official_2025_v2
 
         return evaluate_official_2025_v2(
             predicted=predicted,

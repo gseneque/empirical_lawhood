@@ -11,27 +11,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from empirical_lawhood.kernel.time import parse_utc_timestamp
-from empirical_lawhood.planning.dataset_authority import DatasetStorageScope
-from empirical_lawhood.runtime.dataset_io import (
-    DatasetSourceGuardReceipt,
-    DatasetSourceOpener,
-    GuardedDatasetSource,
-)
+from empirical_lawhood.science.models.time import parse_utc_timestamp
+from empirical_lawhood.design.dataset_authority import DatasetStorageScope
+from empirical_lawhood.storage.contracts.dataset_io import DatasetSourceGuardReceipt, DatasetSourceOpener, GuardedDatasetSource
 
-from .comparison import (
-    GlennHistoricalCSVInput,
-    GlennLogicalEquivalence,
-    compare_historical_observations_csv,
-)
-from .contracts import GLENN_2026_PROFILE, GlennAdapterError, GlennArchiveInput
-from .manifests import GlennRetainedComparisonInputs, GLENN_ARCHIVE_RELATIVE_LOCATOR, GLENN_ARCHIVE_SHA256, GLENN_ARCHIVE_SIZE_BYTES, GLENN_HISTORICAL_OBSERVATIONS_RELATIVE_LOCATOR, GLENN_HISTORICAL_OBSERVATIONS_SIZE_BYTES, GLENN_READ_SET_RELATIVE_LOCATOR, GLENN_READ_SET_SIZE_BYTES
-from .transform import (
-    GlennParquetArtifact,
-    GlennTransformResult,
-    serialize_glenn_parquet,
-    transform_glenn_archive,
-)
+from empirical_lawhood.adapters.physical.glenn.comparison import GlennHistoricalCSVInput, GlennLogicalEquivalence, compare_historical_observations_csv
+from empirical_lawhood.adapters.physical.glenn.contracts import GLENN_2026_PROFILE, GlennAdapterError, GlennArchiveInput
+from empirical_lawhood.adapters.physical.glenn.manifests import GlennRetainedComparisonInputs, GLENN_ARCHIVE_RELATIVE_LOCATOR, GLENN_ARCHIVE_SHA256, GLENN_ARCHIVE_SIZE_BYTES, GLENN_HISTORICAL_OBSERVATIONS_RELATIVE_LOCATOR, GLENN_HISTORICAL_OBSERVATIONS_SIZE_BYTES, GLENN_READ_SET_RELATIVE_LOCATOR, GLENN_READ_SET_SIZE_BYTES
+from empirical_lawhood.adapters.physical.glenn.transform import GlennParquetArtifact, GlennTransformResult, serialize_glenn_parquet, transform_glenn_archive
 
 
 _SOURCE_SCOPE_ID = "scope.glenn-transform-source"

@@ -7,14 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher
-from empirical_lawhood.kernel.authority import AuthorityAction, SourceAccessClass
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.approval import ApprovalCheckerRegistration, ApprovalCheckerRegistry, ApprovalGateAttestation, ApprovalGateKind, ApprovalSignatureAlgorithm, AttestationResult, CompleteApprovalService, DurableAuthorizationRecord, FrozenIssuedStudyApprovalProposal, issue_approval_gate_attestation
-from empirical_lawhood.planning.authority import AuthorizationDecision
-from empirical_lawhood.planning.study_issue import StudyOperationAuthority
-from empirical_lawhood.runtime.study_issue import StudyPublicationReceipt, build_study_approval_proposal, prepare_draft_candidate_issue
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher
+from empirical_lawhood.science.identity.authority import AuthorityAction, SourceAccessClass
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.approval import ApprovalCheckerRegistration, ApprovalCheckerRegistry, ApprovalGateAttestation, ApprovalGateKind, ApprovalSignatureAlgorithm, AttestationResult, CompleteApprovalService, DurableAuthorizationRecord, FrozenIssuedStudyApprovalProposal, issue_approval_gate_attestation
+from empirical_lawhood.design.authority import AuthorizationDecision
+from empirical_lawhood.design.study_issue import StudyOperationAuthority
+from empirical_lawhood.execution.study_issue import StudyPublicationReceipt, build_study_approval_proposal, prepare_draft_candidate_issue
 from tests.approval_support import FixedDecisionClock, deterministic_approval_signer
 from tests.runtime_platform.test_study_issue import _issue_inputs, _publisher
 

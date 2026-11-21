@@ -6,14 +6,12 @@ No native source, scientific result or durable publication is fabricated here.
 """
 from dataclasses import replace
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import (
-    MatrixPreparedOriginalCommitments, committed_entry_evidence,
-)
-from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammeInputCommitments, MatrixProgrammePublishedInput
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixPreparedOriginalCommitments, committed_entry_evidence
+from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammeInputCommitments, MatrixProgrammePublishedInput
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
 
 
 def unpublished_programme_commitments(record, name):

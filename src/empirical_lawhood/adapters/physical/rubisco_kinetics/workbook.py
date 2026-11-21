@@ -16,9 +16,7 @@ from typing import ClassVar
 import xml.etree.ElementTree as ET
 import zipfile
 
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord, validate_relative_locator, validate_sha256,
-)
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_relative_locator, validate_sha256
 
 MAX_ARCHIVE_BYTES = 16 * 1024**2
 MAX_MEMBERS = 128

@@ -4,35 +4,24 @@ from collections.abc import Callable
 from decimal import Decimal
 from typing import cast
 
-from empirical_lawhood.adapters.methods.prepared_response.policy_decision import PreparedParentDecision
-from empirical_lawhood.adapters.methods.prepared_response.stage_envelopes import prepared_response_calibration_native_stage_envelope, prepared_parent_decision_envelope
+from empirical_lawhood.domains.matrix.prepared_response.policy_decision import PreparedParentDecision
+from empirical_lawhood.domains.matrix.prepared_response.stage_envelopes import prepared_response_calibration_native_stage_envelope, prepared_parent_decision_envelope
 from empirical_lawhood.adapters.simulators.response_geometry_prospective.provider import decode_port, output_result, read_port, semantic_contracts
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityManifest, CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskProgressEmitter,
-    TaskRunner,
-    WorkerInputKind,
-    WorkerInputPort,
-)
-from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignStageEnvelope
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskProgressEmitter, TaskRunner, WorkerInputKind, WorkerInputPort
+from empirical_lawhood.execution.linked_campaigns import LinkedCampaignStageEnvelope
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .contracts import PreparedNativeSpec
-from .native_pair import MAXIMUM_PAIR_BYTES, NATIVE_PAIR_SCHEMA, encode_prepared_native_pair
-from .policy_native import PreparedResponseCalibrationNativeInvocation, PreparedResponseCalibrationNativeTaskResult, decode_prepared_response_calibration_task_native, prepared_response_calibration_native_invocations
-from .source import PreparedNativePhaseData, bind_prepared_common_start, bind_prepared_native_handoff, execute_native_future, execute_native_parent, prepare_native_prefix
-from .source_outputs import unentered_prepared_native_bytes
+from empirical_lawhood.domains.matrix.prepared_response.contracts import PreparedNativeSpec
+from empirical_lawhood.adapters.simulators.prepared_response.native_pair import MAXIMUM_PAIR_BYTES, NATIVE_PAIR_SCHEMA, encode_prepared_native_pair
+from empirical_lawhood.domains.matrix.prepared_response.policy_native import PreparedResponseCalibrationNativeInvocation, PreparedResponseCalibrationNativeTaskResult, decode_prepared_response_calibration_task_native, prepared_response_calibration_native_invocations
+from empirical_lawhood.domains.matrix.prepared_response.source import PreparedNativePhaseData, bind_prepared_common_start, bind_prepared_native_handoff, execute_native_future, execute_native_parent, prepare_native_prefix
+from empirical_lawhood.adapters.simulators.prepared_response.source_outputs import unentered_prepared_native_bytes
 
 
 CANONICAL_MEDIA_TYPE = "application/vnd.empirical-lawhood.canonical+json"

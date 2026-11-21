@@ -1,28 +1,151 @@
-"""Reusable short-horizon MAST-U/FreeGSNKE canary calculation.
-
-The caller supplies preparation, static-target, and machine data. This module
-does not load historical inputs, assert source authority, or publish receipts.
-"""
+"""Native acquisition, external-format translation and custody integration."""
 
 from __future__ import annotations
-
+from empirical_lawhood.domains.fusion.mastu_freegsnke_response.canary_assessment import voltage_vector, current_extrema, assemble_canary_episode
+from empirical_lawhood.domains.fusion.mastu_freegsnke_response.canary_assessment import action_roster as _science_action_roster, select_canary as _science_select_canary, select_preparation_slice as _science_select_preparation_slice
 import contextlib
-import hashlib
-import math
 import sys
 import time
 from typing import Any, Final
-
 import numpy as np
+from empirical_lawhood.adapters.physical.mast_freegsnke_static_transport.experiment import _build_tokamak, _set_currents
+from empirical_lawhood.domains.fusion.mast_freegsnke_static_transport.assessment import primary_xpoint
 
-from empirical_lawhood.adapters.physical.mast_freegsnke_static_transport.experiment import _build_tokamak, _primary_xpoint, _set_currents
+from empirical_lawhood.domains.fusion.mastu_freegsnke_response.canary_assessment import _admission_limit
+
+from empirical_lawhood.domains.fusion.mastu_freegsnke_response.canary_assessment import DT_S as _science_DT_S, HORIZONS_S as _science_HORIZONS_S, SCHEMA as _science_SCHEMA, VIEWS as _science_VIEWS
 
 
-SCHEMA: Final = 'empirical-lawhood/physical/mastu-freegsnke-response/canary-evaluation'
-DT_S: Final = 0.0005
-HORIZONS_S: Final = (0.005, 0.010, 0.015)
-FRACTIONS: Final = (0.0625, 0.125, 0.25)
-VIEWS: Final = (65, 129)
+def _scientific_episode(
+    preparation: dict[str, np.ndarray[Any, Any]],
+    machine: dict[str, object],
+    *,
+    view: int,
+    word: str,
+    increment_v: float,
+    source_slice_index: int,
+    qualification_only: bool = False,
+) -> dict[str, object]:
+    try:
+        return _episode(
+            preparation,
+            machine,
+            view=view,
+            word=word,
+            increment_v=increment_v,
+            source_slice_index=source_slice_index,
+            qualification_only=qualification_only,
+        )
+    except (ArithmeticError, RuntimeError, np.linalg.LinAlgError) as error:
+        if qualification_only:
+            return {
+                "eligible": False,
+                "error_code": f"FREEGSNKE_{type(error).__name__.upper()}",
+                "view": view,
+            }
+        return {
+            "episode_id": f"canary.view-{view}.{word}",
+            "view": view,
+            "word": word,
+            "requested_increment_v": increment_v,
+            "valid": False,
+            "error_code": f"FREEGSNKE_{type(error).__name__.upper()}",
+            "pickup_1_t": {},
+        }
+
+
+def evaluate_canary(
+    preparation: dict[str, np.ndarray[Any, Any]],
+    static_target: dict[str, np.ndarray[Any, Any]],
+    machine: dict[str, object],
+    *,
+    materiality_t: float = 0.0017,
+) -> dict[str, object]:
+    """Evaluate supplied MAST-U inputs without asserting release authority.
+
+    Native FreeGSNKE dependencies are loaded only when this calculation runs.
+    The result is a calculation; callers must separately establish source,
+    input, execution, and claim authority before publishing a scientific claim.
+    """
+
+    selected_slice = _science_select_preparation_slice(
+        np.asarray(static_target["slice_times_s"], dtype=float),
+        np.asarray(static_target["symmetry_collapsed__baseline_65__valid"], dtype=bool),
+        np.asarray(static_target["symmetry_collapsed__refined_129__valid"], dtype=bool),
+    )
+    if selected_slice >= len(preparation["slice_times_s"]):
+        raise ValueError("selected static-target slice is absent from preparation")
+    view_qualifications = [
+        _scientific_episode(
+            preparation,
+            machine,
+            view=view,
+            word="qualification",
+            increment_v=0,
+            source_slice_index=selected_slice,
+            qualification_only=True,
+        )
+        for view in _science_VIEWS
+    ]
+    qualified = all(bool(item.get("eligible")) for item in view_qualifications)
+    qualification: dict[str, object] = {
+        "eligible": qualified,
+        "views": view_qualifications,
+        "selection_rule": "EARLIEST_STATIC_VALID_IN_BOTH_FROZEN_VIEWS",
+    }
+    if not qualified:
+        episodes: list[dict[str, object]] = []
+    else:
+        raw_limits = [item.get("full_p4_increment_v") for item in view_qualifications]
+        if any(not isinstance(item, (float, int)) for item in raw_limits):
+            raise TypeError("qualified admission voltage limits are not numeric")
+        full = min(float(item) for item in raw_limits if isinstance(item, (float, int)))
+        qualification["full_p4_increment_v"] = full
+        episodes = [
+            _scientific_episode(
+                preparation,
+                machine,
+                view=view,
+                word=word,
+                increment_v=increment,
+                source_slice_index=selected_slice,
+            )
+            for view in _science_VIEWS
+            for word, increment in _science_action_roster(full)
+        ]
+    selection = (
+        _science_select_canary(episodes, materiality_t=materiality_t)
+        if len(episodes) == 14
+        else {
+            "disposition": "SHORT_HORIZON_SOURCE_UNEVALUABLE",
+            "selected_fraction": None,
+            "selected_horizon_s": None,
+            "minimum_signed_contrast_t": None,
+            "reason_codes": ["ZERO_ACTION_PROBE_INVALID"],
+        }
+    )
+    result = {
+        "schema": _science_SCHEMA,
+        "experiment_id": "mastu-freegsnke-short-horizon-voltage-canary",
+        "preparation_selection_rule": "EARLIEST_STATIC_VALID_IN_BOTH_FROZEN_VIEWS",
+        "source_slice_index": selected_slice,
+        "source_time_s": format(float(preparation["slice_times_s"][selected_slice]), ".2f"),
+        "coordinate": "SYMMETRY_COLLAPSED",
+        "timestep_s": _science_DT_S,
+        "materiality_t": materiality_t,
+        "qualification": qualification,
+        "episodes": episodes,
+        "selection": selection,
+    }
+    return result
+
+
+
+
+
+
+
+
 ACTIVE_LABELS: Final = (
     "Solenoid",
     "px",
@@ -37,102 +160,6 @@ ACTIVE_LABELS: Final = (
     "p5",
     "p6",
 )
-CURRENT_LIMITS_A: Final = {
-    "px": (-5000.0, 5000.0),
-    "d1": (-9000.0, 9000.0),
-    "d2": (-9000.0, 9000.0),
-    "d3": (-7000.0, 7000.0),
-    "dp": (-7000.0, 7000.0),
-    "d5": (-5000.0, 5000.0),
-    "d6": (-4000.0, 4000.0),
-    "d7": (-5000.0, 5000.0),
-    "p4": (-10000.0, 0.0),
-    "p5": (-10000.0, 0.0),
-}
-
-
-def action_roster(full_increment_v: float) -> tuple[tuple[str, float], ...]:
-    if not math.isfinite(full_increment_v) or full_increment_v <= 0:
-        raise ValueError("Admission voltage limit must be positive and finite")
-    values = [("hold", 0.0)]
-    for fraction in FRACTIONS:
-        amplitude = full_increment_v * fraction
-        values.extend(((f"minus-{fraction:g}", -amplitude), (f"plus-{fraction:g}", amplitude)))
-    return tuple(values)
-
-
-def select_preparation_slice(
-    times_s: np.ndarray[Any, Any],
-    baseline_valid: np.ndarray[Any, Any],
-    refined_valid: np.ndarray[Any, Any],
-) -> int:
-    """Select the earliest source slice valid in both frozen numerical views."""
-
-    if (
-        times_s.ndim != 1
-        or baseline_valid.shape != times_s.shape
-        or refined_valid.shape != times_s.shape
-    ):
-        raise ValueError("static-validity rosters do not align")
-    eligible = np.flatnonzero(
-        np.asarray(baseline_valid, dtype=bool) & np.asarray(refined_valid, dtype=bool)
-    )
-    if not eligible.size:
-        raise ValueError("no public preparation is valid in both numerical views")
-    if np.any(np.diff(np.asarray(times_s, dtype=float)) <= 0):
-        raise ValueError("public preparation times are not strictly increasing")
-    return int(eligible[0])
-
-
-def select_canary(
-    episodes: list[dict[str, Any]], *, materiality_t: float = 0.0017
-) -> dict[str, object]:
-    """Apply the predeclared smallest-amplitude/earliest-horizon rule."""
-
-    if not math.isfinite(materiality_t) or materiality_t <= 0:
-        raise ValueError("materiality threshold must be positive and finite")
-    by_key = {(int(row["view"]), str(row["word"])): row for row in episodes}
-    for fraction in FRACTIONS:
-        words = (f"minus-{fraction:g}", "hold", f"plus-{fraction:g}")
-        if any((view, word) not in by_key for view in VIEWS for word in words):
-            raise ValueError("canary episode roster is incomplete")
-        if any(not bool(by_key[view, word]["valid"]) for view in VIEWS for word in words):
-            continue
-        for horizon in HORIZONS_S:
-            key = format(horizon, ".3f")
-            qualified = True
-            contrasts: list[float] = []
-            for view in VIEWS:
-                minus = float(by_key[view, words[0]]["pickup_1_t"][key])
-                hold = float(by_key[view, "hold"]["pickup_1_t"][key])
-                plus = float(by_key[view, words[2]]["pickup_1_t"][key])
-                initial = float(by_key[view, "hold"]["pickup_1_t"]["0.000"])
-                contrast = min(plus - hold, hold - minus)
-                hold_drift = abs(hold - initial)
-                other = VIEWS[1] if view == VIEWS[0] else VIEWS[0]
-                view_gap = abs(hold - float(by_key[other, "hold"]["pickup_1_t"][key]))
-                qualified &= contrast > 0 and contrast > 2 * max(hold_drift, view_gap)
-                contrasts.append(contrast)
-            if qualified:
-                minimum = min(contrasts)
-                return {
-                    "disposition": (
-                        "SUPPORTED" if minimum >= materiality_t else "METHOD_MATERIALITY_INCOMPATIBLE"
-                    ),
-                    "selected_fraction": fraction,
-                    "selected_horizon_s": horizon,
-                    "minimum_signed_contrast_t": minimum,
-                    "reason_codes": (
-                        [] if minimum >= materiality_t else ["CONFIRMATORY_G1R_MATERIALITY_NOT_REACHED"]
-                    ),
-                }
-    return {
-        "disposition": "SHORT_HORIZON_SOURCE_UNEVALUABLE",
-        "selected_fraction": None,
-        "selected_horizon_s": None,
-        "minimum_signed_contrast_t": None,
-        "reason_codes": ["NO_VALID_SIGNED_VIEW_STABLE_SHORT_HORIZON"],
-    }
 
 
 def _pickup_1(eq: Any) -> tuple[float, bool]:
@@ -150,50 +177,11 @@ def _pickup_1(eq: Any) -> tuple[float, bool]:
             strict=True,
         )
     )
-    _point, _mismatch, topology = _primary_xpoint(eq)
+    _point, _mismatch, topology = primary_xpoint(np.asarray(eq.xpt, dtype=np.float64), float(eq.psi_axis), float(eq.psi_bndry))
     valid = (
         topology != "UNQUALIFIED" and not bool(eq.intersectsWall()) and not bool(eq.flag_limiter)
     )
     return float(values[str(pickups[0]["name"])]), valid
-
-
-def _admission_limit(stepping: Any, labels: tuple[str, ...], baseline: np.ndarray[Any, Any]) -> float:
-    from scipy.linalg import expm
-
-    inductance = np.asarray(stepping.evol_metal_curr.coil_self_ind, dtype=float)[:12, :12]
-    resistance = np.asarray(stepping.evol_metal_curr.coil_resist, dtype=float)[:12]
-    dynamics = np.linalg.solve(inductance, np.diag(resistance))
-    forcing = np.linalg.solve(inductance, np.eye(12))
-    p4 = labels.index("p4")
-    maximum = np.zeros(12, dtype=float)
-    for clock in np.linspace(0.0, HORIZONS_S[-1], 61):
-        kernel = np.linalg.solve(dynamics, np.eye(12) - expm(-dynamics * clock)) @ forcing
-        maximum = np.maximum(maximum, np.abs(kernel[:, p4]))
-    candidates = []
-    for index, label in enumerate(labels):
-        if label not in CURRENT_LIMITS_A or maximum[index] == 0:
-            continue
-        lower, upper = CURRENT_LIMITS_A[label]
-        headroom = min(upper - baseline[index], baseline[index] - lower)
-        if headroom <= 0:
-            raise ValueError(f"{label} lacks symmetric current headroom")
-        candidates.append(0.05 * headroom / maximum[index])
-    value = math.floor(min(candidates) * 1_000_000) / 1_000_000
-    if value <= 0:
-        raise ValueError("derived admission voltage limit is not positive")
-    return float(value)
-
-
-def _currents_valid(
-    labels: tuple[str, ...],
-    minimum: np.ndarray[Any, Any],
-    maximum: np.ndarray[Any, Any],
-) -> bool:
-    return all(
-        minimum[labels.index(label)] >= lower and maximum[labels.index(label)] <= upper
-        for label, (lower, upper) in CURRENT_LIMITS_A.items()
-    )
-
 
 def _episode(
     preparation: dict[str, np.ndarray[Any, Any]],
@@ -256,8 +244,8 @@ def _episode(
             eq=eq,
             profiles=profiles,
             GSStaticSolver=solver,
-            full_timestep=DT_S,
-            max_internal_timestep=DT_S,
+            full_timestep=_science_DT_S,
+            max_internal_timestep=_science_DT_S,
             plasma_resistivity=1e-6,
             max_mode_frequency=10**2.5,
         )
@@ -267,7 +255,10 @@ def _episode(
         active_labels = tuple(tokamak.coils_list[:12])
         if active_labels != ACTIVE_LABELS:
             raise ValueError("public symmetric circuit order differs")
-        full_increment = _admission_limit(stepping, active_labels, baseline[:12])
+        full_increment = _admission_limit(
+            np.asarray(stepping.evol_metal_curr.coil_self_ind, dtype=float)[:12, :12],
+            resistance, active_labels, baseline[:12],
+        )
         if qualification_only:
             return {
                 "eligible": bool(initial_valid),
@@ -276,9 +267,7 @@ def _episode(
                 "view": view,
                 "runtime_s": time.monotonic() - started,
             }
-        voltage = baseline[:12] * resistance
-        voltage[active_labels.index("p4")] += increment_v
-        vector_sha = hashlib.sha256(np.asarray(voltage, dtype="<f8").tobytes()).hexdigest()
+        voltage, vector_sha = voltage_vector(baseline[:12], resistance, active_labels, increment_v)
         snapshots = {"0.000": initial_pickup}
         validity = bool(initial_valid)
         max_relative_change = 0.0
@@ -286,7 +275,7 @@ def _episode(
         completed_steps = 0
         extrema_min = baseline[:12].copy()
         extrema_max = baseline[:12].copy()
-        for step in range(1, round(HORIZONS_S[-1] / DT_S) + 1):
+        for step in range(1, round(_science_HORIZONS_S[-1] / _science_DT_S) + 1):
             if bool(stepping.handleMyy.check_Myy(stepping.hatIy)):
                 domain_departed = True
                 break
@@ -298,159 +287,18 @@ def _episode(
             )
             completed_steps = step
             physical = np.asarray(stepping.vessel_currents_vec, dtype=float)
-            extrema_min = np.minimum(extrema_min, physical[:12])
-            extrema_max = np.maximum(extrema_max, physical[:12])
+            extrema_min, extrema_max = current_extrema(extrema_min, extrema_max, physical[:12])
             relative = float(getattr(stepping.NK, "relative_change", 0.0))
             max_relative_change = max(max_relative_change, relative)
-            clock = step * DT_S
-            if any(abs(clock - target) < 1e-12 for target in HORIZONS_S):
+            clock = step * _science_DT_S
+            if any(abs(clock - target) < 1e-12 for target in _science_HORIZONS_S):
                 pickup, observed = _pickup_1(stepping.eq1)
                 snapshots[format(clock, ".3f")] = pickup
                 validity &= observed
-    current_valid = _currents_valid(active_labels, extrema_min, extrema_max)
-    valid = bool(
-        validity
-        and not domain_departed
-        and current_valid
-        and set(snapshots) == {"0.000", "0.005", "0.010", "0.015"}
+    return assemble_canary_episode(
+        active_labels=active_labels, extrema_min=extrema_min, extrema_max=extrema_max,
+        validity=validity, domain_departed=domain_departed, snapshots=snapshots,
+        completed_steps=completed_steps, view=view, word=word, increment_v=increment_v,
+        vector_sha=vector_sha, max_relative_change=max_relative_change,
+        runtime_s=time.monotonic() - started,
     )
-    return {
-        "episode_id": f"canary.view-{view}.{word}",
-        "view": view,
-        "word": word,
-        "requested_increment_v": increment_v,
-        "accepted_increment_v": increment_v,
-        "applied_vector_sha256": vector_sha,
-        "realized_vector_sha256": vector_sha if completed_steps else None,
-        "applied_clocks_s": [format(step * DT_S, ".4f") for step in range(completed_steps)],
-        "pickup_1_t": snapshots,
-        "valid": valid,
-        "domain_departed": domain_departed,
-        "current_limits_passed": bool(current_valid),
-        "maximum_nk_relative_change": max_relative_change,
-        "runtime_s": time.monotonic() - started,
-    }
-
-
-def _scientific_episode(
-    preparation: dict[str, np.ndarray[Any, Any]],
-    machine: dict[str, object],
-    *,
-    view: int,
-    word: str,
-    increment_v: float,
-    source_slice_index: int,
-    qualification_only: bool = False,
-) -> dict[str, object]:
-    try:
-        return _episode(
-            preparation,
-            machine,
-            view=view,
-            word=word,
-            increment_v=increment_v,
-            source_slice_index=source_slice_index,
-            qualification_only=qualification_only,
-        )
-    except (ArithmeticError, RuntimeError, np.linalg.LinAlgError) as error:
-        if qualification_only:
-            return {
-                "eligible": False,
-                "error_code": f"FREEGSNKE_{type(error).__name__.upper()}",
-                "view": view,
-            }
-        return {
-            "episode_id": f"canary.view-{view}.{word}",
-            "view": view,
-            "word": word,
-            "requested_increment_v": increment_v,
-            "valid": False,
-            "error_code": f"FREEGSNKE_{type(error).__name__.upper()}",
-            "pickup_1_t": {},
-        }
-
-
-def evaluate_canary(
-    preparation: dict[str, np.ndarray[Any, Any]],
-    static_target: dict[str, np.ndarray[Any, Any]],
-    machine: dict[str, object],
-    *,
-    materiality_t: float = 0.0017,
-) -> dict[str, object]:
-    """Evaluate supplied MAST-U inputs without asserting release authority.
-
-    Native FreeGSNKE dependencies are loaded only when this calculation runs.
-    The result is a calculation; callers must separately establish source,
-    input, execution, and claim authority before publishing a scientific claim.
-    """
-
-    selected_slice = select_preparation_slice(
-        np.asarray(static_target["slice_times_s"], dtype=float),
-        np.asarray(static_target["symmetry_collapsed__baseline_65__valid"], dtype=bool),
-        np.asarray(static_target["symmetry_collapsed__refined_129__valid"], dtype=bool),
-    )
-    if selected_slice >= len(preparation["slice_times_s"]):
-        raise ValueError("selected static-target slice is absent from preparation")
-    view_qualifications = [
-        _scientific_episode(
-            preparation,
-            machine,
-            view=view,
-            word="qualification",
-            increment_v=0,
-            source_slice_index=selected_slice,
-            qualification_only=True,
-        )
-        for view in VIEWS
-    ]
-    qualified = all(bool(item.get("eligible")) for item in view_qualifications)
-    qualification: dict[str, object] = {
-        "eligible": qualified,
-        "views": view_qualifications,
-        "selection_rule": "EARLIEST_STATIC_VALID_IN_BOTH_FROZEN_VIEWS",
-    }
-    if not qualified:
-        episodes: list[dict[str, object]] = []
-    else:
-        raw_limits = [item.get("full_p4_increment_v") for item in view_qualifications]
-        if any(not isinstance(item, (float, int)) for item in raw_limits):
-            raise TypeError("qualified admission voltage limits are not numeric")
-        full = min(float(item) for item in raw_limits if isinstance(item, (float, int)))
-        qualification["full_p4_increment_v"] = full
-        episodes = [
-            _scientific_episode(
-                preparation,
-                machine,
-                view=view,
-                word=word,
-                increment_v=increment,
-                source_slice_index=selected_slice,
-            )
-            for view in VIEWS
-            for word, increment in action_roster(full)
-        ]
-    selection = (
-        select_canary(episodes, materiality_t=materiality_t)
-        if len(episodes) == 14
-        else {
-            "disposition": "SHORT_HORIZON_SOURCE_UNEVALUABLE",
-            "selected_fraction": None,
-            "selected_horizon_s": None,
-            "minimum_signed_contrast_t": None,
-            "reason_codes": ["ZERO_ACTION_PROBE_INVALID"],
-        }
-    )
-    result = {
-        "schema": SCHEMA,
-        "experiment_id": "mastu-freegsnke-short-horizon-voltage-canary",
-        "preparation_selection_rule": "EARLIEST_STATIC_VALID_IN_BOTH_FROZEN_VIEWS",
-        "source_slice_index": selected_slice,
-        "source_time_s": format(float(preparation["slice_times_s"][selected_slice]), ".2f"),
-        "coordinate": "SYMMETRY_COLLAPSED",
-        "timestep_s": DT_S,
-        "materiality_t": materiality_t,
-        "qualification": qualification,
-        "episodes": episodes,
-        "selection": selection,
-    }
-    return result

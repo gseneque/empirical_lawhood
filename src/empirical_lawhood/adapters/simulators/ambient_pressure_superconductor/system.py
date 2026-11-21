@@ -5,64 +5,18 @@ from __future__ import annotations
 from decimal import Decimal
 from hashlib import sha256
 
-from empirical_lawhood.kernel.authority import (
-    AuthorityAction,
-    AuthorityPolicy,
-    ResourceBudget,
-    SourceAccessClass,
-)
-from empirical_lawhood.kernel.evidence import ClaimSpec, EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experiments import (
-    AssignmentKind,
-    AssignmentSpec,
-    ControlKind,
-    ControlSpec,
-    ExperimentSpec,
-    PrecisionGoal,
-    RevealBarrierSpec,
-)
-from empirical_lawhood.kernel.obligations import (
-    ClosureSpec,
-    ComputabilityEvidence,
-    FalsifierKind,
-    FalsifierSpec,
-    ObligationStatus,
-    ScientificObligations,
-    StructuralConvergenceSpec,
-    SupportSpec,
-    UncertaintySpec,
-    ValiditySpec,
-)
-from empirical_lawhood.kernel.quantities import QuantityKind, QuantitySpec, ResponseDirection
-from empirical_lawhood.kernel.references import NamedDecimal, QuantityBound
-from empirical_lawhood.kernel.status import ReadinessStatus
-from empirical_lawhood.kernel.systems import (
-    IndependentUnitSpec,
-    RelationalIdentity,
-    SystemBoundaryKind,
-    SystemSpec,
-)
-from empirical_lawhood.kernel.time import (
-    AvailabilitySpec,
-    CausalPhase,
-    ClockLabelSemantics,
-    ClockSpec,
-    HoldSemantics,
-    HorizonSpec,
-    InformationCutoff,
-    SamplingSemantics,
-)
-from empirical_lawhood.kernel.worlds import (
-    ComputabilityEnvelope,
-    NumericalCoordinateKind,
-    NumericalCoordinateSpec,
-    NumericalViewSpec,
-    RandomnessSemantics,
-    WorldKind,
-    WorldSpec,
-)
+from empirical_lawhood.science.identity.authority import AuthorityAction, AuthorityPolicy, ResourceBudget, SourceAccessClass
+from empirical_lawhood.science.evidence.evidence import ClaimSpec, EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experiments import AssignmentKind, AssignmentSpec, ControlKind, ControlSpec, ExperimentSpec, PrecisionGoal, RevealBarrierSpec
+from empirical_lawhood.science.evidence.obligations import ClosureSpec, ComputabilityEvidence, FalsifierKind, FalsifierSpec, ObligationStatus, ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec
+from empirical_lawhood.science.models.quantities import QuantityKind, QuantitySpec, ResponseDirection
+from empirical_lawhood.science.identity.references import NamedDecimal, QuantityBound
+from empirical_lawhood.science.records.status import ReadinessStatus
+from empirical_lawhood.science.models.systems import IndependentUnitSpec, RelationalIdentity, SystemBoundaryKind, SystemSpec
+from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase, ClockLabelSemantics, ClockSpec, HoldSemantics, HorizonSpec, InformationCutoff, SamplingSemantics
+from empirical_lawhood.science.models.worlds import ComputabilityEnvelope, NumericalCoordinateKind, NumericalCoordinateSpec, NumericalViewSpec, RandomnessSemantics, WorldKind, WorldSpec
 
-from .contracts import ExcludedSolverControlConfig, SOLVER_CAPABILITY_KEY
+from empirical_lawhood.domains.materials.superconductivity.solver_control_contracts import ExcludedSolverControlConfig, SOLVER_CAPABILITY_KEY
 
 
 SYSTEM_ID = 'system.ambient-pressure-superconductor-excluded-solver-control-pb-solver-smoke'

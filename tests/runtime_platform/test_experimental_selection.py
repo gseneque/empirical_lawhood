@@ -8,15 +8,11 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.experimental_selection import DeclaredCandidate, DeclaredSelectionDesign, DeclaredSelectionResult, WholeUnitFold
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experimental_selection import (
-    evaluate_declared_candidates, freeze_declared_selection, require_development_selection_phase,
-    require_frozen_selection_for_phase, selection_score, validate_declared_selection_result, validate_selection_design,
-    select_declared_candidate, unentered_declared_selection,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.experiments.experimental_selection import DeclaredCandidate, DeclaredSelectionDesign, DeclaredSelectionResult, WholeUnitFold
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experimental_selection import evaluate_declared_candidates, freeze_declared_selection, require_development_selection_phase, require_frozen_selection_for_phase, selection_score, validate_declared_selection_result, validate_selection_design, select_declared_candidate, unentered_declared_selection
 
 
 def identity(name, schema="empirical-lawhood/testing/selection-operand"):

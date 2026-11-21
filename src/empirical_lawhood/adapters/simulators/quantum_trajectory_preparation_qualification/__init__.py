@@ -1,14 +1,6 @@
-"""quantum trajectory preparation qualification strong-source preparation qualification adapter."""
+# SPDX-License-Identifier: MPL-2.0
+"""Quantum source integration, retained transport and explicit configuration access."""
 
-from .schemas import QuantumTrajectoryPreparationQualificationConfig, load_config
-from .types import Action, Denominator, Stage, Validity, Verdict
+from empirical_lawhood.adapters.simulators.quantum_trajectory_preparation_qualification.configuration import load_config
 
-__all__ = [
-    "Action",
-    "Denominator",
-    'QuantumTrajectoryPreparationQualificationConfig',
-    "Stage",
-    "Validity",
-    "Verdict",
-    "load_config",
-]
+__all__ = ["load_config"]

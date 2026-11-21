@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Public metadata-only programme allocation compiler."""
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.input_assembly import PROTOCOL_ID
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.input_assembly import PROTOCOL_ID
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 
 
 def derive_inputs(**kwargs):

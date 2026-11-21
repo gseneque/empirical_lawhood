@@ -1,0 +1,17 @@
+{
+  "source": "adapters/rubisco/rubisco_response/pyscf_periodic_diis.py",
+  "scientific_owner": "methods/electronic_structure/diis.py",
+  "extracted": [
+    "Hermitian/finite matrix validation",
+    "symmetric-QR eigenpairs and residual/orthogonality checks",
+    "original1e-14dependence decision and weights",
+    "weighted vector block arithmetic"
+  ],
+  "native_owner_retains": [
+    "PySCF CDIIS subclass selection",
+    "HDF5 vector storage and native get_vec access",
+    "original Internal Error. trigger only",
+    "original block order and diagnostics callback"
+  ],
+  "preservation": "SameEVdriver, floatingdtype-scaled64epsilon bounds, dependence threshold, formulas and block accumulation; newshape/dtype guards at standalone method boundary. NoSCFcycle replay or GPU execution."
+}

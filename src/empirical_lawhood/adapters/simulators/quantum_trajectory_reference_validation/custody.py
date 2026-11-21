@@ -13,7 +13,7 @@ from typing import Mapping, Protocol, Sequence, cast
 import pyarrow as pa  # type: ignore[import-untyped]
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
 
-from .schemas import QuantumTrajectoryReferenceValidationConfig, stable_json_bytes
+from empirical_lawhood.domains.quantum.trajectory_reference_validation.schemas import QuantumTrajectoryReferenceValidationConfig, stable_json_bytes
 
 
 class _StorageDiagnostic(Protocol):

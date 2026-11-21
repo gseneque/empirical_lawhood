@@ -10,9 +10,9 @@ import os
 from threading import Barrier, Lock
 import time
 
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.infrastructure.native_subwork_ipc import NativeSubworkPipeService
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.runtime_platform.test_native_subwork import ExposedInput, _store
 from tests.runtime_platform.test_worker_preflight import _case, _native_work
 from tests.runtime_platform.test_worker_progress_admission import ExposedCustodyWaitRunner, _liveness

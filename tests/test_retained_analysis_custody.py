@@ -1,14 +1,15 @@
 # SPDX-License-Identifier: MPL-2.0
 """Independent mutations of exact retained bytes and durable completion custody."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.infrastructure.retained_analysis import publish_retained_analysis, read_retained_analysis, read_retained_analysis_member
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.retained_analysis import COMPLETION_FILENAME, RetainedAnalysisMember
+from empirical_lawhood.storage.retained_analysis import publish_retained_analysis, read_retained_analysis, read_retained_analysis_member
+
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.execution.retained_analysis import COMPLETION_FILENAME, RetainedAnalysisMember
 from tests.numerical_provenance_fixtures import numerical_plane
 
 
@@ -48,7 +49,7 @@ def test_changed_exact_bytes_are_refused(tmp_path, changed):
 def test_missing_member_or_durable_publication_is_incomplete(tmp_path, removed):
     plane, directory, _ = completed(tmp_path)
     if removed == "commit":
-        manifest = decode_artifact_manifest((directory / (COMPLETION_FILENAME + ".manifest.json")).read_bytes())
+        manifest = resolve_artifact_sidecar_bytes(plane, (directory / (COMPLETION_FILENAME + '.manifest.json')).read_bytes())
         removed_path = tmp_path / manifest.publication.commit_marker_relative_path
     else:
         removed_path = directory / removed
@@ -67,3 +68,27 @@ def test_symlink_member_and_oversized_consuming_bound_are_refused(tmp_path):
     path.symlink_to(outside)
     with pytest.raises((ValueError, RuntimeError)):
         read_retained_analysis(directory=directory, artifact_writer=plane)
+
+
+def test_unlimited_consuming_allowance_retains_committed_extent_and_digest(tmp_path):
+    plane, directory, completion = completed(tmp_path)
+    assert read_retained_analysis_member(completion, "arrays.npz", directory=directory,
+        artifact_writer=plane, maximum_bytes=None) == b"explicit software bytes"
+    path = directory / "arrays.npz"
+    original = path.read_bytes()
+    path.write_bytes(original + b"uncommitted suffix")
+    with pytest.raises((ValueError, RuntimeError)):
+        read_retained_analysis_member(completion, "arrays.npz", directory=directory,
+            artifact_writer=plane, maximum_bytes=None)
+    path.write_bytes(b"x" * len(original))
+    with pytest.raises(ValueError, match="committed completion"):
+        read_retained_analysis_member(completion, "arrays.npz", directory=directory,
+            artifact_writer=plane, maximum_bytes=None)
+
+
+@pytest.mark.parametrize("allowance", (-1, True, 4.5, "64"))
+def test_invalid_optional_member_allowance_refuses_before_read(tmp_path, allowance):
+    plane, directory, completion = completed(tmp_path)
+    with pytest.raises(ValueError, match="allowance"):
+        read_retained_analysis_member(completion, "arrays.npz", directory=directory,
+            artifact_writer=plane, maximum_bytes=allowance)

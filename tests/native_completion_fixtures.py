@@ -3,11 +3,7 @@
 from dataclasses import replace
 from hashlib import sha256
 
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactGenericValidation, ArtifactLineageParent, ArtifactMaterialization,
-    ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult, LogicalArtifactIdentity,
-    lineage_parent_sort_key,
-)
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactLineageParent, ArtifactMaterialization, ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult, LogicalArtifactIdentity, lineage_parent_sort_key
 
 
 def completion_parents(completion, visibility, access):

@@ -5,11 +5,11 @@ from dataclasses import replace
 import pytest
 
 from empirical_lawhood.api import derived_metadata_access as owner
-from empirical_lawhood.infrastructure.artifact_stream_primitives import ArtifactIdentityConflict
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage.artifact_stream_primitives import ArtifactIdentityConflict
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 from tests.runtime_platform.test_candidate_compiler import _fixture
 from tests.test_matrix_source_evidence import source_case  # noqa: F401
@@ -38,7 +38,7 @@ def test_new_current_metadata_access_reads_actual_publication_then_cold_replays_
         external=external, root=root, source_profile=profile)
     owner.validate_derived_metadata_access(external=external, root=root, source_profile=profile,
         version=record.VERSION, config=config, qualification=qualification)
-    from empirical_lawhood.planning.study_authoring import SourceMaterializationRole
+    from empirical_lawhood.design.study_authoring import SourceMaterializationRole
     assert config.role is SourceMaterializationRole(expected)
     assert qualification.materialization.object_fingerprint == record.fingerprint()
     assert qualification.materialization.object_id == external.logical_artifact_id
@@ -118,13 +118,11 @@ def test_metadata_access_refuses_reinterpretation_before_any_writer_contact(meta
 
 def test_published_retained_metadata_passes_actual_sealed_history_source_guard(metadata):
     from types import SimpleNamespace
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_preparation import _source_projection
-    from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
-    from empirical_lawhood.planning.study_authoring import SourceMaterializationRole
-    from empirical_lawhood.runtime.candidate_compiler import (
-        CandidateGraphExternalInput, ContentIdentityPolicy, ScientificInputRole, _source_diagnostics,
-    )
-    from empirical_lawhood.runtime.capabilities import CapabilityPermission
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_preparation import _source_projection
+    from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
+    from empirical_lawhood.design.study_authoring import SourceMaterializationRole
+    from empirical_lawhood.execution.candidate_compiler import CandidateGraphExternalInput, ContentIdentityPolicy, ScientificInputRole, _source_diagnostics
+    from empirical_lawhood.execution.capabilities import CapabilityPermission
 
     writer, root, profile, record, _, external = metadata
     publication = writer.write(ArtifactWriteRequest("derived.metadata.retained", "derived/history.json", record.SCHEMA,
@@ -209,9 +207,9 @@ def test_published_retained_metadata_passes_actual_sealed_history_source_guard(m
 @pytest.mark.parametrize("damage", (None, "body", "parents", "before-read", "after-authentication", "after-read"))
 def test_produced_history_authenticates_actual_publication_and_fresh_boundaries_without_source_qualification(metadata, damage, monkeypatch):
     """Real publication/decoder controls; the callback claims no real grant."""
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import inherit_external_inputs
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import inherit_external_inputs
     from empirical_lawhood.api.domain_composition.matrix_selected_declarative import derivation
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
     writer, root, profile, record, _, external = metadata
     parents = (ArtifactLineageParent(record, VisibilityCeiling.OUTCOME_VISIBLE, OutcomeAccess.EVALUATION_REVEALED),)
     external, = inherit_external_inputs((external,), ((external.input_id, record),), parents, retained_history=True)
@@ -227,7 +225,7 @@ def test_produced_history_authenticates_actual_publication_and_fresh_boundaries_
     path = writer.root.resolve(publication.materialization.relative_path, for_write=False)
     if damage == "body":
         path.write_bytes(replace(record, object_id="derived.metadata.changed-history").canonical_bytes())
-    from empirical_lawhood.infrastructure import publication_metadata
+    from empirical_lawhood.storage import publication_metadata
     events, calls = [], []
     authenticate = publication_metadata.authenticate_published_materialization
     decode = owner._read_canonical_metadata_binding
@@ -272,10 +270,10 @@ def test_produced_history_authenticates_actual_publication_and_fresh_boundaries_
 def test_selected_history_rejects_stray_ordinary_source_claims_before_input_body_reads(metadata, monkeypatch, claim):
     """Actual typed ordinary-access rows must not be silently dropped by planning."""
     from types import SimpleNamespace
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import inherit_external_inputs
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import inherit_external_inputs
     from empirical_lawhood.api.domain_composition.matrix_selected_declarative import derivation
-    from empirical_lawhood.infrastructure import bounded_io
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent
+    from empirical_lawhood.storage import bounded_io
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
     writer, root, profile, record, publication, external = metadata
     config, qualification = owner.derive_canonical_metadata_access(writer=writer, publication=publication,
         record=record, external=external, root=root, source_profile=profile)

@@ -16,17 +16,17 @@ import pytest
 
 from empirical_lawhood.api import current_task_custody as current
 from empirical_lawhood.api import recursive_qualified_parents as parents
-from empirical_lawhood.infrastructure.artifacts import ArtifactPlaneError
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactStreamWriteRequest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityRequirement
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificStage
-from empirical_lawhood.runtime.recovery import RecoveryTerminalAttempt, RecoveryTerminalDisposition
+from empirical_lawhood.storage.artifacts import ArtifactPlaneError
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactStreamWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityRequirement
+from empirical_lawhood.execution.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificStage
+from empirical_lawhood.execution.recovery import RecoveryTerminalAttempt, RecoveryTerminalDisposition
 from tests.runtime_platform.test_execution_scheduler import _plane
 
 RUN = 'run.synthetic.custody-readers'
@@ -217,12 +217,12 @@ def test_actual_protected_fit_callback_reaches_original_publication_gate_with_sh
     The installed callback and exact config/publication reader remain unchanged.
     """
     from empirical_lawhood.api.domain_composition.matrix_protected_response import runtime as e3
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_statistical_bindings as fit
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_composition import outcome_task_id
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_specification import MatrixResponseErrorSpecification
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation
-    from empirical_lawhood.kernel.time import AvailabilitySpec, CausalPhase, InformationCutoff
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_statistical_bindings as fit
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_composition import outcome_task_id
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_specification import MatrixResponseErrorSpecification
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+    from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase, InformationCutoff
 
     plane = _plane(tmp_path)
     publication = _write(plane, 'sharded', logical='publication.synthetic.fit')

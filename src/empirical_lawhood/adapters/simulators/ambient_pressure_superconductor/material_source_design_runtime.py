@@ -1,49 +1,33 @@
-'Receipt-first ambient pressure superconductor material source design source qualification and design-basis audit.'
+"""Native acquisition and external-format binding for the domain science."""
 
 from __future__ import annotations
-
 from dataclasses import fields
 from hashlib import sha256
 from typing import Any, TypeVar, cast
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.design.study_issue import StudyOperationAuthority
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord, encode_scientific_adjudication
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, CampaignRuntimeProvider, ExternalInputPayload
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_contracts import MATERIAL_SOURCE_DESIGN_ADJUDICATION_SCHEMA, MATERIAL_SOURCE_DESIGN_CAPABILITY_VERSION, MATERIAL_SOURCE_DESIGN_CONFIG_SCHEMA, MATERIAL_SOURCE_DESIGN_CONFIG_VERSION, MATERIAL_SOURCE_DESIGN_DESIGN_CAPABILITY_KEY, MATERIAL_SOURCE_DESIGN_EVALUATOR_CAPABILITY_KEY, MATERIAL_SOURCE_DESIGN_SOURCE_CAPABILITY_KEY, MaterialSourceDesignConfig, MaterialSourceDesignConfigLifecycle, MaterialSourceDesignDesignBasisAudit, MaterialSourceDesignDisposition, MaterialSourceDesignResult, MaterialSourceDesignSourceQualification, ExplorationDesignFreeze, MaterialRosterFreeze, ScienceDesignFreeze, SplitPartition, decode_material_source_design_config_bytes
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_design import build_exploration_design, build_material_roster, build_science_design
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_source_design_source import expected_material_source_design_source_qualification, inspect_material_source_design_external_sources
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_system import task_budget
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.planning.study_issue import StudyOperationAuthority
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-    encode_scientific_adjudication,
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_stages import (
+    CONFIG_ARTIFACT_ID as _science_CONFIG_ARTIFACT_ID,
+    DESIGN_STEP as _science_DESIGN_STEP,
+    EVALUATOR_STEP as _science_EVALUATOR_STEP,
+    SOURCE_CONTRACT_ARTIFACT_ID as _science_SOURCE_CONTRACT_ARTIFACT_ID,
+    SOURCE_STEP as _science_SOURCE_STEP,
 )
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityManifest,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-)
-
-from .material_source_design_contracts import MATERIAL_SOURCE_DESIGN_ADJUDICATION_SCHEMA, MATERIAL_SOURCE_DESIGN_CAPABILITY_VERSION, MATERIAL_SOURCE_DESIGN_CONFIG_SCHEMA, MATERIAL_SOURCE_DESIGN_CONFIG_VERSION, MATERIAL_SOURCE_DESIGN_DESIGN_CAPABILITY_KEY, MATERIAL_SOURCE_DESIGN_EVALUATOR_CAPABILITY_KEY, MATERIAL_SOURCE_DESIGN_SOURCE_CAPABILITY_KEY, MaterialSourceDesignConfig, MaterialSourceDesignConfigLifecycle, MaterialSourceDesignDesignBasisAudit, MaterialSourceDesignDisposition, MaterialSourceDesignResult, MaterialSourceDesignSourceQualification, ExplorationDesignFreeze, MaterialRosterFreeze, ScienceDesignFreeze, SplitPartition, decode_material_source_design_config_bytes
-from .material_source_design_design import build_exploration_design, build_material_roster, build_science_design
-from .material_source_design_source import expected_material_source_design_source_qualification, inspect_material_source_design_external_sources
-from .material_source_design_system import task_budget
-
-
-CONFIG_ARTIFACT_ID = 'config-artifact.ambient-pressure-superconductor-material-source-design'
-SOURCE_CONTRACT_ARTIFACT_ID = 'source-contract.ambient-pressure-superconductor-material-source-design-public-roster'
-SOURCE_STEP = 'material-source-design-source-qualification'
-DESIGN_STEP = 'material-source-design-design-basis-audit'
-EVALUATOR_STEP = 'material-source-design-result-evaluator'
-
 
 def material_source_design_config_ref(config: MaterialSourceDesignConfig) -> CapabilityConfigRef:
     return CapabilityConfigRef(
@@ -51,7 +35,7 @@ def material_source_design_config_ref(config: MaterialSourceDesignConfig) -> Cap
         config_schema=MATERIAL_SOURCE_DESIGN_CONFIG_SCHEMA,
         config_schema_sha256=sha256(MATERIAL_SOURCE_DESIGN_CONFIG_SCHEMA.encode()).hexdigest(),
         content_sha256=config.payload_sha256,
-        artifact_id=CONFIG_ARTIFACT_ID,
+        artifact_id=_science_CONFIG_ARTIFACT_ID,
     )
 
 
@@ -105,7 +89,7 @@ def material_source_design_protocol(*, registry: CapabilityRegistry, config: Mat
 
     steps = (
         step(
-            step_id=SOURCE_STEP,
+            step_id=_science_SOURCE_STEP,
             stage=ScientificStage.QUALIFY,
             capability_key=MATERIAL_SOURCE_DESIGN_SOURCE_CAPABILITY_KEY,
             dependencies=(),
@@ -116,10 +100,10 @@ def material_source_design_protocol(*, registry: CapabilityRegistry, config: Mat
             obligations=('material-source-design-exact-public-source-qualification',),
         ),
         step(
-            step_id=DESIGN_STEP,
+            step_id=_science_DESIGN_STEP,
             stage=ScientificStage.FREEZE,
             capability_key=MATERIAL_SOURCE_DESIGN_DESIGN_CAPABILITY_KEY,
-            dependencies=(SOURCE_STEP,),
+            dependencies=(_science_SOURCE_STEP,),
             outputs=(
                 ("design-basis-audit", MaterialSourceDesignDesignBasisAudit.SCHEMA),
                 ("exploration-design-candidate", ExplorationDesignFreeze.SCHEMA),
@@ -136,10 +120,10 @@ def material_source_design_protocol(*, registry: CapabilityRegistry, config: Mat
             ),
         ),
         step(
-            step_id=EVALUATOR_STEP,
+            step_id=_science_EVALUATOR_STEP,
             stage=ScientificStage.EVALUATE,
             capability_key=MATERIAL_SOURCE_DESIGN_EVALUATOR_CAPABILITY_KEY,
-            dependencies=(SOURCE_STEP, DESIGN_STEP),
+            dependencies=(_science_SOURCE_STEP, _science_DESIGN_STEP),
             outputs=(
                 ('material-source-design-result', MaterialSourceDesignResult.SCHEMA),
                 ("scientific-adjudication", MATERIAL_SOURCE_DESIGN_ADJUDICATION_SCHEMA),
@@ -363,7 +347,7 @@ class MaterialSourceDesignRunner:
         self.execution_count += 1
         records = self._read(context)
         outputs: dict[str, CanonicalRecord | bytes]
-        if context.task_id == SOURCE_STEP:
+        if context.task_id == _science_SOURCE_STEP:
             contract = _one(records, MaterialSourceDesignSourceQualification)
             if contract != self.source_contract:
                 raise ValueError('material source design source contract differs')
@@ -371,7 +355,7 @@ class MaterialSourceDesignRunner:
             if observed != contract:
                 raise ValueError('material source design physical source qualification differs')
             outputs = {"source-qualification": observed}
-        elif context.task_id == DESIGN_STEP:
+        elif context.task_id == _science_DESIGN_STEP:
             source = _one(records, MaterialSourceDesignSourceQualification)
             roster = build_material_roster()
             exploration = build_exploration_design(roster)
@@ -389,7 +373,7 @@ class MaterialSourceDesignRunner:
                 "material-roster-candidate": roster,
                 "science-design-candidate": science,
             }
-        elif context.task_id == EVALUATOR_STEP:
+        elif context.task_id == _science_EVALUATOR_STEP:
             result = _adjudicate(
                 config=self.config,
                 source=_one(records, MaterialSourceDesignSourceQualification),
@@ -495,7 +479,7 @@ class MaterialSourceDesignRuntimeProvider(CampaignRuntimeProvider):
             for task in plan.tasks
             for value in task.external_inputs
         }
-        expected = {CONFIG_ARTIFACT_ID, SOURCE_CONTRACT_ARTIFACT_ID}
+        expected = {_science_CONFIG_ARTIFACT_ID, _science_SOURCE_CONTRACT_ARTIFACT_ID}
         if set(specs) != expected:
             raise ValueError('material source design plan external input set differs')
 
@@ -535,17 +519,17 @@ class MaterialSourceDesignRuntimeProvider(CampaignRuntimeProvider):
 
         return (
             payload(
-                CONFIG_ARTIFACT_ID,
+                _science_CONFIG_ARTIFACT_ID,
                 payload_schema=MATERIAL_SOURCE_DESIGN_CONFIG_SCHEMA,
                 content=self.config_payload,
-                object_id=CONFIG_ARTIFACT_ID,
+                object_id=_science_CONFIG_ARTIFACT_ID,
                 object_version=MATERIAL_SOURCE_DESIGN_CONFIG_VERSION,
             ),
             payload(
-                SOURCE_CONTRACT_ARTIFACT_ID,
+                _science_SOURCE_CONTRACT_ARTIFACT_ID,
                 payload_schema=MaterialSourceDesignSourceQualification.SCHEMA,
                 content=self.source_contract.canonical_bytes(),
-                object_id=SOURCE_CONTRACT_ARTIFACT_ID,
+                object_id=_science_SOURCE_CONTRACT_ARTIFACT_ID,
                 object_version=MaterialSourceDesignSourceQualification.VERSION,
             ),
         )
@@ -590,22 +574,9 @@ class MaterialSourceDesignRuntimeProvider(CampaignRuntimeProvider):
         return ScientificAdjudicationOutputContract(
             capability_key=MATERIAL_SOURCE_DESIGN_EVALUATOR_CAPABILITY_KEY,
             capability_version=MATERIAL_SOURCE_DESIGN_CAPABILITY_VERSION,
-            output_id=f'{EVALUATOR_STEP}.scientific-adjudication',
+            output_id=f'{_science_EVALUATOR_STEP}.scientific-adjudication',
             payload_schema=MATERIAL_SOURCE_DESIGN_ADJUDICATION_SCHEMA,
             maximum_bytes=128 * 1024,
             fixture_scope_id=None,
             plumbing_only=False,
         )
-
-
-__all__ = [
-    'MaterialSourceDesignRunner',
-    'MaterialSourceDesignRuntimeProvider',
-    "CONFIG_ARTIFACT_ID",
-    "DESIGN_STEP",
-    "EVALUATOR_STEP",
-    "SOURCE_CONTRACT_ARTIFACT_ID",
-    "SOURCE_STEP",
-    'material_source_design_config_ref',
-    'material_source_design_protocol',
-]

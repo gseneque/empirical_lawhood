@@ -124,7 +124,7 @@ or a newly executed PDF parser. All **24 geometries / 5,994 atoms** remain in
 the source record: seven syn, five anti, seven protonated syn and five
 protonated anti states, with 248/251/249/252 atoms respectively.
 
-The [maintained owner](../../../../src/empirical_lawhood/adapters/physical/rubisco_kinetics/fm23_preparation.py)
+The [maintained owner](../../../../src/empirical_lawhood/domains/rubisco/kinetics/fm23_preparation.py)
 selects the first unprotonated syn enediolate/O₂ geometry. Exhaustive role
 screening retains **861 O–O pairs, 2,256 directed C–C pairs, 252 C–C–O trials,
 two directed gas trials and 42 water trials**. Exactly one complete role map

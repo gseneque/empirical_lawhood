@@ -6,14 +6,9 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as owner
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.recursive_compiler import (
-    DecodedRecursiveConfigInput,
-    RecursiveScientificRootContext,
-    RecursiveScientificRootPreparationContext,
-    validate_recursive_scientific_roots,
-)
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as owner
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.execution.recursive_compiler import DecodedRecursiveConfigInput, RecursiveScientificRootContext, RecursiveScientificRootPreparationContext, validate_recursive_scientific_roots
 from tests.test_matrix_selected_e3_e4_bridge import selected_bridge, transfer  # noqa: F401 - shared disclosed metadata fixtures
 
 

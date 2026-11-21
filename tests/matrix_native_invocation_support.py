@@ -8,18 +8,16 @@ case. Existing typed tasks and dependency joins are retained when supplied.
 
 from dataclasses import replace
 
-from empirical_lawhood.infrastructure.execution import prepare_worker_invocation
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.kernel.evidence import EvidenceCeiling
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.execution import TaskContext, VerifiedArtifactInput, WorkerInputKind, WorkerIsolationProfile
-from empirical_lawhood.runtime.plans import (
-    ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificStage,
-)
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.execution.local.execution import prepare_worker_invocation
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.execution import TaskContext, VerifiedArtifactInput, WorkerInputKind, WorkerIsolationProfile
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificStage
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 
 
 def typed_native_context(context, *, runner, manifests, run_id=None, attempt_id=None):

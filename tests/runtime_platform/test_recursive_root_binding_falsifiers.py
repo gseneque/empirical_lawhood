@@ -5,13 +5,11 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.operation_bindings import (
-    operation_manifests, operation_registrations, output_codecs,
-)
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.science import default_chain_config
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.operation_bindings import operation_manifests, operation_registrations, output_codecs
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.science import default_chain_config
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform.test_recursive_compiler import prospective_fixture
 from tests.runtime_platform.test_recursive_prospective_workflow import _registrations
 

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Selected E4 actual issued-component API composition."""
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_preparation import COMPONENT_PROTOCOL_ID,SelectedE4NativeComponentSpecification
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_preparation import COMPONENT_PROTOCOL_ID, SelectedE4NativeComponentSpecification
 
 
 def bind_selected_e4_component(*args, **kwargs):

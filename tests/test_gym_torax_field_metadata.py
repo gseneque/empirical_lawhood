@@ -4,7 +4,8 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.simulators.gym_torax_native.field_metadata import build_gym_torax_field_metadata_manifest, verify_installed_gym_torax_metadata_sources
+from empirical_lawhood.domains.fusion.gym_torax_native.field_metadata import build_gym_torax_field_metadata_manifest
+from empirical_lawhood.adapters.simulators.gym_torax_native.field_metadata import verify_installed_gym_torax_metadata_sources
 
 
 def test_field_metadata_is_the_exact_retained_closure() -> None:

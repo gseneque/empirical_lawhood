@@ -12,9 +12,9 @@ from types import SimpleNamespace
 import pytest
 
 import empirical_lawhood
-from empirical_lawhood.infrastructure import selected_candidate as owner
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.kernel.serialization import canonical_json_bytes, canonical_json_document_bytes
+from empirical_lawhood.storage import selected_candidate as owner
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+from empirical_lawhood.science.records.serialization import canonical_json_bytes, canonical_json_document_bytes
 
 
 def encode(value):
@@ -27,7 +27,7 @@ def candidate_case(tmp_path, monkeypatch):
     package = installed / "empirical_lawhood"
     payloads = {"src/empirical_lawhood/__init__.py": b"# literal installed package\n",
         "src/empirical_lawhood/math.py": b"VALUE = 7\n",
-        "src/empirical_lawhood/resources/operand.txt": b"literal operand\n",
+        "src/empirical_lawhood/package_data/operand.txt": b"literal operand\n",
         "scripts/build.py": b"# literal build input\n", "uv.lock": b"version = 1\n",
         "pyproject.toml": b"[project]\nname = 'empirical-lawhood'\n"}
     source = tmp_path / "source-distribution"
@@ -81,7 +81,7 @@ def admit(case):
 def _execution_identity_case(case, tmp_path):
     from empirical_lawhood.api import load_authoring
     from empirical_lawhood.api.execution import CampaignExecutionService
-    from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
+    from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
     from tests.runtime_platform.test_native_subwork import _plane
 
     package = replace(load_authoring(Path(__file__).resolve().parents[1] / "fixtures/reference-campaign.json"),
@@ -97,7 +97,7 @@ def _execution_identity_case(case, tmp_path):
 @pytest.mark.parametrize("installed_commit", ("a" * 40, "d" * 40))
 def test_execution_uses_one_actual_installed_observation_and_retains_commit_check(candidate_case, tmp_path, monkeypatch, installed_commit):
     from empirical_lawhood.api.execution import CampaignIdentityError
-    from empirical_lawhood.infrastructure.source_origin import require_selected_implementation
+    from empirical_lawhood.storage.source_origin import require_selected_implementation
 
     case = candidate_case
     # Each candidate is internally coherent before its first admission. Keep
@@ -141,9 +141,9 @@ def test_next_execution_observation_rechecks_current_installed_bytes(candidate_c
     if mutation == "added-member":
         (case.package / "added.py").write_bytes(b"UNSELECTED = True\n")
     elif mutation == "missing-member":
-        (case.package / "resources/operand.txt").unlink()
+        (case.package / "package_data/operand.txt").unlink()
     else:
-        path = {"unloaded-member": case.package / "resources/operand.txt", "metadata": case.metadata,
+        path = {"unloaded-member": case.package / "package_data/operand.txt", "metadata": case.metadata,
             "source-metadata": case.source / owner.SOURCE_METADATA_FILENAME,
             "pyproject": case.source / "pyproject.toml", "lock": case.source / "uv.lock"}[mutation]
         raw = path.read_bytes()
@@ -166,10 +166,10 @@ def test_first_execution_observation_closes_bytes_and_membership_after_source_bi
         if path == case.source / "pyproject.toml" and not changed:
             changed.append(path)
             if mutation == "unloaded-member":
-                member = case.package / "resources/operand.txt"
+                member = case.package / "package_data/operand.txt"
                 member.write_bytes(member.read_bytes()[:-1] + b"x")
             else:
-                (case.package / "resources/late.txt").write_bytes(b"late unselected member\n")
+                (case.package / "package_data/late.txt").write_bytes(b"late unselected member\n")
         return raw
     monkeypatch.setattr(owner, "read_bounded_bytes", during_source_join)
     with pytest.raises(CampaignIdentityError, match="executing package"):
@@ -205,13 +205,13 @@ def test_source_identity_is_reused_while_current_bytes_are_checked_without_git(c
     assert first.implementation_sha256 == "b" * 64 and first.source_tree_sha256 == "c" * 64
     assert first.dependency_lock_sha256 == sha256(case.payloads["uv.lock"]).hexdigest()
     assert reads.count(case.metadata) == 3
-    assert set(first.file_identities) == {"__init__.py", "math.py", "resources/operand.txt"}
+    assert set(first.file_identities) == {"__init__.py", "math.py", "package_data/operand.txt"}
 
 
 @pytest.mark.parametrize("defect", ("changed", "missing", "extra", "symlink", "symlink-directory", "executable"))
 def test_complete_physical_package_census_and_regular_member_bytes_are_required(candidate_case, defect, tmp_path):
     case = candidate_case
-    member = case.package / "resources/operand.txt"
+    member = case.package / "package_data/operand.txt"
     if defect == "changed":
         member.write_bytes(b"foreign operand\n")
     elif defect == "missing":
@@ -286,7 +286,7 @@ def test_selected_distribution_and_loaded_module_origins_are_exact(candidate_cas
     elif defect == "untracked-module":
         case.observations["empirical_lawhood.math"].__file__ = str(case.package / "not-in-census.py")
     elif defect == "namespace":
-        case.observations["empirical_lawhood.resources"] = SimpleNamespace(__file__=None,
+        case.observations["empirical_lawhood.package_data"] = SimpleNamespace(__file__=None,
             __spec__=SimpleNamespace(submodule_search_locations=[str(tmp_path)]))
     elif defect == "missing-metadata":
         case.distribution.files = ()
@@ -298,8 +298,8 @@ def test_selected_distribution_and_loaded_module_origins_are_exact(candidate_cas
 
 def test_exact_namespace_directory_has_the_admitted_installed_origin(candidate_case):
     case = candidate_case
-    case.observations["empirical_lawhood.resources"] = SimpleNamespace(__file__=None,
-        __spec__=SimpleNamespace(submodule_search_locations=[str(case.package / "resources")]))
+    case.observations["empirical_lawhood.package_data"] = SimpleNamespace(__file__=None,
+        __spec__=SimpleNamespace(submodule_search_locations=[str(case.package / "package_data")]))
     assert admit(case).package_root == case.package
 
 
@@ -331,8 +331,8 @@ def test_source_metadata_validates_canonical_complete_identity_before_admission(
 
 
 def test_installed_source_admission_never_claims_a_clean_checkout(candidate_case):
-    from empirical_lawhood.infrastructure.source_closure import capture_admitted_target_source
-    from empirical_lawhood.infrastructure.source_policy import InstalledSourceAdmission
+    from empirical_lawhood.storage.source_closure import capture_admitted_target_source
+    from empirical_lawhood.storage.source_policy import InstalledSourceAdmission
 
     source = capture_admitted_target_source(candidate_case.source)
     assert type(source.source_admission) is InstalledSourceAdmission
@@ -346,7 +346,7 @@ def test_installed_source_admission_never_claims_a_clean_checkout(candidate_case
 def test_cached_candidate_detects_unloaded_resource_and_complete_membership_changes(candidate_case, defect):
     case = candidate_case
     admit(case)
-    member = case.package / "resources/operand.txt"
+    member = case.package / "package_data/operand.txt"
     if defect == "changed-resource":
         member.write_bytes(b"changed bytes!\n")
     elif defect == "same-size-resource":
@@ -358,7 +358,7 @@ def test_cached_candidate_detects_unloaded_resource_and_complete_membership_chan
     elif defect == "extra-file":
         (case.package / "undeclared.py").write_bytes(b"VALUE = 9\n")
     else:
-        (case.package / "resources/undeclared.txt").write_bytes(b"new undeclared data\n")
+        (case.package / "package_data/undeclared.txt").write_bytes(b"new undeclared data\n")
     with pytest.raises((PermissionError, OSError)):
         admit(case)
 

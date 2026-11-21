@@ -7,19 +7,16 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.recursive_authoring import RecursiveInputLink, RecursiveOperationSpec
-from empirical_lawhood.planning.study_authoring import CapabilitySelection
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityKind
-from empirical_lawhood.runtime.plans import OutputTemplate, ScientificStage
-from empirical_lawhood.runtime.recursive_compiler import (
-    RecursiveOperationRegistration, RecursiveScientificRootPreparationContext,
-    decode_recursive_config_input, project_recursive_config_inputs, validate_recursive_scientific_roots,
-)
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationDeclaration, RecursiveScientificHooks
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.recursive_authoring import RecursiveInputLink, RecursiveOperationSpec
+from empirical_lawhood.design.study_authoring import CapabilitySelection
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityKind
+from empirical_lawhood.execution.plans import OutputTemplate, ScientificStage
+from empirical_lawhood.execution.recursive_compiler import RecursiveOperationRegistration, RecursiveScientificRootPreparationContext, decode_recursive_config_input, project_recursive_config_inputs, validate_recursive_scientific_roots
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationDeclaration, RecursiveScientificHooks
 
 
 @dataclass(frozen=True, slots=True)

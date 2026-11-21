@@ -6,20 +6,41 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import source_binding
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_lowering import operation_class
-from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
-from empirical_lawhood.infrastructure.recovery import decode_run_recovery_index, decode_run_recovery_terminal_event
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.execution import OperationalFailureClass
-from empirical_lawhood.runtime.execution_envelope import ProgressHeartbeat, ProgressLivenessContract, RunExecutionResourceEnvelopeMachine as Machine, reconstruct_execution_resource_envelope
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedWorkerEnvironment
-from empirical_lawhood.runtime.recovery import OperationalFailureDiagnostic, RecoveryTerminalAttempt, RecoveryTerminalDisposition, RunRecoveryIndex, RunRecoveryTerminalEvent, TaskRecoveryDisposition, TaskRecoveryEvent
-from empirical_lawhood.runtime.retained_e3_repair import RetainedE3ControlRepair, RetainedE3RepairRecoveryIndex, RetainedE3RepairTerminalEvent, RetainedE3RepairContinuation, RetainedE3RepairContinuationV2, RetainedE3ContinuedRepairRecoveryIndex
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import source_binding
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_lowering import operation_class
+from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+from empirical_lawhood.storage.recovery import decode_run_recovery_index, decode_run_recovery_terminal_event
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.execution import OperationalFailureClass
+from empirical_lawhood.execution.execution_envelope import ProgressHeartbeat, ProgressLivenessContract, RunExecutionResourceEnvelopeMachine as Machine, reconstruct_execution_resource_envelope
+from empirical_lawhood.execution.prepared_native_invocation import PreparedWorkerEnvironment
+from empirical_lawhood.execution.recovery import OperationalFailureDiagnostic, RecoveryTerminalAttempt, RecoveryTerminalDisposition, RunRecoveryIndex, RunRecoveryTerminalEvent, TaskRecoveryDisposition, TaskRecoveryEvent
+from empirical_lawhood.execution.retained_e3_repair import RetainedE3ControlRepair, RetainedE3RepairRecoveryIndex, RetainedE3RepairTerminalEvent, RetainedE3RepairContinuation, RetainedE3RepairContinuationV2, RetainedE3ContinuedRepairRecoveryIndex
 from tests.recovery_support import case as recovery_case  # noqa: F401
 from tests.test_matrix_e3_retained_continuation import continuation_case, public_case  # noqa: F401
 from tests.runtime_platform.test_execution_scheduler import _plane
+from tests.test_development_output_repair import _IndexedRoster
+
+
+@pytest.mark.parametrize('size', (16, 4096))
+@pytest.mark.parametrize('continued', (False, True))
+def test_retained_repair_event_owner_does_not_rescan_receipt_rosters(size, continued):
+    rows = _IndexedRoster((f'task.{i:06d}', object()) for i in range(size))
+    original = object()
+    calls = []
+    def predecessor_owner(task_id):
+        calls.append(task_id)
+        return original
+    predecessor = SimpleNamespace(event_owner=predecessor_owner) if continued else original
+    selected = SimpleNamespace(repair=SimpleNamespace(completed_receipts=rows),
+        completed_receipts=rows, predecessor=predecessor)
+    method = (RetainedE3ContinuedRepairRecoveryIndex if continued else RetainedE3RepairRecoveryIndex).event_owner
+    for task_id, expected in (('task.000000', original), (f'task.{size - 1:06d}', original), ('task.999999', selected)):
+        rows.reads = 0
+        assert method(selected, task_id) is expected
+        assert rows.reads <= size.bit_length() + 1
+    assert calls == (['task.000000', f'task.{size - 1:06d}'] if continued else [])
 
 
 def pin(record, name):
@@ -125,7 +146,7 @@ def test_pure_repair_never_repeats_completed_or_uncertain_native_work(repair_cas
         envelope = Machine.repair_pure_task(envelope, event_id='repair.first', occurred_at_utc='2026-10-16T00:00:00Z',
             cell_id=cell_id, repair=case.repair.identity)
     else:
-        from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeState
+        from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeState
         state = {'launched': ExecutionResourceEnvelopeState.LAUNCHED, 'reserved': ExecutionResourceEnvelopeState.RESERVED,
             'unknown': ExecutionResourceEnvelopeState.UNKNOWN_COMPLETION}[damage]
         envelope = replace(envelope, cells=tuple(replace(row, state=state) if row.cell_id == cell_id else row
@@ -164,12 +185,12 @@ def test_real_scheduler_reuses_success_and_executes_only_repair_and_unstarted_de
     from copy import copy
     from empirical_lawhood.api.retained_e3_control_repair import repair_resource_coordinator
     from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
-    from empirical_lawhood.infrastructure.execution import DirectTaskExecutor, DurableExecutionResourceEnvelopeCoordinator, ExecutionResourceCapacity
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.execution import RunnerRegistry
-    from empirical_lawhood.runtime.plans import BarrierKind, ScientificInputRole, ScientificInputSpec
+    from empirical_lawhood.execution.local.execution import DirectTaskExecutor, DurableExecutionResourceEnvelopeCoordinator, ExecutionResourceCapacity
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.execution.execution import RunnerRegistry
+    from empirical_lawhood.execution.plans import BarrierKind, ScientificInputRole, ScientificInputSpec
     from tests.runtime_platform.test_execution_scheduler import DeterministicRunner
     from tests.runtime_platform.test_multicore_envelope_admission import _selected_plan, _scheduler
     from tests.runtime_platform.conftest import build_protocol_fixture

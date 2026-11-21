@@ -5,10 +5,7 @@ from dataclasses import replace
 import pytest
 
 from empirical_lawhood.api.protected_e3_read_custody import _publication
-from empirical_lawhood.infrastructure.study_issue import (
-    ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore,
-    PROGRAMME_ISSUE_GRANTEE_ID,
-)
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID
 from tests.test_current_result_custody import actual_issued_current_task_controls  # noqa: F401
 
 
@@ -20,7 +17,7 @@ def _publisher(writer):
 
 def test_original_publication_releases_duplicate_issued_and_base_bodies(
         actual_issued_current_task_controls, monkeypatch):  # noqa: F811
-    from empirical_lawhood.infrastructure import study_issue
+    from empirical_lawhood.storage import study_issue
     f = actual_issued_current_task_controls
     package = f.control.package
     before = package.canonical_bytes()

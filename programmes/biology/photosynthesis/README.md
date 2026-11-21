@@ -24,6 +24,11 @@ processing and biological qualification remain unevaluable in that record.
 The conditional numerical workflow accepts supplied kinetics; it is not an
 edit-to-kinetics predictor or a biological assay.
 
+In the gas-free Galdieria study, water left all four initially coordinated
+sites within 28–34 fs and none of the four outer histories reached the joint
+precursor by 60 fs. The natural populations and the joint kinetic effect of
+I95M remain unresolved in both processing assignments. [Precursor release and measured costs](records/gp-precursor-release.md)
+
 ## Studies and evidence
 
 A study design, also called a protocol, specifies the observations, analysis and outcome rules.
@@ -36,10 +41,12 @@ The [scientific record index](records/README.md) provides the retained document 
 | Conditional kinetics and model reuse | [Study design](records/rubisco-broad-programme-protocol.md) | [Findings](../../shared-records/applied-el/programme-closeout.md) | [Run guide](workflows/rubisco-kinetic-join/guide.md) | Supplied numerical operands and conditional models; no new biological units. |
 | I95M exploratory nomination | [Study design](records/rubisco-nomination-preparation-selection.md) | [Findings](records/rubisco-nomination-preparation-selection.md) | No public study runner | Dossier and source identities are documented; original packets remain external. |
 | Molecular preparation and assessment | [Study design](records/rr-coupled-assessment-design.md) | [Findings](records/rr-qmmm-retained-reference-result-v3.md) | No public study runner | Named historical molecular cases retain their separate refusals, revisions and limits. |
+| Paired WT/I95M reference forecast | [Scientific specification](workflows/rubisco-response/scientific-specification.md) | Physical forecast remains UNEVALUABLE | [Run guide](workflows/rubisco-response/guide.md) | Conditional kinetics, preparation, reference-force custody and retained assessment software; complete enzyme forces, relaxed preparations and physical rate contrasts remain required. |
 
 ## Available workflows
 
 - [Consume supplied Rubisco kinetics and assess a conditional joint target](workflows/rubisco-kinetic-join/guide.md).
+- [Assess paired Rubisco responses and prepare reference suppliers](workflows/rubisco-response/guide.md).
 
 Use the [researcher procedure](../../../docs/using/designing-and-running-an-experiment.md#researcher-procedure)
 and the selected guide's environment, input and storage requirements.

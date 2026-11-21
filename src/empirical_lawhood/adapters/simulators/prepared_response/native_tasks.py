@@ -9,10 +9,10 @@ an invocation; this module cannot expand them to a full exploration menu.
 from dataclasses import dataclass
 from typing import ClassVar
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
-from .contracts import PARENTS, PreparedForceWord, PreparedNativeSpec, PreparedRoot, validate_prepared_future_role
+from empirical_lawhood.domains.matrix.prepared_response.contracts import PARENTS, PreparedForceWord, PreparedNativeSpec, PreparedRoot, validate_prepared_future_role
 
 
 @dataclass(frozen=True, slots=True)

@@ -11,16 +11,16 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_preparation as domain
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_bindings as methods
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import scope_reference
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_preparation as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_bindings as methods
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import scope_reference
 from empirical_lawhood.api import matrix_full_factor_access as access_owner
 from empirical_lawhood.api import matrix_full_factor_authoring as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, PreparedExperimentFile
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, PreparedExperimentFile
 from tests.test_matrix_e4_full_factor_public import (
     ROOT, _development_access_seam, _published_secondary, _real_plane, selected,  # noqa: F401
 )

@@ -6,13 +6,13 @@ from hashlib import sha256
 import os
 import stat
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 
 
 def _input_snapshot(writer, plan, run_id, *, retain_paths=None):
-    from .recursive_unentered import require_input_only_run
-    from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256
+    from empirical_lawhood.api.recursive_unentered import require_input_only_run
+    from empirical_lawhood.storage.bounded_io import bounded_file_sha256
     require_input_only_run(writer, plan, run_id)
     root = writer.root.resolve('runs/' + run_id + '/inputs', for_write=False)
     if not root.exists():
@@ -101,12 +101,12 @@ class UnenteredE4Custody:
 @contextmanager
 def unentered_e4_custody(context, *, expected=None):
     """Hold the ordinary execution lock and refuse any actual execution record."""
-    from .experiment_execution_read import load_development_execution_controls
-    from .matrix_researcher_programme_lineage import read_published_record
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.progress import report_progress
+    from empirical_lawhood.api.experiment_execution_read import load_development_execution_controls
+    from empirical_lawhood.api.matrix_researcher_programme_lineage import read_published_record
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.execution.progress import report_progress
     if 'e4.development' not in context.bindings:
         if expected is not None:
             raise PermissionError('unentered E4 handoff lost its original authored binding')
@@ -115,7 +115,7 @@ def unentered_e4_custody(context, *, expected=None):
     if context.pending_bindings:
         raise PermissionError('unentered E4 handoff refuses an incomplete binding publication')
     binding = context.binding('e4.development')
-    from .selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
     from dataclasses import replace
     for publication in binding.publications:
         manifest = context.writer.read_manifest(publication.materialization.relative_path)
@@ -151,7 +151,7 @@ def unentered_e4_custody(context, *, expected=None):
                 context.writer.root.contract.canonical_path).as_posix()
             if read_published_record(context.writer, relative, MatrixProgrammePhaseBinding, 64 * 1024**2) != binding:
                 raise PermissionError('unentered E4 source handoff changes its original binding')
-            from empirical_lawhood.infrastructure.artifacts import _ScopedArtifactPlane
+            from empirical_lawhood.storage.artifacts import _ScopedArtifactPlane
             reduced = (type(context.writer) is _ScopedArtifactPlane
                 and context.writer._reduced_read_verification())
             if final or not reduced:

@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import experiment_preparation as api
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_matrix_configured_e3_v2 import configured_case
 
 

@@ -10,21 +10,21 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_prepared_choices as scientific_choices
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as domain
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import MatrixSelectedPublicPackage
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_operational_resources import MatrixSelectedOperationalResources
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_prepared_choices as scientific_choices
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as domain
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import MatrixSelectedPublicPackage
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_operational_resources import MatrixSelectedOperationalResources
 from empirical_lawhood.api.domain_composition.matrix_selected_declarative import derivation as api
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, load_experiment_specification, prepare_experiment
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentFileInputBinding, ExperimentFileInputSelection
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, PreparedExperimentFile
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, lineage_parent_sort_key
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentFileInputBinding, ExperimentFileInputSelection
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, PreparedExperimentFile
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, lineage_parent_sort_key
 from tests.test_matrix_selected_opportunity import opportunity, transfer, campaign_fixture, evidence_for  # noqa: F401
 from tests.test_matrix_selected_revision_native import revision_case, selected_calibrated, selected_revision, selected_e4_populations, selected_bridge, confirmation_products  # noqa: F401
 from tests.test_matrix_selected_protected import confirmation as protected_confirmation  # noqa: F401
@@ -129,7 +129,7 @@ def test_current_selection_roundtrips_exact_science_and_direct_input_graph(oppor
     "empirical-lawhood/matrix-experimental-programme/selected-declarative-derived-selection-v3",
 ))
 def test_current_selection_codec_refuses_retired_graph_schemas(opportunity, schema):  # noqa: F811
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
     spec, selected_request = science(opportunity), request(opportunity)
     current = selection(spec, selected_request, opportunity)
     document = current.to_document()
@@ -188,7 +188,8 @@ def test_recipe_edit_is_explicit_preserves_original_starts_and_refuses_invalid_r
 
 
 def test_unsigned_copied_request_refuses_loader_and_cold_binding_reports_derivation(opportunity, tmp_path):  # noqa: F811
-    assert tmp_path.resolve().is_relative_to(Path("/media/chevre/EL/empirical-lawhood"))
+    from tests.numerical_provenance_fixtures import selected_test_mount
+    selected_test_mount(tmp_path)
     spec, selected = science(opportunity), request(opportunity)
     (tmp_path / "specification.json").write_bytes(spec.canonical_bytes())
     (tmp_path / "request.json").write_bytes(selected.canonical_bytes())
@@ -228,7 +229,7 @@ def test_actual_typed_e4_projection_fills_revision_request_and_preserves_unenter
     # Pure disclosed record projection only; no unpublished locator is accepted
     # as custody. The full public exporter still requires an actual E4 run.
     from empirical_lawhood.api import selected_e4_revision_export as export
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as e4
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as e4
     case, fitted = revision_case, selected_calibrated
     spec, selected = science(case.original, "REVISION"), request(case.original, revision=case)
     empty = replace(selected, revision=None, revision_evidence=None)
@@ -313,9 +314,9 @@ def test_public_cli_refuses_unsigned_sources_before_metadata_or_native_contact(o
     from typer.testing import CliRunner
     from empirical_lawhood.cli.app import app
     from empirical_lawhood.cli import integrations
-    from empirical_lawhood.infrastructure import bounded_io
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.storage import bounded_io
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
 
     writer = _plane(tmp_path / "plane")
     plane = Path(writer.root.contract.canonical_path)
@@ -347,19 +348,20 @@ def test_public_cli_refuses_unsigned_sources_before_metadata_or_native_contact(o
     monkeypatch.setattr(LocalProcessExecutor, "execute", forbidden)
     monkeypatch.setattr(LocalProcessExecutor, "execute_deadline_free", forbidden)
     monkeypatch.setattr(integrations, "_storage", lambda: (ROOT, SimpleNamespace(maximum_parallel_tasks=4), writer))
-    args = ["--project-root", str(ROOT), "campaign", "experiment-derive-inputs", "--input", str(plane / "specification.json"),
+    args = ["--project-root", str(ROOT), "--progress-file", str(tmp_path / "progress.json"),
+        "campaign", "experiment-derive-inputs", "--input", str(plane / "specification.json"),
         "--sources", str(source_path), "--metadata-directory", str(plane / "derived"),
         "--output-selection", str(plane / "current-sources.json"), "--environment-id", "main.exposed",
-        "--attempt-dir", str(plane / "attempt"), "--progress-file", str(plane / "progress.json")]
+        "--attempt-dir", str(plane / "attempt")]
     result = CliRunner().invoke(app, args)
-    assert result.exit_code != 0 and "complete canonical locator roster" in result.stdout + result.stderr
+    assert result.exit_code != 0 and "complete canonical locator roster" in result.output, result.output
     assert source_path.read_bytes() == source.canonical_bytes()
     assert not (plane / "derived").exists() and not (plane / "current-sources.json").exists()
     assert (plane / "attempt" / "invocation.json").is_file()
 
 
 def test_exact_phase_resources_derive_all_actual_task_cells_without_a_task_map(opportunity):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_operational_resources import SelectedE4OperationalResources
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_operational_resources import SelectedE4OperationalResources
     from tests.test_matrix_e3_protected_public_lowering import resource_selection
     spec, selected = science(opportunity), request(opportunity)
     bound = selection(spec, selected, opportunity)
@@ -476,12 +478,12 @@ def _protected_formal_graph(original, *, revision=None):
     fixtures. No source qualification, issue, grant, execution or native work is
     performed or claimed by this control.
     """
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_protected_bindings as original_owner
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_bindings as revision_owner
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import MatrixSelectedEntryEvidenceV3, MatrixRevisionEntryEvidenceV2
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_preparation import _source_projection
-    from empirical_lawhood.planning.recursive_authoring import RecursiveOperationSpec, RecursiveStudyDraft
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_protected_bindings as original_owner
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_bindings as revision_owner
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixSelectedEntryEvidenceV3, MatrixRevisionEntryEvidenceV2
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_preparation import _source_projection
+    from empirical_lawhood.design.recursive_authoring import RecursiveOperationSpec, RecursiveStudyDraft
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
     from tests.test_matrix_selected_protected import root_inputs
     from tests.matrix_selected_e4_public_fixture import _source_admissions
     owner = original_owner if revision is None else revision_owner
@@ -498,7 +500,7 @@ def _protected_formal_graph(original, *, revision=None):
     arguments = root_inputs(original)
     root = arguments["root"]
     if revision is None:
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
         programme = MatrixSelectedPublicProgramme.from_programme(programme)
     sources = tuple(value for _, value in programme.sources.source_arms())
     endpoints = tuple(sorted({(value.coordinate.clock_id, value.coordinate.physical_time(value.total_ticks)) for value in sources}))
@@ -577,13 +579,10 @@ def _protected_formal_graph(original, *, revision=None):
 
 
 def _protected_formal_request(case, draft):
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-    from empirical_lawhood.kernel.worlds import EvidenceUnitScope
-    from empirical_lawhood.planning.formal_analysis import (
-        FormalGapSourceCapabilityInventory, FormalMethodBinding, FormalMethodCatalog, FormalMethodRole,
-        derive_formal_gap_applicability,
-    )
-    from empirical_lawhood.planning.formal_gaps import FormalGapCoverageAssignment, FormalGapCoverageDisposition
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+    from empirical_lawhood.science.models.worlds import EvidenceUnitScope
+    from empirical_lawhood.design.formal_analysis import FormalGapSourceCapabilityInventory, FormalMethodBinding, FormalMethodCatalog, FormalMethodRole, derive_formal_gap_applicability
+    from empirical_lawhood.design.formal_gaps import FormalGapCoverageAssignment, FormalGapCoverageDisposition
     from tests.experiment_entry_support import entry_package_for_draft
     root = draft.prospective_draft
     entry = entry_package_for_draft(root)
@@ -619,12 +618,9 @@ def _protected_formal_request(case, draft):
 @pytest.mark.parametrize("phase", ("E5_CONFIRMATION", "E6_TRANSFER"))
 @pytest.mark.parametrize("account", ("ORIGINAL_E3", "REVISION"))
 def test_current_protected_phase_actual_candidate_compile_and_formal_refusals(transfer, request, phase, account):  # noqa: F811
-    from empirical_lawhood.planning.experiment_entry import StudyDefinition
-    from empirical_lawhood.runtime.candidate_compiler import (
-        CandidateCompilationDisposition, CandidateDiagnosticCode, StandardCandidateCompilationContext,
-        compile_study_candidate, _required_obligation_ids,
-    )
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.design.experiment_entry import StudyDefinition
+    from empirical_lawhood.execution.candidate_compiler import CandidateCompilationDisposition, CandidateDiagnosticCode, StandardCandidateCompilationContext, compile_study_candidate, _required_obligation_ids
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     original = transfer if phase == "E6_TRANSFER" else request.getfixturevalue("protected_confirmation")
     revision = request.getfixturevalue("revision_case") if account == "REVISION" else None
     case = _protected_formal_graph(original, revision=revision)

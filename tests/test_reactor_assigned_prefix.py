@@ -8,29 +8,25 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.composition.generated_executable_bindings import (
-    EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY,
-    EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY,
-)
-from empirical_lawhood.adapters.composition.generated_extension_bundles import (
-    GENERATED_EXTENSION_BUNDLE_AGGREGATE,
-)
-from empirical_lawhood.adapters.composition.reactor_prefix_response.authoring import ReactorPrefixResponseCandidateContextProvider, build_reactor_authoring
+from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY, EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
+from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
+from empirical_lawhood.domains.reactor.reactor_prefix_response.authoring.authoring import ReactorPrefixResponseCandidateContextProvider, build_reactor_authoring
 from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import AssignedReactorAuthoringProfile, fresh_assignment_status
-from empirical_lawhood.adapters.composition.reactor_prefix_response.resources import reactor_resource_envelope
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.assigned import ReactorAssignedPrefixPanel, ReactorPrefixAssignedUnit, ReactorPrefixAssignment, ReactorPrefixPriorCensus, assigned_prefix_config
-from empirical_lawhood.adapters.simulators.reactor_prefix_response.panel import SCENARIOS, ReactorPrefixPanel, acquire_prefix_branch
+from empirical_lawhood.domains.reactor.reactor_prefix_response.authoring.resources import reactor_resource_envelope
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_assigned import ReactorAssignedPrefixPanel, ReactorPrefixAssignedUnit, ReactorPrefixAssignment, ReactorPrefixPriorCensus, assigned_prefix_config
+from empirical_lawhood.domains.reactor.reactor_prefix_response.native_panel import SCENARIOS, ReactorPrefixPanel
+from empirical_lawhood.adapters.simulators.reactor_prefix_response.panel import acquire_prefix_branch
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
 from empirical_lawhood.api.results import CompileCandidateRequest
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.packaged_source import load_packaged_reactor_source
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_run_plan
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
-from empirical_lawhood.runtime.providers import ExternalInputPayload
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.compiler import compile_preissue_run_plan, lower_run_plan
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.study_issue import project_standard_study_extensions
+from empirical_lawhood.execution.providers import ExternalInputPayload
 
 ROOT = Path(__file__).parents[1]
 
@@ -157,23 +153,14 @@ def test_actual_native_seed_changes_noise_and_retains_paired_nested_deliveries()
 
 def test_assigned_panel_reaches_retained_projection_and_law_owners(tmp_path):
     """Excluded development integration; these are no campaign receipts."""
-    from empirical_lawhood.adapters.methods.reactor_prefix_response.assigned.records import ReactorAssignedScienceResult, assigned_science_design
-    from empirical_lawhood.adapters.methods.reactor_prefix_response.projection import project_panel
-    from empirical_lawhood.adapters.methods.reactor_prefix_response.binding import bind_finite_chain
-    from empirical_lawhood.adapters.methods.reactor_prefix_response.chain import identify_and_qualify
-    from empirical_lawhood.infrastructure.artifacts import (
-        ExternalArtifactPlane,
-        GuardedExternalRoot,
-    )
-    from empirical_lawhood.infrastructure.candidate_payloads import (
-        ExternalCandidatePayloadPlane,
-    )
-    from empirical_lawhood.runtime.artifacts import (
-        ArtifactManifest,
-        ArtifactWriteRequest,
-        ExternalRootContract,
-    )
-    from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+    from empirical_lawhood.domains.reactor.reactor_prefix_response.assigned.records import ReactorAssignedScienceResult, assigned_science_design
+    from empirical_lawhood.domains.reactor.reactor_prefix_response.projection import project_panel
+    from empirical_lawhood.domains.reactor.reactor_prefix_response.binding import bind_finite_chain
+    from empirical_lawhood.domains.reactor.reactor_prefix_response.chain import identify_and_qualify
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+    from empirical_lawhood.storage.candidate_payloads import ExternalCandidatePayloadPlane
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ExternalRootContract
+    from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 
     root = tmp_path / "synthetic"
     root.mkdir()
@@ -217,11 +204,7 @@ def test_assigned_panel_reaches_retained_projection_and_law_owners(tmp_path):
             outcome_access=OutcomeAccess.EVALUATION_SEALED,
         )
     )
-    manifest = decode_canonical_bytes(
-        (root / "synthetic/panel.json.manifest.json").read_bytes(),
-        ArtifactManifest,
-        maximum_bytes=1024**2,
-    )
+    manifest = plane.read_manifest("synthetic/panel.json")
     identity = ObjectIdentity.from_record("synthetic.input", panel)
     projection = project_panel(
         design=design,

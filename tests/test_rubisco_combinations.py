@@ -9,17 +9,12 @@ import math
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_combinations import records as r
-from empirical_lawhood.adapters.methods.rubisco_combinations.analysis import (
-    commit, evaluate, predict, prepare_roles, wilson_quartet_science,
-)
+from empirical_lawhood.domains.rubisco.rubisco_combinations import records as r
+from empirical_lawhood.domains.rubisco.rubisco_combinations.analysis import commit, evaluate, predict, prepare_roles, wilson_quartet_science
 from empirical_lawhood.adapters.physical.rubisco_kinetics.genbank import decode_te_parent_genbank
-from empirical_lawhood.adapters.physical.rubisco_kinetics.wilson2017 import (
-    DOI, NativeArticleParagraphV1, NativeHTMLCellV1, NativeHTMLTableRowV1,
-    NativeWilsonTableV1, TeProteinSpecificationV1, apply_reported_edits, build_wilson2017_panel,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.adapters.physical.rubisco_kinetics.wilson2017 import DOI, NativeArticleParagraphV1, NativeHTMLCellV1, NativeHTMLTableRowV1, NativeWilsonTableV1, TeProteinSpecificationV1, apply_reported_edits, build_wilson2017_panel
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def software_parent():

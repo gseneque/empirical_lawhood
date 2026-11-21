@@ -11,7 +11,7 @@ from hashlib import sha256
 from pathlib import Path
 from types import SimpleNamespace
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def _record(path, record):
@@ -25,14 +25,14 @@ def issue_public_child(*, copied, writer, selected, namespace, invoke,
     """Create explicit test inputs; issue and assemble through the real CLI."""
     from empirical_lawhood.api.composition import compose_operator_approval_runtime
     from empirical_lawhood.api.models import StudyIssueSummary, ExecutableStudyIssueSummary, ExperimentPackage, assemble_issued_study_package
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-    from empirical_lawhood.kernel.authority import AuthorityAction, SourceAccessClass
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.evidence import OutcomeAccess
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes, validate_stable_id
-    from empirical_lawhood.planning.approval import ApprovalCheckerRegistry, AttestationResult, SystemDecisionClock, issue_approval_gate_attestation
-    from empirical_lawhood.planning.study_issue import AccountableHumanIdentity, HumanProposerAttestation, StudyAuthorityKind, StudyOperationAuthority
-    from empirical_lawhood.runtime.study_issue import ISSUE_PUBLICATION_RELATIVE_ROOT, build_study_approval_proposal
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.science.identity.authority import AuthorityAction, SourceAccessClass
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes, validate_stable_id
+    from empirical_lawhood.design.approval import ApprovalCheckerRegistry, AttestationResult, SystemDecisionClock, issue_approval_gate_attestation
+    from empirical_lawhood.design.study_issue import AccountableHumanIdentity, HumanProposerAttestation, StudyAuthorityKind, StudyOperationAuthority
+    from empirical_lawhood.execution.study_issue import ISSUE_PUBLICATION_RELATIVE_ROOT, build_study_approval_proposal
     from tests.approval_support import deterministic_approval_signer
     from tests.runtime_platform.test_study_approval import _checker_registrations
 

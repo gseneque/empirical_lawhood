@@ -3,18 +3,18 @@
 from dataclasses import replace
 
 from empirical_lawhood.api.recursive_execution import _external_inputs
-from empirical_lawhood.infrastructure.execution import DirectTaskExecutor, LocalScheduler
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ReceiptCheck
-from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, RunnerRegistry, RunnerResult, TaskOutputPayload, WorkerInputKind
-from empirical_lawhood.runtime.plans import PlanLane
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.local.execution import DirectTaskExecutor, LocalScheduler
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ReceiptCheck
+from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry, RunnerResult, TaskOutputPayload, WorkerInputKind
+from empirical_lawhood.execution.plans import PlanLane
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform.test_execution_scheduler import StaticExternalInputResolver
 from tests.runtime_platform.test_recursive_compiler import Config, fixture
 from tests.test_recursive_public_service import _plane

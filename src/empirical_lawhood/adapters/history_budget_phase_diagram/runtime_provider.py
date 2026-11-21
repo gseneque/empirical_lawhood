@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from empirical_lawhood.adapters.history_budget_scientific_inputs import HistoryBudgetUnitScientificInput, require_history_budget_unit_inputs
+from empirical_lawhood.domains.history.history_budget_scientific_inputs import HistoryBudgetUnitScientificInput, require_history_budget_unit_inputs
 
 from dataclasses import dataclass, fields
 from hashlib import sha256
@@ -10,90 +10,70 @@ from typing import Any, Mapping, TypeVar, cast
 
 from threadpoolctl import threadpool_limits  # type: ignore[import-untyped]
 
-from empirical_lawhood.adapters.methods.history_budget_phase_diagram.inference import synthesize_recurrence
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.history.history_budget_phase_diagram.inference import synthesize_recurrence
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from empirical_lawhood.adapters._decimal_custody import require_decimal_operands_preserved
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    canonical_json_bytes,
-    validate_sha256,
-)
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-)
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-    lineage_parent_sort_key,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityManifest, CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    StreamingOutputEmitter,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.plans import ScientificInputRole
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes, validate_sha256
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck, lineage_parent_sort_key
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, StreamingOutputEmitter, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.plans import ScientificInputRole
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
 
-from .authoring import ARRAY_PAYLOAD_SCHEMA, CONFIG_MEDIA_TYPE, DEVELOPMENT_REPORTER_KEY, HistoryBudgetPhaseDiagramExternalRecord, REPORTER_KEY, VERSION, INT_ARRAY_PAYLOAD_SCHEMA, history_budget_phase_diagram_phase_registry, protocol_template, scientific_graph
-from .conformance import audit_source_firewall, merge_canary_reports, run_cross_implementation_conformance, run_conditioning_canary, run_discrete_rank_canary, run_generator_canary, run_observer_canary, run_resource_canary, run_structural_rank_canary, run_untouched_sampler_canary
-from .contracts import HistoryBudgetPhaseDiagramConfig, HistoryBudgetPhaseDiagramMethodFreeze, HistoryBudgetPhaseDiagramPhase, HistoryBudgetPhaseDiagramRecurrenceResult, HistoryBudgetPhaseDiagramScientificState, HistoryBudgetPhaseDiagramSeedRosterCommitment, HistoryBudgetPhaseDiagramTerminal, HistoryBudgetPhaseDiagramTerminalCloseout
-from .descriptors import deterministic_development_seed
-from .runtime_contracts import HistoryBudgetPhaseDiagramAdjudicationBundle, HistoryBudgetPhaseDiagramArrayManifest, HistoryBudgetPhaseDiagramBootstrapSummary, HistoryBudgetPhaseDiagramCanaryReport, HistoryBudgetPhaseDiagramDenominatorBundle, HistoryBudgetPhaseDiagramDevelopmentGate, HistoryBudgetPhaseDiagramDevelopmentLedger, HistoryBudgetPhaseDiagramEvaluationDesignFreeze, HistoryBudgetPhaseDiagramGeneratorBundle, HistoryBudgetPhaseDiagramHistoryBundle, HistoryBudgetPhaseDiagramNominationFreeze, HistoryBudgetPhaseDiagramObserverBundle, HistoryBudgetPhaseDiagramPhaseCloseout, HistoryBudgetPhaseDiagramRequestedUnitLedger, HistoryBudgetPhaseDiagramSeedRoster, HistoryBudgetPhaseDiagramUntouchedBundle
-from .workflow import adjudication_bundle, create_seed_roster, denominator_bundle, development_ledger, evaluate_development_gate, freeze_evaluation_design, freeze_method, freeze_nominations, generator_bundle, history_bundle, receipt_closure_sha256, requested_unit_ledger, targeter_bundle, untouched_bundle, validate_seed_roster_commitment
+from empirical_lawhood.domains.history.history_budget_phase_diagram.authoring import ARRAY_PAYLOAD_SCHEMA, CONFIG_MEDIA_TYPE, DEVELOPMENT_REPORTER_KEY, HistoryBudgetPhaseDiagramExternalRecord, REPORTER_KEY, VERSION, INT_ARRAY_PAYLOAD_SCHEMA, history_budget_phase_diagram_phase_registry, protocol_template, scientific_graph
+from empirical_lawhood.adapters.history_budget_phase_diagram.conformance import audit_source_firewall, merge_canary_reports, run_cross_implementation_conformance, run_conditioning_canary, run_discrete_rank_canary, run_generator_canary, run_observer_canary, run_resource_canary, run_structural_rank_canary, run_untouched_sampler_canary
+from empirical_lawhood.domains.history.history_budget_phase_diagram.contracts import HistoryBudgetPhaseDiagramConfig, HistoryBudgetPhaseDiagramMethodFreeze, HistoryBudgetPhaseDiagramPhase, HistoryBudgetPhaseDiagramRecurrenceResult, HistoryBudgetPhaseDiagramScientificState, HistoryBudgetPhaseDiagramSeedRosterCommitment, HistoryBudgetPhaseDiagramTerminal, HistoryBudgetPhaseDiagramTerminalCloseout
+from empirical_lawhood.domains.history.history_budget_phase_diagram.descriptors import deterministic_development_seed
+from empirical_lawhood.domains.history.history_budget_phase_diagram.runtime_contracts import HistoryBudgetPhaseDiagramAdjudicationBundle, HistoryBudgetPhaseDiagramArrayManifest, HistoryBudgetPhaseDiagramBootstrapSummary, HistoryBudgetPhaseDiagramCanaryReport, HistoryBudgetPhaseDiagramDenominatorBundle, HistoryBudgetPhaseDiagramDevelopmentGate, HistoryBudgetPhaseDiagramDevelopmentLedger, HistoryBudgetPhaseDiagramEvaluationDesignFreeze, HistoryBudgetPhaseDiagramGeneratorBundle, HistoryBudgetPhaseDiagramHistoryBundle, HistoryBudgetPhaseDiagramNominationFreeze, HistoryBudgetPhaseDiagramObserverBundle, HistoryBudgetPhaseDiagramPhaseCloseout, HistoryBudgetPhaseDiagramRequestedUnitLedger, HistoryBudgetPhaseDiagramSeedRoster, HistoryBudgetPhaseDiagramUntouchedBundle
+from empirical_lawhood.domains.history.history_budget_phase_diagram.workflow import adjudication_bundle, denominator_bundle, development_ledger, evaluate_development_gate, freeze_evaluation_design, freeze_method, freeze_nominations, generator_bundle, history_bundle, receipt_closure_sha256, requested_unit_ledger, targeter_bundle, untouched_bundle, validate_seed_roster_commitment
+from empirical_lawhood.adapters.history_budget_phase_diagram.workflow import create_seed_roster
 
 
 HISTORY_BUDGET_PHASE_DIAGRAM_SCIENCE_SOURCE_CLOSURE_PATHS = (
     'src/empirical_lawhood/adapters/_decimal_custody.py',
-    'src/empirical_lawhood/adapters/history_budget_fixed_scientific_inputs.py',
-    'src/empirical_lawhood/adapters/history_budget_scientific_inputs.py',
-    'src/empirical_lawhood/adapters/history_budget_seed_constants.py',
-    'src/empirical_lawhood/adapters/history_budget_phase_diagram/array_io.py',
-    'src/empirical_lawhood/adapters/history_budget_phase_diagram/authoring.py',
     'src/empirical_lawhood/adapters/history_budget_phase_diagram/conformance.py',
-    'src/empirical_lawhood/adapters/history_budget_phase_diagram/contracts.py',
-    'src/empirical_lawhood/adapters/history_budget_phase_diagram/descriptors.py',
-    'src/empirical_lawhood/adapters/history_budget_phase_diagram/study_authoring.py',
-    'src/empirical_lawhood/adapters/history_budget_phase_diagram/runtime_contracts.py',
     'src/empirical_lawhood/adapters/history_budget_phase_diagram/runtime_provider.py',
     'src/empirical_lawhood/adapters/history_budget_phase_diagram/workflow.py',
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/alignment.py',
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/conditioning.py',
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/discrete_rank.py',
-    "src/empirical_lawhood/adapters/methods/_arb.py",
-    "src/empirical_lawhood/adapters/methods/certified_rank.py",
-    "src/empirical_lawhood/kernel/serialization.py",
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/evaluator.py',
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/history.py',
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/inference.py',
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/preparation_sampler.py',
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/structural_rank.py',
-    'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/targeting.py',
-    'src/empirical_lawhood/adapters/simulators/rc_ladder_history_budget/generator.py',
+    'src/empirical_lawhood/domains/circuits/rc_ladder_history_budget/generator.py',
+    'src/empirical_lawhood/domains/circuits/reference_oracles.py',
+    'src/empirical_lawhood/domains/history/history_budget_fixed_scientific_inputs.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/alignment.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/array_codec.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/authoring.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/conditioning.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/contracts.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/descriptors.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/discrete_rank.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/evaluator.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/history.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/inference.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/preparation_sampler.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/runtime_contracts.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/structural_rank.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/study_authoring.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/targeting.py',
+    'src/empirical_lawhood/domains/history/history_budget_phase_diagram/workflow.py',
+    'src/empirical_lawhood/domains/history/history_budget_scientific_inputs.py',
+    'src/empirical_lawhood/domains/history/history_budget_seed_constants.py',
+    'src/empirical_lawhood/methods/_arb.py',
+    'src/empirical_lawhood/methods/certified_rank.py',
+    'src/empirical_lawhood/science/records/serialization.py',
 )
 
 HISTORY_BUDGET_PHASE_DIAGRAM_INTEGRATION_SOURCE_CLOSURE_PATHS = (
-    "pyproject.toml",
+    'pyproject.toml',
     'src/empirical_lawhood/adapters/history_budget_phase_diagram/composition.py',
-    "src/empirical_lawhood/api/composition.py",
-    "src/empirical_lawhood/cli/app.py",
-    "src/empirical_lawhood/cli/platform.py",
-    'src/empirical_lawhood/infrastructure/study_issue.py',
-    "src/empirical_lawhood/infrastructure/source_origin.py",
-    "uv.lock",
+    'src/empirical_lawhood/api/composition.py',
+    'src/empirical_lawhood/cli/app.py',
+    'src/empirical_lawhood/cli/platform.py',
+    'src/empirical_lawhood/storage/source_origin.py',
+    'src/empirical_lawhood/storage/study_issue.py',
+    'uv.lock',
 )
 
 HISTORY_BUDGET_PHASE_DIAGRAM_ALL_SOURCE_CLOSURE_PATHS = tuple(
@@ -172,27 +152,27 @@ def implementation_closures(
         observer_sha256=_closure_digest(
             source_files,
             (
-                'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/conditioning.py',
-                'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/discrete_rank.py',
-                "src/empirical_lawhood/adapters/methods/_arb.py",
-                "src/empirical_lawhood/adapters/methods/certified_rank.py",
-                "src/empirical_lawhood/kernel/serialization.py",
-                'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/history.py',
-                'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/preparation_sampler.py',
-                'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/structural_rank.py',
-                'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/targeting.py',
+                'src/empirical_lawhood/domains/history/history_budget_phase_diagram/conditioning.py',
+                'src/empirical_lawhood/domains/history/history_budget_phase_diagram/discrete_rank.py',
+                "src/empirical_lawhood/methods/_arb.py",
+                "src/empirical_lawhood/methods/certified_rank.py",
+                "src/empirical_lawhood/science/records/serialization.py",
+                'src/empirical_lawhood/domains/history/history_budget_phase_diagram/history.py',
+                'src/empirical_lawhood/domains/history/history_budget_phase_diagram/preparation_sampler.py',
+                'src/empirical_lawhood/domains/history/history_budget_phase_diagram/structural_rank.py',
+                'src/empirical_lawhood/domains/history/history_budget_phase_diagram/targeting.py',
             ),
         ),
         generator_sha256=_closure_digest(
             source_files,
-            ('src/empirical_lawhood/adapters/simulators/rc_ladder_history_budget/generator.py',),
+            ('src/empirical_lawhood/domains/circuits/rc_ladder_history_budget/generator.py',),
         ),
         evaluator_sha256=_closure_digest(
             source_files,
             (
-                'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/evaluator.py',
-                'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/alignment.py',
-                'src/empirical_lawhood/adapters/methods/history_budget_phase_diagram/inference.py',
+                'src/empirical_lawhood/domains/history/history_budget_phase_diagram/evaluator.py',
+                'src/empirical_lawhood/domains/history/history_budget_phase_diagram/alignment.py',
+                'src/empirical_lawhood/domains/history/history_budget_phase_diagram/inference.py',
             ),
         ),
     )

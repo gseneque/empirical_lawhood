@@ -7,21 +7,16 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import (
-    calibration, calibration_bindings as cb, commitment as c, forecast as f,
-    operation_bindings as b, qualification as q, records as r,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.composition import history_draft
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.study_authoring import (
-    DesignInputRecord, DesignInputRole, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest, ArtifactProfile
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import calibration, calibration_bindings as cb, commitment as c, forecast as f, operation_bindings as b, qualification as q, records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.composition import history_draft
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactProfile
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform.test_candidate_compiler import _fixture
 from tests.test_matrix_factor_confirmation_eligibility import publish
 from tests.test_matrix_scheduled_history_bindings import (
@@ -55,7 +50,7 @@ def calibration_fixture(bank, *, unavailable=False):
 def query_fixture(response_bank, *, unavailable=False, alpha=D('.5')):
     import numpy as np
     from tests.test_matrix_scheduled_response_forecast import causal_record, pauli
-    from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES
+    from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES
     plane, sources, commitment, _ = response_bank
     value = calibration_fixture(response_bank, unavailable=unavailable)
     pub = plane.write(ArtifactWriteRequest(value.calibration_id, 'calibration/'+value.calibration_id+'.json', value.SCHEMA,

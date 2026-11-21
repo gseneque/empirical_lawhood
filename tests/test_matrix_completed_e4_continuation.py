@@ -7,16 +7,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import source_continuation as domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import source_continuation as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixProgrammePhaseBinding
 from empirical_lawhood.api import matrix_programme_completed_continuation as owner
 from empirical_lawhood.api.matrix_researcher_programme import _publish
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.development_output_repair import DevelopmentOutputRepairTerminalEvent
-from empirical_lawhood.runtime.development_controller_repair import DevelopmentControllerRepairTerminalEvent
-from empirical_lawhood.runtime.native_continuation_execution import DevelopmentNativeContinuationTerminalEvent
-from empirical_lawhood.runtime.recovery import RunRecoveryTerminalEvent, DevelopmentRunRecoveryTerminalEvent
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.development_output_repair import DevelopmentOutputRepairTerminalEvent
+from empirical_lawhood.execution.development_controller_repair import DevelopmentControllerRepairTerminalEvent
+from empirical_lawhood.execution.native_continuation_execution import DevelopmentNativeContinuationTerminalEvent
+from empirical_lawhood.execution.recovery import RunRecoveryTerminalEvent, DevelopmentRunRecoveryTerminalEvent
 from tests.test_matrix_programme_source_continuation import _plans, metadata_case  # noqa: F401
 
 
@@ -47,7 +47,8 @@ def test_completed_e4_record_retains_acquisition_and_separate_structural_termina
     _publish(writer, Path(writer.root.contract.canonical_path) / relative, record)
     assert owner.read_source_continuation(writer, relative, 64 * 1024**2) == record
     assert decode_canonical_bytes(record.canonical_bytes(), type(record), maximum_bytes=None) == record
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.extension import EXTENSION as _extension_owner_1
+    EXPERIMENT_PROTOCOL_DECLARATIONS = _extension_owner_1.protocols
     declaration, = (row for row in EXPERIMENT_PROTOCOL_DECLARATIONS if row.protocol_id == domain.PROTOCOL_ID)
     assert type(record) in declaration.input_record_types
     with pytest.raises(ValueError, match='complete E1/E2/TRAIN/E3'):

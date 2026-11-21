@@ -13,14 +13,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import e3_numerical_methods as numerical
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as protected
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_specification import MatrixResponseErrorSpecification
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_experiment_inputs import project_protected_e3_allocation
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as original
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole
-from empirical_lawhood.kernel.experimental_design import UnitAllocation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_response import e3_numerical_methods as numerical
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as protected
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_specification import MatrixResponseErrorSpecification
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_experiment_inputs import project_protected_e3_allocation
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as original
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole
+from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests import test_matrix_e3_protected_methods as producer
 from tests.test_matrix_e3_protected_inputs import (
     build_source_inputs, source_inputs as source_inputs, scheduled as scheduled, stock as stock, provenance as provenance,

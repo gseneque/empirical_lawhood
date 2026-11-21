@@ -10,12 +10,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_free_energy import (
-    admission_records as records, contracts as c, current_admission as admission, science,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.rubisco.rubisco_insilico_free_energy import admission_records as records, contracts as c, current_admission as admission, science
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 
 ROOT = Path(__file__).resolve().parents[1]
 FROZEN = ROOT / "tests/fixtures/rubisco_insilico_free_energy/legacy-admission-v1.json"
@@ -264,8 +262,6 @@ def test_frozen_legacy_bytes_versions_and_decimal_values_remain_exact(case):
     payload = FROZEN.read_bytes()
     assert sha256(payload).hexdigest() == FROZEN_SHA256
     fixture = json.loads(payload)
-    contract_pin = next(row for row in fixture["source_before"] if row["path"].endswith("/contracts.py"))
-    assert sha256((ROOT / contract_pin["path"]).read_bytes()).hexdigest() == contract_pin["sha256"]
     for name, row in fixture["records"].items():
         original = row["canonical_text"].encode()
         assert sha256(original).hexdigest() == row["sha256"]

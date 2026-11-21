@@ -6,13 +6,9 @@ import subprocess
 import sys
 from threading import Event
 
-from empirical_lawhood.infrastructure.sql import (
-    SQLiteOperationalRepository,
-    create_catalog_engine,
-    upgrade_catalog,
-)
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.execution import TaskAttemptDisposition
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.execution import TaskAttemptDisposition
 
 
 def test_memory_reader_cannot_rollback_another_connection_transaction():

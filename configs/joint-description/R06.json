@@ -1,0 +1,297 @@
+{
+  "actions": [
+    0.5,
+    1.0
+  ],
+  "calibration_unit_ids": [
+    "unit.r06.calibration.0000",
+    "unit.r06.calibration.0001",
+    "unit.r06.calibration.0002",
+    "unit.r06.calibration.0003",
+    "unit.r06.calibration.0004",
+    "unit.r06.calibration.0005",
+    "unit.r06.calibration.0006",
+    "unit.r06.calibration.0007",
+    "unit.r06.calibration.0008",
+    "unit.r06.calibration.0009",
+    "unit.r06.calibration.0010",
+    "unit.r06.calibration.0011",
+    "unit.r06.calibration.0012",
+    "unit.r06.calibration.0013",
+    "unit.r06.calibration.0014",
+    "unit.r06.calibration.0015",
+    "unit.r06.calibration.0016",
+    "unit.r06.calibration.0017",
+    "unit.r06.calibration.0018",
+    "unit.r06.calibration.0019",
+    "unit.r06.calibration.0020",
+    "unit.r06.calibration.0021",
+    "unit.r06.calibration.0022",
+    "unit.r06.calibration.0023",
+    "unit.r06.calibration.0024",
+    "unit.r06.calibration.0025",
+    "unit.r06.calibration.0026",
+    "unit.r06.calibration.0027",
+    "unit.r06.calibration.0028",
+    "unit.r06.calibration.0029",
+    "unit.r06.calibration.0030",
+    "unit.r06.calibration.0031",
+    "unit.r06.calibration.0032",
+    "unit.r06.calibration.0033",
+    "unit.r06.calibration.0034",
+    "unit.r06.calibration.0035",
+    "unit.r06.calibration.0036",
+    "unit.r06.calibration.0037",
+    "unit.r06.calibration.0038",
+    "unit.r06.calibration.0039",
+    "unit.r06.calibration.0040",
+    "unit.r06.calibration.0041",
+    "unit.r06.calibration.0042",
+    "unit.r06.calibration.0043",
+    "unit.r06.calibration.0044",
+    "unit.r06.calibration.0045",
+    "unit.r06.calibration.0046",
+    "unit.r06.calibration.0047"
+  ],
+  "descriptions": [
+    {
+      "features": [
+        "forecast.local"
+      ],
+      "forecast_work_basis": "Authored estimate:trace-centering and norms of three4x4 matrices plus one scalar exponential budget32; no measured runtime claim.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 800,
+      "id": "scalar",
+      "interface_dimension": 0,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "fixed",
+      "rationale": "Trace-average scalar generator discards all directional coupling.",
+      "state_dimension": 1
+    },
+    {
+      "features": [
+        "forecast.joint"
+      ],
+      "forecast_work_basis": "Authored estimate:full15-dimensional commutator Gram construction plus20 dense15-cubed exponential operations; not measured.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 199980,
+      "id": "joint-operator",
+      "interface_dimension": 0,
+      "memory_dimension": 0,
+      "memory_samples": 0,
+      "model": "fixed",
+      "rationale": "Full symmetric 15-dimensional origin generator retains directional interfaces.",
+      "state_dimension": 120
+    },
+    {
+      "features": [
+        "forecast.memory"
+      ],
+      "forecast_work_basis": "Authored estimate:three complete origin/past operators, quadratic drift fit, PSD spectral projection and matrix exponential; each dense decomposition budget20*15^3.",
+      "forecast_work_unit": "normalized-scalar-operation",
+      "forecast_work_units": 545940,
+      "id": "operator-memory",
+      "interface_dimension": 0,
+      "memory_dimension": 120,
+      "memory_samples": 2,
+      "model": "fixed",
+      "rationale": "Two causal operator samples extrapolate drift; PSD clipping is declared.",
+      "state_dimension": 120
+    }
+  ],
+  "economics": {
+    "accounting_unit": "authored-cost-unit",
+    "action_price": "0",
+    "compute_price": "0.0001",
+    "interface_price": "0.001",
+    "maximum_control_regret": "1",
+    "memory_price": "0.001",
+    "minimum_coverage": "0.9",
+    "missing_penalty": "1000000",
+    "reuse_count": 1,
+    "ridge_penalty": "0.001",
+    "safety_penalty": "1000000",
+    "state_price": "0.001"
+  },
+  "evaluation_unit_ids": [
+    "unit.r06.evaluation.0000",
+    "unit.r06.evaluation.0001",
+    "unit.r06.evaluation.0002",
+    "unit.r06.evaluation.0003",
+    "unit.r06.evaluation.0004",
+    "unit.r06.evaluation.0005",
+    "unit.r06.evaluation.0006",
+    "unit.r06.evaluation.0007",
+    "unit.r06.evaluation.0008",
+    "unit.r06.evaluation.0009",
+    "unit.r06.evaluation.0010",
+    "unit.r06.evaluation.0011",
+    "unit.r06.evaluation.0012",
+    "unit.r06.evaluation.0013",
+    "unit.r06.evaluation.0014",
+    "unit.r06.evaluation.0015",
+    "unit.r06.evaluation.0016",
+    "unit.r06.evaluation.0017",
+    "unit.r06.evaluation.0018",
+    "unit.r06.evaluation.0019",
+    "unit.r06.evaluation.0020",
+    "unit.r06.evaluation.0021",
+    "unit.r06.evaluation.0022",
+    "unit.r06.evaluation.0023",
+    "unit.r06.evaluation.0024",
+    "unit.r06.evaluation.0025",
+    "unit.r06.evaluation.0026",
+    "unit.r06.evaluation.0027",
+    "unit.r06.evaluation.0028",
+    "unit.r06.evaluation.0029",
+    "unit.r06.evaluation.0030",
+    "unit.r06.evaluation.0031"
+  ],
+  "family_id": "R06",
+  "horizons": [
+    0.032,
+    0.064
+  ],
+  "parameters": {
+    "alpha_x": 1.0,
+    "alpha_y": 2.0,
+    "cross_coupling": 1.0,
+    "direction": "x-radial",
+    "downstream_amplitude": 0.1,
+    "dt": 0.002,
+    "friction": 1.0,
+    "handoff_steps": 8,
+    "history_stride": 4,
+    "kappa": 0.2,
+    "mass": 0.5,
+    "maximum_associative_leakage": 0.15,
+    "maximum_band_ratio": 0.35,
+    "memory_depth": 2,
+    "minimum_joint_angle_degrees": 60.0,
+    "momentum_jitter": 0.03,
+    "observed_sector": 1,
+    "persistence_steps": 2,
+    "position_jitter": 0.03,
+    "prefix_steps": 32,
+    "preparations": [
+      "product",
+      "x-factor",
+      "y-factor",
+      "disordered"
+    ],
+    "service_threshold": 1e-05,
+    "shooting_replicates": 4,
+    "support_radius_limit": 100.0,
+    "temperature": 0.15
+  },
+  "question": "When full passive response is decomposed into scalar directions, how much omitted operator coupling must be restored as interface information or memory?",
+  "receiver_policies": {
+    "direction.00": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.01": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.02": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.03": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.04": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.05": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.06": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.07": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.08": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.09": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.10": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.11": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.12": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.13": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    },
+    "direction.14": {
+      "max_abs_error": 0.1,
+      "scale": 1.0,
+      "target": 0.5,
+      "units": "passive-HS-coordinate",
+      "weight": 0.06666666666666667
+    }
+  },
+  "seed": 20261114
+}

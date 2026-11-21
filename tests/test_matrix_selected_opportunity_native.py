@@ -7,18 +7,18 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity as programme_owner
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_future as future
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import preparation_identity
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_forecast import forecast_public
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_native_body import _execute_future_native
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_prefix import identity
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_point import forecast_selected_point
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import package_identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays, decode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity as programme_owner
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_future as future
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import preparation_identity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_forecast import forecast_public
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_native_body import _execute_future_native
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_prefix import identity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_point import forecast_selected_point
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import package_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays, decode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_selected_native_work import literal_history
 from tests.test_matrix_selected_point import feature, literal_unavailable_measurement
 from tests.test_matrix_selected_opportunity import opportunity, transfer  # noqa: F401 - shared in-memory fixtures
@@ -55,7 +55,7 @@ def test_actual_selected_opportunity_native_future_keeps_original_streams_and_al
     assert original_work.scientific_unit_ids == work.scientific_unit_ids == (source.root.root.independent_group_id,)
     assert len(original_work.definitions[0].streams) == 2
     assert len(work.definitions[0].streams) == 4
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_bindings import native_input_records, validate_native_input_records
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_bindings import native_input_records, validate_native_input_records
     selected = native_input_records(source, panels=config.panels)
     assert set(work.definitions[0].streams) == {pin for name, pin, _ in selected if name.startswith("native-stream.")}
     assert all(value.purpose.startswith("autonomous") for name, _, value in selected if name.startswith("native-stream."))

@@ -5,11 +5,12 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.api.finite_operands import original_f_operand_export, preparation_operands_export, saved_matrix_arrays_export, saved_matrix_arrays_import, preparation_bridge_fits
+from empirical_lawhood.domains.matrix.finite_response_law.current_preparation import preparation_bridge_fits
+from empirical_lawhood.api.finite_operands import original_f_operand_export, preparation_operands_export, saved_matrix_arrays_export, saved_matrix_arrays_import
 from empirical_lawhood.api.preparation_readiness import current_preparation_readiness
-from empirical_lawhood.adapters.methods.finite_response_law.retained_entry_readiness.current_input import current_requests, current_readiness
-from empirical_lawhood.adapters.methods.finite_response_law.transient_bridge import mechanical_kernel
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.finite_response_law.retained_entry_readiness.current_input import current_requests, current_readiness
+from empirical_lawhood.domains.matrix.finite_response_law.transient_bridge import mechanical_kernel
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_operand_transport import allocation as allocated
 from tests.numerical_provenance_fixtures import PROJECT_ROOT, numerical_plane
 
@@ -80,7 +81,7 @@ def test_current_readiness_rejects_input_substitution_before_fits(tmp_path,monke
         lower=replace(lower,payload_id="test.other.lower")
     def forbidden(*args,**kwargs):
         raise AssertionError("readiness fitting entered before input checks")
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.finite_response_law.retained_entry_readiness.current_input.compute",forbidden)
+    monkeypatch.setattr("empirical_lawhood.domains.matrix.finite_response_law.retained_entry_readiness.current_input.compute",forbidden)
     with pytest.raises(ValueError):
         current_readiness(manifest=manifest,allocation=allocation,arrays=arrays,lower=lower,bridge_fits=preparation_bridge_fits(arrays),report_id="test.bad")
 

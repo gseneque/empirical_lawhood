@@ -6,17 +6,15 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.completed_source import (
-    MatrixCompletedE3InputSource, validate_completed_inputs,
-)
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.source_continuation import MatrixProgrammeSourceContinuationSpecification
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.completed_source import MatrixCompletedE3InputSource, validate_completed_inputs
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.source_continuation import MatrixProgrammeSourceContinuationSpecification
 from empirical_lawhood.api.matrix_programme_source_continuation import _publish_inputs
 from empirical_lawhood.api.matrix_researcher_programme import _publish
-from empirical_lawhood.infrastructure.matrix_completed_source import original_e3_commitment, original_e3_programme_inputs
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticated_programme_inputs
-from empirical_lawhood.infrastructure.matrix_retained_training import authenticated_retained_training_source
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.adapters.matrix_storage.matrix_completed_source import original_e3_commitment, original_e3_programme_inputs
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticated_programme_inputs
+from empirical_lawhood.adapters.matrix_storage.matrix_retained_training import authenticated_retained_training_source
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_matrix_programme_retained_training_continuation import retained_case  # noqa: F401
 from tests.test_matrix_programme_source_continuation import metadata_case  # noqa: F401
 
@@ -67,7 +65,7 @@ def test_completed_source_preserves_train_and_original_e3_provenance_in_live_rea
 
 
 def test_prepared_source_checks_original_train_while_returning_current_future_inputs(completed_case, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_publications
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_publications
     from empirical_lawhood.api.matrix_prepared_source_runtime import _committed_e4_selections
     case = completed_case
     retained = case.original.lineage

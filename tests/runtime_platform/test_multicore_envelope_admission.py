@@ -12,21 +12,15 @@ import pytest
 from empirical_lawhood.api.execution import CampaignExecutionService, CampaignPrerequisiteError, CampaignValidationError
 from empirical_lawhood.api.facade import EmpiricalLawhoodApi
 from empirical_lawhood.api.results import RunCampaignRequest
-from empirical_lawhood.infrastructure.execution import (
-    DirectTaskExecutor, DurableExecutionResourceEnvelopeCoordinator, ExecutionResourceCapacity,
-    LocalExecutionResourceAdmitter, LocalScheduler, ResourceAdmissionError,
-    selected_execution_resource_budgets,
-)
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, RunnerRegistry
-from empirical_lawhood.runtime.execution_envelope import (
-    ChildResourceTokenLimit, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec, NonTimeResourceBudget,
-)
-from empirical_lawhood.runtime.plans import ExecutionPlan, ExecutionTask, ProtocolExecutionTask
-from empirical_lawhood.runtime.recovery import RunRecoveryIndex
+from empirical_lawhood.execution.local.execution import DirectTaskExecutor, DurableExecutionResourceEnvelopeCoordinator, ExecutionResourceCapacity, LocalExecutionResourceAdmitter, LocalScheduler, ResourceAdmissionError, selected_execution_resource_budgets
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry
+from empirical_lawhood.execution.execution_envelope import ChildResourceTokenLimit, ExecutionResourceEnvelopeSpec, ExecutionResourceTaskCellSpec, NonTimeResourceBudget
+from empirical_lawhood.execution.plans import ExecutionPlan, ExecutionTask, ProtocolExecutionTask
+from empirical_lawhood.execution.recovery import RunRecoveryIndex
 from tests.issued_study_support import build_issued_study_fixture
 from tests.runtime_platform.test_deadline_free_execution_package import (
     _compile, _execution_package_fixture, _external_inputs, _plane, _ResourceEnvelopeStore,

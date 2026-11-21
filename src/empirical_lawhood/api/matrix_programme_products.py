@@ -7,23 +7,17 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import PHASES
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.product_export import (
-    MatrixProgrammePortableProductExportSelection, MatrixProgrammeProductExportSelection,
-)
-from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256, read_bounded_bytes
-from empirical_lawhood.infrastructure.read_checkpoint import completed_read_checkpoints
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, inherited_visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent, ArtifactManifest, ArtifactProfile, ArtifactWriteRequest,
-    CanonicalTaskReceipt, artifact_publication_commit_relative_path, derived_outcome_access,
-    lineage_parent_sort_key,
-)
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import PHASES
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.product_export import MatrixProgrammePortableProductExportSelection, MatrixProgrammeProductExportSelection
+from empirical_lawhood.storage.bounded_io import bounded_file_sha256, read_bounded_bytes
+from empirical_lawhood.storage.read_checkpoint import completed_read_checkpoints
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, inherited_visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactManifest, ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt, artifact_publication_commit_relative_path, derived_outcome_access, lineage_parent_sort_key
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
 
 EXPORT_SCHEMA = 'empirical-lawhood/operational/matrix-programme-product-delivery'
 
@@ -68,7 +62,7 @@ def _current_grants(context, authority_writer, *, include_execution_records=Fals
     """Retain exact bindings, never an authorization decision, for this export."""
     from empirical_lawhood.api.matrix_programme_e4_phases import programme_e4_request
     from empirical_lawhood.api.recursive_qualified_parents import _require_parent_authorities_current
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
 
     bindings = []
     for phase in ('e1', 'e3', 'e4.source-cal', 'e4.calibration', 'e4.source-conf',
@@ -234,16 +228,14 @@ def export_programme_products(owner, *, directory, selection_path, programme_req
         checkpoints = None
         if scientific_reconstruction_enabled():
             from empirical_lawhood.api.matrix_programme_export_checkpoints import ProgrammeExportCheckpoints
-            from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import (
-                METADATA_PHASES, MatrixProgrammeObservation,
-            )
+            from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import METADATA_PHASES, MatrixProgrammeObservation
             checkpoints = ProgrammeExportCheckpoints(owner, reading, selection, plan, operation, manifests, independent_reads)
         with _export_context(scoped, plan, operation, checkpoints) as (context, finalizing), ExitStack() as lifetime:
             authorities = lifetime.enter_context(owner.writer.read_context(observe_manifest=observe))
             execution_reports = {}
             originals, current, structural = None, None, None
             if finalizing:
-                from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+                from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
                 # Gather each live execution census once, before opening any
                 # saved protected body. Recorded original products keep both
                 # the current E3 and imported model producers' reveals live.
@@ -367,8 +359,8 @@ def export_programme_products(owner, *, directory, selection_path, programme_req
             _require_snapshot(owner.writer, manifests, require_access, metadata, payload_paths)
             require_current()
             if type(selection) is MatrixProgrammePortableProductExportSelection:
-                from empirical_lawhood.infrastructure.artifact_replication import replicate_artifact_publications
-                from empirical_lawhood.infrastructure.artifacts import GuardedExternalRoot
+                from empirical_lawhood.storage.artifact_replication import replicate_artifact_publications
+                from empirical_lawhood.storage.artifacts import GuardedExternalRoot
 
                 # Only receipt-joined outputs and receipts are selected for
                 # physical delivery. Metadata-only references confer no body

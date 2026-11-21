@@ -7,27 +7,19 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_parent_finalization import (
-    NativeParentFinalizationPending, authenticate_native_parent_return, inspect_native_parent_return,
-)
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.native_subwork_ipc import (
-    NativeSubworkPipeService, NativeSubworkReply, NativeSubworkRequest, PipeNativeSubworkProgress,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.native_effects import NativeEntryRefused
-from empirical_lawhood.runtime import native_subwork as native_owner
-from empirical_lawhood.runtime.native_subwork import (
-    NativeSubworkCallEntry, NativeSubworkCallReturn, NativeSubworkObservationPublicationError,
-    NativeSubworkReceiptPublicationPending, NativeSubworkRoster, NativeSubworkState,
-    NativeSubworkUncertainContact, invoke_native_subwork,
-)
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedNativeWork
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_parent_finalization import NativeParentFinalizationPending, authenticate_native_parent_return, inspect_native_parent_return
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkReply, NativeSubworkRequest, PipeNativeSubworkProgress
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.native_effects import NativeEntryRefused
+from empirical_lawhood.execution import native_subwork as native_owner
+from empirical_lawhood.execution.native_subwork import NativeSubworkCallEntry, NativeSubworkCallReturn, NativeSubworkObservationPublicationError, NativeSubworkReceiptPublicationPending, NativeSubworkRoster, NativeSubworkState, NativeSubworkUncertainContact, invoke_native_subwork
+from empirical_lawhood.execution.prepared_native_invocation import PreparedNativeWork
 from tests.runtime_platform.test_native_subwork import _complete, _publish, _selected
 from tests.runtime_platform.test_worker_preflight import _case
 

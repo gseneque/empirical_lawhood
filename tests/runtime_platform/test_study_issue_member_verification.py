@@ -11,10 +11,10 @@ from types import MappingProxyType
 
 import pytest
 
-from empirical_lawhood.infrastructure import study_issue as owner
-from empirical_lawhood.infrastructure import artifacts as artifact_owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
+from empirical_lawhood.storage import study_issue as owner
+from empirical_lawhood.storage import artifacts as artifact_owner
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
 from tests.runtime_platform.test_study_issue import _issue_api_fixture, _issue_request
 
 
@@ -36,15 +36,15 @@ def _files(directory):
 def test_scoped_member_joins_match_fresh_reads_without_a_second_decode_pass(issued, monkeypatch):
     publisher, manifest, receipt, external = issued
     before = _files(external)
-    original_decoder = owner.decode_artifact_manifest
+    original_decoder = owner.read_artifact_sidecar
     original_custody_decoder = artifact_owner.decode_artifact_sidecar
     original_read = publisher.artifact_plane.read_manifest
     source_decodes = []
     custody_decodes = []
     source_reads = []
 
-    def source_decode(raw, **kwargs):
-        value = original_decoder(raw, **kwargs)
+    def source_decode(plane, relative, **kwargs):
+        value = original_decoder(plane, relative, **kwargs)
         source_decodes.append(value.logical.logical_artifact_id)
         return value
 
@@ -57,14 +57,14 @@ def test_scoped_member_joins_match_fresh_reads_without_a_second_decode_pass(issu
         source_reads.append((relative, maximum_bytes))
         return original_read(relative, maximum_bytes=maximum_bytes)
 
-    monkeypatch.setattr(owner, "decode_artifact_manifest", source_decode)
+    monkeypatch.setattr(owner, "read_artifact_sidecar", source_decode)
     monkeypatch.setattr(artifact_owner, "decode_artifact_sidecar", custody_decode)
     monkeypatch.setattr(publisher.artifact_plane, "read_manifest", read)
     publisher._validate_manifest_members(manifest, publication=receipt.publication)
     # Independent joins now ask the custody owner to normalize each compact
     # sidecar. The issue consumer retains its own bound and does no decoding.
     assert source_decodes == []
-    assert Counter(source_reads) == Counter((row.relative_path, owner.MAX_PROGRAMME_AUTHORITY_BYTES)
+    assert Counter(source_reads) == Counter((row.relative_path, None)
         for row in manifest.members)
     source_reads.clear()
     original_join = publisher._validate_manifest_members
@@ -85,9 +85,10 @@ def test_scoped_member_joins_match_fresh_reads_without_a_second_decode_pass(issu
     scoped = publisher.load_study(manifest.issue_id)
     assert joined == [len(receipt.publication.members)]
     # The initial manifest has one metadata read; member sidecars are decoded
-    # once in the complete custody callback. Only the receipt stays legacy.
+    # once in the complete custody callback. The receipt uses its own canonical
+    # physical-sidecar read owner.
     assert source_reads == [(f"issued-programmes/{manifest.issue_id}/manifest.json",
-        owner.MAX_PROGRAMME_AUTHORITY_BYTES)]
+        None)]
     assert source_decodes == [receipt.receipt_id]
     decoded_counts = Counter(custody_decodes)
     assert all(decoded_counts[row.member_id] == 1 for row in manifest.members)
@@ -205,20 +206,31 @@ def test_present_noncallable_member_hook_refuses_instead_of_falling_back(issued,
         publisher.load_study(manifest.issue_id)
 
 
-def test_member_callback_retains_its_consumer_byte_bound_when_the_plane_allows_more(issued, monkeypatch):
+def test_changed_control_budget_refuses_previously_verified_issued_manifest(issued):
+    from dataclasses import replace
+
+    publisher, manifest, _, _ = issued
+    with publisher.read_context() as reader:
+        size = manifest.canonical_size_bytes()
+        reader.artifact_plane.custody_limits = replace(reader.artifact_plane.custody_limits, control_record_bytes=size)
+        assert reader.load_study(manifest.issue_id, expected_manifest=manifest).manifest == manifest
+        reader.artifact_plane.custody_limits = replace(reader.artifact_plane.custody_limits, control_record_bytes=size - 1)
+        with pytest.raises(ValueError, match="selected custody byte allowance control_record_bytes"):
+            reader.load_study(manifest.issue_id, expected_manifest=manifest)
+
+
+def test_selected_manifest_allowance_is_enforced_by_owning_plane(issued, monkeypatch):
+    from dataclasses import replace
     publisher, manifest, receipt, external = issued
     sidecar = publisher.artifact_plane.read_manifest(f"issued-programmes/{manifest.issue_id}/manifest.json")
-    monkeypatch.setattr(owner, "MAX_PROGRAMME_AUTHORITY_BYTES", 1)
-    with pytest.raises(ArtifactIdentityConflict) as refused:
+    monkeypatch.setattr(publisher.artifact_plane, 'custody_limits',
+        replace(publisher.artifact_plane.custody_limits, manifest_bytes=1))
+    with pytest.raises((ArtifactIdentityConflict, BoundedFileIOError)):
         publisher._validate_manifest_members(manifest, publication=receipt.publication)
-    assert isinstance(refused.value.__cause__, BoundedFileIOError)
-    assert "exceeds its byte limit" in str(refused.value.__cause__)
     entered = []
-
     def join(sidecars):
         entered.append(True)
         publisher._validate_manifest_members(manifest, publication=receipt.publication, sidecars=sidecars)
-
-    with pytest.raises(BoundedFileIOError, match="exceeds its byte limit"):
+    with pytest.raises((ArtifactIdentityConflict, BoundedFileIOError)):
         publisher.artifact_plane.verify_manifest_members(sidecar, validate_members=join)
-    assert entered == [True]
+    assert not entered

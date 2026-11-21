@@ -8,8 +8,8 @@ import pytest
 from empirical_lawhood.api.matrix_read_indexes import product_record_index, unique_index
 from empirical_lawhood.api.matrix_selected_e3_e4_read import _record_bytes
 from empirical_lawhood.api.matrix_full_factor_custody import _output
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
 
 
 class _Once:

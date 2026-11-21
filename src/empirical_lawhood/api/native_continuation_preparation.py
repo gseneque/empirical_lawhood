@@ -4,27 +4,25 @@
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256
-from empirical_lawhood.infrastructure.native_parent_finalization import inspect_native_parent_return
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.native_continuation_proposal import (
-    DevelopmentNativeContinuationProposal, NativeContinuationCandidate,
-)
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+from empirical_lawhood.storage.bounded_io import bounded_file_sha256
+from empirical_lawhood.storage.native_parent_finalization import inspect_native_parent_return
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.native_continuation_proposal import DevelopmentNativeContinuationProposal, NativeContinuationCandidate
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
 
-from .development_controller_repair import _contacts, require_scientific_source
-from .development_output_repair import _pin
-from .retained_e3_control_repair import observe_frozen_repair_worker
+from empirical_lawhood.api.development_controller_repair import _contacts, require_scientific_source
+from empirical_lawhood.api.development_output_repair import _pin
+from empirical_lawhood.api.retained_e3_control_repair import observe_frozen_repair_worker
 
 
 def _original_controls(writer, plan, index):
-    from .recursive_execution import _custody_control_pins
+    from empirical_lawhood.api.recursive_execution import _custody_control_pins
     rows = list(_custody_control_pins(writer, index))
     contacts = _contacts(writer, plan)
     for task in plan.tasks:
@@ -74,8 +72,8 @@ def _candidate_controls(store, invocation, task):
 
 
 def _inspect_original(*, writer, plan, index, external_inputs, require_access):
-    from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog, SQLiteOperationalRepository
-    from .recursive_operations import operation_catalog
+    from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog, SQLiteOperationalRepository
+    from empirical_lawhood.api.recursive_operations import operation_catalog
     if type(index) is not DevelopmentRunRecoveryIndex:
         raise PermissionError('native continuation preparation requires the original unreplaced development index')
     index.validate_plan(plan)
@@ -91,7 +89,7 @@ def _inspect_original(*, writer, plan, index, external_inputs, require_access):
     finally:
         engine.dispose()
     by_task = {row.task_id: row for row in closure.recovered_receipts}
-    from empirical_lawhood.runtime.execution import VerifiedArtifactInput, dependency_artifact_inputs
+    from empirical_lawhood.execution.execution import VerifiedArtifactInput, dependency_artifact_inputs
     dependency_outputs = {}
     for key, receipt in by_task.items():
         logicals = {row.logical_artifact_id: row for row in receipt.output_logical_artifacts}
@@ -176,11 +174,11 @@ def prepare_native_continuation(*, service, directory, run_id, output_dir,
         preparation_instruction_sha256, worker_interpreter, worker_source_root,
         pure_output_bytes, read_access=None):
     """Publish a proposal only. There is deliberately no scheduler or retry path."""
-    from .recursive_authoring import implementation_binding, load_authored_wave
-    from .recursive_execution import _external_inputs, _retained_plans
-    from .selected_e3_access import original_e3_authority_read_context
-    from empirical_lawhood.infrastructure.run_source_admission import _capture_source
-    from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
+    from empirical_lawhood.api.recursive_authoring import implementation_binding, load_authored_wave
+    from empirical_lawhood.api.recursive_execution import _external_inputs, _retained_plans
+    from empirical_lawhood.api.selected_e3_access import original_e3_authority_read_context
+    from empirical_lawhood.storage.run_source_admission import _capture_source
+    from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
     writer = service.artifact_writer
     target = Path(output_dir).resolve()
     relative = target.relative_to(Path(writer.root.contract.canonical_path)).as_posix()

@@ -13,15 +13,15 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import matrix_selected_scientific_read as reader
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_point import forecast_selected_point
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_point import forecast_selected_point
 from empirical_lawhood.api.experiment_scientific_read import read_prepared_experiment_science
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
 from tests.runtime_platform.test_candidate_compiler import _fixture
 from tests.test_current_result_custody import actual_issued_current_task_controls  # noqa: F401
 from tests.test_matrix_selected_protected import transfer, confirmation  # noqa: F401
@@ -333,7 +333,7 @@ def test_current_protected_protocol_dispatches_the_ordinary_scientific_reader(mo
 def test_issued_configuration_lane_uses_exact_frozen_census_before_body(science,monkeypatch,damage):
     """Actual ExecutionTask metadata, not a permission or native-entry claim."""
     from empirical_lawhood.api import matrix_selected_runtime as runtime
-    from empirical_lawhood.runtime.plans import ScientificInputRole
+    from empirical_lawhood.execution.plans import ScientificInputRole
     task=science.final
     config,=(edge for edge in task.scientific_inputs
         if edge.scientific_role is ScientificInputRole.CONFIGURATION)

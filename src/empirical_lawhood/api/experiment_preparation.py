@@ -7,21 +7,16 @@ from dataclasses import replace
 import json
 from types import MappingProxyType
 
-from .codecs import load_registered_authoring
-from empirical_lawhood.runtime.progress import report_progress
-from empirical_lawhood.runtime.experiment_preparation import (
-    ExecutionSelection, ExperimentPreparation, ExperimentProtocolDeclaration, PreparedExperimentInputs,
-    PreparedExperimentFile, DependencyKind, ExperimentDependency,
-)
+from empirical_lawhood.api.codecs import load_registered_authoring
+from empirical_lawhood.execution.progress import report_progress
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, ExperimentPreparation, ExperimentProtocolDeclaration, PreparedExperimentInputs, PreparedExperimentFile
 
-from .experiment_runtime_bindings import experiment_runtime_binding
+from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding
 
 
 def experiment_protocols() -> tuple[ExperimentProtocolDeclaration, ...]:
     """Static declarations only; never invoke preparation or build a runner."""
-    from empirical_lawhood.adapters.composition.generated_extension_bundles import (
-        EXPERIMENT_PROTOCOL_DECLARATIONS,
-    )
+    from empirical_lawhood.api.generated_experiment_protocols import EXPERIMENT_PROTOCOL_DECLARATIONS
     declarations = EXPERIMENT_PROTOCOL_DECLARATIONS
     if (any(type(value) is not ExperimentProtocolDeclaration for value in declarations)
             or len({value.protocol_id for value in declarations}) != len(declarations)
@@ -57,7 +52,7 @@ def _input_member(directory, relative_path):
 def _installed_file_record_types():
     """Resolve one current closed type roster; never retain it across calls."""
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.runtime.recursive_record_codecs import input_record_type_census
+    from empirical_lawhood.storage.contracts.recursive_record_codecs import input_record_type_census
 
     registrations, _, legacy = operation_catalog()
     return input_record_type_census(registrations, legacy_codecs=legacy)
@@ -65,8 +60,8 @@ def _installed_file_record_types():
 
 def _resolve_file_byte_limit(declaration, identity, record_version, installed, record_types):
     """Resolve an explicitly declared physical contract without decoding bytes."""
-    from empirical_lawhood.runtime.artifacts import is_canonical_json_media_type
-    from empirical_lawhood.runtime.recursive_storage_codecs import resolve_storage_codec
+    from empirical_lawhood.storage.contracts.artifacts import is_canonical_json_media_type
+    from empirical_lawhood.storage.contracts.recursive_storage_codecs import resolve_storage_codec
 
     canonical = tuple(kind for kind in declaration.input_file_record_types
                       if kind.SCHEMA == identity.payload_schema)
@@ -143,9 +138,9 @@ def _selected_input_access_guard(*, specification, selection, path, declaration,
         artifact_writer, read_access=None, before_read=None):
     """Authenticate exact declared locators without opening other input bodies."""
     from empirical_lawhood.api.experiment_runtime_bindings import bootstrap_selected_experiment_inputs
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
     def read_record(binding, kind):
         if before_read is not None:
@@ -171,10 +166,10 @@ def load_experiment_inputs(specification, selection_path: Path, *, artifact_writ
     Domain preparation still establishes role, frame and scientific compatibility.
     In particular these byte bindings cannot make exposed inputs prospective.
     """
-    from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256, read_bounded_bytes
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputSelection
+    from empirical_lawhood.storage.bounded_io import bounded_file_sha256, read_bounded_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputSelection
 
     if _input_access_guard is not None and not callable(_input_access_guard):
         raise TypeError("experiment input access guard must be callable")
@@ -274,6 +269,9 @@ def prepare_experiment(specification, *, scientific_inputs=None,
         if type(selection) is not ExecutionSelection:
             raise TypeError("experiment execution requires its typed operational selection")
         selection.__post_init__()
+        if selection.workers is None:
+            from empirical_lawhood.execution.experiment_preparation import select_experiment_workers
+            selection = replace(selection, workers=select_experiment_workers(None))
         arguments = dict(scientific_inputs=scientific_inputs if scientific_inputs is not None else {},
                          execution=selection, protocol_bytes=protocol_bytes)
         if method_inputs is not None:
@@ -282,9 +280,6 @@ def prepare_experiment(specification, *, scientific_inputs=None,
         if type(preparation) is not ExperimentPreparation or preparation.specification != specification.identity:
             raise ValueError("registered protocol substitutes its selected specification or preparation contract")
         dependencies = preparation.dependencies
-        if selection.workers is None:
-            dependencies = (*dependencies, ExperimentDependency("experiment.workers", DependencyKind.ENVIRONMENT,
-                "Select worker concurrency explicitly or through the operator profile before authoring."))
         if preparation.programme is not None and (
                 declaration.programme_record_type is None
                 or type(preparation.programme) is not declaration.programme_record_type):
@@ -325,7 +320,7 @@ def author_prepared_experiment(*, preparation: ExperimentPreparation, project_ro
     Callers never reconstruct operation IDs or external binding projections.
     Source checks here and at recursive execution retain actual-worker identity.
     """
-    from .recursive_prospective_authoring import _prospective_preparation_scope
+    from empirical_lawhood.api.recursive_prospective_authoring import _prospective_preparation_scope
 
     with _prospective_preparation_scope():
         return _author_prepared_experiment(preparation=preparation, project_root=project_root,
@@ -335,7 +330,7 @@ def author_prepared_experiment(*, preparation: ExperimentPreparation, project_ro
 def _author_prepared_experiment(*, preparation, project_root, artifact_writer, output_dir, read_access):
     from tempfile import TemporaryDirectory
     from empirical_lawhood.api.recursive_authoring import author_recursive_wave, implementation_binding
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
     preparation.__post_init__()
     if preparation.programme is not None:
@@ -374,22 +369,26 @@ def _author_prepared_experiment(*, preparation, project_root, artifact_writer, o
             records = dict(preparation.design_records)
             if any(records.get(key) != record for key, record in original.design_records):
                 raise ValueError("authoring preparation dropped or replaced an original design record")
-            from empirical_lawhood.runtime.experiment_preparation import DependencyKind
+            from empirical_lawhood.execution.experiment_preparation import DependencyKind
 
             if any(row not in preparation.dependencies for row in original.dependencies
                     if row.kind is not DependencyKind.SOFTWARE):
                 raise ValueError("authoring preparation dropped an unresolved entry prerequisite")
-    if (not preparation.executable or not (preparation.input_records or preparation.input_files or preparation.contribution_dirs) or preparation.execution is None
+    # A native simulation may have no external operands: its complete original
+    # specification and canonical operation configurations already supply its
+    # scientific inputs. ExperimentPreparation validates the exact external-input
+    # census against the draft, including a legitimately empty census.
+    if (not preparation.executable or preparation.execution is None
             or preparation.specification_record is None):
         if preparation.dependencies:
             raise ValueError("experiment authoring retains unresolved prerequisites: " + "; ".join(
                 row.code + " (" + row.kind.value + "): " + row.detail for row in preparation.dependencies))
-        raise ValueError("experiment authoring requires a complete executable preparation and derived inputs")
+        raise ValueError("experiment authoring requires a complete executable preparation and original specification")
     _validate_prepared_input_files(preparation)
     if access_guard is not None:
         access_guard()
     if preparation.prospective_spec is not None:
-        from .prospective_experiment import author_prepared_prospective_experiment
+        from empirical_lawhood.api.prospective_experiment import author_prepared_prospective_experiment
 
         return author_prepared_prospective_experiment(preparation=preparation,
             prospective_spec=preparation.prospective_spec, source_configs=preparation.source_configs,
@@ -453,6 +452,15 @@ def experiment_preparation_report(preparation: ExperimentPreparation) -> dict:
         "native_contact": "NONE", "scientific_execution_performed": False,
         "scientific_authority": "NONE", "qualification": "NOT_ESTABLISHED",
     }
+    report["definition_editable"] = True
+    report["derived_plan_editable"] = False
+    report["derived_from"] = preparation.specification.to_document()
+    if preparation.draft is not None:
+        from .investigation_trace import authored_operation_trace
+        report["operation_origins"] = list(authored_operation_trace(preparation.draft,
+            specification=preparation.specification))
+    else:
+        report["operation_origins"] = []
     if preparation.programme is not None:
         report["programme_selection"] = preparation.programme.to_document()
     declarations = tuple(value for value in experiment_protocols()
@@ -486,7 +494,7 @@ def derive_experiment_inputs(*, specification_path, source_selection_path, proje
 def _validate_experiment_input_derivation_result(*, specification, protocol, binding, result,
         artifact_writer, output_selection_path, execution, read_access=None):
     """One unchanged result/custody contract for ordinary and composed input derivation."""
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
     if type(result) is not ExperimentInputDerivationResult:
         raise TypeError("registered experiment input deriver returned another result type")
     result.__post_init__()
@@ -506,9 +514,9 @@ def _validate_experiment_input_derivation_result(*, specification, protocol, bin
 
 def _authenticate_derived_target(result, writer, *, read_access=None):
     """Verify the ordinary committed target publication and reopen actual inputs."""
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, derived_outcome_access
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, inherited_visibility
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, derived_outcome_access
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, inherited_visibility
     root=Path(writer.root.contract.canonical_path)
     selected_paths = []
     for path in (result.target_specification_path, result.source_selection_path):
@@ -564,12 +572,12 @@ def _authenticate_derived_target(result, writer, *, read_access=None):
 
 
 def experiment_input_derivation_report(result):
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
     if type(result) is not ExperimentInputDerivationResult:
         raise TypeError("input derivation report requires its exact typed result")
     result.__post_init__()
     from collections import Counter
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
     preparation = result.preparation
     # Derivation reports retain bounded identities/counts. Complete dependency
     # rows are already preserved with a verified publication, never truncated.

@@ -9,16 +9,11 @@ from types import SimpleNamespace
 import pytest
 from sqlalchemy import delete, event, select, update
 
-from empirical_lawhood.infrastructure.sql import (
-    SQLiteOperationalRepository,
-    OperationalWriteConflict,
-    create_catalog_engine,
-    upgrade_catalog,
-)
-from empirical_lawhood.infrastructure.sql.operations import OperationalQueryWorkLimitExceeded
-from empirical_lawhood.infrastructure.sql.schema import lease, run_event, task_attempt, workflow_run
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.execution import OperationalAttempt, TaskAttemptDisposition, TaskBlockReason
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, OperationalWriteConflict, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.sql.operations import OperationalQueryWorkLimitExceeded
+from empirical_lawhood.storage.sql.schema import lease, run_event, task_attempt, workflow_run
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.execution import OperationalAttempt, TaskAttemptDisposition, TaskBlockReason
 
 
 RUN = "run.disclosed.current-attempt-lease"
@@ -107,6 +102,65 @@ def _refresh(case, **changes):
         "attempt_id": ATTEMPT, "lease_id": LEASE, "owner_id": OWNER,
         "at_epoch_seconds": NOW, "expires_epoch_seconds": 300,
     } | changes))
+
+
+def _require_current(case, **changes):
+    return case.repo.require_current_attempt(**({
+        "run_id": RUN, "execution_plan_sha256": PLAN, "task_id": TASK, "attempt_id": ATTEMPT,
+    } | changes))
+
+
+@pytest.mark.parametrize("lease_state", ("future", "expired", "foreign", "absent"))
+def test_native_current_attempt_has_no_lease_dependency(case, lease_state):
+    with case.engine.begin() as connection:
+        if lease_state == "expired":
+            connection.execute(update(lease).values(expires_epoch_seconds=1))
+        elif lease_state == "foreign":
+            connection.execute(update(lease).values(owner_id="scheduler.foreign", lease_id="lease.foreign"))
+        elif lease_state == "absent":
+            connection.execute(delete(lease))
+    before = _rows(case.engine)
+    statements = []
+    def observe(_conn, _cursor, statement, _parameters, _context, _executemany):
+        statements.append(statement)
+    event.listen(case.engine, "before_cursor_execute", observe)
+    try:
+        assert _require_current(case) is None
+    finally:
+        event.remove(case.engine, "before_cursor_execute", observe)
+    assert len(statements) == 1 and statements[0].lstrip().upper().startswith("SELECT ")
+    assert "lease" not in statements[0].lower()
+    assert _rows(case.engine) == before
+
+
+@pytest.mark.parametrize("changes", (
+    {"run_id": "run.foreign"}, {"task_id": "task.foreign"},
+    {"attempt_id": "attempt.foreign"}, {"execution_plan_sha256": "b" * 64},
+))
+def test_native_current_attempt_still_requires_original_identities(case, changes):
+    before = _rows(case.engine)
+    with pytest.raises(OperationalWriteConflict):
+        _require_current(case, **changes)
+    assert _rows(case.engine) == before
+
+
+@pytest.mark.parametrize("damage", ("run-state", "attempt-state", "attempt-reason", "replacement"))
+def test_native_current_attempt_refuses_replaced_or_terminal_state(case, damage):
+    if damage == "replacement":
+        case.repo.start_attempt(run_id=RUN, task_id=TASK, attempt_id=ATTEMPT + ".next",
+            lease_id=LEASE + ".next", owner_id=OWNER, expires_epoch_seconds=300)
+    else:
+        with case.engine.begin() as connection:
+            if damage == "run-state":
+                connection.execute(update(workflow_run).values(state=OperationalStatus.FAILED.value))
+            elif damage == "attempt-state":
+                connection.execute(update(task_attempt).values(state=TaskAttemptDisposition.SUCCEEDED.value))
+            else:
+                connection.execute(update(task_attempt).values(reason_code="failure.disclosed"))
+    before = _rows(case.engine)
+    with pytest.raises(OperationalWriteConflict):
+        _require_current(case)
+    assert _rows(case.engine) == before
 
 
 def test_owned_live_lease_refresh_changes_only_liveness(case):

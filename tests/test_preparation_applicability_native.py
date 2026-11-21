@@ -5,10 +5,10 @@ import numpy as np
 import pytest
 
 from empirical_lawhood.api.preparation_conformance import preparation_native_conformance
-from empirical_lawhood.adapters.simulators.constructed_preparation_applicability.native import nominal_digest
-from empirical_lawhood.adapters.simulators.constructed_preparation_applicability.records import ConstructedPreparationStream
-from empirical_lawhood.adapters.methods.preparation_applicability.exposure import effective_seed_ids,PreparationApplicabilityExposure
-from empirical_lawhood.adapters.simulators.preparation_applicability.native import acquire_phase
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.phase_records import nominal_digest
+from empirical_lawhood.domains.matrix.constructed_preparation_applicability.phase_records import ConstructedPreparationStream
+from empirical_lawhood.domains.matrix.preparation_applicability.exposure import effective_seed_ids, PreparationApplicabilityExposure
+from empirical_lawhood.domains.matrix.preparation_applicability.dynamics import acquire_phase
 from tests.preparation_applicability_fixtures import allocation,synthetic_identity
 
 
@@ -21,7 +21,7 @@ def test_nominal_programme_and_conditioned_gaussian_are_unchanged():
     for purpose,digest in expected.items():
         assert nominal_digest(purpose)==digest
     from hashlib import sha256
-    from empirical_lawhood.adapters.methods.constructed_preparation_applicability.config import FIXED_PROBE_SEED
+    from empirical_lawhood.domains.matrix.constructed_preparation_applicability.config import FIXED_PROBE_SEED
     actual_probe_digest=sha256(f"cc1-applicability-v1.passive-probes\0{expected['prefix-probes']}\0q2-n4-fields12".encode()).hexdigest()
     assert actual_probe_digest==f"{FIXED_PROBE_SEED:064x}"
     stream=ConstructedPreparationStream(987,expected["prefix"],Decimal(".002"))
@@ -49,7 +49,7 @@ def test_probe_high128_exposure_rejects_changed_low128_label():
 def test_continuation_refuses_before_native_contact(monkeypatch,phase):
     def forbidden(**kwargs):
         raise AssertionError("native marcher entered")
-    monkeypatch.setattr("empirical_lawhood.adapters.simulators.preparation_applicability.native.march_native_intervals",forbidden)
+    monkeypatch.setattr("empirical_lawhood.domains.matrix.preparation_applicability.dynamics.march_native_intervals",forbidden)
     with pytest.raises(ValueError,match="predecessor"):
         acquire_phase(phase_name=phase,allocation=allocation(1).roots[0],refinement=1,source_sha256="a"*64)
 

@@ -12,10 +12,10 @@ import pytest
 
 from empirical_lawhood.api import configured_e3_imported_products as owner
 from empirical_lawhood.api import configured_e3_retained_read, matrix_sampling_runtime, protected_e3_read_custody, recursive_qualified_parents
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_unfinished_execution import ConfiguredE3CompletedOutput, ConfiguredE3UnfinishedExecution
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_unfinished_execution import ConfiguredE3CompletedOutput, ConfiguredE3UnfinishedExecution
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
 from tests.test_configured_e3_product_export import products, original_case, _literal  # noqa: F401
 
 
@@ -24,7 +24,7 @@ def pin(value, field):
 
 
 def _imported_case(products, monkeypatch, damage=None, *, closed=False):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
 
     names = ('models', 'model-freeze', 'calibration', 'calibrated-freeze')
     old = products.package
@@ -124,9 +124,9 @@ def test_four_products_keep_actual_origins_and_refuse_changed_custody(products, 
     'incomplete-current', 'missing-envelope', 'changed-envelope', 'closure-receipt'))
 def test_prepared_access_keeps_actual_partial_producers_inside_completed_continuation(products, monkeypatch, closed, damage):  # noqa: F811
     from empirical_lawhood.api import current_result_custody, selected_prepared_access
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
 
     case = _imported_case(products, monkeypatch, damage, closed=closed)
     monkeypatch.setattr(current_result_custody.CurrentResultPlanReader, 'authenticate',
@@ -172,7 +172,7 @@ def test_prepared_access_keeps_actual_partial_producers_inside_completed_continu
     originals = tuple(sorted((original for original, _ in case.originals), key=lambda value: value.record.object_id))
 
     def read():
-        from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+        from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
         with scientific_reconstruction_operation('full'):
             return selected_prepared_access.original_input_access(artifact_writer=products.plane,
                 locators=tuple(('original.' + str(index), original) for index, original in enumerate(originals)))

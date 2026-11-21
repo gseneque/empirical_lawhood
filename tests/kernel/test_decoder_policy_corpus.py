@@ -12,13 +12,13 @@ import pytest
 import yaml
 
 from empirical_lawhood.api import codecs
-from empirical_lawhood.infrastructure import dataset_projection as projection
-from empirical_lawhood.kernel import decoding
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experiments import RevealBarrierSpec
-from empirical_lawhood.kernel.retrospective_prediction_experiments import RetrospectiveEvaluationBarrier, RetrospectiveExperimentSpec
-from empirical_lawhood.kernel.serialization import CanonicalRecord, CanonicalizationError
-from empirical_lawhood.kernel.time import CausalPhase
+from empirical_lawhood.storage import dataset_projection as projection
+from empirical_lawhood.science.records import decoding
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experiments import RevealBarrierSpec
+from empirical_lawhood.science.experiments.retrospective_prediction_experiments import RetrospectiveEvaluationBarrier, RetrospectiveExperimentSpec
+from empirical_lawhood.science.records.serialization import CanonicalRecord, CanonicalizationError
+from empirical_lawhood.science.models.time import CausalPhase
 
 
 @dataclass(frozen=True, slots=True)
@@ -213,10 +213,8 @@ def test_existing_authoring_registry_byte_node_and_depth_limits(monkeypatch: pyt
             codecs.loads_registered_authoring(text, media_type="application/json", root_schemas=registry)
     with pytest.raises(codecs.AuthoringCodecError, match="byte limit"):
         codecs.loads_registered_authoring(text, media_type="application/json", root_schemas={Corpus.SCHEMA: Corpus}, maximum_bytes=10)
-    with monkeypatch.context() as patch:
-        patch.setattr(codecs, "MAX_AUTHORING_NODES", 10)
-        with pytest.raises(codecs.AuthoringCodecError, match="node limit"):
-            codecs.loads_registered_authoring(text, media_type="application/json", root_schemas={Corpus.SCHEMA: Corpus})
+    with pytest.raises(codecs.AuthoringCodecError, match="node limit"):
+        codecs._parse_json(text, maximum_nodes=10)
     nested = "[" * 128 + "0" + "]" * 128
     with pytest.raises(codecs.AuthoringCodecError, match="nesting limit"):
         codecs.loads_registered_authoring(nested, media_type="application/json", root_schemas={Corpus.SCHEMA: Corpus})

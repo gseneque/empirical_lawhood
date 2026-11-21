@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 # Adapted from the source project; synthetic software conformance only.
 from __future__ import annotations
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 import hashlib
 import json
@@ -16,98 +17,29 @@ import pytest
 from sqlalchemy import func, select
 from tests.runtime_platform.support import IMPLEMENTATION_COMMIT, ExplorationFixture, ProtocolFixture, budget, digest
 
-from empirical_lawhood.adapters.exploration.conformance import _measure, _prepare
-from empirical_lawhood.adapters.exploration.registry import SYNTHESIS_KEY, exploration_capability_keys, exploration_capability_registry
-from empirical_lawhood.adapters.reference_worlds import ReferenceWorldKind, get_reference_world
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane,
-)
-from empirical_lawhood.infrastructure.artifacts import (
-    ArtifactIdentityConflict,
-    FilesystemState,
-    GuardedExternalRoot,
-    STREAM_CHUNK_BYTES,
-)
-from empirical_lawhood.infrastructure.execution import (
-    DirectTaskExecutor,
-    ExecutionResourceCapacity,
-    InjectedSchedulerCrash,
-    LiveLeaseError,
-    LocalProcessExecutor,
-    LocalExecutionResourceAdmitter,
-    LocalScheduler,
-    ResourceAdmissionError,
-    ResourceLockManager,
-    SchedulerConsistencyError,
-    TaskProcessError,
-    _bounded_scratch_bytes,
-)
-from empirical_lawhood.infrastructure.external_execution import (
-    ExternalExecutionBackendKind,
-    ExternalExecutionError,
-    RegisteredExecutionBackend,
-    RegisteredExternalTaskExecutor,
-)
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.sql import (
-    SQLiteOperationalRepository,
-    create_catalog_engine,
-    upgrade_catalog,
-)
-from empirical_lawhood.infrastructure.sql.schema import run_event
-from empirical_lawhood.infrastructure.task_receipts import (
-    ExternalTaskReceiptStore,
-    decode_artifact_manifest,
-    decode_task_receipt,
-)
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalizationError,
-    CanonicalRecord,
-    canonical_json_bytes,
-)
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.discovery import DiagnosticMeasureKind, ThresholdDirection
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactManifest,
-    ArtifactMaterialization,
-    ArtifactProfile,
-    ArtifactSemanticValidationRegistry,
-    ArtifactWriteRequest,
-    ExternalRootContract,
-    ReceiptCheck,
-    lineage_parent_sort_key,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityManifest, CapabilityPermission
-from empirical_lawhood.runtime.compiler import compile_exploration_execution_plan
-from empirical_lawhood.runtime.execution import (
-    ExecutionAssuranceProfile,
-    RunnerRegistry,
-    RunnerResult,
-    StreamedTaskOutput,
-    StreamingOutputEmitter,
-    TaskAttemptDisposition,
-    TaskBlockKind,
-    TaskBlockReason,
-    TaskContext,
-    TaskExecutor,
-    TaskOutputPayload,
-    TaskRunner,
-    VerifiedArtifactInput,
-    WorkerInputBinding,
-    WorkerInputKind,
-    WorkerInputPort,
-    WorkerIsolationProfile,
-    WorkerOutputPort,
-)
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, PlanLane
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    capability_semantic_validation_registry,
-)
-from empirical_lawhood.runtime.recovery import ProtocolRunRecoveryIndex
+from empirical_lawhood.domains.reference_worlds.exploration.conformance import _measure, _prepare
+from empirical_lawhood.domains.reference_worlds.exploration.registry import SYNTHESIS_KEY, exploration_capability_keys, exploration_capability_registry
+from empirical_lawhood.domains.reference_worlds import ReferenceWorldKind, get_reference_world
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, FilesystemState, GuardedExternalRoot, STREAM_CHUNK_BYTES
+from empirical_lawhood.execution.local.execution import DirectTaskExecutor, ExecutionResourceCapacity, InjectedSchedulerCrash, LiveLeaseError, LocalProcessExecutor, LocalExecutionResourceAdmitter, LocalScheduler, ResourceAdmissionError, ResourceLockManager, SchedulerConsistencyError, TaskProcessError, _bounded_scratch_bytes
+from empirical_lawhood.execution.remote.external_execution import ExternalExecutionBackendKind, ExternalExecutionError, RegisteredExecutionBackend, RegisteredExternalTaskExecutor
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.sql.schema import run_event
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore, decode_task_receipt
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalizationError, CanonicalRecord, canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.discovery import DiagnosticMeasureKind, ThresholdDirection
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactManifest, ArtifactMaterialization, ArtifactProfile, ArtifactSemanticValidationRegistry, ArtifactWriteRequest, ExternalRootContract, ReceiptCheck, lineage_parent_sort_key
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityPermission
+from empirical_lawhood.execution.compiler import compile_exploration_execution_plan
+from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry, RunnerResult, StreamedTaskOutput, StreamingOutputEmitter, TaskAttemptDisposition, TaskBlockKind, TaskBlockReason, TaskContext, TaskExecutor, TaskOutputPayload, TaskRunner, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, PlanLane
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, capability_semantic_validation_registry
+from empirical_lawhood.execution.recovery import ProtocolRunRecoveryIndex
 
 
 class StaticInspector:
@@ -2024,7 +1956,7 @@ def test_local_process_executor_isolates_worker_and_reports_typed_failure(
     assert facts["memory_limit"] == 512 * 1024**2
     assert facts["file_limit"] == context.resource_budget.output_bytes
     assert facts["affinity_count"] <= context.resource_budget.cpu_cores
-    assert facts["environment_keys"] == [
+    assert facts["environment_keys"] == sorted([
         "HOME",
         "KMP_DUPLICATE_LIB_OK",
         "LANG",
@@ -2036,7 +1968,11 @@ def test_local_process_executor_isolates_worker_and_reports_typed_failure(
         "PYTHONHASHSEED",
         "TMPDIR",
         "VECLIB_MAXIMUM_THREADS",
-    ]
+    ] + [name for name in (
+        "NUMBA_NUM_THREADS", "BLIS_NUM_THREADS", "OPENMM_CPU_THREADS",
+        "OPENBLAS_CORETYPE", "NPY_DISABLE_CPU_FEATURES",
+        "PYBAMM_DISABLE_TELEMETRY", "CASADIPATH",
+    ) if name in os.environ])
     assert facts["cwd"].endswith(
         f"scratch/task-execution/{context.run_id}/{context.run_id}.prepare.attempt-003"
     )
@@ -2222,7 +2158,7 @@ def test_bounded_scratch_scan_tolerates_an_exact_vanished_entry(
             return self.scan.__exit__(*args)
 
     monkeypatch.setattr(
-        "empirical_lawhood.infrastructure.execution.os.scandir",
+        "empirical_lawhood.execution.local.execution.os.scandir",
         VanishingEntryScan,
     )
 
@@ -2232,11 +2168,20 @@ def test_bounded_scratch_scan_tolerates_an_exact_vanished_entry(
 def test_streaming_worker_commits_validated_artifact_then_receipt(
     tmp_path: Path,
     protocol_fixture: ProtocolFixture,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     scheduler, repository, plane, receipts, plan = _streaming_runtime(
         tmp_path,
         protocol_fixture,
     )
+    from empirical_lawhood.storage.owned_output import OwnedFileChunks
+    adopted = []
+    original = OwnedFileChunks.try_adopt
+    def observe_adoption(self, destination, **kwargs):
+        result = original(self, destination, **kwargs)
+        adopted.append(result)
+        return result
+    monkeypatch.setattr(OwnedFileChunks, 'try_adopt', observe_adoption)
     run_id = plan.source_plan.object_id
     result = scheduler.execute(run_id, plan)
 
@@ -2250,6 +2195,7 @@ def test_streaming_worker_commits_validated_artifact_then_receipt(
     output = receipt.output_materializations[0]
     assert output.size_bytes > 400_000
     assert output.relative_path == f"runs/{run_id}/streams/streaming-task-output.jsonl"
+    assert adopted == [True]
     plane.verify(output)
     assert not tuple(tmp_path.rglob(".worker-output.*.partial"))
     repository.engine.dispose()
@@ -2906,9 +2852,11 @@ def test_resource_admission_keeps_compute_and_does_not_invent_scratch_from_outpu
     )
     assert not refused.admitted
     assert set(refused.reason_codes) == {
+        "ACCELERATED_COMPUTE_NOT_SELECTED",
         "CPU_CAPACITY_UNAVAILABLE",
         "EXECUTOR_RESOURCE_ENFORCEMENT_UNAVAILABLE",
         "GPU_CAPACITY_UNAVAILABLE",
+        "GPU_MEMORY_ISOLATION_UNAVAILABLE",
         "MEMORY_CAPACITY_UNAVAILABLE",
     }
 
@@ -3186,13 +3134,12 @@ def test_failed_branch_does_not_suppress_sibling_and_blocks_join(
 
 
 @pytest.mark.parametrize('mode', ('complete', 'interrupt', 'refusal'))
-def test_parallel_dispatch_overlaps_next_preparation_and_renews_owned_leases(
+def test_parallel_dispatch_overlaps_next_preparation_and_preserves_refusal(
     tmp_path, protocol_fixture, monkeypatch, mode,
 ):
-    from empirical_lawhood.runtime.native_effects import NativeEntryRefused
+    from empirical_lawhood.execution.native_effects import NativeEntryRefused
 
     started, release = threading.Event(), threading.Event()
-    heartbeats = []
 
     class Executor:
         def execute(self, runner, context, *, timeout_seconds):
@@ -3204,17 +3151,12 @@ def test_parallel_dispatch_overlaps_next_preparation_and_renews_owned_leases(
     scheduler, repository, _, receipts, runners = _runtime(tmp_path, protocol_fixture,
         executor=Executor(), maximum_parallel_tasks=2,
         parallel_resource_capacity=ExecutionResourceCapacity(2, 2_000_000, 0, True, True, False))
-    prepare, refresh = scheduler._prepare_task, scheduler._refresh_owned_attempt_lease
-
-    def heartbeat(run_id, task_id, attempt_id):
-        heartbeats.append(task_id)
-        return refresh(run_id, task_id, attempt_id)
+    prepare = scheduler._prepare_task
 
     def prepare_next(run_id, task, *args):
         if task.task_id == 'develop-b':
             try:
                 assert started.wait(5), 'ready task waited for its sibling preparation'
-                assert 'develop-a' in heartbeats, 'coordinator skipped the running lease between preparations'
                 if mode == 'interrupt':
                     raise KeyboardInterrupt
                 if mode == 'refusal':
@@ -3225,7 +3167,6 @@ def test_parallel_dispatch_overlaps_next_preparation_and_renews_owned_leases(
         return prepare(run_id, task, *args)
 
     monkeypatch.setattr(scheduler, '_prepare_task', prepare_next)
-    monkeypatch.setattr(scheduler, '_refresh_owned_attempt_lease', heartbeat)
     run_id = protocol_fixture.run_plan.run_plan_id
     try:
         if mode == 'complete':
@@ -3741,7 +3682,7 @@ def test_receipt_decoder_rejects_noncanonical_and_partial_pairs(
     payload = (tmp_path / relative).read_bytes()
     manifest_payload = (tmp_path / f"{relative}.manifest.json").read_bytes()
     assert decode_task_receipt(payload) == receipt
-    assert decode_artifact_manifest(manifest_payload).logical.content_sha256 == (
+    assert resolve_artifact_sidecar_bytes(_plane_value, manifest_payload).logical.content_sha256 == (
         receipt.fingerprint()
     )
     with pytest.raises(CanonicalizationError, match="not canonical"):

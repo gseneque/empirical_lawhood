@@ -11,10 +11,10 @@ import threading
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, ExternalRootUnavailable, GuardedExternalRoot
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, ExternalRootUnavailable, GuardedExternalRoot
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract
 
 
 def _plane(directory):
@@ -257,7 +257,7 @@ def test_interrupted_intent_owned_prefix_keeps_original_recovery_contract(tmp_pa
     assert partial.read_bytes() == requests[0].payload
 
 
-def _interrupted_unpinned_batch(plane, requests, monkeypatch, *, compact):
+def _interrupted_unpinned_batch(plane, requests, monkeypatch):
     """Retain the real durable intent and simulate an interrupted pair write."""
     captured = []
     publish = plane._publish_staged_batch
@@ -275,7 +275,7 @@ def _interrupted_unpinned_batch(plane, requests, monkeypatch, *, compact):
         patch.setattr(plane, "_publish_staged_batch", capture)
         patch.setattr(plane, "_write_publication_intent", interrupt)
         with pytest.raises(KeyboardInterrupt, match="durable intent"):
-            plane.write_batch(_unpinned_streams(requests), compact_manifests=compact)
+            plane.write_batch(_unpinned_streams(requests))
     batch, sidecars = captured[0]
     first = batch.members[0]
     first.artifact_path.write_bytes(requests[0].payload[:17])
@@ -289,14 +289,13 @@ def _unpinned_streams(requests):
                  for request in requests)
 
 
-@pytest.mark.parametrize("compact", (False, True))
-def test_unpinned_stream_recovers_owned_interrupted_first_sidecar(tmp_path, monkeypatch, compact):
+def test_unpinned_stream_recovers_owned_interrupted_first_sidecar(tmp_path, monkeypatch):
     root = tmp_path / "unpinned-interruption"
     plane = _plane(root)
     requests = _requests(2)
-    batch, sidecars = _interrupted_unpinned_batch(plane, requests, monkeypatch, compact=compact)
+    batch, sidecars = _interrupted_unpinned_batch(plane, requests, monkeypatch)
 
-    recovered = plane.write_batch(_unpinned_streams(requests), compact_manifests=compact)
+    recovered = plane.write_batch(_unpinned_streams(requests))
 
     assert all(item.created for item in recovered)
     assert not batch.intent_path.exists()
@@ -307,13 +306,12 @@ def test_unpinned_stream_recovers_owned_interrupted_first_sidecar(tmp_path, monk
     assert not tuple(root.rglob("*.partial"))
 
 
-@pytest.mark.parametrize("compact", (False, True))
 @pytest.mark.parametrize("damage", ("unowned", "foreign-sidecar", "changed-request"))
-def test_unpinned_interruption_refuses_unowned_or_different_bytes(tmp_path, monkeypatch, compact, damage):
+def test_unpinned_interruption_refuses_unowned_or_different_bytes(tmp_path, monkeypatch, damage):
     root = tmp_path / "unpinned-refusal"
     plane = _plane(root)
     requests = _requests(2)
-    batch, _sidecars = _interrupted_unpinned_batch(plane, requests, monkeypatch, compact=compact)
+    batch, _sidecars = _interrupted_unpinned_batch(plane, requests, monkeypatch)
     if damage == "unowned":
         batch.intent_path.unlink()
     elif damage == "foreign-sidecar":
@@ -324,26 +322,25 @@ def test_unpinned_interruption_refuses_unowned_or_different_bytes(tmp_path, monk
     before = _census(root)
 
     with pytest.raises(ArtifactIdentityConflict):
-        plane.write_batch(_unpinned_streams(requests), compact_manifests=compact)
+        plane.write_batch(_unpinned_streams(requests))
 
     assert _census(root) == before
     assert not batch.commit_path.exists()
     assert not tuple(root.rglob("*.partial"))
 
 
-@pytest.mark.parametrize("compact", (False, True))
 @pytest.mark.parametrize("damage", ("prefix", "foreign"))
-def test_unpinned_replay_never_repairs_a_committed_sidecar(tmp_path, compact, damage):
+def test_unpinned_replay_never_repairs_a_committed_sidecar(tmp_path, damage):
     root = tmp_path / "unpinned-committed-refusal"
     plane = _plane(root)
     requests = _requests(2)
-    initial = plane.write_batch(_unpinned_streams(requests), compact_manifests=compact)
+    initial = plane.write_batch(_unpinned_streams(requests))
     sidecar = plane.root.resolve(initial[0].manifest_materialization.relative_path, for_write=False)
     sidecar.write_bytes(sidecar.read_bytes()[:31] if damage == "prefix" else b'{"foreign":')
     before = _census(root)
 
     with pytest.raises(ArtifactIdentityConflict):
-        plane.write_batch(_unpinned_streams(requests), compact_manifests=compact)
+        plane.write_batch(_unpinned_streams(requests))
 
     assert _census(root) == before
     assert not tuple(root.rglob("*.partial"))

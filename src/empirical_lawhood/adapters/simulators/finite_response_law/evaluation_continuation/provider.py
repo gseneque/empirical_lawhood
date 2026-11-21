@@ -3,39 +3,30 @@
 from hashlib import sha256
 from typing import cast
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.source_qualification import ProspectiveRetainedSourceUse
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, CanonicalTaskReceipt
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import TaskContext, RunnerResult, TaskRunner, TaskProgressEmitter
-from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignStageEnvelope
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-    CapabilityOutputSemanticContract,
-    MAX_EXTERNAL_INPUT_CHUNK_BYTES,
-)
-from empirical_lawhood.runtime.source_resolution import (
-    ContentAddressedInputRequirement,
-    ContentAddressedInputKind,
-    ContentAddressedInputResolver,
-)
-from empirical_lawhood.adapters.methods.finite_response_law.method_provider import _ResolvedInputSource
-from empirical_lawhood.adapters.methods.finite_response_law.control_ports import FiniteResponseLawControlRuntimePort
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.source_qualification import ProspectiveRetainedSourceUse
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import TaskContext, RunnerResult, TaskRunner, TaskProgressEmitter
+from empirical_lawhood.execution.linked_campaigns import LinkedCampaignStageEnvelope
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, ExternalInputPayload, CapabilityOutputSemanticContract, MAX_EXTERNAL_INPUT_CHUNK_BYTES
+from empirical_lawhood.execution.source_resolution import ContentAddressedInputRequirement, ContentAddressedInputKind, ContentAddressedInputResolver
+from empirical_lawhood.domains.matrix.finite_response_law.method_provider import _ResolvedInputSource
+from empirical_lawhood.domains.matrix.finite_response_law.control_ports import FiniteResponseLawControlRuntimePort
 from empirical_lawhood.adapters.simulators.response_geometry_prospective.provider import config_payloads, decode_port, read_port, output_result, semantic_contracts
-from ..evaluation.discovery import SOURCE_CAPABILITY as ORIGINAL_SOURCE
-from ..assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
-from ..contracts import native_invocations
-from ..evaluation_provider import FiniteResponseLawEvaluationSourceProvider, FiniteResponseLawEvaluationSourceTask
-from ..evaluation_retention import FiniteResponseLawEvaluationRetention
-from ..native_artifact import NATIVE_PAIR_SCHEMA
-from ..source_outputs import FiniteResponseLawAssignedEvaluationTaskResult
-from ..provider import native_stage
-from .discovery import SOURCE_CAPABILITY, IMPORT_CAPABILITY
+from empirical_lawhood.adapters.simulators.finite_response_law.evaluation.discovery import SOURCE_CAPABILITY as ORIGINAL_SOURCE
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
+from empirical_lawhood.domains.matrix.finite_response_law.contracts import native_invocations
+from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_provider import FiniteResponseLawEvaluationSourceProvider, FiniteResponseLawEvaluationSourceTask
+from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_retention import FiniteResponseLawEvaluationRetention
+from empirical_lawhood.adapters.simulators.finite_response_law.native_artifact import NATIVE_PAIR_SCHEMA
+from empirical_lawhood.adapters.simulators.finite_response_law.source_outputs import FiniteResponseLawAssignedEvaluationTaskResult
+from empirical_lawhood.adapters.simulators.finite_response_law.provider import native_stage
+from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.discovery import SOURCE_CAPABILITY, IMPORT_CAPABILITY
 
 
 class _ContinuationTask:

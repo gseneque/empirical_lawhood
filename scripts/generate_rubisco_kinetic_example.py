@@ -5,15 +5,12 @@ import argparse
 from decimal import Decimal as D
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.disclosed_examples import DisclosedAssumption
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.disclosed_examples import DisclosedAssumption
 
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_join.recursive_translation import kinetic_join_draft
-from empirical_lawhood.adapters.methods.rubisco_prediction.kinetic_supply import (
-    ApparentKineticConstants, JointKineticSupply, KineticSupplyContext,
-    KineticSupplyMember, KineticSupportInterval, KineticTargetComparison,
-)
-from empirical_lawhood.adapters.simulators.rubisco_assay.records import AssayQuery
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.recursive_translation import kinetic_join_draft
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_supply import ApparentKineticConstants, JointKineticSupply, KineticSupplyContext, KineticSupplyMember, KineticSupportInterval, KineticTargetComparison
+from empirical_lawhood.domains.rubisco.assay.records import AssayQuery
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 ROOT = Path(__file__).resolve().parents[1]
 

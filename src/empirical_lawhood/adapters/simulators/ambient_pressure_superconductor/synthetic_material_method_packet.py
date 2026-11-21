@@ -4,18 +4,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import ClassVar
 
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.planning.experiment_entry import ExecutableStudyDefinition
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256, validate_stable_id
+from empirical_lawhood.design.experiment_entry import ExecutableStudyDefinition
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure
 
-from .synthetic_material_method_authoring import SyntheticMaterialResponseMethodAuthoringBundle, build_synthetic_material_response_method_authoring
-from .synthetic_material_method_contracts import SyntheticMaterialResponseMethodConfig
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.synthetic_material_method_authoring import SyntheticMaterialResponseMethodAuthoringBundle, build_synthetic_material_response_method_authoring
+from empirical_lawhood.domains.materials.synthetic_material_method.contracts import SyntheticMaterialResponseMethodConfig
 
 _MAX_CONFIG_BYTES = 128 * 1024
 _MAX_PACKET_BYTES = 16 * 1024 * 1024

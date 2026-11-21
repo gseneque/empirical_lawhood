@@ -12,7 +12,7 @@ import sys
 import pytest
 
 from empirical_lawhood.adapters.physical.rubisco_kinetics import rr_amber_nonbonded as a
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def native_flag(name, tokens, kind="I", width=8, count=10):

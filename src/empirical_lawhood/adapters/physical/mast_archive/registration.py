@@ -4,27 +4,16 @@ from __future__ import annotations
 
 from hashlib import sha256
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.kernel.serialization import validate_sha256
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.records.serialization import validate_sha256
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
 
-from .contracts import (
-    FairMastMaterializationReceipt,
-    FairMastSourceDeclaration,
-    MastCausalState,
-    MastEndpointResult,
-    MastEvent,
-)
-from .endpoints import MastEndpointRule
-from .events import MastEventRule
-from .features import MastFeatureRule
-from .source import FairMastMaterializationRequest, FairMastOperatorConfig, FairMastPreview
+from empirical_lawhood.domains.fusion.mast_archive.contracts import FairMastMaterializationReceipt, FairMastSourceDeclaration, MastCausalState, MastEndpointResult, MastEvent
+from empirical_lawhood.domains.fusion.mast_archive.endpoints import MastEndpointRule
+from empirical_lawhood.domains.fusion.mast_archive.events import MastEventRule
+from empirical_lawhood.domains.fusion.mast_archive.features import MastFeatureRule
+from empirical_lawhood.adapters.physical.mast_archive.source import FairMastMaterializationRequest, FairMastOperatorConfig, FairMastPreview
 
 
 def build_mast_archive_registry(*, implementation_sha256: str) -> CapabilityRegistry:

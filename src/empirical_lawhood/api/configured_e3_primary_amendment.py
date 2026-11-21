@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: MPL-2.0
 """Exact original native controls and banks for a declared primary amendment."""
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.publication_metadata import authenticate_published_materialization
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def _record(writer, publication, kind):
@@ -25,10 +25,10 @@ def _entry_product(writer, binding):
     from empirical_lawhood.api.recursive_execution import _retained_plans
     from empirical_lawhood.api.recursive_operations import development_output_contracts, operation_catalog
     from empirical_lawhood.api.native_training_banks import _receipt_product
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_acquisition import entry_task_id
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_acquisition import entry_task_id
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
     locator = binding.native_training_locator
     directory = writer.root.resolve(locator.authored_directory, for_write=False)
     packet, draft, _, payloads = load_authored_wave(directory=directory, artifact_writer=writer, lazy_payloads=True)
@@ -60,9 +60,7 @@ def _entry_product(writer, binding):
 
 def authenticate_primary_amendment(*, writer, selection):
     """No default amendment; authenticate actual original seal and unchanged banks."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import (
-        ConfiguredProtectedE3LoweringInputs, configured_preparation_types,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import ConfiguredProtectedE3LoweringInputs, configured_preparation_types
     if type(selection) not in (ConfiguredProtectedE3LoweringInputs, *configured_preparation_types()):
         return None
     selection.__post_init__()

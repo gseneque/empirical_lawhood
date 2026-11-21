@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "deployment_id": "el-gpu-control",
+  "region": "SELECT_REGION",
+  "zone": "SELECT_DATACENTER",
+  "image": "docker:SELECT_REGISTRY/SELECT_IMAGE@sha256:SELECT_BUILT_IMAGE_DIGEST",
+  "volume_name": "SELECT_EXISTING_VOLUME_NAME",
+  "volume_id": "SELECT_EXISTING_VOLUME_ID",
+  "volume_mount": "/el-persistent",
+  "remote_payload": "/el-persistent/inputs/el-gpu-control",
+  "remote_output": "/el-persistent/outputs/el-gpu-control",
+  "source_wheel": "empirical_lawhood-1.0.0-py3-none-any.whl",
+  "operational_config": "operational.json",
+  "arguments": [
+    "campaign", "rc-ladder-native-check",
+    "--config", "/el-persistent/inputs/el-gpu-control/model.json",
+    "--output-dir", "/el-persistent/outputs/el-gpu-control"
+  ],
+  "resources": {
+    "cpu_cores": 8,
+    "memory_bytes": 68719476736,
+    "gpu_devices": 1,
+    "wall_time_seconds": null,
+    "source_scan_bytes": 10737418240,
+    "output_bytes": 10737418240
+  },
+  "container_disk_gb": 40,
+  "maximum_files": 10000,
+  "quoted_hourly_usd": null,
+  "quote_sha256": null
+}

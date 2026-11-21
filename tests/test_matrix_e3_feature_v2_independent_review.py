@@ -11,12 +11,12 @@ from decimal import Decimal as D, localcontext
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import lifetime
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_feature_science as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_experiment_methods import ProtectedE3CausalFeature
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import forecast
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import lifetime
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_feature_science as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_experiment_methods import ProtectedE3CausalFeature
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import forecast
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_matrix_e3_protected_feature import encoded, finite_case
 from tests.test_matrix_e3_protected_prefix_science import blocked
 from tests.test_matrix_e3_protected_prefix_science import case as case, forbid_native as forbid_native  # noqa: F401

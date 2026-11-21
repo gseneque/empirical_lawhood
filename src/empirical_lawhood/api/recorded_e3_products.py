@@ -8,9 +8,9 @@ protected bytes and after the finite read; this is not a scientific reanalysis.
 from contextlib import contextmanager
 from types import MappingProxyType
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
-from .retained_e3_evidence import retained_e3_evidence_context
+from empirical_lawhood.api.retained_e3_evidence import retained_e3_evidence_context
 
 
 def _identity(record, name='record_id'):
@@ -18,9 +18,9 @@ def _identity(record, name='record_id'):
 
 
 def _boundary(read, producer):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_unfinished_execution import ConfiguredE3UnfinishedExecution
-    from .matrix_selected_runtime import _published_input
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_unfinished_execution import ConfiguredE3UnfinishedExecution
+    from empirical_lawhood.api.matrix_selected_runtime import _published_input
     kinds = {kind.SCHEMA: kind for kind in (ConfiguredE3ClosedExecution, ConfiguredE3UnfinishedExecution)}
     specs = tuple(spec for task in producer.plan.tasks for spec in task.external_inputs
         if spec.expected_payload_schema in kinds)
@@ -43,8 +43,8 @@ def recorded_original_product_custody(writer, originals):
     This owner does not open scientific product bodies. It keeps the actual
     model and calibration producers, imported receipts and current grants.
     """
-    from .configured_e3_imported_products import ImportedE3ProductCustody
-    from .recursive_qualified_parents import _ParentReadScope
+    from empirical_lawhood.api.configured_e3_imported_products import ImportedE3ProductCustody
+    from empirical_lawhood.api.recursive_qualified_parents import _ParentReadScope
     if len(originals) != 4:
         raise PermissionError('recorded E3 requires four original products')
     with retained_e3_evidence_context(writer) as read:
@@ -93,8 +93,8 @@ def recorded_original_product_custody(writer, originals):
 
 def recorded_original_members(writer, originals):
     """Collect complete original member facts without retrospective replay."""
-    from .recursive_qualified_parents import _collect_receipt_closure
-    from .selected_prepared_access import _receipt_closure_members
+    from empirical_lawhood.api.recursive_qualified_parents import _collect_receipt_closure
+    from empirical_lawhood.api.selected_prepared_access import _receipt_closure_members
     members, completed = set(), set()
     with recorded_original_product_custody(writer,
             tuple((value, value.record) for value in originals)) as (products, scope):
@@ -121,7 +121,7 @@ def recorded_original_members(writer, originals):
 
 def read_recorded_original_products(writer, originals, codecs, *, scope_validator):
     """Authenticate the four original products, including their actual imports."""
-    from .recursive_qualified_parents import MAX_PARENT_BYTES, _output_payload
+    from empirical_lawhood.api.recursive_qualified_parents import MAX_PARENT_BYTES, _output_payload
     if not callable(scope_validator):
         raise PermissionError('recorded E3 requires its consuming scientific predicate')
     output = []
@@ -139,17 +139,14 @@ def read_recorded_original_products(writer, originals, codecs, *, scope_validato
 
 def _companion(read, producer, directory, expected_specification):
     """Read only the original operands pinned by the published companion."""
-    from .prospective_experiment import _read_prospective_locator
-    from .matrix_researcher_programme_lineage import read_published_record
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import configured_preparation_types
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-    from empirical_lawhood.runtime.prospective_experiment import (
-        ProspectiveExperimentAssociation, ASSOCIATION_FILENAME, INSTANCE_FILENAME,
-        SPECIFICATION_FILENAME, ALLOCATION_FILENAME, source_filename,
-    )
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+    from empirical_lawhood.api.prospective_experiment import _read_prospective_locator
+    from empirical_lawhood.api.matrix_researcher_programme_lineage import read_published_record
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import configured_preparation_types
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+    from empirical_lawhood.execution.prospective_experiment import ProspectiveExperimentAssociation, ASSOCIATION_FILENAME, INSTANCE_FILENAME, SPECIFICATION_FILENAME, ALLOCATION_FILENAME, source_filename
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
     writer = read.writer
     association = _read_prospective_locator(directory / 'experiment', ASSOCIATION_FILENAME, writer,
         ProspectiveExperimentAssociation)
@@ -191,14 +188,12 @@ def _companion(read, producer, directory, expected_specification):
 @contextmanager
 def recorded_programme_e3_products(context):
     """Expose exact consumed products; make no retrospective scientific claim."""
-    from .matrix_researcher_programme_lineage import retained_run_binding
-    from .domain_composition.matrix_configured_protected_response.scientific_read import ConfiguredE3OriginalProducts
-    from .protected_e3_read_custody import product
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_methods import (
-        ConfiguredProtectedE3ModelSet, ConfiguredProtectedE3FrozenProducts, ConfiguredProtectedE3Calibration,
-    )
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_inputs import ConfiguredProtectedE3PreFitJoin
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_statistical_bindings import statistical_task_id
+    from empirical_lawhood.api.matrix_researcher_programme_lineage import retained_run_binding
+    from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.scientific_read import ConfiguredE3OriginalProducts
+    from empirical_lawhood.api.protected_e3_read_custody import product
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_methods import ConfiguredProtectedE3ModelSet, ConfiguredProtectedE3FrozenProducts, ConfiguredProtectedE3Calibration
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_inputs import ConfiguredProtectedE3PreFitJoin
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_statistical_bindings import statistical_task_id
     origin = context.phase_origins.get('e3', context)
     binding = retained_run_binding(origin, 'e3')
     if binding is None:

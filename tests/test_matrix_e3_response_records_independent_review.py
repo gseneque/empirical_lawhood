@@ -5,17 +5,17 @@ The reused fixture has literal qualification metadata and a deliberately
 incomplete native archive. It authenticates no scientific source or authority,
 and the complete cold array reader must continue to refuse its native bytes.
 """
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_response_records as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_source_records as sources
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_bindings import unpack_native
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledResponseSelection
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_response_records as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_source_records as sources
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_bindings import unpack_native
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledResponseSelection
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
 from tests.test_matrix_e3_protected_source_records import response_fixture
 from tests.test_matrix_e3_response_records import (
     arguments,

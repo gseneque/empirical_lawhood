@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Pure protected commitment controls; hypothetical custody grants no authority."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from types import SimpleNamespace
@@ -7,17 +8,17 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.commitment import COMMIT_KEY, E1Commitment, E1CommitmentConfig, E1Committer, authenticate_prior_publications, committed
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.operation_bindings import BUDGET, NAMESPACE, E1NativeRunner, E1OperationConfig, _decode, operation_factories
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.planning.recursive_authoring import RecursiveOperationSpec
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.commitment import COMMIT_KEY, E1Commitment, E1CommitmentConfig, E1Committer, authenticate_prior_publications, committed
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.operation_bindings import BUDGET, NAMESPACE, E1NativeRunner, E1OperationConfig, _decode, operation_factories
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.design.recursive_authoring import RecursiveOperationSpec
 from tests.test_matrix_factor_confirmation_adjudication import prospective
 from tests.test_matrix_factor_confirmation_eligibility import publish
 from tests.test_matrix_factor_confirmation_eligibility import provenance as provenance
@@ -31,8 +32,8 @@ def _blocked(*args, **kwargs):
 
 
 def _block_science(monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation import science
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation import science
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
     monkeypatch.setattr(parameter_source, 'acquire_parameter_history', _blocked)
     for name in ('measure', 'assess_history', 'assess_factor'):
         monkeypatch.setattr(science, name, _blocked)
@@ -63,14 +64,12 @@ def _context(config, ports, role, outputs=(), dependencies=()):
 
 def _prepare_history_context(context, verified, source):
     """Freeze a disclosed direct-worker task, without issue or native preparation."""
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation import operation_bindings as owner
-    from empirical_lawhood.infrastructure.execution import prepare_worker_invocation
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.capabilities import CapabilityRequirement
-    from empirical_lawhood.runtime.plans import (
-        ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec,
-    )
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation import operation_bindings as owner
+    from empirical_lawhood.execution.local.execution import prepare_worker_invocation
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.capabilities import CapabilityRequirement
+    from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+    from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
     from tests.worker_configuration_support import freeze_worker_configuration
 
     declaration = next(row for row in owner.operation_declarations() if row.capability_key == NAMESPACE+'.history')
@@ -238,15 +237,15 @@ def test_prior_publication_authentication_retains_exact_original_sidecar_and_com
         reservation = replace(first.reservation, publication=publication)
         # Rebind the frozen selection to the hypothetical changed reservation,
         # with an actual publication, so the specific sidecar join is tested.
-        from empirical_lawhood.adapters.methods.matrix_factor_confirmation.records import identity
+        from empirical_lawhood.domains.matrix.matrix_factor_confirmation.records import identity
         selection = replace(first.specification.selection, reservation=identity(reservation))
         specification = replace(first.specification, selection=selection, publication=publish(plane, selection, 'selection.sidecar-control'))
         sources = tuple(replace(s, reservation=reservation, specification=specification) for s in sources)
     config = E1CommitmentConfig('config.'+COMMIT_KEY, sources)
     if defect == 'missing-commit':
         original = publication.materialization.relative_path
-        from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-        manifest = decode_artifact_manifest(plane.root.resolve(original+'.manifest.json', for_write=False).read_bytes())
+
+        manifest = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(original + '.manifest.json', for_write=False).read_bytes())
         marker = plane.root.resolve(manifest.publication.commit_marker_relative_path, for_write=False)
         moved = marker.with_name(marker.name+'.software-control')
         marker.rename(moved)
@@ -263,20 +262,14 @@ def test_prior_publication_authentication_retains_exact_original_sidecar_and_com
 
 
 def test_e1_declarations_preserve_canonical_manifest_and_provider_contracts(monkeypatch):
-    from empirical_lawhood.adapters.composition.discovery import manifest
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation import operation_bindings as owner
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation.operation_bindings import (
-        E1AdjudicationConfig, E1OperationConfig, PHASES, operation_declarations,
-        operation_manifests, operation_registrations,
-    )
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation.records import (
-        E1FactorAssessment, E1FactorProduct, E1HistoryAllocation, E1HistorySource,
-        E1PopulationResult, E1ScientificSelection,
-    )
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-    from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-    from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityPermission
+    from empirical_lawhood.execution.declaration_helpers import manifest
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation import operation_bindings as owner
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation.operation_bindings import E1AdjudicationConfig, E1OperationConfig, PHASES, operation_declarations, operation_manifests, operation_registrations
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation.records import E1FactorAssessment, E1FactorProduct, E1HistoryAllocation, E1HistorySource, E1PopulationResult, E1ScientificSelection
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+    from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+    from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityPermission
 
     def _historical_manifests():
         values = []

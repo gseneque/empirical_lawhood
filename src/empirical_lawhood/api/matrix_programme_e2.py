@@ -9,22 +9,20 @@ from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as acquisition
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as utility
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import e2_assembly as domain
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticated_programme_inputs
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.experiment_inputs import (
-    ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as acquisition
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as utility
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import e2_assembly as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticated_programme_inputs
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
 
 def _current_request(*, request, resolved):
@@ -95,7 +93,7 @@ def assemble_programme_e2(*, specification, request, project_root, artifact_writ
     from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
     from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
     from empirical_lawhood.api.selected_e4_bank_recipe import _current_selection, _metadata_record_size
-    from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
+    from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
 
     domain.validate_request(specification, request)
     root, implementation = _current_selection(project_root=project_root, artifact_writer=artifact_writer, execution=execution)

@@ -1,0 +1,50 @@
+{
+  "schema": "el-v1/scientific-module-extraction/1",
+  "full_modules": {
+    "empirical_lawhood.adapters.physical.nrel_inverter_archive.design": "empirical_lawhood.domains.energy.inverter.archive_design",
+    "empirical_lawhood.adapters.physical.nrel_inverter_archive.contracts": "empirical_lawhood.domains.energy.inverter.archive_contracts"
+  },
+  "partial_modules": {
+    "empirical_lawhood.adapters.physical.nrel_inverter_archive.protocol": {
+      "scientific_owner": "empirical_lawhood.domains.energy.inverter.archive_protocol",
+      "symbols": [
+        "NRELPanelReductionConfig",
+        "NREL_ARCHIVE_PROTOCOL_VERSION",
+        "NREL_ARCHIVE_PROVIDER_KEY",
+        "NREL_DECODE_STEP_ID",
+        "NREL_HELD_TABLE_ARTIFACT_ID",
+        "NREL_HELD_TABLE_SCHEMA",
+        "NREL_PHASE_ISSUE_ARTIFACT_ID",
+        "NREL_PROFILE_ARTIFACT_ID",
+        "NREL_REDUCTION_STEP_ID",
+        "NREL_SOURCE_ARTIFACT_ID",
+        "_decode_budget",
+        "_decode_key",
+        "_record_input",
+        "_reduction_budget",
+        "_reduction_key",
+        "_validate_ref",
+        "build_nrel_phase_protocol",
+        "nrel_nrel_inverter_archive_candidate_registrations",
+        "nrel_nrel_inverter_archive_registry",
+        "nrel_panel_reduction_config",
+        "nrel_phase_scientific_graph",
+        "nrel_phase_study_template"
+      ],
+      "remaining_effects": [
+        "NRELSafeDecodeRunner",
+        "NRELReductionRunner",
+        "NRELHeldArchiveRuntimeProvider",
+        "native runner factory"
+      ]
+    }
+  },
+  "reference_changes": [
+    "src/empirical_lawhood/adapters/physical/nrel_inverter_archive/protocol.py",
+    "src/empirical_lawhood/adapters/physical/nrel_inverter_archive/safe_decode.py",
+    "src/empirical_lawhood/domains/energy/inverter/analysis.py",
+    "src/empirical_lawhood/domains/energy/inverter/archive_design.py",
+    "src/empirical_lawhood/domains/energy/inverter/archive_protocol.py"
+  ],
+  "preservation": "Complete-unit identities, source visibility, outcome-blind design, original schema strings, exact source/record bindings and science qualification thresholds unchanged; external UTF8 table parsing and runtime input/output ports remain adapters."
+}

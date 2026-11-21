@@ -9,9 +9,9 @@ from pathlib import Path
 import stat
 from typing import Final
 
-from .gauge_covariant_response_contracts import GaugeCovariantResponseSourceQualification
-from .material_source_design_contracts import SourceAssetLock, SourceOutcomeRole
-from .material_source_design_source import _tar_inventory
+from empirical_lawhood.domains.materials.superconductivity.gauge_covariant_response_contracts import GaugeCovariantResponseSourceQualification
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_contracts import SourceAssetLock, SourceOutcomeRole
+from empirical_lawhood.adapters.simulators.ambient_pressure_superconductor.material_source_design_source import _tar_inventory
 
 
 SOURCE_RELATIVE_ROOT: Final = 'sources/ambient-pressure-superconductor/gauge-covariant-response-staged'

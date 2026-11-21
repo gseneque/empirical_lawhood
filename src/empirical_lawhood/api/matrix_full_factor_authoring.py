@@ -1,15 +1,15 @@
 # SPDX-License-Identifier: MPL-2.0
 """Public metadata authoring over actual original custody and compiled resources."""
 from pathlib import Path
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_preparation as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_preparation as domain
 from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
 from empirical_lawhood.api.matrix_full_factor_custody import authenticate_original_full_factor_scope
 from empirical_lawhood.api.recursive_operations import operation_catalog
-from empirical_lawhood.runtime.experiment_preparation import ExperimentPreparation
+from empirical_lawhood.execution.experiment_preparation import ExperimentPreparation
 
 
 def validate_authoring_read_access(*,preparation,artifact_writer,read_access):
-    from empirical_lawhood.api.selected_e4_access import SelectedE4CurrentAccess,require_current_e4_access
+    from empirical_lawhood.api.selected_e4_access import SelectedE4CurrentAccess, require_current_e4_access
     if (type(preparation) is not ExperimentPreparation
             or type(preparation.specification_record) is not domain.ScheduledFullFactorProtectedSpecification):
         raise TypeError('full factor authoring access requires its exact protected PURE preparation')
@@ -50,8 +50,7 @@ def _prepare_authoring_read(preparation,*,project_root,artifact_writer,output_di
     protected=type(specification) is domain.ScheduledFullFactorProtectedSpecification
     if protected:
         validate_authoring_read_access(preparation=preparation,artifact_writer=artifact_writer,read_access=read_access)
-    from empirical_lawhood.api.matrix_full_factor_access import (
-        bootstrap_authoring_input_access,bootstrap_protected_authoring_input_access)
+    from empirical_lawhood.api.matrix_full_factor_access import bootstrap_authoring_input_access, bootstrap_protected_authoring_input_access
     access=(bootstrap_protected_authoring_input_access if protected else bootstrap_authoring_input_access)(
         preparation=preparation,artifact_writer=artifact_writer,read_access=read_access)
     blind=domain.bind_inputs(specification,dict(preparation.design_records)).method_inputs

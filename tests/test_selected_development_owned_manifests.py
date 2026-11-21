@@ -14,9 +14,9 @@ import pytest
 
 from empirical_lawhood.api.current_task_custody import CurrentDevelopmentTaskCustody
 from empirical_lawhood.api.selected_e3_access import SelectedE3OriginalInputAccess
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
 from tests.runtime_platform.test_recursive_compiler import Config
 from tests.test_recursive_public_service import _plane
 
@@ -35,7 +35,7 @@ class _OriginalGuard:
         raise PermissionError("unowned protected software member")
 
 
-def _case(tmp_path, *, compact=False):
+def _case(tmp_path, *, with_sibling=False):
     plane = _plane(tmp_path / "exact-owned-inputs")
     record = Config("config.disclosed-selected-entry", 7)
     request = ArtifactWriteRequest("config.disclosed-selected-entry",
@@ -43,9 +43,9 @@ def _case(tmp_path, *, compact=False):
         "application/json", "publication.disclosed-selected-entry", "selected",
         record.canonical_bytes(), VisibilityCeiling.DEVELOPMENT_ONLY, (),
         OutcomeAccess.EVALUATION_SEALED)
-    if compact:
+    if with_sibling:
         sibling = Config("config.disclosed-selected-sibling", 11)
-        publications = plane.write_compact_batch((request, replace(request,
+        publications = plane.write_batch((request, replace(request,
             logical_artifact_id=sibling.config_id, relative_path="selected/sibling.json",
             payload=sibling.canonical_bytes())))
     else:
@@ -66,9 +66,9 @@ def _case(tmp_path, *, compact=False):
     return SimpleNamespace(plane=plane, record=record, manifest=manifest, value=value, custody=custody)
 
 
-@pytest.mark.parametrize("compact", (False, True))
-def test_exact_owned_sealed_control_keeps_its_custody_and_current_guard(tmp_path, compact):
-    case = _case(tmp_path, compact=compact)
+@pytest.mark.parametrize("with_sibling", (False, True))
+def test_exact_owned_sealed_control_keeps_its_custody_and_current_guard(tmp_path, with_sibling):
+    case = _case(tmp_path, with_sibling=with_sibling)
     with pytest.raises(PermissionError, match="lacks an exact owned protected input"):
         case.custody._manifest(case.value.materialization.relative_path)
     before = case.custody.original_input_access.samples
@@ -82,9 +82,9 @@ def test_exact_owned_sealed_control_keeps_its_custody_and_current_guard(tmp_path
 
 
 @pytest.mark.parametrize("damage", ("logical-hash", "physical-hash", "width"))
-@pytest.mark.parametrize("compact", (False, True))
-def test_exact_owned_manifest_refuses_substitution_before_body_hash(tmp_path, monkeypatch, damage, compact):
-    case = _case(tmp_path, compact=compact)
+@pytest.mark.parametrize("with_sibling", (False, True))
+def test_exact_owned_manifest_refuses_substitution_before_body_hash(tmp_path, monkeypatch, damage, with_sibling):
+    case = _case(tmp_path, with_sibling=with_sibling)
     logical, material = case.manifest.logical, case.manifest.materialization
     if damage == "logical-hash":
         logical = replace(logical, content_sha256="f" * 64)
@@ -98,9 +98,9 @@ def test_exact_owned_manifest_refuses_substitution_before_body_hash(tmp_path, mo
         case.custody._manifest(case.manifest.materialization.relative_path, expected=expected)
 
 
-@pytest.mark.parametrize("compact", (False, True))
-def test_foreign_same_pair_publication_is_not_owned_input(tmp_path, monkeypatch, compact):
-    case = _case(tmp_path, compact=compact)
+@pytest.mark.parametrize("with_sibling", (False, True))
+def test_foreign_same_pair_publication_is_not_owned_input(tmp_path, monkeypatch, with_sibling):
+    case = _case(tmp_path, with_sibling=with_sibling)
     foreign = Config("config.disclosed-foreign-entry", 11)
     publication = case.plane.write(ArtifactWriteRequest(foreign.config_id,
         "foreign/entry.json", foreign.SCHEMA, ArtifactProfile.CANONICAL_JSON,
@@ -111,7 +111,7 @@ def test_foreign_same_pair_publication_is_not_owned_input(tmp_path, monkeypatch,
     assert (manifest.logical.outcome_access, manifest.logical.visibility_ceiling) == (
         case.manifest.logical.outcome_access, case.manifest.logical.visibility_ceiling)
     before = case.custody.original_input_access.samples
-    from empirical_lawhood.infrastructure import artifacts as storage
+    from empirical_lawhood.storage import artifacts as storage
     original_open = storage.os.open
     body = case.plane.root.resolve(manifest.materialization.relative_path, for_write=False)
     def guarded_open(path, *args, **kwargs):
@@ -125,9 +125,9 @@ def test_foreign_same_pair_publication_is_not_owned_input(tmp_path, monkeypatch,
     assert case.custody.original_input_access.samples > before
 
 
-@pytest.mark.parametrize("compact", (False, True))
-def test_exact_owned_fact_does_not_cache_current_permission(tmp_path, monkeypatch, compact):
-    case = _case(tmp_path, compact=compact)
+@pytest.mark.parametrize("with_sibling", (False, True))
+def test_exact_owned_fact_does_not_cache_current_permission(tmp_path, monkeypatch, with_sibling):
+    case = _case(tmp_path, with_sibling=with_sibling)
     assert case.custody._manifest(case.value.materialization.relative_path, expected=case.manifest) == case.manifest
     case.custody.original_input_access.current = False
     monkeypatch.setattr(case.plane, "verify_manifest", lambda *_a, **_kw: pytest.fail("expired access reached body verification"))
@@ -140,9 +140,9 @@ class _ReachedTypedControlBoundary(Exception):
 
 
 @pytest.mark.parametrize("consumer", ("e4-development-entry", "e5-development-design"))
-@pytest.mark.parametrize("compact", (False, True))
-def test_domain_selected_config_forwards_exact_owned_fact_before_typed_body(tmp_path, monkeypatch, consumer, compact):
-    case = _case(tmp_path, compact=compact)
+@pytest.mark.parametrize("with_sibling", (False, True))
+def test_domain_selected_config_forwards_exact_owned_fact_before_typed_body(tmp_path, monkeypatch, consumer, with_sibling):
+    case = _case(tmp_path, with_sibling=with_sibling)
     from empirical_lawhood.api import matrix_selected_e3_e4_runtime as e4
     from empirical_lawhood.api import matrix_selected_opportunity_runtime as e5
     runtime = e4 if consumer == "e4-development-entry" else e5

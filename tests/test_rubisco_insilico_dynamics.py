@@ -7,13 +7,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import preparation
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.parameter_audit import (
-    assigned_parameter_inventory,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.contracts import (
-    KCX_ALIASES,
-)
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import preparation
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.parameter_audit import assigned_parameter_inventory
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.contracts import KCX_ALIASES
 
 
 def custom_stock():
@@ -230,7 +226,7 @@ def test_completion_instrumentation_retains_full_requests_actual_calls_and_resto
     tmp_path,
 ):
     import json
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import native
+    from empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics import native
 
     mm = mock_openmm()
     classes = (mm.Context, mm.LangevinIntegrator, mm.LocalEnergyMinimizer.minimize)
@@ -284,7 +280,7 @@ def test_completion_instrumentation_retains_full_requests_actual_calls_and_resto
 
 
 def test_completion_failures_keep_original_cause_and_inclusive_parent(tmp_path):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import native
+    from empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics import native
 
     mm = mock_openmm()
     ledger = native.CallLedger(tmp_path)
@@ -310,9 +306,7 @@ def test_completion_failures_keep_original_cause_and_inclusive_parent(tmp_path):
 
 
 def test_amber_origin_join_refuses_lost_genotype_and_missing_inherited_atoms():
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.parameter_audit import (
-        realized_atom_origins,
-    )
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.parameter_audit import realized_atom_origins
 
     residue = SimpleNamespace(idx=0, name="MET", atoms=[])
     atom = SimpleNamespace(idx=0, name="CA", atomic_number=6, residue=residue)
@@ -344,9 +338,7 @@ def test_amber_origin_join_refuses_lost_genotype_and_missing_inherited_atoms():
 
 
 def test_source_disulfides_use_named_symmetry_and_never_proximity_only():
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.coordinate_plan import (
-        source_disulfides,
-    )
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.coordinate_plan import source_disulfides
 
     identity = (
         Decimal(1),

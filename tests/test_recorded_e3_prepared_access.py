@@ -10,14 +10,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.api import (
-    matrix_sampling_runtime, recorded_e3_products, recursive_qualified_parents,
-    retained_e3_evidence, selected_prepared_access,
-)
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+from empirical_lawhood.api import matrix_sampling_runtime, recorded_e3_products, recursive_qualified_parents, retained_e3_evidence, selected_prepared_access
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
 from tests.test_configured_e3_imported_products import _imported_case
 from tests.test_configured_e3_product_export import products, original_case  # noqa: F401
 from tests.test_matrix_e3_protected_prefix_science import forbid_native as forbid_native  # noqa: F401

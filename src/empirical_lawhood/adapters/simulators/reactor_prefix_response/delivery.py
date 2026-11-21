@@ -4,13 +4,13 @@ from dataclasses import dataclass, replace
 from decimal import Decimal
 from typing import Protocol
 
-from empirical_lawhood.kernel.action_contracts import ActionDeliveryStage, ActionStageEvent, OccurrenceActionWord, ObservedActionOccurrence
-from empirical_lawhood.kernel.control import ScientificCommitmentKind
-from empirical_lawhood.kernel.time import CoordinateOrigin
-from empirical_lawhood.planning.controller_study import ImplementationBinding, ImplementationRole
-from empirical_lawhood.runtime.controller_runtime import DeliveryPortResult
+from empirical_lawhood.science.response.action_contracts import ActionDeliveryStage, ActionStageEvent, OccurrenceActionWord, ObservedActionOccurrence
+from empirical_lawhood.science.response.control import ScientificCommitmentKind
+from empirical_lawhood.science.models.time import CoordinateOrigin
+from empirical_lawhood.design.controller_study import ImplementationBinding, ImplementationRole
+from empirical_lawhood.execution.controller_runtime import DeliveryPortResult
 
-from .contracts import ReactorCommand, ReactorDelivery
+from empirical_lawhood.domains.reactor.reactor_prefix_response.contracts import ReactorCommand, ReactorDelivery
 
 
 class ReactorDeliverySession(Protocol):

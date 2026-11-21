@@ -4,11 +4,11 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import ConfiguredE3RetainedExecution, ConfiguredE3RetainedTaskConfig
-from empirical_lawhood.kernel.status import OperationalStatus
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import ConfiguredE3RetainedExecution, ConfiguredE3RetainedTaskConfig
+from empirical_lawhood.science.records.status import OperationalStatus
 
-from .configured_e3_retained_custody import _active_original_reads, read_original_partial_e3
-from .matrix_selected_runtime import _published_input
+from empirical_lawhood.api.configured_e3_retained_custody import _active_original_reads, read_original_partial_e3
+from empirical_lawhood.api.matrix_selected_runtime import _published_input
 
 
 _active_reads = ContextVar('configured_e3_retained_product_reads', default=())
@@ -111,8 +111,8 @@ def retained_execution_read(*, writer, retention):
 @contextmanager
 def continued_plan_read(*, writer, plan, receipts=None):
     """Keep original custody live across one complete continued-product read."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_unfinished_execution import ConfiguredE3UnfinishedExecution
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_unfinished_execution import ConfiguredE3UnfinishedExecution
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
     closed = tuple(spec for task in plan.tasks for spec in task.external_inputs
         if spec.expected_payload_schema == ConfiguredE3ClosedExecution.SCHEMA)
     if closed:
@@ -156,10 +156,10 @@ def continued_plan_read(*, writer, plan, receipts=None):
 
 @contextmanager
 def unfinished_plan_read(*, writer, plan, specs, closed=False):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_unfinished_execution import ConfiguredE3UnfinishedExecution
-    from .configured_e3_unfinished_custody import read_unfinished_e3
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
-    from .configured_e3_closeout_custody import read_closed_e3
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_unfinished_execution import ConfiguredE3UnfinishedExecution
+    from empirical_lawhood.api.configured_e3_unfinished_custody import read_unfinished_e3
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
+    from empirical_lawhood.api.configured_e3_closeout_custody import read_closed_e3
     run_id = plan.source_plan.object_id
     scope = _published_input(writer, run_id, specs[0], ConfiguredE3ClosedExecution if closed else ConfiguredE3UnfinishedExecution)
     if (any(spec != specs[0] for spec in specs)
@@ -205,7 +205,7 @@ def consumed_parent(*, writer, plan, receipts, task, edge):
     producer = edge.producer_task_id
     source_writer = writer
     if producer is None:
-        from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
+        from empirical_lawhood.storage.provider_input_custody import provider_input_location
         matches = tuple(read for root, current, read in _active_unfinished_plan_reads.get()
             if root is writer.root and current is plan)
         if len(matches) != 1:
@@ -255,9 +255,9 @@ def consumed_parent(*, writer, plan, receipts, task, edge):
 
 def authenticated_original_config(*, writer, run_id, task, config):
     """Unwrap scientific operands only after authenticating their real producer."""
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
     if not scientific_reconstruction_enabled():
-        from .retained_e3_evidence import retained_e3_evidence_context
+        from empirical_lawhood.api.retained_e3_evidence import retained_e3_evidence_context
         with retained_e3_evidence_context(writer) as read:
             return read.original_config(task_retention(writer, run_id, task), task, config)
     with retained_execution_read(writer=writer, retention=task_retention(writer, run_id, task)) as read:
@@ -268,15 +268,15 @@ def authenticated_original_config(*, writer, run_id, task, config):
 def authenticate_continued_response_custody(*, writer, plan, receipts, selection, specification,
         allocation, models, model_freeze, calibration, calibrated_freeze, product_reader):
     """Replay original prefix/freeze joins and actual continued native events."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_continued_response import ConfiguredE3ContinuedResponseConfig, ConfiguredE3ContinuedNativeResponse
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_lowering import selected_configs, task_id
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_prefix_records import ConfiguredProtectedE3PrefixHistory, ConfiguredProtectedE3CausalPrefix
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_records import ConfiguredProtectedE3PhysicalForecast
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_methods import ConfiguredProtectedE3Forecast
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorNativeBinding
-    from .configured_e3_retained_custody import _NativeBinding
-    from .recursive_qualified_parents import _prior_native_subwork
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_continued_response import ConfiguredE3ContinuedResponseConfig, ConfiguredE3ContinuedNativeResponse
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_lowering import selected_configs, task_id
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_prefix_records import ConfiguredProtectedE3PrefixHistory, ConfiguredProtectedE3CausalPrefix
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_records import ConfiguredProtectedE3PhysicalForecast
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_methods import ConfiguredProtectedE3Forecast
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorNativeBinding
+    from empirical_lawhood.api.configured_e3_retained_custody import _NativeBinding
+    from empirical_lawhood.api.recursive_qualified_parents import _prior_native_subwork
 
     def pin(record, field='record_id'):
         return ObjectIdentity.from_record(getattr(record, field), record)
@@ -285,8 +285,8 @@ def authenticate_continued_response_custody(*, writer, plan, receipts, selection
     configs = {task_id(config): config for config in selected_configs(specification, allocation, selection)}
     closeout = getattr(selection, 'closeout', None)
     if closeout is not None:
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_methods import ConfiguredProtectedE3PairedOutcome
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseScore
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_methods import ConfiguredProtectedE3PairedOutcome
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseScore
         matches = tuple(read for root, current, read in _active_unfinished_plan_reads.get()
             if root is writer.root and current is plan and read.unfinished == closeout)
         if len(matches) != 1:

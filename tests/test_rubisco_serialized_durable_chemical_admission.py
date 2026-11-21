@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Complete exposed durable receipt joins; never actual molecular admission."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import fields, replace
 from hashlib import sha256
@@ -8,28 +9,22 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as p
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import preparation_integrity
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_contracts import DurableRawFileCensus, DurableUnitReturn
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_preparation import (
-    DurableCallLedger, complete_unit,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_roster import definitions, freeze
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.geometry_reuse import GeometryReuseSupply
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import control_contracts as c, control_science
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_preparation_admission import (
-    SerializedDurableChemicalForcePlan, SerializedDurableGeometrySupply, decode_plan, validate_operands,
-)
-from empirical_lawhood.infrastructure.prepared_native_invocation import (
-    NativeInputPublication, prepare_native_invocation, validate_prepared_native_invocation,
-)
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as p
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import preparation_integrity
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_contracts import DurableRawFileCensus, DurableUnitReturn
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_preparation import DurableCallLedger, complete_unit
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_roster import definitions, freeze
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.geometry_reuse import GeometryReuseSupply
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import control_contracts as c, control_science
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_preparation_admission import SerializedDurableChemicalForcePlan, SerializedDurableGeometrySupply, decode_plan, validate_operands
+from empirical_lawhood.storage.prepared_native_invocation import NativeInputPublication, prepare_native_invocation, validate_prepared_native_invocation
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.runtime_platform.test_native_subwork import _plane, _store
 from tests import test_rubisco_reused_geometry_chemical_admission as reuse_fixture
 from tests import test_rubisco_chemical_force_controls as force_fixture
@@ -97,8 +92,7 @@ def durable_admitted(reuse_admitted, tmp_path_factory):
     prefix = inspection.receipt.task_id
     archive_root = "runs/" + actual_parent.run_id + "/native-subwork/" + prefix.removeprefix("native-subwork.")
     def manifest(name):
-        return decode_artifact_manifest(plane.root.resolve(archive_root + "/" + name + ".manifest.json",
-            for_write=False).read_bytes())
+        return resolve_artifact_sidecar_bytes(plane, plane.root.resolve(archive_root + '/' + name + '.manifest.json', for_write=False).read_bytes())
     def output(definition, name, kind):
         raw = b"".join(store.iter_completed_output(definition, name))
         return decode_canonical_bytes(raw, kind, maximum_bytes=len(raw))

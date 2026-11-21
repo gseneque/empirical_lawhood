@@ -17,21 +17,18 @@ from sqlalchemy import delete, select, update
 
 from empirical_lawhood.api import recursive_authoring
 from empirical_lawhood.api.results import CampaignStatusRequest, ResumeCampaignRequest, RunCampaignRequest
-from empirical_lawhood.infrastructure.execution import DirectTaskExecutor, InjectedSchedulerCrash, LocalScheduler
-from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-from empirical_lawhood.infrastructure.sql.schema import lease, run_event, task_attempt, workflow_run
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.runtime.execution_envelope import (
-    ExecutionResourceEnvelopeState, ProgressHeartbeat, ProgressLivenessContract,
-    RunExecutionResourceEnvelopeMachine,
-)
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedNativeWork
-from empirical_lawhood.runtime.recovery import TaskRecoveryEvent
-from empirical_lawhood.runtime.execution import TaskBlockReason
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.execution.local.execution import DirectTaskExecutor, InjectedSchedulerCrash, LocalScheduler
+from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.sql.schema import lease, run_event, task_attempt, workflow_run
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeState, ProgressHeartbeat, ProgressLivenessContract, RunExecutionResourceEnvelopeMachine
+from empirical_lawhood.execution.prepared_native_invocation import PreparedNativeWork
+from empirical_lawhood.execution.recovery import TaskRecoveryEvent
+from empirical_lawhood.execution.execution import TaskBlockReason
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.execution_support import ENFORCING_TEST_EXECUTOR_CAPABILITY
 from tests.runtime_platform import test_recursive_prospective_workflow as fixtures
 from tests.test_issued_worker_preparation import _binding
@@ -658,7 +655,7 @@ def test_supplied_receipt_reader_is_copied_into_owned_scope_without_losing_hooks
 @pytest.mark.parametrize("late_history", ("original-catalog",), indirect=True)
 def test_receipt_store_from_another_plane_refuses_before_any_effect(late_history):
     from copy import copy
-    from empirical_lawhood.infrastructure.recovery import RunRecoveryError
+    from empirical_lawhood.storage.recovery import RunRecoveryError
 
     case = late_history
     before = _census(Path(case.root))
@@ -679,7 +676,7 @@ def test_receipt_store_from_another_plane_refuses_before_any_effect(late_history
 
 @pytest.mark.parametrize("late_history", ("original-catalog",), indirect=True)
 def test_valid_receipt_substitution_after_read_refuses_before_first_effect(late_history, monkeypatch):
-    from empirical_lawhood.runtime.artifacts import ReceiptCheck
+    from empirical_lawhood.storage.contracts.artifacts import ReceiptCheck
 
     case = late_history
     body = ExternalTaskReceiptStore._read_body
@@ -737,7 +734,7 @@ def test_valid_receipt_substitution_after_read_refuses_before_first_effect(late_
 
 @pytest.mark.parametrize("custom_reconstruct", (False, True))
 def test_failed_history_resource_journal_reuses_only_owned_stock_reader(late_history, monkeypatch, custom_reconstruct):
-    from empirical_lawhood.infrastructure import execution_resource_envelopes as resource_module
+    from empirical_lawhood.execution.resources import execution_resource_envelopes as resource_module
 
     case = late_history
     decoded_origins = []
@@ -766,7 +763,7 @@ def test_failed_history_resource_journal_reuses_only_owned_stock_reader(late_his
 
 
 def test_external_resource_reconstruction_reuses_identical_decoded_prefix(late_history, monkeypatch):
-    from empirical_lawhood.infrastructure import execution_resource_envelopes as resource_module
+    from empirical_lawhood.execution.resources import execution_resource_envelopes as resource_module
 
     case = late_history
     decoded_origins = []
@@ -806,7 +803,7 @@ def test_owned_resource_prefix_refuses_physical_member_drift_before_effects(late
 
 
 def test_owned_resource_prefix_observes_new_committed_journal_suffix(late_history, monkeypatch):
-    from empirical_lawhood.runtime.execution_envelope import RunExecutionResourceEnvelopeMachine
+    from empirical_lawhood.execution.execution_envelope import RunExecutionResourceEnvelopeMachine
 
     case = late_history
     inspect = ExternalNativeSubworkStore.inspect
@@ -839,7 +836,7 @@ def test_owned_resource_prefix_observes_new_committed_journal_suffix(late_histor
 
 
 def test_owned_resource_reader_cannot_outlive_failed_history_scope(late_history, monkeypatch):
-    from empirical_lawhood.infrastructure.recovery import RunRecoveryError
+    from empirical_lawhood.storage.recovery import RunRecoveryError
 
     case = late_history
     captured = []

@@ -9,10 +9,10 @@ import pytest
 
 from empirical_lawhood.api import recursive_authoring as author
 from empirical_lawhood.api import recursive_execution as execution
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.infrastructure import recursive_custody as owner
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.storage import recursive_custody as owner
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
 from tests.test_recursive_report_projection import ROOT, wave as wave  # noqa: F401
 
 
@@ -20,7 +20,7 @@ from tests.test_recursive_report_projection import ROOT, wave as wave  # noqa: F
 def compact_wave(wave):
     # This is the existing registered six-task Rubisco PURE software workflow,
     # not a constructed scientific issue, native acquisition or qualification.
-    from empirical_lawhood.adapters.methods.rubisco_historical.recursive_translation import historical_recursive_draft
+    from empirical_lawhood.domains.rubisco.rubisco_historical.recursive_translation import historical_recursive_draft
     from tests.test_rubisco_historical_recursive import _inputs
 
     model, slices = _inputs()
@@ -63,6 +63,48 @@ def compact_wave(wave):
 def _read(selected, plane, *, full=False):
     return execution.read_recursive_wave(directory=selected.directory, artifact_writer=plane,
         include_products=True, terminal_product_format="documents" if full else "compact")
+
+
+@pytest.mark.parametrize("custom_policy", (False, True))
+def test_full_read_releases_derived_encodings_before_retaining_the_population(compact_wave, monkeypatch, custom_policy):
+    """Both batch and fresh policy paths keep exact values with one typed decode."""
+    from hashlib import sha256
+    from empirical_lawhood.science.records import decoded_record_store
+
+    decode = decoded_record_store.decode_scoped_canonical_bytes
+    assemble = owner._assemble_read_products
+    decoded, assembled = [], []
+
+    def observe_decode(raw, codec, *, maximum_bytes):
+        record = decode(raw, codec, maximum_bytes=maximum_bytes)
+        decoded.append((record, raw, sha256(raw).hexdigest()))
+        return record
+
+    def observe_assembly(**kwargs):
+        result = assemble(**kwargs)
+        for values in result["records"].values():
+            for record in values.values():
+                assert not hasattr(record, "_canonical_encoding")
+                assert hasattr(record, "_canonical_fingerprint")
+        assembled.append(result)
+        return result
+
+    monkeypatch.setattr(decoded_record_store, "decode_scoped_canonical_bytes", observe_decode)
+    monkeypatch.setattr(owner, "_assemble_read_products", observe_assembly)
+    with compact_wave.plane.verification_scope() as plane:
+        if custom_policy:
+            plane.verify_manifest = plane.verify_manifest
+        actual = _read(compact_wave, plane, full=True)
+    assert actual == compact_wave.full
+    products, = assembled
+    records = [record for values in products["records"].values() for record in values.values()]
+    selected = {id(record) for record in records}
+    product_decodes = [row for row in decoded if id(row[0]) in selected]
+    assert len(product_decodes) == len(records) == len(selected)
+    for record, raw, digest in product_decodes:
+        assert record.fingerprint() == digest
+        assert not hasattr(record, "_canonical_encoding")
+        assert record.canonical_bytes() == raw
 
 
 @pytest.mark.parametrize("mode", ("scoped", "public-default", "unscoped", "full", "custom-policy", "foreign-store", "low-request-limit", "custom-root", "custom-inspector", "custom-limits"))
@@ -119,7 +161,7 @@ def test_actual_pure_bulk_compact_parity_and_strict_serial_fallback(compact_wave
             plane.root = artifacts.GuardedExternalRoot(plane.root.contract, ObservedInspector())
             assert execution._read_only_custody_policy(plane) is None
         if mode == "custom-limits":
-            from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits
+            from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits
             class ObservedLimits(ArtifactCustodyLimits):
                 def exceeds(self, *args, **kwargs):
                     limit_calls.append(True)
@@ -209,6 +251,8 @@ def test_stock_full_read_batches_complete_output_custody_before_typed_consumptio
 
 
 def test_full_output_batch_retains_final_mutation_refusal(compact_wave, monkeypatch):
+    from empirical_lawhood.science.records import decoded_record_store
+
     expected = compact_wave.full
     products = expected[1]
     kinds = {type(record) for rows in products['records'].values() for record in rows.values()}
@@ -216,7 +260,7 @@ def test_full_output_batch_retains_final_mutation_refusal(compact_wave, monkeypa
     selected = next(iter(products['outputs'].values()))
     path = compact_wave.plane.root.resolve(selected.materialization.relative_path, for_write=False)
     before = path.read_bytes()
-    original, consumed = owner.decode_canonical_bytes, []
+    original, consumed = decoded_record_store.decode_scoped_canonical_bytes, []
     def decode(raw, kind, **options):
         value = original(raw, kind, **options)
         if kind in kinds:
@@ -224,7 +268,7 @@ def test_full_output_batch_retains_final_mutation_refusal(compact_wave, monkeypa
             if len(consumed) == count:
                 path.write_bytes(b'X' + before[1:])
         return value
-    monkeypatch.setattr(owner, 'decode_canonical_bytes', decode)
+    monkeypatch.setattr(decoded_record_store, 'decode_scoped_canonical_bytes', decode)
     try:
         with pytest.raises(artifacts.ArtifactIdentityConflict):
             _read(compact_wave, compact_wave.plane, full=True)
@@ -344,6 +388,8 @@ def test_bulk_read_error_preserves_exception_and_never_returns_rows(compact_wave
 
 
 def test_bulk_metadata_codec_refusal_precedes_all_explicit_body_hashes(compact_wave, monkeypatch):
+    from empirical_lawhood.storage.contracts.record_codecs import UnsupportedRecordRevision
+
     original = owner._assemble_read_products
     ordered = tuple(compact_wave.compact[1]["outputs"].values())
     schema = next(value.logical.payload_schema for value in ordered
@@ -362,10 +408,10 @@ def test_bulk_metadata_codec_refusal_precedes_all_explicit_body_hashes(compact_w
 
     monkeypatch.setattr(owner, "_assemble_read_products", assemble)
     monkeypatch.setattr(owner, "_verified_product_path", forbidden)
-    with pytest.raises(ValueError, match="registered strict record codec"):
+    with pytest.raises(UnsupportedRecordRevision) as refused:
         with compact_wave.plane.verification_scope() as plane:
             _read(compact_wave, plane)
-    assert bodies == []
+    assert schema in str(refused.value) and bodies == []
 
 
 @pytest.mark.parametrize("damage", ("missing-input", "input-lineage"))
@@ -404,10 +450,10 @@ def test_bulk_metadata_preflight_keeps_exact_external_input_and_lineage_guards(c
 
 def test_same_registry_class_custom_binary_validator_keeps_serial_admission_and_mutation_guard(compact_wave, monkeypatch):
     from empirical_lawhood.api.integration_artifact_profiles import INTEGRATION_ARTIFACT_PROFILE_VALIDATORS
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-    from empirical_lawhood.runtime.recursive_storage_codecs import RecursiveStorageCodec
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.storage.contracts.recursive_storage_codecs import RecursiveStorageCodec
 
     selected = compact_wave
     target = selected.plane.root.resolve(selected.first.materialization.relative_path, for_write=False)

@@ -1,23 +1,17 @@
 # SPDX-License-Identifier: MPL-2.0
-"""Opt-in operational counters and a storage-independent status view."""
+"""One CLI presentation owner and the storage-independent progress view."""
 
-from functools import wraps
-import inspect
+from contextlib import contextmanager
+import sys
 import json
 from pathlib import Path
 from typing import Annotated
 
+from typer.models import TyperPath
 import typer
 
-from empirical_lawhood.infrastructure.progress import JsonProgressReporter, read_progress
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.runtime.progress import progress_reporting
-
-
-PROGRESS_FILE_OPTION = typer.Option(
-    "--progress-file",
-    help="New advisory JSON status file outside scientific packages; phase counts, updated at most once per second.",
-)
+from empirical_lawhood.storage.progress import OperationalProgressReporter, format_progress, read_progress
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
 
 
 def _check_destination(path: Path, arguments: dict) -> None:
@@ -30,42 +24,68 @@ def _check_destination(path: Path, arguments: dict) -> None:
             if not isinstance(item, Path):
                 continue
             other = item.resolve()
-            if selected == other or (name in {"authoring_dir", "output_dir", "output_root", "attempt_dir", "metadata_directory"}
+            if selected == other or ((other.is_dir() or name in {"authoring_dir", "output_dir", "output_root", "attempt_dir", "metadata_directory", "root", "payload", "package"})
                                      and selected.is_relative_to(other)):
                 raise ValueError("progress file must be separate from inputs, selected output roots and scientific or attempt packages")
 
 
-def progress_command(operation: str):
-    """Bind advisory reporting for one invocation without changing its result."""
-    def decorate(function):
-        signature = inspect.signature(function, eval_str=True)
+def _invocation(group, context):
+    """Inspect declared path options before telemetry claims its output path."""
+    from empirical_lawhood.cli.attempts import _option_values
+    current = group
+    remaining = [*context._protected_args, *context.args]
+    names, arguments = [], dict(context.params)
+    for parameter in group.params:
+        value = arguments.get(parameter.name)
+        if isinstance(parameter.type, TyperPath) and value is not None:
+            arguments[parameter.name] = [Path(v) for v in value] if isinstance(value, (list, tuple)) else Path(value)
+    while True:
+        parameters = {option: parameter for parameter in current.params for option in getattr(parameter, "opts", ())}
+        for index, token in enumerate(remaining):
+            spelling, equal, inline = token.partition("=")
+            parameter = parameters.get(spelling)
+            if parameter is None or not isinstance(parameter.type, TyperPath):
+                continue
+            if not equal and index + 1 >= len(remaining):
+                continue
+            value = inline if equal else remaining[index + 1]
+            key = parameter.name
+            existing = arguments.get(key)
+            arguments[key] = [*(existing if isinstance(existing, list) else []), Path(value)]
+        _, remaining = _option_values(current, remaining, leaf=not bool(getattr(current, "commands", None)))
+        if not getattr(current, "commands", None) or not remaining:
+            break
+        name = remaining.pop(0)
+        child = current.commands.get(name)
+        if child is None:
+            break
+        names.append(name)
+        current = child
+    return " ".join(names) or "command", arguments
 
-        @wraps(function)
-        def invoke(*args, **kwargs):
-            arguments = signature.bind(*args, **kwargs)
-            arguments.apply_defaults()
-            selected = arguments.arguments.get("progress_file")
-            if selected is None:
-                return function(*args, **kwargs)
-            try:
-                _check_destination(selected, arguments.arguments)
-                reporter = JsonProgressReporter(selected, operation)
-            except (OSError, ValueError, TypeError) as error:
-                raise typer.BadParameter(str(error), param_hint="--progress-file") from error
-            with progress_reporting(reporter):
-                try:
-                    result = function(*args, **kwargs)
-                except BaseException as error:
-                    code = getattr(error, "exit_code", getattr(error, "code", None))
-                    status = "INTERRUPTED" if isinstance(error, KeyboardInterrupt) else "FAILED"
-                    reporter.finish("RETURNED" if code == 0 else status)
-                    raise
-                else:
-                    reporter.finish("RETURNED")
-                    return result
 
-        return invoke
-    return decorate
+@contextmanager
+def command_progress(group, context):
+    """Default stderr progress for every command; optional one atomic UI file."""
+    operation, arguments = _invocation(group, context)
+    if operation == "progress":
+        yield
+        return
+    value = context.params.get("progress_file")
+    selected = None if value is None else Path(value)
+    enabled = context.params.get("progress", True)
+    if not enabled and selected is None:
+        yield
+        return
+    try:
+        if selected is not None:
+            _check_destination(selected, arguments)
+        reporter = OperationalProgressReporter(selected, operation,
+            stream=sys.stderr if enabled else None)
+    except (OSError, ValueError, TypeError) as error:
+        raise typer.BadParameter(str(error), param_hint="--progress-file") from error
+    with reporter:
+        yield
 
 
 def register_progress_command(app: typer.Typer) -> None:
@@ -83,10 +103,5 @@ def register_progress_command(app: typer.Typer) -> None:
         if as_json:
             typer.echo(json.dumps(record, allow_nan=False, sort_keys=True))
             return
-        done, total, percent = record["done"], record["total"], record["percent"]
-        count = "count unknown" if done is None else str(done)
-        if total is not None:
-            count += f"/{total}"
-        fraction = "" if percent is None else f" ({percent:.1f}%)"
-        typer.echo(f"{record['status']} | {record['phase']} | {count}{fraction} | failed={record['failed']}")
-        typer.echo(f"Updated: {record['updated_at_utc']} | PID: {record['pid']}")
+        typer.echo(format_progress(record))
+        typer.echo(f"Updated: {record['updated_at_utc']} | PID: {record['pid']} | sequence={record['sequence']}")

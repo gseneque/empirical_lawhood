@@ -8,11 +8,11 @@ import pytest
 
 from empirical_lawhood.api import matrix_source_runtime as owner
 from empirical_lawhood.api.matrix_source_input_assembly import publish_source_input_record
-from empirical_lawhood.infrastructure.artifact_stream_primitives import ArtifactIdentityConflict
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling, inherited_visibility
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, derived_outcome_access, lineage_parent_sort_key
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
+from empirical_lawhood.storage.artifact_stream_primitives import ArtifactIdentityConflict
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling, inherited_visibility
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, derived_outcome_access, lineage_parent_sort_key
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
 from tests.test_recursive_public_service import _plane
 
 
@@ -71,7 +71,7 @@ def test_source_publication_lookup_reads_only_missing_unique_original_inputs(tmp
     value, _, observed = published(plane)
     pin = ObjectIdentity.from_record(value.cutoff_id, value)
     monkeypatch.setattr(owner, "matrix_source_publication_references", lambda *args: (pin,))
-    import empirical_lawhood.infrastructure.provider_input_custody as locations
+    import empirical_lawhood.storage.provider_input_custody as locations
     calls = []
     def location(writer, run_id, logical_id):
         calls.append(logical_id)

@@ -46,7 +46,7 @@ def require_input_only_run(writer, plan, run_id):
         if path.name == 'producing-provenance.json':
             # The ordinary execution owner writes this before its input
             # materialization loop. It is retained preparation, not contact.
-            from .recursive_execution import _provenance
+            from empirical_lawhood.api.recursive_execution import _provenance
             provenance = _provenance(plane=writer, run_id=run_id)
             if provenance.observed_git_head != plan.implementation_commit:
                 raise PermissionError('unentered run changes its original producing source')

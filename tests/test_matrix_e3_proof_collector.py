@@ -10,9 +10,9 @@ import weakref
 
 import pytest
 
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_e3_public_programme import (
     _ObservedProcessContext, _ObservedProcessExecutor, _PreparedObservation, _release_dedicated_child, _retain_ready_record,
 )
@@ -154,7 +154,7 @@ def test_four_concurrent_child_collectors_keep_exact_per_task_attribution():
 
 
 def _source_entry_fixture(tmp_path):
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes, canonical_json_document_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes, canonical_json_document_bytes
 
     package_sources = (("module.py", "b" * 64),)
     implementation = SimpleNamespace(observed_git_head="a" * 40, package_sources=package_sources,
@@ -187,7 +187,7 @@ def _source_entry_fixture(tmp_path):
 
 
 def test_concurrent_source_proof_reads_candidate_once_without_serializing_child_execution(tmp_path, monkeypatch):
-    from empirical_lawhood.infrastructure import selected_candidate
+    from empirical_lawhood.storage import selected_candidate
 
     executor = object.__new__(_ObservedProcessExecutor)
     executor.source_custody_root, executor.source_entries = tmp_path, {}

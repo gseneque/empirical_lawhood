@@ -9,13 +9,9 @@ from __future__ import annotations
 import re
 
 from empirical_lawhood.api import CapabilityListSummary, CapabilityShowSummary
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.candidate_composition import (
-    CandidateCapabilityRegistration,
-)
-from empirical_lawhood.runtime.executable_bindings import (
-    CapabilityExecutionAvailability,
-)
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityRegistration
+from empirical_lawhood.execution.executable_bindings import CapabilityExecutionAvailability
 
 
 def _words(value: str) -> str:

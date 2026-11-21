@@ -5,9 +5,9 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.infrastructure.retained_input_read import RetainedInputRead
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.storage.retained_input_read import RetainedInputRead
+from empirical_lawhood.execution.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 from tests.test_artifact_read_context import _work
 
@@ -29,8 +29,8 @@ def count_copies(monkeypatch):
 
 def test_common_inputs_are_sealed_once_with_independent_cursors_and_live_access(tmp_path, monkeypatch):
     from empirical_lawhood.api import current_result_custody
-    from empirical_lawhood.kernel import decoding
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.records import decoding
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
     plane, manifests = _publication(tmp_path, 2)
     values, bindings, size = inputs(manifests)

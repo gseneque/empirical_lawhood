@@ -7,25 +7,19 @@ from typing import ClassVar
 import pytest
 
 from empirical_lawhood.api import load_authoring
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import (
-    AssessmentDisposition, AssessmentPhase, ConditionRole, ContributionRole,
-    DevelopmentStudySpec, RequirementSupplyAssessment, ScientificConditionScope,
-    ScientificConnectionSpec, ScientificRequirementSpec,
-)
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.recursive_authoring import (
-    RecursiveInputLink, RecursiveOperationSpec, RecursiveStudyDraft, SupplierProposal,
-)
-from empirical_lawhood.planning.study_authoring import CapabilitySelection
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, DevelopmentRunPlan, OutputTemplate, PlanLane, ScientificInputRole, ScientificStage
-from empirical_lawhood.runtime.recursive_compiler import RecursiveOperationRegistration, RecursivePortContract, compile_recursive_wave
-from empirical_lawhood.runtime.scientific_graph_preservation import prove_development_graph_parity
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition, AssessmentPhase, ConditionRole, ContributionRole, DevelopmentStudySpec, RequirementSupplyAssessment, ScientificConditionScope, ScientificConnectionSpec, ScientificRequirementSpec
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.recursive_authoring import RecursiveInputLink, RecursiveOperationSpec, RecursiveStudyDraft, SupplierProposal
+from empirical_lawhood.design.study_authoring import CapabilitySelection
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, DevelopmentRunPlan, OutputTemplate, PlanLane, ScientificInputRole, ScientificStage
+from empirical_lawhood.execution.recursive_compiler import RecursiveOperationRegistration, RecursivePortContract, compile_recursive_wave
+from empirical_lawhood.execution.scientific_graph_preservation import prove_development_graph_parity
 
 
 @dataclass(frozen=True, slots=True)
@@ -102,8 +96,8 @@ def compile_fixture(**changes):
 
 @pytest.mark.parametrize("output_limit", [None, 4096, 128 * 1024**2])
 def test_closed_matrix_array_port_derives_scientific_bound_without_operational_ceiling(output_limit):
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA, MAXIMUM_MATRIX_ARRAY_BYTES
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA, MAXIMUM_MATRIX_ARRAY_BYTES
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
 
     draft, registrations, registry = fixture()
     source_budget = replace(BUDGET, output_bytes=output_limit)
@@ -138,8 +132,8 @@ def test_closed_matrix_array_port_derives_scientific_bound_without_operational_c
 
 @pytest.mark.parametrize("changed", ["canonical", "schema", "media", "profile", "smaller-port"])
 def test_closed_array_bound_does_not_exempt_other_transports_or_tighter_consumer(changed):
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA, MAXIMUM_MATRIX_ARRAY_BYTES
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA, MAXIMUM_MATRIX_ARRAY_BYTES
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
 
     draft, registrations, registry = fixture()
     unlimited_budget = replace(BUDGET, output_bytes=None)
@@ -178,7 +172,7 @@ def test_output_names_incompatible_with_legacy_receipt_order_are_refused_before_
 
 @pytest.mark.parametrize('names', [('primary', 'secondary'), ('result', 'result.z')])
 def test_multiple_outputs_keep_complete_census_and_actual_materialization_order(tmp_path, names):
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest
     from tests.test_recursive_public_service import _plane
 
     draft, registrations, registry = fixture()
@@ -230,8 +224,8 @@ def test_closed_wave_has_real_authority_free_root_and_exact_scientific_edges():
 
 @pytest.mark.parametrize('changed_digest', (False, True))
 def test_scientific_validators_receive_selected_external_contracts_at_compile_and_assessment(changed_digest):
-    from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
-    from empirical_lawhood.runtime.recursive_compiler import project_recursive_assessments
+    from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
+    from empirical_lawhood.execution.recursive_compiler import project_recursive_assessments
 
     draft, registrations, registry = fixture()
     source = Config('original.source', 7)
@@ -424,11 +418,11 @@ def test_negative_assessment_is_a_retained_scientific_product_and_positive_requi
 def prospective_fixture(*, typed_outputs=False, reveal_terminal=False, worker_memory_bytes=None):
     """Materialize the reference topology through the general authored compiler."""
     from hashlib import sha256
-    from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
+    from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
     from tests.runtime_platform.test_candidate_compiler import _fixture
     from tests.experiment_entry_support import standard_authoring_for_draft
-    from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-    from empirical_lawhood.adapters.reference_worlds.runtime import ReferenceAdjudicationFixture
+    from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+    from empirical_lawhood.domains.reference_worlds.runtime import ReferenceAdjudicationFixture
 
     draft, original = _fixture()
     template = original.templates[0]
@@ -529,16 +523,9 @@ def test_general_authored_topology_enters_actual_public_source_entry_and_issue_l
 
 
 def test_shared_provider_builds_through_existing_factory_composite_without_config_capture():
-    from empirical_lawhood.runtime.executable_bindings import (
-        ExecutableBindingContribution, ExecutableCapabilityProviderFactoryRegistry,
-        ExecutablePlatformPort, LayeredCampaignRuntimeProviderResolver,
-        compose_executable_binding_aggregate,
-    )
-    from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry, ExternalInputPayload
-    from empirical_lawhood.runtime.recursive_provider import (
-        RecursiveOperationInputPort, RecursiveOperationProviderFactory,
-        recursive_input_port_key, recursive_operation_binding,
-    )
+    from empirical_lawhood.execution.executable_bindings import ExecutableBindingContribution, ExecutableCapabilityProviderFactoryRegistry, ExecutablePlatformPort, LayeredCampaignRuntimeProviderResolver, compose_executable_binding_aggregate
+    from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry, ExternalInputPayload
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort, RecursiveOperationProviderFactory, recursive_input_port_key, recursive_operation_binding
     compiled = compile_fixture()
     _, registrations, registry = fixture()
     configs = {row.config_id: row for row in compiled.config_inputs}
@@ -563,8 +550,8 @@ def test_shared_provider_builds_through_existing_factory_composite_without_confi
         ports.append(ExecutablePlatformPort(recursive_input_port_key(registration.selection), RecursiveOperationInputPort(Supplier())))
     factories = tuple(sorted(factories, key=lambda value: value.binding.binding_id))
     contribution = ExecutableBindingContribution("contribution.generic", "1.0.0", tuple(factory.binding for factory in factories))
-    from empirical_lawhood.runtime.extension_bundles import ExtensionBundleContribution, ExtensionContributionKind, compose_extension_bundle_aggregate
-    from empirical_lawhood.adapters.composition.generated_extension_bundles import EXTENSION_BUNDLE_CONTRIBUTIONS
+    from empirical_lawhood.execution.extension_bundles import ExtensionBundleContribution, ExtensionContributionKind, compose_extension_bundle_aggregate
+    from empirical_lawhood.execution.generated_extension_bundles import EXTENSION_BUNDLE_CONTRIBUTIONS
     discovery_contribution = ExtensionBundleContribution("discovery.generic", "1.0.0", ExtensionContributionKind.METHOD,
         (), registry.capabilities, (), (), (), (), (), (), (), (), False, False)
     discovery = compose_extension_bundle_aggregate((*EXTENSION_BUNDLE_CONTRIBUTIONS, discovery_contribution))
@@ -580,7 +567,7 @@ def test_shared_provider_builds_through_existing_factory_composite_without_confi
 
 
 def test_closed_wave_retains_unselected_partial_requirement_and_unknown_supplier():
-    from empirical_lawhood.runtime.recursive_compiler import project_recursive_assessments
+    from empirical_lawhood.execution.recursive_compiler import project_recursive_assessments
     draft, registrations, registry = fixture()
     operation = replace(draft.operations[0], node_id='future', selection=CapabilitySelection('unavailable.future', '1.0.0', 'd' * 64))
     requirement = replace(draft.requirements[0], requirement_id='requirement.future', consumer_operation_id='future',
@@ -604,7 +591,7 @@ def test_closed_wave_retains_unselected_partial_requirement_and_unknown_supplier
 
 def test_global_material_decision_and_explicit_object_edge_depth_bounds():
     import json
-    from empirical_lawhood.planning.study_authoring import UnresolvedDecision
+    from empirical_lawhood.design.study_authoring import UnresolvedDecision
     draft, registrations, registry = fixture()
     decision = UnresolvedDecision('decision.wave', 'wave.selected', 'Which selected task threshold applies?', ('first', 'second'))
     with pytest.raises(ValueError, match='unresolved scientific decisions'):
@@ -661,7 +648,7 @@ def test_config_nesting_has_no_sixty_four_level_ceiling_but_strict_numbers_and_k
 
 
 def test_registered_multiplicity_and_identity_projection_have_no_global_count_ceiling():
-    from empirical_lawhood.runtime.recursive_compiler import _registered_identity_projection
+    from empirical_lawhood.execution.recursive_compiler import _registered_identity_projection
     port = RecursivePortContract('operand', Config.SCHEMA, 'application/json', None, 0, 300)
     assert port.matches('operand.299')
     values = tuple(f'unit.{index:04d}' for index in range(300))
@@ -684,8 +671,8 @@ def test_scientific_operand_binding_refuses_coherent_config_substitution_before_
 
 
 def test_external_config_bindings_round_trip_and_share_schema_without_constructor_capture():
-    from empirical_lawhood.runtime.executable_bindings import ExecutableBindingContribution
-    from empirical_lawhood.runtime.recursive_provider import recursive_operation_binding
+    from empirical_lawhood.execution.executable_bindings import ExecutableBindingContribution
+    from empirical_lawhood.execution.recursive_provider import recursive_operation_binding
     _, registrations, registry = fixture()
     registration = replace(registrations[1], config_record_type=SourceConfig)
     manifest = replace(registry.capabilities[1], config_schema=SourceConfig.SCHEMA,

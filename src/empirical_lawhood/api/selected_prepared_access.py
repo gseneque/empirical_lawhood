@@ -8,14 +8,12 @@ from contextlib import ExitStack
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as domain
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import (
-    produced_access, produced_record_parents, validate_produced_input_parents,
-)
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactManifest, lineage_parent_sort_key
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as domain
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access, produced_record_parents, validate_produced_input_parents
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactManifest, lineage_parent_sort_key
 
 
 def _ordered(values):
@@ -30,10 +28,14 @@ class SelectedPreparedCurrentAccess:
     """Operation-local replacement reveals; all original scientific pins stay fixed."""
     originals:tuple[MatrixSelectedOriginalProduct,...]
 
+    @property
+    def selected_records(self):
+        return self.originals
+
     def __post_init__(self):
         _ordered(self.originals)
         if len(self.originals)==5:
-            from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4Calibration
+            from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4Calibration
             calibration=tuple(value for value in self.originals if value.record.object_schema==SelectedE4Calibration.SCHEMA)
             if len(calibration)!=1:
                 raise ValueError('protected E4 current access requires its one exact CAL producer')
@@ -51,9 +53,7 @@ class SelectedPreparedCurrentAccess:
         return selected
 
     def development_access(self):
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import (
-            SelectedE4Calibration,SelectedE4DownstreamNomination,
-        )
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4Calibration, SelectedE4DownstreamNomination
         from empirical_lawhood.api.selected_e3_access import SelectedE3CurrentAccess
         e4={SelectedE4Calibration.SCHEMA,SelectedE4DownstreamNomination.SCHEMA}
         values=tuple(value for value in self.originals if value.record.object_schema not in e4)
@@ -73,7 +73,7 @@ def _selected(originals,current):
 
 
 def _ordinary(writer):
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane,_ScopedArtifactPlane
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, _ScopedArtifactPlane
     return (ExternalArtifactPlane(writer.root,writer.validators,writer.semantic_validations,
         custody_limits=writer.custody_limits, artifact_verification='strict') if type(writer) is _ScopedArtifactPlane else writer)
 
@@ -131,7 +131,7 @@ class SelectedPreparedOriginalInputAccess:
     def bind_source_provenance(self,*,packet,directory):
         """Admit only the two original closure-owned operational disclosures."""
         from empirical_lawhood.api.prospective_experiment import _source_provenance_member_facts
-        from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+        from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
         if type(packet) is not AuthoredRecursiveWave:
             raise TypeError('prepared source provenance requires its exact already-bound packet')
         if self.issued_directory is None or Path(directory)!=self.issued_directory:
@@ -186,8 +186,8 @@ class SelectedPreparedOriginalInputAccess:
 
 def _bind_issued_members(access,manifests,*,packet,association,directory,model_source_schemas,locator_schemas):
     """Common exact-member/role checks; callers select closed scientific owners."""
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
-    from empirical_lawhood.runtime.prospective_experiment import ProspectiveExperimentAssociation,ASSOCIATION_FILENAME
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
+    from empirical_lawhood.execution.prospective_experiment import ProspectiveExperimentAssociation, ASSOCIATION_FILENAME
     if type(packet) is not AuthoredRecursiveWave or type(association) is not ProspectiveExperimentAssociation:
         raise TypeError('prepared issued members require their exact closed packet and association')
     packet.__post_init__();association.__post_init__()
@@ -258,9 +258,7 @@ def _bind_issued_members(access,manifests,*,packet,association,directory,model_s
 
 
 def _require_specification(specification,*,development):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_prepared_choices import (
-        SelectedPreparedDevelopmentSpecification,SelectedPreparedProtectedSpecification,
-    )
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedDevelopmentSpecification, SelectedPreparedProtectedSpecification
     kind=SelectedPreparedDevelopmentSpecification if development is True else SelectedPreparedProtectedSpecification
     if development is None:
         kinds=(SelectedPreparedDevelopmentSpecification,SelectedPreparedProtectedSpecification)
@@ -271,9 +269,7 @@ def _require_specification(specification,*,development):
 
 
 def _require_account(specification,rows):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import (
-        SelectedE4Calibration,SelectedE4DownstreamNomination,
-    )
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4Calibration, SelectedE4DownstreamNomination
     originals=tuple(value for key,value in rows if key.startswith('original.'))
     e4={SelectedE4Calibration.SCHEMA,SelectedE4DownstreamNomination.SCHEMA}
     if specification.account=='REVISION':
@@ -288,11 +284,11 @@ def _development_metadata(writer,value,current):
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.current_task_custody import CurrentDevelopmentTaskCustody
     from empirical_lawhood.api.recursive_execution import _retained_plans
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.kernel.status import OperationalStatus
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.science.records.status import OperationalStatus
     writer=_ordinary(writer)
     directory=writer.root.resolve(getattr(value,'authored_directory',getattr(value,'authoring_relative_path',None)),for_write=False)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4DevelopmentProduct
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4DevelopmentProduct
     access_selection=(None if current is None else current.development_access()) if type(value) is SelectedE4DevelopmentProduct else current
     packet,draft,_,payloads=load_authored_wave(directory=directory,artifact_writer=writer,lazy_payloads=True,
         read_access=access_selection)
@@ -332,7 +328,7 @@ def _development_metadata(writer,value,current):
     # Retain exact control envelopes for the reachable producing DEV graph.
     # Every scientific output is still admitted by that actual DEV custody's
     # successful receipt/full-input-lineage check, never by this control census.
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
     tasks_by_id={row.task_id:row for row in plan.tasks}
     pending=[value.task_id];seen=set();receipt_facts=set()
     while pending:
@@ -394,8 +390,8 @@ def original_input_parents(*, artifact_writer, locators, read_access=None):
     parent identities. Consumers of other original members still require
     original_input_access and its complete member census.
     """
-    from .retained_e3_evidence import recorded_product_kinds
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+    from empirical_lawhood.api.retained_e3_evidence import recorded_product_kinds
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
     originals = tuple(value for key, value in locators if key.startswith('original.'))
     development = tuple(value for key, value in locators if key.startswith('development.'))
     _ordered(originals)
@@ -408,7 +404,7 @@ def original_input_parents(*, artifact_writer, locators, read_access=None):
     if read_access is not None and any(value.record not in {original.record for original in originals}
             for value in read_access.originals):
         raise PermissionError('prepared current access adds a foreign unused original producer')
-    from .recorded_e3_products import recorded_original_product_custody
+    from empirical_lawhood.api.recorded_e3_products import recorded_original_product_custody
     parents = []
     with recorded_original_product_custody(artifact_writer,
             tuple((value, value.record) for value in selected)) as (products, scope):
@@ -428,10 +424,10 @@ def original_input_parents(*, artifact_writer, locators, read_access=None):
 
 def _selected_e4_original_roster(upstream_products,calibration_product):
     """Recognize the two supported E3 editions and a distinct optional E4 CAL."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as e3
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as configured
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4Calibration
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_preparation import validate_component_original_products
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as e3
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as configured
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4Calibration
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_preparation import validate_component_original_products
 
     validate_component_original_products(upstream_products,calibration_product)
     editions=((e3.ProtectedE3ModelSet,e3.ProtectedE3FrozenProducts,e3.ProtectedE3Calibration,e3.ProtectedE3FrozenProducts),
@@ -450,8 +446,8 @@ def _selected_e4_original_roster(upstream_products,calibration_product):
 def selected_e4_original_input_access(*,artifact_writer,upstream_products,calibration_product,
         development=(),read_access=None):
     """Authenticate the protected E4 roster without widening prepared accounts."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4DevelopmentProduct
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4RevisionNomination,SelectedE4FrozenRevision
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4DevelopmentProduct
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4RevisionNomination, SelectedE4FrozenRevision
 
     _selected_e4_original_roster(upstream_products,calibration_product)
     if development:
@@ -474,7 +470,7 @@ def selected_e4_original_input_access(*,artifact_writer,upstream_products,calibr
 
 def _receipt_closure_members(writer,closure):
     """Collect exact publication and receipt envelopes without outcome reads."""
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
 
     members={(row.logical,row.materialization) for row in closure.manifests}
     store=ExternalTaskReceiptStore(writer)
@@ -491,10 +487,10 @@ def _receipt_closure_members(writer,closure):
 
 def _imported_original_members(writer,originals):
     """Join partial E3 producers only through their authenticated continuation."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as e3
-    from .configured_e3_imported_products import imported_e3_product_custody
-    from .recursive_operations import operation_catalog
-    from .recursive_qualified_parents import _collect_receipt_closure
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as e3
+    from empirical_lawhood.api.configured_e3_imported_products import imported_e3_product_custody
+    from empirical_lawhood.api.recursive_operations import operation_catalog
+    from empirical_lawhood.api.recursive_qualified_parents import _collect_receipt_closure
 
     schemas={e3.ConfiguredProtectedE3ModelSet.SCHEMA,e3.ConfiguredProtectedE3FrozenProducts.SCHEMA,
         e3.ConfiguredProtectedE3Calibration.SCHEMA}
@@ -503,9 +499,9 @@ def _imported_original_members(writer,originals):
         return (value.prior_execution.run_id,value.issued_study,value.execution_authority,value.reveal_authority)
     if len(selected)!=4 or len({key(value) for value in selected})==1:
         return set(),set()
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
     if not scientific_reconstruction_enabled():
-        from .recorded_e3_products import recorded_original_members
+        from empirical_lawhood.api.recorded_e3_products import recorded_original_members
         return recorded_original_members(writer, selected)
     members=set();completed=set()
     with imported_e3_product_custody(writer,tuple((value,value.record) for value in selected),
@@ -532,8 +528,8 @@ def _authenticate_original_input_access(*,artifact_writer,originals,development,
 
     selected=_selected(originals,read_access)
     parents=[];entries={};scopes=[];development_custodies=[]
-    from .retained_e3_evidence import retained_e3_evidence_context, recorded_product_kinds
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+    from empirical_lawhood.api.retained_e3_evidence import retained_e3_evidence_context, recorded_product_kinds
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
     kinds={(kind.SCHEMA,kind.VERSION) for kind in recorded_product_kinds()}
     with ExitStack() as lifetime:
         if not scientific_reconstruction_enabled() and any(
@@ -553,7 +549,7 @@ def _authenticate_original_input_access(*,artifact_writer,originals,development,
             old=entries.setdefault(key,(value,package))
             if old[1]!=package:raise PermissionError('prepared originals combine different producing packages')
             if key not in closures:
-                from .recursive_qualified_parents import _collect_receipt_closure
+                from empirical_lawhood.api.recursive_qualified_parents import _collect_receipt_closure
                 # This owner collects only manifests and actual receipts; it
                 # does not verify/hash scientific outcome or array bodies.
                 closure=_collect_receipt_closure(package,plan,writer,reveal,prefixes,control_reader=reader)
@@ -602,7 +598,7 @@ def _locator_rows(bindings,read):
 def bootstrap_selected_input_access(*,specification,selection,read_locator,artifact_writer,read_access=None,selection_path=None):
     from empirical_lawhood.api.experiment_preparation import _input_member
     _require_specification(specification,development=None)
-    from empirical_lawhood.planning.experiment_inputs import ExperimentInputSelection,ExperimentFileInputSelection
+    from empirical_lawhood.design.experiment_inputs import ExperimentInputSelection, ExperimentFileInputSelection
     if type(selection) not in (ExperimentInputSelection,ExperimentFileInputSelection):
         raise TypeError('prepared selected bootstrap requires its exact canonical selector')
     selection.__post_init__()
@@ -709,7 +705,7 @@ def guarded_output_payload(writer,receipt,logical,maximum,access):
     sibling; it does not create own-issued outcome access or a receipt verdict.
     """
     from hashlib import sha256
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
     if logical not in receipt.output_logical_artifacts:
         raise PermissionError('prepared output is foreign to its actual producing receipt')
     materials=tuple(row for row in receipt.output_materializations if row.logical_artifact_id==logical.logical_artifact_id)

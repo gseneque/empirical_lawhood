@@ -6,7 +6,7 @@ import sys
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import ExternalRootUnavailable, GuardedExternalRoot
+from empirical_lawhood.storage.artifacts import ExternalRootUnavailable, GuardedExternalRoot
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 
 

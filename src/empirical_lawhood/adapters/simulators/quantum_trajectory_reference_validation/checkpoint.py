@@ -1,17 +1,13 @@
-"""Safe NPZ trajectory/checkpoint serialization and exact restart capsules."""
+"""Native acquisition and external-format binding for the domain science."""
 
 from __future__ import annotations
-
 from dataclasses import asdict
 from io import BytesIO
 import json
 from typing import Mapping, cast
-
 import numpy as np
-
-from .schemas import stable_json_bytes
-from .types import Action, Denominator, EventRecord, JumpDiagnostic, TrajectoryCheckpoint, TrajectoryResult, View
-
+from empirical_lawhood.domains.quantum.trajectory_reference_validation.schemas import stable_json_bytes
+from empirical_lawhood.domains.quantum.trajectory_reference_validation.types import Action, Denominator, EventRecord, JumpDiagnostic, TrajectoryCheckpoint, TrajectoryResult, View
 
 DIAGNOSTIC_COLUMNS = (
     "event_index",
@@ -201,49 +197,6 @@ def trajectory_from_bytes(payload: bytes) -> TrajectoryResult:
     )
 
 
-def checkpoint_from_result(
-    result: TrajectoryResult,
-    clock: float,
-) -> TrajectoryCheckpoint:
-    if clock not in result.snapshots:
-        raise ValueError("requested checkpoint clock is absent")
-    events = tuple(event for event in result.events if event.event_time < clock)
-    diagnostics = tuple(row for row in result.diagnostics if row.event_time < clock)
-    return TrajectoryCheckpoint(
-        unit_id=result.unit_id,
-        denominator=result.denominator,
-        action=result.action,
-        l_sites=result.l_sites,
-        particles=result.particles,
-        clock=clock,
-        state=np.asarray(result.snapshots[clock], dtype=np.complex128),
-        events=events,
-        diagnostics=diagnostics,
-        rng_state=result.checkpoint_rng_states[clock],
-        rng_draw_count=result.checkpoint_rng_draw_counts[clock],
-        maximum_propagator_norm_residual=max(
-            (row.propagator_norm_residual for row in diagnostics),
-            default=0.0,
-        ),
-        maximum_post_jump_norm_residual=max(
-            (row.post_jump_norm_residual for row in diagnostics),
-            default=0.0,
-        ),
-        maximum_projected_mass_identity_residual=max(
-            (row.projected_mass_identity_residual for row in diagnostics),
-            default=0.0,
-        ),
-        maximum_mark_probability_sum_residual=max(
-            (row.mark_probability_sum_residual for row in diagnostics),
-            default=0.0,
-        ),
-        maximum_particle_number_residual=max(
-            (row.particle_number_residual for row in diagnostics),
-            default=0.0,
-        ),
-    )
-
-
 def checkpoint_to_bytes(checkpoint: TrajectoryCheckpoint) -> bytes:
     metadata = {
         "schema": 'empirical-lawhood/simulators/quantum-trajectory/reference-compatible-exact-restart-checkpoint',
@@ -309,13 +262,3 @@ def checkpoint_from_bytes(payload: bytes) -> TrajectoryCheckpoint:
             metadata["maximum_particle_number_residual"],
         ),
     )
-
-
-__all__ = [
-    "DIAGNOSTIC_COLUMNS",
-    "checkpoint_from_bytes",
-    "checkpoint_from_result",
-    "checkpoint_to_bytes",
-    "trajectory_from_bytes",
-    "trajectory_to_bytes",
-]

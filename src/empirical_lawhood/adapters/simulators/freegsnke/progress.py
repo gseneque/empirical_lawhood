@@ -7,7 +7,7 @@ from enum import StrEnum
 import sys
 from typing import ClassVar
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
 
 
 FREEGSNKE_PROGRESS_PREFIX = "EMPIRICAL_LAWHOOD_FREEGSNKE_PROGRESS "

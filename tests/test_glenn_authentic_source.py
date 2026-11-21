@@ -13,13 +13,7 @@ import pytest
 
 pytestmark = pytest.mark.held
 
-from empirical_lawhood.adapters.physical.glenn.contracts import (
-    ACTION_COLUMNS,
-    GLENN_2026_PROFILE,
-    GlennAdapterError,
-    GlennArchiveInput,
-    GlennMemberRole,
-)
+from empirical_lawhood.adapters.physical.glenn.contracts import ACTION_COLUMNS, GLENN_2026_PROFILE, GlennAdapterError, GlennArchiveInput, GlennMemberRole
 from empirical_lawhood.adapters.physical.glenn.source import inspect_glenn_archive
 from empirical_lawhood.adapters.physical.glenn.transform import transform_glenn_archive
 

@@ -6,17 +6,15 @@ They establish no scientific source gate, issue, reveal, sampling or freshness.
 """
 from hashlib import sha256
 
-from empirical_lawhood.infrastructure.publication_metadata import authenticate_published_materialization
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_json_bytes
-from empirical_lawhood.planning.study_authoring import (
-    MaterializationQualificationReceipt, SourceAccessDisposition, SourceMaterializationRole, StudyDraft,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteResult
-from empirical_lawhood.runtime.source_pipelines import SourcePipelineProfile
-from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig, SourceReadMode
+from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes
+from empirical_lawhood.design.study_authoring import MaterializationQualificationReceipt, SourceAccessDisposition, SourceMaterializationRole, StudyDraft
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteResult
+from empirical_lawhood.execution.source_pipelines import SourcePipelineProfile
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
 
 
 def _require_scope(root, source_profile, observation_operator):

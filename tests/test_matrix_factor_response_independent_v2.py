@@ -8,9 +8,9 @@ from pathlib import Path
 from types import SimpleNamespace
 import numpy as np
 import pytest
-from empirical_lawhood.adapters.methods.matrix_factor_response import independent as v1, independent_v2 as v2
-from empirical_lawhood.adapters.methods.matrix_factor_response.independent_v2_records import MatrixResponseIndependentMethodV2
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_response import independent as v1, independent_v2 as v2
+from empirical_lawhood.domains.matrix.matrix_factor_response.independent_v2_records import MatrixResponseIndependentMethodV2
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_factor_response import mechanical_case
 
 
@@ -38,7 +38,7 @@ def parameter_case(mass, cross, alpha, eta, bath, dt):
 ))
 def test_all96_gradient_against_literal_finite_difference_and_parameter_history(params):
     d, initial = parameter_case(*params)
-    from empirical_lawhood.adapters.methods.matrix_parameter_history.independent import potential_gradient as other
+    from empirical_lawhood.domains.matrix.matrix_parameter_history.independent import potential_gradient as other
     x = initial["positions"][0]
     measured = v2.potential_gradient(x,d.member,(d.alpha_x,d.alpha_y))
     reference = v2.potential_gradient_fd(x,d)

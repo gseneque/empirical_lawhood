@@ -12,10 +12,10 @@ from hashlib import sha256
 import pytest
 
 from empirical_lawhood.api import matrix_scheduled_programme as api
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_records as records, programme_reduction as reduction
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.infrastructure.artifacts import ArtifactPlaneError
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_records as records, programme_reduction as reduction
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.artifacts import ArtifactPlaneError
 from tests.test_matrix_scheduled_programme_graph import (
     bank as bank, compile_wave, programme576_bank, provenance as provenance,
     response_bank as response_bank, scheduled as scheduled, stock as stock,
@@ -43,7 +43,7 @@ def _synthetic_identity(key, schema, version='1.0.0'):
 
 
 def _synthetic_cases(programme):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseScore
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseScore
     groups = {group: index+1 for index, group in enumerate(programme.group_ids)}
     seen = {}
     result = []
@@ -73,8 +73,8 @@ def _waves(programme, cases):
 
 
 def test_public_full576_preflight_and_complete_crosswave_negative_census(response_bank, tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments
-    from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_prediction
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments
+    from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_prediction
 
     def blocked(*args, **kwargs):
         pytest.fail('bounded programme preflight or reduction entered numerical science')

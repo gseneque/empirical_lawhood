@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Public source derivation and existing E4 phase programme composition."""
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_declarative import PROTOCOL_ID
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_declarative import PROTOCOL_ID
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 
 
 def derive_inputs(**kwargs):

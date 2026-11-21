@@ -5,11 +5,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure.execution import LocalScheduler, ResourceAdmissionError
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-from empirical_lawhood.runtime.plans import PlanLane
+from empirical_lawhood.execution.local.execution import LocalScheduler, ResourceAdmissionError
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
+from empirical_lawhood.execution.plans import PlanLane
 from tests.runtime_platform.test_development_original_input_contracts import _compile
 from tests.test_recursive_public_service import _plane
 

@@ -10,18 +10,10 @@ import math
 import mpmath as mp
 import pytest
 
-from empirical_lawhood.adapters.methods.rc_information.checker import (
-    check_rc_information_bound,
-)
-from empirical_lawhood.adapters.methods.rc_information.contracts import (
-    RCInformationConfig,
-    RCInformationInstanceKind,
-)
-from empirical_lawhood.api.rc_information import (
-    RCInformationReport,
-    calculate_rc_information,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.circuits.rc_information.checker import check_rc_information_bound
+from empirical_lawhood.domains.circuits.rc_information.contracts import RCInformationConfig, RCInformationInstanceKind
+from empirical_lawhood.api.rc_information import RCInformationReport, calculate_rc_information
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def baseline(scale: str = "1") -> RCInformationConfig:
@@ -40,6 +32,7 @@ def baseline(scale: str = "1") -> RCInformationConfig:
     )
 
 
+@pytest.mark.numerical(oracle='Analytical RC branch exponentials and stationary point t=4*log(4)/3')
 def test_baseline_matches_independent_mean_response_and_stationary_condition():
     report = calculate_rc_information(baseline())
     result = report.result
@@ -142,6 +135,7 @@ def test_indistinguishable_responses_have_valid_zero_bound(degeneracy):
     assert report.check.passed
 
 
+@pytest.mark.numerical(oracle='Analytical rescaled RC stationary point t=8*log(4)/3 and branch exponential difference')
 def test_time_constant_variant_preserves_independent_equation_agreement():
     config = replace(
         baseline(),
@@ -239,7 +233,7 @@ def test_checker_rejects_a_fabricated_bound_and_wrong_input_identity(monkeypatch
         raise AssertionError("checker called the analytical producer")
 
     monkeypatch.setattr(
-        "empirical_lawhood.adapters.methods.rc_information.analytic.evaluate_rc_information",
+        "empirical_lawhood.domains.circuits.rc_information.analytic.evaluate_rc_information",
         refuse_calculation,
     )
     assert check_rc_information_bound(config, report.result).passed

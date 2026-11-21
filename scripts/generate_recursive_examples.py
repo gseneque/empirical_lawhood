@@ -6,7 +6,7 @@ from dataclasses import replace
 from pathlib import Path
 
 from empirical_lawhood.adapters.composition.recursive_examples import materials_partial_draft, rc_scientific_examples
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.recursive_translation import rc_recursive_draft
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -25,7 +25,7 @@ def examples():
             rc_recursive_draft(config, draft_id=f"draft.rc-chain.{name}")
         )
         records[f"rc-{name}-scientific.json"] = config
-    from empirical_lawhood.adapters.methods.battery_recursive_construction.examples import battery_wave_a_draft
+    from empirical_lawhood.domains.battery.battery_recursive_construction.examples import battery_wave_a_draft
     records["battery-wave-a.json"] = _historical_exposed_draft(battery_wave_a_draft())
     roots = {
         "materials": "programmes/materials/superconductivity/workflows/recursive-materials",

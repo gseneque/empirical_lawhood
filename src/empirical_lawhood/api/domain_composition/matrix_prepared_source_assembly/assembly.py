@@ -4,8 +4,8 @@
 CONF adds the exact authenticated TRAIN/E3/E4/E5 DEV exposure union. E6 keeps
 its original audit/reserve/panels. Actual fresh E5 DEV custody remains required.
 """
-from empirical_lawhood.adapters.methods.matrix_factor_response.exposure import MatrixScheduledPhysicalExclusion
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support as current_exposure_support
+from empirical_lawhood.domains.matrix.matrix_factor_response.exposure import MatrixScheduledPhysicalExclusion
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support as current_exposure_support
 from contextlib import contextmanager
 from dataclasses import replace
 from hashlib import sha256
@@ -21,23 +21,18 @@ def source_root_from_e3(*, original, programme, bank, certificate, cutoff, compu
     The genuine numerical world, represented/unrepresented physics, relation,
     paired views and explicit computability evidence retain their real scope.
     """
-    from empirical_lawhood.adapters.composition.experiment_authoring import single_experiment_campaign
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_bindings as bindings
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_records as r
-    from empirical_lawhood.kernel.authority import AuthorityAction, ResourceBudget
-    from empirical_lawhood.kernel.evidence import ClaimSpec, OutcomeAccess
-    from empirical_lawhood.kernel.experiments import ControlKind, ControlSpec, PrecisionGoal, RevealBarrierSpec
-    from empirical_lawhood.kernel.obligations import (
-        ClosureSpec, FalsifierKind, FalsifierSpec, ObligationStatus, ScientificObligations,
-        StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec,
-    )
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
-    from empirical_lawhood.kernel.status import ReadinessStatus
-    from empirical_lawhood.kernel.worlds import WorldKind
-    from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceGateKind
-    from empirical_lawhood.planning.study_authoring import (
-        DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, StudyDraft, StudyDraftLifecycle,
-    )
+    from empirical_lawhood.execution.experiment_authoring import single_experiment_campaign
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_bindings as bindings
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_records as r
+    from empirical_lawhood.science.identity.authority import AuthorityAction, ResourceBudget
+    from empirical_lawhood.science.evidence.evidence import ClaimSpec, OutcomeAccess
+    from empirical_lawhood.science.experiments.experiments import ControlKind, ControlSpec, PrecisionGoal, RevealBarrierSpec
+    from empirical_lawhood.science.evidence.obligations import ClosureSpec, FalsifierKind, FalsifierSpec, ObligationStatus, ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
+    from empirical_lawhood.science.records.status import ReadinessStatus
+    from empirical_lawhood.science.models.worlds import WorldKind
+    from empirical_lawhood.design.scientific_source_qualification import ScientificSourceGateKind
+    from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, StudyDraft, StudyDraftLifecycle
     original.__post_init__()
     computability.__post_init__()
     if original.system is None or original.experiment is None or original.system.world.kind is not WorldKind.NUMERICAL_SIMULATOR:
@@ -131,9 +126,9 @@ def current_confirmation_sources(*, programme, facts, namespace, publication, au
     the ordinary declarative owner builds the new consumer from these sources. E4 committed streams are conservatively excluded;
     their execution is not asserted. Original records remain retained inputs.
     """
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import ScheduledExposureAudit, corpus_artifact
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import ScheduledExposureAudit, corpus_artifact
     if programme.phase != 'E5_CONFIRMATION':
         raise ValueError('current exposure projection applies only to new unacquired CONF sources')
     old = programme.sources.closure
@@ -195,8 +190,8 @@ def current_confirmation_sources(*, programme, facts, namespace, publication, au
     # initialization metadata must name those exact sources, while retaining
     # its deterministic state/array, clock, root and producing provenance.
     # Historical observed V1 initialization records remain byte-for-byte.
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import MatrixPreparationInitialStateV2
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixPreparationInitialStateV2
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
     prior_initials=dict(old.initial_states)
     initial_states=tuple((subject.root_id,replace(prior_initials[subject.root_id],
         state_id='initial.' + namespace + '.current-conf.' + prior_initials[subject.root_id].fingerprint(),
@@ -215,29 +210,28 @@ def current_confirmation_sources(*, programme, facts, namespace, publication, au
 @contextmanager
 def assembled_prepared_source_inputs(*,assembly_specification,assembly_inputs,project_root,artifact_writer,
         metadata_directory,output_selection_path,execution,read_access=None):
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_experiment as domain
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_records as r
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_bindings as bindings
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_pipeline as rows_owner
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as native
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
-    from empirical_lawhood.api.matrix_finite_dt_source_pipeline import (
-        publish_finite_dt_source_metadata)
-    from ...selected_e4_bank_recipe import _current_selection, _read_exact_record, _publication_from_manifest
-    from ...matrix_numerical_provenance import capture_matrix_provenance
-    from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
-    from ...matrix_programme_e4_inputs import authenticated_programme_e4_banks, prepared_source_lineage, _require_original_e3_access
-    from ...matrix_programme_e4_inputs import _preparation_kind
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseProtocol
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.kernel.worlds import WorldKind
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_experiment as domain
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_records as r
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_bindings as bindings
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_pipeline as rows_owner
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as native
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
+    from empirical_lawhood.api.matrix_finite_dt_source_pipeline import publish_finite_dt_source_metadata
+    from empirical_lawhood.api.selected_e4_bank_recipe import _current_selection, _read_exact_record, _publication_from_manifest
+    from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
+    from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
+    from empirical_lawhood.api.matrix_programme_e4_inputs import authenticated_programme_e4_banks, prepared_source_lineage, _require_original_e3_access
+    from empirical_lawhood.api.matrix_programme_e4_inputs import _preparation_kind
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseProtocol
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.science.models.worlds import WorldKind
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
 
-    from empirical_lawhood.adapters.methods.matrix_prepared_source_assembly import MatrixPreparedSourceAssemblyInputs,validate_inputs
+    from empirical_lawhood.domains.matrix.matrix_prepared_source_assembly import MatrixPreparedSourceAssemblyInputs, validate_inputs
     from empirical_lawhood.api.recursive_authoring import implementation_binding
 
 
@@ -363,7 +357,7 @@ def assembled_prepared_source_inputs(*,assembly_specification,assembly_inputs,pr
         publication("scientific-root." + root.fingerprint(), root, lineage_parents=produced_parents)
         rows = rows_owner.MatrixPreparedPendingSourceRows.from_bank(programme, bank, record_id="rows." + namespace)
         rule = rows_owner.MatrixPreparedSourceValidationRule("rule." + namespace, programme.identity, bank.identity, rows.identity)
-        from empirical_lawhood.api.matrix_source_input_assembly import materialize_source_input_rows,prepare_source_candidate
+        from empirical_lawhood.api.matrix_source_input_assembly import materialize_source_input_rows, prepare_source_candidate
         materialized,evidence_profile=materialize_source_input_rows(writer=writer,project=project,prefix=prefix,
             namespace=namespace,selected=selected,key_path=key_path,selected_start=selected_start,seconds=seconds,reasons=reasons,
             implementation=implementation,publication=publication,retained=retained,rows=rows,rule=rule,bank=bank,
@@ -421,21 +415,18 @@ def _prepared_source_bank_and_certificate(*, writer, programme_inputs, public, p
     Source grants and later author/run/read calls retain their fresh admissions.
     Only immutable bank, certificate and request values leave this invocation.
     """
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_records as r
-    from ...matrix_prepared_source_runtime import (
-        _native_training_prerequisite, _prepared_source_exposure_facts, _prepared_source_certificate_from_facts,
-        _validate_prepared_source_certificate_bank,
-    )
-    from ...selected_e4_bank_recipe import _publication_from_manifest
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_originals import _authenticate_artifact
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_records as r
+    from empirical_lawhood.api.matrix_prepared_source_runtime import _native_training_prerequisite, _prepared_source_exposure_facts, _prepared_source_certificate_from_facts, _validate_prepared_source_certificate_bank
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_originals import _authenticate_artifact
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
     from empirical_lawhood.api.native_training_banks import _read_instance
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_execution import _retained_plans
     from empirical_lawhood.api.matrix_finite_dt_source_runtime import _verify_file_supports
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
 
     writer.require_verification_context()
     # Keep the existing fast metadata/locator/candidate refusal before
@@ -454,10 +445,10 @@ def _prepared_source_bank_and_certificate(*, writer, programme_inputs, public, p
     training_specification, actual_request, acquisition, future = _native_training_prerequisite(writer, locator)
     if actual_request != training_request:
         raise PermissionError('prepared source changes its exact original TRAIN request or whole C during source reconstruction')
-    from empirical_lawhood.infrastructure.matrix_completed_source import original_e3_commitment
+    from empirical_lawhood.adapters.matrix_storage.matrix_completed_source import original_e3_commitment
     e3_commitment = original_e3_commitment(writer, programme_inputs, input_commitments)
     if training_request.input_commitments != e3_commitment:
-        from empirical_lawhood.infrastructure.matrix_retained_training import read_retained_training_source
+        from empirical_lawhood.adapters.matrix_storage.matrix_retained_training import read_retained_training_source
         # The enclosing E4 input owner holds the complete original/continued C
         # proof alive. Match this second native read to that exact source link.
         retained = read_retained_training_source(writer, programme_inputs.commitments)

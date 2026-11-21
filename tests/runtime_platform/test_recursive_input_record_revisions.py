@@ -8,12 +8,10 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.recursive_compiler import RecursivePortContract
-from empirical_lawhood.runtime.recursive_record_codecs import (
-    input_record_type_census, resolve_recursive_input_codec, validate_input_record_types,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.execution.recursive_compiler import RecursivePortContract
+from empirical_lawhood.storage.contracts.recursive_record_codecs import input_record_type_census, resolve_recursive_input_codec, validate_input_record_types
 from tests.runtime_platform.test_recursive_compiler import fixture
 
 

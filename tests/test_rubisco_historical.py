@@ -10,21 +10,12 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_historical.analysis import (
-    commit_forecasts, evaluate, fit, predict, rank_one_feasibility, rr2018_science,
-)
-from empirical_lawhood.adapters.methods.rubisco_historical.records import (
-    BaselineV1, HistoricalEvaluationV1, HistoricalFittedModelV1,
-    HistoricalFoldForecastsV1, HistoricalFoldV1, HistoricalForecastCommitmentV1,
-    HistoricalScienceV1, RankOneFeasibilityV1,
-)
-from empirical_lawhood.adapters.physical.rubisco_kinetics.records import (
-    HistoricalFeatureSliceV1, HistoricalLabelSliceV1, HistoricalTrainingSliceV1,
-    ReportedEndpointsV1, ReportedSubstitutionV1,
-)
+from empirical_lawhood.domains.rubisco.rubisco_historical.analysis import commit_forecasts, evaluate, fit, predict, rank_one_feasibility, rr2018_science
+from empirical_lawhood.domains.rubisco.rubisco_historical.records import BaselineV1, HistoricalEvaluationV1, HistoricalFittedModelV1, HistoricalFoldForecastsV1, HistoricalFoldV1, HistoricalForecastCommitmentV1, HistoricalScienceV1, RankOneFeasibilityV1
+from empirical_lawhood.domains.rubisco.kinetics.records import HistoricalFeatureSliceV1, HistoricalLabelSliceV1, HistoricalTrainingSliceV1, ReportedEndpointsV1, ReportedSubstitutionV1
 from empirical_lawhood.adapters.physical.rubisco_kinetics.rr2018 import Rr2018NativeAuditV1
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def endpoint(sample: str, turnover: str, specificity: str) -> ReportedEndpointsV1:
@@ -270,16 +261,11 @@ class CountingReader(BytesIO):
 
 
 def worker_context(role, config, records):
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_bindings import (
-        MEDIA_TYPE, PHASES, operation_declarations,
-    )
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-    from empirical_lawhood.runtime.execution import (
-        DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind,
-        WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort,
-    )
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_bindings import MEDIA_TYPE, PHASES, operation_declarations
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+    from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
     runner = next(declaration.runner_factory() for declaration in operation_declarations()
                   if declaration.capability_key.endswith(f".{role}"))
     row = next(row for row in PHASES if row[0] == role)
@@ -313,9 +299,7 @@ def run_worker(role, config, records):
 
 
 def test_actual_registered_stages_preserve_six_forecasts_and_global_barrier(e1):
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_contracts import (
-        HistoricalCommitConfigV1, HistoricalEvaluateConfigV1, HistoricalFitConfigV1, HistoricalPredictConfigV1,
-    )
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_contracts import HistoricalCommitConfigV1, HistoricalEvaluateConfigV1, HistoricalFitConfigV1, HistoricalPredictConfigV1
     science, training, targets, labels = e1
     bundles = []
     for item, features in zip(training, targets, strict=True):
@@ -335,7 +319,7 @@ def test_actual_registered_stages_preserve_six_forecasts_and_global_barrier(e1):
 
 
 def test_evaluate_worker_checks_incomplete_global_commit_before_label_bytes(e1):
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_contracts import HistoricalEvaluateConfigV1
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_contracts import HistoricalEvaluateConfigV1
     science, _, _, labels = e1
     _, commitment = committed(e1)
     incomplete = replace(commitment, fold_forecasts=commitment.fold_forecasts[:1])
@@ -349,7 +333,7 @@ def test_evaluate_worker_checks_incomplete_global_commit_before_label_bytes(e1):
 
 
 def test_forecast_worker_refuses_label_injection_before_any_data_reads(e1):
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_contracts import HistoricalPredictConfigV1
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_contracts import HistoricalPredictConfigV1
     science, _, targets, labels = e1
     models, _ = committed(e1)
     runner, context, readers, _ = worker_context("predict", HistoricalPredictConfigV1("config.predict", science, "site100"),
@@ -360,7 +344,7 @@ def test_forecast_worker_refuses_label_injection_before_any_data_reads(e1):
 
 
 def test_evaluation_worker_refuses_external_commitment_without_receipt_before_reads(e1):
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_contracts import HistoricalEvaluateConfigV1
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_contracts import HistoricalEvaluateConfigV1
     science, _, _, labels = e1
     _, commitment = committed(e1)
     runner, context, readers, _ = worker_context("evaluate", HistoricalEvaluateConfigV1("config.evaluate", science),
@@ -371,13 +355,13 @@ def test_evaluation_worker_refuses_external_commitment_without_receipt_before_re
 
 
 def test_historical_binding_construction_is_cold_and_complete(monkeypatch):
-    from empirical_lawhood.adapters.methods.rubisco_historical import analysis, operation_bindings
-    from empirical_lawhood.adapters.methods.rubisco_historical.executable_binding import EXECUTABLE_BINDING_FACTORIES
-    from empirical_lawhood.adapters.methods.rubisco_historical.extension_bundle import EXTENSION_BUNDLE_CONTRIBUTION
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_bindings import (
-        operation_declarations, output_codecs,
-    )
-    from empirical_lawhood.runtime.plans import BarrierKind, ScientificStage
+    from empirical_lawhood.domains.rubisco.rubisco_historical import analysis, operation_bindings
+    from empirical_lawhood.domains.rubisco.rubisco_historical.extension import EXTENSION as _extension_owner_1
+    EXECUTABLE_BINDING_FACTORIES = _extension_owner_1.factories
+    from empirical_lawhood.domains.rubisco.rubisco_historical.extension import EXTENSION as _extension_owner_2
+    EXTENSION_BUNDLE_CONTRIBUTION = _extension_owner_2.discovery
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_bindings import operation_declarations, output_codecs
+    from empirical_lawhood.execution.plans import BarrierKind, ScientificStage
     def forbidden(*args):
         raise AssertionError("cold construction entered science")
     for function in ("fit", "predict", "commit_forecasts", "evaluate", "rr2018_science"):
@@ -395,16 +379,12 @@ def test_historical_binding_construction_is_cold_and_complete(monkeypatch):
 
 
 def root_contexts(science, *, source_linked=False):
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_bindings import (
-        MEDIA_TYPE, historical_development_root, operation_declarations, scientific_unit_ids,
-    )
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_contracts import (
-        HistoricalCommitConfigV1, HistoricalEvaluateConfigV1, HistoricalFitConfigV1, HistoricalPredictConfigV1,
-    )
-    from empirical_lawhood.adapters.methods.rubisco_historical.source_binding import HistoricalSourceConfigV1
-    from empirical_lawhood.planning.recursive_authoring import RecursiveInputLink
-    from empirical_lawhood.runtime.plans import ExternalInputSpec
-    from empirical_lawhood.runtime.recursive_compiler import RecursiveConfigInput, RecursiveScientificRootContext
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_bindings import MEDIA_TYPE, historical_development_root, operation_declarations, scientific_unit_ids
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_contracts import HistoricalCommitConfigV1, HistoricalEvaluateConfigV1, HistoricalFitConfigV1, HistoricalPredictConfigV1
+    from empirical_lawhood.domains.rubisco.rubisco_historical.source_binding import HistoricalSourceConfigV1
+    from empirical_lawhood.design.recursive_authoring import RecursiveInputLink
+    from empirical_lawhood.execution.plans import ExternalInputSpec
+    from empirical_lawhood.execution.recursive_compiler import RecursiveConfigInput, RecursiveScientificRootContext
     configs, links = [], []
     for fold in science.folds:
         configs.extend(((f"fit.{fold.fold_id}", HistoricalFitConfigV1(f"config.fit.{fold.fold_id}", science, fold.fold_id)),
@@ -446,8 +426,8 @@ def root_contexts(science, *, source_linked=False):
 
 
 def test_exact_analysis_root_and_role_joins_refuse_world_science_or_barrier_substitution(e1):
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_bindings import scientific_root_validator
-    from empirical_lawhood.kernel.worlds import WorldKind
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_bindings import scientific_root_validator
+    from empirical_lawhood.science.models.worlds import WorldKind
     contexts = root_contexts(e1[0])
     for config, context in contexts:
         assert scientific_root_validator(config, context) is None
@@ -467,7 +447,7 @@ def test_exact_analysis_root_and_role_joins_refuse_world_science_or_barrier_subs
 
 @pytest.fixture
 def source_fixture(monkeypatch):
-    from empirical_lawhood.adapters.methods.rubisco_historical import analysis, source_binding
+    from empirical_lawhood.domains.rubisco.rubisco_historical import analysis, source_binding
     from empirical_lawhood.adapters.physical.rubisco_kinetics.rr2018 import DOI, HEADERS, LABELS, decode_rr2018
     # The hash is overridden only within this synthetic software fixture. Real
     # execution accepts exclusively the actual retained article digest.
@@ -497,7 +477,7 @@ def source_fixture(monkeypatch):
 
 
 def test_source_input_preserves_exact_utf8_bytes_and_refuses_changed_or_unbounded_input():
-    from empirical_lawhood.adapters.methods.rubisco_historical.source_binding import Rr2018ArticleInputV1
+    from empirical_lawhood.domains.rubisco.rubisco_historical.source_binding import Rr2018ArticleInputV1
     from empirical_lawhood.adapters.physical.rubisco_kinetics.rr2018 import MAX_INPUT_BYTES
     raw = "<article>°±μ\r\n</article>"
     record = Rr2018ArticleInputV1("synthetic.utf8", sha256(raw.encode()).hexdigest(), raw)
@@ -513,7 +493,7 @@ def test_source_input_preserves_exact_utf8_bytes_and_refuses_changed_or_unbounde
 
 
 def test_source_stage_refuses_another_hash_before_native_decode(e1, monkeypatch):
-    from empirical_lawhood.adapters.methods.rubisco_historical import source_binding
+    from empirical_lawhood.domains.rubisco.rubisco_historical import source_binding
     raw = "<article/>"
     article = source_binding.Rr2018ArticleInputV1("synthetic.wrong", sha256(raw.encode()).hexdigest(), raw)
     config = source_binding.HistoricalSourceConfigV1("synthetic.config", e1[0])
@@ -525,10 +505,8 @@ def test_source_stage_refuses_another_hash_before_native_decode(e1, monkeypatch)
 
 
 def test_registered_source_stage_emits_exact_separate_roles_then_runs_historical_barrier(source_fixture):
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_contracts import (
-        HistoricalCommitConfigV1, HistoricalEvaluateConfigV1, HistoricalFitConfigV1, HistoricalPredictConfigV1,
-    )
-    from empirical_lawhood.adapters.methods.rubisco_historical.source_binding import SOURCE_OUTPUTS
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_contracts import HistoricalCommitConfigV1, HistoricalEvaluateConfigV1, HistoricalFitConfigV1, HistoricalPredictConfigV1
+    from empirical_lawhood.domains.rubisco.rubisco_historical.source_binding import SOURCE_OUTPUTS
     config, article, expected_audit = source_fixture
     runner, context, readers, _ = worker_context("source", config, [("article", article, False)])
     result = runner.execute(context)
@@ -564,7 +542,7 @@ def test_registered_source_stage_emits_exact_separate_roles_then_runs_historical
 
 
 def test_source_stage_refuses_science_audit_identity_substitution(source_fixture):
-    from empirical_lawhood.adapters.methods.rubisco_historical.source_binding import prepare_source
+    from empirical_lawhood.domains.rubisco.rubisco_historical.source_binding import prepare_source
     config, article, _ = source_fixture
     changed_source = replace(config.science.source, object_fingerprint="b" * 64)
     changed = replace(config, science=replace(config.science, source=changed_source))
@@ -573,7 +551,7 @@ def test_source_stage_refuses_science_audit_identity_substitution(source_fixture
 
 
 def test_source_linked_roots_require_exact_fold_role_and_declared_article_port(source_fixture):
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_bindings import scientific_root_validator
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_bindings import scientific_root_validator
     contexts = root_contexts(source_fixture[0].science, source_linked=True)
     for config, context in contexts:
         assert scientific_root_validator(config, context) is None
@@ -593,17 +571,15 @@ def test_source_linked_roots_require_exact_fold_role_and_declared_article_port(s
 
 
 def test_historical_runners_use_exact_compiler_output_contracts_for_source_and_fit(source_fixture):
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_bindings import (
-        operation_declarations, output_codecs,
-    )
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_contracts import HistoricalFitConfigV1
-    from empirical_lawhood.adapters.methods.rubisco_historical.recursive_translation import historical_recursive_draft
-    from empirical_lawhood.adapters.methods.rubisco_historical.source_binding import SOURCE_OUTPUTS
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_bindings import operation_declarations, output_codecs
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_contracts import HistoricalFitConfigV1
+    from empirical_lawhood.domains.rubisco.rubisco_historical.recursive_translation import historical_recursive_draft
+    from empirical_lawhood.domains.rubisco.rubisco_historical.source_binding import SOURCE_OUTPUTS
     from empirical_lawhood.adapters.physical.rubisco_kinetics.rr2018 import role_slices
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.execution import WorkerOutputPort
-    from empirical_lawhood.runtime.plans import BarrierKind, ScientificStage
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.execution import WorkerOutputPort
+    from empirical_lawhood.execution.plans import BarrierKind, ScientificStage
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     config, article, audit = source_fixture
     draft = historical_recursive_draft(config.science, role_slices(audit), article_input=article)
     compiled = compile_recursive_wave(draft=draft, registrations=tuple(declaration.registration() for declaration in operation_declarations()),
@@ -647,7 +623,7 @@ def test_historical_runners_use_exact_compiler_output_contracts_for_source_and_f
 @pytest.mark.parametrize("role", ("source", "fit"))
 @pytest.mark.parametrize("prefix", ("", "unrelated.task."))
 def test_output_namespace_substitution_refuses_before_reading_inputs(source_fixture, role, prefix):
-    from empirical_lawhood.adapters.methods.rubisco_historical.operation_contracts import HistoricalFitConfigV1
+    from empirical_lawhood.domains.rubisco.rubisco_historical.operation_contracts import HistoricalFitConfigV1
     from empirical_lawhood.adapters.physical.rubisco_kinetics.rr2018 import role_slices
     config, article, audit = source_fixture
     if role == "source":

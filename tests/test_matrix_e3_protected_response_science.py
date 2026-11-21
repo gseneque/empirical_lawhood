@@ -14,17 +14,17 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import FEATURES
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import forecast as f, records as r, response_forecast as rf, response_records as rr, response_science as science, science as history_science
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments as segments
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion, NativeSubworkContact, NativeSubworkDefinition
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import forecast as f, records as r, response_forecast as rf, response_records as rr, response_science as science, science as history_science
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments as segments
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion, NativeSubworkContact, NativeSubworkDefinition
 from tests.test_matrix_scheduled_response_bindings import (
     response_bank as response_bank, bank as bank, scheduled as scheduled, provenance as provenance, stock as stock,
 )
@@ -153,8 +153,8 @@ def blocked(*args, **kwargs):
 
 
 def forbid_producers(monkeypatch):
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_derivatives, parameter_source
-    from empirical_lawhood.runtime import experimental_statistics
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_derivatives, parameter_source
+    from empirical_lawhood.methods.statistics import experimental_statistics
     for owner, names in ((science, ("native_responses", "panel_innovations", "native_scheduled_branch", "hermitian_noise")),
             (np.random, ("Generator", "PCG64DXSM")), (np.linalg, ("eigh", "eigvalsh")),
             (parameter_derivatives, ("scheduled_force_step",)), (parameter_source, ("acquire_parameter_history",)),

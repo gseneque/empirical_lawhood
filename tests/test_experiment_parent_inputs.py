@@ -7,16 +7,14 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.scientific_contributions import ContributionManifest, ContributionProduct
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
-from empirical_lawhood.planning.recursive_input_origins import (
-    RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins,
-)
-from empirical_lawhood.runtime.experiment_preparation import PreparedExperimentInputs
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput, RecursiveInputLink
+from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
+from empirical_lawhood.execution.experiment_preparation import PreparedExperimentInputs
 from tests.test_experiment_file_inputs import _prepared
 from tests.test_experiment_preparation_public import OtherSource, _other_input_scope
 
@@ -103,7 +101,7 @@ def test_parent_ownership_and_complete_source_union_refuse_substitutions(tmp_pat
 
 
 def test_locations_are_opt_in_authenticated_paths_in_an_immutable_mapping(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
 
     specification, records, selection, path, calls, _ = _other_input_scope(tmp_path, monkeypatch)
     observed = []
@@ -130,7 +128,7 @@ def test_locations_are_opt_in_authenticated_paths_in_an_immutable_mapping(tmp_pa
 
 @pytest.mark.parametrize('flag', (None, 0, 1, 'yes'))
 def test_input_location_flag_requires_exact_boolean(tmp_path, monkeypatch, flag):
-    from empirical_lawhood.adapters.composition import generated_extension_bundles as generated
+    import empirical_lawhood.api.generated_experiment_protocols as generated
 
     _other_input_scope(tmp_path, monkeypatch)
     declaration, = generated.EXPERIMENT_PROTOCOL_DECLARATIONS

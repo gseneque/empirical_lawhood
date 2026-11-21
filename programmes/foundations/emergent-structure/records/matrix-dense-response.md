@@ -3,7 +3,7 @@
 SPDX-License-Identifier: CC-BY-4.0
 
 The shared numerical owner is
-[`response_scoring.py`](../../../../src/empirical_lawhood/adapters/methods/matrix_factor_response/response_scoring.py).
+[`response_scoring.py`](../../../../src/empirical_lawhood/domains/matrix/matrix_factor_response/response_scoring.py).
 Scheduled, utility, training and prepared native scores use its exact response
 norm and the amended dense record when their assay selects
 `MatrixOriginResponseModel`. The complete programme still requires its issued

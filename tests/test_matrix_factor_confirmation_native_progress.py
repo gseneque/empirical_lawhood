@@ -10,11 +10,11 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_bindings,operation_bindings
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
-from empirical_lawhood.infrastructure.execution import _DirectProgressEmitter
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_bindings, operation_bindings
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
+from empirical_lawhood.execution.local.execution import _DirectProgressEmitter
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
 from tests.test_matrix_factor_confirmation_compact_core import compact_case
 from tests.test_matrix_factor_confirmation_history import e1 as e1  # noqa: F401
 from tests.test_matrix_factor_confirmation_eligibility import provenance as provenance,stock as stock  # noqa: F401

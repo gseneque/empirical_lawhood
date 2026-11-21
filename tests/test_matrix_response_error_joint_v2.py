@@ -9,29 +9,19 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import eligibility as p
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_prediction import (
-    FEATURES, development_roles, fit_error_model,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_joint_v2 import (
-    CALIBRATION_ROLE, EVALUATION_ROLE, STRATA, MatrixResponseCausalErrorInputV2,
-    MatrixResponseErrorGroupV2, MatrixResponseErrorRolesV2, MatrixResponseJointDesignV2,
-    MatrixResponseJointForecastV2, calibrate,
-    calibration_radius, causal_input_from_origin, evaluate, forecast, identity, split_rank,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_error_joint_bindings_v2 import INPUTS, BUDGET, MatrixResponseJointForecastConfigV2, MatrixResponseJointForecastRunnerV2, node_id, operation_factory, operation_registration, selected_manifest, validate_native_forecast_gate
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import identity as response_identity
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole as Role
-from empirical_lawhood.adapters.methods.matrix_prospective.example import example_source
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.runtime.execution import (
-    DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort,
-    WorkerIsolationProfile, WorkerOutputPort,
-)
+from empirical_lawhood.domains.matrix.matrix_factor_response import eligibility as p
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_prediction import FEATURES, development_roles, fit_error_model
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_joint_v2 import CALIBRATION_ROLE, EVALUATION_ROLE, STRATA, MatrixResponseCausalErrorInputV2, MatrixResponseErrorGroupV2, MatrixResponseErrorRolesV2, MatrixResponseJointDesignV2, MatrixResponseJointForecastV2, calibrate, calibration_radius, causal_input_from_origin, evaluate, forecast, identity, split_rank
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_error_joint_bindings_v2 import INPUTS, BUDGET, MatrixResponseJointForecastConfigV2, MatrixResponseJointForecastRunnerV2, node_id, operation_factory, operation_registration, selected_manifest, validate_native_forecast_gate
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import identity as response_identity
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole as Role
+from empirical_lawhood.domains.matrix.matrix_prospective.example import example_source
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
 from tests.test_matrix_factor_response import mechanical_case
 from tests.test_matrix_response_frontier import numerical_operands, numerical_origin, bind_numerical_identities, replace
 from tests.test_matrix_response_error_prediction import spec as old_spec_fixture, inputs as old_inputs
@@ -62,10 +52,7 @@ def case(tmp_path_factory):
     train=old_inputs(old,role='TRAIN')
     model=fit_error_model(old,*train,method='ALL_ORIGIN',record_id='fixture.joint.training-model')
     original=example_source()
-    from empirical_lawhood.adapters.methods.matrix_factor_response.exposure import (
-        MANDATORY_EFFECTIVE_SEEDS, MANDATORY_FLOOR_IDENTITY, MANDATORY_FLOOR_SHA256,
-        MatrixConstantPhysicalExclusion,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.exposure import MANDATORY_EFFECTIVE_SEEDS, MANDATORY_FLOOR_IDENTITY, MANDATORY_FLOOR_SHA256, MatrixConstantPhysicalExclusion
     facts=(artifact('fixture.joint.audit'),artifact('fixture.joint.bank'))
     regime=p.MatrixFactorRegime(original.protocol.root.regime_id,original.protocol.member,
         original.protocol.view,original.protocol.alpha_x,original.protocol.alpha_y)
@@ -206,7 +193,7 @@ def port(record,name,*,kind=WorkerInputKind.DEPENDENCY,access=Access.DEVELOPMENT
     return WorkerInputPort(binding,BytesIO(raw))
 
 
-def forecast_context(case,calibration,*,defect=None,protected=False):
+def forecast_context(case,calibration,*,bad_receipt=None,changed_operand=None,protected=False):
     f=feature(case,case.source.root.root_id)
     values=dict(design=case.design,roles=case.roles,reservation=case.reservation,criterion=case.criterion,
         model=case.model,calibration=calibration,feature=f,**{'training-spec':case.training})
@@ -215,13 +202,15 @@ def forecast_context(case,calibration,*,defect=None,protected=False):
         f.root_id,f.independent_group_id,f.family_id,f.source,producers,protected)
     access=Access.OUTCOME_BLIND if protected else Access.DEVELOPMENT_VISIBLE
     visibility=Visibility.PROSPECTIVE if protected else Visibility.DEVELOPMENT_ONLY
-    if defect=='criterion':values['criterion']=replace(case.criterion,protocol_id='fixture.foreign-criterion')
-    if defect=='role':values['roles']=replace(case.roles,record_id='fixture.foreign-roles')
+    if changed_operand == 'criterion':
+        values['criterion'] = replace(case.criterion, protocol_id='fixture.foreign-criterion')
+    if changed_operand == 'roles':
+        values['roles'] = replace(case.roles, record_id='fixture.foreign-roles')
     ports=[port(config,'config',kind=WorkerInputKind.EXTERNAL,access=access,visibility=visibility)]
     receipts=[]
     for name,_ in INPUTS:
         selected=port(values[name],name,access=access,visibility=visibility)
-        producer='fixture.foreign-producer.'+name if defect==name else 'fixture.producer.'+name
+        producer='fixture.foreign-producer.'+name if bad_receipt==name else 'fixture.producer.'+name
         ports.append(selected);receipts.append(DependencyReceiptBinding('receipt.'+name,producer,(selected.materialization_id,)))
     output=WorkerOutputPort('forecast',MatrixResponseJointForecastV2.SCHEMA,ArtifactProfile.CANONICAL_JSON,'application/json','fixture.output.forecast')
     m=selected_manifest(protected)
@@ -245,10 +234,16 @@ def test_actual_path_free_freeze_provider_with_complete_receipt_bound_operands(c
     assert operation_factory(protected).registration==operation_registration(protected)
 
 
-@pytest.mark.parametrize('defect',tuple(n for n,_ in INPUTS)+('criterion','role'))
-def test_actual_freeze_provider_refuses_missing_receipt_or_changed_exact_operands(case,calibrated,defect):
-    context,_=forecast_context(case,calibrated,defect=defect)
-    with pytest.raises(ValueError):
+@pytest.mark.parametrize("bad_receipt,changed_operand,reason", [
+    *(pytest.param(name, None, "lacks its exact actual producing receipt",
+                   id="criterion-receipt" if name == "criterion" else name) for name, _ in INPUTS),
+    pytest.param(None, "criterion", "substitutes locked model/training criterion/design", id="criterion-record"),
+    pytest.param(None, "roles", "changes its complete selected roles/reservation", id="role"),
+])
+def test_actual_freeze_provider_refuses_missing_receipt_or_changed_exact_operands(
+        case, calibrated, bad_receipt, changed_operand, reason):
+    context, _ = forecast_context(case, calibrated, bad_receipt=bad_receipt, changed_operand=changed_operand)
+    with pytest.raises(ValueError, match=reason):
         MatrixResponseJointForecastRunnerV2().execute(context)
 
 
@@ -276,7 +271,7 @@ def test_forecast_gate_checks_receipt_and_disclosed_numerical_clock_frame_cutoff
 
 def test_causal_projection_refuses_incomplete_window_without_future_or_rng(case,monkeypatch):
     monkeypatch.setattr(np.random,'default_rng',lambda *a,**k:pytest.fail('feature projection drew a stream'))
-    monkeypatch.setattr('empirical_lawhood.adapters.simulators.six_matrix_response.factor_response.native_factor_response_branch',lambda *a,**k:pytest.fail('feature projection entered future'))
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.six_matrix_response.factor_response.native_factor_response_branch',lambda *a,**k:pytest.fail('feature projection entered future'))
     result=causal_input_from_origin(case.design,case.roles,case.source,case.origin,case.past,record_id='fixture.projected')
     assert result.disposition=='REFUSED' and not result.values  # origin0 has no trailing interval
     assert result.source==response_identity(case.source) and result.origin==response_identity(case.origin)
@@ -293,6 +288,6 @@ def test_causal_projection_complete_window_is_available_and_future_free(case,mon
     projected=bind_numerical_identities(monkeypatch,source,origin)
     monkeypatch.setattr(__name__ + ".response_identity",projected)
     monkeypatch.setattr(np.random,'default_rng',lambda *a,**k:pytest.fail('feature projection drew a stream'))
-    monkeypatch.setattr('empirical_lawhood.adapters.simulators.six_matrix_response.factor_response.native_factor_response_branch',lambda *a,**k:pytest.fail('feature projection entered future'))
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.six_matrix_response.factor_response.native_factor_response_branch',lambda *a,**k:pytest.fail('feature projection entered future'))
     first=causal_input_from_origin(case.design,case.roles,source,origin,past,record_id='fixture.available')
     assert first.disposition=='AVAILABLE' and dict(first.values)['trailing-angle'] >= 0

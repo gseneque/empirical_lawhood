@@ -10,20 +10,20 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity as science
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_bindings as method
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_development_product import MatrixSelectedDevelopmentProduct
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity as science
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_bindings as method
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_development_product import MatrixSelectedDevelopmentProduct
 from empirical_lawhood.api import current_task_custody as custody_owner
 from empirical_lawhood.api import matrix_selected_opportunity_runtime as owner
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, CanonicalTaskReceipt
-from empirical_lawhood.runtime.capabilities import CapabilityPermission, CapabilityRegistry
-from empirical_lawhood.runtime.input_access import validate_planned_input_access
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, DevelopmentRunPlan, PlanLane
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.input_access import validate_planned_input_access
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, DevelopmentRunPlan, PlanLane
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveWaveMember
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 from tests.test_matrix_selected_opportunity import opportunity, transfer, evidence_for, committed_evidence_for, literal_observations  # noqa: F401
 from tests.test_matrix_selected_opportunity_workers import invocation
@@ -207,7 +207,7 @@ def test_current_development_task_matches_exact_typed_run_manifest_and_plan(oppo
     # constructor boundary; no durable read is substituted with a true flag.
     custody = object.__new__(custody_owner.CurrentDevelopmentTaskCustody)
     custody.plan, custody.run = plan, SimpleNamespace(run_plan_id=context.run_id)
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
     custody.index = DevelopmentRunRecoveryIndex.from_execution_plan(plan,
         run_id=context.run_id, wave_id='wave.exposed-development')
     custody.access_pair = (OutcomeAccess.DEVELOPMENT_VISIBLE, VisibilityCeiling.DEVELOPMENT_ONLY)
@@ -265,7 +265,7 @@ def development_case(opportunity):  # noqa: F811
 @pytest.mark.parametrize("changed", (None, "whole-groups", "receipt", "endpoint"))
 def test_original_development_nomination_replays_exact_producer_and_numerical_outcomes(development_case, monkeypatch, changed):
     from empirical_lawhood.api import recursive_execution
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import commitment
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import commitment
     case = development_case
     # Explicit metadata/products seam; real producer checks and endpoint replay remain.
     source, index = object(), object()

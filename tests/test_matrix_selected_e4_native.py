@@ -11,18 +11,18 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_science as method
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as p
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import selected_target_shape
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_science as method
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as p
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import selected_target_shape
 from empirical_lawhood.api import selected_e4_programme_service as public
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 from tests.test_matrix_selected_package import package
 from tests.test_matrix_selected_e4_fixtures import selected_e4_populations,selected_bridge,transfer  # noqa: F401
 from tests.test_matrix_selected_e4_methods import selected_revision,fixture_observations  # noqa: F401
@@ -32,10 +32,10 @@ from tests.test_matrix_source_evidence import source_case  # noqa: F401
 
 def _ordinary_structure_case(monkeypatch):
     """Disclosed adverse metadata tests orchestration, never actual custody."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_reduction import NATIVE_PHASES, ScheduledProgrammeNativeDisposition
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import ScheduledSource
-    from empirical_lawhood.runtime.plans import ExecutionPlan
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_reduction import NATIVE_PHASES, ScheduledProgrammeNativeDisposition
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import ScheduledSource
+    from empirical_lawhood.execution.plans import ExecutionPlan
 
     def pin(name, kind):
         return ObjectIdentity(name, kind.SCHEMA, kind.VERSION, "a"*64)
@@ -226,12 +226,12 @@ def test_all_actual_new_factories_build_manifest_bound_parent_prepared_runners()
 
 
 def test_selected_operation_families_use_compiler_allowed_stage_kinds():
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_bindings, selected_protected_bindings, selected_revision_bindings
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings, selected_e4_method_bindings
-    from empirical_lawhood.runtime.candidate_compiler import _ALLOWED_STAGE_KINDS
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-    from empirical_lawhood.runtime.compiler import _validate_stage_capability
-    from empirical_lawhood.runtime.plans import ProtocolStepTemplate
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_bindings, selected_protected_bindings, selected_revision_bindings
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings, selected_e4_method_bindings
+    from empirical_lawhood.execution.candidate_compiler import _ALLOWED_STAGE_KINDS
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+    from empirical_lawhood.execution.compiler import _validate_stage_capability
+    from empirical_lawhood.execution.plans import ProtocolStepTemplate
 
     families = (selected_e3_e4_bindings, owner, selected_e4_method_bindings,
         selected_opportunity_bindings, selected_protected_bindings, selected_revision_bindings)
@@ -313,7 +313,7 @@ def test_native_and_collector_budgets_both_require_explicit_finite_non_time_limi
 
 
 def test_unprepared_new_worker_refuses_before_reading_any_protected_port():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_protected_workers import SelectedE4ProtectedWorker
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_protected_workers import SelectedE4ProtectedWorker
     declaration=next(v for v in owner.operation_declarations() if v.capability_key.endswith(".response-score"))
     runner=SelectedE4ProtectedWorker("response-score",declaration.manifest())
     with pytest.raises(TypeError,match="TaskContext"):runner.execute(object())
@@ -375,7 +375,7 @@ def test_actual_all_wave_preflight_refuses_wave_two_before_any_wave_one_executio
 
 
 def test_explicit_resource_profile_derives_exact_native_cells_without_task_id_configuration():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_operational_resources import SelectedE4OperationalResources
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_operational_resources import SelectedE4OperationalResources
     path=Path(__file__).parents[1]/"programmes/foundations/emergent-structure/workflows/matrix-selected-e4-protected/resources-calibration.example.json"
     choice=decode_canonical_bytes(path.read_bytes(),SelectedE4OperationalResources,maximum_bytes=None)
     budget=ResourceBudget(1,256*1024**2,0,None,1024,1024)
@@ -420,31 +420,31 @@ def test_selected_size_component_structural_preparation_refuses_unsigned_authori
     """Declared-size structure and honest unsigned refusal, no issued proof."""
     import json
     import os
-    from empirical_lawhood.adapters.methods import matrix_source_evidence as shared
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_bank_recipe as recipe
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as science
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as preparation_owner
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial as factorial
-    from empirical_lawhood.api.experiment_preparation import author_prepared_experiment,load_experiment_inputs
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection,ExperimentInputBinding,ExperimentFileInputBinding
-    from empirical_lawhood.infrastructure.source_closure import capture_target_closure
+    from empirical_lawhood.domains.matrix import matrix_source_evidence as shared
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_bank_recipe as recipe
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as preparation_owner
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial as factorial
+    from empirical_lawhood.api.experiment_preparation import author_prepared_experiment, load_experiment_inputs
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding, ExperimentFileInputBinding
+    from empirical_lawhood.storage.source_closure import capture_target_closure
     from empirical_lawhood.api.facade import EmpiricalLawhoodApi
     from empirical_lawhood.api.models import ExperimentPackage
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-    from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, PreparedExperimentFile
-    from empirical_lawhood.runtime.experimental_factorial import PairInteractionScale
-    from empirical_lawhood.runtime.experimental_statistics import PairedMeanTAlternative
-    from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile, resolve_external_root_contract
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, ExecutionPlan
-    from empirical_lawhood.runtime.recovery import RunRecoveryTerminalEvent
-    from empirical_lawhood.runtime.study_issue import IssuedExecutableStudyManifest
-    from empirical_lawhood.planning.study_issue import StudyOperationAuthority
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+    from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, PreparedExperimentFile
+    from empirical_lawhood.execution.experimental_factorial import PairInteractionScale
+    from empirical_lawhood.methods.statistics.experimental_statistics import PairedMeanTAlternative
+    from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, resolve_external_root_contract
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, ExecutionPlan
+    from empirical_lawhood.execution.recovery import RunRecoveryTerminalEvent
+    from empirical_lawhood.execution.study_issue import IssuedExecutableStudyManifest
+    from empirical_lawhood.design.study_issue import StudyOperationAuthority
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling
     from tests import matrix_selected_source_predecessor as gates, matrix_selected_e4_public_fixture as held
     from tests.test_matrix_selected_e4_methods import declaration
     from tests.test_matrix_selected_e4_public_programme import _wave_observation_records
@@ -536,7 +536,7 @@ def test_selected_size_component_structural_preparation_refuses_unsigned_authori
         calibration=science.calibrate_revision_public(cs,export,programmes["CAL"],banks["CAL"],cr,cd,forecasts,record_id="calibration."+stem)
         public_calibration=p.SelectedE4PublicCalibration.from_calibration(calibration,record_id="public-calibration."+stem)
         prior=prior_product(calibration.identity)
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
         calibration_product=MatrixSelectedOriginalProduct(prior.prior_execution,prior.reveal_authority)
     destination=selected_root/stem
     original_root_bytes=f.inputs.original_preparation.root.canonical_bytes()
@@ -595,7 +595,7 @@ def test_selected_size_component_structural_preparation_refuses_unsigned_authori
         maximum_bytes=None)
     assert entry.declaration_publication.logical.lineage_parents==plan.evidence.produced_input_parents
     assert entry.declaration_publication.logical.outcome_access is not r.BLIND
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import _publication
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import _publication
     with pytest.raises(ValueError,match="blind prospective"):
         _publication(entry.declaration_publication,entry.declaration)
     for damage in ("blind","missing-parent","different-body"):
@@ -624,8 +624,8 @@ def test_selected_size_component_structural_preparation_refuses_unsigned_authori
         assert not wave_inputs
     if component=="wave":
         from dataclasses import fields
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_execution import phase_config
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import bind_selected_native_source
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_execution import phase_config
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import bind_selected_native_source
 
         # Inspect the actual public lowering over the already constructed small
         # fixture. No extra fit, source read, native task or authority is added.
@@ -746,7 +746,7 @@ def test_selected_size_component_structural_preparation_refuses_unsigned_authori
         records=_wave_observation_records(draft,records,observations)
         configs,qualifications=held._source_admissions(draft,records,arrays,root=draft.prospective_draft,prefix=stem,
             observation_operator=source.pipeline.pipeline_config.profile.observation_operator)
-        from empirical_lawhood.planning.study_authoring import SourceMaterializationRole
+        from empirical_lawhood.design.study_authoring import SourceMaterializationRole
         assert all(value.role is SourceMaterializationRole.RETAINED_HISTORY for value in configs
             if value.source_id in wave_ids)
         collection=replace(collection,source_configs=configs,qualifications=qualifications)
@@ -792,7 +792,7 @@ def test_selected_size_component_structural_preparation_refuses_unsigned_authori
     with pytest.raises(TypeError,match='original E3'):
         replace(selection,upstream_products=selection.upstream_products[:-1])
     assert "preparation" not in selection.to_document()["value"]
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
     obsolete=selection.to_document()
     obsolete["version"]="1.0.0"
     obsolete["value"]["plan"]=plan.to_document()
@@ -840,7 +840,7 @@ def test_selected_size_component_structural_preparation_refuses_unsigned_authori
     def forbidden(*args,**kwargs):pytest.fail("unsigned structural control entered issue or worker execution")
     monkeypatch.setattr(EmpiricalLawhoodApi,"issue_study",forbidden)
     monkeypatch.setattr(EmpiricalLawhoodApi,"issue_extensions",forbidden)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_protected_workers import SelectedE4ProtectedWorker
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_protected_workers import SelectedE4ProtectedWorker
     monkeypatch.setattr(SelectedE4ProtectedWorker,"execute",forbidden)
     monkeypatch.setattr(methods.SelectedE4MethodWorker,"execute",forbidden)
     directory=destination/"authored-component"
@@ -851,8 +851,8 @@ def test_selected_size_component_structural_preparation_refuses_unsigned_authori
     # Formal structure can be checked from the pure component projection. It
     # does not require claiming a prospective handoff from unsigned originals.
     _,_,_,design,_=preparation_owner.component_design(component_spec,inputs)
-    from empirical_lawhood.planning.formal_analysis import derive_formal_gap_applicability
-    from empirical_lawhood.planning.experiment_entry import validate_experiment_entry
+    from empirical_lawhood.design.formal_analysis import derive_formal_gap_applicability
+    from empirical_lawhood.design.experiment_entry import validate_experiment_entry
     local_root=design.draft.prospective_draft
     local_entry=design.entry_package
     local_inventory,=design.formal_source_inventories
@@ -868,7 +868,7 @@ def test_selected_size_component_structural_preparation_refuses_unsigned_authori
     assert local_inventory.numerical_view_ids==tuple(value for value in parent_inventory.numerical_view_ids
         if value in {view.view_id for view in local_root.system.numerical_views})
     assert local_entry.coverage.applicability==derive_formal_gap_applicability(local_entry.register,local_inventory)
-    from empirical_lawhood.planning.formal_gaps import FormalGapCoverageDisposition
+    from empirical_lawhood.design.formal_gaps import FormalGapCoverageDisposition
     assert local_entry.register.canonical_bytes()==plan.preparation.entry.register.canonical_bytes()
     assert all(value.minimum_independent_units==len(programme.group_ids) for value in local_entry.register.gaps)
     if component=="wave":
@@ -894,17 +894,12 @@ def test_selected_size_component_structural_preparation_refuses_unsigned_authori
 
 def _active_e4_formal_plan(plan):
     """Explicit actual E4 method families; disclosed conformance inputs only."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as preparation
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling,OutcomeAccess
-    from empirical_lawhood.kernel.worlds import EvidenceUnitScope
-    from empirical_lawhood.planning.formal_analysis import (
-        FormalGapSourceCapabilityInventory,FormalMethodBinding,FormalMethodCatalog,FormalMethodRole,derive_formal_gap_applicability,
-    )
-    from empirical_lawhood.planning.formal_gaps import (
-        FormalDomain,FormalGapCoverage,FormalGapCoverageAssignment,FormalGapCoverageDisposition,
-        FormalGapRegister,FormalGapSpec,
-    )
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as preparation
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+    from empirical_lawhood.science.models.worlds import EvidenceUnitScope
+    from empirical_lawhood.design.formal_analysis import FormalGapSourceCapabilityInventory, FormalMethodBinding, FormalMethodCatalog, FormalMethodRole, derive_formal_gap_applicability
+    from empirical_lawhood.design.formal_gaps import FormalDomain, FormalGapCoverage, FormalGapCoverageAssignment, FormalGapCoverageDisposition, FormalGapRegister, FormalGapSpec
     root=plan.declaration.root
     phase=plan.declaration.bank_phase
     prefix="e4-formal.disclosed."+phase.lower()

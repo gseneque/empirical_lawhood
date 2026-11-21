@@ -9,16 +9,16 @@ import pytest
 
 from empirical_lawhood.api import load_authoring
 from empirical_lawhood.api.models import CampaignPackage
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling, inherited_visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.campaigns import CampaignNode
-from empirical_lawhood.planning.study_authoring import CapabilitySelection, ConditionalGateKind, ConditionalChildRequest, ConditionalTerminalDisposition, DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, MaterializationQualificationReceipt, StudyDraft, StudyDraftLifecycle, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole, UnresolvedDecision
-from empirical_lawhood.runtime.candidate_compiler import AuthoringMaterializationIdentity, CandidateCompilationContext, CandidateCompilationDisposition, CandidateDiagnosticCode, CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole, compile_draft_candidate, required_candidate_obligation_ids
-from empirical_lawhood.runtime.capabilities import CapabilityKind
-from empirical_lawhood.runtime.conditional_children import bind_frozen_parent_input, instantiate_conditional_child
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolTemplate
-from empirical_lawhood.runtime.recovery import ProtocolRunRecoveryIndex, TaskRecoveryDisposition, ProtocolTaskRecoveryEvent
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling, inherited_visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.campaigns import CampaignNode
+from empirical_lawhood.design.study_authoring import CapabilitySelection, ConditionalGateKind, ConditionalChildRequest, ConditionalTerminalDisposition, DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, MaterializationQualificationReceipt, StudyDraft, StudyDraftLifecycle, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole, UnresolvedDecision
+from empirical_lawhood.execution.candidate_compiler import AuthoringMaterializationIdentity, CandidateCompilationContext, CandidateCompilationDisposition, CandidateDiagnosticCode, CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole, compile_draft_candidate, required_candidate_obligation_ids
+from empirical_lawhood.execution.capabilities import CapabilityKind
+from empirical_lawhood.execution.conditional_children import bind_frozen_parent_input, instantiate_conditional_child
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolTemplate
+from empirical_lawhood.execution.recovery import ProtocolRunRecoveryIndex, TaskRecoveryDisposition, ProtocolTaskRecoveryEvent
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]

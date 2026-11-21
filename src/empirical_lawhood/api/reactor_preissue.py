@@ -4,33 +4,24 @@ SPDX-License-Identifier: MPL-2.0
 """
 
 from __future__ import annotations
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from pathlib import Path
 
 from empirical_lawhood.api.composition import create_cli_api
 from empirical_lawhood.api.results import CheckReadinessRequest
 from empirical_lawhood.api.reactor_source_provenance import authenticate_reactor_authoring_source
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactProfile,
-    ArtifactWriteRequest,
-)
-from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeSpec
-from empirical_lawhood.runtime.operator_profile import (
-    OperatorStorageProfile,
-    resolve_external_root_contract,
-)
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan, CandidateRunPlan
-from empirical_lawhood.runtime.study_issue import MAX_ISSUE_PAYLOAD_BYTES
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeSpec
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, resolve_external_root_contract
+from empirical_lawhood.execution.plans import CandidateExecutionPlan, CandidateRunPlan
 
 from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import load_fresh_reactor_bundle
 
@@ -62,8 +53,6 @@ def prove_fresh_reactor(
         name: (directory / name).stat().st_size
         for name in ("base-authoring.json", "authoring.json")
     }
-    if any(size > MAX_ISSUE_PAYLOAD_BYTES for size in issue_member_bytes.values()):
-        raise ValueError("REACTOR_AUTHORING_EXCEEDS_PRODUCTION_ISSUE_BYTE_BOUND")
     from empirical_lawhood.adapters.composition.reactor_prefix_response.fresh_authoring import fresh_assignment_status, load_fresh_reactor_profile
 
     profile = load_fresh_reactor_profile(directory / "profile.json")
@@ -156,14 +145,7 @@ def prove_fresh_reactor(
         first = plane.write_stream(request.as_stream())
         replay = plane.write_stream(request.as_stream())
         path = guard.resolve(relative, for_write=False)
-        manifest = decode_artifact_manifest(
-            read_bounded_bytes(
-                guard.resolve(
-                    first.manifest_materialization.relative_path, for_write=False
-                ),
-                maximum_bytes=_RECORD_LIMIT,
-            )
-        )
+        manifest = resolve_artifact_sidecar_bytes(plane, read_bounded_bytes(guard.resolve(first.manifest_materialization.relative_path, for_write=False), maximum_bytes=_RECORD_LIMIT))
         plane.verify_manifest(manifest)
         if (
             replay.created
@@ -198,7 +180,7 @@ def prove_fresh_reactor(
         "closure_sections": summary.closure_sections,
         "control_persistence": persisted,
         "issue_authoring_member_bytes": issue_member_bytes,
-        "issue_authoring_member_byte_ceiling": MAX_ISSUE_PAYLOAD_BYTES,
+        "issue_authoring_member_byte_ceiling": None,
         **fresh_assignment_status(profile),
         "source_contacted": False,
         "native_tasks_executed": 0,

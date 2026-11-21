@@ -11,15 +11,13 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifact_validation
-from empirical_lawhood.infrastructure.canonical_record_read import read_verified_canonical_record
-from empirical_lawhood.infrastructure.publication_metadata import read_published_canonical_record
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_bytes_with_identity
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactCustodyLimits, ArtifactProfile, ArtifactSemanticValidation, ArtifactWriteRequest, ArtifactWriteResult,
-)
+from empirical_lawhood.storage import artifact_validation
+from empirical_lawhood.storage.canonical_record_read import read_verified_canonical_record
+from empirical_lawhood.storage.publication_metadata import read_published_canonical_record
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_bytes_with_identity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits, ArtifactProfile, ArtifactSemanticValidation, ArtifactWriteRequest, ArtifactWriteResult
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 
 
@@ -57,7 +55,7 @@ def _read(plane, manifest):
 def test_cold_receipt_control_resolves_complete_publication(tmp_path, damage):
     """A receipt supplies logical/material custody; the sidecar owns siblings."""
     from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
-    from empirical_lawhood.runtime.artifacts import ArtifactManifest
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
     plane, manifests = _publication(tmp_path, 3)
     actual = manifests[0]
     selected = ArtifactManifest(actual.logical, actual.materialization)
@@ -242,7 +240,7 @@ def test_identity_result_does_not_seed_a_custom_encoding_policy():
 
 
 def test_parallel_member_validation_uses_the_same_selected_typed_read(tmp_path):
-    from empirical_lawhood.kernel import decoding
+    from empirical_lawhood.science.records import decoding
     plane, _ = _publication(tmp_path, 1)
     value = LargeControl(('disclosed metadata ' * 32,) * 2048)
     assert len(value.canonical_bytes()) >= 1024**2

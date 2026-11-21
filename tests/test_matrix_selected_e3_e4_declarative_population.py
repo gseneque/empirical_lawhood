@@ -6,10 +6,10 @@ from decimal import Decimal as D
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_science as science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_science as science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 from tests.test_matrix_selected_e3_e4_bridge import selected_bridge, transfer  # noqa: F401 - disclosed fixture
 from tests.test_matrix_selected_protected import unpublished
 
@@ -105,11 +105,11 @@ def test_explicit_design_refuses_incomplete_or_unsupported_declarations(selected
 def test_preparation_census_is_derived_from_edited_programme_and_actual_output_ports(selected_bridge):  # noqa: F811
     from collections import Counter
     from pathlib import Path
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as owner
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_experiment as public
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, PreparedExperimentFile
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as owner
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_experiment as public
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, PreparedExperimentFile
     from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
     from tests.matrix_e4_structure_support import disclosed_structure
     from tests.test_matrix_selected_e3_e4_bridge import disclosed_operational_resources
@@ -140,7 +140,7 @@ def test_preparation_census_is_derived_from_edited_programme_and_actual_output_p
         native += int(declaration.execution_properties.native_effect)
         for output in declaration.outputs:
             outputs["array-products" if output.profile is ArtifactProfile.MATRIX_ARRAY_NPZ else "canonical-products"] += 1
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_bindings import key
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_bindings import key
     count = len(programme.cases)
     phases.update({key(False, "measure"): count, key(False, "assess"): count, key(False, "reduce"): 1})
     outputs.update({key(False, "measure") + ".product": count, key(False, "assess") + ".product": count,

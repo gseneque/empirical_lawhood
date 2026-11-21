@@ -9,30 +9,22 @@ import shutil
 
 import pytest
 
-from empirical_lawhood.adapters.methods.native_subwork_conformance import ExposedNativeSubworkRunner
-from empirical_lawhood.adapters.methods import isolated_native_conformance
-from empirical_lawhood.adapters.methods.isolated_native_conformance import ExposedIsolatedNativeRunner
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, TaskProcessError
-from empirical_lawhood.infrastructure.native_subwork_inputs import (
-    NativeSubworkInputError, validate_native_subwork_inputs,
-)
-from empirical_lawhood.infrastructure.native_subwork_ipc import (
-    NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress,
-)
-from empirical_lawhood.infrastructure.prepared_native_invocation import (
-    NativeInputPublication, prepare_native_invocation, validate_prepared_native_invocation,
-)
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkOutput, NativeSubworkRoster, NativeSubworkState
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.isolated_native_subwork import (
-    IsolatedNativeEntryReturn, IsolatedNativeEntrySelection, IsolatedNativeProcessStart,
-)
+from empirical_lawhood.methods.native_subwork_conformance import ExposedNativeSubworkRunner
+from empirical_lawhood.adapters.conformance import isolated_native as isolated_native_conformance
+from empirical_lawhood.adapters.conformance.isolated_native import ExposedIsolatedNativeRunner
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, TaskProcessError
+from empirical_lawhood.execution.local.native_subwork_inputs import NativeSubworkInputError, validate_native_subwork_inputs
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
+from empirical_lawhood.storage.prepared_native_invocation import NativeInputPublication, prepare_native_invocation, validate_prepared_native_invocation
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkOutput, NativeSubworkRoster, NativeSubworkState
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.isolated_native_subwork import IsolatedNativeEntryReturn, IsolatedNativeEntrySelection, IsolatedNativeProcessStart
 from tests.runtime_platform.test_native_subwork import ExposedInput, _plane, _store, _process_context
 
 
@@ -202,8 +194,8 @@ def test_actual_two_process_hops_preserve_complete_input_refusal_before_native_e
     entry.write_text(
         "import json, os\n"
         "from pathlib import Path\n"
-        "from empirical_lawhood.kernel.decoding import decode_canonical_bytes\n"
-        "from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition\n"
+        "from empirical_lawhood.science.records.decoding import decode_canonical_bytes\n"
+        "from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition\n"
         "def exposed_child(progress, invocation):\n"
         "    data = json.loads(invocation.read())\n"
         "    raw = data['definitions'][1].encode()\n"

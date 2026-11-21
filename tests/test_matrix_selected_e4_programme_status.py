@@ -8,7 +8,7 @@ import pytest
 
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api import selected_e4_programme_service as owner
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 
 ROOT = Path(__file__).resolve().parents[1]

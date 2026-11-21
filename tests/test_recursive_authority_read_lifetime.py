@@ -9,14 +9,14 @@ from weakref import ref
 import pytest
 
 from empirical_lawhood.api import selected_e3_access as owner
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.recursive_handoff import RecursiveWaveMember
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, ArtifactIdentityConflict
+from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.recursive_handoff import RecursiveWaveMember
 from tests.test_selected_e3_current_access import (
     _actual_original_access, _authority_read_work,
     actual_issued_current_task_controls,  # noqa: F401

@@ -64,14 +64,14 @@ def retain_history(programme, args, prior):
 
 
 def authenticate_nomination(programme, prior):
-    from empirical_lawhood.adapters.methods.rubisco_cycle_constraints.contracts import CycleUseProduct
-    from empirical_lawhood.adapters.methods.rubisco_nomination_preparation import science, recursive_translation
-    from empirical_lawhood.adapters.methods.rubisco_nomination_preparation.contracts import NominationDossier
-    from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry.science import SourceAudit
+    from empirical_lawhood.domains.rubisco.rubisco_cycle_constraints.contracts import CycleUseProduct
+    from empirical_lawhood.domains.rubisco.rubisco_nomination_preparation import science, recursive_translation
+    from empirical_lawhood.domains.rubisco.rubisco_nomination_preparation.contracts import NominationDossier
+    from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry.science import SourceAudit
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_execution import read_recursive_wave
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
     directory = programme.root / 'nomination-preparation'
     actual_report, products, _, _ = read_recursive_wave(directory=directory, artifact_writer=programme.plane,
@@ -106,17 +106,17 @@ def authenticate_nomination(programme, prior):
 
 def selected_question(programme, args, dossier, macro, parent):
     """Select installed scientific owners; the controller supplies no analysis."""
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     raw = archived_bytes(programme, args.source_selection)
     if args.check == 'mechanism':
-        from empirical_lawhood.adapters.methods.rubisco_insilico_mechanism.contracts import MechanismSource
-        from empirical_lawhood.adapters.methods.rubisco_insilico_mechanism import recursive_translation
+        from empirical_lawhood.domains.rubisco.rubisco_insilico_mechanism.contracts import MechanismSource
+        from empirical_lawhood.domains.rubisco.rubisco_insilico_mechanism import recursive_translation
         source = decode_canonical_bytes(raw, MechanismSource, maximum_bytes=None)
         draft = recursive_translation.challenge_draft(source, macro, dossier, parent=parent)
         records = (source, macro)
     elif args.check == 'structure-inventory':
-        from empirical_lawhood.adapters.methods.rubisco_insilico_structure.contracts import StructuralSource
-        from empirical_lawhood.adapters.methods.rubisco_insilico_structure import recursive_translation
+        from empirical_lawhood.domains.rubisco.rubisco_insilico_structure.contracts import StructuralSource
+        from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import recursive_translation
         source = decode_canonical_bytes(raw, StructuralSource, maximum_bytes=None)
         draft = recursive_translation.source_mapping_draft(source, dossier, parent=parent)
         records = (source,)
@@ -134,8 +134,8 @@ def selected_question(programme, args, dossier, macro, parent):
 
 
 def run(programme, args):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_mechanism.contracts import MechanismAssessment
-    from empirical_lawhood.adapters.methods.rubisco_insilico_structure.contracts import StructuralAssessment
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_mechanism.contracts import MechanismAssessment
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_structure.contracts import StructuralAssessment
     archived_bytes(programme, Path(__file__))
     prior, cost = prior_documents(args)
     programme.report['prior_nomination'] = {'report_path': str(args.prior_report),
@@ -173,9 +173,9 @@ def run(programme, args):
 
 def source_scope(source, check):
     if check == 'mechanism':
-        from empirical_lawhood.adapters.methods.rubisco_insilico_mechanism.contracts import scope
+        from empirical_lawhood.domains.rubisco.rubisco_insilico_mechanism.contracts import scope
     else:
-        from empirical_lawhood.adapters.methods.rubisco_insilico_structure.contracts import scope
+        from empirical_lawhood.domains.rubisco.rubisco_insilico_structure.contracts import scope
     return scope(source)
 
 

@@ -6,40 +6,17 @@ from hashlib import sha256
 import json
 from types import SimpleNamespace as N
 import pytest
-from empirical_lawhood.adapters.methods.rubisco_nomination_preparation import (
-    contracts as c,
-    science,
-    operation_bindings as owner,
-    recursive_translation as drafts,
-)
-from empirical_lawhood.adapters.methods.rubisco_cycle_constraints import (
-    assessment,
-    recursive_translation as cycle_drafts,
-)
-from empirical_lawhood.adapters.methods.rubisco_portfolio_inquiry import (
-    science as portfolio,
-)
-from empirical_lawhood.kernel.decoding import (
-    decode_canonical_bytes,
-)
-from empirical_lawhood.kernel.evidence import (
-    EvidenceCeiling,
-    OutcomeAccess,
-    VisibilityCeiling,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.recursive_requirements import (
-    AssessmentDisposition,
-    AssessmentPhase,
-    ContributionRole,
-)
-from empirical_lawhood.kernel.scientific_contributions import (
-    ContributionManifest,
-    ContributionProduct,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.execution import WorkerInputKind
+from empirical_lawhood.domains.rubisco.rubisco_nomination_preparation import contracts as c, science, operation_bindings as owner, recursive_translation as drafts
+from empirical_lawhood.domains.rubisco.rubisco_cycle_constraints import assessment, recursive_translation as cycle_drafts
+from empirical_lawhood.domains.rubisco.rubisco_portfolio_inquiry import science as portfolio
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition, AssessmentPhase, ContributionRole
+from empirical_lawhood.science.inquiry.scientific_contributions import ContributionManifest, ContributionProduct
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.execution import WorkerInputKind
 from tests.test_inquiry_successor_compilation import compile_complete_draft
 from tests.rubisco_nomination_fixture import proposal, sources
 
@@ -170,10 +147,10 @@ class RefuseNative(importlib.abc.MetaPathFinder):
             raise AssertionError('cold recursive discovery imports PyBaMM')
 sys.meta_path.insert(0, RefuseNative())
 from empirical_lawhood.api.recursive_operations import operation_catalog, operation_factories
-from empirical_lawhood.adapters.methods.rubisco_nomination_preparation.executable_binding import EXECUTABLE_BINDING_FACTORIES
+from empirical_lawhood.domains.rubisco.rubisco_nomination_preparation.extension import EXTENSION
 _, registry, _ = operation_catalog()
 assert tuple(sorted((f.manifest for f in operation_factories()), key=lambda m: m.registry_id)) == registry.capabilities
-factory, = EXECUTABLE_BINDING_FACTORIES
+factory, = EXTENSION.factories
 runner = factory.runner_factory()
 assert runner.manifest == factory.manifest == registry.resolve(factory.manifest.capability_key, factory.manifest.capability_version)
 assert callable(runner.execute)
@@ -199,27 +176,16 @@ def test_real_registered_pure_runner_shared_scheduler_receipt_and_no_effect_reco
     or biological qualification. No worker or registry is replaced by a mock.
     """
     from empirical_lawhood.api.recursive_execution import _external_inputs
-    from empirical_lawhood.api.recursive_operations import (
-        operation_catalog,
-        operation_runners,
-    )
-    from empirical_lawhood.infrastructure.execution import (
-        DirectTaskExecutor,
-        LocalProcessExecutor,
-        LocalScheduler,
-    )
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.infrastructure.sql import (
-        SQLiteOperationalRepository,
-        create_catalog_engine,
-        upgrade_catalog,
-    )
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile
-    from empirical_lawhood.runtime.plans import PlanLane
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.api.recursive_operations import operation_catalog, operation_runners
+    from empirical_lawhood.execution.local.execution import DirectTaskExecutor, LocalProcessExecutor, LocalScheduler
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.execution.execution import ExecutionAssuranceProfile
+    from empirical_lawhood.execution.plans import PlanLane
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
     from tests.runtime_platform.test_execution_scheduler import StaticExternalInputResolver
     from tests.test_recursive_public_service import _plane
 

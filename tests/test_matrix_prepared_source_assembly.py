@@ -6,11 +6,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods import matrix_prepared_source_assembly as domain
-from empirical_lawhood.api.experiment_preparation import load_experiment_inputs,load_experiment_specification,prepare_experiment
+from empirical_lawhood.domains.matrix import matrix_prepared_source_assembly as domain
+from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, load_experiment_specification, prepare_experiment
 from empirical_lawhood.api.domain_composition.matrix_prepared_source_assembly.assembly import current_confirmation_sources
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_matrix_prepared_source import prepared_bank
 from tests.test_matrix_selected_opportunity import opportunity  # noqa: F401
 from tests.test_matrix_selected_protected import transfer,confirmation,unpublished  # noqa: F401
@@ -96,18 +96,18 @@ def test_current_conf_projection_keeps_original_bytes_and_e6_refuses_projection(
     assert tuple(row.root for row in sources.closure.descriptors)==tuple(row.root for row in programme.sources.closure.descriptors)
     assert sources.closure.provenances==programme.sources.closure.provenances
     assert sources.closure.initial_states==programme.sources.closure.initial_states
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support
     assert supports==exposure_support(current) and len(supports)==1
     _require_current_exposure_subset(audit,current,effective_seeds=(seed,),group_ids=(group,),coordinates=(coordinate,))
     assert seed in current.census.effective_seed_exclusions and group in current.census.exposed_independent_groups
     # Every projected prior-corpus row is an actual immutable publication.
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
     for stored in current.prior_corpus:authenticate_publication(plane,stored)
 
 
 def test_registry_declares_source_preprocessing_target_and_configuration():
     from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding
-    from empirical_lawhood.adapters.methods.matrix_prepared_source_experiment import PROTOCOL_ID as target
+    from empirical_lawhood.domains.matrix.matrix_prepared_source_experiment import PROTOCOL_ID as target
     from empirical_lawhood.api.experiment_preparation import experiment_protocols
     declaration,=(value for value in experiment_protocols() if value.protocol_id==domain.PROTOCOL_ID)
     assert declaration.example_paths==('programmes/foundations/emergent-structure/workflows/matrix-response-experiment/prepared-source-assembly.example.json',)
@@ -123,11 +123,10 @@ def test_current_conf_rebinds_actual_declared_v2_initialization_metadata_without
     No source qualification or original execution is claimed. The actual Q2
     initializer and independent consumer check every retained array without RNG.
     """
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_initialization_science as initializer
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science as consumer
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import (
-        MatrixPreparationInitialStateV2,MatrixCouplingRecipe,original_schedule_recipe)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
+    import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as initializer_owner_0
+    import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as consumer_owner_0
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixPreparationInitialStateV2, MatrixCouplingRecipe, original_schedule_recipe
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
     from empirical_lawhood.api.matrix_prepared_source_runtime import _require_current_exposure_subset
     from tests.test_matrix_factor_confirmation_eligibility import publish
     from tests.test_matrix_preparation_initialization import forbid_contact
@@ -139,7 +138,7 @@ def test_current_conf_rebinds_actual_declared_v2_initialization_metadata_without
     source_index = prior.source_index()
     for descriptor in prior.descriptors:
         subject=prior.original(descriptor, index=source_index)
-        state,raw=initializer.initialize_source(subject,subject.provenance,
+        state,raw=initializer_owner_0.initialize_source(subject,subject.provenance,
             state_id='initial.disclosed.current.'+descriptor.root_id,artifact_id='array.disclosed.current.'+descriptor.root_id)
         assert type(state) is MatrixPreparationInitialStateV2
         assert decode_canonical_bytes(state.canonical_bytes(),MatrixPreparationInitialStateV2,maximum_bytes=None)==state
@@ -193,12 +192,12 @@ def test_current_conf_rebinds_actual_declared_v2_initialization_metadata_without
         assert actual.root==old.root and actual.producing_provenance==old.producing_provenance
         assert actual.cutoff==old.cutoff and actual.alpha_tilde==old.alpha_tilde
         assert actual.consumed_streams==() and actual.native_contact_count==0
-        assert consumer.initial_state(actual,arrays[descriptor.root_id]).step_index==0
+        assert consumer_owner_0.initial_state(actual,arrays[descriptor.root_id]).step_index==0
         for selected_arm,prepared in current.source_arms():
             if prepared.root.root.root_id==descriptor.root_id:
                 assert prepared.initial==actual and prepared.original==actual.original
     _require_current_exposure_subset(audit,current.closure.audit,effective_seeds=(seed,),group_ids=(group,),coordinates=(coordinate,))
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support
     assert supports==exposure_support(current.closure.audit) and len(supports)==1
     # The old public initialization bank is preserved, not relabelled as the
     # new canonical state. Reintroducing its source pin must still refuse.
@@ -217,8 +216,8 @@ def test_prepared_assembly_reuses_one_disclosed_fact_read_and_guards_real_file_b
     from empirical_lawhood.api.domain_composition.matrix_prepared_source_assembly import assembly as api
     from empirical_lawhood.api import matrix_prepared_source_runtime as runtime
     from empirical_lawhood.api import recursive_authoring, recursive_execution, native_training_banks
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
     from tests.test_matrix_prepared_source import disclosed_certificate
     from tests.test_matrix_factor_confirmation_eligibility import publish
     from tests.test_recursive_public_service import _plane
@@ -247,7 +246,7 @@ def test_prepared_assembly_reuses_one_disclosed_fact_read_and_guards_real_file_b
     # This control supplies unexecuted C descriptors and replaces upstream
     # scientific custody. Exercise FILE guards without pretending that the
     # descriptor is a decoded, authenticated programme commitment.
-    from empirical_lawhood.infrastructure import matrix_completed_source
+    from empirical_lawhood.adapters.matrix_storage import matrix_completed_source
     def original_commitment(writer, inputs, commitment):
         assert inputs is programme_inputs and commitment == original.input_commitments
         return commitment

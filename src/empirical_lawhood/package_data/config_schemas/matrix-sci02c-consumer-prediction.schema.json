@@ -1,0 +1,145 @@
+{
+  "$defs": {
+    "ObjectIdentity_1e3d5e7bc67c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/kernel/object-identity"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "object_fingerprint": {
+              "description": "object fingerprint; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_id": {
+              "description": "object id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_schema": {
+              "description": "object schema; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "object_version": {
+              "description": "object version; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "object_schema",
+            "object_version",
+            "object_fingerprint"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "Sci02CSpecification_fdab0c1e5ed2": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-sci02c/specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "calibrated": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "calibrated; constructor checks semantics and units."
+            },
+            "campaign": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "campaign; constructor checks semantics and units."
+            },
+            "cases": {
+              "description": "cases; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+              },
+              "type": "array"
+            },
+            "frozen": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "frozen; constructor checks semantics and units."
+            },
+            "provenance": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "provenance; constructor checks semantics and units."
+            },
+            "selection": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "selection; constructor checks semantics and units."
+            },
+            "specification_id": {
+              "description": "specification id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "study": {
+              "$ref": "#/$defs/ObjectIdentity_1e3d5e7bc67c",
+              "description": "study; constructor checks semantics and units."
+            },
+            "tranche": {
+              "description": "tranche; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "specification_id",
+            "study",
+            "selection",
+            "provenance",
+            "campaign",
+            "tranche",
+            "cases",
+            "frozen",
+            "calibrated"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-sci02c-consumer-prediction",
+  "$ref": "#/$defs/Sci02CSpecification_fdab0c1e5ed2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Sci02C Consumer Prediction",
+  "x-consumer": "matrix-sci02c-consumer-prediction",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

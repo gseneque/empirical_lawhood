@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.infrastructure import source_closure as owner
+from empirical_lawhood.storage import source_closure as owner
 from tests.infrastructure.test_selected_candidate import candidate_case as candidate_case  # noqa: F401
 
 
@@ -39,7 +39,7 @@ def test_admitted_guard_refuses_actual_changed_bytes_or_membership(candidate_cas
     elif damage == "source-added":
         (case.source / "src/empirical_lawhood/extra.py").write_bytes(b"EXTRA = 1\n")
     elif damage == "source-missing":
-        (case.source / "src/empirical_lawhood/resources/operand.txt").unlink()
+        (case.source / "src/empirical_lawhood/package_data/operand.txt").unlink()
     else:
         path = case.source / "uv.lock"
         raw = path.read_bytes()
@@ -87,7 +87,7 @@ def test_closed_installed_source_cannot_project_closure_after_real_mutation(cand
     elif damage=="source-added":
         (case.source/"src/empirical_lawhood/extra.py").write_bytes(b"EXTRA = 1\n")
     elif damage=="source-missing":
-        (case.source/"src/empirical_lawhood/resources/operand.txt").unlink()
+        (case.source/"src/empirical_lawhood/package_data/operand.txt").unlink()
     else:
         path=case.source/"uv.lock"
         path.write_bytes(path.read_bytes().replace(b"1",b"2"))

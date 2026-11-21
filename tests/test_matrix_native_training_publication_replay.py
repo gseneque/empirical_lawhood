@@ -6,10 +6,10 @@ from decimal import Decimal
 import pytest
 
 from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.time import AvailabilitySpec, CausalPhase
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
 from tests.test_matrix_factor_confirmation_eligibility import _matrix_plane
 
 

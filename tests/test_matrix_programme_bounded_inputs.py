@@ -3,8 +3,8 @@ import os
 
 import pytest
 
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticated_programme_inputs
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticated_programme_inputs
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
 from tests.test_matrix_programme_source_continuation import metadata_case  # noqa: F401
 
 
@@ -103,8 +103,8 @@ def test_custom_reader_falls_back(metadata_case):  # noqa: F811
 @pytest.mark.parametrize('registry', ('semantic', 'format'))
 def test_changed_validation_registry_revalidates_physical_members(metadata_case, registry):  # noqa: F811
     from empirical_lawhood.api.recursive_operations import operation_storage_codecs
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-    from empirical_lawhood.runtime.artifacts import ArtifactSemanticValidationRegistry
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactSemanticValidationRegistry
     from tests.test_artifact_read_context import _work
     with metadata_case.case.writer.read_context() as reading:
         with authenticated_programme_inputs(**options(metadata_case, reading)) as first:

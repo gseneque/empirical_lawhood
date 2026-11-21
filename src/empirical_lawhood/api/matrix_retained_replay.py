@@ -3,9 +3,9 @@
 
 from contextlib import contextmanager
 
-from empirical_lawhood.infrastructure.matrix_array_io import decoded_matrix_array_scope
-from empirical_lawhood.kernel.decoded_record_store import decoded_record_scope
-from empirical_lawhood.kernel.decoding import record_validation_scope
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decoded_matrix_array_scope
+from empirical_lawhood.science.records.decoded_record_store import decoded_record_scope
+from empirical_lawhood.science.records.decoding import record_validation_scope
 
 
 # Additional concurrent operands, including conservative expansion/workspace
@@ -15,13 +15,9 @@ MAXIMUM_PENDING_REPLAY_BYTES = 512 * 1024**2
 
 def bounded_e4_replay_source(source):
     """Use the existing local carrier, never pickle the full source index."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import (
-        SelectedE3E4NativeSource, SelectedE3E4NativeSourceReference,
-    )
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import (
-        SelectedE4ProtectedNativeSource, SelectedE4ProtectedNativeSourceReference,
-    )
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import bind_selected_native_source
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4NativeSource, SelectedE3E4NativeSourceReference
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4ProtectedNativeSource, SelectedE4ProtectedNativeSourceReference
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import bind_selected_native_source
 
     kinds = {SelectedE3E4NativeSource: SelectedE3E4NativeSourceReference,
         SelectedE4ProtectedNativeSource: SelectedE4ProtectedNativeSourceReference}
@@ -55,7 +51,7 @@ def _replay_scope():
 
 
 def replay_e1(value):
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_science
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_science
     _, (source, history, numerical, product, assessment, native, diagnostics, receipts) = value
     with _replay_scope():
         compact_science.read_retained(source, history, numerical, product, assessment, native, diagnostics,
@@ -64,7 +60,7 @@ def replay_e1(value):
 
 
 def replay_full_factor(value):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_science
     _, (source, product, assessment, native, diagnostics) = value
     with _replay_scope():
         full_factor_science.read_retained(source, product, assessment, native, diagnostics)
@@ -73,11 +69,9 @@ def replay_full_factor(value):
 
 def replay_e4_functional(value):
     """Reprove one case's unchanged forecast, score and sealed account."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import (
-        response_forecast, response_science, selected_e3_e4_science, selected_e4_native_science,
-    )
-    from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-    from .matrix_mechanism_read import bound_mechanism
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast, response_science, selected_e3_e4_science, selected_e4_native_science
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+    from empirical_lawhood.api.matrix_mechanism_read import bound_mechanism
     _, data = value
     case, protocol, panels = (data[name] for name in ('case', 'protocol', 'panels'))
     score, account, causal, physical = (data[name] for name in ('score', 'account', 'causal', 'physical'))

@@ -16,59 +16,32 @@ from hashlib import sha256
 from types import MappingProxyType
 from typing import ClassVar, Final
 
-from empirical_lawhood.adapters.methods.structural_recurrence import PolicyBranch
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    canonical_json_bytes,
-    require_sorted_unique_ids,
-    require_sorted_unique_strings,
-    validate_semantic_version,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.planning.study_authoring import ConditionalGateKind, ConditionalChildRequest, ConditionalTerminalDisposition
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.candidate_compiler import CandidateCompilationReport, CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole, StudyCompilationReport
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityRegistration
-from empirical_lawhood.runtime.conditional_children import ConditionalChildInstantiation, ConditionalChildResolution, FrozenParentInputBinding, bind_frozen_parent_input, instantiate_conditional_child
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-)
+from empirical_lawhood.methods.structural_recurrence import PolicyBranch
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes, require_sorted_unique_ids, require_sorted_unique_strings, validate_semantic_version, validate_sha256, validate_stable_id
+from empirical_lawhood.design.study_authoring import ConditionalGateKind, ConditionalChildRequest, ConditionalTerminalDisposition
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.candidate_compiler import CandidateCompilationReport, CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole, StudyCompilationReport
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityRegistration
+from empirical_lawhood.execution.conditional_children import ConditionalChildInstantiation, ConditionalChildResolution, FrozenParentInputBinding, bind_frozen_parent_input, instantiate_conditional_child
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, CampaignRuntimeProvider, ExternalInputPayload
 
-from .contracts import FREEGSNKE_TARGET_SAVED_PREPARATION_SCHEMA, FreeGsnkeActionChart, FreeGsnkeNumericalView, FreeGsnkePhase, FreeGsnkePreparation, FreeGsnkeProcessRequest, FreeGsnkeSavedPreparation, FreeGsnkeSourceBinding, FreeGsnkeTargetProcessResponse, FreeGsnkeTargetWorkerInput, freegsnke_saved_preparation_artifact
-from .design import FreeGsnkeActionDesign
-from .generation_protocol import FreeGsnkeEpisodeExecutor
-from .structural_recurrence_bridge import FreeGsnkeStructuralRecurrenceBridgeFreeze, FreeGsnkeStructuralRecurrenceDesignCandidate
-from .registry import FREEGSNKE_CAPABILITY_VERSION
-from .runtime import decode_freegsnke_target_response
-from .target_analysis import FreeGsnkeTargetReductionConfig
-from .target_design import FreeGsnkePowerFreeze
-from .target_evaluation import FreeGsnkeAdmissionEvaluationEvaluation
-from .target_validation import FreeGsnkeProspectiveValidationReductionConfig, FreeGsnkeProspectiveValidationReduction, FreeGsnkeProspectiveValidationRequestRoster, FreeGsnkeTargetValidation, build_freegsnke_prospective_requests, evaluate_freegsnke_prospective, freegsnke_prospective_parent_eligible, freeze_freegsnke_prospective_reduction_config, issue_freegsnke_prospective_roster, reduce_freegsnke_prospective_panel, selected_freegsnke_prospective_target_branches
+from empirical_lawhood.domains.fusion.freegsnke.contracts import FREEGSNKE_TARGET_SAVED_PREPARATION_SCHEMA, FreeGsnkeActionChart, FreeGsnkeNumericalView, FreeGsnkePhase, FreeGsnkePreparation, FreeGsnkeProcessRequest, FreeGsnkeSavedPreparation, FreeGsnkeSourceBinding, FreeGsnkeTargetProcessResponse, FreeGsnkeTargetWorkerInput, freegsnke_saved_preparation_artifact
+from empirical_lawhood.domains.fusion.freegsnke.design import FreeGsnkeActionDesign
+from empirical_lawhood.adapters.simulators.freegsnke.generation_protocol import FreeGsnkeEpisodeExecutor
+from empirical_lawhood.domains.fusion.freegsnke.structural_recurrence_bridge import FreeGsnkeStructuralRecurrenceBridgeFreeze, FreeGsnkeStructuralRecurrenceDesignCandidate
+from empirical_lawhood.adapters.simulators.freegsnke.registry import FREEGSNKE_CAPABILITY_VERSION
+from empirical_lawhood.adapters.simulators.freegsnke.runtime import decode_freegsnke_target_response
+from empirical_lawhood.domains.fusion.freegsnke.target_analysis import FreeGsnkeTargetReductionConfig
+from empirical_lawhood.domains.fusion.freegsnke.target_design import FreeGsnkePowerFreeze
+from empirical_lawhood.domains.fusion.freegsnke.target_evaluation import FreeGsnkeAdmissionEvaluationEvaluation
+from empirical_lawhood.domains.fusion.freegsnke.target_validation import FreeGsnkeProspectiveValidationReductionConfig, FreeGsnkeProspectiveValidationReduction, FreeGsnkeProspectiveValidationRequestRoster, FreeGsnkeTargetValidation, build_freegsnke_prospective_requests, evaluate_freegsnke_prospective, freegsnke_prospective_parent_eligible, freeze_freegsnke_prospective_reduction_config, issue_freegsnke_prospective_roster, reduce_freegsnke_prospective_panel, selected_freegsnke_prospective_target_branches
 
 
 FREEGSNKE_PROSPECTIVE_VALIDATION_ISSUE_KEY: Final = 'freegsnke.issue-prospective-validation-roster'

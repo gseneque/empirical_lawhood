@@ -12,12 +12,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import (
-    RESOURCE_BINDING_DEPENDENCY, derive_protected_e3_design_inputs,
-)
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import RESOURCE_BINDING_DEPENDENCY, derive_protected_e3_design_inputs
 from empirical_lawhood.api import prospective_experiment
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind
+from empirical_lawhood.execution.experiment_preparation import DependencyKind
 from tests.test_matrix_configured_protected_public_preparation import public_case  # noqa: F401
 from tests.test_matrix_researcher_programme_deferred_authoring import _prepare
 from tests.test_matrix_researcher_programme import ROOT
@@ -29,8 +27,8 @@ class _ReachedAfterExactRoster(RuntimeError):
 
 @pytest.fixture(scope='module', autouse=True)
 def no_native_effects():
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
 
     def forbidden(*_args, **_kwargs):
         raise AssertionError('source-order control entered a worker/native effect')
@@ -127,7 +125,7 @@ def test_generic_preview_keeps_exact_source_census_guard(ordered_preparation, mo
 @pytest.fixture(scope='module')
 def full_authoring_return(ordered_preparation, no_native_effects):
     from empirical_lawhood.api.domain_composition.matrix_configured_protected_response import runtime
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
     case, _service, original = ordered_preparation
     design = derive_protected_e3_design_inputs(original)
@@ -140,7 +138,7 @@ def full_authoring_return(ordered_preparation, no_native_effects):
     before = (selected.canonical_bytes(), prepared.draft.canonical_bytes(),
         tuple((key, record.canonical_bytes()) for key, record in prepared.design_records))
     destination = Path(case.plane.root.contract.canonical_path) / 'full-preview-return-only'
-    assert destination.is_relative_to(Path('/media/chevre/EL'))
+    assert destination.is_relative_to(Path(case.plane.root.contract.required_mount_path))
     assert not destination.exists()
     result = runtime.prepare_protected_e3_experiment_authoring(prepared, project_root=ROOT,
         artifact_writer=case.plane, output_dir=destination)
@@ -148,11 +146,9 @@ def full_authoring_return(ordered_preparation, no_native_effects):
 
 
 def test_actual_authoring_hook_returns_typed_sha_order_without_changing_selected_science(full_authoring_return):
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentPreparation
-    from empirical_lawhood.runtime.recursive_prospective import (
-        RecursiveProspectiveAuthoringSpec, RecursiveProspectiveCandidatePreview,
-    )
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.experiment_preparation import ExperimentPreparation
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec, RecursiveProspectiveCandidatePreview
 
     case, prepared, result, before, destination = full_authoring_return
     assert type(result) is ExperimentPreparation and result.executable
@@ -192,8 +188,8 @@ def test_returned_operational_preparation_refuses_selected_id_order(full_authori
 def test_programme_child_source_uses_actual_configured_design_id(ordered_preparation):
     from empirical_lawhood.api.composite_experiment_programme import prepared_component_source_snapshot
     from empirical_lawhood.api.recursive_authoring import implementation_binding
-    from empirical_lawhood.infrastructure.source_closure import capture_target_closure
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.storage.source_closure import capture_target_closure
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
     _case, _service, original = ordered_preparation
     parent = ObjectIdentity.from_record('recursive-member.implementation', implementation_binding(ROOT))

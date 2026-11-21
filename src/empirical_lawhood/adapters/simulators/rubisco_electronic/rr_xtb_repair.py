@@ -1,11 +1,5 @@
-# SPDX-License-Identifier: MPL-2.0
-"""Cold source-bound GFN2-xTB coordinate-repair plans and native admission.
+"""Native acquisition and external-format binding for the domain science."""
 
-Draft selected-release adapter; no executable lookup, I/O, imports of native
-libraries or subprocess execution. The external selected launcher must bind the
-actual 6.7.1 binary/runtime/source revision and enforce the finite budgets.
-Pure primitive records support software controls, not scientific source claims.
-"""
 from dataclasses import asdict, dataclass, field
 from decimal import Decimal, ROUND_HALF_EVEN, localcontext
 from fractions import Fraction
@@ -14,30 +8,56 @@ import json
 from math import isfinite, sqrt
 from pathlib import PurePosixPath
 import re
+from empirical_lawhood.domains.rubisco.rubisco_insilico_structure.embedding import MODEL_ID as FIELD_MODEL_ID, RrEmbeddingFieldV1
+from empirical_lawhood.domains.rubisco.kinetics.rr_coupled_preparation import PreparedAtomV1, RrCoupledSourceV1, RrInitialContextV1, SOURCE_BINDINGS, construct_rr_initial_context
 
-from empirical_lawhood.adapters.physical.rubisco_kinetics.rr_coupled_embedding import (
-    MODEL_ID as FIELD_MODEL_ID, RrEmbeddingFieldV1,
-)
-from empirical_lawhood.adapters.physical.rubisco_kinetics.rr_coupled_preparation import (
-    PreparedAtomV1, RrCoupledSourceV1, RrInitialContextV1, SOURCE_BINDINGS, construct_rr_initial_context,
+from empirical_lawhood.domains.rubisco.electronic.xtb_numerics import (
+    ANGSTROM_PER_BOHR as _science_ANGSTROM_PER_BOHR,
+    angstrom_to_bohr as _science_angstrom_to_bohr,
 )
 
 RELEASE_TAG = '6.7.1'
+
+
 TAG_COMMIT = '26b28010e805f7d1aeeef39813feb473e69cc4be'
+
+
 RUNTIME_BUILD = 'edcfbbe'  # Official binary; not a claim that it was built from TAG_COMMIT.
+
+
 RECALC_ENERGY_TOLERANCE_HARTREE = Decimal('1e-6')
+
+
 PARAMETER_SHA256 = 'f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545'
-# Legacy tagged src/mctc/convert.f90 convention; deliberately not PySCF/CODATA.
-ANGSTROM_PER_BOHR = Decimal('0.52917726')
+
+
 FIXED_COORDINATE_TOLERANCE_ANGSTROM = Decimal('1e-10')
+
+
 MODEL_ID = 'rr-gfn2-xtb-6.7.1-hardness99-constrained-coordinate-repair-v1'
+
+
 LBFGS_MODEL_ID = 'rr-gfn2-xtb-6.7.1-hardness99-lbfgs-constrained-coordinate-repair-v1'
+
+
 MAXIMUM_NATIVE_FILE_BYTES = 16 * 1024 ** 2
+
+
 MAXIMUM_QM_ATOMS = 100
+
+
 MAXIMUM_FIELD_ATOMS = 14000
+
+
 PHOSPHATE_ANCHORS = frozenset(('P1', 'P2', 'O1P', 'O2P', 'O3P', 'O4P', 'O5P', 'O6P', 'O1', 'O5'))
+
+
 ELEMENT_Z = {'H': 1, 'C': 6, 'N': 7, 'O': 8, 'Mg': 12, 'P': 15}
+
+
 ELEMENT_VALENCE = {'H': 1, 'C': 4, 'N': 5, 'O': 6, 'Mg': 2, 'P': 5}
+
+
 INITIAL_CONTEXT_PINS = {
     ('unedited-reference', 'V2'): 'fbb6858ccb92685c2f0d7d07dd8e819d0c837fd3a8e4c41033327df3f259406c',
     ('unedited-reference', 'V3'): '36ceacc1a4b25dfd2b78cac47c8b4d1d9bae5d1ea68af53cb1dbc39ad7237b0d',
@@ -61,40 +81,6 @@ def _coordinates(value):
             and all(type(v) is Decimal and v.is_finite() and abs(v) <= Decimal('10000') for v in value))
 
 
-def angstrom_to_bohr(value):
-    if type(value) is not Decimal or not value.is_finite():
-        raise ValueError('finite Decimal Angstrom coordinate required')
-    with localcontext() as ctx:
-        ctx.prec = 50
-        ctx.rounding = ROUND_HALF_EVEN
-        return value / ANGSTROM_PER_BOHR
-
-
-def bohr_to_angstrom(value):
-    if type(value) is not Decimal or not value.is_finite():
-        raise ValueError('finite Decimal Bohr coordinate required')
-    with localcontext() as ctx:
-        ctx.prec = 50
-        ctx.rounding = ROUND_HALF_EVEN
-        return value * ANGSTROM_PER_BOHR
-
-
-def gradient_hartree_per_angstrom(value):
-    """Chain rule: an Eh/Bohr derivative is divided by Angstrom/Bohr."""
-    return angstrom_to_bohr(value)
-
-
-def gfn2_damped_coulomb_kernel(distance_bohr, qm_shell_hardness, external_hardness=99.0):
-    """Tagged GFN2 kernel only: arithmetic hardness mean, not singular 1/r."""
-    values = (distance_bohr, qm_shell_hardness, external_hardness)
-    if any(type(v) not in (int, float) or not isfinite(v) for v in values):
-        raise ValueError('finite native-kernel operands required')
-    if distance_bohr < 0 or qm_shell_hardness <= 0 or external_hardness != 99:
-        raise ValueError('nonnegative distance, positive shell hardness and selected99 required')
-    combined = (qm_shell_hardness + external_hardness) / 2
-    return 1 / sqrt(distance_bohr ** 2 + 1 / combined ** 2)
-
-
 @dataclass(frozen=True, slots=True)
 class XtbRepairSettingsV1:
     optimizer_engine: str = 'rf'
@@ -114,7 +100,7 @@ class XtbRepairSettingsV1:
     maximum_roster_native_cpu_seconds: int = field(init=False, default=1800)
     unpaired_electrons: int = field(init=False, default=0)
     external_hardness: int = field(init=False, default=99)
-    angstrom_per_bohr: Decimal = field(init=False, default=ANGSTROM_PER_BOHR)
+    angstrom_per_bohr: Decimal = field(init=False, default=_science_ANGSTROM_PER_BOHR)
     native_effects: int = field(init=False, default=0)
 
     def __post_init__(self):
@@ -306,7 +292,7 @@ def encode_pcem(rows):
         ctx.prec = 50;ctx.rounding = ROUND_HALF_EVEN
         for r in selected:
             q = Decimal(r.exact_charge.numerator) / Decimal(r.exact_charge.denominator)
-            tokens = (format(q, '.17E'), *(format(angstrom_to_bohr(v), '.17E') for v in r.coordinates_angstrom), '99')
+            tokens = (format(q, '.17E'), *(format(_science_angstrom_to_bohr(v), '.17E') for v in r.coordinates_angstrom), '99')
             if any(len(t) >= 48 for t in tokens):
                 raise ValueError('native PCEM token exceeds tagged parser width')
             lines.append(' '.join(tokens));native_ids.append(r.atom_id);native_sum += Fraction(tokens[0])
@@ -379,7 +365,7 @@ class XtbStagePlanV1:
 def plan_fixed_optimization(job):
     if type(job) is not RrXtbRepairInputV1:
         raise ValueError('source-bound reconstituted Rr repair input required')
-    coordinates = tuple(tuple(angstrom_to_bohr(v) for v in a.coordinates_angstrom) for a in job.native_contract.atoms)
+    coordinates = tuple(tuple(_science_angstrom_to_bohr(v) for v in a.coordinates_angstrom) for a in job.native_contract.atoms)
     return XtbStagePlanV1(job.native_contract, 'fixed-optimization', coordinates, settings=job.settings)
 
 
@@ -540,7 +526,7 @@ def _parse_stage(plan, returncode, stdout, stderr, coordinate_bytes, gradient_by
         with localcontext() as ctx:
             ctx.prec = 50
             for index in plan.fixed_atom_indices:
-                if any(abs((v-initial)*ANGSTROM_PER_BOHR) > FIXED_COORDINATE_TOLERANCE_ANGSTROM
+                if any(abs((v-initial)*_science_ANGSTROM_PER_BOHR) > FIXED_COORDINATE_TOLERANCE_ANGSTROM
                        for v, initial in zip(coords[index-1], plan.coordinates_bohr[index-1], strict=True)):
                     raise ValueError('native optimizer moved a fixed source coordinate')
         if gradient_bytes is not None:
@@ -563,7 +549,7 @@ def _parse_stage(plan, returncode, stdout, stderr, coordinate_bytes, gradient_by
         ctx.prec = 50
         for xyz, expected, witness in zip(coords, plan.coordinates_bohr, gradcoords, strict=True):
             for v, initial, native in zip(xyz, expected, witness, strict=True):
-                if max(abs(v-initial), abs(native-initial))*ANGSTROM_PER_BOHR > FIXED_COORDINATE_TOLERANCE_ANGSTROM:
+                if max(abs(v-initial), abs(native-initial))*_science_ANGSTROM_PER_BOHR > FIXED_COORDINATE_TOLERANCE_ANGSTROM:
                     raise ValueError('unfixed gradient moved geometry or differs from coordinate witness')
     fullnorm = sqrt(sum(float(v)**2 for row in gradients for v in row))
     free_components = tuple(float(v) for a,row in zip(plan.contract.atoms,gradients,strict=True)

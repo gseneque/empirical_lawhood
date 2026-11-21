@@ -4,7 +4,7 @@
 import pytest
 
 from empirical_lawhood.api import matrix_programme_allocations as admission
-from empirical_lawhood.infrastructure import process_memory
+from empirical_lawhood.execution.resources import process_memory
 
 
 def test_metadata_reclaims_unused_pages_before_same_limit_check(monkeypatch):

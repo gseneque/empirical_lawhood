@@ -3,6 +3,7 @@
 Earlier pytest factor outputs were pruned. Retain one genuinely new PURE run;
 never recreate or relabel their original task returns or native acquisitions.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 from dataclasses import replace
 from hashlib import sha256
 import json
@@ -15,26 +16,26 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_parameter_factor import science
-from empirical_lawhood.adapters.methods.matrix_parameter_factor.operation_bindings import BUDGET, NAMESPACE, development_draft, operands
-from empirical_lawhood.adapters.methods.matrix_parameter_factor.records import MatrixParameterFactorAssessment, MatrixParameterFactorProduct
+from empirical_lawhood.domains.matrix.matrix_parameter_factor import science
+from empirical_lawhood.domains.matrix.matrix_parameter_factor.operation_bindings import BUDGET, NAMESPACE, development_draft, operands
+from empirical_lawhood.domains.matrix.matrix_parameter_factor.records import MatrixParameterFactorAssessment, MatrixParameterFactorProduct
 from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
 from empirical_lawhood.api.recursive_authoring import author_recursive_wave, load_authored_wave
 from empirical_lawhood.api.recursive_execution import _external_inputs, read_recursive_wave, run_recursive_wave
 from empirical_lawhood.api.recursive_operations import operation_catalog, operation_factories
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.execution import LocalScheduler
-from empirical_lawhood.infrastructure.recursive_custody import iter_exact_custody_file_chunks
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind, WorkerOutputPort
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.providers import ExternalInputPayload
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.execution.local.execution import LocalScheduler
+from empirical_lawhood.storage.recursive_custody import iter_exact_custody_file_chunks
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind, WorkerOutputPort
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.providers import ExternalInputPayload
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 from tests.runtime_platform.test_native_subwork import _plane
 from tests.test_matrix_parameter_factor import retained as _retained_fixture
 
@@ -95,7 +96,7 @@ def test_installed_default_author_execution_provider_and_exact_refusals(installe
     factories=tuple(f for f in operation_factories() if f.manifest.capability_key.startswith(NAMESPACE+'.'))
     assert len(factories)==2 and all(not f.registration.native_effect for f in factories)
     native_manifest_path=next((original/'runs/test.e4.run/native-subwork').rglob('outputs/arrays.manifest.json'))
-    native_manifest=decode_artifact_manifest(native_manifest_path.read_bytes())
+    native_manifest=resolve_artifact_sidecar_bytes(plane, native_manifest_path.read_bytes())
     native_path=original/native_manifest.materialization.relative_path
     assert (native_manifest.logical.logical_artifact_id,native_manifest.logical.content_sha256)==(source.history_arrays.artifact_id,source.history_arrays.sha256)
     with pytest.raises(ArtifactIdentityConflict,match='binding differs'):
@@ -138,16 +139,16 @@ def cold_reproof(*,proof,output,plane,case,draft,original,before_native,factorie
     source,parameter,_,_,*_=case
     current=case[-1]
     native_manifest_path=next((original/'runs/test.e4.run/native-subwork').rglob('outputs/arrays.manifest.json'))
-    native_manifest=decode_artifact_manifest(native_manifest_path.read_bytes())
+    native_manifest=resolve_artifact_sidecar_bytes(plane, native_manifest_path.read_bytes())
     native_path=original/native_manifest.materialization.relative_path
     with pytest.raises(ArtifactIdentityConflict,match='binding differs'):
         opened(_plane(original),native_manifest,artifact_id='test.substituted-native-alias')
     def blocked(*args,**kwargs):
         pytest.fail('cold installed PURE reproof entered a producer/eigensolver/native/RNG path')
     monkeypatch.setattr(science,'measure',blocked)
-    monkeypatch.setattr('empirical_lawhood.adapters.methods.matrix_parameter_factor.scalar.measure',blocked)
-    monkeypatch.setattr('empirical_lawhood.adapters.simulators.six_matrix_response.parameter_source.acquire_parameter_history',blocked)
-    monkeypatch.setattr('empirical_lawhood.adapters.simulators.six_matrix_response.simulation.baoab_step_with_hermitian_noise',blocked)
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.matrix_parameter_factor.scalar.measure',blocked)
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.six_matrix_response.parameter_source.acquire_parameter_history',blocked)
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.six_matrix_response.simulation.baoab_step_with_hermitian_noise',blocked)
     monkeypatch.setattr(np.linalg,'eigh',blocked)
     monkeypatch.setattr(np.linalg,'eigvalsh',blocked)
     monkeypatch.setattr(np.random,'Generator',blocked)

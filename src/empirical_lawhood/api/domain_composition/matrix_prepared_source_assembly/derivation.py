@@ -1,20 +1,20 @@
 # SPDX-License-Identifier: MPL-2.0
 """Registered source preprocessing; the target keeps ordinary prospective guards."""
 from pathlib import Path
-from ...experiment_preparation import load_experiment_inputs,prepare_experiment
-from ...matrix_programme_e4_inputs import prepared_source_lineage
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess,inherited_visibility
-from empirical_lawhood.runtime.artifacts import ArtifactProfile,ArtifactWriteRequest,derived_outcome_access
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
+from empirical_lawhood.api.matrix_programme_e4_inputs import prepared_source_lineage
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, inherited_visibility
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, derived_outcome_access
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
 
 def derive_input_selection(*,specification,source_selection_path,project_root,artifact_writer,metadata_directory,output_selection_path,execution, read_access=None):
-    from .assembly import assembled_prepared_source_inputs
+    from empirical_lawhood.api.domain_composition.matrix_prepared_source_assembly.assembly import assembled_prepared_source_inputs
 
 
     inputs=load_experiment_inputs(specification,source_selection_path, artifact_writer=artifact_writer, read_access=read_access)
-    from empirical_lawhood.adapters.methods.matrix_prepared_source_assembly import validate_inputs
+    from empirical_lawhood.domains.matrix.matrix_prepared_source_assembly import validate_inputs
     validate_inputs(specification,inputs.method_inputs,complete=True)
     with assembled_prepared_source_inputs(assembly_specification=specification,
         assembly_inputs=inputs.method_inputs,project_root=project_root,artifact_writer=artifact_writer,

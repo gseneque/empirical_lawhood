@@ -23,5 +23,7 @@ Historical source paths identify original custody, not new executable selections
 | [Current algebra and passive history protocol](matrix-history-analysis-v1.md) | Finding, assessment or retained checkpoint |
 | [Matrix matched response forecasts](matrix-matched-forecast.md) | Finding, assessment or retained checkpoint |
 | [Matrix origin response mechanics and IO48](matrix-origin-response.md) | Finding, assessment or retained checkpoint |
+| [SCI01 retained fixed-basis refresh](matrix-sci01-retained-refresh-v1.md) | Separate exposed successor protocol and method assessment |
+| [Receiver-specific classical matrix results, M0–M7](model-free-receiver-results.md) | Five completed studies with scoped scientific decisions, costs and ordinary-read hashes |
 | [Matrix E1–E6 scientific contract](matrix-programme.md) | Finding, assessment or retained checkpoint |
 | [Retained Matrix programme results for the release](release-results.md) | Finding, assessment or retained checkpoint |

@@ -6,12 +6,12 @@ from __future__ import annotations
 from dataclasses import replace
 from decimal import Decimal
 import pytest
-from empirical_lawhood.kernel.authority import AuthorityAction, AuthorityPolicy, ResourceBudget, SourceAccessClass
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.kernel.quantities import QuantityKind, QuantitySpec, ResponseDirection
-from empirical_lawhood.kernel.systems import BalanceRole, IndependentUnitSpec, PortDirection, PortSpec, RelationalIdentity, SystemBoundaryKind, SystemSpec
-from empirical_lawhood.kernel.time import AvailabilitySpec, CausalPhase, ClockLabelSemantics, ClockSpec, HoldSemantics, HorizonSpec, SamplingSemantics
-from empirical_lawhood.kernel.worlds import ComputabilityEnvelope, NumericalCoordinateKind, NumericalCoordinateSpec, NumericalViewSpec, RandomnessSemantics, WorldKind, WorldSpec
+from empirical_lawhood.science.identity.authority import AuthorityAction, AuthorityPolicy, ResourceBudget, SourceAccessClass
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.models.quantities import QuantityKind, QuantitySpec, ResponseDirection
+from empirical_lawhood.science.models.systems import BalanceRole, IndependentUnitSpec, PortDirection, PortSpec, RelationalIdentity, SystemBoundaryKind, SystemSpec
+from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase, ClockLabelSemantics, ClockSpec, HoldSemantics, HorizonSpec, SamplingSemantics
+from empirical_lawhood.science.models.worlds import ComputabilityEnvelope, NumericalCoordinateKind, NumericalCoordinateSpec, NumericalViewSpec, RandomnessSemantics, WorldKind, WorldSpec
 
 
 @pytest.fixture

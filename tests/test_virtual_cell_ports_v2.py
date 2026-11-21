@@ -7,27 +7,18 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.compiler import _compile_step, _template_order
-from empirical_lawhood.runtime.plans import ExecutionTask, PlanLane, ProtocolExecutionPlan
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.compiler import _compile_step, _template_order
+from empirical_lawhood.execution.plans import ExecutionTask, PlanLane, ProtocolExecutionPlan
 
-from empirical_lawhood.adapters.physical.virtual_cell import protocol, system
-from empirical_lawhood.adapters.physical.virtual_cell.contracts import (
-    LeaderboardSnapshot,
-    VirtualCellSourceManifest,
-    VirtualCellSourceObject,
-    VirtualCellSourcePart,
-    VirtualCellSplit,
-)
-from empirical_lawhood.adapters.physical.virtual_cell.custody_transport_v2 import CanonicalEvidenceV2
-from empirical_lawhood.adapters.physical.virtual_cell.ports_v2 import (
-    ORIGINAL_CONFIG_INPUT_ID_V2,
-    project_template_v2,
-    virtual_cell_capability_registry_v2,
-)
+import empirical_lawhood.domains.biology.virtual_cell.protocol as protocol
+import empirical_lawhood.domains.biology.virtual_cell.system as system
+from empirical_lawhood.domains.biology.virtual_cell.contracts import LeaderboardSnapshot, VirtualCellSourceManifest, VirtualCellSourceObject, VirtualCellSourcePart, VirtualCellSplit
+from empirical_lawhood.domains.biology.virtual_cell.custody_transport_v2 import CanonicalEvidenceV2
+from empirical_lawhood.domains.biology.virtual_cell.ports_v2 import ORIGINAL_CONFIG_INPUT_ID_V2, project_template_v2, virtual_cell_capability_registry_v2
 from empirical_lawhood.adapters.physical.virtual_cell.provider_v2 import VirtualCellCampaignRuntimeProviderV2
-from empirical_lawhood.adapters.physical.virtual_cell.registry import virtual_cell_capability_keys, virtual_cell_capability_registry
+from empirical_lawhood.domains.biology.virtual_cell.capabilities import virtual_cell_capability_keys, virtual_cell_capability_registry
 from tests.test_virtual_cell_custody_v2 import fixture
 from tests.test_virtual_cell_runtime_v2 import _selection
 

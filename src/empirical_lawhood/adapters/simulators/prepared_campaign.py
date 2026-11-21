@@ -7,76 +7,31 @@ from decimal import Decimal
 import hashlib
 from typing import Any, Callable
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, EvidenceRung, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experiments import ExperimentSpec
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    canonical_json_bytes,
-    require_sorted_unique_strings,
-    validate_relative_locator,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.kernel.status import AdmissionStatus, ReadinessStatus, ScientificStatus
-from empirical_lawhood.kernel.systems import SystemSpec
-from empirical_lawhood.kernel.worlds import NumericalCoordinateKind, NumericalCoordinateSpec
-from empirical_lawhood.planning.experiment_entry import StudyDefinition
-from empirical_lawhood.planning.campaigns import CampaignSpec
-from empirical_lawhood.planning.formal_analysis import (
-    FormalGapSourceCapabilityInventory,
-    FormalMethodCatalog,
-)
-from empirical_lawhood.planning.formal_gaps import FormalGapCoverage, FormalGapRegister
-from empirical_lawhood.planning.study_authoring import CapabilitySelection, DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, MaterializationQualificationReceipt, StudyDraft, StudyDraftLifecycle, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-)
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactProfile,
-    ReceiptCheck,
-)
-from empirical_lawhood.runtime.candidate_compiler import AuthoringMaterializationIdentity, CandidateCompilationContext, CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole, StandardCandidateCompilationContext, StudyCompilationReport, compile_study_candidate, required_candidate_obligation_ids
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    StreamingOutputEmitter,
-    TaskContext,
-    TaskOutputPayload,
-    TaskRunner,
-)
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    CapabilityOutputSemanticContract,
-    ExternalInputPayload,
-)
-from empirical_lawhood.runtime.source_resolution import (
-    SourceMaterializationConfig,
-    SourceReadMode,
-)
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, EvidenceRung, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experiments import ExperimentSpec
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes, require_sorted_unique_strings, validate_relative_locator, validate_sha256, validate_stable_id
+from empirical_lawhood.science.records.status import AdmissionStatus, ReadinessStatus, ScientificStatus
+from empirical_lawhood.science.models.systems import SystemSpec
+from empirical_lawhood.science.models.worlds import NumericalCoordinateKind, NumericalCoordinateSpec
+from empirical_lawhood.design.experiment_entry import StudyDefinition
+from empirical_lawhood.design.campaigns import CampaignSpec
+from empirical_lawhood.design.formal_analysis import FormalGapSourceCapabilityInventory, FormalMethodCatalog
+from empirical_lawhood.design.formal_gaps import FormalGapCoverage, FormalGapRegister
+from empirical_lawhood.design.study_authoring import CapabilitySelection, DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, MaterializationQualificationReceipt, StudyDraft, StudyDraftLifecycle, SourceAccessDisposition, SourceMaterializationRef, SourceMaterializationRole
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.candidate_compiler import AuthoringMaterializationIdentity, CandidateCompilationContext, CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole, StandardCandidateCompilationContext, StudyCompilationReport, compile_study_candidate, required_candidate_obligation_ids
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.execution import RunnerResult, StreamingOutputEmitter, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload
+from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
 
-from .open_campaigns import (
-    OpenSimulatorKind,
-    OpenSimulatorSourceManifest,
-    _entry_package,
-    build_open_simulator_authoring_bundle,
-    open_simulator_campaign,
-    open_simulator_experiment,
-    open_simulator_formal_catalog,
-    open_simulator_system,
-)
-from .prepared_base import DevelopmentDecision, EvaluationAdjudication, PreparedBaseAcquisitionBatch, PreparedBaseConfig, PreparedBaseStage, PREPARED_SOURCE_PRIMARY_VIEW_ID, PREPARED_SOURCE_REFINED_VIEW_ID, PreparedBasePrimaryResult, acquire_stage, adjudicate_development, adjudicate_evaluation, development_cells, evaluation_master_cells
+from empirical_lawhood.domains.simulators.open_campaigns import OpenSimulatorKind, OpenSimulatorSourceManifest, _entry_package, build_open_simulator_authoring_bundle, open_simulator_campaign, open_simulator_experiment, open_simulator_formal_catalog, open_simulator_system
+from empirical_lawhood.domains.fusion.prepared_base import DevelopmentDecision, EvaluationAdjudication, PreparedBaseAcquisitionBatch, PreparedBaseConfig, PreparedBaseStage, PREPARED_SOURCE_PRIMARY_VIEW_ID, PREPARED_SOURCE_REFINED_VIEW_ID, PreparedBasePrimaryResult, adjudicate_development, adjudicate_evaluation, development_cells, evaluation_master_cells
+from empirical_lawhood.adapters.simulators.prepared_base import acquire_stage
 
 
 _VERSION = "1.0.0"
@@ -1165,7 +1120,7 @@ class PreparedBaseConfigDecoder:
         return self.manifest.capability_version
 
     def validate_config(self, payload: bytes, *, expected_schema: str) -> None:
-        from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
         if expected_schema != PreparedBaseConfig.SCHEMA:
             raise ValueError("prepared-base config schema differs")
@@ -1194,7 +1149,7 @@ class PreparedBaseTaskRunner:
 
     @staticmethod
     def _decode_config(context: TaskContext) -> PreparedBaseConfig:
-        from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
         ports = tuple(
             value
@@ -1221,7 +1176,7 @@ class PreparedBaseTaskRunner:
         return matches[0]
 
     def execute(self, context: TaskContext) -> RunnerResult:
-        from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
         config = self._decode_config(context)
         if config != self.bundle.capability_config:

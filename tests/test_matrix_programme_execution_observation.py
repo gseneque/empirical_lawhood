@@ -5,9 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import (
-    PHASES, MatrixProgrammeObservation, programme_frontier,
-)
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import PHASES, MatrixProgrammeObservation, programme_frontier
 from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService, _phase_complete
 
 
@@ -102,7 +100,7 @@ def test_advance_uses_the_immediate_owner_read_without_a_second_or_final_replay(
 
 @pytest.mark.parametrize('operational', (False, True))
 def test_explicit_full_observation_still_uses_the_full_owner_reader(monkeypatch, operational):
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
     service = MatrixResearchProgrammeService(service=SimpleNamespace(artifact_writer=object()))
     context = SimpleNamespace(observations={}, bindings={'e1': object(), 'e2': object(), 'train': object()})
     calls = []

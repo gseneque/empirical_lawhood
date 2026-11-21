@@ -1,0 +1,9 @@
+{
+  "old_module": "empirical_lawhood.methods.structural_recurrence_runtime",
+  "moved_symbols": {
+    "MarginStructuralRecurrenceForecastFrozenSourceFile": "empirical_lawhood.science.identity.structural_recurrence_source",
+    "MarginStructuralRecurrenceForecastMethodSourceManifest": "empirical_lawhood.science.identity.structural_recurrence_source",
+    "method_source_manifest": "empirical_lawhood.storage.structural_recurrence_source"
+  },
+  "preservation": "Canonical schema strings,7-file roster,byte limits andsource digest semantics retained. No old public forwarding function remains."
+}

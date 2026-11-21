@@ -4,9 +4,9 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import physical_forecast_implementation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import physical_forecast_implementation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def test_selected_manifest_has_exact_full_roster_bytes_and_constructs_only_its_owner(monkeypatch):

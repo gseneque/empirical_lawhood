@@ -14,16 +14,16 @@ import sys
 import h5py
 import numpy as np
 
-from empirical_lawhood.adapters.methods.analytic_material_inquiry import science as material
-from empirical_lawhood.adapters.physical.virtual_cell.contracts import MatrixEncoding, VirtualCellSplit
+from empirical_lawhood.domains.materials.analytic_material_inquiry import science as material
+from empirical_lawhood.domains.biology.virtual_cell.contracts import MatrixEncoding, VirtualCellSplit
 from empirical_lawhood.adapters.physical.virtual_cell.dataset import inspect_h5ad
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.native_quickstart import UniformElectronGasAnalyticReferenceConfig
-from empirical_lawhood.infrastructure.bounded_io import bounded_file_sha256, copy_bounded_file
-from empirical_lawhood.infrastructure.matrix_array_io import iter_worker_matrix_array_chunks
-from empirical_lawhood.infrastructure.recursive_custody import iter_exact_custody_file_chunks, iter_recursive_product_records
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactProfile, ArtifactStreamWriteRequest
+from empirical_lawhood.domains.materials.electron_gas.native_quickstart import UniformElectronGasAnalyticReferenceConfig
+from empirical_lawhood.storage.bounded_io import bounded_file_sha256, copy_bounded_file
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import iter_worker_matrix_array_chunks
+from empirical_lawhood.storage.recursive_custody import iter_exact_custody_file_chunks, iter_recursive_product_records
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactProfile, ArtifactStreamWriteRequest
 from tests.rubisco_nomination_fixture import sources
 from tests.test_battery_thermal_service import _trace
 from tests.test_matrix_array_worker_delivery import stock

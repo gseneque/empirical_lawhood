@@ -8,22 +8,22 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.adapters.composition import generated_extension_bundles as installed
-from empirical_lawhood.adapters.methods.analytic_material_inquiry.recursive_translation import supply_draft
-from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.native_quickstart import UniformElectronGasAnalyticReferenceConfig
+import empirical_lawhood.api.generated_experiment_protocols as installed
+from empirical_lawhood.domains.materials.analytic_material_inquiry.recursive_translation import supply_draft
+from empirical_lawhood.domains.materials.electron_gas.native_quickstart import UniformElectronGasAnalyticReferenceConfig
 from empirical_lawhood.api import experiment_preparation
 from empirical_lawhood.api import experiment_scientific_read as owner
 from empirical_lawhood.api import generated_experiment_runtime_bindings as generated
 from empirical_lawhood.api import recursive_authoring as author
 from empirical_lawhood.api import recursive_execution as execution
 from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding, validate_experiment_runtime_binding
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.recursive_authoring import RecursiveScientificSelection
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding, ExperimentProtocolDeclaration, ExperimentRuntimeBinding
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.recursive_authoring import RecursiveScientificSelection
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding, ExperimentProtocolDeclaration, ExperimentRuntimeBinding
 from tests.test_recursive_public_service import _plane
 from tests.test_recursive_report_projection import wave as wave
 
@@ -208,7 +208,8 @@ def test_operational_access_preflight_rechecks_owner_without_opening_products(co
     def validate(**kwargs):
         checks.append(kwargs)
     binding = replace(context.binding, bind_development_runtime=_forbidden,
-        validate_development_read_access=validate, complete_development_result=lambda **kwargs: completions.append(kwargs))
+        validate_development_read_access=validate,
+        complete_development_result=lambda **kwargs: (completions.append(kwargs) or {"status": "SUCCEEDED"}))
     declaration = replace(context.declaration, requires_development_runtime_binding=True)
     monkeypatch.setattr(generated, "EXPERIMENT_RUNTIME_BINDINGS", (binding,))
     monkeypatch.setattr(installed, "EXPERIMENT_PROTOCOL_DECLARATIONS", (declaration,))
@@ -362,7 +363,7 @@ def authored_specification(tmp_path, monkeypatch):
         (_Specification.SCHEMA, _Specification.VERSION, declaration.protocol_id)))
     plane = _plane(tmp_path / "single-load-control")
     root = Path(plane.root.contract.canonical_path)
-    from empirical_lawhood.infrastructure.artifacts import GuardedExternalRoot
+    from empirical_lawhood.storage.artifacts import GuardedExternalRoot
     mount = next(parent for parent in root.parents if parent.is_mount())
     plane.root = GuardedExternalRoot(replace(plane.root.contract, required_mount_path=str(mount)))
     path = root / "source.json"
@@ -423,7 +424,7 @@ def test_unexecuted_read_refuses_changed_member_in_an_independent_invocation(aut
 
 
 def test_unexecuted_read_rechecks_absence_after_its_custody_scope_closes(authored_specification, monkeypatch):
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
 
     case = authored_specification
     run_path = case.plane.root.resolve("runs/" + case.report["run_id"], for_write=False)

@@ -6,7 +6,7 @@ import pytest
 
 from empirical_lawhood.api.recursive_execution import _provenance
 from empirical_lawhood.api.recursive_unentered import require_input_only_run
-from empirical_lawhood.infrastructure.artifact_stream_primitives import ArtifactIdentityConflict
+from empirical_lawhood.storage.artifact_stream_primitives import ArtifactIdentityConflict
 from tests.numerical_provenance_fixtures import numerical_plane
 from tests.test_rubisco_kinetic_declaration import _profile_provenance
 

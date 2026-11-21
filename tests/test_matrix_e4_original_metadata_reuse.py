@@ -13,10 +13,10 @@ import pytest
 
 from empirical_lawhood.api import matrix_programme_e4_inputs as owner
 from empirical_lawhood.api import recursive_qualified_parents as parents
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.decoding import _decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, ArtifactIdentityConflict
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.records.decoding import _decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
 from tests.test_current_result_custody import actual_issued_current_task_controls  # noqa: F401
 from tests.test_selected_e3_current_access import literal_originals, evidence
 

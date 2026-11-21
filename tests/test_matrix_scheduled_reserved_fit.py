@@ -6,12 +6,12 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_prediction as prediction
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole as Role
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records
-from empirical_lawhood.kernel.evidence import VisibilityCeiling
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort
+from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_prediction as prediction
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole as Role
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records
+from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.execution.execution import VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerInputPort
 from tests.test_matrix_factor_confirmation_eligibility import publish
 from tests.test_matrix_factor_confirmation_eligibility import provenance as provenance
 from tests.test_matrix_factor_confirmation_eligibility import stock as stock

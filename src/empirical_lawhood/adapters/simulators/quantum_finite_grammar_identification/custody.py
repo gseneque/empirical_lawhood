@@ -7,7 +7,7 @@ from hashlib import sha256
 from pathlib import PurePosixPath
 from typing import Mapping, Sequence
 
-from .contracts import Disposition
+from empirical_lawhood.domains.quantum.finite_grammar_identification.contracts import Disposition
 
 
 def validate_relative_path(relative_path: str) -> None:

@@ -3,20 +3,19 @@
 
 from dataclasses import fields, replace
 from decimal import Decimal
-from hashlib import sha256
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as p
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import control_contracts as c, control_roster, nve_contracts, nve_roster, nve_science
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.nve_preparation_admission import SerializedPreparationNVEControlPlan, decode_plan
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.serialized_nve_custody import ChemicalForceCustodySupply, SerializedCustodyNVEControlPlan
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.status import OperationalStatus
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as p
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import control_contracts as c, control_roster, nve_contracts, nve_roster, nve_science
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.nve_preparation_admission import SerializedPreparationNVEControlPlan, decode_plan
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.serialized_nve_custody import ChemicalForceCustodySupply, SerializedCustodyNVEControlPlan
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.records.status import OperationalStatus
 from tests.test_rubisco_nve_durable_controls import full_state, full_system, native_text
 from tests.test_rubisco_serialized_durable_chemical_admission import durable_admitted as durable_admitted, reuse_admitted as reuse_admitted, original as original
 
@@ -136,8 +135,3 @@ def test_independent_or_unknown_admission_refuses_before_contact(admitted, chang
             old = plan.admitted_parents[0]
             replace(plan, admitted_parents=((old[0], old[1], old[2], old[3], replace(old[4], object_fingerprint="1"*64), old[5]),))
         nve_science.validate_operands(plan, source, (row.relaxed,), custody)
-
-
-def test_preserved_accepted_legacy_record_and_numerical_owners():
-    root = Path(__file__).resolve().parents[1]/"src/empirical_lawhood/adapters/methods/rubisco_insilico_sampling"
-    assert sha256((root/"nve_contracts.py").read_bytes()).hexdigest() == "56d98187056b49a1b56a591e1183460c472b7b40339620655df5b3b166fc2114"

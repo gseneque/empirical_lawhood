@@ -8,8 +8,8 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api.matrix_researcher_programme_prepared_lineage import require_current_account
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixResearchProgrammeSpecification
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixResearchProgrammeSpecification
 from tests.test_matrix_selected_opportunity import opportunity  # noqa: F401
 from tests.test_matrix_selected_protected import confirmation, transfer  # noqa: F401
 
@@ -90,8 +90,8 @@ def test_initialization_has_no_invented_account_field_and_still_joins_exact_c(ph
 @pytest.mark.parametrize('phase', ('e5.source', 'e6.source'))
 def test_original_prepared_source_keeps_instrument_controls_after_failed_nomination(confirmation, transfer, opportunity, phase):  # noqa: F811
     from tests.test_matrix_prepared_source import prepared_bank, disclosed_certificate
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_records as controls, matrix_prepared_source_assembly as source
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_opportunity import nominate_selected_opportunity
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_records as controls, matrix_prepared_source_assembly as source
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_opportunity import nominate_selected_opportunity
     from tests.test_matrix_selected_opportunity import literal_observations
     unadmitted = replace(opportunity, criterion=replace(opportunity.criterion, normalized_error_maximum=Decimal(999)))
     _, nomination = nominate_selected_opportunity(unadmitted, literal_observations(unadmitted), result_id='nomination.disclosed.unadmitted')

@@ -8,33 +8,15 @@ import json
 import sys
 from types import SimpleNamespace as N
 import pytest
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry import (
-    native as original_native,
-    science as original_science,
-)
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import (
-    BatteryInquirySource,
-    BatteryInquirySupply,
-    BatteryInquiryTrace,
-    BatteryInquiryChargingAttempt,
-)
-from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic import (
-    science,
-    native,
-    operation_bindings as owner,
-)
-from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic.contracts import (
-    DiagnosticSource,
-    DiagnosticChargingAttempt,
-    DiagnosticTrace,
-    DiagnosticResult,
-)
-from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic.recursive_translation import (
-    draft_from_config,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.adapters.battery.battery_thermal_inquiry import native as original_native
+from empirical_lawhood.domains.battery.battery_thermal_inquiry import science as original_science
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquirySource, BatteryInquirySupply, BatteryInquiryTrace, BatteryInquiryChargingAttempt
+from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic import science, native, operation_bindings as owner
+from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic.contracts import DiagnosticSource, DiagnosticChargingAttempt, DiagnosticTrace, DiagnosticResult
+from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic.recursive_translation import draft_from_config
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_battery_thermal_inquiry import _exposed_trace
 from tests.test_inquiry_successor_compilation import compile_complete_draft
 
@@ -231,19 +213,17 @@ def test_cold_discovery_has_no_native_import():
         [
             sys.executable,
             "-c",
-            "import sys; from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic.executable_binding import EXECUTABLE_BINDING_FACTORIES; assert len(EXECUTABLE_BINDING_FACTORIES)==1; assert 'pybamm' not in sys.modules",
+            "import sys; from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic.extension import EXTENSION; assert len(EXTENSION.factories)==1; assert 'pybamm' not in sys.modules",
         ],
         check=True,
     )
 
 
 def test_actual_product_hooks_require_receipt_and_export_only_analysis():
-    from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic import (
-        recursive_translation as drafts,
-    )
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.kernel.recursive_requirements import ContributionRole
+    from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic import recursive_translation as drafts
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
 
     rows = tuple(exposed(c) for c in config_rows())
     result = DiagnosticResult(
@@ -391,20 +371,11 @@ def test_converged_service_negative_resolves_precision_without_delivery():
 
 
 def unsigned_parent(row):
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.kernel.scientific_contributions import (
-        ContributionProduct,
-        ContributionManifest,
-    )
-    from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-    from empirical_lawhood.kernel.evidence import (
-        EvidenceCeiling,
-        OutcomeAccess,
-        VisibilityCeiling,
-    )
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import (
-        scope,
-    )
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.science.inquiry.scientific_contributions import ContributionProduct, ContributionManifest
+    from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import scope
 
     # Unsigned portable metadata seam only: known actual operand identity, no invented scientific payload.
     product = ContributionProduct(
@@ -449,25 +420,12 @@ def unsigned_parent(row):
 
 
 def test_parent_origin_preserves_negative_procedure_design_role_and_model_graph():
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.kernel.scientific_contributions import (
-        ContributionProduct,
-        ContributionManifest,
-    )
-    from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-    from empirical_lawhood.kernel.evidence import (
-        EvidenceCeiling,
-        OutcomeAccess,
-        VisibilityCeiling,
-    )
-    from empirical_lawhood.planning.recursive_input_origins import (
-        RecursiveInputOrigin,
-        RecursiveInputOriginKind,
-        RecursiveInputOrigins,
-    )
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import (
-        scope,
-    )
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.science.inquiry.scientific_contributions import ContributionProduct, ContributionManifest
+    from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import scope
 
     row = config_rows()[0]
     # Unsigned portable metadata seam only: known actual operand identity, no invented scientific payload.
@@ -562,7 +520,7 @@ def test_parent_origin_preserves_negative_procedure_design_role_and_model_graph(
 
 
 def test_exact_evidential_condition_and_precision_phases_do_not_qualify_delivery():
-    from empirical_lawhood.kernel.recursive_requirements import AssessmentPhase
+    from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentPhase
 
     row = config_rows()[0]
     config = owner.DiagnosticOperationConfig(

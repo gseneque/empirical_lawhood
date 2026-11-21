@@ -9,20 +9,18 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_composition as composition
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_closeout_execution import (
-    ConfiguredE3CALRootCloseout, ConfiguredE3ClosedExecution, ConfiguredE3MissingOutcomeProducts,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error, selected_configs, task_id
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import source_binding
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3ClosedPreparationSelection
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_unfinished_execution import ConfiguredE3CompletedOutput
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.execution_envelope import RunExecutionResourceEnvelope
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.recovery import RunRecoveryIndex
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_composition as composition
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_closeout_execution import ConfiguredE3CALRootCloseout, ConfiguredE3ClosedExecution, ConfiguredE3MissingOutcomeProducts
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error, selected_configs, task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import source_binding
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3ClosedPreparationSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_unfinished_execution import ConfiguredE3CompletedOutput
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.execution_envelope import RunExecutionResourceEnvelope
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.recovery import RunRecoveryIndex
 from tests.test_matrix_e3_unfinished_continuation import (
     unfinished_case, continuation_case, public_case, _changed_source, _unexecuted_receipt, _pin,  # noqa: F401
     test_unfinished_compiler_keeps_completed_work_out_of_execution as check_compiler,
@@ -105,8 +103,8 @@ def test_closed_cal_compiles_only_missingness_and_original_confirmation(closeout
 
 
 def test_closed_resource_envelope_keeps_only_confirmation_demand(closeout_case):
-    from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeSpec
-    from empirical_lawhood.runtime.study_issue import IssuedExtensionSet
+    from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeSpec
+    from empirical_lawhood.execution.study_issue import IssuedExtensionSet
 
     case = closeout_case
     resources = case.lowered.resource_selection
@@ -153,7 +151,7 @@ def test_closeout_refuses_changed_missingness_and_original_denominators(closeout
 
 
 def test_closed_selection_cannot_enter_original_no_contact_projection(closeout_case):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3UnfinishedPreparationSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3UnfinishedPreparationSelection
     case = closeout_case
     with pytest.raises(ValueError, match='source continuation'):
         ConfiguredE3UnfinishedPreparationSelection(**{field.name: getattr(case.selection, field.name)
@@ -174,7 +172,7 @@ def test_closeout_preserves_absent_terminal_with_exact_original_controls(closeou
 @pytest.mark.parametrize('state', ('unknown', 'launched', 'reserved', 'wrong-root', 'hidden-attempt'))
 def test_closeout_keeps_unknown_resource_cost_without_terminal_or_completion(resource_case, state):  # noqa: F811
     from empirical_lawhood.api.configured_e3_closeout_custody import _closed_resources
-    from empirical_lawhood.runtime.execution_envelope import RunExecutionResourceEnvelopeMachine as Machine
+    from empirical_lawhood.execution.execution_envelope import RunExecutionResourceEnvelopeMachine as Machine
     case = resource_case
     node, attempt = case.failed.task_id, case.failed_event.attempt_id
     common = dict(cell_id=case.envelope.spec.cell_for_task(node).cell_id,

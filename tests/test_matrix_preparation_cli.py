@@ -18,7 +18,7 @@ def _invoke(*arguments):
 
 
 def test_public_copy_edit_prepare_transfer_baseline_result_journey(tmp_path, monkeypatch, operands):  # noqa: F811 - pytest resolves the imported fixture
-    from empirical_lawhood.adapters.methods.matrix_preparation_analysis.records import BaselineSupportConfig, TransientAnalysisConfig
+    from empirical_lawhood.domains.matrix.matrix_preparation_analysis.records import BaselineSupportConfig, TransientAnalysisConfig
     native, bridge, original, _, _, _, _ = operands
     plane = numerical_plane(tmp_path)
     monkeypatch.setattr("empirical_lawhood.cli.integrations._storage", lambda: (PROJECT_ROOT, None, plane))
@@ -53,7 +53,7 @@ def test_public_full_tangent_configuration_source_evaluator_result(tmp_path, mon
                         "--master-seed", "90232", "--output", str(config), "--attempt-dir", str(tmp_path / "allocation-attempt"))
     assert allocated["status"] == "PREPARED"
     _invoke("config", "validate", "--config", str(config), "--consumer", "matrix-tangent", "--format", "json")
-    monkeypatch.setattr("empirical_lawhood.adapters.methods.matrix_preparation_analysis.tangent.acquire_tangent_root", _software_source)
+    monkeypatch.setattr("empirical_lawhood.adapters.simulators.matrix_preparation.tangent.acquire_tangent_root", _software_source)
     source, analysis = store / "source", store / "analysis"
     result = _invoke("campaign", "matrix-tangent-source-export", "--input", str(config), "--output", str(source), "--attempt-dir", str(tmp_path / "source-attempt"))
     assert result["status"] == "EXPOSED_TANGENT_SOURCE"
@@ -66,7 +66,7 @@ def test_public_full_tangent_configuration_source_evaluator_result(tmp_path, mon
 
 
 def test_invalid_cli_destination_precedes_current_input_contact(tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_preparation_analysis.records import TransientAnalysisConfig
+    from empirical_lawhood.domains.matrix.matrix_preparation_analysis.records import TransientAnalysisConfig
     _, store = _rc_cli_plane(tmp_path, monkeypatch)
     config = tmp_path / "input.json"
     config.write_bytes(TransientAnalysisConfig("test.denied").canonical_bytes())

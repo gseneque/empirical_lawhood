@@ -1,59 +1,58 @@
-# Run your first example
+# Install EL and run the first investigation
 
 SPDX-License-Identifier: CC-BY-4.0
 
-This guide installs the reactor example and produces a readable report.
-It introduces the configure, run and inspect sequence used by the engine.
-Use a source checkout or source distribution and select a new output directory.
+This guide selects the environment for the first recursive investigation.
+The example uses exposed mass observations and pure Decimal arithmetic.
+Install the source, then follow the complete investigation recipe.
 
 ## Prerequisites
 
-The tested host is Linux x86-64 with CPython 3.11.14.
-Start in an unactivated shell at the source root.
-Read the [environment support table](using/environments.md) before selecting a different profile.
+Use Linux x86-64 and CPython 3.11.14 for the documented release environment.
+The example requires no GPU, native solver, cloud account or signing key.
+Choose a new writable directory for its inputs and retained results.
 
-## Install and run
+For a source checkout or extracted source distribution:
 
 ```sh
-uv sync --locked --python 3.11.14 --group reactor-example
+uv sync --locked --python 3.11.14
 uv run --no-sync empirical-lawhood --help
-uv run --no-sync empirical-lawhood doctor --route reactor --format json
-uv run --no-sync empirical-lawhood capability list --limit 5 --format json
-uv run --no-sync empirical-lawhood example reactor-prefix --output-dir ./example-output/reactor-prefix
+uv run --no-sync empirical-lawhood workflow show mass-balance-starter --format json
 ```
 
-Select another explicit output directory if this destination already contains a run.
-After environment selection, use `uv run --no-sync` for subsequent commands.
+Select the environment once, then use `uv run --no-sync` for later commands.
+The [environment guide](using/environments.md) owns optional dependencies and frozen numerical settings.
+A solver-specific investigation uses its declared profile.
 
-## Read the report
+## First investigation
 
-Open `example-output/reactor-prefix/report.md` first.
-The example uses packaged public inputs and performs 20 short native branches
-with 40 observed decisions.
+Follow [Define or modify an investigation](v1.0/define-investigation.md).
+It gives the complete inputs, commands, expected results and failure handling.
+The predictor calculates final mass from initial and added mass.
+A separate assessment compares its retained predictions with supplied observations.
 
-| Output | Purpose |
-|---|---|
-| `report.md` | Readable findings and limits |
-| `report.json` | Exact clocks and summaries |
-| `panel.json` | Canonical episode record |
+The guide retains all three cases: supported, falsified and unevaluable.
+Its three independent units are exposed examples, not fresh physical evidence.
+Successful execution supplies no scientific qualification.
 
-An input is prepared, a fixed response route is applied, and the records show
-whether the declared conditions were met.
-This is an unqualified local numerical demonstration.
-Its five independent units contain nested arms and numerical views.
-The fixed exposed inputs provide no fresh independent support and do not
-reproduce the paper's historical observations.
-The example needs no operator profile or scientific authority.
-Other workflows retain their own requirements.
+## Installed usage
 
-## Choose the next action
+Install the release wheel into the selected environment.
+Use the wheel's matching source distribution for editable examples and source-bound operations.
+The distribution metadata's `Documentation` URL identifies its source revision.
 
-- [Change the RC model](../programmes/foundations/measurement-and-response/workflows/rc-ladder-response/guide.md).
-- [Inspect the reactor study and its assigned lifecycle](../programmes/foundations/measurement-and-response/workflows/reactor-response/guide.md).
-- [Choose a research programme](../programmes/README.md).
-- [Design and run a supported study](using/designing-and-running-an-experiment.md).
-- [Interpret results, refusals and interrupted attempts](using/results-and-failures.md).
+An activated installed environment uses the same commands without the `uv run --no-sync` prefix.
+Public imports and operation contracts are identical in checkout and installed use.
+The wheel supplies read-only assets and implementations; mutable run data belongs in your explicit output root.
+Do not use an unrelated checkout as the installed implementation's source identity.
 
-Guide and editable input files belong to the selected source checkout or
-distribution. The installed wheel supplies the CLI, static catalogue and
-packaged example. Select the source files explicitly for other workflows.
+## Choose the next job
+
+- [Add a reusable method](v1.0/add-method.md).
+- [Add a domain or native substrate](v1.0/add-domain.md).
+- [Read the public API contract](v1.0/public-api.md).
+- [Select a research programme](../programmes/README.md).
+- [Interpret results and interrupted attempts](using/results-and-failures.md).
+
+The packaged reactor-prefix demonstration remains available through the workflow catalogue.
+The mass-balance route introduces the canonical recursive execution and custody services used by the three public jobs.

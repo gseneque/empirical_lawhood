@@ -13,12 +13,12 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import FactorLifetime
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import forecast as method, records as r, science
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import FactorLifetime
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import forecast as method, records as r, science
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_factor_confirmation_eligibility import publish, stock as source_stock
 from tests.test_matrix_parameter_history import source as parameter_template
 from tests.test_matrix_response_error_prediction import observation
@@ -89,8 +89,8 @@ def case(tmp_path_factory):
 
 @pytest.fixture(autouse=True)
 def block_producers(monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_prediction
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments, parameter_source
+    from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_prediction
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments, parameter_source
 
     def forbidden(*args, **kwargs):
         raise AssertionError('literal feature entered native acquisition, RNG, fit or eigensolve')

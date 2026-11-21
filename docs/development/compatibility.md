@@ -6,12 +6,25 @@ This policy defines the first public interface and data-contract baseline.
 It separates compatibility, tested software behavior and scientific authority.
 Use it to select a supported interface and understand an honest stopping condition.
 
+## V1.0 source interface
+
+The [three public jobs](../v1.0/README.md) and [supported v1.0 imports](../v1.0/public-api.md) are the current contributor entry points.
+V1.0 removes superseded Python module paths without import aliases or compatibility wrappers.
+The [migration record](../v1.0/migration.md) assigns each moved module to its new owner.
+Original scientific schema identifiers, canonical bytes and retained histories remain unchanged.
+Supported historical data readers preserve evidence; they do not restore retired source imports.
+
 ## Source and release identity
 
 Package metadata owns the distribution version.
 The [external release-status record](../release/release-status.md) owns the selected source, tested artifacts and software evidence.
 A version string alone does not identify a checked Git tree or qualify a scientific result.
 Publication, its date and any DOI require their separate owner selection.
+
+Built distributions bind their `Documentation` URL to the exact source commit.
+Use that link for compatible instructions.
+The matching source distribution contains the maintained guides and copied inputs.
+Repository extensions use the selected checkout, [contributor checklist](../../CONTRIBUTING.md#contributor-checklist) and [build procedure](../release/release-artifacts.md).
 
 The public baseline governs the names and contracts documented for the selected release.
 Unpublished source-project iterations do not create a compatibility promise.
@@ -37,6 +50,8 @@ no source eligibility or scientific qualification.
 Use the documented fields and effects for the selected version.
 Treat an unknown reason code as a refusal.
 Undocumented helpers, test fixtures and arbitrary retained adapter imports carry no general stability promise.
+The [extension interface guide](extension-interfaces.md) enumerates supported imports, callback API ranges and selected lifecycle profiles.
+It also records the report, input-supplier and locator-selection transition without changing canonical scientific bytes.
 The [environment guide](../using/environments.md) owns the tested platform and selected lock/profile.
 Other platforms require their own verification.
 
@@ -132,6 +147,79 @@ Historical `CLEAN_GIT_COMMIT` records retain their original bytes and verificati
 Companion removal cannot convert a selected-source packet into a historical clean-source packet.
 The [integration guide](../using/paper-study-workflows.md#one-application-handoff-and-the-existing-lifecycle) gives the shared source and custody procedure.
 
+### Consequences of a source change
+
+The supported implementation boundary is the whole selected distribution.
+Adding an unrelated adapter, changing a generated aggregate or changing the
+dependency lock can therefore change implementation identity even when the
+selected scientific operation looks unchanged. An import trace is not a
+complete source census. Registration selects installed code; scientific
+configuration cannot supply an arbitrary executable import.
+
+| Operation | Required source and effect boundary |
+| --- | --- |
+| New editable execution | Authenticate the selected committed executable, resource and copied-input census against the actual loaded checkout. Disclose documentary changes separately. A matching Git label alone is insufficient. |
+| New installed execution | Authenticate the wheel's retained build-source metadata, installed package bytes and matching source distribution. A different checkout passed as `--project-root` cannot substitute for the loaded installation. |
+| Read a retained result | Authenticate the original producing source records, complete receipts and current supported format/semantic contracts. The reader keeps its own identity and checks current access. It does not claim to have produced the result or acquire new evidence. |
+| Resume pending work | Keep the original source, lock, numerical environment and exact pending operands. A changed installation does not authorize switching implementations. Select the retained compatible installation, or a separately documented authenticated transition where one exists. |
+| Reassess a scientific claim | Apply the selected protocol's scientific admission, exposure, uncertainty and applicability rules. Software compatibility or a successful recovery supplies no requalification. |
+
+Preserve original records, installed artifacts and source distributions when
+upgrading. Completed native work and unfinished parent publication remain
+separate: receipt-based recovery may finish publication without reacquisition,
+but uncertain contact supplies no permission to replay. The
+[result and recovery guide](../using/results-and-failures.md) owns the supported
+commands and narrowly scoped source transitions. The
+[source-entry checks](../../tests/test_run_source_admission.py) and
+[original-provenance controls](../../tests/test_recursive_contribution_custody.py)
+exercise these software boundaries with disclosed fixtures.
+
+### Compare source identities
+
+Use the [source-identity recipe](../../scripts/examples/source_identity.py) to compare two selected installations or checkouts.
+It reuses their numerical provenance records and static discovery and executable aggregates.
+The report is a diagnostic. It supplies no custody, execution, reading or scientific authority.
+
+Select the matching source distribution and locked interpreter for each installation.
+Retain each observation in a new explicit directory:
+
+```sh
+uv run --no-sync python scripts/examples/source_identity.py observe \
+  --project-root /absolute/selected/source --output-dir /absolute/selected/identity-a
+```
+
+For an installed wheel, run its matching source recipe with the installed interpreter.
+Pass its retained source distribution as `--project-root`.
+For a checkout, run from that checkout with its locked environment.
+Repeat the observation for the second selected source, with a different output directory.
+
+Compare the retained observations and explicitly select the capability key and version:
+
+```sh
+uv run --no-sync python scripts/examples/source_identity.py compare \
+  --before /absolute/selected/identity-a --after /absolute/selected/identity-b \
+  --capability mass-balance.predict 1.0.0
+```
+
+The comparison prints JSON to standard output.
+It lists added, removed and changed package members, lock identities, runtime observations and source commits.
+It reports aggregate identities and the selected manifests, bundle bindings and executable declarations separately.
+An unrelated adapter can change the common bundle binding while the selected manifest and executable declaration remain equal.
+That equality cannot relax whole-distribution admission or transfer qualification.
+
+Each observation retains existing canonical records in `provenance.json`, `discovery.json` and `executables.json`.
+The reader limits each member to 16 MiB and each selection to 32 distinct capability/version pairs.
+These limits bound diagnostic input sizes. They do not bound decoded memory or the source observer's complete package scan.
+Absent historical aggregates produce `UNKNOWN`; a capability absent from both observed aggregates produces `ABSENT`.
+The recipe refuses malformed records, changed revisions, symbolic links and inconsistent aggregate references.
+An interrupted observation can omit a member. Such an incomplete observation grants no admission.
+
+The [comparison owner](../../src/empirical_lawhood/api/source_identity.py) preserves original runtime bytes and does not observe a reader runtime during comparison.
+Its canonical decoding establishes structural consistency only.
+Original receipts, source custody, current access and supported scientific readers remain necessary for retained results.
+The report distinguishes new execution, pending work, retained reading and scientific reassessment.
+Even an unchanged complete observation still requires the ordinary current admission checks.
+
 These SDK authoring functions require an explicit `artifact_writer`:
 
 | Function | Module |
@@ -156,8 +244,8 @@ A preparation check alone cannot establish that acceptance.
 ## Local catalog baseline and recovery
 
 The public SQLite catalog has `application_id=0x454C4157`, schema version `1` and Alembic head `initial_catalog`.
-[database.py](../../src/empirical_lawhood/infrastructure/sql/database.py) owns those constants.
-The [initial migration](../../src/empirical_lawhood/infrastructure/sql/migrations/versions/initial_catalog.py) owns the public tables and indexes.
+[database.py](../../src/empirical_lawhood/storage/sql/database.py) owns those constants.
+The [initial migration](../../src/empirical_lawhood/storage/sql/migrations/versions/initial_catalog.py) owns the public tables and indexes.
 There is no source-project three-revision upgrade chain in this baseline.
 Foreign database identities refuse before catalog writes.
 

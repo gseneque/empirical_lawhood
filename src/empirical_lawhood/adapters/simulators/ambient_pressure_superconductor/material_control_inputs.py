@@ -15,8 +15,8 @@ import shutil
 import tarfile
 from typing import Final
 
-from .material_source_design_contracts import MaterialStructureSpec, SolverViewFreeze
-from .material_source_design_design import build_material_roster, build_science_design
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_contracts import MaterialStructureSpec, SolverViewFreeze
+from empirical_lawhood.domains.materials.superconductivity.material_source_design_design import build_material_roster, build_science_design
 
 
 INPUT_BUNDLE_LOCATOR: Final = (

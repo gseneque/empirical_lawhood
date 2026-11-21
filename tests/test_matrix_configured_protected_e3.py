@@ -3,28 +3,28 @@
 from dataclasses import replace
 from decimal import Decimal
 import pytest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_inputs as inputs_owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as science
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_specification import ConfiguredE3CoordinateCensus
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_inputs as inputs_owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as science
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_specification import ConfiguredE3CoordinateCensus
 from tests.test_matrix_configured_e3_v2 import configured_case
 from tests.test_matrix_e3_original_publications import case as original_case  # noqa: F401
 from tests.test_matrix_e3_protected_methods import causal as original_causal, reference
 from tests.test_matrix_factor_confirmation_eligibility import publish
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as source_records, response_records
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_factor_response import experiment_methods as exposed_science
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_originals as custody
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as source_records, response_records
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_factor_response import experiment_methods as exposed_science
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_originals as custody
 
 
 
 def causal(case, unit, *, source_index=None):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_prefix_records as current
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_feature_records import ConfiguredProtectedE3CausalFeature
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_prefix_records as current
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_feature_records import ConfiguredProtectedE3CausalFeature
     source, observed = original_causal(case, unit, source_index=source_index)
     kinds = {kind.SCHEMA.replace("/configured-protected-", "/protected-"): kind for kind in (
         current.ConfiguredProtectedE3CausalPrefix, current.ConfiguredProtectedE3NumericalAssessment,
@@ -77,7 +77,7 @@ def test_configured_prefit_requires_versioned_join_and_never_relabels_old_public
         science.fit_protected_e3_models(inputs, object(), original_case.train_features,
             original_case.train_outcomes, record_id="models.refuse-old-join")
     roles = original_case.allocation
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_experiment_inputs import E3RequiredPublication
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_experiment_inputs import E3RequiredPublication
     publications = tuple(E3RequiredPublication(key, {"allocation": inputs.reservation.allocation,
         "native-selection": inputs.native_specification.selection, "reservation": inputs.reservation,
         "roles": roles}[key], publication, availability) for key, publication, availability in original_case.publications)

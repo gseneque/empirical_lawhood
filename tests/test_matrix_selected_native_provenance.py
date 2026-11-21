@@ -10,15 +10,15 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as legacy
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as dev
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as development
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as protected
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import bind_selected_native_source,source_transport
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as legacy
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as dev
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as development
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as protected
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import bind_selected_native_source, source_transport
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_matrix_selected_e3_e4_bridge import selected_bridge, transfer  # noqa: F401
 from tests.test_matrix_selected_e4_fixtures import selected_e4_populations  # noqa: F401
 

@@ -2,12 +2,13 @@
 
 from dataclasses import replace
 
-from empirical_lawhood.adapters.simulators.reactor_causal_response.delivery import BatchDeliverySession, ReactorExposureWordMap, exposure_word
-from empirical_lawhood.kernel.action_contracts import OccurrenceActionWord, ObservedActionOccurrence
-from empirical_lawhood.kernel.control import OperationalDeliveryState
-from empirical_lawhood.runtime.controller_runtime import DeliveryPortResult
-from .contracts import ReactorDelivery
-from .finite_words import feed_action_word
+from empirical_lawhood.adapters.simulators.reactor_causal_response.delivery import BatchDeliverySession
+from empirical_lawhood.domains.reactor.reactor_causal_response.delivery_words import ReactorExposureWordMap, exposure_word
+from empirical_lawhood.science.response.action_contracts import OccurrenceActionWord, ObservedActionOccurrence
+from empirical_lawhood.science.response.control import OperationalDeliveryState
+from empirical_lawhood.execution.controller_runtime import DeliveryPortResult
+from empirical_lawhood.domains.reactor.reactor_prefix_response.contracts import ReactorDelivery
+from empirical_lawhood.domains.reactor.reactor_prefix_response.finite_words import feed_action_word
 
 
 def deliver_feed_word(

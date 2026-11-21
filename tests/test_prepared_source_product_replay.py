@@ -14,12 +14,12 @@ import pytest
 from empirical_lawhood.api import recursive_qualified_parents as replay
 from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
-from empirical_lawhood.adapters.reference_worlds.runtime import ReferenceAdjudicationFixture
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
+from empirical_lawhood.domains.reference_worlds.runtime import ReferenceAdjudicationFixture
 from tests.runtime_platform.test_recursive_compiler import Config
 from tests.test_issued_original_input_scope import _DisclosedOriginalScope
 from tests.test_issued_provider_input_custody import completed  # noqa: F401
@@ -120,8 +120,8 @@ def test_actual_retained_product_replay_keeps_winning_receipt_and_fresh_guard(co
 
 
 def test_guard_refresh_after_heavy_verification_precedes_direct_payload_open(tmp_path, monkeypatch):
-    from empirical_lawhood.kernel.time import InformationCutoff, CausalPhase
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest, ArtifactProfile
+    from empirical_lawhood.science.models.time import InformationCutoff, CausalPhase
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactProfile
     from decimal import Decimal
     from tests.test_recursive_public_service import _plane
     plane = _plane(tmp_path / "raw-open-boundary")
@@ -158,11 +158,11 @@ def gate_case(tmp_path, confirmation, opportunity, monkeypatch):  # noqa: F811
     original metadata callback creates no E3/TRAIN grant or source admission.
     Current-issued scope/receipt lifetime is tested independently above.
     """
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_experiment as domain
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_bindings as gates
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_experiment as domain
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_bindings as gates
     from empirical_lawhood.api import matrix_prepared_source_runtime as runtime
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_produced_inputs import produced_access
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, lineage_parent_sort_key
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_produced_inputs import produced_access
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, lineage_parent_sort_key
     from tests.test_recursive_public_service import _plane
     from tests.test_matrix_prepared_source import prepared_bank, disclosed_certificate, prepared_public_case
     plane = _plane(tmp_path / "gate-contract")
@@ -196,17 +196,17 @@ from tests.test_matrix_selected_opportunity import opportunity  # noqa: E402,F40
 
 
 def _gate_invocation(f, *, config_damage=None):
-    from empirical_lawhood.adapters.methods import matrix_prepared_source_experiment as domain
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_experiment import operand_access_from_authoring
-    from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling, inherited_visibility
-    from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, lineage_parent_sort_key
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-    from empirical_lawhood.runtime.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
-    from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
-    from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+    from empirical_lawhood.domains.matrix import matrix_prepared_source_experiment as domain
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_experiment import operand_access_from_authoring
+    from empirical_lawhood.storage.provider_input_custody import provider_input_location
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, inherited_visibility
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest, lineage_parent_sort_key
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+    from empirical_lawhood.execution.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+    from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+    from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment
+    from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
     from tests.worker_configuration_support import freeze_worker_configuration
     from tests.test_matrix_selected_protected_worker import MemoryReader
     run_id, task_id = "run.disclosed.prepared-gate", domain.node_id(f.selection.scope, f.config.gate_kind.value.lower())
@@ -318,7 +318,7 @@ def test_prepared_product_pair_comes_from_exact_config_all_operands_and_full_par
 
 @pytest.mark.parametrize("damage", ("none", "foreign-config-edge"))
 def test_actual_prepared_worker_accepts_its_sealed_frozen_config_and_refuses_substitution_before_body(gate_case, monkeypatch, damage):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_workers
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_workers
     f = gate_case
     actual = _gate_invocation(f, config_damage=None if damage == "none" else damage)
     assert actual.context.outcome_access is OutcomeAccess.DEVELOPMENT_VISIBLE

@@ -9,10 +9,10 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.input_access import validated_scientific_input_edges
-from empirical_lawhood.runtime.plans import BarrierKind, ScientificInputRole
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.input_access import validated_scientific_input_edges
+from empirical_lawhood.execution.plans import BarrierKind, ScientificInputRole
 from tests.test_matrix_configured_protected_prefix_worker_routing import (
     configured_prefix_case, legacy_case, prepare_literal_case,  # noqa: F401 - actual shared fixtures
 )
@@ -102,15 +102,15 @@ def _utility_entry(metadata):
     """Real current E2 entry inputs and ports; no acquisition is invoked."""
     from types import SimpleNamespace
 
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_bindings as bindings
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_acquisition import entry_task_id
-    from empirical_lawhood.infrastructure.execution import prepare_worker_invocation
-    from empirical_lawhood.infrastructure.prepared_native_invocation import NativeInputPublication, prepare_native_invocation
-    from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-    from empirical_lawhood.runtime.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
-    from empirical_lawhood.runtime.plans import ArtifactOutputSpec, ExecutionTask, ExternalInputSpec
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_bindings as bindings
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_acquisition import entry_task_id
+    from empirical_lawhood.execution.local.execution import prepare_worker_invocation
+    from empirical_lawhood.storage.prepared_native_invocation import NativeInputPublication, prepare_native_invocation
+    from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+    from empirical_lawhood.execution.execution import TaskContext, WorkerIsolationProfile, WorkerOutputPort
+    from empirical_lawhood.execution.plans import ArtifactOutputSpec, ExecutionTask, ExternalInputSpec
+    from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
     from tests.worker_configuration_support import freeze_worker_configuration
 
     declaration = next(row for row in bindings.operation_declarations() if row.capability_key.endswith(".entry"))
@@ -152,7 +152,7 @@ def _utility_entry(metadata):
 
 
 def test_actual_e2_entry_authenticates_config_then_runs_pure_seal_without_native(utility_metadata, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_bindings as bindings
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_bindings as bindings
     for name in ("execute_parameter_native_work", "execute_paired_response_native_work"):
         monkeypatch.setattr(bindings, name, blocked)
     selected = _utility_entry(utility_metadata)
@@ -167,7 +167,7 @@ def test_actual_e2_entry_authenticates_config_then_runs_pure_seal_without_native
 
 @pytest.mark.parametrize("damage", ("missing", "foreign"))
 def test_actual_e2_entry_refuses_config_edge_substitution_before_seal(utility_metadata, monkeypatch, damage):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_bindings as bindings
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_bindings as bindings
     selected = _utility_entry(utility_metadata)
     try:
         edge, = selected.task.scientific_inputs

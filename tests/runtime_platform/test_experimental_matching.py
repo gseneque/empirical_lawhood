@@ -8,21 +8,16 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
-from empirical_lawhood.kernel.experimental_matching import (
-    MatchedArmDesign, MatchedCoordinate, ParameterAxisScale, ParameterGrid, ParameterGridAxis,
-    ParameterGridSetting, PopulationReservationBinding,
-)
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-from empirical_lawhood.runtime.experimental_matching import (
-    require_reserved_population, validate_matched_arms, validate_parameter_grid,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.experiments.experimental_design import IndependentUnit, UnitAllocation, UnitRoleAssignment
+from empirical_lawhood.science.experiments.experimental_matching import MatchedArmDesign, MatchedCoordinate, ParameterAxisScale, ParameterGrid, ParameterGridAxis, ParameterGridSetting, PopulationReservationBinding
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
+from empirical_lawhood.execution.experimental_matching import require_reserved_population, validate_matched_arms, validate_parameter_grid
 from tests.numerical_provenance_fixtures import numerical_plane
 
 

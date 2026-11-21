@@ -15,14 +15,12 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import experiment_preparation as public, load_authoring
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_selection as method
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selection_preparation as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selection_specification import (
-    RevisionCandidateSelection, ScheduledRevisionExperimentSpecification, derive_revision_specification,
-)
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExecutionSelection
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_selection as method
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selection_preparation as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selection_specification import RevisionCandidateSelection, ScheduledRevisionExperimentSpecification, derive_revision_specification
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection
 from tests.test_matrix_programme_selection import exposed as exposed_builder, pin
 
 
@@ -52,7 +50,7 @@ def case():
 @pytest.fixture(autouse=True)
 def no_effects(monkeypatch):
     from empirical_lawhood.api import recursive_authoring
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     def forbidden(*args, **kwargs):
         pytest.fail("pure E4 preparation entered fitting, custody publication or actual workers")
     monkeypatch.setattr(method, "fit_standardized_ridge", forbidden)
@@ -133,7 +131,7 @@ def test_all_original_inputs_and_execution_dependencies_are_reported_together(ca
     preparation = public.prepare_experiment(case.specification)
     findings = _dependencies(preparation)
     assert set(findings) == {"campaign.missing", "programme.missing", "reduction.missing", "data.missing",
-        "environment", "source-snapshot", "output-root", "experiment.workers"}
+        "environment", "source-snapshot", "output-root"}
     assert {key: row.source_key for key, row in findings.items() if key.endswith(".missing")} == {
         key+".missing": key for key in owner.INPUT_TYPES}
     assert all(findings[key+".missing"].kind is DependencyKind.EXTERNAL_INPUT for key in owner.INPUT_TYPES)

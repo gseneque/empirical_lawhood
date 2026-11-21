@@ -16,22 +16,9 @@ import unicodedata
 import zipfile
 import zlib
 
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_ids,
-    validate_nonempty,
-    validate_relative_locator,
-    validate_sha256,
-    validate_stable_id,
-)
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_ids, validate_nonempty, validate_relative_locator, validate_sha256, validate_stable_id
 
-from .contracts import (
-    GlennAdapterError,
-    GlennArchiveInput,
-    GlennMemberExpectation,
-    GlennMemberRole,
-    GlennTransformProfile,
-)
+from empirical_lawhood.adapters.physical.glenn.contracts import GlennAdapterError, GlennArchiveInput, GlennMemberExpectation, GlennMemberRole, GlennTransformProfile
 
 
 _EOCD_SIGNATURE = b"PK\x05\x06"

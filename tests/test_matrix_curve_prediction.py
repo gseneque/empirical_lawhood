@@ -8,19 +8,11 @@ from math import comb
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.curve_prediction import (
-    MatchedCurveDecision, curve_loss, curve_decision, group_curve_loss,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.curve_contract import MECHANISM_FEATURES
-from empirical_lawhood.adapters.methods.matrix_factor_response.matched_response_prediction import (
-    MATCHED_FEATURES, MATCHED_METHODS, SHARED_FEATURES, STRUCTURAL_FEATURES, DRIFT_FEATURES,
-    matched_primary_inference,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.matched_response_fitting import (
-    MatchedCurveEstimatorModel, MatchedCurveCrossValidationFit, fit_matched_models,
-    MatchedTrainingRow, predict_bundle,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_response.curve_prediction import MatchedCurveDecision, curve_loss, curve_decision, group_curve_loss
+from empirical_lawhood.domains.matrix.matrix_factor_response.curve_contract import MECHANISM_FEATURES
+from empirical_lawhood.domains.matrix.matrix_factor_response.matched_response_prediction import MATCHED_FEATURES, MATCHED_METHODS, SHARED_FEATURES, STRUCTURAL_FEATURES, DRIFT_FEATURES, matched_primary_inference
+from empirical_lawhood.domains.matrix.matrix_factor_response.matched_response_fitting import MatchedCurveEstimatorModel, MatchedCurveCrossValidationFit, fit_matched_models, MatchedTrainingRow, predict_bundle
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def test_root_rms_matches_independent_array_oracle_and_equal_paired_view_weights():
@@ -100,7 +92,7 @@ def test_curve_cross_validation_replays_root_losses_and_preserves_fold_local_fiv
             for _, n, d in fit.group_losses) / 64 for penalty in (D(1), D(10))}
         assert model.parameters.diagnostics.penalty == min(losses, key=lambda penalty: (losses[penalty], penalty))
         # Out-of-fold loss is a whole-root RMS of the actually postprocessed curve.
-        from empirical_lawhood.adapters.methods.matrix_factor_response.matched_response_fitting import fit_ridge_bundle
+        from empirical_lawhood.domains.matrix.matrix_factor_response.matched_response_fitting import fit_ridge_bundle
         fit = model.cross_validation[0]
         original = fit_ridge_bundle(rows[1::2], model.feature_names, D(1))
         for row, (_, coordinate_losses) in zip(rows[::2], fit.coordinate_losses, strict=True):
@@ -108,7 +100,7 @@ def test_curve_cross_validation_replays_root_losses_and_preserves_fold_local_fiv
 
 
 def test_median_K_headroom_uses_only_fitting_labels_and_lower_even_integer():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_duration import duration_diagnostic
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_duration import duration_diagnostic
     def row(index, k):
         return MatchedTrainingRow('exposed.median.%02d' % index, 'exposed.median.%02d' % index, 'exposed.family', (),
             ((D('.001'),) * k + (D('.02'),) * (29 - k)) * 2, ())
@@ -127,7 +119,7 @@ def test_median_K_headroom_uses_only_fitting_labels_and_lower_even_integer():
 
 def test_later_median_K_keeps_unavailable_roots_and_complete_nine_coordinate_weights():
     from types import SimpleNamespace
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_duration import evaluation_median_K
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_duration import evaluation_median_K
     model = SimpleNamespace(duration_diagnostic=SimpleNamespace(median_counts=(11, 11)))
     def targets(k):
         return ((D('.001'),) * k + (D('.02'),) * (29 - k)) * 2

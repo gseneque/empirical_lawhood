@@ -6,16 +6,14 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_feedback.assay_binding import (
-    AssayRunProduct, assay_claim, assay_declaration,
-)
-from empirical_lawhood.adapters.methods.rubisco_feedback.recursive_translation import assay_recursive_draft
-from empirical_lawhood.adapters.simulators.rubisco_assay.fixture import historical_r1_config
-from empirical_lawhood.adapters.simulators.rubisco_assay.records import AssayQuery
-from empirical_lawhood.adapters.simulators.rubisco_assay.science import run_assay
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.rubisco.rubisco_feedback.assay_binding import AssayRunProduct, assay_claim, assay_declaration
+from empirical_lawhood.domains.rubisco.rubisco_feedback.recursive_translation import assay_recursive_draft
+from empirical_lawhood.domains.rubisco.assay.fixture import historical_r1_config
+from empirical_lawhood.domains.rubisco.assay.records import AssayQuery
+from empirical_lawhood.domains.rubisco.assay.science import run_assay
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -47,7 +45,7 @@ def test_recursive_assay_preserves_complete_units_queries_and_nonpromotable_clai
 
 
 def test_correct_branch_rates_with_rank_deficiency_do_not_satisfy_the_rank_four_claim():
-    from empirical_lawhood.kernel.status import ScientificStatus
+    from empirical_lawhood.science.records.status import ScientificStatus
 
     config = _config()
     one_probe = replace(config, initial_fixed_queries=config.initial_fixed_queries[:1], rounds_per_case=1,
@@ -63,8 +61,8 @@ def test_correct_branch_rates_with_rank_deficiency_do_not_satisfy_the_rank_four_
 def test_later_feedback_does_not_redefine_the_initial_probe_rank_claim():
     import numpy as np
 
-    from empirical_lawhood.adapters.simulators.rubisco_assay.core import log_sensitivity
-    from empirical_lawhood.kernel.status import ScientificStatus
+    from empirical_lawhood.domains.rubisco.assay.core import log_sensitivity
+    from empirical_lawhood.science.records.status import ScientificStatus
 
     config = _config()
     two_probes = replace(config, initial_fixed_queries=(config.initial_fixed_queries[0], config.initial_fixed_queries[2]))
@@ -150,18 +148,15 @@ def test_registered_assay_executes_and_recovers_without_reacquisition(tmp_path, 
     from empirical_lawhood.api import matrix_numerical_provenance as provenance_owner
     from empirical_lawhood.api import recursive_authoring as author
     from empirical_lawhood.api import recursive_execution as execute
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, FilesystemState, GuardedExternalRoot
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.runtime.artifacts import ExternalRootContract
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, FilesystemState, GuardedExternalRoot
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
 
     class Inspector:
         def inspect(self, contract):
             return FilesystemState(contract.canonical_path, True, True, 2**40, False)
 
-    source = author.implementation_binding(ROOT)
     observed = provenance_owner.capture_matrix_provenance(project_root=ROOT)
-    monkeypatch.setattr(author, "implementation_binding", lambda root, **kwargs: source)
-    monkeypatch.setattr(execute, "implementation_binding", lambda root, **kwargs: source)
     monkeypatch.setattr(provenance_owner, "capture_matrix_provenance", lambda **kwargs: observed)
     selected = tmp_path / "custody"
     selected.mkdir()

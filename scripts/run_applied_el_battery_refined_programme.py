@@ -68,9 +68,9 @@ def retain_prior(programme, args, report):
 
 
 def validate_prior_census(report, cost, actual_report, products, plan, plane):
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
     previous = report['waves']['precision-diagnostic']
     expected = report['custody_members']
     if (report['native_contacts'] != 1 or cost['native_contacts'] != 1
@@ -101,7 +101,7 @@ def validate_prior_census(report, cost, actual_report, products, plan, plane):
 
 
 def source_intake(programme, source, selection_path, diagnostic):
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import SOURCE_VERSION
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import SOURCE_VERSION
     target = programme.root / 'refined-source-originals'
     target.mkdir()
     retained = []
@@ -142,7 +142,7 @@ def source_intake(programme, source, selection_path, diagnostic):
 
 
 def current_traces(products, source, phase):
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c
     rows = {}
     for outputs in products['records'].values():
         for record in outputs.values():
@@ -154,7 +154,7 @@ def current_traces(products, source, phase):
 
 
 def assessed_product(products, phase):
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c
     records = [record for outputs in products['records'].values() for record in outputs.values()
                if type(record) is c.AssessedInstance and record.assessment.instance.phase == phase]
     if len(records) != 1:
@@ -163,8 +163,8 @@ def assessed_product(products, phase):
 
 
 def retain_current_summary(programme, products, source, phase):
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry.recipient_bindings import ComparatorAssessment
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c
+    from empirical_lawhood.domains.battery.battery_refined_inquiry.recipient_bindings import ComparatorAssessment
     traces = current_traces(products, source, phase)
     counts = programme.report.setdefault('current_native_ledgers', {})
     counts[phase] = {'returned_trace_ledger_rows': len(traces),
@@ -192,10 +192,10 @@ def contact_paths(root):
 
 def reconcile_contacts(programme, inherited):
     """Retain actual new entry even when a worker returns no scientific ledger."""
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.native_effects import NativeEffectContact
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.execution.native_effects import NativeEffectContact
     contacts = []
     for relative in sorted(contact_paths(programme.root) - inherited):
         raw = programme.plane.root.resolve(relative, for_write=False).read_bytes()
@@ -215,11 +215,11 @@ def obstruction_history_intake(programme,args,prior_report,prior_cost,actual_rep
     This never submits the obstructed native wave to the scheduler. Original
     absent forecast/subcall completion remains unknown after successful intake.
     """
-    from empirical_lawhood.adapters.methods.battery_diagnostic_obstruction import contracts as oc,science as os,recursive_translation as ot
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry import contracts as bc,recursive_translation as original_translation
+    from empirical_lawhood.domains.battery.battery_diagnostic_obstruction import contracts as oc, science as os, recursive_translation as ot
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry import contracts as bc, recursive_translation as original_translation
     from empirical_lawhood.api.recursive_execution import read_recursive_wave
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
     source=decode_canonical_bytes(archived_bytes(programme,args.obstruction_source),oc.ObstructionSource,maximum_bytes=None)
     os.validate_source(source)
     previous=prior_report['waves']['precision-diagnostic']
@@ -276,15 +276,15 @@ def obstruction_history_intake(programme,args,prior_report,prior_cost,actual_rep
 
 
 def run(programme, args):
-    from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic import contracts as dc, science as ds
-    from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic import recursive_translation as prior_translation
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import scope as original_scope
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, science, recursive_translation as drafts
+    from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic import contracts as dc, science as ds
+    from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic import recursive_translation as prior_translation
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import scope as original_scope
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, science, recursive_translation as drafts
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_execution import read_recursive_wave
     from empirical_lawhood.api.recursive_inquiry import preview_inquiry_successor
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 
     archived_bytes(programme, Path(__file__))
     selection_bytes = archived_bytes(programme, args.numerical_selection)
@@ -306,7 +306,7 @@ def run(programme, args):
     if getattr(args,'prior_history_kind','diagnostic-result') == 'operational-obstruction':
         directory,products,prior_draft,diagnostic,original_result = programme.measured('actual-obstruction-history-intake',lambda:
             obstruction_history_intake(programme,args,prior_report,prior_cost,actual_report,products,prior_draft,plan))
-        from empirical_lawhood.adapters.methods.battery_diagnostic_obstruction import recursive_translation as prior_translation
+        from empirical_lawhood.domains.battery.battery_diagnostic_obstruction import recursive_translation as prior_translation
     else:
         programme.measured('actual-diagnostic-census-join', lambda:
             validate_prior_census(prior_report, prior_cost, actual_report, products, plan, programme.plane))

@@ -7,10 +7,10 @@ from decimal import Decimal
 from importlib.metadata import version
 from typing import ClassVar
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
 
-from .contracts import NativeToraxAction, NativeToraxEpisodeDisposition, NativeToraxPreparation, NativeToraxView
-from .runtime import execute_native_torax
+from empirical_lawhood.domains.fusion.torax_native.contracts import NativeToraxAction, NativeToraxEpisodeDisposition, NativeToraxPreparation, NativeToraxView
+from empirical_lawhood.adapters.simulators.torax_native.runtime import execute_native_torax
 
 
 @dataclass(frozen=True, slots=True)

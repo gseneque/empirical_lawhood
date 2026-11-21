@@ -5,9 +5,7 @@ Synthetic development fixtures carry explicit numbers and grant no authority.
 Each ordered row contains seventeen native stream digests and one probe digest.
 """
 
-from empirical_lawhood.adapters.simulators.prepared_response.contracts import (
-    CONTEXTS, STAGE_COUNTS, PreparedRootRandomness,
-)
+from empirical_lawhood.domains.matrix.prepared_response.contracts import CONTEXTS, STAGE_COUNTS, PreparedRootRandomness
 
 FROZEN_SEED_COMMITMENTS = {
     '26bfb3e6d1f18302122d8facdaea1cd64c3bff69a268c42201b48bd1f79d89b1': {

@@ -5,15 +5,15 @@ from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_specification import MatrixResponseErrorSpecification
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_original_publications import authenticate_protected_e3_fit_config
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_statistical_bindings import ProtectedE3FitConfig, ProtectedE3StatisticalRunner
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_specification import MatrixResponseErrorSpecification
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_original_publications import authenticate_protected_e3_fit_config
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_statistical_bindings import ProtectedE3FitConfig, ProtectedE3StatisticalRunner
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody, CurrentIssuedTaskCustodySupplier
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExperimentPreparation
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExperimentPreparation
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 
 
 def _fit(compilation):
@@ -24,7 +24,7 @@ def _fit(compilation):
 
 
 def _selection(records):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import ProtectedE3PreparationSelection
 
     values = tuple(record for _, record in records if type(record) is ProtectedE3PreparationSelection)
     if len(values) != 1:
@@ -38,8 +38,8 @@ def authenticate_protected_e3_numerical_originals(writer, selection):
     One existing qualified selection may cover every selected protocol. This
     current authentication creates no earlier publication or numerical warrant.
     """
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_response_records import _object
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_response_records import _object
 
     containers = {_object(row): row for row in (selection.response_selection, *selection.protocols, *selection.numerical_containers)}
     checked = set()
@@ -129,12 +129,10 @@ class ProtectedE3RuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
 
 def prepare_protected_e3_experiment_authoring(preparation, *, project_root, artifact_writer, output_dir):
     """Bind resources from the actual candidate without changing selected science."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import (
-        RESOURCE_BINDING_DEPENDENCY, derive_protected_e3_design_inputs,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import RESOURCE_BINDING_DEPENDENCY, derive_protected_e3_design_inputs
     from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
     from empirical_lawhood.api.prospective_experiment import preview_prepared_prospective_experiment_candidate
-    from empirical_lawhood.runtime.experiment_resources import bind_execution_resources
+    from empirical_lawhood.execution.experiment_resources import bind_execution_resources
 
     if (type(preparation) is not ExperimentPreparation
             or type(preparation.specification_record) is not MatrixResponseErrorSpecification):
@@ -156,7 +154,7 @@ def prepare_protected_e3_experiment_authoring(preparation, *, project_root, arti
         artifact_writer=artifact_writer)
     preview = preview_prepared_prospective_experiment_candidate(preparation=preparation, design_inputs=design,
         source_configs=selected.source_configs, project_root=project_root, artifact_writer=artifact_writer)
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import derive_protected_e3_resource_selection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import derive_protected_e3_resource_selection
 
     resources = bind_execution_resources(derive_protected_e3_resource_selection(preparation),
         issued_extensions=preview.issued_extensions)
@@ -165,8 +163,8 @@ def prepare_protected_e3_experiment_authoring(preparation, *, project_root, arti
 
 
 def _fit_from_draft(draft):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_composition import operation_declarations
-    from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_composition import operation_declarations
+    from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
 
     registered = {row.registration().selection.selection_id: row.registration() for row in operation_declarations()}
     records = tuple(decode_recursive_config_input(operation, registered[operation.selection.selection_id]).record
@@ -180,10 +178,10 @@ def _fit_from_draft(draft):
 def bind_protected_e3_experiment_handoff(handoff, *, specification, allocation, source_records,
         artifact_writer, reveal_authority_id=None):
     """Recheck the original instance and attach only parent-side fit custody."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import validate_protected_e3_experiment_instance
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import validate_protected_e3_experiment_instance
     from empirical_lawhood.api.recursive_prospective_authoring import RecursiveProspectiveApplicationHandoff
-    from empirical_lawhood.kernel.serialization import validate_stable_id
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.science.records.serialization import validate_stable_id
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
 
     if type(handoff) is not RecursiveProspectiveApplicationHandoff:
         raise TypeError("protected E3 requires the actual public prospective handoff")

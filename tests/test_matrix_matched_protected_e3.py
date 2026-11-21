@@ -10,20 +10,18 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as science
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_specification import (
-    ConfiguredE3Assessment, ConfiguredE3Protocol, matched_e3_estimators, matched_e3_measurement,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response import matched_response_prediction as matched
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_records import NativeTrainingPhysicalForecast
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_records import ConfiguredProtectedE3PhysicalForecast
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_adjudication import conditional_reasons
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_inputs import project_protected_e3_allocation
-from empirical_lawhood.adapters.methods.matrix_primary_family import AMENDED_PRIMARY_FAMILY
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_records
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as science
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_specification import ConfiguredE3Assessment, ConfiguredE3Protocol, matched_e3_estimators, matched_e3_measurement
+from empirical_lawhood.domains.matrix.matrix_factor_response import matched_response_prediction as matched
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_records import NativeTrainingPhysicalForecast
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_records import ConfiguredProtectedE3PhysicalForecast
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_adjudication import conditional_reasons
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_inputs import project_protected_e3_allocation
+from empirical_lawhood.domains.matrix.matrix_primary_family import AMENDED_PRIMARY_FAMILY
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_records
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
 from empirical_lawhood.api.configured_e3_incomplete_read import _denominator_math
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_matrix_e3_original_publications import build_original_case
 from tests.test_matrix_configured_protected_statistical import case as configured_case
 from tests.test_matrix_configured_protected_e3 import actual_join, causal
@@ -54,7 +52,7 @@ def outcome(forecast, missing=False):
 
 @pytest.fixture(scope='module', params=(False, True), ids=('retained-K', 'prospective-curve'))
 def matched_e3_products(original_case, request):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_contract import CURVE_IMPROVEMENT_RULE
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_contract import CURVE_IMPROVEMENT_RULE
     curve_primary = request.param
     previous = configured_case.__wrapped__(original_case)
     assessment = ConfiguredE3Assessment(improvement_margin=None, minimum_usable_units=0,
@@ -122,12 +120,12 @@ def test_native_schema_protected_matched_fit_freeze_calibrate_confirm_and_full_u
     assert all(policy.bound_kind == 'INFINITE' and not any(policy.admissions) for row in fs for policy in row.policies)
     assert conditional_reasons(specification, allocation, result)
     assert all(row['upper95_worst_case_failure_probability'] is None for row in matched.matched_admission_risk(fs, ys))
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_prediction import curve_loss_summary
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_prediction import curve_loss_summary
     summary = curve_loss_summary if specification.is_curve_primary else matched.matched_loss_summary
     assert summary(result.decisions)['unknown_groups' if specification.is_curve_primary else 'unknown_units'] == 1
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_package import predict_selected_points
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_package import ConfiguredMatrixSelectedFrozenPackage
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_package import predict_selected_points
     package = ConfiguredMatrixSelectedFrozenPackage('test.matched.export', specification, allocation, joined, models,
         frozen, calibration, sealed, tuple(sorted((*allocation.unit_ids('calibration'), *allocation.unit_ids('evaluation')))))
     public = ConfiguredMatrixSelectedPublicPackage.from_package(package)
@@ -150,13 +148,13 @@ def test_native_schema_protected_matched_fit_freeze_calibrate_confirm_and_full_u
 
     # Exercise the post-authentication UNKNOWN projection with disclosed
     # operands. The mocked guard supplies no real access or contact authority.
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_unknown_response as unknown
-    from empirical_lawhood.adapters.methods.matrix_factor_response.origin_mechanics import MatrixOriginResponseModel, MatrixIO48Construction
-    from empirical_lawhood.adapters.methods.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_secondary_readout import _checked_pair
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_unknown_response as unknown
+    from empirical_lawhood.domains.matrix.matrix_factor_response.origin_mechanics import MatrixOriginResponseModel, MatrixIO48Construction
+    from empirical_lawhood.domains.matrix.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_secondary_readout import _checked_pair
     error = fs[0]
     source, _ = causal(original_case, error.feature.unit_id, source_index=index)
-    from empirical_lawhood.adapters.methods.matrix_factor_response.records import MatrixFactorAction, ACTION_ROLES
+    from empirical_lawhood.domains.matrix.matrix_factor_response.records import MatrixFactorAction, ACTION_ROLES
     protocol = SimpleNamespace(public_source=error.feature.public_source, criterion=specification.identity,
         mechanical_model=MatrixOriginResponseModel('test.matched.unknown-model', response_records.physical_forecast_implementation(),
             MatrixIO48Construction('test.matched.unknown-io48')), horizon_steps=DENSE_RESPONSE_HORIZONS,

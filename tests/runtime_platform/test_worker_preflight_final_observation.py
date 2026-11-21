@@ -10,7 +10,7 @@ import os
 
 import pytest
 
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, WorkerPreflightError
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, WorkerPreflightError
 from tests.runtime_platform.test_native_subwork import _store
 from tests.runtime_platform.test_worker_preflight import ExposedReadRunner, _case, _native_work
 

@@ -6,12 +6,9 @@ qualification. No TaskContext, prepared invocation or permission is fabricated.
 """
 from hashlib import sha256
 
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.plans import (
-    ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec,
-    ScientificInputRole, ScientificInputSpec,
-)
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
 from tests.worker_configuration_support import freeze_worker_configuration
 
 

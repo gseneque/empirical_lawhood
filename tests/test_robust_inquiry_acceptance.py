@@ -19,18 +19,15 @@ from empirical_lawhood.api import recursive_authoring as author
 from empirical_lawhood.api import recursive_execution as execute
 from empirical_lawhood.api import recursive_inquiry as service
 from empirical_lawhood.api.recursive_contributions import export_recursive_contribution
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.recursive_inquiry import identity
-from empirical_lawhood.kernel.recursive_inquiry_policy import (
-    InquiryStopScope,
-    ScientificOutcomeKind,
-)
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.planning.recursive_inquiry import InquiryAction
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.recursive_inquiry import InquiryStateSources, InquiryWaveSource
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.inquiry.recursive_inquiry import identity
+from empirical_lawhood.science.inquiry.recursive_inquiry_policy import InquiryStopScope, ScientificOutcomeKind
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.design.recursive_inquiry import InquiryAction
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.recursive_inquiry import InquiryStateSources, InquiryWaveSource
 from tests.test_recursive_public_service import _plane
 from tests.test_battery_refined_inquiry import selected as selected
 from tests.test_battery_refined_inquiry_binding import stock as stock
@@ -40,7 +37,7 @@ D = Decimal
 
 
 def input_origins(draft, parent=None):
-    from empirical_lawhood.adapters.methods.compact_inquiry_policy import compact_input_origins
+    from empirical_lawhood.methods.compact_inquiry_policy import compact_input_origins
     return compact_input_origins(draft, parent)
 
 
@@ -56,15 +53,13 @@ def frozen_software_source(monkeypatch):
 
 def operands(domain):
     if domain == "material":
-        from empirical_lawhood.adapters.methods.analytic_material_inquiry import policy_binding, science
-        from empirical_lawhood.adapters.simulators.uniform_electron_gas_response.native_quickstart import UniformElectronGasAnalyticReferenceConfig
+        from empirical_lawhood.domains.materials.analytic_material_inquiry import policy_binding, science
+        from empirical_lawhood.domains.materials.electron_gas.native_quickstart import UniformElectronGasAnalyticReferenceConfig
         source = decode_canonical_bytes((ROOT / "programmes/materials/superconductivity/workflows/electron-gas-response/config.json").read_bytes(),
                                         UniformElectronGasAnalyticReferenceConfig, maximum_bytes=None)
         return policy_binding, science, (source,)
-    from empirical_lawhood.adapters.methods.rubisco_inquiry import policy_binding, science
-    from empirical_lawhood.adapters.methods.rubisco_combinations.source_binding import (
-        GENBANK_SOURCE_SHA256, WILSON_SOURCE_SHA256, TeParentGenbankInputV1, WilsonArticleInputV1,
-    )
+    from empirical_lawhood.domains.rubisco.rubisco_inquiry import policy_binding, science
+    from empirical_lawhood.domains.rubisco.rubisco_combinations.source_binding import GENBANK_SOURCE_SHA256, WILSON_SOURCE_SHA256, TeParentGenbankInputV1, WilsonArticleInputV1
     from tests.rubisco_nomination_fixture import source_operands
     retained = source_operands()
     return policy_binding, science, (
@@ -117,10 +112,10 @@ def commit(plane, directory, request, sources, campaign):
 
 def test_legacy_robust_packet_is_readable_history_and_cannot_enter_current_admission(tmp_path, monkeypatch):
     """An exposed v2 custody fixture is never promoted to a current ACT."""
-    from empirical_lawhood.planning.recursive_inquiry_policy import choose_robust_inquiry, make_robust_successor_intent
-    from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigins
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveWaveMember
-    from empirical_lawhood.runtime.recursive_inquiry import RobustInquiryDecisionPacket
+    from empirical_lawhood.design.recursive_inquiry_policy import choose_robust_inquiry, make_robust_successor_intent
+    from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigins
+    from empirical_lawhood.execution.recursive_handoff import RecursiveWaveMember
+    from empirical_lawhood.execution.recursive_inquiry import RobustInquiryDecisionPacket
     from tests.test_recursive_inquiry_policy import policy_case
 
     case = policy_case("rubisco")
@@ -180,10 +175,10 @@ def interrupted_material_fixture(plane, directory, draft, source_bindings):
     fixture exercises recovery semantics; it is no historical scientific count.
     """
     from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.execution import OperationalAttempt, OperationalFailureClass, TaskAttemptDisposition, TaskBlockReason
-    from empirical_lawhood.runtime.recovery import OperationalFailureDiagnostic
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.execution.execution import OperationalAttempt, OperationalFailureClass, TaskAttemptDisposition, TaskBlockReason
+    from empirical_lawhood.execution.recovery import OperationalFailureDiagnostic
 
     author.author_recursive_wave(draft=draft, origins=input_origins(draft), input_bindings=source_bindings,
         project_root=ROOT, artifact_writer=plane, output_dir=directory)
@@ -208,10 +203,10 @@ def interrupted_material_fixture(plane, directory, draft, source_bindings):
 
 def check_completed_work_and_read_only_reuse(*, plane, root, request, sources, campaign, source_draft, source_bindings, monkeypatch):
     """Actual COMPLETE census defeats omitted menu rows and misleading labels."""
-    from empirical_lawhood.kernel.recursive_inquiry_policy import CompletedInquiryWork
-    from empirical_lawhood.planning.recursive_inquiry_policy import InquiryAlternativeKind
-    from empirical_lawhood.infrastructure.execution import DirectTaskExecutor, LocalProcessExecutor
-    from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigins
+    from empirical_lawhood.science.inquiry.recursive_inquiry_policy import CompletedInquiryWork
+    from empirical_lawhood.design.recursive_inquiry_policy import InquiryAlternativeKind
+    from empirical_lawhood.execution.local.execution import DirectTaskExecutor, LocalProcessExecutor
+    from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigins
     from empirical_lawhood.cli.app import app
     from typer.testing import CliRunner
     import json
@@ -299,11 +294,11 @@ def check_completed_work_and_read_only_reuse(*, plane, root, request, sources, c
 
 def test_public_projection_blocks_config_rename_and_admits_only_authentic_distinct_work(tmp_path, monkeypatch):
     """Actual API projection/custody, with no policy-forged attempt operation."""
-    from empirical_lawhood.kernel.recursive_inquiry import InquiryAttemptStatus, identity
-    from empirical_lawhood.kernel.recursive_inquiry_policy import WorkBoundInquiryState
-    from empirical_lawhood.planning.recursive_inquiry_policy import choose_robust_inquiry
-    from empirical_lawhood.planning.recursive_inquiry_policy import InquiryAlternativeKind
-    from empirical_lawhood.adapters.methods.analytic_material_inquiry.recursive_translation import use_draft
+    from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryAttemptStatus, identity
+    from empirical_lawhood.science.inquiry.recursive_inquiry_policy import WorkBoundInquiryState
+    from empirical_lawhood.design.recursive_inquiry_policy import choose_robust_inquiry
+    from empirical_lawhood.design.recursive_inquiry_policy import InquiryAlternativeKind
+    from empirical_lawhood.domains.materials.analytic_material_inquiry.recursive_translation import use_draft
 
     frozen_software_source(monkeypatch)
     binding, science, records = operands("material")
@@ -416,17 +411,17 @@ def run_exposed_battery_source_gate(stock, directory):
     This explicitly selected software gate does not select the native acquisition
     or the qualification reducer present in the complete domain draft.
     """
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import operation_bindings as owner
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import operation_bindings as owner
     from empirical_lawhood.api.recursive_execution import _external_inputs
-    from empirical_lawhood.infrastructure.execution import DirectTaskExecutor, LocalScheduler
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.infrastructure.recursive_custody import read_recursive_products
-    from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, RunnerRegistry
-    from empirical_lawhood.runtime.plans import PlanLane
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
+    from empirical_lawhood.execution.local.execution import DirectTaskExecutor, LocalScheduler
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.recursive_custody import read_recursive_products
+    from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry
+    from empirical_lawhood.execution.plans import PlanLane
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
     from tests.runtime_platform.test_execution_scheduler import StaticExternalInputResolver
     from tests.test_battery_refined_inquiry_binding import compile_stock
 
@@ -466,11 +461,11 @@ def run_exposed_battery_source_gate(stock, directory):
 def test_source_bound_battery_pure_gate_retains_uncertainty_or_negative_without_admission(
         tmp_path, monkeypatch, stock, kind):
     """Actual complete exposed diagnostic operands; no acquisition or qualification."""
-    from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic import science as diagnostic_science
-    from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic.contracts import DiagnosticResult
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, native, operation_bindings as owner
-    from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import scope as original_scope
-    from empirical_lawhood.kernel.recursive_inquiry import InquiryEvidence
+    from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic import science as diagnostic_science
+    from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic.contracts import DiagnosticResult
+    from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, native, operation_bindings as owner
+    from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import scope as original_scope
+    from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryEvidence
     from tests.test_battery_dfn_precision_diagnostic import config_rows, exposed
     from tests.test_recursive_inquiry_policy import choose, policy_case, rebound
 
@@ -641,7 +636,7 @@ def test_actual_origin_supplier_independent_later_use_and_unmet_application_fron
         assert joined.disposition is AssessmentDisposition.FALSIFIED
     before = {path.relative_to(root): sha256(path.read_bytes()).hexdigest()
               for path in root.rglob("*") if path.is_file() and not path.name.endswith(".lock")}
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     monkeypatch.setattr(LocalProcessExecutor, "execute", lambda *args, **kwargs: (_ for _ in ()).throw(
         AssertionError("completed exposed inquiry was reacquired")))
     assert service.run_inquiry_successor(directory=use_dir, project_root=ROOT, artifact_writer=plane)["new_native_contact_count"] == 0

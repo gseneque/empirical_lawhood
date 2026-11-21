@@ -12,8 +12,8 @@ import stat
 
 import pytest
 
-from empirical_lawhood.infrastructure import candidate_sources as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage import candidate_sources as owner
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
 from tests.test_unrestricted_source_resolution import _root
 
 

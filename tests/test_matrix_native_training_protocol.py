@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseAssay
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseAssay
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 EXAMPLES = Path(__file__).parents[1]/'programmes/foundations/emergent-structure/workflows/matrix-response-experiment'
 

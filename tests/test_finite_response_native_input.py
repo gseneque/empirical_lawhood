@@ -6,7 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.composition.finite_response_law.native_input import FiniteResponseLawCalibrationInput, _census, check_finite_calibration_input
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.native_input import FiniteResponseLawCalibrationInput
+from empirical_lawhood.adapters.composition.finite_response_law.native_input import _census, check_finite_calibration_input
 from empirical_lawhood.api.codecs import load_registered_authoring
 
 ROOT = Path(__file__).parents[1]

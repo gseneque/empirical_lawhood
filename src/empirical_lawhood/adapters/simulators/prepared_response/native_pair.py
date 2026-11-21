@@ -13,12 +13,12 @@ from typing import ClassVar
 import h5py  # type: ignore[import-untyped]
 import numpy as np
 
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256
 from empirical_lawhood.adapters.simulators.six_matrix_response.response_source import response_hdf5_read_text, response_hdf5_text, response_hdf5_writer
 
-from .native_artifact import MAXIMUM_PHASE_BYTES, METADATA, PreparedNativePhaseArtifact, decode_prepared_native_phase, encode_prepared_native_phase
-from .source import PreparedNativePhaseData
-from .native_tasks import PreparedNativeInvocation
+from empirical_lawhood.adapters.simulators.prepared_response.native_artifact import MAXIMUM_PHASE_BYTES, METADATA, PreparedNativePhaseArtifact, decode_prepared_native_phase, encode_prepared_native_phase
+from empirical_lawhood.domains.matrix.prepared_response.source import PreparedNativePhaseData
+from empirical_lawhood.adapters.simulators.prepared_response.native_tasks import PreparedNativeInvocation
 
 
 NATIVE_PAIR_SCHEMA = 'empirical-lawhood/simulators/prepared-response/native-pair-hdf5'

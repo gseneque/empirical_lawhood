@@ -6,16 +6,16 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_bindings as opportunity_owner
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as public
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_protected_bindings as protected_owner
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_operational_resources import MatrixSelectedOperationalResources
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_bindings as opportunity_owner
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as public
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_protected_bindings as protected_owner
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_operational_resources import MatrixSelectedOperationalResources
 from empirical_lawhood.api.configuration import validate_configuration
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, PreparedExperimentFile
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, PreparedExperimentFile
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 from tests.test_matrix_selected_entry_scope import entry_shape, source_case  # noqa: F401
 from tests.test_matrix_selected_entry_v2 import v2_shape
@@ -166,9 +166,9 @@ def test_shared_resource_consumer_is_registered_once_and_each_workflow_enforces_
 @pytest.mark.parametrize("damage", ("different-bound", "base-consumer-collision"))
 def test_shared_input_consumer_reuse_refuses_conflicting_owners(monkeypatch, damage):
     from empirical_lawhood.api import configuration_registry, experiment_preparation
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import extension_bundle
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import extension as extension_bundle
 
-    owners = tuple(value for value in extension_bundle.EXPERIMENT_PROTOCOL_DECLARATIONS if value.configuration_inputs)
+    owners = tuple(value for value in extension_bundle.EXTENSION.protocols if value.configuration_inputs)
     first, second = owners[:2]
     selected, = (value for value in second.configuration_inputs if value.consumer_id == "matrix-selected-phase-resources")
     if damage == "different-bound":

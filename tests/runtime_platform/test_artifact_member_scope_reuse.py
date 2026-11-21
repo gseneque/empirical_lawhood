@@ -4,8 +4,8 @@
 import pytest
 from contextlib import nullcontext
 
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
-from empirical_lawhood.runtime.artifacts import ArtifactSemanticValidationRegistry
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+from empirical_lawhood.storage.contracts.artifacts import ArtifactSemanticValidationRegistry
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 
 

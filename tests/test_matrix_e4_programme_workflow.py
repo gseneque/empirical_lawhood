@@ -8,16 +8,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial as factorial
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_reduction as rr
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_selection as selection
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_workflow as workflow
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import ScheduledProgrammeWave
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.revision_calibration import forecast_revision_cases
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial as factorial
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_reduction as rr
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_selection as selection
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_workflow as workflow
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import ScheduledProgrammeWave
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.revision_calibration import forecast_revision_cases
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_programme_factorial import _specification
 from tests.test_matrix_revision_calibration import calibrated  # noqa: F401
 from tests.test_matrix_programme_selection import exposed, _prefix, _score, pin  # noqa: F401

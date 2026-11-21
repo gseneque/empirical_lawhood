@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.api import recursive_execution as owner
-from empirical_lawhood.infrastructure import recursive_custody as custody
+from empirical_lawhood.storage import recursive_custody as custody
 from tests.test_recursive_report_projection import wave as wave  # noqa: F401
 from tests.test_recursive_contribution_custody import portable_a as portable_a  # noqa: F401
 
@@ -142,16 +142,16 @@ def test_actual_committed_train_support_mutation_after_preflight_refuses_before_
         tmp_path, monkeypatch, custody_kind, scoped):
     from empirical_lawhood.api.experiment_preparation import author_prepared_experiment
     from empirical_lawhood.api.native_training_banks import _read_instance
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as records
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import authenticate_request
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as records
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_request
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
     from tests.test_matrix_native_training_acquisition import fresh_training_metadata_case
     from tests.test_matrix_native_training_public_lifecycle import _copied_preparation, ROOT
     # Existing metadata constructors publish actual support commitments only;
     # no trajectory, native worker, fitting or producing completion is executed.
     case = fresh_training_metadata_case(tmp_path)
     if custody_kind == "FILE":
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support
         census_artifacts = {artifact for manifest in (case.request.train_manifest, case.request.future_manifest)
             for artifact, _ in exposure_support(manifest.audit)}
         mandatory = records.future_response_support(case.request)
@@ -218,11 +218,9 @@ def test_actual_committed_train_support_mutation_after_preflight_refuses_before_
 def authored_parent_origins(portable_a, monkeypatch):
     from empirical_lawhood.api import recursive_authoring as author
     from empirical_lawhood.api import recursive_contributions as parents
-    from empirical_lawhood.adapters.methods.battery_recursive_construction.contracts import (
-        BatteryFurtherProduct, BatteryProcedureContribution,
-    )
-    from empirical_lawhood.adapters.methods.battery_recursive_construction.examples import battery_wave_b_draft
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
+    from empirical_lawhood.domains.battery.battery_recursive_construction.contracts import BatteryFurtherProduct, BatteryProcedureContribution
+    from empirical_lawhood.domains.battery.battery_recursive_construction.examples import battery_wave_b_draft
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
     from tests.test_recursive_contribution_custody import _publish_fixture_wave, ROOT
     from tests.test_recursive_multiple_parents import pair_draft, PairConfig, PairRead
     # Reuse disclosed precomputed synthetic software custody, real owner

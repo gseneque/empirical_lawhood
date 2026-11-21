@@ -14,12 +14,11 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY
-from empirical_lawhood.adapters.methods.recursive_scientific_authoring.executable_binding import REGISTRATION
-from empirical_lawhood.adapters.methods.recursive_scientific_authoring_bounded32.executable_binding import REGISTRATION as BOUNDED
+from empirical_lawhood.methods.recursive_scientific_authoring.extension import REGISTRATION
 from empirical_lawhood.api import facade as owner
 from empirical_lawhood.api.results import CompileCandidateRequest, OperationStatus
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalizationError
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalizationError
 from tests import test_prospective_experiment as fixtures
 
 
@@ -73,8 +72,8 @@ def _api(case, registry, *, missing_owner=None, external_root=None):
     aggregate = case.factories.aggregate
     if missing_owner == "aggregate":
         aggregate = None
-    elif missing_owner == "bounded-binding":
-        removed = {row.binding_id for row in aggregate.bindings if row.accepts_issued_decoder_registration(BOUNDED)}
+    elif missing_owner == "installed-binding":
+        removed = {row.binding_id for row in aggregate.bindings if row.accepts_issued_decoder_registration(REGISTRATION)}
         assert removed
         aggregate = replace(aggregate, bindings=tuple(row for row in aggregate.bindings if row.binding_id not in removed),
             availability=tuple(row for row in aggregate.availability if row.binding is None or row.binding.object_id not in removed))
@@ -104,7 +103,7 @@ def _invalid_before_payload(api, request, reads):
     assert reads == []
 
 
-@pytest.mark.parametrize("registration", (REGISTRATION, BOUNDED), ids=("legacy", "bounded32"))
+@pytest.mark.parametrize("registration", (REGISTRATION,), ids=("current",))
 def test_public_candidate_uses_exact_installed_decoder_and_preserves_canonical_receipt(candidate_case, tmp_path, monkeypatch, registration):
     case = candidate_case
     maximum = len(case.raw)
@@ -150,8 +149,8 @@ def test_legacy_and_unkeyed_default_never_upgrade_to_the_additional_codec(candid
 
 
 @pytest.mark.parametrize("field,value", (
-    ("registration_id", "decoder.recursive-scientific-selection-bounded32.forged"),
-    ("decoder_key", "recursive.scientific-selection-bounded32.forged"),
+    ("registration_id", "decoder.recursive-scientific-selection-forged"),
+    ("decoder_key", "recursive.scientific-selection-forged"),
     ("decoder_version", "9.0.0"),
     ("payload_schema", "empirical-lawhood/testing/foreign-candidate-science"),
     ("payload_version", "9.0.0"),
@@ -162,7 +161,7 @@ def test_legacy_and_unkeyed_default_never_upgrade_to_the_additional_codec(candid
 ))
 def test_every_changed_full_decoder_identity_refuses_before_payload_read(candidate_case, tmp_path, monkeypatch, field, value):
     case = candidate_case
-    changed = replace(BOUNDED, **{field: value})
+    changed = replace(REGISTRATION, **{field: value})
     # Keep descriptor/proposal scalar joins coherent: installed full ownership
     # must reject this, including registration ID and both cap forgeries.
     request = _request(tmp_path, _package(case, changed), changed, case.raw)
@@ -180,41 +179,25 @@ def test_every_changed_full_decoder_identity_refuses_before_payload_read(candida
 def test_proposal_descriptor_mismatch_refuses_before_payload_read(candidate_case, tmp_path, monkeypatch, field, value):
     case = candidate_case
     changes = {"payload": replace(case.proposal.payload, **{field: value})} if field.startswith("object_") else {field: value}
-    request = _request(tmp_path, _package(case, BOUNDED, **changes), BOUNDED, case.raw)
+    request = _request(tmp_path, _package(case, REGISTRATION, **changes), REGISTRATION, case.raw)
     reads = _observe_payload_reads(monkeypatch)
     _invalid_before_payload(_api(case, _registry(case)), request, reads)
 
 
-@pytest.mark.parametrize("changes", ({"decoder_implementation_sha256": "f" * 64}, {"maximum_bytes": 32 * 1024**2 + 1}),
-    ids=("implementation", "upward-cap"))
-def test_additional_codec_must_match_implementation_and_decoder_subcap(candidate_case, tmp_path, monkeypatch, changes):
-    case = candidate_case
-    request = _request(tmp_path, _package(case, BOUNDED), BOUNDED, case.raw)
-    reads = _observe_payload_reads(monkeypatch)
-    _invalid_before_payload(_api(case, _registry(case, additional_changes=changes)), request, reads)
-
-
-@pytest.mark.parametrize("missing_owner", ("aggregate", "bounded-binding"))
+@pytest.mark.parametrize("missing_owner", ("aggregate", "installed-binding"))
 def test_larger_codec_requires_its_full_installed_owner(candidate_case, tmp_path, monkeypatch, missing_owner):
     case = candidate_case
-    request = _request(tmp_path, _package(case, BOUNDED), BOUNDED, case.raw)
+    request = _request(tmp_path, _package(case, REGISTRATION), REGISTRATION, case.raw)
     reads = _observe_payload_reads(monkeypatch)
     _invalid_before_payload(_api(case, _registry(case), missing_owner=missing_owner), request, reads)
 
 
-@pytest.mark.parametrize("registration", (REGISTRATION, BOUNDED), ids=("legacy", "bounded32"))
+@pytest.mark.parametrize("registration", (REGISTRATION,), ids=("current",))
 def test_declared_size_above_selected_codec_refuses_before_payload_read(candidate_case, tmp_path, monkeypatch, registration):
     case = candidate_case
     request = _request(tmp_path, _package(case, registration, payload_size_bytes=len(case.raw) + 1), registration, case.raw)
     reads = _observe_payload_reads(monkeypatch)
     _invalid_before_payload(_api(case, _registry(case, primary_maximum=len(case.raw))), request, reads)
-
-
-def test_missing_additional_codec_cannot_enlarge_primary_from_declared_decoder_cap(candidate_case, tmp_path, monkeypatch):
-    case = candidate_case
-    request = _request(tmp_path, _package(case, BOUNDED), BOUNDED, case.raw)
-    reads = _observe_payload_reads(monkeypatch)
-    _invalid_before_payload(_api(case, _registry(case, include_additional=False)), request, reads)
 
 
 @pytest.mark.parametrize("damage", ("oversized", "truncated", "noncanonical", "different-identity"))
@@ -232,9 +215,9 @@ def test_payload_bound_canonical_bytes_and_frozen_identity_still_apply(candidate
         changed = replace(case.selection, selection_id=old_id[:-1] + ("x" if old_id[-1] != "x" else "y"))
         raw = changed.canonical_bytes()
         assert len(raw) == len(case.raw)
-    request = _request(tmp_path, _package(case, BOUNDED), BOUNDED, raw)
+    request = _request(tmp_path, _package(case, REGISTRATION), REGISTRATION, raw)
     reads = _observe_payload_reads(monkeypatch)
-    result = _api(case, _registry(case)).compile_candidate(request)
+    result = _api(case, _registry(case, primary_maximum=len(case.raw))).compile_candidate(request)
     assert result.status is OperationStatus.INVALID
     assert result.reason_codes == ("EXTENSION_CANDIDATE_INVALID",)
     assert reads == [("payload.json", len(case.raw))]

@@ -13,8 +13,8 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import forecast as feature
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_forecast as response
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import forecast as feature
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_forecast as response
 from tests.test_matrix_e3_causal_feature_extraction import _case as feature_fixture, _damaged
 from tests import test_matrix_scheduled_response_forecast as response_fixture
 

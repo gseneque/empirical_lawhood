@@ -4,11 +4,11 @@
 The caller has authenticated current issue/execution/reveal and all receipts.
 This adds no parent read, task invocation, plan compilation or authority cache.
 """
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as legacy
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as configured
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_secondary_readout import secondary_response_projection
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseScore
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as legacy
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as configured
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_secondary_readout import secondary_response_projection
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseScore
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def _pin(record):
@@ -36,7 +36,7 @@ def consumed_response_rows(*, specification, allocation, calibration, assessment
                     raise PermissionError("E3 secondary read drops its complete consumed forecast/outcome census")
                 values = {}
                 for edge in edges:
-                    from .configured_e3_retained_read import consumed_parent
+                    from empirical_lawhood.api.configured_e3_retained_read import consumed_parent
                     producer, _, logical, _ = consumed_parent(writer=writer, plan=plan, receipts=receipts, task=task, edge=edge)
                     if logical.payload_schema != kind.SCHEMA:
                         raise PermissionError("E3 secondary read changes the actual consumed typed output")
@@ -78,9 +78,9 @@ def read_matched_response(*, specification, allocation, models, model_freeze, ca
     fitting, native acquisition and authority never run in this read.
     """
     from hashlib import sha256
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes, canonical_value
-    from empirical_lawhood.adapters.methods.matrix_factor_response import e3_numerical_methods as numerical
-    from empirical_lawhood.adapters.methods.matrix_factor_response import matched_response_prediction as matched
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes, canonical_value
+    from empirical_lawhood.domains.matrix.matrix_factor_response import e3_numerical_methods as numerical
+    from empirical_lawhood.domains.matrix.matrix_factor_response import matched_response_prediction as matched
 
     if not specification.measurement.is_matched:
         raise ValueError('matched response read requires the selected paired58 specification')
@@ -104,7 +104,7 @@ def read_matched_response(*, specification, allocation, models, model_freeze, ca
                 or (score.root_id, score.independent_group_id) != (root, forecast.feature.unit_id)):
             raise PermissionError('MATCHED_E3_READ_ORIGINAL_SCORE_FORECAST_AND_CAUSAL_PARENTS_REQUIRED')
         views, disposition = configured.paired_response_view_values(specification, source, protocol, panels, score)
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_unknown_response import ConfiguredProtectedE3UnknownResponseAvailability
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_unknown_response import ConfiguredProtectedE3UnknownResponseAvailability
         if score.responses.object_schema == ConfiguredProtectedE3UnknownResponseAvailability.SCHEMA:
             from dataclasses import replace
             if (score.reason_codes != ('UNKNOWN_CONTACT',) or disposition != 'UNEVALUABLE'
@@ -121,7 +121,7 @@ def read_matched_response(*, specification, allocation, models, model_freeze, ca
         forecasts[role].append(forecast)
         outcomes[role].append(outcome)
         if specification.is_curve_primary:
-            from .matrix_mechanism_read import configured_e3_mechanism
+            from empirical_lawhood.api.matrix_mechanism_read import configured_e3_mechanism
             mechanism.append({'role': role, **configured_e3_mechanism(writer=writer, plan=plan, receipts=receipts,
                 protocol=protocol, outcome=outcome, forecast=forecast, score=score, panels=panels,
                 product_reader=product_reader, retention=getattr(source_selection, 'retention', None))})
@@ -136,8 +136,8 @@ def read_matched_response(*, specification, allocation, models, model_freeze, ca
         reasons = numerical.outcome_reasons(specification, outcome)
         loss_rows.append(matched.matched_loss_readout(forecast.feature.unit_id, dict(forecast.log_points), outcome, reasons,
             curve_primary=specification.is_curve_primary))
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_prediction import curve_loss_summary
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_duration import duration_diagnostic_summary, evaluation_median_K
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_prediction import curve_loss_summary
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_duration import duration_diagnostic_summary, evaluation_median_K
     return canonical_value({'status': 'REPRODUCED',
         'basis': 'ORIGINAL_CONSUMED_FORECASTS_AND_COMPLETE_DENSE_SCORE_CELLS',
         'admission_owner': 'S0', 'losses': tuple(loss_rows),

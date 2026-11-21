@@ -3,13 +3,11 @@
 from contextlib import contextmanager
 from dataclasses import replace
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import PHASES
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.source_continuation import (
-    CONTINUATION_FILENAME, MatrixProgrammeSourceContinuation, require_separate_home,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from .matrix_programme_projection import MatrixProgrammeProjectionContext
-from .matrix_researcher_programme_lineage import read_published_record
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import PHASES
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.source_continuation import CONTINUATION_FILENAME, MatrixProgrammeSourceContinuation, require_separate_home
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammeProjectionContext
+from empirical_lawhood.api.matrix_researcher_programme_lineage import read_published_record
 
 
 def _absent(path):
@@ -39,10 +37,10 @@ def _withdrawn_packet(writer, directory, expected_source):
     product and never substitutes for the full reader of an entered programme.
     Only unprivileged development packets are eligible for this observation.
     """
-    from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads, read_recursive_bootstrap_record
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveImplementationBinding
+    from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads, read_recursive_bootstrap_record
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveImplementationBinding
 
     relative = (directory / 'authored-wave.json').relative_to(writer.root.contract.canonical_path).as_posix()
     packet = read_recursive_bootstrap_record(writer, relative, AuthoredRecursiveWave)
@@ -78,10 +76,10 @@ def _withdrawn_packet(writer, directory, expected_source):
 
 @contextmanager
 def withdrawn_custody(service, specification, original_plan, original_bindings, retained):
-    from .matrix_researcher_programme import MatrixResearchProgrammeService, PLAN_FILENAME
-    from .matrix_programme_source_continuation import _pin_original_selection
-    from .selected_e4_bank_recipe import _publication_from_manifest
-    from empirical_lawhood.runtime.experiment_programme import PROGRAMME_DESCRIPTOR_FILENAME
+    from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService, PLAN_FILENAME
+    from empirical_lawhood.api.matrix_programme_source_continuation import _pin_original_selection
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.execution.experiment_programme import PROGRAMME_DESCRIPTOR_FILENAME
 
     with service.artifact_writer.read_context() as writer:
         scoped = replace(service, artifact_writer=writer)

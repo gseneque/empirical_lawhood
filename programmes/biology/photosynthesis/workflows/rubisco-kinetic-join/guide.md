@@ -48,7 +48,7 @@ instance identities. Researchers do not maintain detailed operation IDs.
 Different source evidence instead requires separately identified typed records
 and their exact source bindings. A new gas query creates no biological evidence.
 
-Follow [environment reuse](../../../../../docs/development/maintainer-environment.md) and select a
+Follow [environment reuse](../../../../../docs/using/environments.md#select-storage-and-reuse-an-environment) and select a
 frozen checkout. Capture its canonical `RecursiveImplementationBinding` through
 `api.recursive_authoring.implementation_binding(project_root)` and supply that
 record as `--source-snapshot`. Actual execution checks the selected worker source.

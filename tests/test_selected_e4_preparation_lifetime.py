@@ -13,8 +13,8 @@ import pytest
 
 from empirical_lawhood.api import selected_e4_method_runtime as owner
 from empirical_lawhood.api.selected_e3_access import _current_authority_reader, original_e3_authority_read_context
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_development_task_concurrency import _case
 from tests.test_matrix_selected_e4_method_workers import fitting_invocation
 from tests.test_matrix_selected_e4_methods import (  # noqa: F401

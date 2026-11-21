@@ -5,12 +5,12 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_entry as owner
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_entry as owner
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
 from empirical_lawhood.api.matrix_selected_runtime import _reconstruct_entry_programme
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.metatheory import MetatheoryAggregateDisposition, MetatheoryApplicability
-from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceGateKind
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.structural_claims import MetatheoryAggregateDisposition, MetatheoryApplicability
+from empirical_lawhood.design.scientific_source_qualification import ScientificSourceGateKind
 from tests.test_matrix_selected_protected import confirmation, transfer, unpublished  # noqa: F401
 from tests.test_matrix_source_evidence import source_case  # noqa: F401
 from tests.test_matrix_sampling_follow_on import prior_product

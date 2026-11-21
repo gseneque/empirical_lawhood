@@ -134,15 +134,15 @@ from empirical_lawhood.api.results import (
     IssueStudyRequest, IssueExtensionsRequest, AssembleExperimentPackageRequest,
     CompileCampaignRequest, RunCampaignRequest, ResumeCampaignRequest, CampaignStatusRequest,
 )
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
-from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCompilationReport
-from empirical_lawhood.planning.study_issue import (
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
+from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCompilationReport
+from empirical_lawhood.design.study_issue import (
     AccountableHumanIdentity, HumanProposerAttestation, ImplementationSourceClosure,
     StudyOperationAuthority, StudyAuthorityKind,
 )
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.authority import AuthorityAction
-from empirical_lawhood.infrastructure.study_issue import (
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.authority import AuthorityAction
+from empirical_lawhood.storage.study_issue import (
     PROGRAMME_ISSUE_GRANTEE_ID, PROGRAMME_EXECUTION_GRANTEE_ID, PROGRAMME_REVEAL_GRANTEE_ID,
 )
 from scripts.operator_records import (
@@ -182,7 +182,7 @@ Each checker generates or loads its own Ed25519 key using
 only its `verification_key_hex` in an `ApprovalCheckerRegistration`:
 
 ```python
-from empirical_lawhood.planning.approval import (
+from empirical_lawhood.design.approval import (
     ApprovalCheckerRegistration, ApprovalCheckerRegistry, ApprovalGateKind,
     ApprovalSignatureAlgorithm, ApprovalGateAttestation, AttestationResult,
     issue_approval_gate_attestation,
@@ -319,7 +319,7 @@ loads its private signer **in its own environment** and creates an attestation:
 
 ```python
 # Executed by the actual checker after review, with its selected layer and signer.
-from empirical_lawhood.planning.approval import FrozenIssuedStudyApprovalProposal
+from empirical_lawhood.design.approval import FrozenIssuedStudyApprovalProposal
 frozen = read_record(local / f"{layer}-frozen.json", FrozenIssuedStudyApprovalProposal)
 registration = next(r for r in registry.registrations if r.gate_id == gate_id)
 attestation = issue_approval_gate_attestation(
@@ -341,7 +341,7 @@ The operator receives only the signed records, verifies their exact IDs and
 assembles the durable authorization:
 
 ```python
-from empirical_lawhood.planning.approval import DurableAuthorizationRecord, FrozenIssuedStudyApprovalProposal
+from empirical_lawhood.design.approval import DurableAuthorizationRecord, FrozenIssuedStudyApprovalProposal
 for layer in ("base", "extension"):
     frozen = read_record(local / f"{layer}-frozen.json", FrozenIssuedStudyApprovalProposal)
     attestations = tuple(read_record(local / f"{layer}-{gate}-attestation.json", ApprovalGateAttestation)

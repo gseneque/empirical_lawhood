@@ -7,15 +7,11 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.api import recursive_inquiry as service
-from empirical_lawhood.kernel.recursive_inquiry import identity
-from empirical_lawhood.kernel.recursive_inquiry_policy import (
-    InquiryClaimFinding, InquiryRequirementFinding, ScientificOutcomeKind,
-)
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition
-from empirical_lawhood.kernel.status import LifecycleStatus
-from empirical_lawhood.runtime.recursive_inquiry import (
-    InquiryStateSources, WorkBoundInquiryDecisionRequest,
-)
+from empirical_lawhood.science.inquiry.recursive_inquiry import identity
+from empirical_lawhood.science.inquiry.recursive_inquiry_policy import InquiryClaimFinding, InquiryRequirementFinding, ScientificOutcomeKind
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition
+from empirical_lawhood.science.records.status import LifecycleStatus
+from empirical_lawhood.execution.recursive_inquiry import InquiryStateSources, WorkBoundInquiryDecisionRequest
 from tests.test_recursive_inquiry_policy import policy_case
 from tests.test_recursive_public_service import _plane
 
@@ -86,7 +82,7 @@ def test_v3_invalid_operands_refuse_before_publication(tmp_path, monkeypatch, de
         right = replace(request.right, authority_policy_id="unrelated-policy")
         request = replace(request, right=right, campaign=replace(request.campaign, decision_rights=(right,)))
     elif defect == "mixed-version":
-        from empirical_lawhood.planning.recursive_inquiry import InquiryPolicy
+        from empirical_lawhood.design.recursive_inquiry import InquiryPolicy
         request = replace(request, policy=InquiryPolicy(request.policy.policy_id, request.policy.specification,
             request.policy.max_cost, None, None, None))
     else:

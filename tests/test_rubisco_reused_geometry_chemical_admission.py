@@ -9,20 +9,18 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as p
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import preparation_integrity as legacy
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import physical_preparation_geometry as legacy_geometry
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import serialized_preparation_assessment as serialized
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_roster import definitions
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import control_contracts as c, control_science
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_preparation_admission import (
-    ReusedGeometryChemicalForcePlan, decode_assessments, decode_plan, validate_operands,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_invocation import build_invocation
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_roster import definitions as control_definitions
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as p
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import preparation_integrity as legacy
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import physical_preparation_geometry as legacy_geometry
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import serialized_preparation_assessment as serialized
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_roster import definitions
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import control_contracts as c, control_science
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_preparation_admission import ReusedGeometryChemicalForcePlan, decode_assessments, decode_plan, validate_operands
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_invocation import build_invocation
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_roster import definitions as control_definitions
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_rubisco_geometry_reuse import fresh, original as original
 from tests import test_rubisco_chemical_force_controls as chemical_controls
 from tests.test_rubisco_physical_preparation_geometry import diagnostic

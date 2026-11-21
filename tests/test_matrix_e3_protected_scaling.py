@@ -21,14 +21,14 @@ import tracemalloc
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.prospective_experiment import load_prepared_prospective_experiment
-from empirical_lawhood.infrastructure import bounded_io
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.infrastructure.source_closure import capture_admitted_target_source, capture_target_closure
-from empirical_lawhood.kernel.experimental_design import UnitAllocation
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
-from empirical_lawhood.runtime.recursive_compiler import derive_recursive_scientific_selection
+from empirical_lawhood.storage import bounded_io
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.storage.source_closure import capture_admitted_target_source, capture_target_closure
+from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
+from empirical_lawhood.execution.recursive_compiler import derive_recursive_scientific_selection
 from tests import test_matrix_e3_public_programme as public
 from tests.test_matrix_e3_protected_public_lowering import write_public_file_selection
 from tests.test_matrix_experiment_scaling import embedded_allocations
@@ -49,8 +49,8 @@ def _file_census(paths):
 @contextmanager
 def _measure(monkeypatch, *, original_root):
     """Observe the shared bounded descriptor stream and actual owning callbacks."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_original_publications as originals
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_original_publications as originals
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_source_records import ProtectedE3NativeSourceManifest
 
     counters, opened, path_reads = Counter(), {}, Counter()
     open_regular, chunks = bounded_io._open_regular, bounded_io._regular_chunks
@@ -214,7 +214,7 @@ def test_protected_public_authoring_measures_complete_populations_and_repeated_o
                 method_inputs=resolved.method_inputs, execution=execution, protocol_bytes=case.candidate_bytes)
         # Authoring binds the derived resources to its actual public candidate;
         # the pure preparation intentionally retains precisely this dependency.
-        from empirical_lawhood.adapters.methods.matrix_factor_response.protected_preparation import RESOURCE_BINDING_DEPENDENCY
+        from empirical_lawhood.domains.matrix.matrix_factor_response.protected_preparation import RESOURCE_BINDING_DEPENDENCY
         row["pre_author_dependency_codes"] = [value.code for value in preparation.dependencies]
         assert set(row["pre_author_dependency_codes"]) == {RESOURCE_BINDING_DEPENDENCY}
         assert preparation.draft is not None

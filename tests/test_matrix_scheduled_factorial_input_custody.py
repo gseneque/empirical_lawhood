@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """The factorial input reader reuses exact legacy or sharded custody metadata."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from hashlib import sha256
@@ -7,13 +8,13 @@ from hashlib import sha256
 import pytest
 
 from empirical_lawhood.api.matrix_scheduled_factorial_runtime import _original_external
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ArtifactPlaneError
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactStreamWriteRequest
-from empirical_lawhood.runtime.plans import ExternalInputSpec
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ArtifactPlaneError
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactStreamWriteRequest
+from empirical_lawhood.execution.plans import ExternalInputSpec
 from tests.runtime_platform.test_execution_scheduler import _plane
 from tests.test_execution_input_layout import LOGICAL, PAYLOAD, RUN, SCHEMA, _legacy, _payload, _persist
 
@@ -48,7 +49,9 @@ def test_original_external_joins_exact_custody_and_preserves_all_original_bytes(
     before = _snapshot(tmp_path)
     result = _original_external(plane, RUN, _spec())
     assert (result.logical, result.materialization) == (written.logical, written.materialization)
-    assert result.canonical_bytes() == _sidecar(tmp_path, written).read_bytes()
+    sidecar = _sidecar(tmp_path, written)
+    assert resolve_artifact_sidecar_bytes(plane, sidecar.read_bytes(),
+        sidecar_relative_path=sidecar.relative_to(tmp_path).as_posix()) == result
     assert _snapshot(tmp_path) == before
 
 
@@ -182,7 +185,7 @@ def test_existing_manifest_and_marker_refusals_preserve_retained_bytes(tmp_path,
     plane = _plane(tmp_path)
     written = _publish(plane, layout)
     path = _sidecar(tmp_path, written)
-    manifest = decode_artifact_manifest(path.read_bytes())
+    manifest = resolve_artifact_sidecar_bytes(plane, path.read_bytes())
     if mutation == 'invalid-sidecar':
         path.write_bytes(b'not a canonical manifest')
     elif mutation == 'missing-publication':

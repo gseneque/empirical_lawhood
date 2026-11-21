@@ -6,17 +6,17 @@ from decimal import Decimal
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import METHODS, MatrixParameterHistoryControl
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import calibration_bindings as calibration, compact_bindings as b, compact_records as r
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.continuation import ScheduledFullAssessment, ScheduledFullHistory
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.qualification import cutoffs
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus, ScientificStatus
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationContext
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import METHODS, MatrixParameterHistoryControl
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import calibration_bindings as calibration, compact_bindings as b, compact_records as r
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.continuation import ScheduledFullAssessment, ScheduledFullHistory
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.qualification import cutoffs
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus, ScientificStatus
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationContext
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
 from tests.test_matrix_scheduled_calibration import calibration_fixture
 from tests.test_matrix_scheduled_compact_workers import compact_context, run_compact_commit
 from tests.test_matrix_scheduled_history_bindings import (

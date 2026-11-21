@@ -12,10 +12,10 @@ import json
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_protocol as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as sr
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_protocol as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as sr
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
 from tests import test_matrix_e3_protected_source_records as producer
 from tests.test_matrix_factor_confirmation_eligibility import publish, stock
 from tests.test_matrix_parameter_history import source as parameter_template

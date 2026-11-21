@@ -21,20 +21,30 @@ dependencies and record lineage. These policy contracts preserve those owners.
 
 ## Freeze the question and its frontier
 
-[Kernel policy records](../../src/empirical_lawhood/kernel/recursive_inquiry_policy.py)
+[Kernel policy records](../../src/empirical_lawhood/science/inquiry/recursive_inquiry_policy.py)
 retain the target, required claims, exact scoped requirements, connections,
 assessment contract and complete positive, negative, unevaluable, missing,
 operational-failure and uncertain-contact outcome map. Every prerequisite must
 belong to the declared target graph. Routine use of a known method has supply or
 assessment semantics; it does not require invented competing explanations.
 
-[Planning policy records](../../src/empirical_lawhood/planning/recursive_inquiry_policy.py)
+[Planning policy records](../../src/empirical_lawhood/design/recursive_inquiry_policy.py)
 bind each ACT to its selected draft, configuration, input origins, capability,
 complete operation count and scientific work identity. Source, scope, cutoff,
 role, campaign/right, prerequisites and assessment witnesses are checked before
 ranking. An assessed outcome requires its actual scoped evidence witness.
 Physical or biological target claims remain unattempted until their own
 independent assessment exists.
+
+Current target findings require an [independent claim projection](../../src/empirical_lawhood/science/inquiry/recursive_claim_assessment.py).
+The [public service](../../src/empirical_lawhood/api/recursive_inquiry_claims.py) reconstructs it through an installed `inquiry_claim_assessment_projector`.
+Requests and stored packets cannot supply that projection.
+The projection binds the full claim revision, assessment contract, scoped result, producing receipt and complete evidence census.
+Planning also verifies independent units, nested views and the original evidence ceiling.
+A finding's disposition must equal the independently assessed disposition.
+Commitment and current readback use the same validation.
+Missing assessors, raw sources and wrong-claim assessments refuse current satisfaction.
+Explicit historical reading preserves the original packet without current eligibility.
 
 The public projector retains every actual attempt's original configuration,
 registered scientific work, authored wave, execution plan/task and exact receipt
@@ -92,8 +102,8 @@ A complete negative denominator supports scoped branch closure and preserves the
 
 ## Supported exposed adapter routes
 
-The [material binding](../../src/empirical_lawhood/adapters/methods/analytic_material_inquiry/policy_binding.py)
-and [Rubisco binding](../../src/empirical_lawhood/adapters/methods/rubisco_inquiry/policy_binding.py)
+The [material binding](../../src/empirical_lawhood/domains/materials/analytic_material_inquiry/policy_binding.py)
+and [Rubisco binding](../../src/empirical_lawhood/domains/rubisco/rubisco_inquiry/policy_binding.py)
 provide `policy_supply_draft`, `inquiry_specification`, `inquiry_menu`,
 `input_origins` and `assessed_use_draft`. They author their fixed application
 target and the exact original analytic prerequisite. Their prospective menus
@@ -130,6 +140,10 @@ The [domain control tests](../../tests/test_rubisco_inquiry_acceptance.py) also 
 compatible conditional arithmetic, missing endpoints and wrong assembly or
 reference controls. Material clock/source/receiver controls remain in its
 [acceptance tests](../../tests/test_analytic_material_inquiry_acceptance.py).
+The [target-assessment controls](../../tests/test_recursive_target_assessment.py) verify actual analytic target satisfaction and unsupported-target refusals through public custody.
+Independent SI response and slab equations establish their expected positive result.
+That material assessor accepts only the exact registered analytic use claim.
+Its result remains non-promotable and does not satisfy the physical application target.
 Historical version-one records and draft constructors retain their original
 bytes and meanings. Explicit archive reading uses
 `read_inquiry_decision(revalidate_sources=False)` or

@@ -5,33 +5,34 @@ Current DEV and issued custody remain distinct. Complete original DEV, CAL and
 CONF readers run only at entry; later leaves require that actual successful
 entry receipt plus fresh current task/source/grant authentication.
 """
+from empirical_lawhood.storage.contracts.record_codecs import snapshot_record_codecs
 from dataclasses import replace
 from functools import partial
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustodySupplier
 from empirical_lawhood.api.current_task_custody import CurrentDevelopmentTaskCustody, CurrentIssuedTaskCustody
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import is_baseline_recipe
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_original_commitments import MatrixRevisionEntryEvidenceV2, MatrixRevisionRootConfigV2
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import MatrixRevisionRootConfig, MatrixRevisionEntrySeal, entry_seal
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_entry import validate_entry_evidence
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_workers import SelectedRevisionWorker
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_results import MatrixRevisionProgrammeAssessment
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as public_e4
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4Calibration, SelectedE4DownstreamNomination
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity as original_identity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import is_baseline_recipe
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_original_commitments import MatrixRevisionEntryEvidenceV2, MatrixRevisionRootConfigV2
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import MatrixRevisionRootConfig, MatrixRevisionEntrySeal, entry_seal
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_entry import validate_entry_evidence
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_workers import SelectedRevisionWorker
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_results import MatrixRevisionProgrammeAssessment
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as public_e4
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4Calibration, SelectedE4DownstreamNomination
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_point import SelectedE4PointModels
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity as original_identity
 from empirical_lawhood.api.matrix_sampling_runtime import _original_product
 from empirical_lawhood.api.matrix_selected_runtime import _current_source_qualifications, _issued_configuration_lane, _published_input
 from empirical_lawhood.api.matrix_source_runtime import authenticate_matrix_source_qualification, matrix_source_publication_references
 from empirical_lawhood.api.recursive_qualified_parents import MAX_PARENT_BYTES, _output_payload, _semantic_writer
 from empirical_lawhood.api.selected_e4_native_runtime import development_products
 from empirical_lawhood.api.selected_e4_method_runtime import validate_selected_e4_calibration_producer, validate_selected_e4_downstream_producer
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.metatheory import MetatheoryAggregateDisposition, MetatheoryApplicability
-from empirical_lawhood.planning.scientific_source_qualification import ScientificSourceGateKind
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.structural_claims import MetatheoryAggregateDisposition, MetatheoryApplicability
+from empirical_lawhood.design.scientific_source_qualification import ScientificSourceGateKind
 
 
 def _decode_original(raw, kind, expected):
@@ -71,7 +72,7 @@ def _source_scope(programme, evidence):
 
 def _development_nomination(writer, locator, programme, codecs,*,current_access=None):
     from empirical_lawhood.api.recursive_execution import _read_recursive_wave_with_roots
-    from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+    from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
     locator.__post_init__()
     directory = writer.root.resolve(locator.authoring_relative_path, for_write=False)
     def validate_authored(*, packet, draft, source, payloads, run, plan, index):
@@ -165,7 +166,7 @@ def revision_original_operands(writer, programme, evidence, codecs, *, include_o
     if type(include_original_allocation) is not bool:
         raise TypeError("revision original allocation selection must be a boolean")
     validate_entry_evidence(evidence, programme)
-    from .selected_prepared_access import _selected
+    from empirical_lawhood.api.selected_prepared_access import _selected
     selected={value.record:value for value in _selected(tuple(sorted((evidence.calibration,evidence.downstream_nomination),key=lambda value:value.record.object_id)),current_access)}
     development_access=None if current_access is None else current_access.development_access()
     (development, nomination, original_bank), (frozen_development, frozen, frozen_bank) = development_products(writer,
@@ -219,7 +220,7 @@ def authenticate_revision_source_custody(writer, programme, evidence, codecs, *,
     _source_scope(programme, evidence)
     if programme.phase != "E5_OPPORTUNITY":
         references = matrix_source_publication_references(evidence.source_specification, evidence.source_result, evidence.pipeline)
-        from .prepared_source_replay import is_prepared_source_result, partition_prepared_source_publications
+        from empirical_lawhood.api.prepared_source_replay import is_prepared_source_result, partition_prepared_source_publications
         if is_prepared_source_result(evidence.source_result):
             scientific, bootstrap = partition_prepared_source_publications(writer=writer,
                 publications=evidence.publications)
@@ -256,12 +257,12 @@ class RevisionRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
             raise TypeError("revision custody changes its exact issued lifecycle, writer or reveal selection")
         if custody is not None and getattr(custody,"original_input_access",None) is not original_input_access:
             raise TypeError("revision custody substitutes its actual original input scope")
-        self.supplier, self.writer, self.output_codecs = supplier, writer, dict(output_codecs)
+        self.supplier, self.writer, self.output_codecs = supplier, writer, snapshot_record_codecs(output_codecs)
         self.current_access=read_access if original_input_access is None else original_input_access.current_access
         self.original_input_access=original_input_access
         if directory is not None:
             if payloads is None:
-                from .recursive_authoring import load_authored_wave
+                from empirical_lawhood.api.recursive_authoring import load_authored_wave
                 _,_,_,payloads=load_authored_wave(directory=directory,artifact_writer=writer,lazy_payloads=True,read_access=read_access)
             self.original_input_access=getattr(payloads,'original_input_access',None)
             if self.original_input_access is None:raise PermissionError("revision DEV lacks its actual original-parent bootstrap")
@@ -338,7 +339,7 @@ class RevisionRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
                 raise PermissionError("revision entry changes its selected original evidence")
             _, original_allocation = authenticate_revision_entry(self.writer, config.programme, evidence, self.output_codecs,
                 source_scan_bytes=context.resource_budget.source_scan_bytes, include_original_allocation=True,current_access=self.current_access)
-            from .domain_composition.matrix_selected_declarative.derivation import require_evidence_produced_input_parents
+            from empirical_lawhood.api.domain_composition.matrix_selected_declarative.derivation import require_evidence_produced_input_parents
             require_evidence_produced_input_parents(self.writer, config.produced_input_parents, evidence,read_access=self.current_access)
         else:
             with self.writer.verification_scope() as writer:
@@ -352,7 +353,7 @@ class RevisionRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
                 if self.original_input_access is None:
                     raw = _output_payload(semantic, receipt, logicals[0], MAX_PARENT_BYTES)
                 else:
-                    from .selected_prepared_access import guarded_output_payload
+                    from empirical_lawhood.api.selected_prepared_access import guarded_output_payload
                     raw=guarded_output_payload(semantic,receipt,logicals[0],MAX_PARENT_BYTES,self.original_input_access)
                 seal = decode_canonical_bytes(raw, MatrixRevisionEntrySeal, maximum_bytes=MAX_PARENT_BYTES)
                 if seal.canonical_bytes() != raw:
@@ -376,8 +377,8 @@ class RevisionRuntimeInputSupplier(CurrentIssuedTaskCustodySupplier):
 
 def bind_revision_handoff(handoff, *, writer, output_codecs, reveal_authority_id=None,original_input_access=None,read_access=None):
     from empirical_lawhood.api.recursive_prospective_authoring import RecursiveProspectiveApplicationHandoff
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
     if type(handoff) is not RecursiveProspectiveApplicationHandoff:
         raise TypeError("revision protected binding requires its exact actual prospective handoff")
     if not any(type(row.record) is MatrixRevisionRootConfigV2 and row.record.phase == "entry" and owner.lane_of(row.record.programme) == "PROTECTED"

@@ -10,20 +10,21 @@ import numpy as np
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerOutputPort, WorkerIsolationProfile
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerOutputPort, WorkerIsolationProfile
 
-from empirical_lawhood.adapters.physical.virtual_cell import protocol, runtime, task_runner_v2 as tasks
-from empirical_lawhood.adapters.physical.virtual_cell.config import SELECTION_CAPABILITY_KEY, EVALUATOR_CAPABILITY_KEY, SOURCE_CAPABILITY_KEY, MODEL_CAPABILITY_KEY
-from empirical_lawhood.adapters.physical.virtual_cell.custody_transport_v2 import CanonicalEvidenceEntryV2, CanonicalEvidenceV2
-from empirical_lawhood.adapters.physical.virtual_cell.ports_v2 import virtual_cell_capability_registry_v2, virtual_cell_config_ref_v2, project_protocol_v2, project_graph_v2, ORIGINAL_CONFIG_INPUT_ID_V2
+import empirical_lawhood.domains.biology.virtual_cell.protocol as protocol
+from empirical_lawhood.adapters.physical.virtual_cell import runtime, task_runner_v2 as tasks
+from empirical_lawhood.domains.biology.virtual_cell.config import SELECTION_CAPABILITY_KEY, EVALUATOR_CAPABILITY_KEY, SOURCE_CAPABILITY_KEY, MODEL_CAPABILITY_KEY
+from empirical_lawhood.domains.biology.virtual_cell.custody_transport_v2 import CanonicalEvidenceEntryV2, CanonicalEvidenceV2
+from empirical_lawhood.domains.biology.virtual_cell.ports_v2 import virtual_cell_capability_registry_v2, virtual_cell_config_ref_v2, project_protocol_v2, project_graph_v2, ORIGINAL_CONFIG_INPUT_ID_V2
 from empirical_lawhood.adapters.physical.virtual_cell.receiver_readiness_v2 import ReceiverEnvironmentUnavailable
-from empirical_lawhood.adapters.physical.virtual_cell.records import ModelDevelopmentRecord, ModelSelectionRecord
-from empirical_lawhood.adapters.physical.virtual_cell.records_v2 import ModelSelectionRecordV2
-from empirical_lawhood.adapters.physical.virtual_cell.registry import virtual_cell_capability_registry, virtual_cell_capability_keys
+from empirical_lawhood.domains.biology.virtual_cell.records import ModelDevelopmentRecord, ModelSelectionRecord
+from empirical_lawhood.domains.biology.virtual_cell.records_v2 import ModelSelectionRecordV2
+from empirical_lawhood.domains.biology.virtual_cell.capabilities import virtual_cell_capability_registry, virtual_cell_capability_keys
 from tests.test_virtual_cell_custody_v2 import fixture
 
 
@@ -92,7 +93,7 @@ def test_custody_transport_exact_roundtrip_and_unknown_type_refusal():
 
 
 def test_custody_transport_bounds_its_serialized_outer_json_including_escaping(monkeypatch):
-    from empirical_lawhood.adapters.physical.virtual_cell import custody_transport_v2 as transport
+    import empirical_lawhood.domains.biology.virtual_cell.custody_transport_v2 as transport
 
     identity, record = next(iter(fixture().records.items()))
     inner_size = len(record.canonical_bytes())
@@ -154,10 +155,10 @@ def test_inherited_selection_stage_consumes_actual_v2_custody_and_emits_only_new
     selected = decode_canonical_bytes(selection_payload, ModelSelectionRecordV2, maximum_bytes=65536)
     assert selected.selected_model == case.model_selection.selected_model
     assert selected.development == ObjectIdentity.from_record(case.development.record_id, case.development)
-    assert tasks.VirtualCellTaskRunnerV2._select is runtime.VirtualCellTaskRunner._select
-    assert tasks.VirtualCellTaskRunnerV2._develop is runtime.VirtualCellTaskRunner._develop
-    assert tasks.VirtualCellTaskRunnerV2._falsify is runtime.VirtualCellTaskRunner._falsify
-    assert tasks.VirtualCellTaskRunnerV2._evaluate is runtime.VirtualCellTaskRunner._evaluate
+    assert tasks.VirtualCellTaskRunnerV2._select is runtime.VirtualCellTaskExecutionBase._select
+    assert tasks.VirtualCellTaskRunnerV2._develop is runtime.VirtualCellTaskExecutionBase._develop
+    assert tasks.VirtualCellTaskRunnerV2._falsify is runtime.VirtualCellTaskExecutionBase._falsify
+    assert tasks.VirtualCellTaskRunnerV2._evaluate is runtime.VirtualCellTaskExecutionBase._evaluate
     emitted = decode_canonical_bytes(next(value.payload for value in result.outputs if value.output_id == "custody-evidence"),
         CanonicalEvidenceV2, maximum_bytes=65536).actual_records()
     assert emitted == ((ObjectIdentity.from_record(selected.record_id, selected), selected),)
@@ -176,14 +177,14 @@ def test_actual_evaluator_stage_keeps_original_reveal_gate_after_software_admiss
 def test_development_factory_binds_actual_model_and_metric_payloads_with_complete_census():
     """Saved exposed models exercise the new factory, independently of H5AD I/O."""
     from decimal import Decimal
-    from empirical_lawhood.adapters.physical.virtual_cell.analysis import LinearResponseModel
+    from empirical_lawhood.domains.biology.virtual_cell.analysis import LinearResponseModel
     from empirical_lawhood.adapters.physical.virtual_cell.codecs import encode_linear_model
-    from empirical_lawhood.adapters.physical.virtual_cell.contracts import MetricContract
-    from empirical_lawhood.adapters.physical.virtual_cell.correction_records_v2 import OfficialMetricSetV2, SharedTemplateShiftV2BuildReceipt
-    from empirical_lawhood.adapters.physical.virtual_cell.custody_views_v2 import development_view_v2
-    from empirical_lawhood.adapters.physical.virtual_cell.receiver_observation_v2 import CandidateValidationObservationV2, ReceiverObservation
-    from empirical_lawhood.adapters.physical.virtual_cell.records import ModelArtifactBinding, ResponseSummaryRecord
-    from empirical_lawhood.adapters.physical.virtual_cell.records_v2 import ModelDevelopmentRecordV2
+    from empirical_lawhood.domains.biology.virtual_cell.contracts import MetricContract
+    from empirical_lawhood.domains.biology.virtual_cell.correction_records_v2 import OfficialMetricSetV2, SharedTemplateShiftV2BuildReceipt
+    from empirical_lawhood.domains.biology.virtual_cell.custody_views_v2 import development_view_v2
+    from empirical_lawhood.domains.biology.virtual_cell.receiver_observation_v2 import CandidateValidationObservationV2, ReceiverObservation
+    from empirical_lawhood.domains.biology.virtual_cell.records import ModelArtifactBinding, ResponseSummaryRecord
+    from empirical_lawhood.domains.biology.virtual_cell.records_v2 import ModelDevelopmentRecordV2
 
     case = fixture()
     runner, manifest = _runner(case, MODEL_CAPABILITY_KEY)
@@ -241,12 +242,12 @@ def test_development_factory_binds_actual_model_and_metric_payloads_with_complet
 def test_actual_five_family_fit_tournament_and_refit_math_preserve_observation_parity():
     """Changed payload semantics leave the existing numerical finalizer intact."""
     from decimal import Decimal as D
-    from empirical_lawhood.adapters.physical.virtual_cell.analysis import TargetFeatureMatrix, TargetResponseMatrix
+    from empirical_lawhood.domains.biology.virtual_cell.analysis import TargetFeatureMatrix, TargetResponseMatrix
     from empirical_lawhood.adapters.physical.virtual_cell.codecs import encode_official_metrics
-    from empirical_lawhood.adapters.physical.virtual_cell.correction_records_v2 import OfficialMetricGaugeV2, OfficialMetricSetV2, MetricSourceSemantics
-    from empirical_lawhood.adapters.physical.virtual_cell.development import fit_tier_l0_candidates, finalize_tier_l0_development, CandidateOfficialValidation
-    from empirical_lawhood.adapters.physical.virtual_cell.metric_correction_v2 import score_corrected_metrics
-    from empirical_lawhood.adapters.physical.virtual_cell.receiver_observation_v2 import ReceiverObservation, CandidateValidationObservationV2
+    from empirical_lawhood.domains.biology.virtual_cell.correction_records_v2 import OfficialMetricGaugeV2, OfficialMetricSetV2, MetricSourceSemantics
+    from empirical_lawhood.domains.biology.virtual_cell.development import fit_tier_l0_candidates, finalize_tier_l0_development, CandidateOfficialValidation
+    from empirical_lawhood.domains.biology.virtual_cell.metric_interpretation_v2 import score_corrected_metrics
+    from empirical_lawhood.domains.biology.virtual_cell.receiver_observation_v2 import ReceiverObservation, CandidateValidationObservationV2
     from tests.test_virtual_cell_runtime_v2 import _original_config
 
     selected = _original_config()

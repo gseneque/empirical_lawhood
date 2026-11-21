@@ -9,12 +9,10 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.protected_experiment_inputs import (
-    E3RequiredPublication, e3_prepared_publication_transports, require_e3_reserved_fit_inputs,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+from empirical_lawhood.domains.matrix.matrix_factor_response.protected_experiment_inputs import E3RequiredPublication, e3_prepared_publication_transports, require_e3_reserved_fit_inputs
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
 from tests.test_matrix_e3_statistical_bindings import (
     case as statistical_case, config, prepared, sources,
 )

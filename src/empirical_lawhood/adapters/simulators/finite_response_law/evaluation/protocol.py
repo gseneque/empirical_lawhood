@@ -3,32 +3,32 @@
 from dataclasses import replace
 from math import ceil
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.source_qualification import PredecessorBoundSourceQualificationExperiment
-from empirical_lawhood.runtime.capabilities import CapabilityPermission
-from empirical_lawhood.runtime.linked_campaigns import LinkedCampaignStageEnvelope
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolStepTemplate, ScientificStage
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-from empirical_lawhood.adapters.methods.finite_response_law.evaluation_results import FiniteResponseLawEvaluationRevealConfig, FiniteResponseLawEvaluationCohort, COHORT, ADJUDICATE, reveal_tasks
-from empirical_lawhood.adapters.methods.finite_response_law.evaluation_provider import reveal_dependencies
-from empirical_lawhood.adapters.methods.finite_response_law.control_reveal import FiniteResponseLawProspectiveRootEvaluation
-from empirical_lawhood.adapters.methods.finite_response_law.evaluation_readout import FiniteResponseLawRootInferenceOperands
-from empirical_lawhood.adapters.composition.protocol_helpers import capability_config_ref as _config_ref, protocol_outputs as _outputs
-from empirical_lawhood.adapters.methods.finite_response_law.control_provider import control_tasks, control_dependencies, CONTROL_RECORDS, OPERATIONS
-from empirical_lawhood.adapters.methods.finite_response_law.control_records import FiniteResponseLawControlConfig
-from empirical_lawhood.adapters.methods.finite_response_law.method_records import FiniteResponseLawAssignedQualificationReport
-from empirical_lawhood.adapters.methods.finite_response_law.control_closeout import FiniteResponseLawRootSealedControl
-from empirical_lawhood.adapters.methods.finite_response_law.assigned_native_records import FiniteResponseLawAssignedEvaluationProjectionConfig, FiniteResponseLawAssignedEvaluationCompletionConfig, FiniteResponseLawAssignedEvaluationViewObservation, FiniteResponseLawAssignedEvaluationNativeCompletion
-from empirical_lawhood.adapters.methods.finite_response_law.native_provider import EVALUATOR_TASK_ID
-from ..assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
-from ..contracts import native_invocations
-from ..evaluation_retention import FiniteResponseLawEvaluationRetention
-from ..evaluation_provider import control_dependency
-from ..source_outputs import FiniteResponseLawAssignedEvaluationTaskResult
-from ..native_artifact import NATIVE_PAIR_SCHEMA
-from .discovery import SOURCE_CAPABILITY, PROJECTION_CAPABILITY, EVALUATION_CAPABILITY, CONTROL_CAPABILITY, REVEAL_CAPABILITY
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.source_qualification import PredecessorBoundSourceQualificationExperiment
+from empirical_lawhood.execution.capabilities import CapabilityPermission
+from empirical_lawhood.execution.linked_campaigns import LinkedCampaignStageEnvelope
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolStepTemplate, ScientificStage
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+from empirical_lawhood.domains.matrix.finite_response_law.evaluation_results import FiniteResponseLawEvaluationRevealConfig, FiniteResponseLawEvaluationCohort, COHORT, ADJUDICATE, reveal_tasks
+from empirical_lawhood.domains.matrix.finite_response_law.evaluation_provider import reveal_dependencies
+from empirical_lawhood.domains.matrix.finite_response_law.control_reveal import FiniteResponseLawProspectiveRootEvaluation
+from empirical_lawhood.domains.matrix.finite_response_law.evaluation_readout import FiniteResponseLawRootInferenceOperands
+from empirical_lawhood.execution.protocol_helpers import capability_config_ref as _config_ref, protocol_outputs as _outputs
+from empirical_lawhood.domains.matrix.finite_response_law.control_provider import control_tasks, control_dependencies, CONTROL_RECORDS, OPERATIONS
+from empirical_lawhood.domains.matrix.finite_response_law.control_records import FiniteResponseLawControlConfig
+from empirical_lawhood.domains.matrix.finite_response_law.method_records import FiniteResponseLawAssignedQualificationReport
+from empirical_lawhood.domains.matrix.finite_response_law.control_closeout import FiniteResponseLawRootSealedControl
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_native_records import FiniteResponseLawAssignedEvaluationProjectionConfig, FiniteResponseLawAssignedEvaluationCompletionConfig, FiniteResponseLawAssignedEvaluationViewObservation, FiniteResponseLawAssignedEvaluationNativeCompletion
+from empirical_lawhood.domains.matrix.finite_response_law.native_provider import EVALUATOR_TASK_ID
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
+from empirical_lawhood.domains.matrix.finite_response_law.contracts import native_invocations
+from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_retention import FiniteResponseLawEvaluationRetention
+from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_provider import control_dependency
+from empirical_lawhood.adapters.simulators.finite_response_law.source_outputs import FiniteResponseLawAssignedEvaluationTaskResult
+from empirical_lawhood.adapters.simulators.finite_response_law.native_artifact import NATIVE_PAIR_SCHEMA
+from empirical_lawhood.adapters.simulators.finite_response_law.evaluation.discovery import SOURCE_CAPABILITY, PROJECTION_CAPABILITY, EVALUATION_CAPABILITY, CONTROL_CAPABILITY, REVEAL_CAPABILITY
 
 
 def evaluation_protocol_steps(
@@ -120,7 +120,7 @@ def evaluation_protocol_steps(
             # receipted graph input. They do not reread compiled programmes.
             prior_bytes = 12 * 1024**2 if guard else 0
             if retention is not None:
-                from ..evaluation_continuation.discovery import SOURCE_CAPABILITY as CONTINUATION_SOURCE, IMPORT_CAPABILITY
+                from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.discovery import SOURCE_CAPABILITY as CONTINUATION_SOURCE, IMPORT_CAPABILITY
 
                 manifest = CONTINUATION_SOURCE
                 if invocation.phase == "prefix":

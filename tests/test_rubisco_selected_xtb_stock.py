@@ -12,10 +12,10 @@ import ast
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.contracts import SourceMember
-from empirical_lawhood.adapters.methods.rubisco_insilico_free_energy import prospective_xtb as x
-from empirical_lawhood.infrastructure.isolated_native_subwork import _file_sha256
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.contracts import SourceMember
+from empirical_lawhood.domains.rubisco.rubisco_insilico_free_energy import prospective_xtb as x
+from empirical_lawhood.execution.local.isolated_native_subwork import _file_sha256
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from tests.test_rubisco_rr_qmmm_xtb import native_capture
 
 D = Decimal
@@ -101,7 +101,7 @@ def test_v2_identity_and_all_original_native_bytes_remain_exact(tmp_path, embedd
                'files': [(n, sha256(raw).hexdigest()) for n, raw in current.input_files]}
     assert current.identity == sha256(json.dumps(payload, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
     assert (current.release_tag, current.runtime_build) == ('6.7.1', 'edcfbbe')
-    original = Path('/tmp/el-domain-entry-audit-20261011/selected-prefix-source02/src/empirical_lawhood/adapters/methods/rubisco_insilico_free_energy/prospective_xtb.py')
+    original = Path('/tmp/el-domain-entry-audit-20261011/selected-prefix-source02/src/empirical_lawhood/domains/rubisco/rubisco_insilico_free_energy/prospective_xtb.py')
     if original.is_file():
         assert sha256(original.read_bytes()).hexdigest() == '641f8a0138223d84081c07d787813fedde0554ac07165277ec02672ad882766c'
         name = 'tests._immutable_original_prospective_xtb'

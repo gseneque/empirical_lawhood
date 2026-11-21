@@ -11,10 +11,10 @@ from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import PurePosixPath
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactManifest
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
 
 _active = ContextVar('retained_e3_evidence', default=None)
 
@@ -23,7 +23,7 @@ def current_e3_evidence(writer):
     """Return only an active read of this exact guarded root and policy."""
     current = _active.get()
     if current is not None and current.active and current.writer.root is writer.root:
-        from empirical_lawhood.infrastructure.artifacts import _has_stock_manifest_reads
+        from empirical_lawhood.storage.artifacts import _has_stock_manifest_reads
         if (_has_stock_manifest_reads(writer) and _has_stock_manifest_reads(current.writer)
                 and current.writer.custody_limits is writer.custody_limits
                 and current.writer.validators is writer.validators
@@ -40,7 +40,7 @@ def retained_e3_reader(writer):
     their own callbacks, and custom or differently selected policies keep
     their ordinary reader. This creates no publication or access authority.
     """
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, _has_stock_artifact_plane_state
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, _has_stock_artifact_plane_state
     current = current_e3_evidence(writer)
     if (current is not None and type(writer) is ExternalArtifactPlane
             and _has_stock_artifact_plane_state(writer)
@@ -52,9 +52,7 @@ def retained_e3_reader(writer):
 
 
 def recorded_product_kinds():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_methods import (
-        ConfiguredProtectedE3ModelSet, ConfiguredProtectedE3FrozenProducts, ConfiguredProtectedE3Calibration,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_methods import ConfiguredProtectedE3ModelSet, ConfiguredProtectedE3FrozenProducts, ConfiguredProtectedE3Calibration
     return (ConfiguredProtectedE3ModelSet, ConfiguredProtectedE3FrozenProducts, ConfiguredProtectedE3Calibration)
 
 
@@ -75,7 +73,7 @@ class RecordedProducer:
     @property
     def writer(self):
         """Typed output custody is needed when a scientific product is consumed."""
-        from .recursive_operations import operation_catalog
+        from empirical_lawhood.api.recursive_operations import operation_catalog
         self.evidence.require_access(self)
         writer = self.evidence.reader.output_artifact_plane(package=self.package,
             execution_plan=self.plan, output_codecs=operation_catalog()[2])
@@ -85,7 +83,7 @@ class RecordedProducer:
 
 class RetainedE3Evidence:
     def __init__(self, writer, publisher):
-        from .current_result_custody import CurrentResultPlanReader
+        from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
         self.writer, self.publisher = writer, publisher
         self.reader = CurrentResultPlanReader(writer)
         self.producers = {}
@@ -111,7 +109,7 @@ class RetainedE3Evidence:
             and getattr(writer, '_read_verification', None) is self.writer._read_verification)
 
     def require_access(self, producer=None):
-        from .protected_e3_read_custody import _current_read_grants
+        from empirical_lawhood.api.protected_e3_read_custody import _current_read_grants
         if not self.active:
             raise PermissionError('retained E3 evidence escaped its owning read')
         self.writer.require_active_verification_scope()
@@ -120,7 +118,7 @@ class RetainedE3Evidence:
 
     def require_custody(self):
         """Close the original complete control census, including absent attempts."""
-        from .recursive_execution import _custody_control_pins
+        from empirical_lawhood.api.recursive_execution import _custody_control_pins
         self.require_access()
         for row in self.producers.values():
             if _custody_control_pins(self.writer, row.index) != row.control_pins:
@@ -128,11 +126,11 @@ class RetainedE3Evidence:
         self.writer.require_verification_snapshot()
 
     def producer(self, run_id, reveal_id, *, package_pin=None, plan_pin=None):
-        from .recursive_qualified_parents import _actual_package
-        from .protected_e3_read_custody import authorize
-        from .retained_e3_control_repair import selected_repair_index
-        from .experiment_execution_read import read_execution_records
-        from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
+        from empirical_lawhood.api.recursive_qualified_parents import _actual_package
+        from empirical_lawhood.api.protected_e3_read_custody import authorize
+        from empirical_lawhood.api.retained_e3_control_repair import selected_repair_index
+        from empirical_lawhood.api.experiment_execution_read import read_execution_records
+        from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
         key = run_id, reveal_id
         row = self.producers.get(key)
         if row is None:
@@ -154,8 +152,8 @@ class RetainedE3Evidence:
         return row
 
     def receipt(self, producer, task_id, expected=None):
-        from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-        from .current_result_custody import _require_current_task_receipt_outputs, authenticate_historical_execution_authority
+        from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+        from empirical_lawhood.api.current_result_custody import _require_current_task_receipt_outputs, authenticate_historical_execution_authority
         rows = tuple(row for row in producer.report['operational_census']
             if row['task_id'] == task_id and row['operational_status'] == 'SUCCEEDED')
         if len(rows) != 1:
@@ -176,7 +174,7 @@ class RetainedE3Evidence:
         return receipt
 
     def product_metadata(self, original, expected):
-        from .recursive_qualified_parents import _replay_parent_authority
+        from empirical_lawhood.api.recursive_qualified_parents import _replay_parent_authority
         original.__post_init__()
         binding = original.prior_execution
         if binding.record != expected:
@@ -196,11 +194,11 @@ class RetainedE3Evidence:
 
     def boundary(self, boundary):
         """Authenticate recorded exclusion and import custody, without recreating it."""
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
-        from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-        from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-        from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-        from .recursive_execution import _custody_control_pins
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
+        from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+        from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+        from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+        from empirical_lawhood.api.recursive_execution import _custody_control_pins
         key = boundary.identity
         if key in self.boundaries:
             self.require_access()
@@ -249,7 +247,7 @@ class RetainedE3Evidence:
         return producer
 
     def imported(self, boundary, task_id):
-        from empirical_lawhood.adapters.methods.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
+        from empirical_lawhood.domains.matrix.matrix_factor_response.configured_closeout_execution import ConfiguredE3ClosedExecution
         self.boundary(boundary)
         imports = tuple(row for row in boundary.imported_outputs if row.task_id == task_id)
         if not imports or len({row.receipt for row in imports}) != 1:
@@ -277,7 +275,7 @@ class RetainedE3Evidence:
 
     def original_config(self, retention, task, config):
         """Authenticate a PURE byte adoption, without refitting or replaying arrays."""
-        from .matrix_selected_runtime import _published_input
+        from empirical_lawhood.api.matrix_selected_runtime import _published_input
         config.validate_retention(retention)
         producer = self.producer(retention.original_run_id, retention.original_reveal_authority.object_id,
             package_pin=retention.original_package, plan_pin=retention.original_plan)
@@ -297,8 +295,8 @@ class RetainedE3Evidence:
 
 @contextmanager
 def retained_e3_evidence_context(artifact_writer):
-    from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID
-    from .selected_e3_access import original_e3_authority_read_context
+    from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore, PROGRAMME_ISSUE_GRANTEE_ID
+    from empirical_lawhood.api.selected_e3_access import original_e3_authority_read_context
     current = current_e3_evidence(artifact_writer)
     if current is not None:
         current.require_access()

@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: MPL-2.0
 """Lazy actual development custody for declarative selected preparation."""
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedDevelopmentSpecification
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_declarative_preparation import DEVELOPMENT_PROTOCOL_ID
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedDevelopmentSpecification
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_declarative_preparation import DEVELOPMENT_PROTOCOL_ID
 
 
 def derive_inputs(**kwargs):
@@ -11,8 +11,8 @@ def derive_inputs(**kwargs):
 
 
 def bind_development(*, supplier, writer, directory, plan, output_codecs, payloads=None, read_access=None):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_revision_bindings as revision
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_opportunity_bindings as opportunity
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_revision_bindings as revision
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_opportunity_bindings as opportunity
     keys = {value.capability.capability_key for value in plan.tasks}
     if keys and all(value.startswith(revision.NAMESPACE + ".development.") for value in keys):
         from empirical_lawhood.api.matrix_selected_revision_runtime import bind_revision_development
@@ -36,7 +36,7 @@ EXPERIMENT_RUNTIME_BINDING = ExperimentRuntimeBinding(DEVELOPMENT_PROTOCOL_ID, N
 # Exact existing locator classes only. Requests/selections contain fitted bodies.
 from dataclasses import replace
 from empirical_lawhood.api import selected_prepared_access as original_access
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_declarative_preparation import locator_record_types
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_declarative_preparation import locator_record_types
 
 EXPERIMENT_RUNTIME_BINDING=replace(EXPERIMENT_RUNTIME_BINDING,
     development_bootstrap_record_types=locator_record_types(),

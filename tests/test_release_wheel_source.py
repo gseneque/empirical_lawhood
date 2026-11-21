@@ -18,7 +18,7 @@ def wheel_source_case(tmp_path, monkeypatch):
     release = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(release)
     payloads = {"empirical_lawhood/__init__.py": b"# selected package\n",
-                "empirical_lawhood/resources/opaque.bin": b"retained source bytes\0"}
+                "empirical_lawhood/package_data/opaque.bin": b"retained source bytes\0"}
     checkout = tmp_path / "selected-inputs"
     for name, raw in payloads.items():
         path = checkout / "src" / name
@@ -113,6 +113,18 @@ def test_noncanonical_or_escaping_zip_names_refuse(wheel_source_case, tmp_path, 
         release.compare_wheel_source(checkout, wheel)
 
 
+@pytest.mark.parametrize("member", ("OPTIM.md", "docs/plans/results.json", "docs/plans/",
+    "empirical_lawhood-1.data/data/docs/plans/plot.png", "empirical_lawhood-1.data/purelib/OPTIM.md",
+    "empirical_lawhood-1.dist-info/PROREVIEW/receipts.zip"))
+def test_wheel_excludes_private_files_and_relocated_data(wheel_source_case, tmp_path, member):
+    release, checkout, payloads = wheel_source_case
+    wheel = make_wheel(tmp_path / "leak.whl", payloads)
+    with zipfile.ZipFile(wheel, "a") as archive:
+        archive.writestr(member, b"" if member.endswith("/") else b"private")
+    with pytest.raises(RuntimeError, match="working plan"):
+        release.compare_wheel_source(checkout, wheel)
+
+
 def test_zip_directory_cannot_hide_payload_bytes(wheel_source_case, tmp_path):
     release, checkout, payloads = wheel_source_case
     wheel = make_wheel(tmp_path / "directory.whl", payloads)
@@ -136,9 +148,9 @@ def test_source_symlink_is_not_regular_selected_input(wheel_source_case, tmp_pat
 
 def test_member_bodies_use_bounded_delivery_without_whole_bank_reads(wheel_source_case, tmp_path, monkeypatch):
     release, checkout, payloads = wheel_source_case
-    payloads["empirical_lawhood/resources/opaque.bin"] = bytes(range(256)) * 16385
-    source = checkout / "src/empirical_lawhood/resources/opaque.bin"
-    source.write_bytes(payloads["empirical_lawhood/resources/opaque.bin"])
+    payloads["empirical_lawhood/package_data/opaque.bin"] = bytes(range(256)) * 16385
+    source = checkout / "src/empirical_lawhood/package_data/opaque.bin"
+    source.write_bytes(payloads["empirical_lawhood/package_data/opaque.bin"])
     wheel = make_wheel(tmp_path / "bounded.whl", payloads)
     calls = []
     original = zipfile.ZipExtFile.read

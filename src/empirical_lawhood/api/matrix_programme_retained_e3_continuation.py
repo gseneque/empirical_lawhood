@@ -5,31 +5,31 @@ from dataclasses import fields, replace
 from pathlib import Path
 from time import monotonic
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import retained_e3_continuation as domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import e3_closeout as closeout_domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import retained_training_continuation as training_domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import source_continuation as source_domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import PHASES
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import CONTINUED_PROTOCOL_ID, MatrixContinuedProgrammeSpecification, MatrixResearchProgrammePlan
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticated_programme_inputs
-from empirical_lawhood.infrastructure.matrix_retained_training import read_retained_training_source
-from empirical_lawhood.infrastructure.source_closure import require_admitted_target_source_current
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import retained_e3_continuation as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import e3_closeout as closeout_domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import retained_training_continuation as training_domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import source_continuation as source_domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import PHASES
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import CONTINUED_PROTOCOL_ID, MatrixContinuedProgrammeSpecification, MatrixResearchProgrammePlan
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticated_programme_inputs
+from empirical_lawhood.adapters.matrix_storage.matrix_retained_training import read_retained_training_source
+from empirical_lawhood.storage.source_closure import require_admitted_target_source_current
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
-from .configured_e3_retained_custody import read_original_partial_e3
-from .matrix_researcher_programme_lineage import read_published_record, retained_run_binding
+from empirical_lawhood.api.configured_e3_retained_custody import read_original_partial_e3
+from empirical_lawhood.api.matrix_researcher_programme_lineage import read_published_record, retained_run_binding
 
 
 def _predecessor(service, request):
-    from .matrix_researcher_programme import MatrixResearchProgrammeService, PLAN_FILENAME
-    from .selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService, PLAN_FILENAME
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
     writer, selected = service.artifact_writer, request.predecessor
     plan = read_published_record(writer, selected.publication.materialization.relative_path,
         MatrixResearchProgrammePlan, selected.publication.materialization.size_bytes)
@@ -64,7 +64,7 @@ def _require_original_frontier(context):
 
 
 def _inherited_terminals(context):
-    from .matrix_programme_source_continuation import _pin
+    from empirical_lawhood.api.matrix_programme_source_continuation import _pin
     rows = []
     for phase in training_domain.RETAINED_PHASES:
         report = context.retained_execution_reports.get(phase)
@@ -95,11 +95,11 @@ def _original_partial(context, request):
         raise PermissionError('retained E3 requires the exact original entered run and a distinct continuation')
     context.bound_specification(context.binding('e3'))
     relative = context.child_directory('e3').relative_to(context.writer.root.contract.canonical_path).as_posix()
-    from .configured_e3_unfinished_custody import read_unfinished_e3
+    from empirical_lawhood.api.configured_e3_unfinished_custody import read_unfinished_e3
     reader = (read_unfinished_e3 if context.plan.specification.continuation_request.object_schema ==
         domain.MatrixProgrammeRetainedE3ContinuationSpecification.SCHEMA else read_original_partial_e3)
     if type(request) is closeout_domain.MatrixProgrammeE3CloseoutSpecification:
-        from .configured_e3_closeout_custody import read_closed_e3
+        from empirical_lawhood.api.configured_e3_closeout_custody import read_closed_e3
         reader = read_closed_e3
     with reader(artifact_writer=context.writer, directory=relative, run_id=run.run_id,
             reveal_authority_id=request.original_reveal_authority_id) as partial:
@@ -157,7 +157,7 @@ def continued_context(owner, context, record):
 
 
 def _publish_inputs(original, provenance, old_training, retained, support, publish, *, record_id):
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.input_records import validate_programme_input_records
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.input_records import validate_programme_input_records
     phases, handles = [], []
     for phase in original.phases:
         handle = original.commitments.phase(phase.role)
@@ -183,12 +183,12 @@ def _publish_inputs(original, provenance, old_training, retained, support, publi
 
 def derive_inputs(*, specification, source_selection_path, project_root, artifact_writer,
         metadata_directory, output_selection_path, execution, read_access=None):
-    from .experiment_preparation import load_experiment_inputs, prepare_experiment
-    from .experiment_programme import ExperimentProgrammeService
-    from .matrix_numerical_provenance import capture_matrix_provenance
-    from .matrix_programme_allocations import _require_memory
-    from .matrix_researcher_programme import _publish
-    from .selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest
+    from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
+    from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
+    from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
+    from empirical_lawhood.api.matrix_programme_allocations import _require_memory
+    from empirical_lawhood.api.matrix_researcher_programme import _publish
+    from empirical_lawhood.api.selected_e4_bank_recipe import _current_selection, _metadata_record_size, _publication_from_manifest
     if type(specification) not in (domain.MatrixProgrammeRetainedE3ContinuationSpecification,
             closeout_domain.MatrixProgrammeE3CloseoutSpecification) or read_access is not None:
         raise TypeError('retained E3 continuation requires its exact ordinary source-transition specification')

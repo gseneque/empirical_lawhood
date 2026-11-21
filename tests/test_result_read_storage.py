@@ -7,9 +7,9 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.cli import integrations, platform
-from empirical_lawhood.infrastructure import artifacts, selected_candidate, source_origin
-from empirical_lawhood.runtime import operator_profile
-from empirical_lawhood.runtime.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
+from empirical_lawhood.storage import artifacts, selected_candidate, source_origin
+from empirical_lawhood.execution import operator_profile
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile
 
 
 def _forbidden(*_args, **_kwargs):

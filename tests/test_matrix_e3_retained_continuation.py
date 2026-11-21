@@ -10,29 +10,23 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_composition as composition
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_lowering import (
-    lower_protected_matrix_response_error, operation_class, selected_configs, task_id,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import (
-    ConfiguredE3RetainedExecution, ConfiguredE3RetainedTaskConfig, require_numerical_source_continuity, source_binding,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_continued_response import (
-    ConfiguredE3ContinuedResponseConfig, original_config,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_methods import ConfiguredProtectedE3FrozenProducts
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, CanonicalTaskReceipt, LogicalArtifactIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, ExecutionPlan, ExecutionTask
-from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input, project_recursive_config_inputs
-from empirical_lawhood.runtime.recovery import RunRecoveryTerminalEvent
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_composition as composition
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error, operation_class, selected_configs, task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import ConfiguredE3RetainedExecution, ConfiguredE3RetainedTaskConfig, require_numerical_source_continuity, source_binding
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_continued_response import ConfiguredE3ContinuedResponseConfig, original_config
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_methods import ConfiguredProtectedE3FrozenProducts
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, CanonicalTaskReceipt, LogicalArtifactIdentity
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, ExecutionPlan, ExecutionTask
+from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input, project_recursive_config_inputs
+from empirical_lawhood.execution.recovery import RunRecoveryTerminalEvent
 from tests.test_matrix_configured_protected_public_preparation import public_case  # noqa: F401
 
 
@@ -42,7 +36,7 @@ def _pin(label, kind):
 
 def _changed_source(provenance, *, member=None, lock=False):
     sources = dict(provenance.package_sources)
-    selected = member or 'adapters/methods/matrix_factor_response/configured_protected_response_records.py'
+    selected = member or 'domains/matrix/matrix_factor_response/configured_protected_response_records.py'
     sources[selected] = 'd' * 64 if sources.get(selected) != 'd' * 64 else 'e' * 64
     rows = tuple(sorted(sources.items()))
     return replace(provenance, package_sources=rows, code_sources_sha256=sha256(canonical_json_bytes(rows)).hexdigest(),
@@ -176,8 +170,8 @@ def test_continued_response_supplies_exact_direct_producing_provenance(continuat
 @pytest.fixture(scope='module')
 def continued_compiler_inputs(continuation_case):
     """Supply disclosed source metadata to the ordinary complete compiler."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_preparation import _source_projection
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import retained_file_versions
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_preparation import _source_projection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import retained_file_versions
     from empirical_lawhood.api.derived_metadata_access import _semantic_access
     from empirical_lawhood.api.recursive_operations import operation_catalog
 
@@ -212,11 +206,9 @@ def continued_compiler_inputs(continuation_case):
 @pytest.fixture
 def continued_public_files(continued_compiler_inputs, tmp_path):
     """Bind the disclosed literal outputs through the real public FILE owner."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_bindings import retained_input_id
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import retained_file_versions
-    from empirical_lawhood.planning.experiment_inputs import (
-        ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding,
-    )
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_bindings import retained_input_id
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import retained_file_versions
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
 
     case = continued_compiler_inputs
     original = case.continuation.original
@@ -251,7 +243,7 @@ def continued_public_files(continued_compiler_inputs, tmp_path):
 
 def _prepare_continued_public_files(selected):
     from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, prepare_experiment
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
     specification = selected.case.continuation.original.specification
     bound = load_experiment_inputs(specification, selected.path)
@@ -264,7 +256,7 @@ def _prepare_continued_public_files(selected):
 
 
 def test_continuation_public_files_prepare_complete_retained_graph(continued_public_files):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_preparation as preparation_owner
+    from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_preparation as preparation_owner
     from empirical_lawhood.api.experiment_preparation import _validate_prepared_input_files
 
     selected = continued_public_files
@@ -325,8 +317,8 @@ def test_continuation_public_files_keep_exact_contract_refusals(continued_public
 
 
 def test_continuation_complete_compiler_accepts_original_custody_operands(continued_compiler_inputs):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_bindings import retained_input_id
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_bindings import retained_input_id
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
     case = continued_compiler_inputs
     compiled = compile_recursive_wave(draft=case.draft, **case.options,
@@ -350,7 +342,7 @@ def test_continuation_complete_compiler_accepts_original_custody_operands(contin
 
 @pytest.mark.parametrize('operand', ('original_task', 'original_receipt', 'public_source', 'numerical_profile', 'continuation'))
 def test_continuation_compiler_refuses_omitted_original_operands(continued_compiler_inputs, operand):
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
     case = continued_compiler_inputs
     if operand in ('original_task', 'original_receipt'):
@@ -393,8 +385,8 @@ def test_continuation_refuses_missing_receipts_and_bypassed_freezes(continuation
 
 
 @pytest.mark.parametrize('member,lock', (
-    ('adapters/methods/matrix_scheduled_history/response_native.py', False),
-    ('adapters/methods/matrix_factor_response/configured_protected_methods.py', False),
+    ('domains/matrix/matrix_scheduled_history/response_native.py', False),
+    ('domains/matrix/matrix_factor_response/configured_protected_methods.py', False),
     (None, True),
 ))
 def test_continuation_refuses_changed_numerical_owners_or_lock(continuation_case, member, lock):

@@ -9,16 +9,9 @@ from pathlib import Path
 
 from empirical_lawhood.api.codecs import load_authoring
 from empirical_lawhood.api.models import CampaignPackage
-from empirical_lawhood.infrastructure.authority import Ed25519ApprovalAttestationSigner
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.approval import (
-    ApprovalCheckerRegistration,
-    ApprovalCheckerRegistry,
-    ApprovalGateAttestation,
-    CompleteApprovalService,
-    DurableAuthorizationRecord,
-    FrozenApprovalProposal,
-)
+from empirical_lawhood.storage.authority import Ed25519ApprovalAttestationSigner
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.approval import ApprovalCheckerRegistration, ApprovalCheckerRegistry, ApprovalGateAttestation, CompleteApprovalService, DurableAuthorizationRecord, FrozenApprovalProposal
 
 
 def deterministic_approval_signer(label: str) -> Ed25519ApprovalAttestationSigner:

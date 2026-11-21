@@ -9,11 +9,11 @@ from typing import BinaryIO
 import unicodedata
 import zipfile
 
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 
-from .contracts import MASTUPublicArchiveInventory, MASTUPublicArchiveLimits, MASTUPublicArchiveMemberInventory, MASTUPublicDataCiteMetadataReceipt, MASTUPublicMemberRole, MASTUPublicReleaseObjectPolicy, MASTUPublicReleaseRole, MASTUPublicSelectedMemberExpectation, MASTUPublicTrustedUseAcceptance
+from empirical_lawhood.domains.fusion.mastu_release_qualification.contracts import MASTUPublicArchiveInventory, MASTUPublicArchiveLimits, MASTUPublicArchiveMemberInventory, MASTUPublicDataCiteMetadataReceipt, MASTUPublicMemberRole, MASTUPublicReleaseObjectPolicy, MASTUPublicReleaseRole, MASTUPublicSelectedMemberExpectation, MASTUPublicTrustedUseAcceptance
 
 
 _ALLOWED_COMPRESSION = frozenset({zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED})

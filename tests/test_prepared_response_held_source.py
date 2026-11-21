@@ -10,15 +10,15 @@ import pytest
 
 pytestmark = pytest.mark.held
 
-from empirical_lawhood.adapters.composition.prepared_response.native_authoring import PreparedResponseNativeAuthoringInput
+from empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring import PreparedResponseNativeAuthoringInput
 from empirical_lawhood.api.native_authoring import author_matrix_response
-from empirical_lawhood.adapters.simulators.prepared_response.contracts import PARENTS, PreparedForceWord, PreparedNativeSpec, prepared_native_member, prepared_numerical_view
-from empirical_lawhood.adapters.simulators.prepared_response.extension_bundle import SOURCE_QUALIFICATION_SOURCE_CAPABILITY
-from empirical_lawhood.adapters.simulators.prepared_response.instruments import prepared_receiver, select_prepared_ports
+from empirical_lawhood.domains.matrix.prepared_response.contracts import PARENTS, PreparedForceWord, PreparedNativeSpec, prepared_native_member, prepared_numerical_view
+from empirical_lawhood.adapters.simulators.prepared_response.extension import SOURCE_QUALIFICATION_SOURCE_CAPABILITY
+from empirical_lawhood.domains.matrix.prepared_response.instruments import prepared_receiver, select_prepared_ports
 from empirical_lawhood.adapters.simulators.prepared_response.native_tasks import prepared_static_native_invocations
-from empirical_lawhood.adapters.simulators.prepared_response.source import bind_prepared_common_start, bind_prepared_native_handoff, execute_native_future, execute_native_parent, prepare_native_prefix
+from empirical_lawhood.domains.matrix.prepared_response.source import bind_prepared_common_start, bind_prepared_native_handoff, execute_native_future, execute_native_parent, prepare_native_prefix
 from empirical_lawhood.api.codecs import load_registered_authoring
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 ROOT = Path(__file__).parents[1]
 
@@ -97,7 +97,7 @@ def test_shipped_q_selected_source_keeps_five_parents_and_seventeen_words() -> N
     )
     assert common.frame is not None
     assert common.frame.cutoff_tick == root.landmark
-    from empirical_lawhood.adapters.simulators.six_matrix_response.response_observer import _decode
+    from empirical_lawhood.domains.matrix.six_matrix_response.response_observer import _decode
 
     causal = _decode(prefixes[0].checkpoint.history_positions_base64, (31, 2, 3, 4, 4))[
         -16:, 0

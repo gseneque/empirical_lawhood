@@ -3,25 +3,20 @@
 from io import BytesIO
 from dataclasses import dataclass
 
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_NPZ_CODEC, MATRIX_STORAGE_CODECS
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import MatrixPreparationInitialStateV2, initial_state_types
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
-from empirical_lawhood.api.derived_metadata_access import (
-    _semantic_access, validate_derived_metadata_access, _require_canonical_metadata_binding,
-    _read_canonical_metadata_binding,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseArrays
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.continuation import ScheduledFullArrays
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays, NPZMemberSelection
-from empirical_lawhood.infrastructure.publication_metadata import (
-    authenticate_published_materialization, consume_published_materializations, supports_closed_publication_access,
-)
-from empirical_lawhood.kernel.matrix_inputs import SavedMatrixArrays
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult
-from empirical_lawhood.runtime.recursive_storage_codecs import resolve_storage_codec
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_NPZ_CODEC, MATRIX_STORAGE_CODECS
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixPreparationInitialStateV2, initial_state_types
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
+from empirical_lawhood.api.derived_metadata_access import _semantic_access, validate_derived_metadata_access, _require_canonical_metadata_binding, _read_canonical_metadata_binding
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseArrays
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.continuation import ScheduledFullArrays
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays, NPZMemberSelection
+from empirical_lawhood.storage.publication_metadata import authenticate_published_materialization, consume_published_materializations, supports_closed_publication_access
+from empirical_lawhood.domains.matrix.input_contracts import SavedMatrixArrays
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ArtifactWriteResult
+from empirical_lawhood.storage.contracts.recursive_storage_codecs import resolve_storage_codec
 
 
 def _selection(arrays, external):
@@ -66,7 +61,7 @@ def validate_matrix_array_input_bytes(*, raw, arrays, external):
     codec.validate_stream(BytesIO(raw), request, size=len(raw))
     values = decode_matrix_arrays(raw, selected)
     if type(arrays) is MatrixPreparationInitialStateV2:
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_initialization_science import validate_initial_state
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_initialization_science import validate_initial_state
         validate_initial_state(arrays, values)
 
 

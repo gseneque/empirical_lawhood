@@ -8,25 +8,18 @@ import numpy as np
 import pytest
 from scipy.linalg import expm
 
-from empirical_lawhood.adapters.methods.matrix_history_analysis import algebra
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import (
-    FactorEventSpec, FactorPopulation, FactorPopulationResult, FactorRootRole, ScalarClosureSpec,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import (
-    SectorMeasurement, causal_observations, eligible_origins, lifetime,
-    align_factor, decimal_measurement, measure_sector, measure_trace, population_counts, risk_sets, scalar_closure_ratios, trace,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.products import (
-    read_result, recurrence_intervals, residual_survival_intervals, validate_diagnostics,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.scalar_assessment import assess_scalar_trace, independent_scalar_closure_ratio
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import su2_generators
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.domains.matrix.matrix_history_analysis import algebra
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import FactorEventSpec, FactorPopulation, FactorPopulationResult, FactorRootRole, ScalarClosureSpec
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import SectorMeasurement, causal_observations, eligible_origins, lifetime, align_factor, decimal_measurement, measure_sector, measure_trace, population_counts, risk_sets, scalar_closure_ratios, trace
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.products import read_result, recurrence_intervals, residual_survival_intervals, validate_diagnostics
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.scalar_assessment import assess_scalar_trace, independent_scalar_closure_ratio
+from empirical_lawhood.domains.matrix.six_matrix_response.model import su2_generators
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
 
 
 def spec(**changes):
@@ -320,10 +313,10 @@ def test_retained_admission_or_root_substitution_refuses():
 
 @pytest.mark.parametrize("view", ("PRIMARY", "FINE"))
 def test_scalar_producer_extraction_preserves_original_geometry_and_independent_oracle(view, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import ScalarClosureSpec
-    from empirical_lawhood.adapters.methods.matrix_factor_lifetime.scalar_assessment import independent_scalar_closure_ratio
-    from empirical_lawhood.adapters.simulators.six_matrix_response.model import ideal_state
-    from empirical_lawhood.adapters.simulators.six_matrix_response import response_observer
+    from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import ScalarClosureSpec
+    from empirical_lawhood.domains.matrix.matrix_factor_lifetime.scalar_assessment import independent_scalar_closure_ratio
+    from empirical_lawhood.domains.matrix.six_matrix_response.model import ideal_state
+    from empirical_lawhood.domains.matrix.six_matrix_response import response_observer
     original = ideal_state(q=2, alpha_tilde_x=8., alpha_tilde_y=8., constitution="11")
     positions = np.broadcast_to(original.positions, (97, *original.positions.shape)).copy()
     positions[:, 1, 0] *= 1.01
@@ -339,9 +332,9 @@ def test_scalar_producer_extraction_preserves_original_geometry_and_independent_
 
 
 def test_independent_scalar_residual_uses_original_native_coupling_not_band_ratio(monkeypatch):
-    from empirical_lawhood.adapters.simulators.six_matrix_response.model import SixMatrixState
-    from empirical_lawhood.adapters.simulators.six_matrix_response.history_source import history_native_parameters
-    from empirical_lawhood.adapters.simulators.six_matrix_response.response_observer import geometry_sample
+    from empirical_lawhood.domains.matrix.six_matrix_response.model import SixMatrixState
+    from empirical_lawhood.domains.matrix.six_matrix_response.history_source import history_native_parameters
+    from empirical_lawhood.domains.matrix.six_matrix_response.response_observer import geometry_sample
     member,_=history_native_parameters()
     fields=.4*algebra.LEFT+.1*algebra.RIGHT
     positions=np.stack((fields,2*fields))
@@ -359,7 +352,7 @@ def test_independent_scalar_residual_uses_original_native_coupling_not_band_rati
 
 @pytest.mark.parametrize("view", ("PRIMARY", "FINE"))
 def test_self_consistent_wrong_scalar_ratio_refuses_raw_native_assessment(view):
-    from empirical_lawhood.adapters.simulators.six_matrix_response.model import ideal_state
+    from empirical_lawhood.domains.matrix.six_matrix_response.model import ideal_state
     initial = ideal_state(q=2, alpha_tilde_x=8., alpha_tilde_y=8., constitution="11")
     positions = np.broadcast_to(initial.positions, (97, *initial.positions.shape)).copy()
     positions[:, 1, 0] *= 1.01

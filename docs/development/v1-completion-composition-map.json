@@ -1,0 +1,630 @@
+{
+  "full_modules": {
+    "empirical_lawhood.adapters.composition.causal_response.authoring": "empirical_lawhood.domains.matrix.causal_response.authoring.authoring",
+    "empirical_lawhood.adapters.composition.causal_response.exposure": "empirical_lawhood.domains.matrix.causal_response.authoring.exposure",
+    "empirical_lawhood.adapters.composition.causal_response.resources": "empirical_lawhood.domains.matrix.causal_response.authoring.resources",
+    "empirical_lawhood.adapters.composition.constructed_preparation_applicability.authoring": "empirical_lawhood.domains.matrix.constructed_preparation_applicability.authoring.authoring",
+    "empirical_lawhood.adapters.composition.constructed_preparation_applicability.protocol": "empirical_lawhood.domains.matrix.constructed_preparation_applicability.authoring.protocol",
+    "empirical_lawhood.adapters.composition.constructed_preparation_applicability.resources": "empirical_lawhood.domains.matrix.constructed_preparation_applicability.authoring.resources",
+    "empirical_lawhood.adapters.composition.constructed_preparation_applicability.science": "empirical_lawhood.domains.matrix.constructed_preparation_applicability.authoring.science",
+    "empirical_lawhood.adapters.composition.constructed_preparation_applicability.selection": "empirical_lawhood.domains.matrix.constructed_preparation_applicability.authoring.selection",
+    "empirical_lawhood.adapters.composition.finite_response_law.assignment": "empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment",
+    "empirical_lawhood.adapters.composition.finite_response_law.authoring": "empirical_lawhood.domains.matrix.finite_response_law.authoring.authoring",
+    "empirical_lawhood.adapters.composition.finite_response_law.completion_authoring": "empirical_lawhood.domains.matrix.finite_response_law.authoring.completion_authoring",
+    "empirical_lawhood.adapters.composition.finite_response_law.design": "empirical_lawhood.domains.matrix.finite_response_law.authoring.design",
+    "empirical_lawhood.adapters.composition.finite_response_law.exposure": "empirical_lawhood.domains.matrix.finite_response_law.authoring.exposure",
+    "empirical_lawhood.adapters.composition.finite_response_law.method_authoring": "empirical_lawhood.domains.matrix.finite_response_law.authoring.method_authoring",
+    "empirical_lawhood.adapters.composition.finite_response_law.preparation_policy_authoring": "empirical_lawhood.domains.matrix.finite_response_law.authoring.preparation_policy_authoring",
+    "empirical_lawhood.adapters.composition.finite_response_law.preparation_policy_resources": "empirical_lawhood.domains.matrix.finite_response_law.authoring.preparation_policy_resources",
+    "empirical_lawhood.adapters.composition.finite_response_law.resources": "empirical_lawhood.domains.matrix.finite_response_law.authoring.resources",
+    "empirical_lawhood.adapters.composition.information_response.authoring": "empirical_lawhood.domains.matrix.information_response.authoring.authoring",
+    "empirical_lawhood.adapters.composition.information_response.exposure": "empirical_lawhood.domains.matrix.information_response.authoring.exposure",
+    "empirical_lawhood.adapters.composition.information_response.resources": "empirical_lawhood.domains.matrix.information_response.authoring.resources",
+    "empirical_lawhood.adapters.composition.matrix_preparation.entry": "empirical_lawhood.domains.matrix.matrix_preparation.authoring.entry",
+    "empirical_lawhood.adapters.composition.matrix_preparation.resources": "empirical_lawhood.domains.matrix.matrix_preparation.authoring.resources",
+    "empirical_lawhood.adapters.composition.matrix_preparation.science": "empirical_lawhood.domains.matrix.matrix_preparation.authoring.science",
+    "empirical_lawhood.adapters.composition.matrix_response_study.causal_intersection_residence_design": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.causal_intersection_residence_design",
+    "empirical_lawhood.adapters.composition.matrix_response_study.contracts": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.contracts",
+    "empirical_lawhood.adapters.composition.matrix_response_study.design": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.design",
+    "empirical_lawhood.adapters.composition.matrix_response_study.invariant_capacity_comparison_design": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.invariant_capacity_comparison_design",
+    "empirical_lawhood.adapters.composition.matrix_response_study.lineage_inputs": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.lineage_inputs",
+    "empirical_lawhood.adapters.composition.matrix_response_study.prospective_reactive_source_design": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.prospective_reactive_source_design",
+    "empirical_lawhood.adapters.composition.matrix_response_study.reactive_nesting_design": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.reactive_nesting_design",
+    "empirical_lawhood.adapters.composition.matrix_response_study.shooting_design": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.shooting_design",
+    "empirical_lawhood.adapters.composition.matrix_response_study.transient_controlled_invariance_design": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.transient_controlled_invariance_design",
+    "empirical_lawhood.adapters.composition.multi_world_response_study.conformance": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.conformance",
+    "empirical_lawhood.adapters.composition.multi_world_response_study.contracts.historical": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.historical",
+    "empirical_lawhood.adapters.composition.multi_world_response_study.contracts.platform_binding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.platform_binding",
+    "empirical_lawhood.adapters.composition.multi_world_response_study.contracts.science": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.science",
+    "empirical_lawhood.adapters.composition.preparation_applicability.authoring": "empirical_lawhood.domains.matrix.preparation_applicability.authoring.authoring",
+    "empirical_lawhood.adapters.composition.preparation_applicability.exposure": "empirical_lawhood.domains.matrix.preparation_applicability.authoring.exposure",
+    "empirical_lawhood.adapters.composition.preparation_applicability.protocol": "empirical_lawhood.domains.matrix.preparation_applicability.authoring.protocol",
+    "empirical_lawhood.adapters.composition.preparation_applicability.resources": "empirical_lawhood.domains.matrix.preparation_applicability.authoring.resources",
+    "empirical_lawhood.adapters.composition.preparation_applicability.science": "empirical_lawhood.domains.matrix.preparation_applicability.authoring.science",
+    "empirical_lawhood.adapters.composition.preparation_applicability.selection": "empirical_lawhood.domains.matrix.preparation_applicability.authoring.selection",
+    "empirical_lawhood.adapters.composition.prepared_response.calibration_design": "empirical_lawhood.domains.matrix.prepared_response.authoring.calibration_design",
+    "empirical_lawhood.adapters.composition.prepared_response.calibration_resources": "empirical_lawhood.domains.matrix.prepared_response.authoring.calibration_resources",
+    "empirical_lawhood.adapters.composition.prepared_response.development_design": "empirical_lawhood.domains.matrix.prepared_response.authoring.development_design",
+    "empirical_lawhood.adapters.composition.prepared_response.development_resources": "empirical_lawhood.domains.matrix.prepared_response.authoring.development_resources",
+    "empirical_lawhood.adapters.composition.prepared_response.exposure": "empirical_lawhood.domains.matrix.prepared_response.authoring.exposure",
+    "empirical_lawhood.adapters.composition.prepared_response.qualification_design": "empirical_lawhood.domains.matrix.prepared_response.authoring.qualification_design",
+    "empirical_lawhood.adapters.composition.prepared_response.qualification_resources": "empirical_lawhood.domains.matrix.prepared_response.authoring.qualification_resources",
+    "empirical_lawhood.adapters.composition.prepared_response.task_charter": "empirical_lawhood.domains.matrix.prepared_response.authoring.task_charter",
+    "empirical_lawhood.adapters.composition.rc_ladder_response.authoring": "empirical_lawhood.domains.circuits.rc_ladder.authoring.authoring",
+    "empirical_lawhood.adapters.composition.rc_ladder_response.design": "empirical_lawhood.domains.circuits.rc_ladder.authoring.design",
+    "empirical_lawhood.adapters.composition.reactor_causal_response.authoring": "empirical_lawhood.domains.reactor.reactor_causal_response.authoring.authoring",
+    "empirical_lawhood.adapters.composition.reactor_causal_response.resources": "empirical_lawhood.domains.reactor.reactor_causal_response.authoring.resources",
+    "empirical_lawhood.adapters.composition.reactor_finite_control_frontier.authoring": "empirical_lawhood.domains.reactor.reactor_finite_control_frontier.authoring.authoring",
+    "empirical_lawhood.adapters.composition.reactor_finite_control_frontier.protocol": "empirical_lawhood.domains.reactor.reactor_finite_control_frontier.authoring.protocol",
+    "empirical_lawhood.adapters.composition.reactor_finite_control_frontier.resources": "empirical_lawhood.domains.reactor.reactor_finite_control_frontier.authoring.resources",
+    "empirical_lawhood.adapters.composition.reactor_local_domain_qualification.authoring": "empirical_lawhood.domains.reactor.reactor_local_domain_qualification.authoring.authoring",
+    "empirical_lawhood.adapters.composition.reactor_local_domain_qualification.resources": "empirical_lawhood.domains.reactor.reactor_local_domain_qualification.authoring.resources",
+    "empirical_lawhood.adapters.composition.reactor_matched_replay_forecast.authoring": "empirical_lawhood.domains.reactor.reactor_matched_replay_forecast.authoring.authoring",
+    "empirical_lawhood.adapters.composition.reactor_matched_replay_forecast.resources": "empirical_lawhood.domains.reactor.reactor_matched_replay_forecast.authoring.resources",
+    "empirical_lawhood.adapters.composition.reactor_prefix_response.authoring": "empirical_lawhood.domains.reactor.reactor_prefix_response.authoring.authoring",
+    "empirical_lawhood.adapters.composition.reactor_prefix_response.resources": "empirical_lawhood.domains.reactor.reactor_prefix_response.authoring.resources",
+    "empirical_lawhood.adapters.composition.reactor_prepared_feed_qualification.authoring": "empirical_lawhood.domains.reactor.reactor_prepared_feed_qualification.authoring.authoring",
+    "empirical_lawhood.adapters.composition.reactor_prepared_feed_qualification.resources": "empirical_lawhood.domains.reactor.reactor_prepared_feed_qualification.authoring.resources",
+    "empirical_lawhood.adapters.composition.reactor_reference_policy_forecast.authoring": "empirical_lawhood.domains.reactor.reactor_reference_policy_forecast.authoring.authoring",
+    "empirical_lawhood.adapters.composition.reactor_reference_policy_forecast.resources": "empirical_lawhood.domains.reactor.reactor_reference_policy_forecast.authoring.resources",
+    "empirical_lawhood.adapters.composition.reactor_regime_response.authoring": "empirical_lawhood.domains.reactor.reactor_regime_response.authoring.authoring",
+    "empirical_lawhood.adapters.composition.reactor_regime_response.continuation": "empirical_lawhood.domains.reactor.reactor_regime_response.authoring.continuation",
+    "empirical_lawhood.adapters.composition.reactor_regime_response.protocol": "empirical_lawhood.domains.reactor.reactor_regime_response.authoring.protocol",
+    "empirical_lawhood.adapters.composition.reactor_regime_response.resources": "empirical_lawhood.domains.reactor.reactor_regime_response.authoring.resources",
+    "empirical_lawhood.adapters.composition.reactor_selected_action_response.authoring": "empirical_lawhood.domains.reactor.reactor_selected_action_response.authoring.authoring",
+    "empirical_lawhood.adapters.composition.reactor_selected_action_response.protocol": "empirical_lawhood.domains.reactor.reactor_selected_action_response.authoring.protocol",
+    "empirical_lawhood.adapters.composition.reactor_selected_action_response.resources": "empirical_lawhood.domains.reactor.reactor_selected_action_response.authoring.resources",
+    "empirical_lawhood.adapters.composition.reactor_staged_pulse_response.authoring": "empirical_lawhood.domains.reactor.reactor_staged_pulse_response.authoring.authoring",
+    "empirical_lawhood.adapters.composition.reactor_staged_pulse_response.protocol": "empirical_lawhood.domains.reactor.reactor_staged_pulse_response.authoring.protocol",
+    "empirical_lawhood.adapters.composition.reactor_staged_pulse_response.resources": "empirical_lawhood.domains.reactor.reactor_staged_pulse_response.authoring.resources",
+    "empirical_lawhood.adapters.composition.response_composition.scalar_parent": "empirical_lawhood.domains.matrix.response_composition.authoring.scalar_parent",
+    "empirical_lawhood.adapters.composition.response_geometry_prospective.design": "empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.design",
+    "empirical_lawhood.adapters.composition.response_geometry_prospective.development_authoring": "empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.development_authoring",
+    "empirical_lawhood.adapters.composition.response_geometry_prospective.development_design": "empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.development_design",
+    "empirical_lawhood.adapters.composition.response_geometry_prospective.development_resources": "empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.development_resources",
+    "empirical_lawhood.adapters.composition.response_geometry_prospective.exposure": "empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.exposure",
+    "empirical_lawhood.adapters.composition.response_geometry_prospective.resources": "empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.resources",
+    "empirical_lawhood.adapters.composition.tokamak_control_replication.action_words": "empirical_lawhood.domains.fusion.tokamak_control_replication.authoring.action_words",
+    "empirical_lawhood.adapters.composition.tokamak_control_replication.campaign_design": "empirical_lawhood.domains.fusion.tokamak_control_replication.authoring.campaign_design",
+    "empirical_lawhood.adapters.composition.tokamak_control_replication.rosters": "empirical_lawhood.domains.fusion.tokamak_control_replication.authoring.rosters",
+    "empirical_lawhood.adapters.composition.tokamak_control_replication.scientific_inputs": "empirical_lawhood.domains.fusion.tokamak_control_replication.authoring.scientific_inputs",
+    "empirical_lawhood.adapters.composition.experiment_authoring": "empirical_lawhood.execution.experiment_authoring",
+    "empirical_lawhood.adapters.composition.phase_authoring": "empirical_lawhood.execution.phase_authoring",
+    "empirical_lawhood.adapters.composition.task_resources": "empirical_lawhood.execution.task_resources",
+    "empirical_lawhood.adapters.composition.record_provider": "empirical_lawhood.execution.record_provider",
+    "empirical_lawhood.adapters.composition.acquisition_recurrence_margin_contracts": "empirical_lawhood.domains.reference_worlds.registration.acquisition_recurrence_margin_contracts",
+    "empirical_lawhood.adapters.composition.prospective_execution_contracts": "empirical_lawhood.domains.reference_worlds.registration.prospective_execution_contracts",
+    "empirical_lawhood.adapters.composition.multi_world_execution_contracts": "empirical_lawhood.domains.reference_worlds.registration.multi_world_execution_contracts",
+    "empirical_lawhood.adapters.composition.generated_extension_bundles": "empirical_lawhood.execution.generated_extension_bundles",
+    "empirical_lawhood.adapters.composition.matrix_response_study.observation_order_design": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.observation_order_design",
+    "empirical_lawhood.adapters.composition.matrix_preparation.authoring": "empirical_lawhood.domains.matrix.matrix_preparation.authoring.authoring",
+    "empirical_lawhood.adapters.composition.matrix_preparation.method_continuation": "empirical_lawhood.domains.matrix.matrix_preparation.authoring.method_continuation",
+    "empirical_lawhood.adapters.composition.response_geometry_prospective.development_continuation_authoring": "empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.development_continuation_authoring",
+    "empirical_lawhood.adapters.composition.finite_response_law.rerun_input": "empirical_lawhood.domains.matrix.finite_response_law.authoring.rerun_input",
+    "empirical_lawhood.adapters.composition.finite_response_law.consumer_input": "empirical_lawhood.domains.matrix.finite_response_law.authoring.consumer_input",
+    "empirical_lawhood.adapters.composition.finite_response_law.informative_composition_input": "empirical_lawhood.domains.matrix.finite_response_law.authoring.informative_composition_input",
+    "empirical_lawhood.adapters.composition.reactor_prefix_response.prior_run": "empirical_lawhood.domains.reactor.reactor_prefix_response.authoring.prior_run"
+  },
+  "symbols": {
+    "empirical_lawhood.adapters.composition.matrix_response_study": {
+      "SixMatrixResponseArtifactDataset": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.contracts",
+      "SixMatrixResponseArtifactProfileConfig": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.contracts",
+      "MatrixResponseCampaignPackageDag": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.contracts",
+      "MatrixResponseCampaignPackageNode": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.contracts",
+      "MatrixResponseDesignBinding": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.contracts",
+      "MatrixResponseResourceEnvelope": "empirical_lawhood.domains.matrix.matrix_response_study.authoring.contracts"
+    },
+    "empirical_lawhood.adapters.composition.tokamak_control_replication": {
+      "GYM_TORAX_ACTION_CHART_ID": "empirical_lawhood.domains.fusion.tokamak_control_replication.authoring.action_words",
+      "build_gym_torax_prospective_action_chart": "empirical_lawhood.domains.fusion.tokamak_control_replication.authoring.action_words",
+      "GYM_TORAX_PACKAGE_IDS": "empirical_lawhood.domains.fusion.tokamak_control_replication.authoring.campaign_design",
+      "build_gym_torax_authority_requirements": "empirical_lawhood.domains.fusion.tokamak_control_replication.authoring.campaign_design",
+      "build_gym_torax_package_lineage": "empirical_lawhood.domains.fusion.tokamak_control_replication.authoring.campaign_design",
+      "build_gym_torax_terminal_matrix": "empirical_lawhood.domains.fusion.tokamak_control_replication.authoring.campaign_design",
+      "GymToraxRosterGenerator": "empirical_lawhood.domains.fusion.tokamak_control_replication.authoring.rosters"
+    },
+    "empirical_lawhood.adapters.composition.multi_world_response_study": {
+      "MultiWorldStudyChildPackageBinding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.platform_binding",
+      "MultiWorldStudyGraphBinding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.platform_binding",
+      "MultiWorldStudyConsumerCompatibilityReceipt": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.platform_binding",
+      "MultiWorldStudyConsumerPlatformBinding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.platform_binding",
+      "verify_study_consumer_platform_binding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.platform_binding",
+      "MultiWorldStudyPayloadNamespaceBinding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.science",
+      "MultiWorldStudyScientificBinding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.science",
+      "SyntheticMultiWorldStudyParentConformance": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.science",
+      "validate_study_scientific_binding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.science"
+    },
+    "empirical_lawhood.adapters.composition.multi_world_response_study.contracts": {
+      "MultiWorldStudyChildPackageBinding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.platform_binding",
+      "MultiWorldStudyGraphBinding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.platform_binding",
+      "MultiWorldStudyConsumerCompatibilityReceipt": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.platform_binding",
+      "MultiWorldStudyConsumerPlatformBinding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.platform_binding",
+      "verify_study_consumer_platform_binding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.platform_binding",
+      "ExposedDesignInputLedger": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.historical",
+      "ExposedDesignInput": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.historical",
+      "MultiWorldStudyPayloadNamespaceBinding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.science",
+      "MultiWorldStudyScientificBinding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.science",
+      "SyntheticMultiWorldStudyParentConformance": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.science",
+      "validate_study_scientific_binding": "empirical_lawhood.domains.reference_worlds.multi_world_response_study.authoring.contracts.science"
+    },
+    "empirical_lawhood.adapters.composition": {
+      "BOUNDED_ACQUISITION_CAPABILITY_KEY": "empirical_lawhood.domains.reference_worlds.registration.acquisition_recurrence_margin_contracts",
+      "AcquisitionRecurrenceMarginContractRegistry": "empirical_lawhood.domains.reference_worlds.registration.acquisition_recurrence_margin_contracts",
+      "GATE_MARGIN_CAPABILITY_KEY": "empirical_lawhood.domains.reference_worlds.registration.acquisition_recurrence_margin_contracts",
+      "MAXIMIN_CONTINUATION_CAPABILITY_KEY": "empirical_lawhood.domains.reference_worlds.registration.acquisition_recurrence_margin_contracts",
+      "RECURRENCE_CAPABILITY_KEY": "empirical_lawhood.domains.reference_worlds.registration.acquisition_recurrence_margin_contracts",
+      "ACQUISITION_RECURRENCE_MARGIN_CAPABILITY_KEYS": "empirical_lawhood.domains.reference_worlds.registration.acquisition_recurrence_margin_contracts",
+      "build_acquisition_recurrence_margin_contract_registry": "empirical_lawhood.domains.reference_worlds.registration.acquisition_recurrence_margin_contracts",
+      "acquisition_recurrence_margin_capability_manifests": "empirical_lawhood.domains.reference_worlds.registration.acquisition_recurrence_margin_contracts"
+    },
+    "empirical_lawhood.execution.generated_extension_bundles": {
+      "EXPERIMENT_PROTOCOL_DECLARATIONS": "empirical_lawhood.api.generated_experiment_protocols"
+    },
+    "empirical_lawhood.adapters.composition.prepared_response.dependent_input": {
+      "PreparedResponseDependentAuthoring": "empirical_lawhood.domains.matrix.prepared_response.authoring.dependent_input",
+      "PreparedResponseDependentInput": "empirical_lawhood.domains.matrix.prepared_response.authoring.dependent_input"
+    },
+    "empirical_lawhood.adapters.composition.prepared_response.native_authoring": {
+      "PreparedNativeAuthoring": "empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring",
+      "PreparedResponseNativeAuthoringInput": "empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring",
+      "ROUTES": "empirical_lawhood.domains.matrix.prepared_response.authoring.native_authoring"
+    },
+    "empirical_lawhood.adapters.composition.finite_response_law.native_input": {
+      "FiniteResponseLawCalibrationInput": "empirical_lawhood.domains.matrix.finite_response_law.authoring.native_input"
+    },
+    "empirical_lawhood.adapters.composition.finite_response_law.stage_input": {
+      "FiniteResponseLawPriorCensus": "empirical_lawhood.domains.matrix.finite_response_law.authoring.stage_input",
+      "FiniteResponseLawStageInput": "empirical_lawhood.domains.matrix.finite_response_law.authoring.stage_input",
+      "_build_assigned_calibration": "empirical_lawhood.domains.matrix.finite_response_law.authoring.stage_input",
+      "STAGE_BINDINGS": "empirical_lawhood.domains.matrix.finite_response_law.authoring.stage_input"
+    },
+    "empirical_lawhood.adapters.composition.response_composition.input": {
+      "ResponseCompositionInput": "empirical_lawhood.domains.matrix.response_composition.authoring.input"
+    }
+  },
+  "dispositions": [
+    {
+      "old": "adapters/composition/causal_response/authoring.py",
+      "new": "domains/matrix/causal_response/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/causal_response/exposure.py",
+      "new": "domains/matrix/causal_response/authoring/exposure.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/causal_response/resources.py",
+      "new": "domains/matrix/causal_response/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/constructed_preparation_applicability/authoring.py",
+      "new": "domains/matrix/constructed_preparation_applicability/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/constructed_preparation_applicability/protocol.py",
+      "new": "domains/matrix/constructed_preparation_applicability/authoring/protocol.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/constructed_preparation_applicability/resources.py",
+      "new": "domains/matrix/constructed_preparation_applicability/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/constructed_preparation_applicability/science.py",
+      "new": "domains/matrix/constructed_preparation_applicability/authoring/science.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/constructed_preparation_applicability/selection.py",
+      "new": "domains/matrix/constructed_preparation_applicability/authoring/selection.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/finite_response_law/assignment.py",
+      "new": "domains/matrix/finite_response_law/authoring/assignment.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/finite_response_law/authoring.py",
+      "new": "domains/matrix/finite_response_law/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/finite_response_law/completion_authoring.py",
+      "new": "domains/matrix/finite_response_law/authoring/completion_authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/finite_response_law/design.py",
+      "new": "domains/matrix/finite_response_law/authoring/design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/finite_response_law/exposure.py",
+      "new": "domains/matrix/finite_response_law/authoring/exposure.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/finite_response_law/method_authoring.py",
+      "new": "domains/matrix/finite_response_law/authoring/method_authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/finite_response_law/preparation_policy_authoring.py",
+      "new": "domains/matrix/finite_response_law/authoring/preparation_policy_authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/finite_response_law/preparation_policy_resources.py",
+      "new": "domains/matrix/finite_response_law/authoring/preparation_policy_resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/finite_response_law/resources.py",
+      "new": "domains/matrix/finite_response_law/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/information_response/authoring.py",
+      "new": "domains/matrix/information_response/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/information_response/exposure.py",
+      "new": "domains/matrix/information_response/authoring/exposure.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/information_response/resources.py",
+      "new": "domains/matrix/information_response/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/matrix_preparation/entry.py",
+      "new": "domains/matrix/matrix_preparation/authoring/entry.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/matrix_preparation/resources.py",
+      "new": "domains/matrix/matrix_preparation/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/matrix_preparation/science.py",
+      "new": "domains/matrix/matrix_preparation/authoring/science.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/matrix_response_study/causal_intersection_residence_design.py",
+      "new": "domains/matrix/matrix_response_study/authoring/causal_intersection_residence_design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/matrix_response_study/contracts.py",
+      "new": "domains/matrix/matrix_response_study/authoring/contracts.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/matrix_response_study/design.py",
+      "new": "domains/matrix/matrix_response_study/authoring/design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/matrix_response_study/invariant_capacity_comparison_design.py",
+      "new": "domains/matrix/matrix_response_study/authoring/invariant_capacity_comparison_design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/matrix_response_study/lineage_inputs.py",
+      "new": "domains/matrix/matrix_response_study/authoring/lineage_inputs.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/matrix_response_study/prospective_reactive_source_design.py",
+      "new": "domains/matrix/matrix_response_study/authoring/prospective_reactive_source_design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/matrix_response_study/reactive_nesting_design.py",
+      "new": "domains/matrix/matrix_response_study/authoring/reactive_nesting_design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/matrix_response_study/shooting_design.py",
+      "new": "domains/matrix/matrix_response_study/authoring/shooting_design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/matrix_response_study/transient_controlled_invariance_design.py",
+      "new": "domains/matrix/matrix_response_study/authoring/transient_controlled_invariance_design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/multi_world_response_study/conformance.py",
+      "new": "domains/reference_worlds/multi_world_response_study/authoring/conformance.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/multi_world_response_study/contracts/historical.py",
+      "new": "domains/reference_worlds/multi_world_response_study/authoring/contracts/historical.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/multi_world_response_study/contracts/platform_binding.py",
+      "new": "domains/reference_worlds/multi_world_response_study/authoring/contracts/platform_binding.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/multi_world_response_study/contracts/science.py",
+      "new": "domains/reference_worlds/multi_world_response_study/authoring/contracts/science.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/preparation_applicability/authoring.py",
+      "new": "domains/matrix/preparation_applicability/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/preparation_applicability/exposure.py",
+      "new": "domains/matrix/preparation_applicability/authoring/exposure.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/preparation_applicability/protocol.py",
+      "new": "domains/matrix/preparation_applicability/authoring/protocol.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/preparation_applicability/resources.py",
+      "new": "domains/matrix/preparation_applicability/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/preparation_applicability/science.py",
+      "new": "domains/matrix/preparation_applicability/authoring/science.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/preparation_applicability/selection.py",
+      "new": "domains/matrix/preparation_applicability/authoring/selection.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/prepared_response/calibration_design.py",
+      "new": "domains/matrix/prepared_response/authoring/calibration_design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/prepared_response/calibration_resources.py",
+      "new": "domains/matrix/prepared_response/authoring/calibration_resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/prepared_response/development_design.py",
+      "new": "domains/matrix/prepared_response/authoring/development_design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/prepared_response/development_resources.py",
+      "new": "domains/matrix/prepared_response/authoring/development_resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/prepared_response/exposure.py",
+      "new": "domains/matrix/prepared_response/authoring/exposure.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/prepared_response/qualification_design.py",
+      "new": "domains/matrix/prepared_response/authoring/qualification_design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/prepared_response/qualification_resources.py",
+      "new": "domains/matrix/prepared_response/authoring/qualification_resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/prepared_response/task_charter.py",
+      "new": "domains/matrix/prepared_response/authoring/task_charter.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/rc_ladder_response/authoring.py",
+      "new": "domains/circuits/rc_ladder/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/rc_ladder_response/design.py",
+      "new": "domains/circuits/rc_ladder/authoring/design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_causal_response/authoring.py",
+      "new": "domains/reactor/reactor_causal_response/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_causal_response/resources.py",
+      "new": "domains/reactor/reactor_causal_response/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_finite_control_frontier/authoring.py",
+      "new": "domains/reactor/reactor_finite_control_frontier/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_finite_control_frontier/protocol.py",
+      "new": "domains/reactor/reactor_finite_control_frontier/authoring/protocol.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_finite_control_frontier/resources.py",
+      "new": "domains/reactor/reactor_finite_control_frontier/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_local_domain_qualification/authoring.py",
+      "new": "domains/reactor/reactor_local_domain_qualification/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_local_domain_qualification/resources.py",
+      "new": "domains/reactor/reactor_local_domain_qualification/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_matched_replay_forecast/authoring.py",
+      "new": "domains/reactor/reactor_matched_replay_forecast/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_matched_replay_forecast/resources.py",
+      "new": "domains/reactor/reactor_matched_replay_forecast/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_prefix_response/authoring.py",
+      "new": "domains/reactor/reactor_prefix_response/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_prefix_response/resources.py",
+      "new": "domains/reactor/reactor_prefix_response/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_prepared_feed_qualification/authoring.py",
+      "new": "domains/reactor/reactor_prepared_feed_qualification/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_prepared_feed_qualification/resources.py",
+      "new": "domains/reactor/reactor_prepared_feed_qualification/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_reference_policy_forecast/authoring.py",
+      "new": "domains/reactor/reactor_reference_policy_forecast/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_reference_policy_forecast/resources.py",
+      "new": "domains/reactor/reactor_reference_policy_forecast/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_regime_response/authoring.py",
+      "new": "domains/reactor/reactor_regime_response/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_regime_response/continuation.py",
+      "new": "domains/reactor/reactor_regime_response/authoring/continuation.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_regime_response/protocol.py",
+      "new": "domains/reactor/reactor_regime_response/authoring/protocol.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_regime_response/resources.py",
+      "new": "domains/reactor/reactor_regime_response/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_selected_action_response/authoring.py",
+      "new": "domains/reactor/reactor_selected_action_response/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_selected_action_response/protocol.py",
+      "new": "domains/reactor/reactor_selected_action_response/authoring/protocol.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_selected_action_response/resources.py",
+      "new": "domains/reactor/reactor_selected_action_response/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_staged_pulse_response/authoring.py",
+      "new": "domains/reactor/reactor_staged_pulse_response/authoring/authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_staged_pulse_response/protocol.py",
+      "new": "domains/reactor/reactor_staged_pulse_response/authoring/protocol.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/reactor_staged_pulse_response/resources.py",
+      "new": "domains/reactor/reactor_staged_pulse_response/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/response_composition/scalar_parent.py",
+      "new": "domains/matrix/response_composition/authoring/scalar_parent.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/response_geometry_prospective/design.py",
+      "new": "domains/matrix/response_geometry_prospective/authoring/design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/response_geometry_prospective/development_authoring.py",
+      "new": "domains/matrix/response_geometry_prospective/authoring/development_authoring.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/response_geometry_prospective/development_design.py",
+      "new": "domains/matrix/response_geometry_prospective/authoring/development_design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/response_geometry_prospective/development_resources.py",
+      "new": "domains/matrix/response_geometry_prospective/authoring/development_resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/response_geometry_prospective/exposure.py",
+      "new": "domains/matrix/response_geometry_prospective/authoring/exposure.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/response_geometry_prospective/resources.py",
+      "new": "domains/matrix/response_geometry_prospective/authoring/resources.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/tokamak_control_replication/action_words.py",
+      "new": "domains/fusion/tokamak_control_replication/authoring/action_words.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/tokamak_control_replication/campaign_design.py",
+      "new": "domains/fusion/tokamak_control_replication/authoring/campaign_design.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/tokamak_control_replication/rosters.py",
+      "new": "domains/fusion/tokamak_control_replication/authoring/rosters.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    },
+    {
+      "old": "adapters/composition/tokamak_control_replication/scientific_inputs.py",
+      "new": "domains/fusion/tokamak_control_replication/authoring/scientific_inputs.py",
+      "responsibility": "Domain-specific scientific specification, protocol, assessment or declared resource requirement; native contact is not implemented here."
+    }
+  ],
+  "scope": "Scientific composition extraction; strict native/file/custody input bridges remain at their effect boundary; no retired forwarding exports.",
+  "reference_updates": [],
+  "extraction_scope": "Complete domain scientific declarations/authoring and scientificinputrecords extracted; remaining modules perform externalformat/custody/source I/O or native binding, not independent scientific algorithms."
+}

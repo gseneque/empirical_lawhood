@@ -8,40 +8,14 @@ from typing import Annotated
 import typer
 
 from empirical_lawhood.cli.configuration import config_app
+from empirical_lawhood.cli.accelerated_deployment import deployment_app
 from empirical_lawhood.cli.workflows import workflow_app
-from empirical_lawhood.cli.attempts import (
-    ATTEMPT_DIRECTORY_OPTION,
-    ATTEMPT_OUTPUT_OPTION,
-    attempt_input,
-    AttemptGroup,
-    attempt_stage,
-    retain_development_report,
-    retained_command,
-)
+from empirical_lawhood.cli.attempts import ATTEMPT_DIRECTORY_OPTION, ATTEMPT_OUTPUT_OPTION, attempt_input, AttemptGroup, attempt_stage, retain_development_report, retained_command
 
-from empirical_lawhood.cli.platform import (
-    OutputFormat,
-    admission_app,
-    atlas_app,
-    authority_app,
-    campaign_app,
-    capability_app,
-    catalog_app,
-    control_app,
-    dataset_app,
-    db_app,
-    doctor_command,
-    law_app,
-    set_cli_inputs,
-    source_app,
-    system_app,
-)
+from empirical_lawhood.cli.platform import OutputFormat, admission_app, atlas_app, authority_app, campaign_app, capability_app, catalog_app, control_app, dataset_app, db_app, doctor_command, law_app, set_cli_inputs, source_app, system_app
 from empirical_lawhood.cli.integrations import register_integration_commands
 from empirical_lawhood.cli.progress import register_progress_command
-from empirical_lawhood.runtime.operational_configuration import (
-    ArtifactVerificationMode, OperationalConfiguration, ScientificReconstructionMode,
-    scientific_reconstruction_operation,
-)
+from empirical_lawhood.execution.operational_configuration import ArtifactVerificationMode, OperationalConfiguration, ScientificReconstructionMode, scientific_reconstruction_operation
 
 register_integration_commands(campaign_app)
 
@@ -66,6 +40,7 @@ app.add_typer(control_app, name="control")
 app.add_typer(source_app, name="source")
 app.add_typer(workflow_app, name="workflow")
 app.add_typer(config_app, name="config")
+app.add_typer(deployment_app, name="deployment")
 example_app = typer.Typer(
     cls=AttemptGroup,
     no_args_is_help=True,
@@ -77,6 +52,10 @@ app.add_typer(example_app, name="example")
 @app.callback()
 def global_inputs(
     context: typer.Context,
+    progress: Annotated[bool, typer.Option("--progress/--no-progress",
+        help="Show throttled operational progress and liveness on stderr; JSON results stay on stdout.")] = True,
+    progress_file: Annotated[Path | None, typer.Option("--progress-file",
+        help="New atomic operational-progress.v2 JSON snapshot outside inputs and scientific packages; readable by CLI and UI.")] = None,
     project_root: Annotated[
         Path | None,
         typer.Option(
@@ -112,11 +91,6 @@ def global_inputs(
         typer.Option('--scientific-reconstruction',
             help='Retrospective scientific reconstruction and exhaustive reports: off (default) or full. Evidence authentication, access checks and new task computations remain required.'),
     ] = None,
-    allow_output_reservation_overcommit: Annotated[
-        bool,
-        typer.Option('--allow-output-reservation-overcommit',
-            help='Compatibility option. Output reservations are advisory by default; task limits and actual storage checks remain active.'),
-    ] = False,
     metadata_rss_limit_bytes: Annotated[
         int | None,
         typer.Option('--metadata-rss-limit-bytes', min=1,
@@ -206,9 +180,10 @@ def global_inputs(
     from dataclasses import replace
     from empirical_lawhood.api.configuration import load_configuration_record
     from empirical_lawhood.cli.attempts import retain_metadata_rss, retain_operational_configuration, retain_output_reservations
-    from empirical_lawhood.infrastructure.artifact_verification import artifact_verification_operation
-    from empirical_lawhood.runtime.output_reservations import output_reservation_operation
-    from empirical_lawhood.runtime.metadata_memory import metadata_rss_operation
+    from empirical_lawhood.storage.artifact_verification import artifact_verification_operation
+    from empirical_lawhood.execution.output_reservations import output_reservation_operation
+    from empirical_lawhood.execution.metadata_memory import metadata_rss_operation
+    from empirical_lawhood.execution.operational_configuration import accelerated_compute_operation
 
     configuration = OperationalConfiguration()
     if operational_config is not None:
@@ -224,9 +199,9 @@ def global_inputs(
         configuration = replace(configuration, scientific_reconstruction=scientific_reconstruction)
     context.call_on_close(retain_operational_configuration(configuration))
     context.with_resource(scientific_reconstruction_operation(configuration.scientific_reconstruction))
+    context.with_resource(accelerated_compute_operation(configuration.accelerated_compute))
     context.with_resource(artifact_verification_operation(new=True))
-    reservations = context.with_resource(output_reservation_operation(
-        allow_overcommit=allow_output_reservation_overcommit))
+    reservations = context.with_resource(output_reservation_operation())
     retain_output_reservations(reservations)
     memory = context.with_resource(metadata_rss_operation(limit_bytes=metadata_rss_limit_bytes))
     retain_metadata_rss(memory)
@@ -305,7 +280,7 @@ def rc_information_example(
     output_dir: Annotated[Path | None, ATTEMPT_OUTPUT_OPTION] = None,
 ) -> None:
     """Evaluate the common-input RC separation and independent bound check."""
-    from empirical_lawhood.adapters.methods.rc_information.contracts import RCInformationConfig
+    from empirical_lawhood.domains.circuits.rc_information.contracts import RCInformationConfig
     from empirical_lawhood.api.configuration import ConfigurationError, load_configuration_record
     from empirical_lawhood.api.rc_information import calculate_rc_information
 
@@ -331,12 +306,17 @@ def platform_doctor(
     ] = OutputFormat.TEXT,
     route: Annotated[
         str | None,
-        typer.Option("--route", help="Inspect the selected documented environment (including rc-challenges, finite-response-law and preparation-applicability) without native contact."),
+        typer.Option("--route", help="Read installed versions for an exact registered environment route; this inspection establishes no workflow readiness."),
     ] = None,
+    workflow: Annotated[str | None, typer.Option("--workflow", help="Inspect the exact installation manifest for this workflow.")] = None,
+    profile: Annotated[str, typer.Option("--profile", help="Select a declared workflow installation profile.")] = "standard",
+    worker_python: Annotated[list[str] | None, typer.Option("--worker-python", help="Select ROLE=/absolute/python for a declared worker; repeat for distinct roles.")] = None,
+    software: Annotated[list[str] | None, typer.Option("--software", help="Select ID=/absolute/file for declared external software identity inspection.")] = None,
+    assert_prerequisites: Annotated[bool, typer.Option("--assert-prerequisites", help="Fail when the selected workflow's required software is absent, incompatible or unbound. No scientific authority is assessed.")] = False,
 ) -> None:
     """Read-only environment, Git, catalog and external-storage diagnosis."""
 
-    doctor_command(output_format, route)
+    doctor_command(output_format, route, workflow, profile, worker_python, software, assert_prerequisites)
 
 
 def main() -> None:

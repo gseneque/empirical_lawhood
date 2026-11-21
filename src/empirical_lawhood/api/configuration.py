@@ -17,21 +17,10 @@ import stat
 
 from empirical_lawhood.adapters._bounded_files import read_bounded_contained
 from empirical_lawhood.adapters._strict_json import loads_external_json
-from empirical_lawhood.api.codecs import (
-    AuthoringCodecError,
-    MAX_AUTHORING_BYTES,
-    _parse_json,
-    _parse_yaml,
-    _validate_parsed_structure,
-    decode_record,
-)
-from empirical_lawhood.api.configuration_registry import (
-    ConfigurationConsumer,
-    consumer_by_id,
-    consumers_for_schema,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.api.codecs import AuthoringCodecError, _parse_json, _parse_yaml, _validate_parsed_structure, decode_record
+from empirical_lawhood.api.configuration_registry import ConfigurationConsumer, consumer_by_id, consumers_for_schema
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
 
 class ConfigurationError(ValueError):
@@ -158,7 +147,7 @@ def _string_size(value: str, *, limit: int | None = None) -> int:
 
 def _helper_inventory(document: object) -> None:
     """Validate the inert example's shape, without authenticating member locators."""
-    from empirical_lawhood.kernel.serialization import validate_sha256, validate_stable_id
+    from empirical_lawhood.science.records.serialization import validate_sha256, validate_stable_id
 
     if not isinstance(document, dict) or set(document) != {"schema", "version", "value"}:
         raise ValueError("exposed inventory helper envelope fields differ")
@@ -175,7 +164,7 @@ def _helper_inventory(document: object) -> None:
     for member in value["members"]:
         if not isinstance(member, dict) or set(member) != {"locator", "sha256"}:
             raise ValueError("exposed inventory helper member fields differ")
-        from empirical_lawhood.kernel.serialization import validate_relative_locator
+        from empirical_lawhood.science.records.serialization import validate_relative_locator
         validate_relative_locator(member["locator"])
         validate_sha256(member["sha256"])
 
@@ -197,14 +186,30 @@ def _validate(path: Path, *, consumer: str | None) -> _ValidatedConfiguration:
         if selected.schema_id is None:
             raise ConfigurationError("HELPER_ONLY", "human provenance template is not a runner config; copy and edit it manually")
     absolute = _absolute(path)
-    limit = MAX_AUTHORING_BYTES if selected is None else selected.authoring_maximum_bytes
+    limit = None if selected is None else selected.authoring_maximum_bytes
     try:
         raw = read_bounded_contained(Path(absolute.anchor), absolute, maximum_bytes=limit)
     except (OSError, ValueError) as error:
         raise ConfigurationError("INPUT_READ_REFUSED", str(error)) from error
+    return _validate_bytes(raw, format=path.suffix, consumer=consumer)
+
+
+def _validate_bytes(raw: bytes, *, format: str, consumer: str | None) -> _ValidatedConfiguration:
+    """The same owning grammar for file inputs and unsaved editable text."""
+    if type(raw) is not bytes or type(format) is not str:
+        raise TypeError("configuration values require exact bytes and an explicit format")
+    try:
+        selected = None if consumer is None else consumer_by_id(consumer)
+    except ValueError as error:
+        raise ConfigurationError("UNKNOWN_CONSUMER", str(error)) from error
+    if selected is not None and selected.schema_id is None:
+        raise ConfigurationError("HELPER_ONLY", "human provenance template is not a runner config; copy and edit it manually")
+    limit = None if selected is None else selected.authoring_maximum_bytes
+    if limit is not None and len(raw) > limit:
+        raise ConfigurationError("AUTHORING_BYTE_LIMIT", "editable document exceeds its declared authoring byte limit")
     try:
         text = raw.decode("utf-8")
-        suffix = path.suffix.casefold()
+        suffix = format.casefold()
         if suffix == ".json":
             # Root discovery retains the owning import grammar. Canonical
             # authoring roots receive the stricter lexical parser below.
@@ -249,10 +254,22 @@ def _validate(path: Path, *, consumer: str | None) -> _ValidatedConfiguration:
             if suffix == ".json":
                 document = _parse_json(text)
             if (selected.consumer == "operational-configuration"
-                    and document.get("version") == "1.0.0"):
-                from empirical_lawhood.runtime.operational_configuration import OperationalConfigurationV1
-                previous = decode_record(document, OperationalConfigurationV1)
-                document = record_type(artifact_verification=previous.artifact_verification).to_document()
+                    and document.get("version") in ("1.0.0", "2.0.0")):
+                from empirical_lawhood.execution.operational_configuration import OperationalConfigurationV1, OperationalConfigurationV2, ScientificReconstructionMode
+                previous_type = (OperationalConfigurationV1 if document["version"] == "1.0.0"
+                                 else OperationalConfigurationV2)
+                previous = decode_record(document, previous_type)
+                document = record_type(
+                    artifact_verification=previous.artifact_verification,
+                    scientific_reconstruction=getattr(previous, "scientific_reconstruction",
+                                                      ScientificReconstructionMode.OFF),
+                ).to_document()
+            if (selected.consumer == "operational-configuration"
+                    and document.get("version") == record_type.VERSION
+                    and isinstance(document.get("value"), dict)):
+                # Editable omission selects the default. Strict canonical records
+                # still carry the complete field census after preparation.
+                document["value"].setdefault("accelerated_compute", False)
             if document.get("version") != record_type.VERSION:
                 raise ConfigurationError("WRONG_REVISION", "configuration version differs from its typed owner", field="document.version")
             _bound_decimal_expansion(document, selected.maximum_bytes)
@@ -304,6 +321,26 @@ def validate_configuration(path: Path, *, consumer: str | None = None) -> dict[s
     return _validate(path, consumer=consumer).report
 
 
+def validate_configuration_bytes(raw: bytes, *, format: str, consumer: str) -> dict[str, object]:
+    """Validate unsaved edits through the file consumer without creating a file."""
+    validated = _validate_bytes(raw, format=format, consumer=consumer)
+    if validated.consumer.disposition != "editable":
+        raise ConfigurationError("EDITING_FORBIDDEN", "only declared editable inputs accept unsaved values")
+    return validated.report
+
+
+def prepare_configuration_bytes(raw: bytes, output_file: Path, *, format: str, consumer: str,
+                                expected_parent_device: int | None = None) -> dict[str, object]:
+    """Prepare exact reviewed edits into a fresh file with the ordinary owner."""
+    validated = _validate_bytes(raw, format=format, consumer=consumer)
+    if validated.consumer.disposition != "editable" or not validated.consumer.preparation_allowed:
+        raise ConfigurationError("PREPARATION_FORBIDDEN", "only declared editable inputs permit canonical preparation")
+    assert validated.canonical is not None
+    _write_new_file(output_file, validated.canonical, expected_parent_device=expected_parent_device)
+    return {**validated.report, "status": "PREPARED", "output_file": str(_absolute(output_file)),
+            "output_sha256": sha256(validated.canonical).hexdigest()}
+
+
 def load_configuration_record(
     path: Path, *, consumer: str | None = None
 ) -> CanonicalRecord:
@@ -312,7 +349,15 @@ def load_configuration_record(
     Editable values needing canonical preparation remain a first-stop refusal.
     Helpers have no executable record; import/retained roles keep their policy.
     """
-    validated = _validate(path, consumer=consumer)
+    return _configuration_record(_validate(path, consumer=consumer))
+
+
+def load_configuration_bytes(raw: bytes, *, format: str, consumer: str) -> CanonicalRecord:
+    """Load one already bounded immutable byte observation with the same owner."""
+    return _configuration_record(_validate_bytes(raw, format=format, consumer=consumer))
+
+
+def _configuration_record(validated: _ValidatedConfiguration) -> CanonicalRecord:
     if validated.canonical is None:
         raise ConfigurationError("NO_RECORD_CONSUMER", "this input has no typed operation record")
     if validated.report["preparation_required"]:
@@ -368,7 +413,7 @@ def preflight_new_configuration_output(path: Path) -> Path:
             os.close(parent)
 
 
-def _write_new_file(path: Path, payload: bytes) -> None:
+def _write_new_file(path: Path, payload: bytes, *, expected_parent_device: int | None = None) -> None:
     absolute = _absolute(path)
     nofollow = getattr(os, "O_NOFOLLOW", 0)
     parent = -1
@@ -376,6 +421,8 @@ def _write_new_file(path: Path, payload: bytes) -> None:
     created = None
     try:
         parent = _open_real_output_parent(absolute)
+        if expected_parent_device is not None and os.fstat(parent).st_dev != expected_parent_device:
+            raise OSError("configuration output changed its selected storage device")
         descriptor = os.open(absolute.name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | nofollow, 0o600, dir_fd=parent)
         created = os.fstat(descriptor)
         with os.fdopen(descriptor, "wb") as stream:

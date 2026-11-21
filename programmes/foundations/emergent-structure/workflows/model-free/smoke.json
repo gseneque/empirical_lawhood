@@ -1,0 +1,279 @@
+{
+  "label": "Tiny native software/scientific controls only; no scientific qualification",
+  "roots": [
+    {
+      "modules": [
+        "M0",
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1790001
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1790002
+    },
+    {
+      "modules": [
+        "M1",
+        "M6",
+        "M7"
+      ],
+      "role": "development",
+      "seed": 1790003
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1790010
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1790011
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1790012
+    },
+    {
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development",
+      "seed": 1790013
+    }
+  ],
+  "schema": "model-free-matrix-definition.v1",
+  "settings": {
+    "alpha": "0.05",
+    "equilibrium": {
+      "burnin_ticks": 0,
+      "centers": [
+        "-0.2",
+        "-0.1",
+        "0",
+        "0.1",
+        "0.2"
+      ],
+      "importance_samples": 8,
+      "receiver_seed": 0,
+      "reference_precision": "8",
+      "reference_ticks": 8,
+      "sample_ticks": 4,
+      "stiffness": "1",
+      "stride": 1
+    },
+    "events": {
+      "horizon_ticks": 4,
+      "lower_target": "-0.1",
+      "receiver_seed": 0,
+      "replicas": 2,
+      "upper_target": "0.1"
+    },
+    "evidence_scope": "EXPOSED_DEVELOPMENT",
+    "formation": {
+      "continuous_loss_gain_margin": "0.0001",
+      "fixed_tick": 8,
+      "minimum_signal": "0.000001",
+      "observation_stride": 2,
+      "probability_gain_margin": "0.1",
+      "required_sectors": [
+        "Y"
+      ],
+      "service_panels": 1,
+      "trailing_ticks": 2,
+      "trigger_deadline": 8
+    },
+    "historical_comparison": "NOT_CLAIMED_WITHOUT_AUTHENTICATED_OPERANDS",
+    "historical_operands": [],
+    "memory": {
+      "bin_edges": [
+        [
+          -10.0,
+          0.0,
+          10.0
+        ],
+        [
+          -10.0,
+          0.0,
+          10.0
+        ],
+        [
+          -100.0,
+          0.0,
+          100.0
+        ]
+      ],
+      "binning_allowance": "0",
+      "burnin_ticks": 0,
+      "checkpoint_ticks": [
+        0,
+        8,
+        16
+      ],
+      "history_orders": [
+        1
+      ],
+      "lags": [
+        1,
+        2
+      ],
+      "maximum_cells": 4096,
+      "minimum_support": 2,
+      "observation_dimensions": [
+        1,
+        2
+      ],
+      "observation_seed": 0,
+      "receiver_oscillation": "1",
+      "record_length_ladder": [
+        16
+      ],
+      "record_ticks": 16,
+      "reset_horizon_ticks": 2,
+      "stride": 1,
+      "tail_allowance": "0",
+      "tolerance": "0.1"
+    },
+    "native": {
+      "actions": [
+        "TRACE"
+      ],
+      "amplitude": "0.01",
+      "calibration_alpha": "0.05",
+      "capstone_horizon_tick": 4,
+      "capstone_support_radius": "3",
+      "capstone_task_threshold": "0",
+      "coordinates": [
+        {
+          "cross_coupling": "1",
+          "friction": "1",
+          "id": "nominal",
+          "temperature": "1"
+        }
+      ],
+      "decreasing_start": "8",
+      "derivation_blocks": 3,
+      "factor_angle_degrees": "15",
+      "factor_leakage_maximum": "0.05",
+      "family": "joint-decreasing",
+      "handoff_tick": 8,
+      "history_ticks": 8,
+      "horizon_ticks": 4,
+      "joint_rank": 48,
+      "mass": "0.5",
+      "numerical_tolerance": "0.0001",
+      "observation_stride": 2,
+      "occurrence_deadline": 6,
+      "panels": 2,
+      "persistence_ticks": 2,
+      "phases": [
+        "capstone-forecast",
+        "capstone-preparation",
+        "e1",
+        "e2",
+        "e3",
+        "e4",
+        "e5",
+        "e6",
+        "sci01",
+        "sci02",
+        "derivations"
+      ],
+      "preparation_arms": [
+        "baseline",
+        "joint-increasing"
+      ],
+      "preparation_minimum_gain": "0.1",
+      "pulse_ticks": 1,
+      "radius_limit": "1000000",
+      "ramp_ticks": 4,
+      "reduced_rank": 24,
+      "refresh_tick": 2,
+      "relation_folds": 4,
+      "relation_response_method": "FACTOR",
+      "relation_ridge_candidates": [
+        "0.000001",
+        "0.001",
+        "1"
+      ],
+      "relation_training_coordinates": [],
+      "resolvent_imaginary": "1",
+      "response_tolerance": "0.01",
+      "ridge_penalty": "0.000001",
+      "strict_win_margin": "0.1",
+      "survival_ticks": 2,
+      "target_x": "0.6666666666666666666666666667",
+      "target_y": "7.333333333333333333333333334",
+      "timestep": "0.001"
+    },
+    "population": {
+      "audit_size": 2,
+      "auxiliary_rank": 4,
+      "clip_bounds": null,
+      "frame_size": 4,
+      "individual_halfwidth": "0.001",
+      "mode": "reveal_all",
+      "receiver_seed": 0,
+      "sampling_seed": 20261117,
+      "value_bounds": null
+    },
+    "resources": {
+      "memory_bytes": null,
+      "output_bytes": null,
+      "wall_time_seconds": null
+    },
+    "response": {
+      "action_budgets": [
+        2
+      ],
+      "amplitude_scales": [
+        "1",
+        "0.5"
+      ],
+      "certificate_tolerance": "0.01",
+      "dense_oracle_seed_modulus": 64,
+      "equal_ranks": [
+        2
+      ],
+      "handoffs": [
+        "fixed"
+      ],
+      "methods": [
+        "INPUT",
+        "JOINT"
+      ],
+      "minimum_signal": "0.000001",
+      "port_controls": true,
+      "refinements": [
+        1,
+        2
+      ],
+      "refresh_schedules": [
+        [],
+        [
+          2
+        ]
+      ],
+      "resolvent_imaginary": "1",
+      "selection_tick": 2
+    }
+  }
+}

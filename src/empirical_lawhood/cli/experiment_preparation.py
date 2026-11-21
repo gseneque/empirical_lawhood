@@ -7,11 +7,8 @@ import json
 
 import typer
 
-from empirical_lawhood.cli.attempts import (
-    ATTEMPT_DIRECTORY_OPTION, attempt_input, attempt_stage, emit_development_report, retained_command,
-)
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.cli.progress import PROGRESS_FILE_OPTION, progress_command
+from empirical_lawhood.cli.attempts import ATTEMPT_DIRECTORY_OPTION, attempt_input, attempt_stage, emit_development_report, retained_command
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
 
 
 READ_ACCESS_OPTION = typer.Option('--read-access', help=(
@@ -34,32 +31,29 @@ def _emit_execution_report(report, *, issued_preview=False):
 def _read_access_options(paths, *, specification_path=None, directory=None, artifact_writer=None):
     if not paths:
         return {}
-    from empirical_lawhood.api.codecs import MAX_AUTHORING_BYTES
-    from empirical_lawhood.api.experiment_read_access import (
-        experiment_read_access_protocol, load_experiment_read_access,
-    )
+    from empirical_lawhood.api.experiment_read_access import experiment_read_access_protocol, load_experiment_read_access
 
     protocol_id = experiment_read_access_protocol(specification_path=specification_path,
         directory=directory, artifact_writer=artifact_writer)
 
-    selected = tuple(attempt_input(path, maximum_bytes=MAX_AUTHORING_BYTES,
+    selected = tuple(attempt_input(path, maximum_bytes=None,
         role='experiment-read-access', copy=False) for path in paths)
     return {'read_access': load_experiment_read_access(selected, protocol_id=protocol_id)}
 
 
 def _execution_selection(environment_id, output_root, workers, source_snapshot_path=None, *, storage_profile=None):
     """Resolve the existing profile/snapshot owner once for preparation routes."""
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, select_experiment_workers
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
-    from empirical_lawhood.planning.study_issue import ImplementationSourceClosure
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, select_experiment_workers
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
+    from empirical_lawhood.design.study_issue import ImplementationSourceClosure
 
     from empirical_lawhood.cli import platform
     if storage_profile is None and platform.CLI_OPERATOR_PROFILE is not None:
         from empirical_lawhood.api.codecs import load_registered_authoring
-        from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+        from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 
         storage_profile = load_registered_authoring(platform.CLI_OPERATOR_PROFILE,
             root_schemas={OperatorStorageProfile.SCHEMA: OperatorStorageProfile})
@@ -83,10 +77,8 @@ def _execution_selection(environment_id, output_root, workers, source_snapshot_p
 def _prepare_record(input_path, protocol_path, environment_id, output_root, workers,
                     sources_path=None, source_snapshot_path=None, *, storage_profile=None, programme_service=None,
                     read_access=None, authoring=False):
-    from empirical_lawhood.api.experiment_preparation import (
-        _protocol, load_experiment_inputs, load_experiment_specification, prepare_experiment,
-    )
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
+    from empirical_lawhood.api.experiment_preparation import _protocol, load_experiment_inputs, load_experiment_specification, prepare_experiment
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
 
     specification = load_experiment_specification(input_path)
     selected = attempt_input(input_path, maximum_bytes=None, role="experiment-specification",
@@ -135,18 +127,16 @@ def _prepare(*args, **kwargs):
 def register_experiment_commands(campaign_app: typer.Typer) -> None:
     @campaign_app.command('matrix-continue')
     @retained_command('campaign matrix-continue', closed_output=True, native=True)
-    @progress_command('campaign matrix-continue')
     def matrix_continue(
         authoring_dir: Annotated[Path, typer.Option('--authoring-dir', exists=True, file_okay=False,
             help='Actual completed-E3 or completed-E4-DEV predecessor, including a supported stopped input-only E4 child.')],
         output_dir: Annotated[Path, typer.Option('--output-dir',
             help='Explicit disjoint new programme directory in the selected artifact root.')],
         workers: Annotated[int | None, typer.Option('--workers', min=1)] = None,
-        pure_output_bytes: Annotated[int | None, typer.Option('--pure-output-bytes', min=1, max=268435456,
+        pure_output_bytes: Annotated[int | None, typer.Option('--pure-output-bytes', min=1,
             help='After completed E4 DEV and structure, increase only later unentered response-score output allowances.')] = None,
         yes: Annotated[bool, typer.Option('--yes', help='Continue through ordinary authenticated scientific execution.')] = False,
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
-        progress_file: Annotated[Path | None, PROGRESS_FILE_OPTION] = None,
     ) -> None:
         """Continue completed Matrix phases through ordinary preparation and eligible execution."""
         from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
@@ -165,7 +155,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
 
     @campaign_app.command("experiment-derive-inputs")
     @retained_command("campaign experiment-derive-inputs", closed_output=True, native=False)
-    @progress_command("campaign experiment-derive-inputs")
     def experiment_derive_inputs(
         input_path: Annotated[Path, typer.Option("--input", help="Copied typed experiment specification.")],
         sources_path: Annotated[Path, typer.Option("--sources", help="Exact original/request input selector.")],
@@ -173,10 +162,9 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
         output_selection_path: Annotated[Path, typer.Option("--output-selection", help="New selector alongside the original source selector.")],
         source_snapshot_path: Annotated[Path | None, typer.Option("--source-snapshot")] = None,
         environment_id: Annotated[str | None, typer.Option("--environment-id")] = None,
-        workers: Annotated[int | None, typer.Option("--workers", min=1, help="Must agree with the selected operator profile.")] = None,
+        workers: Annotated[int | None, typer.Option("--workers", min=1, help="Optional worker ceiling within detected capacity and the operator profile.")] = None,
         read_access_paths: Annotated[list[Path] | None, READ_ACCESS_OPTION] = None,
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
-        progress_file: Annotated[Path | None, PROGRESS_FILE_OPTION] = None,
     ) -> None:
         """Derive current input metadata and report exact remaining prerequisites."""
         from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
@@ -202,7 +190,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
 
     @campaign_app.command('experiment-export-products')
     @retained_command('campaign experiment-export-products',closed_output=True,native=False)
-    @progress_command('campaign experiment-export-products')
     def experiment_export_products(
         authoring_dir: Annotated[Path,typer.Option('--authoring-dir',help='Exact retained public experiment directory.')],
         selection_path: Annotated[Path,typer.Option('--selection',help='Copied typed export selection for its owning protocol.')],
@@ -210,11 +197,10 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
             help='Current component authority and source selections for this exact composite programme.')] = None,
         read_access_paths: Annotated[list[Path] | None, READ_ACCESS_OPTION] = None,
         attempt_dir: Annotated[Path|None,ATTEMPT_DIRECTORY_OPTION]=None,
-        progress_file: Annotated[Path|None,PROGRESS_FILE_OPTION]=None,
     )->None:
         """Publish derived products from complete original receipts; no acquisition."""
         from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
-        from empirical_lawhood.cli import platform,integrations as helpers
+        from empirical_lawhood.cli import platform, integrations as helpers
         try:
             if read_access_paths and programme_request_path is not None:
                 raise ValueError('--read-access refuses composite product export options')
@@ -233,7 +219,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
 
     @campaign_app.command("experiment-explain")
     @retained_command("campaign experiment-explain", closed_output=True, native=False)
-    @progress_command("campaign experiment-explain")
     def experiment_explain(
         input_path: Annotated[Path, typer.Option("--input", help="Copied experiment specification.")],
         protocol_path: Annotated[Path | None, typer.Option("--protocol", help="Exact selected scientific protocol bytes.")] = None,
@@ -241,10 +226,9 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
         source_snapshot_path: Annotated[Path | None, typer.Option("--source-snapshot", help="Retained implementation binding; execution checks actual worker identity.")] = None,
         environment_id: Annotated[str | None, typer.Option("--environment-id")] = None,
         output_root: Annotated[Path | None, typer.Option("--output-root")] = None,
-        workers: Annotated[int | None, typer.Option("--workers", min=1, help="Worker concurrency; defaults to the explicitly selected operator profile.")] = None,
+        workers: Annotated[int | None, typer.Option("--workers", min=1, help="Optional worker concurrency; automatically selected within usable capacity and the operator profile.")] = None,
         read_access_paths: Annotated[list[Path] | None, READ_ACCESS_OPTION] = None,
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
-        progress_file: Annotated[Path | None, PROGRESS_FILE_OPTION] = None,
     ) -> None:
         """Explain the complete selected census and entry dependencies; no contact."""
         try:
@@ -259,7 +243,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
 
     @campaign_app.command("experiment-author")
     @retained_command("campaign experiment-author", closed_output=True, native=False)
-    @progress_command("campaign experiment-author")
     def experiment_author(
         input_path: Annotated[Path, typer.Option("--input", help="Copied experiment specification.")],
         sources_path: Annotated[Path, typer.Option("--sources", help="Exact selected domain input bindings.")],
@@ -267,10 +250,9 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
         environment_id: Annotated[str, typer.Option("--environment-id")],
         output_dir: Annotated[Path, typer.Option("--output-dir", help="New directory under selected guarded custody.")],
         protocol_path: Annotated[Path | None, typer.Option("--protocol")] = None,
-        workers: Annotated[int | None, typer.Option("--workers", min=1, help="Worker concurrency; defaults to the explicitly selected operator profile.")] = None,
+        workers: Annotated[int | None, typer.Option("--workers", min=1, help="Optional worker concurrency; automatically selected within usable capacity and the operator profile.")] = None,
         read_access_paths: Annotated[list[Path] | None, READ_ACCESS_OPTION] = None,
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
-        progress_file: Annotated[Path | None, PROGRESS_FILE_OPTION] = None,
     ) -> None:
         """Freeze all derived operations and bindings without manual projections."""
         from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
@@ -293,12 +275,11 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
 
     @campaign_app.command("experiment-run")
     @retained_command("campaign experiment-run", closed_output=True, native=True)
-    @progress_command("campaign experiment-run")
     def experiment_run(
         authoring_dir: Annotated[Path, typer.Option("--authoring-dir", exists=True, file_okay=False)],
         programme_request_path: Annotated[Path | None, typer.Option("--programme-request",
             help="Copied component authority and source selections for this exact composite programme.")] = None,
-        workers: Annotated[int | None, typer.Option("--workers", min=1, help="Worker concurrency; defaults to the explicitly selected operator profile.")] = None,
+        workers: Annotated[int | None, typer.Option("--workers", min=1, help="Optional worker concurrency; automatically selected within usable capacity and the operator profile.")] = None,
         plan_path: Annotated[Path | None, typer.Option("--plan", help="Original issued campaign package for a prospective programme.")] = None,
         yes: Annotated[bool, typer.Option("--yes", help="Execute an issued or Matrix programme after its existing authority checks.")] = False,
         reveal_authority_id: Annotated[str | None, typer.Option("--reveal-authority-id")] = None,
@@ -306,7 +287,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
         parent_input_bindings: Annotated[list[Path] | None, typer.Option("--parent-input-binding")] = None,
         read_access_paths: Annotated[list[Path] | None, READ_ACCESS_OPTION] = None,
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
-        progress_file: Annotated[Path | None, PROGRESS_FILE_OPTION] = None,
     ) -> None:
         """Run the frozen programme through its existing execution owner."""
         from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
@@ -342,7 +322,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
 
     @campaign_app.command("experiment-read")
     @retained_command("campaign experiment-read", closed_output=True, native=False)
-    @progress_command("campaign experiment-read")
     def experiment_read(
         authoring_dir: Annotated[Path, typer.Option("--authoring-dir", exists=True, file_okay=False)],
         programme_request_path: Annotated[Path | None, typer.Option("--programme-request",
@@ -354,7 +333,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
         reveal_authority_id: Annotated[str | None, typer.Option("--reveal-authority-id", help="Authorize the protected scientific result read.")] = None,
         read_access_paths: Annotated[list[Path] | None, READ_ACCESS_OPTION] = None,
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
-        progress_file: Annotated[Path | None, PROGRESS_FILE_OPTION] = None,
     ) -> None:
         """Read complete outcomes or an explicitly partial receipt census."""
         from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
@@ -389,7 +367,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
 
     @campaign_app.command('experiment-prepare-native-continuation')
     @retained_command('campaign experiment-prepare-native-continuation', closed_output=True, native=False)
-    @progress_command('campaign experiment-prepare-native-continuation')
     def experiment_prepare_native_continuation(
         authoring_dir: Annotated[Path, typer.Option('--authoring-dir', exists=True, file_okay=False)],
         run_id: Annotated[str, typer.Option('--run', help='Exact original development run with incomplete native custody.')],
@@ -397,11 +374,10 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
         worker_interpreter: Annotated[Path, typer.Option('--worker-interpreter', help='Original frozen installed worker interpreter.')],
         worker_source_root: Annotated[Path, typer.Option('--worker-source-root', help='Original frozen worker source distribution.')],
         preparation_instruction_path: Annotated[Path, typer.Option('--preparation-instruction', help='Exact retained instruction requesting a proposal; grants no execution.')],
-        pure_output_bytes: Annotated[int, typer.Option('--pure-output-bytes', min=1, max=256 * 1024**2,
+        pure_output_bytes: Annotated[int, typer.Option('--pure-output-bytes', min=1,
             help='Proposed bounded PURE output allowance; no original reservation changes during preparation.')],
         read_access_paths: Annotated[list[Path] | None, READ_ACCESS_OPTION] = None,
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
-        progress_file: Annotated[Path | None, PROGRESS_FILE_OPTION] = None,
     ) -> None:
         """Prepare a reviewable incomplete-native proposal without task execution."""
         from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
@@ -424,7 +400,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
 
     @campaign_app.command('experiment-repair-structure')
     @retained_command('campaign experiment-repair-structure', closed_output=True)
-    @progress_command('campaign experiment-repair-structure')
     def experiment_repair_structure(
         authoring_dir: Annotated[Path, typer.Option('--authoring-dir', exists=True, file_okay=False,
             help='Original completed E4 development acquisition directory.')],
@@ -434,7 +409,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
         yes: Annotated[bool, typer.Option('--yes', help='Select separate PURE production over unchanged original inputs.')] = False,
         read_access_paths: Annotated[list[Path] | None, READ_ACCESS_OPTION] = None,
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
-        progress_file: Annotated[Path | None, PROGRESS_FILE_OPTION] = None,
     ) -> None:
         """Repair a failed E4 structural child without new native acquisition."""
         from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
@@ -456,7 +430,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
 
     @campaign_app.command('experiment-continue-native')
     @retained_command('campaign experiment-continue-native', closed_output=True, native=True)
-    @progress_command('campaign experiment-continue-native')
     def experiment_continue_native(
         authoring_dir: Annotated[Path, typer.Option('--authoring-dir', exists=True, file_okay=False)],
         run_id: Annotated[str, typer.Option('--run', help='Exact original exposed development run.')],
@@ -466,7 +439,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
         yes: Annotated[bool, typer.Option('--yes', help='Select one separate attempt for each reviewed incomplete case and continue eligible original work.')] = False,
         read_access_paths: Annotated[list[Path] | None, READ_ACCESS_OPTION] = None,
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
-        progress_file: Annotated[Path | None, PROGRESS_FILE_OPTION] = None,
     ) -> None:
         """Validate or explicitly execute a separate native continuation."""
         from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
@@ -491,12 +463,11 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
 
     @campaign_app.command("experiment-recover")
     @retained_command("campaign experiment-recover", closed_output=True, native=True)
-    @progress_command("campaign experiment-recover")
     def experiment_recover(
         authoring_dir: Annotated[Path, typer.Option("--authoring-dir", exists=True, file_okay=False)],
         programme_request_path: Annotated[Path | None, typer.Option("--programme-request",
             help="Copied component authority and source selections for this exact composite programme.")] = None,
-        workers: Annotated[int | None, typer.Option("--workers", min=1, help="Worker concurrency; defaults to the explicitly selected operator profile.")] = None,
+        workers: Annotated[int | None, typer.Option("--workers", min=1, help="Optional worker concurrency; automatically selected within usable capacity and the operator profile.")] = None,
         run_id: Annotated[str | None, typer.Option("--run", help="Resume the original issued campaign.")] = None,
         yes: Annotated[bool, typer.Option("--yes", help="Recover an issued or Matrix programme after its existing authority checks.")] = False,
         reveal_authority_id: Annotated[str | None, typer.Option("--reveal-authority-id")] = None,
@@ -507,19 +478,20 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
             help="Close exhausted initial development custody without task execution.")] = False,
         repair_retained_e3: Annotated[bool, typer.Option("--repair-retained-e3",
             help="Bind a repaired controller for a failed PURE retained-model adoption; preserve completed receipts and frozen native work.")] = False,
-        repair_development_output_bytes: Annotated[int | None, typer.Option("--repair-development-output-bytes", min=1, max=256 * 1024**2,
+        repair_development_output_bytes: Annotated[int | None, typer.Option("--repair-development-output-bytes", min=1,
             help="Raise the output allowance for resource-refused PURE development calculations; pair with controller repair for an unfinished graph.")] = None,
         repair_development_controller: Annotated[bool, typer.Option("--repair-development-controller",
             help="Resume an interrupted development graph with its frozen workers; pair with --repair-development-output-bytes.")] = False,
+        repair_development_scratch: Annotated[bool, typer.Option("--repair-development-scratch",
+            help="Add one attempt for PURE calculations refused by retained empty scratch; preserve original custody and task budgets.")] = False,
         worker_interpreter: Annotated[Path | None, typer.Option("--worker-interpreter",
-            help="Original frozen installed worker interpreter, required for selective repair.")] = None,
+            help="Original frozen worker interpreter, required for selective repair.")] = None,
         worker_source_root: Annotated[Path | None, typer.Option("--worker-source-root",
-            help="Original frozen worker source distribution, required for selective repair.")] = None,
+            help="Original frozen worker source distribution or, for scratch repair, its exact preserved checkout.")] = None,
         repair_instruction_path: Annotated[Path | None, typer.Option("--repair-instruction",
             help="Exact retained owner instruction file authorizing the selective PURE repair.")] = None,
         read_access_paths: Annotated[list[Path] | None, READ_ACCESS_OPTION] = None,
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
-        progress_file: Annotated[Path | None, PROGRESS_FILE_OPTION] = None,
     ) -> None:
         """Resume frozen receipt-based work; uncertain native contact refuses."""
         from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
@@ -530,20 +502,25 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
         try:
             repair_options = {}
             development_repair = repair_development_output_bytes is not None or repair_development_controller
-            if repair_retained_e3 or development_repair or any(value is not None for value in (
+            repair_count = int(repair_retained_e3) + int(development_repair) + int(repair_development_scratch)
+            if repair_count or any(value is not None for value in (
                     worker_interpreter, worker_source_root, repair_instruction_path)):
-                if (repair_retained_e3 == development_repair or not yes or run_id is None or programme_request_path is not None
+                if (repair_count != 1 or not yes or run_id is None or programme_request_path is not None
                         or custody_only or reconcile_only or parent_record or parent_input_bindings
-                        or development_repair and reveal_authority_id is not None
+                        or (development_repair or repair_development_scratch) and reveal_authority_id is not None
                         or repair_development_controller and repair_development_output_bytes is None
                         or worker_interpreter is None or worker_source_root is None or repair_instruction_path is None):
-                    selected_repair = '--repair-retained-e3' if repair_retained_e3 else '--repair-development-output-bytes'
+                    selected_repair = ('--repair-retained-e3' if repair_retained_e3 else
+                        '--repair-development-scratch' if repair_development_scratch else '--repair-development-output-bytes')
                     raise ValueError(selected_repair + ' requires --run, --yes, both frozen worker paths and --repair-instruction; select exactly one repair')
                 repair_options = {**({'repair_retained_e3': True} if repair_retained_e3 else
+                    {'repair_development_scratch': True} if repair_development_scratch else
                     {'repair_development_output_bytes': repair_development_output_bytes}), 'worker_interpreter': worker_interpreter,
                     'worker_source_root': worker_source_root, 'repair_instruction_path': attempt_input(
                         repair_instruction_path, maximum_bytes=1024 * 1024,
-                        role='retained-e3-repair-instruction' if repair_retained_e3 else 'development-output-repair-instruction', copy=False)}
+                        role='retained-e3-repair-instruction' if repair_retained_e3 else
+                        'development-scratch-repair-instruction' if repair_development_scratch else
+                        'development-output-repair-instruction', copy=False)}
                 if repair_development_controller:
                     repair_options['repair_development_controller'] = True
             if read_access_paths and (programme_request_path is not None or custody_only):
@@ -580,7 +557,6 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
 
     @campaign_app.command("experiment-prepare")
     @retained_command("campaign experiment-prepare", closed_output=True, native=False)
-    @progress_command("campaign experiment-prepare")
     def experiment_prepare(
         input_path: Annotated[Path, typer.Option("--input", help="Copied experiment specification.")],
         output: Annotated[Path, typer.Option("--output", help="New preparation report file.")],
@@ -589,10 +565,9 @@ def register_experiment_commands(campaign_app: typer.Typer) -> None:
         source_snapshot_path: Annotated[Path | None, typer.Option("--source-snapshot", help="Retained implementation binding; execution checks actual worker identity.")] = None,
         environment_id: Annotated[str | None, typer.Option("--environment-id")] = None,
         output_root: Annotated[Path | None, typer.Option("--output-root")] = None,
-        workers: Annotated[int | None, typer.Option("--workers", min=1, help="Worker concurrency; defaults to the explicitly selected operator profile.")] = None,
+        workers: Annotated[int | None, typer.Option("--workers", min=1, help="Optional worker concurrency; automatically selected within usable capacity and the operator profile.")] = None,
         read_access_paths: Annotated[list[Path] | None, READ_ACCESS_OPTION] = None,
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
-        progress_file: Annotated[Path | None, PROGRESS_FILE_OPTION] = None,
     ) -> None:
         """Retain a new complete preparation report without issue or native work."""
         from empirical_lawhood.api.configuration import _write_new_file

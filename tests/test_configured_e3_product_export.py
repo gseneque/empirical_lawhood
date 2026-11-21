@@ -5,6 +5,7 @@ Typed E3 products, actual original publications and receipts, frozen joins,
 public projection, lineage and atomic publication use the production owners.
 The full protected reader is an explicit seam tested by its separate controls.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from contextlib import contextmanager
 from dataclasses import replace
@@ -15,22 +16,23 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_exports import ConfiguredProtectedE3ProductExportSelection
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_statistical_bindings import statistical_task_id
-from empirical_lawhood.adapters.methods.matrix_factor_response.extension_bundle import EXPERIMENT_PROTOCOL_DECLARATIONS
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.configured_selected_public import ConfiguredMatrixSelectedPublicPackage
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_exports import ConfiguredProtectedE3ProductExportSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_statistical_bindings import statistical_task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.extension import EXTENSION as _extension_owner_1
+EXPERIMENT_PROTOCOL_DECLARATIONS = _extension_owner_1.protocols
 from empirical_lawhood.api.domain_composition.matrix_configured_protected_response import product_export as owner
 from empirical_lawhood.api.domain_composition.matrix_configured_protected_response import scientific_read
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.prospective_experiment import RetainedProspectiveExperiment
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, CanonicalTaskReceipt
 from tests.test_matrix_configured_selected_package import configured_package
 from tests.test_matrix_e3_original_publications import case as original_case  # noqa: F401
 
@@ -125,7 +127,7 @@ def test_public_prospective_export_dispatches_retained_owner_without_runtime_com
     assert public.calibration == owner._identity(export_case.products.full.calibration)
     assert public.selection_unit_ids == export_case.products.full.selection_unit_ids
     assert b'"scores"' not in public.canonical_bytes()
-    manifests = tuple(decode_artifact_manifest(Path(path + ".manifest.json").read_bytes())
+    manifests = tuple(resolve_artifact_sidecar_bytes(export_case.products.plane, Path(path + ".manifest.json").read_bytes())
         for path in report["paths"].values())
     assert len(manifests) == 5
     # An exposed TRAIN member makes the whole export exposed; sealed CAL members

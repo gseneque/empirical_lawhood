@@ -4,13 +4,13 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as r
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import authenticate_future_response_selections
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as old
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import corpus_artifact
-from empirical_lawhood.infrastructure.artifacts import ArtifactPlaneError
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as r
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import authenticate_future_response_selections
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as old
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import corpus_artifact
+from empirical_lawhood.storage.artifacts import ArtifactPlaneError
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding
 from tests.test_matrix_factor_confirmation_eligibility import publish
 from tests.test_matrix_native_training_acquisition import fresh_training_metadata_case
 
@@ -27,7 +27,7 @@ def _declare(case, selections):
     custody. Negative partition controls change candidate selectors, so their
     positive byte support remains real while the scientific join must refuse.
     """
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledResponseSelection
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledResponseSelection
     baseline = r.future_response_support(case.request)
     selector_rows = {reference: (artifact, publication) for reference, artifact, publication in baseline
         if reference.object_schema == ScheduledResponseSelection.SCHEMA}
@@ -62,8 +62,8 @@ def _replace_streams(selection, streams):
 
 
 def test_prior_whole_programme_publications_authenticate_all_seven_inputs_before_train(tmp_path):
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammeInputCommitments
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammeInputCommitments
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
     case = fresh_training_metadata_case(tmp_path)
     original = case.request.canonical_bytes()
     support = r.future_response_support(case.request)

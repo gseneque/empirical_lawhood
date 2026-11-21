@@ -6,8 +6,8 @@ import os
 import pytest
 
 from empirical_lawhood.adapters import _bounded_files as adapter
-from empirical_lawhood.infrastructure import bounded_io as control
-from empirical_lawhood.infrastructure import repository_identity as repository
+from empirical_lawhood.storage import bounded_io as control
+from empirical_lawhood.storage import repository_identity as repository
 
 
 @pytest.mark.parametrize("operation", (

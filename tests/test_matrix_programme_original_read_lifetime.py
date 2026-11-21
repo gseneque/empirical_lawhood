@@ -10,7 +10,7 @@ import pytest
 from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammeProjectionContext
 from empirical_lawhood.api.domain_composition.matrix_configured_protected_response import scientific_read
 from empirical_lawhood.api.prospective_experiment import RetainedProspectiveExperiment
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def _case(monkeypatch, lifetime):

@@ -1,4 +1,5 @@
 """Compact allocation exposed conformance; no fresh scientific qualification."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from hashlib import sha256
@@ -12,23 +13,21 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_parameter_history import compact_operation_bindings as binding, compact_science
-from empirical_lawhood.adapters.methods.matrix_parameter_history.compact_records import (
-    MatrixParameterCompactAssessment, MatrixParameterCompactHistory, bind_source, compact_sources,
-)
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import WorkerInputBinding, WorkerInputKind, WorkerOutputPort
-from empirical_lawhood.runtime.native_subwork import NativeSubworkRoster, NativeSubworkState
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_parameter_history import compact_operation_bindings as binding, compact_science
+from empirical_lawhood.domains.matrix.matrix_parameter_history.compact_records import MatrixParameterCompactAssessment, MatrixParameterCompactHistory, bind_source, compact_sources
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import WorkerInputBinding, WorkerInputKind, WorkerOutputPort
+from empirical_lawhood.execution.native_subwork import NativeSubworkRoster, NativeSubworkState
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.runtime_platform.test_native_subwork import _plane, _store
 from tests.test_matrix_parameter_history import progress_store, provider, publish, source
 
@@ -64,11 +63,11 @@ def context(plane,s,a,p,role,*,history=None,raw=None):
     def retained_or_publish(name,schema,payload):
         # Reuse the original sidecar identity. Republishing equal bytes with a
         # current validator would try to replace immutable historical metadata.
-        from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
+
         sidecar = plane.root.resolve('inputs/'+name+'.manifest.json',for_write=False)
         if not sidecar.exists():
             return publish(plane,name,schema,payload)
-        manifest = decode_artifact_manifest(sidecar.read_bytes())
+        manifest = resolve_artifact_sidecar_bytes(plane, sidecar.read_bytes())
         plane.verify_manifest(manifest)
         if (manifest.logical.logical_artifact_id != name or manifest.logical.payload_schema != schema
                 or manifest.logical.content_sha256 != sha256(payload).hexdigest()
@@ -219,7 +218,7 @@ def test_negative_native_custody_never_repeats(tmp_path,monkeypatch,state):
     store.freeze_roster(NativeSubworkRoster('selected.native-subwork',store.parent_contact,(definition.identity,)),definitions=(definition,))
     entry = store.begin(definition);store.contact(entry)
     if state == 'failed':
-        from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
+        from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
         from decimal import Decimal
         store.complete(entry,operational_status=OperationalStatus.FAILED,cost=InquiryCost(Decimal(0),Decimal(0),None),
             cost_scope='exposed negative contact fixture',unknown_streams=definition.streams,reason_codes=('exposed-failure',))
@@ -236,7 +235,7 @@ def test_changed_shared_allocation_and_unsupported_domain_before_effects():
         bind_source(s,replace(a,allocation_id='test.compact.changed'),a.coordinates[0],p)
     c = replace(a.coordinates[0],primary_view=replace(a.coordinates[0].primary_view,friction_gamma=__import__('decimal').Decimal('1e-18')),
         fine_view=replace(a.coordinates[0].fine_view,friction_gamma=__import__('decimal').Decimal('1e-18')))
-    from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
+    from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
     root = replace(a.roots[0],coordinate=coordinate_identity(c))
     a = replace(a,coordinates=(c,),roots=(root,))
     sources = compact_sources(a,p,s.numerical_design,namespace='source.compact')

@@ -1,18 +1,19 @@
 # SPDX-License-Identifier: MPL-2.0
-"""Final parent permission and lease checks after real worker readiness."""
+"""Current native permission and attempt identity, without a lease deadline."""
+
+from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.infrastructure.native_parent_finalization import NativeParentFinalizationPending
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.execution import TaskAttemptDisposition
-from empirical_lawhood.runtime.native_effects import NativeEntryRefused
+from empirical_lawhood.storage.native_parent_finalization import NativeParentFinalizationPending
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.execution import RunnerRegistry, TaskAttemptDisposition
+from empirical_lawhood.execution.native_effects import NativeEntryRefused
 from tests.runtime_platform.test_native_parent_finalization_scheduler import _event, _runtime
 
 
 @pytest.mark.parametrize("parallel", (1, 2))
-@pytest.mark.parametrize("refusal", ("permission", "lease-expired-after-permission"))
-def test_final_refusal_precedes_contact_without_inventing_a_native_failure(tmp_path, parallel, refusal):
+def test_final_refusal_precedes_contact_without_inventing_a_native_failure(tmp_path, parallel):
     state = _runtime(tmp_path, parallel=parallel, parent_prepared=True)
     scheduler, contacts = state.scheduler()
     checked = []
@@ -24,13 +25,11 @@ def test_final_refusal_precedes_contact_without_inventing_a_native_failure(tmp_p
         assert prepared_contract.manifest == runner.manifest
         assert contacts.read(context.run_id, context.task_id) is None
         checked.append(context.attempt_id)
-        if refusal == "permission":
-            raise PermissionError("disclosed current execution permission expired during Ready")
-        state.clock.value += scheduler.lease_seconds + 1
+        raise PermissionError("disclosed current execution permission expired during Ready")
 
     scheduler.native_entry_guard = require_permission
     try:
-        with pytest.raises(NativeEntryRefused, match="permission|lease"):
+        with pytest.raises(NativeEntryRefused, match="permission"):
             scheduler.execute("exposed.run", state.plan)
         attempt, = state.repository.attempts("exposed.run")
         assert checked == [attempt.attempt_id]
@@ -39,6 +38,44 @@ def test_final_refusal_precedes_contact_without_inventing_a_native_failure(tmp_p
         assert state.receipts.read("exposed.run", state.task.task_id, attempt.attempt_id) is None
         assert _event(state) is None
         assert state.recovery.read_terminal(state.index) is None
+    finally:
+        state.bundle.close()
+        state.repository.engine.dispose()
+
+
+@pytest.mark.parametrize("parallel", (1, 2))
+def test_preparation_and_each_native_boundary_have_no_lease_deadline(tmp_path, monkeypatch, parallel):
+    state = _runtime(tmp_path, parallel=parallel, parent_prepared=True)
+    scheduler, contacts = state.scheduler()
+    wrapper = scheduler.runner_registry.resolve(state.task)
+    original = wrapper.prepare_callback
+    checked = []
+
+    def prepare(context):
+        state.clock.value += 100 * scheduler.lease_seconds
+        return original(context)
+
+    prepare.definition = original.definition
+    scheduler.runner_registry = RunnerRegistry((replace(wrapper, prepare_callback=prepare),),
+        registry_sha256=scheduler.runner_registry.registry_sha256)
+
+    def permission(context, runner, *, prepared_contract):
+        prepared_contract.require_complete()
+        checked.append(context.attempt_id)
+        state.clock.value += 100 * scheduler.lease_seconds
+
+    scheduler.native_entry_guard = permission
+    monkeypatch.setattr(state.repository, "current_attempt_lease",
+        lambda **kwargs: pytest.fail("native execution checked a lease deadline"))
+    monkeypatch.setattr(state.repository, "refresh_attempt_lease",
+        lambda **kwargs: pytest.fail("native execution renewed a lease"))
+    try:
+        result = scheduler.execute("exposed.run", state.plan)
+        assert result.status is OperationalStatus.SUCCEEDED
+        receipt, = result.receipts
+        assert checked == [receipt.attempt_id] * 3
+        assert contacts.read("exposed.run", state.task.task_id).attempt_id == receipt.attempt_id
+        assert state.clock.value >= 100 + 400 * scheduler.lease_seconds
     finally:
         state.bundle.close()
         state.repository.engine.dispose()

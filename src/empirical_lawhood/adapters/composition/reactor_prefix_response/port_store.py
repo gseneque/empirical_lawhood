@@ -6,39 +6,32 @@ These are installed recipes over the existing external stores. A selector never
 contains Python objects or callable names. Publication, operation authority and
 the runner's execution closure remain separate from this no-effect resolution.
 """
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import ClassVar
 
-from empirical_lawhood.adapters.methods.reactor_staged_pulse_response.config import ClassicalStage
-from empirical_lawhood.adapters.methods.reactor_finite_control_frontier.phase import FrontierPhase
-from empirical_lawhood.adapters.methods.reactor_regime_response.continuation import NoRegimeRetainedInputs, RegimeCContinuation, RegimeRetainedInput
-from empirical_lawhood.adapters.methods.reactor_regime_response.prior import RegimePriorArtifact
+from empirical_lawhood.domains.reactor.reactor_staged_pulse_response.config import ClassicalStage
+from empirical_lawhood.domains.reactor.reactor_finite_control_frontier.phase import FrontierPhase
+from empirical_lawhood.domains.reactor.reactor_regime_response.continuation import NoRegimeRetainedInputs, RegimeCContinuation, RegimeRetainedInput
+from empirical_lawhood.domains.reactor.reactor_regime_response.prior import RegimePriorArtifact
 from empirical_lawhood.adapters.simulators.reactor_prefix_response.reactor_binding import ReactorResolvedPort, required_upstream_port_keys
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    validate_sha256,
-    validate_stable_id,
-)
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent,
-    ArtifactManifest,
-    CanonicalTaskReceipt,
-)
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec
-from empirical_lawhood.runtime.providers import ExternalInputPayload
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
 
-from .empirical_ports import EmpiricalControlCustodyPorts, EmpiricalPayloadCustodyPorts
-from .prepared_ports import PreparedControlCustodyPorts
-from .process_limits import LocalCampaignAllocation, LocalCampaignProcessLimits
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256, validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactManifest, CanonicalTaskReceipt
+from empirical_lawhood.execution.plans import ArtifactOutputSpec
+from empirical_lawhood.execution.providers import ExternalInputPayload
+
+from empirical_lawhood.adapters.composition.reactor_prefix_response.empirical_ports import EmpiricalControlCustodyPorts, EmpiricalPayloadCustodyPorts
+from empirical_lawhood.adapters.composition.reactor_prefix_response.prepared_ports import PreparedControlCustodyPorts
+from empirical_lawhood.adapters.composition.reactor_prefix_response.process_limits import LocalCampaignAllocation, LocalCampaignProcessLimits
 
 _NAMESPACE = "operator/reactor-ports"
 _MAX_BYTES = 64 * 1024**2
@@ -157,9 +150,7 @@ class ReactorExternalPortStore:
         sidecar = self.plane.root.resolve(relative + ".manifest.json", for_write=False)
         if not path.is_file() or not sidecar.is_file():
             raise KeyError(identity.object_id)
-        manifest = decode_artifact_manifest(
-            read_bounded_bytes(sidecar, maximum_bytes=_MAX_BYTES)
-        )
+        manifest = read_artifact_sidecar(self.plane, (sidecar).relative_to(self.plane.root.contract.canonical_path).as_posix(), maximum_bytes=_MAX_BYTES)
         if (
             manifest.publication is None
             or manifest.materialization.relative_path != relative

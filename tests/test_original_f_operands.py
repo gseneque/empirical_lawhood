@@ -7,8 +7,8 @@ import numpy as np
 import pytest
 
 from empirical_lawhood.api.finite_operands import original_f_operand_export, original_f_operand_import
-from empirical_lawhood.adapters.methods.finite_response_law.original_f import ORIGINAL_CALIBRATION, ORIGINAL_Q
-from empirical_lawhood.adapters.methods.finite_response_law.law_payloads import _supported
+from empirical_lawhood.domains.matrix.finite_response_law.original_f import ORIGINAL_CALIBRATION, ORIGINAL_Q
+from empirical_lawhood.domains.matrix.finite_response_law.law_payloads import _supported
 
 
 @pytest.fixture

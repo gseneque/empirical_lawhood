@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifacts
-from empirical_lawhood.infrastructure.artifact_sidecars import decode_artifact_sidecar
-from empirical_lawhood.infrastructure.recursive_input_publication import publish_recursive_metadata
-from empirical_lawhood.runtime.artifact_sidecar import ArtifactManifestReference
+from empirical_lawhood.storage import artifacts
+from empirical_lawhood.storage.artifact_sidecars import decode_artifact_sidecar
+from empirical_lawhood.storage.recursive_input_publication import publish_recursive_metadata
+from empirical_lawhood.storage.contracts.artifact_sidecar import ArtifactManifestReference
 from tests.test_artifact_publication_admission import _census, _plane, _requests
 
 
@@ -56,7 +56,7 @@ def test_existing_members_keep_original_closed_publications(tmp_path, legacy):
         for request in selected:
             plane.write(request)
     else:
-        plane.write_compact_batch(selected)
+        plane.write_batch(selected)
     if legacy == 'changed-bound':
         plane.custody_limits = replace(plane.custody_limits, in_memory_payload_bytes=1)
         requests = tuple(row.as_stream() for row in requests)
@@ -92,7 +92,7 @@ def test_matching_interrupted_group_resumes_its_original_intent(tmp_path, monkey
 def test_retained_group_refuses_changed_unselected_sibling(tmp_path):
     root = tmp_path / 'changed'
     plane, requests = _plane(root), _requests(3)
-    plane.write_compact_batch(requests)
+    plane.write_batch(requests)
     sibling = plane.root.resolve(requests[-1].relative_path, for_write=False)
     sibling.write_bytes(requests[-1].payload.replace(b'aaaa', b'bbbb', 1))
     with pytest.raises(artifacts.ArtifactIdentityConflict):
@@ -102,7 +102,7 @@ def test_retained_group_refuses_changed_unselected_sibling(tmp_path):
 @pytest.mark.parametrize('changed', ('scope', 'readonly', 'memory'))
 def test_existing_group_keeps_current_publication_request_limits(tmp_path, changed):
     plane, requests = _plane(tmp_path / 'policy'), _requests(3)
-    plane.write_compact_batch(requests)
+    plane.write_batch(requests)
     request = requests[0]
     if changed == 'scope':
         request = replace(request, publication_scope_id='software.other')
@@ -146,7 +146,7 @@ def test_custom_writer_keeps_its_single_member_boundary(tmp_path, monkeypatch, h
 def test_public_authoring_and_fresh_input_copy_use_readable_groups(tmp_path, monkeypatch):
     from empirical_lawhood.api import recursive_authoring as author, recursive_execution as execution
     from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     from tests.test_recursive_public_service import _draft, ROOT
     plane = _plane(tmp_path / 'public')
     plane.validators = integration_artifact_profile_validators()
@@ -160,7 +160,7 @@ def test_public_authoring_and_fresh_input_copy_use_readable_groups(tmp_path, mon
     raw = next(directory.glob('config-*.json.manifest.json')).read_bytes()
     assert type(decode_artifact_sidecar(raw, maximum_bytes=len(raw))) is ArtifactManifestReference
     raw = (directory / 'authored-wave.json.manifest.json').read_bytes()
-    assert type(decode_artifact_sidecar(raw, maximum_bytes=len(raw))) is artifacts.ArtifactManifest
+    assert type(decode_artifact_sidecar(raw, maximum_bytes=len(raw))) is ArtifactManifestReference
     packet, draft, _, eager = author.load_authored_wave(directory=directory, artifact_writer=plane)
     lazy_packet, lazy_draft, _, payloads = author.load_authored_wave(directory=directory,
         artifact_writer=plane, lazy_payloads=True)
@@ -170,6 +170,35 @@ def test_public_authoring_and_fresh_input_copy_use_readable_groups(tmp_path, mon
     assert execution._read_only_custody_policy(plane) is not None
     inputs = execution._external_inputs(plane=plane, plan=plan, draft=draft, payloads=payloads, read_only=False)
     assert len(inputs) > 1
+    from empirical_lawhood.api.execution import _StaticInputResolver
+    resolver = _StaticInputResolver(inputs)
+    spec = next(spec for task in plan.tasks for spec in task.external_inputs)
+    supplier = execution._DevelopmentInputSupplier(plan, resolver, plane, None)
+    with pytest.raises(ValueError, match="exact frozen specification"):
+        supplier.resolve_input(replace(spec, expected_content_sha256='f' * 64))
+    operand = supplier.resolve_input(spec)
+    value, = resolver.resolve((spec.logical_artifact_id,))
+    try:
+        assert b''.join(operand.chunks()) == plane.root.resolve(
+            value.materialization.relative_path, for_write=False).read_bytes()
+        assert operand.lineage_parents == value.logical.lineage_parents
+    finally:
+        operand.close()
+    from types import SimpleNamespace
+    current = True
+    checked = []
+    def require_current():
+        if not current:
+            raise PermissionError("original input grant expired")
+    guarded = execution._DevelopmentInputSupplier(plan, resolver, plane, SimpleNamespace(
+        require_current=require_current, require_member=checked.append)).resolve_input(spec)
+    with pytest.raises(PermissionError, match="grant expired"):
+        chunks = guarded.chunks()
+        assert next(chunks)
+        current = False
+        next(chunks)
+    guarded.close()
+    assert any(member.logical == value.logical for member in checked)
     assert any(len(plane.read_manifest(value.materialization.relative_path).publication.members) > 1
         for value in inputs)
     before = _census(Path(plane.root.contract.canonical_path))

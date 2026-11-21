@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService
-from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
 from tests.test_current_result_custody import actual_issued_current_task_controls  # noqa: F401
 
 
@@ -39,8 +39,8 @@ def test_combined_continuation_publishes_with_owning_writer_inside_read_scope(tm
     from empirical_lawhood.api.experiment_preparation import prepare_experiment
     from empirical_lawhood.api.matrix_researcher_programme import _publish, PLAN_FILENAME
     from empirical_lawhood.api.composite_experiment_programme import write_experiment_programme_descriptor
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import programme_protocol
-    from empirical_lawhood.runtime.experiment_programme import ExperimentProgrammeDescriptor
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import programme_protocol
+    from empirical_lawhood.execution.experiment_programme import ExperimentProgrammeDescriptor
     from empirical_lawhood.api.retained_e3_evidence import current_e3_evidence
     from tests.test_matrix_programme_preparation_context import _case
     from tests.test_matrix_researcher_programme import ROOT, _execution
@@ -61,7 +61,7 @@ def test_combined_continuation_publishes_with_owning_writer_inside_read_scope(tm
             relative = options[name].relative_to(root).as_posix()
             plane.verify_manifest(plane.read_manifest(relative))
         from empirical_lawhood.api.experiment_preparation import load_experiment_specification
-        from empirical_lawhood.adapters.methods.matrix_researcher_programme import source_continuation
+        from empirical_lawhood.domains.matrix.matrix_researcher_programme import source_continuation
         selected = load_experiment_specification(options['specification_path'])
         kind = (source_continuation.MatrixProgrammeSourceContinuationSpecification if pure_output_bytes is None
             else source_continuation.MatrixProgrammeOutputContinuationSpecification)
@@ -82,7 +82,7 @@ def test_combined_continuation_publishes_with_owning_writer_inside_read_scope(tm
 
 @pytest.mark.parametrize('refuse_entry', (False, True))
 def test_newly_authored_child_reaches_ordinary_entry_without_an_intermediate_status_read(monkeypatch, refuse_entry):
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import PHASES
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import PHASES
     from tests.test_matrix_programme_execution_observation import _complete
     service = MatrixResearchProgrammeService(service=SimpleNamespace(artifact_writer=object()))
     context = SimpleNamespace(bindings={'train': object()},
@@ -119,9 +119,9 @@ def test_newly_authored_child_reaches_ordinary_entry_without_an_intermediate_sta
 
 @pytest.fixture
 def recorded_controls(actual_issued_current_task_controls):  # noqa: F811
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.recovery import build_run_recovery_index
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.recovery import build_run_recovery_index
     f = actual_issued_current_task_controls
     package = f.control.package
     index = build_run_recovery_index(f.plan, run_id=package.run_plan_id, wave_id='wave.' + package.package_id,
@@ -135,7 +135,7 @@ def recorded_controls(actual_issued_current_task_controls):  # noqa: F811
 
 def test_recorded_issued_controls_preserve_extended_source_and_refuse_incomplete_terminal(recorded_controls):
     from empirical_lawhood.api.recorded_execution_controls import completed_issued_execution
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
     f = recorded_controls
     package = f.control.package
     locator = SimpleNamespace(run_id=package.run_plan_id,
@@ -150,7 +150,7 @@ def test_recorded_issued_controls_preserve_extended_source_and_refuse_incomplete
 
 def test_retained_evidence_reuses_only_immutable_controls_and_rechecks_reveal(recorded_controls, monkeypatch):
     from empirical_lawhood.api.retained_e3_evidence import retained_e3_evidence_context, current_e3_evidence
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
     f = recorded_controls
     plane = f.control.service.artifact_plane
     load = ExternalStudyOperationAuthorityStore.load
@@ -201,8 +201,8 @@ def test_retained_evidence_refuses_changed_original_control_at_close(recorded_co
 def recorded_output_views(recorded_controls, monkeypatch):
     """Use the real reference plan's codecs; execute no task or Matrix science."""
     from empirical_lawhood.api import recursive_operations
-    from empirical_lawhood.adapters.reference_worlds.runtime import ReferenceAdjudicationFixture
-    from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
+    from empirical_lawhood.domains.reference_worlds.runtime import ReferenceAdjudicationFixture
+    from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
     from tests.runtime_platform.test_recursive_prospective_workflow import Config
     codecs = {kind.SCHEMA: kind for kind in (Config, ReferenceAdjudicationFixture, ScientificAdjudicationRecord)}
     original = recursive_operations.operation_catalog
@@ -218,7 +218,7 @@ def recorded_output_views(recorded_controls, monkeypatch):
 def test_registered_output_view_reuses_controls_but_refreshes_current_grants(recorded_output_views, monkeypatch):
     from empirical_lawhood.api import recursive_qualified_parents
     from empirical_lawhood.api.retained_e3_evidence import retained_e3_evidence_context, current_e3_evidence
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
     f = recorded_output_views
     packages, grants = [], []
     actual_package = recursive_qualified_parents._actual_package
@@ -273,7 +273,7 @@ def test_output_control_reuse_rejects_unregistered_or_changed_views(recorded_out
 
 def test_registered_output_view_refuses_expired_access_before_nested_use(recorded_output_views, monkeypatch):
     from empirical_lawhood.api.retained_e3_evidence import retained_e3_evidence_context
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
     f = recorded_output_views
     load = ExternalStudyOperationAuthorityStore.load
     with retained_e3_evidence_context(f.control.service.artifact_plane) as retained:

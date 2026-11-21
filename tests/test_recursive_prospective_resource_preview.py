@@ -7,15 +7,12 @@ from pathlib import Path
 import pytest
 
 from empirical_lawhood.api import recursive_prospective_authoring as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_inputs import (
-    ProtectedFactorialPreparationRequest, bind_protected_factorial_preparation_request,
-    validate_protected_factorial_request_binding,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_resources import ProtectedFactorialResourceSelection
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCandidate
-from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveDesignInputs
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_inputs import ProtectedFactorialPreparationRequest, bind_protected_factorial_preparation_request, validate_protected_factorial_request_binding
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_resources import ProtectedFactorialResourceSelection
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCandidate
+from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveDesignInputs
 from tests import test_prospective_experiment as fixtures
 
 
@@ -76,24 +73,18 @@ def test_fresh_preview_authoring_preserves_all_fourteen_fully_bound_members(sele
     assert report["scientific_authority"] == "NONE" and report["native_contact"] == "none"
 
 
-@pytest.mark.parametrize("capacity", (64, 128))
-def test_preview_and_authoring_share_capacity_for_the_actual_retained_draft(selected, monkeypatch, capacity):
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring_bounded64 import executable_binding as large
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring_draft128.executable_binding import REGISTRATION as EXTENDED
-    from empirical_lawhood.runtime.experiment_resources import ExecutionResourceSelection, bind_execution_resources
-    from empirical_lawhood.runtime.recursive_prospective_envelope import RecursiveProspectiveAuthoringEnvelope
+def test_preview_and_authoring_share_exact_current_spec(selected, monkeypatch):
+    from empirical_lawhood.execution.experiment_resources import ExecutionResourceSelection, bind_execution_resources
 
+    from empirical_lawhood.methods.recursive_scientific_authoring.extension import REGISTRATION
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec
     original = selected.prospective_spec
     # The projection fits the legacy decoder, while the actual draft and
     # authoring exceed scaled legacy carriers. No scientific bytes are invented.
-    monkeypatch.setattr(owner, "MAXIMUM_SPEC_BYTES", len(original.draft.canonical_bytes()) - 1)
-    expected_decoder = large.REGISTRATION if capacity == 64 else EXTENDED
-    if capacity == 128:
-        monkeypatch.setattr(owner, "LARGE_RECURSIVE_SELECTION_MAXIMUM_BYTES", len(original.draft.canonical_bytes()) - 1)
     design = RecursiveProspectiveDesignInputs.from_spec(original)
     controls = ExecutionResourceSelection(**{field.name: getattr(original.resources, field.name)
         for field in fields(ExecutionResourceSelection)})
-    directory = Path(selected.plane.root.contract.canonical_path) / ("draft-capacity-preview-" + str(capacity))
+    directory = Path(selected.plane.root.contract.canonical_path) / "current-spec-preview"
     calls = []
     compile_candidate = owner._compile_outer_candidate
     def compile_once(**kwargs):
@@ -106,10 +97,10 @@ def test_preview_and_authoring_share_capacity_for_the_actual_retained_draft(sele
         report = owner.author_recursive_prospective(spec=spec, output_dir=directory,
             expected_preview=preview, **_arguments(selected))
     assert calls == [True]
-    assert (directory / "decoder.json").read_bytes() == expected_decoder.canonical_bytes()
+    assert (directory / "decoder.json").read_bytes() == REGISTRATION.canonical_bytes()
     envelope = decode_canonical_bytes((directory / "recursive-prospective.json").read_bytes(),
-        RecursiveProspectiveAuthoringEnvelope, maximum_bytes=None)
-    assert envelope.reconstruct().canonical_bytes() == spec.canonical_bytes()
+        RecursiveProspectiveAuthoringSpec, maximum_bytes=None)
+    assert envelope.canonical_bytes() == spec.canonical_bytes()
     assert (directory / "draft.json").read_bytes() == original.draft.canonical_bytes()
     assert report["native_contact"] == "none" and report["scientific_authority"] == "NONE"
     loaded = owner.load_retained_recursive_prospective_handoff(directory=directory, root=selected.root / "checkout",
@@ -185,7 +176,7 @@ def test_request_binding_refuses_source_identity_or_operational_substitution(sel
 
 def _install_fixture_hook(selected, monkeypatch, hook):
     from empirical_lawhood.api import experiment_preparation as preparation_owner
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+    from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 
     declaration = replace(preparation_owner._protocol(selected.preparation.specification_record), requires_prospective_runtime_binding=True)
     monkeypatch.setattr(preparation_owner, "_protocol", lambda _: declaration)
@@ -196,7 +187,7 @@ def _install_fixture_hook(selected, monkeypatch, hook):
 
 def test_common_api_invokes_hook_before_entry_guard_and_forwards_exact_preview(selected, preview, monkeypatch):
     from empirical_lawhood.api import prospective_experiment
-    from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExperimentDependency
+    from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExperimentDependency
 
     dependency = ExperimentDependency("fixture.mechanical-resource-projection", DependencyKind.SOFTWARE, "Fixture projection pending.")
     partial = replace(selected.preparation, dependencies=(dependency,))
@@ -221,7 +212,7 @@ def test_common_api_invokes_hook_before_entry_guard_and_forwards_exact_preview(s
 
 @pytest.mark.parametrize("mutation", ("question", "original-record", "authority"))
 def test_common_api_hook_cannot_change_science_drop_original_or_waive_authority(selected, monkeypatch, mutation):
-    from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExperimentDependency
+    from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExperimentDependency
 
     partial = selected.preparation
     if mutation == "authority":
@@ -241,13 +232,11 @@ def test_common_api_hook_cannot_change_science_drop_original_or_waive_authority(
 @pytest.mark.parametrize("kind_name", ("SOFTWARE", "SCIENTIFIC_EVIDENCE", "AUTHORITY", "EXTERNAL_INPUT", "ENVIRONMENT", "STORAGE"))
 def test_domain_hook_rejects_every_injected_entry_dependency_before_discovery(selected, monkeypatch, kind_name):
     from empirical_lawhood.api import matrix_protected_experiment, experiment_runtime_bindings
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial_confirmation import ScheduledFactorialCriteriaBinding
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_specification import (
-        ProtectedFactorialAcquisitionRoster, ProtectedFactorialExperimentSpecification,
-    )
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.planning.experiment_entry import StudyDefinition
-    from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExperimentDependency
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial_confirmation import ScheduledFactorialCriteriaBinding
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_specification import ProtectedFactorialAcquisitionRoster, ProtectedFactorialExperimentSpecification
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.design.experiment_entry import StudyDefinition
+    from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExperimentDependency
 
     def reference(name, kind, digest):
         return ObjectIdentity(name, kind.SCHEMA, kind.VERSION, digest * 64)

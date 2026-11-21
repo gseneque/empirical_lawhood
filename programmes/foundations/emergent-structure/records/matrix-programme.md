@@ -34,7 +34,7 @@ Let Z be either triplet, `R_Z = sum_a Z_a²`,
 `alpha_Z = alpha_tilde_Z/q`, `c2=(q²-1)/4`,
 `mu(M)=2*(4*c2*M-1)/9`, and `beta_Z=-alpha_Z²*mu(M_Z)`.
 The potential implemented by
-[`gradients.py`](../../../../src/empirical_lawhood/adapters/simulators/six_matrix_response/gradients.py) is
+[`gradients.py`](../../../../src/empirical_lawhood/domains/matrix/six_matrix_response/gradients.py) is
 
 ```text
 V = n * sum_(Z=X,Y) Tr(
@@ -116,9 +116,9 @@ and `a*xi1+xi2=sqrt(1+a²)*xi`. Composing the two OU momentum updates therefore
 recovers the coarse OU innovation at the actual gamma and T. It does not make
 the complete nonlinear coarse and fine BAOAB trajectories identical.
 The implementation owners are
-[`parameter_history.py`](../../../../src/empirical_lawhood/adapters/simulators/six_matrix_response/parameter_history.py),
-[`shooting.py`](../../../../src/empirical_lawhood/adapters/simulators/six_matrix_response/shooting.py)
-and [`simulation.py`](../../../../src/empirical_lawhood/adapters/simulators/six_matrix_response/simulation.py).
+[`parameter_history.py`](../../../../src/empirical_lawhood/domains/matrix/six_matrix_response/parameter_history.py),
+[`shooting.py`](../../../../src/empirical_lawhood/domains/matrix/six_matrix_response/shooting.py)
+and [`simulation.py`](../../../../src/empirical_lawhood/domains/matrix/six_matrix_response/simulation.py).
 
 Original root-purpose PCG64DXSM streams and independent future streams are
 committed before use. Roots are disjoint across banks. Nine E4 coordinates

@@ -6,11 +6,11 @@ from decimal import Decimal as D, localcontext
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.protected_point import MatrixPreparedComparatorMethod, forecast_comparator
-from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_methods import MatrixE3EstimatorModel, MatrixE3ModelSet, METHODS
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.experimental_design import UnitAllocation
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.protected_point import MatrixPreparedComparatorMethod, forecast_comparator
+from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_methods import MatrixE3EstimatorModel, MatrixE3ModelSet, METHODS
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 from tests.test_matrix_later_programme import ref
 from tests import test_matrix_prepared_functional as fixture
 

@@ -7,9 +7,9 @@ from dataclasses import replace
 import pytest
 
 from empirical_lawhood.api import recursive_execution as execution
-from empirical_lawhood.infrastructure import recursive_custody as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.storage import recursive_custody as owner
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
 from tests.test_recursive_report_projection import wave as wave  # noqa: F401
 
 

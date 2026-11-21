@@ -9,21 +9,19 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_composition as composition
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_closeout_execution import (
-    ConfiguredE3CALRootCloseout, ConfiguredE3MissingOutcomeConfig, ConfiguredE3MissingOutcomeProducts,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_continued_response import ConfiguredE3ContinuedResponseConfig
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_unknown_response import score_unknown_response
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import source_binding
-from empirical_lawhood.infrastructure.execution import prepare_worker_invocation
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.execution import TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionPlan, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_composition as composition
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_closeout_execution import ConfiguredE3CALRootCloseout, ConfiguredE3MissingOutcomeConfig, ConfiguredE3MissingOutcomeProducts
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_continued_response import ConfiguredE3ContinuedResponseConfig
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_unknown_response import score_unknown_response
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import source_binding
+from empirical_lawhood.execution.local.execution import prepare_worker_invocation
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.execution import TaskContext, VerifiedArtifactInput, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionPlan, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
 from tests.test_matrix_configured_unknown_response import (
     case as unknown_case, configured_prefix_case, legacy_case, original_case, no_science, _pin,  # noqa: F401
 )
@@ -144,7 +142,7 @@ def test_missingness_worker_retains_original_unknown_and_separate_source(worker_
 def test_closeout_rechecks_previously_absent_native_return(unknown_case):  # noqa: F811
     """A real new orphan witness must refuse the previously read UNKNOWN state."""
     from empirical_lawhood.api.configured_e3_closeout_custody import _require_unknown_current
-    from empirical_lawhood.infrastructure.native_subwork import NativeSubworkUncertainContact
+    from empirical_lawhood.storage.native_subwork import NativeSubworkUncertainContact
 
     case = unknown_case
     original = case.native.inspect(case.availability.definition)

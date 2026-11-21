@@ -13,25 +13,19 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import (
-    METHODS,
-    MatrixParameterHistoryControl,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as common
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as development
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_science as development_science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as protected
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_science as protected_science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as programme
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.continuation import ScheduledFullArrays
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import (
-    ScheduledResponseScore,
-    branch_census,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import METHODS, MatrixParameterHistoryControl
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as common
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as development
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_science as development_science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as protected
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_science as protected_science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as programme
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.continuation import ScheduledFullArrays
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseScore, branch_census
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion
 from tests.native_completion_fixtures import literal_completion, receipt_with_completion
 from tests.test_matrix_e4_response_nonentry import no_native, response_case  # noqa: F401
 from tests.test_matrix_selected_e4_fixtures import selected_bridge, selected_e4_populations, transfer  # noqa: F401

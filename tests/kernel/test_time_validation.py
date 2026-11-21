@@ -11,17 +11,11 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.references import ArtifactIdentity, ExecutableReference, SafePayloadFormat
-from empirical_lawhood.kernel.serialization import CanonicalRecord, CanonicalizationError
-from empirical_lawhood.kernel.time import (
-    AvailabilitySpec, CausalPhase, ClockCoordinate, ClockLabelSemantics,
-    ClockProjectionStatus, ClockRelationKind, ClockRelationSpec,
-    ClockSpec, ClockTransport, ClockTransportAvailability, ClockTransportKind,
-    ClockTransportMonotonicity, CoordinateOrigin, HoldSemantics, InformationCutoff,
-    SamplingSemantics,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.references import ArtifactIdentity, ExecutableReference, SafePayloadFormat
+from empirical_lawhood.science.records.serialization import CanonicalRecord, CanonicalizationError
+from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase, ClockCoordinate, ClockLabelSemantics, ClockProjectionStatus, ClockRelationKind, ClockRelationSpec, ClockSpec, ClockTransport, ClockTransportAvailability, ClockTransportKind, ClockTransportMonotonicity, CoordinateOrigin, HoldSemantics, InformationCutoff, SamplingSemantics
 
 
 def _clock() -> ClockSpec:

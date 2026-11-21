@@ -1,239 +1,40 @@
-"Authority-guarded acquisition for the selected Gym-TORAX finite-action recurrence parent.\n\nThe selected branch is outcome-visible because branch qualification has been adjudicated.  The\nnew finite-action recurrence requests and episodes nevertheless remain evaluation-sealed until\nan explicit reveal.  Operational receipts inherit the revealed branch\nselection; scientific episode artifacts inherit their exact sealed requests.\n"
+"""Native acquisition, external-format translation and custody integration."""
 
 from __future__ import annotations
-
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
-from enum import StrEnum
 from pathlib import Path
 import re
-from typing import ClassVar
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.study_issue import StudyAuthorityKind, StudyOperationAuthority, require_study_authority
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
+from empirical_lawhood.domains.fusion.gym_torax_native.field_metadata_contracts import GymToraxFieldMetadataEpisodeRequest, GymToraxFieldMetadataNativeEpisode
+from empirical_lawhood.domains.fusion.gym_torax_native.extraction_manifest import GymToraxBoundedExtractionManifest
+from empirical_lawhood.domains.fusion.gym_torax_native.field_metadata import GymToraxFieldMetadataManifest
+from empirical_lawhood.domains.fusion.gym_torax_native.finite_action_recurrence_protocol import GymToraxFiniteActionRecurrenceCellStage, GymToraxFiniteActionRecurrenceCell, GymToraxFiniteActionRecurrenceProspectiveFreeze, materialize_gym_torax_finite_action_recurrence_request
+from empirical_lawhood.execution.gym_torax_custody import GymToraxArtifactPublicationItem, GymToraxBoundedArtifactStore
+from empirical_lawhood.domains.fusion.gym_torax_native.source_assessment_execution_records import GymToraxOperationalDisposition
+from empirical_lawhood.adapters.simulators.gym_torax_native.runtime import GymToraxEnvironmentFactory, GymToraxRuntimeInspector, acquire_gym_torax_episode, inspect_gym_torax_runtime
+from empirical_lawhood.domains.fusion.gym_torax_native.native_episode import GymToraxOutputBoundError, GymToraxRuntimePreflightError
+from empirical_lawhood.domains.fusion.gym_torax_native.source_qualification import GymToraxNativeSourceQualificationDisposition, GymToraxNativeSourceQualificationReceipt
 
-from empirical_lawhood.kernel.evidence import (
-    EvidenceCeiling,
-    OutcomeAccess,
-    VisibilityCeiling,
+from empirical_lawhood.domains.fusion.gym_torax_native.finite_action_recurrence_execution_records import (
+    GymToraxFiniteActionRecurrenceCellAcquisitionReceipt as _science_GymToraxFiniteActionRecurrenceCellAcquisitionReceipt,
+    GymToraxFiniteActionRecurrenceStageAcquisitionReceipt as _science_GymToraxFiniteActionRecurrenceStageAcquisitionReceipt,
+    GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition as _science_GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition,
+    GymToraxFiniteActionRecurrenceTerminalAcquisitionReceipt as _science_GymToraxFiniteActionRecurrenceTerminalAcquisitionReceipt,
 )
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_ids,
-    require_sorted_unique_strings,
-    validate_stable_id,
-)
-from empirical_lawhood.planning.study_issue import StudyAuthorityKind, StudyOperationAuthority, require_study_authority
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent
-
-from .field_metadata_contracts import GymToraxFieldMetadataEpisodeRequest, GymToraxFieldMetadataNativeEpisode
-from .extraction_manifest import GymToraxBoundedExtractionManifest
-from .field_metadata import GymToraxFieldMetadataManifest
-from .finite_action_recurrence_protocol import GymToraxFiniteActionRecurrenceCellStage, GymToraxFiniteActionRecurrenceCell, GymToraxFiniteActionRecurrenceProspectiveFreeze, materialize_gym_torax_finite_action_recurrence_request
-from .source_assessment_execution import GymToraxArtifactPublicationItem, GymToraxOperationalDisposition, GymToraxBoundedArtifactStore
-from .runtime import GymToraxEnvironmentFactory, GymToraxOutputBoundError, GymToraxRuntimePreflightError, GymToraxRuntimeInspector, acquire_gym_torax_episode, inspect_gym_torax_runtime
-from .source_qualification import GymToraxNativeSourceQualificationDisposition, GymToraxNativeSourceQualificationReceipt
-
 
 _EXECUTION_GRANTEE_ID = "operator.execution-service"
-
-
-class GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition(StrEnum):
-    COMPLETE = "COMPLETE"
-    INCOMPLETE = "INCOMPLETE"
-
-
-@dataclass(frozen=True, slots=True)
-class GymToraxFiniteActionRecurrenceCellAcquisitionReceipt(CanonicalRecord):
-    "One immutable acquisition attempt for one frozen finite-action recurrence cell."
-
-    SCHEMA: ClassVar[str] = (
-        'empirical-lawhood/simulators/gym-torax-native/gym-torax-finite-action-recurrence-cell-acquisition-receipt'
-    )
-
-    receipt_id: str
-    freeze: ObjectIdentity
-    cell: ObjectIdentity
-    request: ObjectIdentity
-    expected_episode_id: str
-    episode: ObjectIdentity | None
-    disposition: GymToraxOperationalDisposition
-    reason_codes: tuple[str, ...]
-    attempt_count: int
-    automatic_retry_performed: bool
-    source_reset_attempted: bool
-    scientific_values_decoded: bool
-    outcome_access: OutcomeAccess
-    visibility_ceiling: VisibilityCeiling
-    evidence_ceiling: EvidenceCeiling
-
-    def __post_init__(self) -> None:
-        validate_stable_id(self.receipt_id, field_name="receipt_id")
-        validate_stable_id(self.expected_episode_id, field_name="expected_episode_id")
-        if self.freeze.object_schema != GymToraxFiniteActionRecurrenceProspectiveFreeze.SCHEMA:
-            raise ValueError("Finite-action recurrence cell receipt binds another freeze schema")
-        if self.cell.object_schema != GymToraxFiniteActionRecurrenceCell.SCHEMA:
-            raise ValueError("Finite-action recurrence cell receipt binds another cell schema")
-        if self.request.object_schema != GymToraxFieldMetadataEpisodeRequest.SCHEMA:
-            raise ValueError("Finite-action recurrence cell receipt binds another request schema")
-        require_sorted_unique_strings(self.reason_codes, field_name="reason_codes")
-        if self.attempt_count != 1 or self.automatic_retry_performed:
-            raise ValueError("Finite-action recurrence permits exactly one attempt and no automatic retry")
-        if self.disposition is GymToraxOperationalDisposition.SUCCEEDED:
-            if self.episode is None or self.reason_codes:
-                raise ValueError(
-                    "successful finite-action recurrence acquisition requires one exact episode"
-                )
-            if (
-                self.episode.object_schema != GymToraxFieldMetadataNativeEpisode.SCHEMA
-                or self.episode.object_id != self.expected_episode_id
-            ):
-                raise ValueError("Finite-action recurrence receipt episode identity differs")
-        elif self.episode is not None or not self.reason_codes:
-            raise ValueError("failed finite-action recurrence acquisition cannot claim an episode")
-        if self.scientific_values_decoded:
-            raise ValueError("Finite-action recurrence acquisition cannot decode scientific values")
-        if (
-            self.outcome_access is not OutcomeAccess.EVALUATION_REVEALED
-            or self.visibility_ceiling is not VisibilityCeiling.OUTCOME_VISIBLE
-            or self.evidence_ceiling is not EvidenceCeiling.MEASUREMENT
-        ):
-            raise ValueError("Finite-action recurrence receipt changes its selected-parent evidence lane")
-
-
-@dataclass(frozen=True, slots=True)
-class GymToraxFiniteActionRecurrenceTerminalAcquisitionReceipt(CanonicalRecord):
-    """Exact terminal accounting for all 98 selected-parent cells."""
-
-    SCHEMA: ClassVar[str] = (
-        'empirical-lawhood/simulators/gym-torax-native/gym-torax-finite-action-recurrence-terminal-acquisition-receipt'
-    )
-
-    receipt_id: str
-    freeze: ObjectIdentity
-    cell_receipts: tuple[ObjectIdentity, ...]
-    episodes: tuple[ObjectIdentity, ...]
-    accounted_cell_count: int
-    completed_episode_count: int
-    failed_cell_count: int
-    disposition: GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition
-    reason_codes: tuple[str, ...]
-    scientific_values_decoded: bool
-    outcome_access: OutcomeAccess
-    visibility_ceiling: VisibilityCeiling
-    evidence_ceiling: EvidenceCeiling
-
-    def __post_init__(self) -> None:
-        validate_stable_id(self.receipt_id, field_name="receipt_id")
-        if self.freeze.object_schema != GymToraxFiniteActionRecurrenceProspectiveFreeze.SCHEMA:
-            raise ValueError("Finite-action recurrence terminal binds another freeze schema")
-        require_sorted_unique_ids(
-            self.cell_receipts,
-            attribute="object_id",
-            field_name="cell_receipts",
-        )
-        require_sorted_unique_ids(
-            self.episodes, attribute="object_id", field_name="episodes"
-        )
-        require_sorted_unique_strings(self.reason_codes, field_name="reason_codes")
-        if self.accounted_cell_count != 98 or len(self.cell_receipts) != 98:
-            raise ValueError("Finite-action recurrence terminal requires all 98 cell receipts")
-        if self.completed_episode_count != len(self.episodes):
-            raise ValueError("Finite-action recurrence completed count differs from episode identities")
-        if self.completed_episode_count + self.failed_cell_count != 98:
-            raise ValueError("Finite-action recurrence terminal counts do not cover the frozen roster")
-        if self.disposition is GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition.COMPLETE:
-            if (
-                self.completed_episode_count != 98
-                or self.failed_cell_count
-                or self.reason_codes
-            ):
-                raise ValueError("complete finite-action recurrence terminal requires all episodes")
-        elif self.failed_cell_count <= 0 or not self.reason_codes:
-            raise ValueError("incomplete finite-action recurrence terminal requires exact failed cells")
-        if self.scientific_values_decoded:
-            raise ValueError("Finite-action recurrence terminal cannot decode scientific values")
-        if (
-            self.outcome_access is not OutcomeAccess.EVALUATION_REVEALED
-            or self.visibility_ceiling is not VisibilityCeiling.OUTCOME_VISIBLE
-            or self.evidence_ceiling is not EvidenceCeiling.MEASUREMENT
-        ):
-            raise ValueError("Finite-action recurrence terminal changes its selected-parent evidence lane")
-
-
-@dataclass(frozen=True, slots=True)
-class GymToraxFiniteActionRecurrenceStageAcquisitionReceipt(CanonicalRecord):
-    "Exact outcome-sealed terminal for one explicitly selected finite-action recurrence stage set."
-
-    SCHEMA: ClassVar[str] = (
-        'empirical-lawhood/simulators/gym-torax-native/gym-torax-finite-action-recurrence-stage-acquisition-receipt'
-    )
-
-    receipt_id: str
-    freeze: ObjectIdentity
-    stages: tuple[GymToraxFiniteActionRecurrenceCellStage, ...]
-    cell_receipts: tuple[ObjectIdentity, ...]
-    episodes: tuple[ObjectIdentity, ...]
-    expected_cell_count: int
-    completed_episode_count: int
-    failed_cell_count: int
-    disposition: GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition
-    reason_codes: tuple[str, ...]
-    scientific_values_decoded: bool
-    outcome_access: OutcomeAccess
-    visibility_ceiling: VisibilityCeiling
-    evidence_ceiling: EvidenceCeiling
-
-    def __post_init__(self) -> None:
-        validate_stable_id(self.receipt_id, field_name="receipt_id")
-        if self.freeze.object_schema != GymToraxFiniteActionRecurrenceProspectiveFreeze.SCHEMA:
-            raise ValueError("Finite-action recurrence stage terminal binds another freeze")
-        if (
-            not self.stages
-            or tuple(sorted(set(self.stages), key=lambda value: value.value))
-            != self.stages
-        ):
-            raise ValueError("Finite-action recurrence stage terminal requires unique sorted stages")
-        require_sorted_unique_ids(
-            self.cell_receipts, attribute="object_id", field_name="cell_receipts"
-        )
-        require_sorted_unique_ids(
-            self.episodes, attribute="object_id", field_name="episodes"
-        )
-        require_sorted_unique_strings(self.reason_codes, field_name="reason_codes")
-        if self.expected_cell_count != len(self.cell_receipts):
-            raise ValueError("Finite-action recurrence stage terminal omits an expected cell receipt")
-        if self.completed_episode_count != len(self.episodes):
-            raise ValueError(
-                "Finite-action recurrence stage completed count differs from episode identities"
-            )
-        if (
-            self.completed_episode_count + self.failed_cell_count
-            != self.expected_cell_count
-        ):
-            raise ValueError("Finite-action recurrence stage terminal counts do not cover its roster")
-        if self.disposition is GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition.COMPLETE:
-            if self.failed_cell_count or self.reason_codes:
-                raise ValueError("complete finite-action recurrence stage terminal cannot carry failures")
-        elif self.failed_cell_count <= 0 or not self.reason_codes:
-            raise ValueError("incomplete finite-action recurrence stage terminal requires exact failures")
-        if self.scientific_values_decoded:
-            raise ValueError("Finite-action recurrence stage acquisition cannot decode scientific values")
-        if (
-            self.outcome_access is not OutcomeAccess.EVALUATION_REVEALED
-            or self.visibility_ceiling is not VisibilityCeiling.OUTCOME_VISIBLE
-            or self.evidence_ceiling is not EvidenceCeiling.MEASUREMENT
-        ):
-            raise ValueError("Finite-action recurrence stage terminal changes its evidence lane")
-
 
 class GymToraxFiniteActionRecurrenceIncompleteError(RuntimeError):
     def __init__(self, missing_cell_ids: Sequence[str]) -> None:
         self.missing_cell_ids = tuple(sorted(set(missing_cell_ids)))
         super().__init__(f"GYM_TORAX_FINITE_ACTION_RECURRENCE_CELL_RECEIPTS_MISSING:{len(self.missing_cell_ids)}")
 
-
 def _identity(identifier: str, record: CanonicalRecord) -> ObjectIdentity:
     return ObjectIdentity.from_record(identifier, record)
-
 
 def _parent(
     identity: ObjectIdentity,
@@ -247,34 +48,26 @@ def _parent(
         outcome_access=access,
     )
 
-
 def _freeze_logical_id(freeze: GymToraxFiniteActionRecurrenceProspectiveFreeze) -> str:
     return f"artifact.{freeze.run_id}.freeze"
-
 
 def _request_logical_id(request_id: str) -> str:
     return f"artifact.{request_id}"
 
-
 def _episode_logical_id(episode_id: str) -> str:
     return f"artifact.{episode_id}"
-
 
 def _receipt_logical_id(cell_id: str) -> str:
     return f"artifact.receipt.{cell_id}"
 
-
 def _request_path(freeze: GymToraxFiniteActionRecurrenceProspectiveFreeze, request_id: str) -> str:
     return f"{freeze.relative_root}/requests/{request_id}.json"
-
 
 def _episode_path(freeze: GymToraxFiniteActionRecurrenceProspectiveFreeze, episode_id: str) -> str:
     return f"{freeze.relative_root}/episodes/{episode_id}.json"
 
-
 def _receipt_path(freeze: GymToraxFiniteActionRecurrenceProspectiveFreeze, cell_id: str) -> str:
     return f"{freeze.relative_root}/receipts/{cell_id}.json"
-
 
 def _require_custody(
     freeze: GymToraxFiniteActionRecurrenceProspectiveFreeze,
@@ -295,7 +88,6 @@ def _require_custody(
     )
     if authority.authority_id not in freeze.required_operation_authority_ids:
         raise PermissionError("Finite-action recurrence custody authority ID is outside the freeze")
-
 
 def _require_execution(
     freeze: GymToraxFiniteActionRecurrenceProspectiveFreeze,
@@ -331,7 +123,6 @@ def _require_execution(
     } - set(freeze.required_operation_authority_ids):
         raise PermissionError("Finite-action recurrence execution authority ID is outside the freeze")
 
-
 def _require_persisted_freeze(
     store: GymToraxBoundedArtifactStore,
     freeze: GymToraxFiniteActionRecurrenceProspectiveFreeze,
@@ -345,7 +136,6 @@ def _require_persisted_freeze(
     if observed != freeze:
         raise RuntimeError("GYM_TORAX_FINITE_ACTION_RECURRENCE_FREEZE_NOT_PERSISTED_EXACTLY")
 
-
 def _technical_reason(error: Exception) -> tuple[str, ...]:
     if isinstance(error, GymToraxRuntimePreflightError):
         return tuple(f"FINITE_ACTION_RECURRENCE_{value}" for value in error.reason_codes)
@@ -353,7 +143,6 @@ def _technical_reason(error: Exception) -> tuple[str, ...]:
         return ("FINITE_ACTION_RECURRENCE_OUTPUT_BOUND_EXCEEDED",)
     token = re.sub(r"[^A-Z0-9]+", "_", type(error).__name__.upper()).strip("_")
     return (f"FINITE_ACTION_RECURRENCE_TECHNICAL_{token or 'ERROR'}",)
-
 
 def publish_gym_torax_finite_action_recurrence_freeze(
     *,
@@ -410,13 +199,12 @@ def publish_gym_torax_finite_action_recurrence_freeze(
         ),
     )[0]
 
-
 def _validate_cell_products(
     *,
     freeze: GymToraxFiniteActionRecurrenceProspectiveFreeze,
     cell: GymToraxFiniteActionRecurrenceCell,
     request: GymToraxFieldMetadataEpisodeRequest | None,
-    receipt: GymToraxFiniteActionRecurrenceCellAcquisitionReceipt,
+    receipt: _science_GymToraxFiniteActionRecurrenceCellAcquisitionReceipt,
     episode: GymToraxFieldMetadataNativeEpisode | None,
 ) -> None:
     expected_request = materialize_gym_torax_finite_action_recurrence_request(freeze, cell)
@@ -457,7 +245,6 @@ def _validate_cell_products(
     elif episode is not None:
         raise RuntimeError("GYM_TORAX_FINITE_ACTION_RECURRENCE_FAILED_RECEIPT_HAS_EPISODE")
 
-
 def run_gym_torax_finite_action_recurrence(
     *,
     freeze: GymToraxFiniteActionRecurrenceProspectiveFreeze,
@@ -475,7 +262,7 @@ def run_gym_torax_finite_action_recurrence(
     episode_acquirer: Callable[[GymToraxFieldMetadataEpisodeRequest], GymToraxFieldMetadataNativeEpisode]
     | None = None,
     stages: tuple[GymToraxFiniteActionRecurrenceCellStage, ...] = tuple(GymToraxFiniteActionRecurrenceCellStage),
-) -> tuple[GymToraxFiniteActionRecurrenceCellAcquisitionReceipt, ...]:
+) -> tuple[_science_GymToraxFiniteActionRecurrenceCellAcquisitionReceipt, ...]:
     """Execute/recover only the explicitly selected frozen stages."""
 
     if freeze.maximum_concurrency != 1:
@@ -505,7 +292,7 @@ def run_gym_torax_finite_action_recurrence(
         source_qualification.receipt_id,
         source_qualification,
     )
-    receipts: list[GymToraxFiniteActionRecurrenceCellAcquisitionReceipt] = []
+    receipts: list[_science_GymToraxFiniteActionRecurrenceCellAcquisitionReceipt] = []
     for cell in (value for value in freeze.cells if value.stage in set(stages)):
         request = materialize_gym_torax_finite_action_recurrence_request(freeze, cell)
         request_id = _request_logical_id(request.request_id)
@@ -523,7 +310,7 @@ def run_gym_torax_finite_action_recurrence(
         recovered_receipt = store.load_optional(
             logical_artifact_id=receipt_id,
             relative_path=receipt_path,
-            record_type=GymToraxFiniteActionRecurrenceCellAcquisitionReceipt,
+            record_type=_science_GymToraxFiniteActionRecurrenceCellAcquisitionReceipt,
             maximum_bytes=2 * 1024**2,
         )
         recovered_episode = store.load_optional(
@@ -613,7 +400,7 @@ def run_gym_torax_finite_action_recurrence(
                     )
                 )
                 episode_identity = _identity(episode.episode_id, episode)
-                provisional_receipt = GymToraxFiniteActionRecurrenceCellAcquisitionReceipt(
+                provisional_receipt = _science_GymToraxFiniteActionRecurrenceCellAcquisitionReceipt(
                     receipt_id=f"receipt.{cell.cell_id.removeprefix('cell.')}",
                     freeze=freeze_identity,
                     cell=_identity(cell.cell_id, cell),
@@ -684,7 +471,7 @@ def run_gym_torax_finite_action_recurrence(
             )
         else:
             receipt_episode_identity = None
-        receipt = GymToraxFiniteActionRecurrenceCellAcquisitionReceipt(
+        receipt = _science_GymToraxFiniteActionRecurrenceCellAcquisitionReceipt(
             receipt_id=f"receipt.{cell.cell_id.removeprefix('cell.')}",
             freeze=freeze_identity,
             cell=_identity(cell.cell_id, cell),
@@ -750,7 +537,6 @@ def run_gym_torax_finite_action_recurrence(
         receipts.append(receipt)
     return tuple(sorted(receipts, key=lambda value: value.cell.object_id))
 
-
 def finalize_gym_torax_finite_action_recurrence_stages(
     *,
     freeze: GymToraxFiniteActionRecurrenceProspectiveFreeze,
@@ -758,7 +544,7 @@ def finalize_gym_torax_finite_action_recurrence_stages(
     custody_authority: StudyOperationAuthority,
     store: GymToraxBoundedArtifactStore,
     at_utc: str,
-) -> GymToraxFiniteActionRecurrenceStageAcquisitionReceipt:
+) -> _science_GymToraxFiniteActionRecurrenceStageAcquisitionReceipt:
     """Publish exact terminal accounting for the named frozen stage set."""
 
     normalized = tuple(sorted(set(stages), key=lambda value: value.value))
@@ -772,7 +558,7 @@ def finalize_gym_torax_finite_action_recurrence_stages(
     recovered = store.load_optional(
         logical_artifact_id=logical_id,
         relative_path=path,
-        record_type=GymToraxFiniteActionRecurrenceStageAcquisitionReceipt,
+        record_type=_science_GymToraxFiniteActionRecurrenceStageAcquisitionReceipt,
         maximum_bytes=16 * 1024**2,
     )
     if recovered is not None:
@@ -784,7 +570,7 @@ def finalize_gym_torax_finite_action_recurrence_stages(
         return recovered
 
     cells = tuple(value for value in freeze.cells if value.stage in set(normalized))
-    receipts: list[GymToraxFiniteActionRecurrenceCellAcquisitionReceipt] = []
+    receipts: list[_science_GymToraxFiniteActionRecurrenceCellAcquisitionReceipt] = []
     episodes: list[ObjectIdentity] = []
     missing: list[str] = []
     for cell in cells:
@@ -798,7 +584,7 @@ def finalize_gym_torax_finite_action_recurrence_stages(
         receipt = store.load_optional(
             logical_artifact_id=_receipt_logical_id(cell.cell_id),
             relative_path=_receipt_path(freeze, cell.cell_id),
-            record_type=GymToraxFiniteActionRecurrenceCellAcquisitionReceipt,
+            record_type=_science_GymToraxFiniteActionRecurrenceCellAcquisitionReceipt,
             maximum_bytes=2 * 1024**2,
         )
         episode = store.load_optional(
@@ -827,7 +613,7 @@ def finalize_gym_torax_finite_action_recurrence_stages(
         for value in receipts
         if value.disposition is not GymToraxOperationalDisposition.SUCCEEDED
     )
-    terminal = GymToraxFiniteActionRecurrenceStageAcquisitionReceipt(
+    terminal = _science_GymToraxFiniteActionRecurrenceStageAcquisitionReceipt(
         receipt_id=f"receipt.{freeze.run_id}.stages.{slug}",
         freeze=_identity(freeze.freeze_id, freeze),
         stages=normalized,
@@ -842,9 +628,9 @@ def finalize_gym_torax_finite_action_recurrence_stages(
         completed_episode_count=len(episodes),
         failed_cell_count=len(failed),
         disposition=(
-            GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition.COMPLETE
+            _science_GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition.COMPLETE
             if not failed
-            else GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition.INCOMPLETE
+            else _science_GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition.INCOMPLETE
         ),
         reason_codes=tuple(
             sorted({reason for value in failed for reason in value.reason_codes})
@@ -899,14 +685,13 @@ def finalize_gym_torax_finite_action_recurrence_stages(
     )
     return terminal
 
-
 def finalize_gym_torax_finite_action_recurrence(
     *,
     freeze: GymToraxFiniteActionRecurrenceProspectiveFreeze,
     custody_authority: StudyOperationAuthority,
     store: GymToraxBoundedArtifactStore,
     at_utc: str,
-) -> GymToraxFiniteActionRecurrenceTerminalAcquisitionReceipt:
+) -> _science_GymToraxFiniteActionRecurrenceTerminalAcquisitionReceipt:
     """Publish terminal accounting only after every frozen cell has a receipt."""
 
     _require_custody(freeze, custody_authority, store, at_utc=at_utc)
@@ -916,7 +701,7 @@ def finalize_gym_torax_finite_action_recurrence(
     recovered = store.load_optional(
         logical_artifact_id=logical_id,
         relative_path=path,
-        record_type=GymToraxFiniteActionRecurrenceTerminalAcquisitionReceipt,
+        record_type=_science_GymToraxFiniteActionRecurrenceTerminalAcquisitionReceipt,
         maximum_bytes=16 * 1024**2,
     )
     if recovered is not None:
@@ -924,7 +709,7 @@ def finalize_gym_torax_finite_action_recurrence(
             raise RuntimeError("GYM_TORAX_FINITE_ACTION_RECURRENCE_TERMINAL_RECOVERY_FREEZE_DIVERGENCE")
         return recovered
 
-    receipts: list[GymToraxFiniteActionRecurrenceCellAcquisitionReceipt] = []
+    receipts: list[_science_GymToraxFiniteActionRecurrenceCellAcquisitionReceipt] = []
     episodes: list[ObjectIdentity] = []
     missing: list[str] = []
     for cell in freeze.cells:
@@ -938,7 +723,7 @@ def finalize_gym_torax_finite_action_recurrence(
         receipt = store.load_optional(
             logical_artifact_id=_receipt_logical_id(cell.cell_id),
             relative_path=_receipt_path(freeze, cell.cell_id),
-            record_type=GymToraxFiniteActionRecurrenceCellAcquisitionReceipt,
+            record_type=_science_GymToraxFiniteActionRecurrenceCellAcquisitionReceipt,
             maximum_bytes=2 * 1024**2,
         )
         episode = store.load_optional(
@@ -967,7 +752,7 @@ def finalize_gym_torax_finite_action_recurrence(
     failed = sum(
         value.disposition is GymToraxOperationalDisposition.FAILED for value in receipts
     )
-    terminal = GymToraxFiniteActionRecurrenceTerminalAcquisitionReceipt(
+    terminal = _science_GymToraxFiniteActionRecurrenceTerminalAcquisitionReceipt(
         receipt_id=f"receipt.{freeze.run_id.removeprefix('run.')}.terminal-acquisition",
         freeze=_identity(freeze.freeze_id, freeze),
         cell_receipts=tuple(
@@ -981,9 +766,9 @@ def finalize_gym_torax_finite_action_recurrence(
         completed_episode_count=len(episodes),
         failed_cell_count=failed,
         disposition=(
-            GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition.COMPLETE
+            _science_GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition.COMPLETE
             if failed == 0
-            else GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition.INCOMPLETE
+            else _science_GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition.INCOMPLETE
         ),
         reason_codes=() if failed == 0 else ("GYM_TORAX_FINITE_ACTION_RECURRENCE_TECHNICAL_CELL_FAILURE",),
         scientific_values_decoded=False,
@@ -1019,16 +804,3 @@ def finalize_gym_torax_finite_action_recurrence(
         ),
     )
     return terminal
-
-
-__all__ = [
-    'GymToraxFiniteActionRecurrenceCellAcquisitionReceipt',
-    'GymToraxFiniteActionRecurrenceIncompleteError',
-    'GymToraxFiniteActionRecurrenceStageAcquisitionReceipt',
-    'GymToraxFiniteActionRecurrenceTerminalAcquisitionDisposition',
-    'GymToraxFiniteActionRecurrenceTerminalAcquisitionReceipt',
-    'finalize_gym_torax_finite_action_recurrence',
-    'finalize_gym_torax_finite_action_recurrence_stages',
-    'publish_gym_torax_finite_action_recurrence_freeze',
-    'run_gym_torax_finite_action_recurrence',
-]

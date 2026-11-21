@@ -8,9 +8,9 @@ from dataclasses import replace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.composition.response_composition.scalar_parent import SHAPES, ResponseCompositionScalarParent, analyze_scalar_parent
-from empirical_lawhood.adapters.methods.response_composition.development import ResponseCompositionDevelopmentSpec
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.response_composition.authoring.scalar_parent import SHAPES, ResponseCompositionScalarParent, analyze_scalar_parent
+from empirical_lawhood.domains.matrix.response_composition.development import ResponseCompositionDevelopmentSpec
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def test_scalar_parent_keeps_hold_subtraction_and_root_denominator(monkeypatch):
@@ -43,7 +43,7 @@ def test_scalar_parent_keeps_hold_subtraction_and_root_denominator(monkeypatch):
         return {"synthetic": True}
 
     monkeypatch.setattr(
-        'empirical_lawhood.adapters.composition.response_composition.scalar_parent.develop_context',
+        'empirical_lawhood.domains.matrix.response_composition.authoring.scalar_parent.develop_context',
         consume,
     )
     analyze_scalar_parent(parent)

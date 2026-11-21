@@ -150,7 +150,7 @@ does not remove the physical CA atoms or their short cap contacts.
 The work uses ordinary development records and a deterministic field SHA;
 neither creates a registered scientific-product identity or execution receipt.
 The owner is
-[rr_coupled_embedding.py](../../../../src/empirical_lawhood/adapters/physical/rubisco_kinetics/rr_coupled_embedding.py),
+[rr_coupled_embedding.py](../../../../src/empirical_lawhood/domains/rubisco/rubisco_insilico_structure/embedding.py),
 SHA-256 `4edcd851c019826f0822079c45b28675fdbeee4bb529b26aefd0e26b1267f2ba`;
 its [focused checks](../../../../tests/test_rubisco_rr_coupled_embedding.py) have
 SHA-256 `bab25c93b14d7a617257e1366662dbbc63df749b9d2ec611cbc05a9eb8fcd6df`.

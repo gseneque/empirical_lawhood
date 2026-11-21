@@ -1,24 +1,23 @@
 # SPDX-License-Identifier: MPL-2.0
 """Owning public preparation, issued binding and actual finite-dt source reads."""
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import exposure_support as current_exposure_support
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import exposure_support as current_exposure_support
 from dataclasses import replace
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods import matrix_prepared_source_experiment as domain
-from empirical_lawhood.adapters.methods import matrix_prepared_source_records as r
-from empirical_lawhood.adapters.methods.matrix_source_evidence import MatrixSourcePipelineEvidence
+from empirical_lawhood.domains.matrix import matrix_prepared_source_experiment as domain
+from empirical_lawhood.domains.matrix import matrix_prepared_source_records as r
+from empirical_lawhood.domains.matrix.matrix_source_evidence import MatrixSourcePipelineEvidence
 from empirical_lawhood.api.current_task_custody import CurrentIssuedTaskCustody
-from .matrix_prepared_source_runtime import (
-    authenticate_prepared_source_certificate, bind_prepared_source_handoff)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experiment_preparation import ExperimentPreparation
-from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveDesignInputs
+from empirical_lawhood.api.matrix_prepared_source_runtime import authenticate_prepared_source_certificate, bind_prepared_source_handoff
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experiment_preparation import ExperimentPreparation
+from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveDesignInputs
 
 
 def _authenticate_bank_publications(writer, bank, exposure_support):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_originals import _authenticate_artifact
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_originals import _authenticate_artifact
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
     required = {artifact for artifact, _ in current_exposure_support(bank.audit)}
     if len(exposure_support) != len(required) or {value for value, _ in exposure_support} != required:
         raise PermissionError('prepared source omits its exact current census publication support')
@@ -52,8 +51,7 @@ def pipeline_evidence(selection):
 
 def authenticate_selection(*, writer, selection, control_reader=None, original_input_access=None):
     from empirical_lawhood.api.matrix_finite_dt_source_pipeline import authenticate_finite_dt_source_materialization
-    from .matrix_source_runtime import (
-        _authenticate_source_publication, matrix_source_publication_references)
+    from empirical_lawhood.api.matrix_source_runtime import _authenticate_source_publication, matrix_source_publication_references
     selection.__post_init__()
     _authenticate_bank_publications(writer, selection.bank, selection.exposure_support)
     authenticate_prepared_source_certificate(writer=writer, certificate=selection.certificate,
@@ -76,12 +74,12 @@ def prepare_prepared_source_authoring(preparation, *, project_root, artifact_wri
 
 
     from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
-    from .prospective_experiment import preview_prepared_prospective_experiment_candidate
+    from empirical_lawhood.api.prospective_experiment import preview_prepared_prospective_experiment_candidate
     if (type(preparation) is not ExperimentPreparation
             or type(preparation.specification_record) is not domain.MatrixPreparedSourceQualificationSpecification
             or preparation.dependencies or preparation.execution is None or preparation.prospective_spec is None):
         raise PermissionError("finite-dt authoring requires its complete original public preparation")
-    from .prepared_source_access import require_prepared_source_scope
+    from empirical_lawhood.api.prepared_source_access import require_prepared_source_scope
     access = require_prepared_source_scope(original_input_access, preparation.specification_record, read_access)
     selected = _selection(preparation.specification_record, preparation.allocation,
         preparation.draft, preparation.design_records)
@@ -109,7 +107,7 @@ def bind_prepared_source_experiment(handoff, *, specification, allocation, sourc
         artifact_writer, reveal_authority_id=None, read_access=None, original_input_access=None):
 
 
-    from .prepared_source_access import require_prepared_source_scope
+    from empirical_lawhood.api.prepared_source_access import require_prepared_source_scope
     access = require_prepared_source_scope(original_input_access, specification, read_access)
     selected = _selection(specification, allocation, handoff.compilation.draft, source_records)
     custody = CurrentIssuedTaskCustody(writer=artifact_writer)
@@ -123,9 +121,8 @@ def bind_prepared_source_experiment(handoff, *, specification, allocation, sourc
 
 
 def _retained_selection(selected):
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation
-    from empirical_lawhood.runtime.prospective_experiment import (
-        ALLOCATION_FILENAME, SPECIFICATION_FILENAME, source_filename)
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+    from empirical_lawhood.execution.prospective_experiment import ALLOCATION_FILENAME, SPECIFICATION_FILENAME, source_filename
     specification = decode_canonical_bytes(selected.payloads[SPECIFICATION_FILENAME],
         domain.MatrixPreparedSourceQualificationSpecification,
         maximum_bytes=len(selected.payloads[SPECIFICATION_FILENAME]))
@@ -149,7 +146,7 @@ def _retained_selection(selected):
 
 
 def _source_publications(*, writer, package, plan, selection, evidence, result):
-    from .matrix_source_runtime import retained_source_publications
+    from empirical_lawhood.api.matrix_source_runtime import retained_source_publications
     return retained_source_publications(writer=writer, package=package, plan=plan,
         selection=selection, evidence=evidence, result=result)
 
@@ -163,16 +160,13 @@ def prepared_source_bootstrap_publications(*, writer, selected, access):
     producer read; they supply no cached admission or permission verdict.
     """
     from empirical_lawhood.api.prospective_experiment import RetainedProspectiveExperiment
-    from .prepared_source_access import PreparedSourceOriginalInputAccess
-    from empirical_lawhood.adapters.methods.matrix_prepared_source_assembly import prepared_assembly_request_types, DEVELOPMENT_TYPES
-    from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-    from empirical_lawhood.infrastructure.publication_metadata import read_publication_metadata
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteResult
-    from empirical_lawhood.runtime.prospective_experiment import (
-        ALLOCATION_FILENAME, ASSOCIATION_FILENAME, INSTANCE_FILENAME, SPECIFICATION_FILENAME,
-        ProspectiveExperimentAssociation, instance_identity, source_filename,
-    )
-    from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
+    from empirical_lawhood.api.prepared_source_access import PreparedSourceOriginalInputAccess
+    from empirical_lawhood.domains.matrix.matrix_prepared_source_assembly import prepared_assembly_request_types, DEVELOPMENT_TYPES
+    from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+    from empirical_lawhood.storage.publication_metadata import read_publication_metadata
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteResult
+    from empirical_lawhood.execution.prospective_experiment import ALLOCATION_FILENAME, ASSOCIATION_FILENAME, INSTANCE_FILENAME, SPECIFICATION_FILENAME, ProspectiveExperimentAssociation, instance_identity, source_filename
+    from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
     if (type(selected) is not RetainedProspectiveExperiment
             or type(access) is not PreparedSourceOriginalInputAccess
             or type(selected.association) is not ProspectiveExperimentAssociation
@@ -241,16 +235,15 @@ def read_prepared_source_result(*, selected, artifact_writer, run_id, reveal_aut
         allow_partial=False, read_access=None):
 
 
-    from .current_result_custody import authenticate_current_execution_plan, retained_output_artifact_plane
-    from .matrix_source_runtime import authenticate_matrix_source_qualification
+    from empirical_lawhood.api.current_result_custody import authenticate_current_execution_plan, retained_output_artifact_plane
+    from empirical_lawhood.api.matrix_source_runtime import authenticate_matrix_source_qualification
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from .recursive_qualified_parents import (
-        _actual_package, _ParentReadScope)
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.recursive_qualified_parents import RecursivePriorExecutionBinding
+    from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _ParentReadScope
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.recursive_qualified_parents import RecursivePriorExecutionBinding
     if type(allow_partial) is not bool:
         raise TypeError("finite-dt source read requires an explicit partial selection")
-    from .prepared_source_access import require_prepared_source_scope
+    from empirical_lawhood.api.prepared_source_access import require_prepared_source_scope
     access = require_prepared_source_scope(getattr(selected, "original_input_access", None),
         getattr(getattr(selected, "original_input_access", None), "issued_specification", None), read_access)
     selection = _retained_selection(selected)
@@ -304,7 +297,7 @@ def read_prepared_source_result(*, selected, artifact_writer, run_id, reveal_aut
                     r.pin(receipt, "receipt_id"), logical.logical_artifact_id,
                     ObjectIdentity.from_record(getattr(product, field), product), record_id_field=field))
             executions = tuple(sorted(bindings, key=lambda value: value.record.object_id))
-            from empirical_lawhood.infrastructure.publication_metadata import read_publication_metadata
+            from empirical_lawhood.storage.publication_metadata import read_publication_metadata
             # These exact intrinsic source publications were independently
             # authenticated by authenticate_selection above. Their source
             # roles are fixed by Selection, not inferred from artifact labels.

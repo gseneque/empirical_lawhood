@@ -16,15 +16,13 @@ import pytest
 
 from empirical_lawhood.api import authoring_handoff as shared
 from empirical_lawhood.api.recursive_prospective_authoring import _capture_prospective_source, _publish_source_provenance
-from empirical_lawhood.infrastructure import source_closure
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.artifact_stream_primitives import ArtifactPlaneError
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.operator_profile import (
-    OperatorStorageAccessMode, OperatorStorageProfile, resolve_external_root_contract,
-)
+from empirical_lawhood.storage import source_closure
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.artifact_stream_primitives import ArtifactPlaneError
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.operator_profile import OperatorStorageAccessMode, OperatorStorageProfile, resolve_external_root_contract
 
 ROOT = Path(__file__).resolve().parents[1]
 NOTES = {"CONSOLIDATION.md", "MATRIXAUDIT.md", "THEMATRIX-AUDIT-EXPDESIGN.md"}
@@ -47,6 +45,23 @@ def current_packet(tmp_path):
     shared.write_exclusive_record(directory, "source-closure.json", captured.closure)
     _publish_source_provenance(captured=captured, destination=directory, artifact_writer=writer)
     return writer, directory, captured
+
+
+@pytest.mark.parametrize("allowance", ("control_record_bytes", "in_memory_payload_bytes"))
+def test_original_source_closure_honours_each_selected_byte_allowance(tmp_path, allowance):
+    from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits
+
+    writer = plane(tmp_path)
+    closure = ImplementationSourceClosure("software.byte-budget", SourceClosureKind.CLEAN_GIT_COMMIT,
+        "a" * 40, "b" * 64, "c" * 64, True)
+    shared.write_exclusive_record(tmp_path, "source-closure.json", closure)
+    size = len(closure.canonical_bytes())
+    writer.custody_limits = ArtifactCustodyLimits(**{allowance: size - 1})
+    with pytest.raises(BoundedFileIOError, match="byte limit"):
+        shared.authenticate_authoring_source(directory=tmp_path, project_root=ROOT, artifact_writer=writer)
+    writer.custody_limits = ArtifactCustodyLimits(**{allowance: size})
+    assert shared.authenticate_authoring_source(directory=tmp_path, project_root=ROOT, artifact_writer=writer) == closure
 
 
 def assert_actual_source_disclosure(captured):
@@ -96,7 +111,7 @@ def test_selected_source_missing_or_corrupt_real_companion_refuses_before_reobse
         sidecar = target.with_name(target.name + ".manifest.json")
         raw = sidecar.read_bytes()
         sidecar.write_bytes(raw[:-1] + bytes((raw[-1] ^ 1,)))
-    from empirical_lawhood.infrastructure import study_issue
+    from empirical_lawhood.storage import study_issue
     monkeypatch.setattr(study_issue.GitStudySourceClosureInspector, "observe",
         lambda *_: pytest.fail("corrupt companion reached current source reobservation"))
     with pytest.raises((OSError, ValueError, PermissionError, ArtifactPlaneError)):
@@ -261,8 +276,8 @@ def _assert_actual_handoff_source(directory, writer):
 
 
 def _forbid_handoff_execution(monkeypatch):
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
 
     def forbidden(*args, **kwargs):
         pytest.fail("software author/load/prove attempted scientific execution or native contact")
@@ -273,8 +288,8 @@ def _forbid_handoff_execution(monkeypatch):
 def test_actual_selected_source_rc_canary_author_load_and_prove_without_execution(tmp_path, monkeypatch):
     """Actual source, compiler, exact profile, family loader and provider proof."""
     from empirical_lawhood.api import rc_challenge_authoring as module
-    from empirical_lawhood.adapters.simulator_morphism_challenges.contracts import SimulatorMorphismChallengePhase
-    from empirical_lawhood.adapters.simulator_morphism_challenges.descriptors import default_config
+    from empirical_lawhood.domains.history.simulator_morphism_challenges.contracts import SimulatorMorphismChallengePhase
+    from empirical_lawhood.domains.history.simulator_morphism_challenges.descriptors import default_config
 
     writer, profile = _actual_handoff_storage(tmp_path)
     _forbid_handoff_execution(monkeypatch)
@@ -299,9 +314,7 @@ def test_actual_selected_source_finite_calibration32_author_load_and_prove_witho
     """Declared 32 roots remain unentered; no result, issue or qualification act."""
     from empirical_lawhood.api import finite_rerun_authoring as module
     from empirical_lawhood.api.finite_operands import current_nomination_operand_export
-    from empirical_lawhood.adapters.composition.finite_response_law.rerun_input import (
-        FiniteResponseLawCurrentExposure, original_development_exposure,
-    )
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.rerun_input import FiniteResponseLawCurrentExposure, original_development_exposure
 
     writer, profile = _actual_handoff_storage(tmp_path)
     _forbid_handoff_execution(monkeypatch)

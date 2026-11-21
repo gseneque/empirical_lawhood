@@ -3,15 +3,15 @@
 from contextlib import contextmanager
 from dataclasses import dataclass
 
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.candidate_payloads import ExternalCandidatePayloadPlane
-from empirical_lawhood.infrastructure.dependency_manifests import DependencyManifestReader
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.candidate_payloads import ExternalCandidatePayloadPlane
+from empirical_lawhood.storage.dependency_manifests import DependencyManifestReader
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
+from empirical_lawhood.execution.plans import ArtifactOutputSpec
 from empirical_lawhood.adapters.composition.preparation_applicability.inputs import preparation_input_template
-from empirical_lawhood.adapters.methods.preparation_applicability.config import preparation_run_id
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.domains.matrix.preparation_applicability.config import preparation_run_id
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
 
 
 @dataclass(frozen=True, slots=True)
@@ -64,7 +64,7 @@ def runtime_platform_ports(*, selection, bundle, projection, root):
 
     def payload(record, logical_id, *, lineage=()):
         external = externals[logical_id]
-        from empirical_lawhood.runtime.artifacts import ArtifactProfile
+        from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
         return preparation_input_template(
             logical_artifact_id=logical_id, payload_schema=record.SCHEMA,
             profile=ArtifactProfile.CANONICAL_JSON, media_type=external.media_type,
@@ -88,7 +88,7 @@ def runtime_platform_ports(*, selection, bundle, projection, root):
         # Native task contexts still receive this same global committed input
         # through their explicit graph edges and check it before prefix contact.
         method_inputs.append(source)
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
     parent = ArtifactLineageParent(ObjectIdentity.from_record(stage.config_id, stage),
                                    VisibilityCeiling.PROSPECTIVE, OutcomeAccess.EVALUATION_SEALED)
     custody = PreparationApplicabilityCustodyPorts(root, projection.source_plan.object_id, parent,

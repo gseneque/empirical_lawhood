@@ -6,11 +6,11 @@ from itertools import product
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import e4_structural_prediction as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response.matched_response_fitting import MatchedTrainingRow
-from empirical_lawhood.adapters.methods.matrix_factor_response.matched_response_prediction import MATCHED_FEATURES
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import e4_structural_prediction as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response.matched_response_fitting import MatchedTrainingRow
+from empirical_lawhood.domains.matrix.matrix_factor_response.matched_response_prediction import MATCHED_FEATURES
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def pin(name):
@@ -135,7 +135,7 @@ def test_conf32_counts_one_nested_group_per_win_and_retains_unknowns():
 
 
 def test_prospective_curve_claim_can_win_without_a_K_win_and_preserves_all_nine_coordinates():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_prediction import MatchedCurveDecision
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_prediction import MatchedCurveDecision
     groups, cases = scoring(32)
     with localcontext() as context:
         context.prec = 60
@@ -154,8 +154,8 @@ def test_prospective_curve_claim_can_win_without_a_K_win_and_preserves_all_nine_
 
 
 def test_curve_relation_keeps_equal_group_weights_and_two_shared_mechanism_inputs():
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_contract import MECHANISM_FEATURES, CURVE_RELATION_LOSS_RULE
-    from empirical_lawhood.adapters.methods.matrix_factor_response.matched_response_fitting import MatchedCurveEstimatorModel
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_contract import MECHANISM_FEATURES, CURVE_RELATION_LOSS_RULE
+    from empirical_lawhood.domains.matrix.matrix_factor_response.matched_response_fitting import MatchedCurveEstimatorModel
     selected = replace(selection(), loss=CURVE_RELATION_LOSS_RULE)
     rows, folds, originals = training()
     rows = tuple(replace(row, features=tuple(sorted((*row.features, *((name, D('.1')) for name in MECHANISM_FEATURES))))) for row in rows)
@@ -191,7 +191,7 @@ def test_paired_target_discrepancy_is_nonuse_for_fit_calibration_and_confirmatio
 
 
 def test_both_e4_graphs_require_original_mechanics_before_statistical_accounts():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings, selected_e4_native_bindings
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings, selected_e4_native_bindings
     for graph in (selected_e3_e4_bindings, selected_e4_native_bindings):
         assert graph.PHASES.index('mechanical') < graph.PHASES.index('account')
         assert {'mechanical', 'mechanical-arrays'} <= set(graph.INPUTS['account'])
@@ -205,10 +205,10 @@ def test_both_e4_graphs_require_original_mechanics_before_statistical_accounts()
 
 def test_uniform_family_draw_keeps_zero_counts_without_balancing_or_reusing_native_material():
     from types import SimpleNamespace
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Design
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_population import selected_e4_population_groups
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_streams import SelectedE4StreamRecipe, STREAM_RULE
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Design
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_population import selected_e4_population_groups
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_streams import SelectedE4StreamRecipe, STREAM_RULE
     factors = tuple(ScheduledProgrammeFactor(name, 'LOG', D(1), D(2), D(4)) for name in ('temperature', 'friction', 'coupling'))
     designs = tuple((phase, SelectedE3E4Design('test.design.' + phase.lower(), count, D('.95'), factors, 4,
         'BALANCED_FIXED_FOUR_FAMILY_GROUPS' if phase == 'DEVELOPMENT' else 'IID_UNIFORM_FOUR_FAMILIES_NO_REDRAW'))

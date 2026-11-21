@@ -5,6 +5,7 @@ All custody below is explicitly synthetic unpublished software metadata. No
 RNG, integrator, acquisition, child process, storage or authority service runs.
 """
 
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as _preparation_io_effect
 from dataclasses import fields, replace
 from hashlib import sha256
 from types import SimpleNamespace
@@ -12,25 +13,25 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_bindings as preparation
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_science
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_future as future
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import MatrixPreparationHistory, preparation_identity
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_forecast import forecast_public
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_prefix import identity
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_point import forecast_selected_point
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_public import package_identity
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import MatrixParameterNativeHistory, expected_members
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteResult, CanonicalTaskReceipt, LogicalArtifactIdentity
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion, NativeSubworkContact
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import preparation_bindings as preparation
+import empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io as preparation_science_owner_0
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_future as future
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixPreparationHistory, preparation_identity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_forecast import forecast_public
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_prefix import identity
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_point import forecast_selected_point
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_protected_programme import MatrixSelectedPublicProgramme
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_public import package_identity
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import MatrixParameterNativeHistory, expected_members
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactMaterialization, ArtifactProfile, ArtifactWriteResult, CanonicalTaskReceipt, LogicalArtifactIdentity
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion, NativeSubworkContact
 from tests.test_matrix_selected_point import feature
 from tests.test_matrix_selected_protected import transfer, unpublished  # noqa: F401 - shared pure fixture
 from tests.native_completion_fixtures import literal_completion
@@ -54,10 +55,10 @@ def literal_history(programme, *, native_version="1.0.0"):
         values[view + "_ticks"] = np.arange(multiplier * source.total_ticks + 1, dtype="<i8")
         values[view + "_alpha_tilde"][:] = np.asarray(source.recipe.half_tick_couplings[::2 // multiplier], dtype="<f8")
     # Initial bytes are the literal all-zero Hermitian arrays from the fixture.
-    from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
     initial_raw, _ = encode_matrix_arrays({"positions": np.zeros((2, 3, 4, 4), dtype="<c16"), "momenta": np.zeros((2, 3, 4, 4), dtype="<c16")})
     child = "native-subwork." + sha256((task + ":" + definition.subwork_id).encode()).hexdigest()
-    raw, operand = preparation_science.preparation_array_product(source, initial_raw, values, artifact_id=child + ".output.arrays")
+    raw, operand = preparation_science_owner_0.preparation_array_product(source, initial_raw, values, artifact_id=child + ".output.arrays")
     contact = NativeSubworkContact(ObjectIdentity("begin.synthetic-native", "empirical-lawhood/runtime/native-subwork-begin", "1.0.0", "c" * 64))
     consumed = tuple(row for row in definition.streams if row.object_id.rsplit(".", 1)[-1].startswith("preparation"))
     completion = NativeSubworkCompletion(definition.identity, ObjectIdentity.from_record("contact.synthetic-native", contact), OperationalStatus.SUCCEEDED,
@@ -111,26 +112,26 @@ def test_direct_preparation_native_revision_uses_only_actual_rng_pair_and_preser
     assert len(source.root.streams) == len(old_work.definitions[0].streams) == 4
     assert len(old_history.native.completion.unconsumed_streams) == 2
     history.validate_source(source, transfer.sources.closure.reservation.allocation)
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
     assert decode_canonical_bytes(old_history.canonical_bytes(), type(old_history), maximum_bytes=None) == old_history
     assert decode_canonical_bytes(history.canonical_bytes(), type(history), maximum_bytes=None) == history
 
 
 @pytest.mark.parametrize("recovered", (False, True))
 def test_preparation_native_closeout_reuses_authenticated_initial_and_decodes_output_once(transfer, monkeypatch, recovered):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_native_body
-    from empirical_lawhood.infrastructure import matrix_array_io
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_native_body
+    from empirical_lawhood.adapters.matrix_storage import matrix_array_io
     from tests.test_matrix_native_real_progress import DisclosedStore
 
     source, history, work, initial_raw, raw = literal_history(transfer, native_version="2.0.0")
     arrays = decode_matrix_arrays(raw, history.arrays)
-    initial = preparation_science.initial_state(source.initial, initial_raw)
+    initial = preparation_science_owner_0.initial_state(source.initial, initial_raw)
     store = DisclosedStore(raw if recovered else None)
     store.completed = SimpleNamespace(state=store.completed.state, receipt=history.native.receipt,
         completion=history.native.completion)
-    monkeypatch.setattr(preparation_science, "acquire_preparation", lambda *args, **kwargs:
+    monkeypatch.setattr(_preparation_io_effect, "acquire_preparation", lambda *args, **kwargs:
         pytest.fail("completed preparation was repeated") if recovered else arrays)
-    monkeypatch.setattr(preparation_science, "initial_state", lambda *_:
+    monkeypatch.setattr(_preparation_io_effect, "initial_state", lambda *_:
         pytest.fail("authenticated child initial state was decoded again"))
     calls = []
     decode = matrix_array_io.decode_native_matrix_arrays
@@ -165,7 +166,7 @@ def test_preparation_history_refuses_zero_consumed_or_wrong_purpose_partition(tr
 
 @pytest.mark.parametrize("native_version", ("1.0.0", "2.0.0"))
 def test_preparation_history_refuses_coherent_completion_in_another_array_lane(transfer, native_version):  # noqa: F811
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
     from tests.native_completion_fixtures import literal_completion, receipt_with_completion
     source, history, _, _, _ = literal_history(transfer, native_version=native_version)
     publication = literal_completion(history.native.completion, history.native.receipt.task_id,
@@ -193,7 +194,7 @@ def test_selected_future_native_work_and_nonentry_keep_selected_points_and_all48
     # Produce mechanical nonentry from unchanged source/causal arrays, using the
     # literal templates retained in this fixture's assay metadata.
     from tests.test_matrix_prepared_assay_method import literal_protocol
-    from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
     templates, _ = encode_matrix_arrays({"generic_basis": np.zeros((3, 4, 4), dtype="<c16"), "force_coefficients": np.zeros((2, 3, 3), dtype="<f8"),
         "trace_coefficients": np.zeros((2, 3), dtype="<f8"), "receiver_coefficients": np.zeros((48, 2, 2, 3, 4), dtype="<f8")})
     assert literal_protocol()[0].templates.array_artifact.sha256 == sha256(templates).hexdigest()
@@ -214,7 +215,7 @@ def test_selected_future_native_work_and_nonentry_keep_selected_points_and_all48
     def forbidden(*args, **kwargs):
         raise AssertionError("known complete nonentry entered RNG/native child")
     monkeypatch.setattr(np.random, "Generator", forbidden)
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_native_body import _execute_future_native
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_native_body import _execute_future_native
     values, _, native, disposition = _execute_future_native(config, history, prefix, mechanical, b"", b"", b"", SimpleNamespace(), work)
     assert disposition == "UNEVALUABLE" and native == ()
     assert np.array_equal(values["unentered_branches"], np.arange(48, dtype="<i8"))

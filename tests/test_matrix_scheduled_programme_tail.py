@@ -12,15 +12,12 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import (
-    programme_calibration as calibration, programme_calibration_bindings as bindings,
-    programme_tail_composition as composition,
-)
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_calibration as calibration, programme_calibration_bindings as bindings, programme_tail_composition as composition
 from empirical_lawhood.api import matrix_scheduled_programme as public, recursive_prospective_authoring as author
-from empirical_lawhood.infrastructure.artifacts import ArtifactPlaneError
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan, ExecutionPlan
-from empirical_lawhood.planning.study_authoring import SourceMaterializationRole
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_tail_freeze import TASK_ID as TAIL_FREEZE_TASK_ID
+from empirical_lawhood.storage.artifacts import ArtifactPlaneError
+from empirical_lawhood.execution.plans import CandidateExecutionPlan, ExecutionPlan
+from empirical_lawhood.design.study_authoring import SourceMaterializationRole
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_tail_freeze import TASK_ID as TAIL_FREEZE_TASK_ID
 from tests.programme_entry_support import programme_scientific_root, qualify_programme_draft
 from tests.runtime_platform.test_candidate_compiler import _fixture
 from tests.test_matrix_scheduled_calibration import TEST_BUDGET
@@ -59,9 +56,9 @@ def tail_bundle(response_bank):
 
 
 def test_complete_global_tail_public_author_load_provider_and_original_custody_refusals(response_bank, tmp_path, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_prediction
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_science
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments
+    from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_prediction
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_science
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments
 
     def blocked(*args, **kwargs):
         pytest.fail('global tail author/load/provider proof entered numerical science or fitting')

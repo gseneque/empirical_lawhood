@@ -1,27 +1,26 @@
 # SPDX-License-Identifier: MPL-2.0
 """Disclosed original seams; actual public revealed PURE workflow, never authority."""
 from dataclasses import replace
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import E4_LINEAGE_SCOPE as LINEAGE_SCOPE
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import E4_LINEAGE_SCOPE as LINEAGE_SCOPE
 from tests.matrix_e4_structure_support import publish_secondary
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_bindings as owner,full_factor_preparation as domain,records as old,selected_e4_bank_recipe as recipe,selected_e4_native_bindings as native_owner,selected_e4_native_records as native,selected_e4_methods as revision,selected_e4_programme as phase_science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorScope,scope_reference
-from empirical_lawhood.api import matrix_full_factor_derivation as derive,matrix_full_factor_authoring as author,matrix_full_factor_runtime as runtime,matrix_full_factor_read as reader
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_bindings as owner, full_factor_preparation as domain, records as old, selected_e4_bank_recipe as recipe, selected_e4_native_bindings as native_owner, selected_e4_native_records as native, selected_e4_methods as revision, selected_e4_programme as phase_science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorScope, scope_reference
+from empirical_lawhood.api import matrix_full_factor_derivation as derive, matrix_full_factor_authoring as author, matrix_full_factor_runtime as runtime, matrix_full_factor_read as reader
 from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
-from empirical_lawhood.api.recursive_authoring import implementation_binding,load_authored_wave,_authenticate_experiment_instance
-from empirical_lawhood.api.recursive_execution import _external_inputs,_retained_plans
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling,OutcomeAccess,VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding,ExperimentInputSelection
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
-from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
+from empirical_lawhood.api.recursive_authoring import implementation_binding, load_authored_wave, _authenticate_experiment_instance
+from empirical_lawhood.api.recursive_execution import _external_inputs, _retained_plans
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
 from tests import matrix_selected_e4_public_fixture as held
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 from tests.test_matrix_e4_full_factor_protected_reference import _waves
@@ -91,7 +90,7 @@ def _public_inputs(directory,plane,selected):
 
 
 def _original_seams(monkeypatch,selected):
-    from empirical_lawhood.api import matrix_full_factor_access as access_owner,selected_e4_access
+    from empirical_lawhood.api import matrix_full_factor_access as access_owner, selected_e4_access
     events=[]
     def protected_access(*,artifact_writer,request,read_access=None):
         if (request.programme!=selected.programme.identity or request.bank!=selected.bank.identity
@@ -135,7 +134,6 @@ def _original_seams(monkeypatch,selected):
 def _derive_public(tmp_path,scope_values,f,monkeypatch):
     selected=_selected(scope_values,f,monkeypatch)
     root=tmp_path/'revealed-public'
-    assert root.is_relative_to(Path('/media/chevre/EL/empirical-lawhood'))
     plane=_real_plane(root)
     spec,sources,request=_public_inputs(root,plane,selected)
     events=_original_seams(monkeypatch,selected)
@@ -167,7 +165,7 @@ def _derive_public(tmp_path,scope_values,f,monkeypatch):
 
 
 def test_actual_protected_public_derive_author_compile_and_scope_preflight_without_worker(tmp_path,scopes,literal_recipe_source_inputs,monkeypatch):  # noqa: F811
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     monkeypatch.setattr(LocalProcessExecutor,'execute',lambda *args,**kwargs:pytest.fail('compile control entered worker'))
     value=_derive_public(tmp_path,scopes,literal_recipe_source_inputs,monkeypatch)
     instance=_authenticate_experiment_instance(payloads=value.payloads,draft=value.draft)
@@ -193,11 +191,11 @@ def test_actual_protected_public_pure_run_read_recover_keeps_revealed_custody(tm
     value=_derive_public(tmp_path,scopes,literal_recipe_source_inputs,monkeypatch)
     completed=value.service.run(directory=value.directory,maximum_parallel_tasks=4)
     assert completed['status']=='SUCCEEDED' and completed['new_native_contact_count']==0
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
     monkeypatch.setattr(LocalProcessExecutor,'execute',lambda *args,**kwargs:pytest.fail('completed recovery entered worker'))
     recovered=value.service.recover(directory=value.directory,maximum_parallel_tasks=4)
     assert recovered['status']=='SUCCEEDED' and recovered['new_native_contact_count']==0
-    from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
     with scientific_reconstruction_operation('full'):
         science=value.service.read(directory=value.directory)['scientific_result']
     assert science['scientific_completion']=='COMPLETE_ORIGINAL_FULL_FACTOR_CENSUS' and science['scientific_qualification']=='NOT_ESTABLISHED'
@@ -255,7 +253,7 @@ def test_revealed_initial_loader_remains_admitted_but_custody_only_refuses_befor
         require_initial_experiment=True)
     assert draft.development_study.access_pair==(OutcomeAccess.EVALUATION_REVEALED,VisibilityCeiling.OUTCOME_VISIBLE)
     from empirical_lawhood.api import recursive_execution as execution
-    import empirical_lawhood.infrastructure.sql as sql
+    import empirical_lawhood.storage.sql as sql
     def forbidden(*args,**kwargs):pytest.fail('revealed custody refusal followed plan/input/catalog processing')
     monkeypatch.setattr(execution,'_retained_plans',forbidden)
     monkeypatch.setattr(execution,'_external_inputs',forbidden)

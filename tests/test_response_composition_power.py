@@ -10,15 +10,12 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from empirical_lawhood.adapters.methods.finite_response_law.power import (
-    fixed_sample_power_report,
-    joint_success_risk_power,
-)
-from empirical_lawhood.adapters.methods.finite_response_law.science import PLAN_SHA256
+from empirical_lawhood.domains.matrix.finite_response_law.power import fixed_sample_power_report, joint_success_risk_power
+from empirical_lawhood.domains.matrix.finite_response_law.science import PLAN_SHA256
 from empirical_lawhood.cli.app import app
 from empirical_lawhood.cli import platform
 from empirical_lawhood.cli.metadata import COMMAND_METADATA, invocation_contracts
-from empirical_lawhood.planning.paired_power import paired_binary_power
+from empirical_lawhood.methods.statistics.paired_power import paired_binary_power
 
 
 def _category_probability(n, a, b, pa, pb):
@@ -172,7 +169,7 @@ def test_prediction_normal_boundary_and_limits_are_distinct():
 def test_specification_identity_and_no_contact_cli(tmp_path, monkeypatch):
     protocol = (
         Path(__file__).parents[1]
-        / "src/empirical_lawhood/adapters/methods/finite_response_law/specification.md"
+        / "src/empirical_lawhood/domains/matrix/finite_response_law/specification.md"
     )
     assert sha256(protocol.read_bytes()).hexdigest() == PLAN_SHA256
 
@@ -183,7 +180,7 @@ def test_specification_identity_and_no_contact_cli(tmp_path, monkeypatch):
     monkeypatch.setattr(platform, "create_inspection_api", forbidden)
     monkeypatch.setattr(Path, "read_bytes", forbidden)
     monkeypatch.chdir(tmp_path)
-    result = CliRunner().invoke(app, ["campaign", "response-composition-power"])
+    result = CliRunner().invoke(app, ["--no-progress", "campaign", "response-composition-power"])
     assert result.exit_code == 0, result.output
     assert result.stderr == ""
     report = json.loads(result.stdout)

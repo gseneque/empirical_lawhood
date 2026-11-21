@@ -7,12 +7,9 @@ from hashlib import sha256
 import pytest
 from sqlalchemy import event
 
-from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog
-from empirical_lawhood.infrastructure.sql import repository as owner
-from empirical_lawhood.runtime.catalog import (
-    CatalogSnapshot, ExplorationAttemptRecord, KnowledgeEdgeRecord, MetricDefinitionRecord,
-    MetricObservationRecord, ReceiptLocatorRecord,
-)
+from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.sql import repository as owner
+from empirical_lawhood.storage.contracts.catalog import CatalogSnapshot, ExplorationAttemptRecord, KnowledgeEdgeRecord, MetricDefinitionRecord, MetricObservationRecord, ReceiptLocatorRecord
 from tests.api.test_catalog_facade import _snapshot
 
 

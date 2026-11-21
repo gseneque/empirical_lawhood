@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Exposed passive capture and real AR3 custody; no battery solve or admission."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from decimal import Decimal
@@ -12,23 +13,21 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, science
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import prepared_native as native
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import BatteryInquiryInitializerAttempt
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.preparation_contracts import (
-    ObservationKind, PreparationProtocol,
-)
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.preparation_science import PREPARATION_SOURCE_MEMBERS
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, science
+from empirical_lawhood.adapters.battery.battery_refined_inquiry import prepared_native as native
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquiryInitializerAttempt
+from empirical_lawhood.domains.battery.battery_refined_inquiry.preparation_contracts import ObservationKind, PreparationProtocol
+from empirical_lawhood.domains.battery.battery_refined_inquiry.preparation_science import PREPARATION_SOURCE_MEMBERS
+from empirical_lawhood.storage.artifact_validation import ArtifactIdentityConflict
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
 from tests.runtime_platform.test_native_subwork import _plane, _process_context, _store
 from tests.test_battery_refined_inquiry import exposed, selected as exposed_selection
 
@@ -55,9 +54,8 @@ def custody(tmp_path, selected):
         result = plane.write(ArtifactWriteRequest(name, "inputs/" + name + ".json", record.SCHEMA,
             ArtifactProfile.CANONICAL_JSON, "application/json", "exposed.passive.inputs", "inputs",
             record.canonical_bytes(), VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
-        from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-        manifests.append(decode_artifact_manifest(plane.root.resolve(
-            result.materialization.relative_path + ".manifest.json", for_write=False).read_bytes()))
+
+        manifests.append(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()))
     manifests = tuple(sorted(manifests, key=lambda row: row.materialization.materialization_id))
     parent = NativeEffectContact("exposed.passive", "battery.forecast", "exposed.passive.battery.forecast.attempt-001",
         ObjectIdentity("plan.exposed", "empirical-lawhood/runtime/development-execution-plan", "1.0.0", "1" * 64),
@@ -395,6 +393,38 @@ def test_actual_native_source_pin_mismatch_refuses(custody, tmp_path, monkeypatc
         native._validate_source_pins(SimpleNamespace(__file__=str(root / "__init__.py")), custody.protocol)
 
 
+def test_preparation_and_inquiry_share_one_verified_read_per_source(tmp_path, monkeypatch):
+    from empirical_lawhood.storage import bounded_io
+
+    battery, scipy = tmp_path / "pybamm", tmp_path / "scipy"
+    battery.mkdir()
+    scipy.mkdir()
+    names = ("solver.py", "scipy/constants.py", "save.py")
+    paths = (battery / "solver.py", scipy / "constants.py", battery / "save.py")
+    pins = []
+    for name, path in zip(names, paths, strict=True):
+        data = ("exposed source for " + name).encode()
+        path.write_bytes(data)
+        pins.append((name, sha256(data).hexdigest()))
+    monkeypatch.setattr(native, "PREPARATION_SOURCE_MEMBERS", tuple(pins[:2]))
+    protocol = SimpleNamespace(source_members=tuple(pins))
+    read = bounded_io.bounded_file_sha256
+    reads = []
+    def counted(path, *, maximum_bytes):
+        reads.append(path)
+        return read(path, maximum_bytes=maximum_bytes)
+    monkeypatch.setattr(bounded_io, "bounded_file_sha256", counted)
+    native.verify_native_source_members(battery, scipy, protocol, (pins[0],))
+    assert reads == list(paths)
+    reads.clear()
+    with pytest.raises(ValueError, match="conflicting"):
+        native.verify_native_source_members(battery, scipy, protocol, ((names[0], "f" * 64),))
+    assert reads == []
+    paths[2].write_bytes(b"changed")
+    with pytest.raises(ValueError, match="source pin differs: save.py"):
+        native.verify_native_source_members(battery, scipy, protocol, (pins[0],))
+
+
 def test_passive_native_owner_import_is_cold():
     code = '''
 import importlib.abc, sys
@@ -403,7 +433,7 @@ class Block(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in {'pybamm', 'pybammsolvers'}:
             raise AssertionError('native import attempted: ' + fullname)
 sys.meta_path.insert(0, Block())
-from empirical_lawhood.adapters.methods.battery_refined_inquiry.prepared_native import forecast_outputs
+from empirical_lawhood.adapters.battery.battery_refined_inquiry.prepared_native import forecast_outputs
 assert len(forecast_outputs()) == 12
 '''
     completed = subprocess.run([sys.executable, "-c", code], text=True, capture_output=True)

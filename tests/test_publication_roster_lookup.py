@@ -5,7 +5,7 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.runtime.artifacts import ArtifactManifest
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest
 from tests.test_artifact_manifest_known_publication import _manifests
 
 

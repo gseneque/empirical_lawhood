@@ -13,44 +13,19 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import ClassVar, Final
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256
-from empirical_lawhood.planning.dataset_manifests import (
-    DatasetCapabilityBinding,
-    DatasetCapabilityKind,
-    DatasetRegistrationManifest,
-    DatasetTransformationManifest,
-)
-from empirical_lawhood.planning.datasets import (
-    CurrentMaterializationVerification,
-    DatasetMaterialization,
-    DatasetMaterializationVerificationReceipt,
-)
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.datasets import (
-    DatasetCapabilityLimits,
-    DatasetCapabilityRegistry,
-    DatasetEvidenceVerification,
-    DatasetEvidenceVerifierRegistration,
-    DatasetFormatInspectorRegistration,
-    DatasetImplementationRegistry,
-    DatasetSupportingIdentityRegistry,
-    DatasetTransformRegistration,
-    validate_dataset_capability_bindings,
-)
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256
+from empirical_lawhood.design.dataset_manifests import DatasetCapabilityBinding, DatasetCapabilityKind, DatasetRegistrationManifest, DatasetTransformationManifest
+from empirical_lawhood.design.datasets import CurrentMaterializationVerification, DatasetMaterialization, DatasetMaterializationVerificationReceipt
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.datasets import DatasetCapabilityLimits, DatasetCapabilityRegistry, DatasetEvidenceVerification, DatasetEvidenceVerifierRegistration, DatasetFormatInspectorRegistration, DatasetImplementationRegistry, DatasetSupportingIdentityRegistry, DatasetTransformRegistration, validate_dataset_capability_bindings
 
-from .contracts import GLENN_2026_PROFILE
-from .manifests import GlennRetainedComparisonInputs, GLENN_ARCHIVE_FULL_SCAN_READ_LIMIT_BYTES, GLENN_ARCHIVE_SIZE_BYTES, GLENN_HISTORICAL_OBSERVATIONS_SIZE_BYTES, GLENN_READ_SET_SIZE_BYTES, GlennRegistrationManifestDependencies, GlennTransformationManifestDependencies
-from .transform import GLENN_OUTPUT_SCHEMA_ID, GLENN_PARQUET_PROFILE_ID
+from empirical_lawhood.adapters.physical.glenn.contracts import GLENN_2026_PROFILE
+from empirical_lawhood.adapters.physical.glenn.manifests import GlennRetainedComparisonInputs, GLENN_ARCHIVE_FULL_SCAN_READ_LIMIT_BYTES, GLENN_ARCHIVE_SIZE_BYTES, GLENN_HISTORICAL_OBSERVATIONS_SIZE_BYTES, GLENN_READ_SET_SIZE_BYTES, GlennRegistrationManifestDependencies, GlennTransformationManifestDependencies
+from empirical_lawhood.adapters.physical.glenn.transform import GLENN_OUTPUT_SCHEMA_ID, GLENN_PARQUET_PROFILE_ID
 
 
 GLENN_CONFIG_REGISTRY_KEY: Final = "dataset.config.glenn"

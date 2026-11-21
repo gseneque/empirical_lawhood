@@ -9,7 +9,7 @@ import tomllib
 
 from empirical_lawhood.api.execution import RunStatusSummary
 from empirical_lawhood.api.models import DoctorSummary
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
 
 
 def _source_version_hint(root: Path | None, installed: str) -> str | None:
@@ -79,6 +79,26 @@ def render_doctor(summary: DoctorSummary, *, project_root: Path | None = None) -
     if hint is not None:
         lines.append(hint)
     lines.append("Next: workflow list for task selection; docs/using/results-and-failures.md for result interpretation.")
+    return "\n".join(lines)
+
+
+def render_workflow_doctor(report: dict) -> str:
+    lines = [f"Workflow software inspection: {report['workflow_id']} / {report['profile_id']}",
+        f"Software prerequisites satisfied: {report['software_prerequisites_satisfied']}",
+        f"Exact manifest: {report['manifest']['manifest_sha256']}",
+        f"Source binding: {report['source_binding']['status']}"]
+    for environment in report["environments"]:
+        lines.append(f"  {environment['role_id']} / {environment['environment_id']}: {environment['status']}")
+        for dependency in environment["dependencies"]:
+            if dependency["reason_codes"]:
+                lines.append(f"    {dependency['distribution']}: required={dependency['required_version']}; "
+                    f"observed={dependency['observed_versions'] or 'absent'}; reasons={','.join(dependency['reason_codes'])}")
+    if report["reason_codes"]:
+        lines.append("Reasons: " + ", ".join(report["reason_codes"]))
+    for prerequisite in report["manifest"]["profile"]["declaration"]["source_prerequisites"]:
+        lines.append("Separate workflow prerequisite: " + prerequisite)
+    lines.append("Scientific inputs, source connections, resource admission, execution and reveal remain separate prerequisites.")
+    lines.append("No native task or scientific qualification was produced.")
     return "\n".join(lines)
 
 

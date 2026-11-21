@@ -8,14 +8,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.compact_records import E1CompactCriterionChoices
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import e1_allocation as domain
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.compact_records import E1CompactCriterionChoices
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import e1_allocation as domain
 from empirical_lawhood.api import matrix_programme_e1_allocation as owner
 from empirical_lawhood.api.experiment_preparation import derive_experiment_inputs, load_experiment_inputs
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 from tests.test_matrix_programme_allocations import MATERIALS, NAMESPACE, census as census  # noqa: F401
 
 ROOT = Path(__file__).parents[1]

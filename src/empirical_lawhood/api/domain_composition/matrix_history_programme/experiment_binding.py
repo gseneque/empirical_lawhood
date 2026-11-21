@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Cold E2 dedicated-service facade registration."""
-from empirical_lawhood.adapters.methods.matrix_history_analysis.experiment_preparation import PROTOCOL_ID
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_history_analysis.experiment_preparation import PROTOCOL_ID
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 
 
 def programme_service_factory(**kwargs):

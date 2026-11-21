@@ -12,7 +12,7 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.physical.rubisco_kinetics import rr_preparation as rr
+import empirical_lawhood.domains.rubisco.kinetics.rr_preparation as rr
 
 
 FIXTURE = Path(__file__).parent / "fixtures/rubisco/rr9rub"
@@ -279,7 +279,7 @@ class Refuse(importlib.abc.MetaPathFinder):
         if fullname.split(".")[0] in blocked:
             raise AssertionError("optional import: " + fullname)
 sys.meta_path.insert(0, Refuse())
-from empirical_lawhood.adapters.physical.rubisco_kinetics import rr_preparation
+from empirical_lawhood.domains.rubisco.kinetics import rr_preparation
 assert len(rr_preparation.LATER_CONTEXT_ROSTER) == 6
 assert not blocked.intersection(sys.modules)
 '''

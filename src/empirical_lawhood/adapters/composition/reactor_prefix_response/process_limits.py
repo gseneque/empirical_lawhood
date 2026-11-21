@@ -13,10 +13,10 @@ from datetime import UTC, datetime
 from time import monotonic
 from typing import ClassVar
 
-from empirical_lawhood.infrastructure.artifacts import GuardedExternalRoot
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
-from empirical_lawhood.kernel.time import parse_utc_timestamp
+from empirical_lawhood.storage.artifacts import GuardedExternalRoot
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.science.models.time import parse_utc_timestamp
 
 
 @dataclass(frozen=True, slots=True)

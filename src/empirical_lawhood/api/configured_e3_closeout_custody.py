@@ -11,39 +11,37 @@ from dataclasses import dataclass, fields, replace
 from hashlib import sha256
 from types import MappingProxyType
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_closeout_execution import (
-    ConfiguredE3CALRootCloseout, ConfiguredE3ClosedExecution, ConfiguredE3MissingOutcomeProducts,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_continued_response import ConfiguredE3ContinuedNativeResponse, original_config
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_composition import operation_declarations
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error, operation_class, selected_configs, task_id
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_methods import ConfiguredProtectedE3PairedOutcome
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_preparation import response_task_id
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_unknown_response import ConfiguredProtectedE3UnknownResponseAvailability
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_execution import source_binding
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection, ConfiguredE3UnfinishedPreparationSelection
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_unfinished_execution import ConfiguredE3CompletedOutput
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseScore
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-from empirical_lawhood.infrastructure.retained_input_read import RetainedInputRead
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeEventKind as ResourceEvent, ExecutionResourceEnvelopeState as ResourceState
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_closeout_execution import ConfiguredE3CALRootCloseout, ConfiguredE3ClosedExecution, ConfiguredE3MissingOutcomeProducts
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_continued_response import ConfiguredE3ContinuedNativeResponse, original_config
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_composition import operation_declarations
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_lowering import lower_protected_matrix_response_error, operation_class, selected_configs, task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_methods import ConfiguredProtectedE3PairedOutcome
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_preparation import response_task_id
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_unknown_response import ConfiguredProtectedE3UnknownResponseAvailability
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_execution import source_binding
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_retained_preparation import ConfiguredE3ContinuedPreparationSelection, ConfiguredE3UnfinishedPreparationSelection
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_unfinished_execution import ConfiguredE3CompletedOutput
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseScore
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+from empirical_lawhood.storage.retained_input_read import RetainedInputRead
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeEventKind as ResourceEvent, ExecutionResourceEnvelopeState as ResourceState
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
 
-from .configured_e3_incomplete_read import _configuration, _external_inputs, _operands, _unknown_response
-from .configured_e3_retained_custody import _pin
-from .configured_e3_retained_read import continued_plan_read
-from .current_result_custody import CurrentResultPlanReader, authenticate_task_dispatch_authority
-from .domain_composition.matrix_configured_protected_response.scientific_read import _original_design, _selected_preparation
-from .protected_e3_read_custody import _current_read_grants, authorize, product
-from .prospective_experiment import load_retained_prospective_experiment
-from .recursive_execution import _custody_control_pins
-from .recursive_qualified_parents import _actual_package, _verify_receipt_closure
+from empirical_lawhood.api.configured_e3_incomplete_read import _configuration, _external_inputs, _operands, _unknown_response
+from empirical_lawhood.api.configured_e3_retained_custody import _pin
+from empirical_lawhood.api.configured_e3_retained_read import continued_plan_read
+from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader, authenticate_task_dispatch_authority
+from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.scientific_read import _original_design, _selected_preparation
+from empirical_lawhood.api.protected_e3_read_custody import _current_read_grants, authorize, product
+from empirical_lawhood.api.prospective_experiment import load_retained_prospective_experiment
+from empirical_lawhood.api.recursive_execution import _custody_control_pins
+from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _verify_receipt_closure
 
 
 _active_closeout_reads = ContextVar('configured_e3_closeout_reads', default=())
@@ -155,8 +153,8 @@ def _completed_response(writer, package, plan, task, contact, receipts, external
         raise PermissionError('CAL closeout requires durable completed scoring before retaining a finite outcome')
     score, _ = product(writer, plan, receipts, score_task, ScheduledResponseScore)
     outcome, _ = product(writer, plan, receipts, score_task, ConfiguredProtectedE3PairedOutcome)
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_response_score_validation import validate_current_score
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_secondary_readout import _checked_pair
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_response_score_validation import validate_current_score
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_secondary_readout import _checked_pair
     values = operands.science_arguments()
     validate_current_score(score, operands.config, response, source=values['source'], protocol=values['protocol'],
         panels=values['panels'], causal_identity=_pin(values['causal']), error_identity=_pin(values['error']),
@@ -376,7 +374,7 @@ def read_closed_e3(*, artifact_writer, directory, run_id, reveal_authority_id):
                     predecessor.require_access()
 
                 def current():
-                    from empirical_lawhood.infrastructure.artifacts import verify_read_context_snapshots
+                    from empirical_lawhood.storage.artifacts import verify_read_context_snapshots
                     access()
                     if _custody_control_pins(view, index) != controls:
                         raise PermissionError('CAL closeout original controls or resource history changed')

@@ -9,11 +9,9 @@ import time
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import (
-    ArtifactIdentityConflict, ConcurrentArtifactMemberPreflight, ExternalArtifactPlane, GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ConcurrentArtifactMemberPreflight, ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 from tests.runtime_platform.test_current_development_receipted_inputs import _case as _receipt_case
 from tests.test_reduced_artifact_verification import _mask_changed_stat

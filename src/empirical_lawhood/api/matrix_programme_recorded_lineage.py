@@ -9,9 +9,9 @@ a separate explicit operation.
 from contextlib import ExitStack, contextmanager
 from dataclasses import replace
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
-from .matrix_researcher_programme_lineage import read_published_record, retained_run_binding
+from empirical_lawhood.api.matrix_researcher_programme_lineage import read_published_record, retained_run_binding
 
 
 def _recorded_source_inputs(original, current, *, support_files=None, design=None):
@@ -37,8 +37,8 @@ def _recorded_source_inputs(original, current, *, support_files=None, design=Non
 
 
 def _unentered_training(context, expected, lifetime):
-    from .matrix_amendment_withdrawals import _withdrawn_packet
-    from .matrix_programme_source_continuation import _require_future_namespaces_absent
+    from empirical_lawhood.api.matrix_amendment_withdrawals import _withdrawn_packet
+    from empirical_lawhood.api.matrix_programme_source_continuation import _require_future_namespaces_absent
     _require_future_namespaces_absent(context)
     packet, run, payloads = _withdrawn_packet(context.writer,
         context.child_directory('train'), context.plan.source_snapshot)
@@ -72,8 +72,8 @@ def operational_report(report):
 
 
 def phase_execution(context, phase, *, observe_controls=None):
-    from .retained_e3_evidence import current_e3_evidence
-    from .recursive_execution import _custody_control_pins
+    from empirical_lawhood.api.retained_e3_evidence import current_e3_evidence
+    from empirical_lawhood.api.recursive_execution import _custody_control_pins
     evidence = current_e3_evidence(context.writer)
     origin = context.phase_origins.get(phase, context)
     key = origin.plan.identity, context.binding(phase).identity, phase
@@ -104,15 +104,13 @@ def phase_execution(context, phase, *, observe_controls=None):
 
 def _phase_execution(context, phase, *, observe_controls=None):
     """Read original scheduling custody without loading every scientific input."""
-    from .experiment_execution_read import read_development_execution, read_execution_records
-    from .current_result_custody import CurrentResultPlanReader
-    from .recursive_qualified_parents import _actual_package
-    from .prospective_experiment import _read_prospective_locator
-    from .retained_e3_control_repair import selected_repair_index
-    from empirical_lawhood.runtime.prospective_experiment import (
-        ASSOCIATION_FILENAME, ProspectiveExperimentAssociation, SPECIFICATION_FILENAME,
-    )
-    from .protected_e3_read_custody import _current_read_grants
+    from empirical_lawhood.api.experiment_execution_read import read_development_execution, read_execution_records
+    from empirical_lawhood.api.current_result_custody import CurrentResultPlanReader
+    from empirical_lawhood.api.recursive_qualified_parents import _actual_package
+    from empirical_lawhood.api.prospective_experiment import _read_prospective_locator
+    from empirical_lawhood.api.retained_e3_control_repair import selected_repair_index
+    from empirical_lawhood.execution.prospective_experiment import ASSOCIATION_FILENAME, ProspectiveExperimentAssociation, SPECIFICATION_FILENAME
+    from empirical_lawhood.api.protected_e3_read_custody import _current_read_grants
 
     origin = context.phase_origins.get(phase, context)
     directory, writer = origin.child_directory(phase), context.writer
@@ -122,7 +120,7 @@ def _phase_execution(context, phase, *, observe_controls=None):
             return {'state':'AUTHORING_REQUIRED','new_native_contact_count':0}
         expected = context.binding(phase).specification.identity
         if phase != 'e4.revision':
-            from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_declarative
+            from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_declarative
             _, specification = context.bound_specification(context.binding(phase))
             inputs = context.method_inputs(phase)
             selected_e4_declarative.validate_plan(specification, inputs)
@@ -131,7 +129,7 @@ def _phase_execution(context, phase, *, observe_controls=None):
             raise PermissionError('programme execution inspection substitutes its original composite specification')
         options = {}
         if phase != 'e4.revision':
-            from .matrix_programme_e4_phases import programme_e4_request
+            from empirical_lawhood.api.matrix_programme_e4_phases import programme_e4_request
             options['request'] = programme_e4_request(context, phase, include_collection=False)
         return child.read_execution(directory=directory, **options)
     association_path = directory / 'experiment' / ASSOCIATION_FILENAME
@@ -145,8 +143,8 @@ def _phase_execution(context, phase, *, observe_controls=None):
         # scheduling state does not require decoding its scientific selector.
         report = read_development_execution(directory=directory, artifact_writer=writer,
             observe_controls=observe_controls)
-        from empirical_lawhood.infrastructure.recursive_custody import read_recursive_bootstrap_record
-        from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave
+        from empirical_lawhood.storage.recursive_custody import read_recursive_bootstrap_record
+        from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave
         packet = read_recursive_bootstrap_record(writer,
             (directory / 'authored-wave.json').relative_to(writer.root.contract.canonical_path).as_posix(), AuthoredRecursiveWave)
         pins = tuple(row.identity for row in packet.members if row.filename == 'experiment-specification.json')
@@ -155,7 +153,7 @@ def _phase_execution(context, phase, *, observe_controls=None):
                 expected.object_schema, expected.object_version, expected.object_fingerprint):
             raise PermissionError('programme execution observation changes its exact phase specification')
         if phase == 'e4.development' and report.get('execution_complete') is True:
-            from .selected_e4_structure import read_development_structure_execution
+            from empirical_lawhood.api.selected_e4_structure import read_development_structure_execution
             structure = read_development_structure_execution(directory=directory, artifact_writer=writer,
                 acquisition_report=report, observe_controls=observe_controls)
             report = {**report, 'structure':structure,
@@ -172,11 +170,11 @@ def _phase_execution(context, phase, *, observe_controls=None):
         if tuple(row.identity for row in association.members if row.filename == SPECIFICATION_FILENAME) != (locator.specification,):
             raise PermissionError('programme execution observation changes its original specification')
         if phase == 'e1' and phase in context.retained_terminal_pins:
-            from .recorded_execution_controls import completed_issued_execution
+            from empirical_lawhood.api.recorded_execution_controls import completed_issued_execution
             return completed_issued_execution(writer=controls, locator=locator, candidate=association.candidate,
                 terminal=context.retained_terminal_pins[phase], observe_controls=observe_controls)
         if phase == 'e3':
-            from .retained_e3_evidence import current_e3_evidence
+            from empirical_lawhood.api.retained_e3_evidence import current_e3_evidence
             evidence = current_e3_evidence(controls)
             if evidence is not None:
                 authority = locator.authority
@@ -214,7 +212,7 @@ def _phase_execution(context, phase, *, observe_controls=None):
 @contextmanager
 def recorded_continuation_context(owner, context, record):
     """Keep transition reads scoped while the caller retains its publisher."""
-    from .retained_e3_evidence import retained_e3_reader
+    from empirical_lawhood.api.retained_e3_evidence import retained_e3_reader
     with retained_e3_reader(context.writer).read_context() as writer:
         reading = replace(context, service=replace(context.service, artifact_writer=writer))
         with _recorded_continuation_context(owner, reading, record):
@@ -224,13 +222,10 @@ def recorded_continuation_context(owner, context, record):
 @contextmanager
 def _recorded_continuation_context(owner, context, record):
     """Consume an exact existing handoff; never re-create its historical work."""
-    from .matrix_researcher_programme import MatrixResearchProgrammeService
-    from .selected_e4_bank_recipe import _publication_from_manifest
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import MatrixResearchProgrammePlan
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme import (
-        source_continuation, retained_training_continuation, retained_e3_continuation,
-        curve_amendment,
-    )
+    from empirical_lawhood.api.matrix_researcher_programme import MatrixResearchProgrammeService
+    from empirical_lawhood.api.selected_e4_bank_recipe import _publication_from_manifest
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixResearchProgrammePlan
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme import source_continuation, retained_training_continuation, retained_e3_continuation, curve_amendment
     if record.target_plan != context.plan:
         raise PermissionError('recorded continuation changes its exact target programme')
     handle = record.specification.predecessor
@@ -259,20 +254,20 @@ def _recorded_continuation_context(owner, context, record):
         if any(phase in context.bindings for phase in inherited):
             raise PermissionError('recorded continuation cannot replace a completed original phase')
         if isinstance(record, source_continuation.MatrixProgrammeCompletedSourceContinuation):
-            from .matrix_programme_completed_continuation import require_numerical_continuity, require_unentered_successors
-            from empirical_lawhood.adapters.methods.matrix_researcher_programme.completed_source import completed_source_files
-            from empirical_lawhood.infrastructure.matrix_completed_source import read_completed_source, original_e3_commitment
-            from empirical_lawhood.infrastructure.matrix_recorded_inputs import recorded_programme_inputs
+            from empirical_lawhood.api.matrix_programme_completed_continuation import require_numerical_continuity, require_unentered_successors
+            from empirical_lawhood.domains.matrix.matrix_researcher_programme.completed_source import completed_source_files
+            from empirical_lawhood.adapters.matrix_storage.matrix_completed_source import read_completed_source, original_e3_commitment
+            from empirical_lawhood.adapters.matrix_storage.matrix_recorded_inputs import recorded_programme_inputs
             if isinstance(record, source_continuation.MatrixProgrammeCompletedE4SourceContinuation):
-                from .matrix_programme_completed_continuation import recorded_completed_e4_custody
+                from empirical_lawhood.api.matrix_programme_completed_continuation import recorded_completed_e4_custody
                 report = lifetime.enter_context(recorded_completed_e4_custody(original_owner, original, record))
                 context.retained_execution_reports['e4.development'] = report
             elif type(record) is source_continuation.MatrixProgrammeUnenteredE4SourceContinuation:
-                from .matrix_programme_unentered_e4 import unentered_e4_custody
+                from empirical_lawhood.api.matrix_programme_unentered_e4 import unentered_e4_custody
                 retained_e4 = lifetime.enter_context(unentered_e4_custody(original, expected=record))
                 require_unentered_successors(original, unentered_e4=retained_e4)
             else:
-                from .matrix_programme_retained_bank_metadata import _namespace
+                from empirical_lawhood.api.matrix_programme_retained_bank_metadata import _namespace
                 directory = original.metadata_directory('e4.development')
                 guard = (lambda: _namespace(original, directory)) if directory.exists() or directory.is_symlink() else None
                 require_unentered_successors(original, retained_metadata=guard)
@@ -294,7 +289,7 @@ def _recorded_continuation_context(owner, context, record):
             _recorded_source_inputs(original.inputs, context.inputs)
             _unentered_training(original, record.unentered_training_packet, lifetime)
         elif type(record) is retained_training_continuation.MatrixProgrammeRetainedTrainingContinuation:
-            from empirical_lawhood.infrastructure.matrix_retained_training import read_retained_training_source
+            from empirical_lawhood.adapters.matrix_storage.matrix_retained_training import read_retained_training_source
             source = record.retained_training
             rows = retained_training_continuation.retained_source_files(context.commitments)
             if (read_retained_training_source(context.writer, context.commitments) != source
@@ -304,7 +299,7 @@ def _recorded_continuation_context(owner, context, record):
             _recorded_source_inputs(original.inputs, context.inputs,
                 support_files=tuple(row for row in context.commitments.support_files if row not in rows))
         elif isinstance(record, retained_e3_continuation.MatrixProgrammeRetainedE3Continuation):
-            from empirical_lawhood.infrastructure.matrix_retained_training import read_retained_training_source
+            from empirical_lawhood.adapters.matrix_storage.matrix_retained_training import read_retained_training_source
             before, after = record.predecessor_training, record.retained_training
             old_rows = retained_training_continuation.retained_source_files(original.commitments)
             new_rows = retained_training_continuation.retained_source_files(context.commitments)
@@ -328,8 +323,8 @@ def _recorded_continuation_context(owner, context, record):
             # imported receipt pins. Product access checks their actual producers.
             context.retained_e3.append((record, None, None))
         elif type(record) is curve_amendment.MatrixProgrammeCurveAmendment:
-            from .matrix_amendment_evidence import read_evidence
-            from .matrix_amendment_withdrawals import withdrawn_custody
+            from empirical_lawhood.api.matrix_amendment_evidence import read_evidence
+            from empirical_lawhood.api.matrix_amendment_withdrawals import withdrawn_custody
             from types import SimpleNamespace
             expected = curve_amendment.amend_curve_design(original.inputs.scientific_design,
                 record_id=context.inputs.scientific_design.record_id)

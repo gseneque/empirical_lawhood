@@ -1,0 +1,279 @@
+{
+  "label": "M0\u2013M4 bounded development pilot; finite-age memory and matched preparation",
+  "roots": [
+    {
+      "modules": [
+        "M0"
+      ],
+      "role": "development",
+      "seed": 1700001
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700101
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700102
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700103
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700104
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700105
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700106
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700107
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700108
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700109
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700110
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700111
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700112
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700113
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700114
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700115
+    },
+    {
+      "modules": [
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "role": "development",
+      "seed": 1700116
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700201
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700202
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700203
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700204
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700205
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700206
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700207
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700208
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700209
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700210
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700211
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700212
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700213
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700214
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700215
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "development",
+      "seed": 1700216
+    }
+  ],
+  "schema": "model-free-matrix-definition.v1",
+  "settings": {
+    "memory": {
+      "protocol_age_ticks": [
+        16384
+      ]
+    },
+    "response": {
+      "selection_tick": 32
+    }
+  }
+}

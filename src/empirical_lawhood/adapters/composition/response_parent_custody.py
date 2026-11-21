@@ -9,21 +9,11 @@ from hashlib import sha256
 from pathlib import Path
 from typing import ClassVar, Protocol
 
-from empirical_lawhood.adapters._bounded_files import (
-    AdapterFileBoundError,
-    read_bounded_contained,
-    sha256_bounded_contained,
-)
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_strings,
-    validate_relative_locator,
-    validate_semantic_version,
-    validate_sha256,
-    validate_stable_id,
-)
+from empirical_lawhood.adapters._bounded_files import AdapterFileBoundError, read_bounded_contained, sha256_bounded_contained
+from empirical_lawhood.science.records.serialization import CanonicalRecord, require_sorted_unique_strings, validate_relative_locator, validate_semantic_version, validate_sha256, validate_stable_id
 
-from .response_parent_input import ImportedResponseParentCustody
+from empirical_lawhood.adapters.composition.response_parent_input import ImportedResponseParentCustody
+from empirical_lawhood.storage.contracts.artifact_sidecar import ArtifactManifestReference
 
 _MAX_MANIFEST_BYTES = 128 * 1024**2
 _MAX_MEMBERS = 100_000
@@ -114,7 +104,7 @@ def _read_member(root: Path, path: Path, *, maximum_bytes: int) -> bytes:
     return raw
 
 
-def _read_record(path: Path, root: Path, roster: dict[Path, tuple[int, str]]) -> dict:
+def _record_bytes(path: Path, root: Path, roster: dict[Path, tuple[int, str]]) -> bytes:
     if path not in roster:
         raise ValueError("RESPONSE_PARENT_RECORD_MISSING_FROM_ROSTER")
     size, digest = roster[path]
@@ -123,11 +113,21 @@ def _read_record(path: Path, root: Path, roster: dict[Path, tuple[int, str]]) ->
     raw = _read_member(root, path, maximum_bytes=min(size, _MAX_RECORD_BYTES))
     if len(raw) != size or sha256(raw).hexdigest() != digest:
         raise ValueError("RESPONSE_PARENT_RECORD_DIGEST_MISMATCH")
+    return raw
+
+
+def _record_document(raw: bytes) -> dict:
     try:
         value = json.loads(raw)
     except (UnicodeDecodeError, json.JSONDecodeError) as error:
         raise ValueError("RESPONSE_PARENT_RECORD_INVALID_JSON") from error
-    value = _unwrap(value)
+    if not isinstance(value, dict):
+        raise TypeError("RESPONSE_PARENT_RECORD_SHAPE_INVALID")
+    return value
+
+
+def _read_record(path: Path, root: Path, roster: dict[Path, tuple[int, str]]) -> dict:
+    value = _unwrap(_record_document(_record_bytes(path, root, roster)))
     if not isinstance(value, dict):
         raise TypeError("RESPONSE_PARENT_RECORD_SHAPE_INVALID")
     return value
@@ -139,25 +139,51 @@ def _manifest_publication(
     project: Path,
     root: Path,
     roster: dict[Path, tuple[int, str]],
-    expected_material: dict,
+    expected_material: dict | None,
     expected_storage_root_id: str,
+    publications: dict,
 ) -> Path:
     manifest_path = Path(str(path) + ".manifest.json")
-    manifest = _read_record(manifest_path, root, roster)
+    raw = _record_bytes(manifest_path, root, roster)
+    document = _record_document(raw)
+
+    def require_material(material, logical_digest):
+        if ((expected_material is not None and material != expected_material)
+                or material.get("storage_root_id") != expected_storage_root_id
+                or project / material.get("relative_path", "") != path
+                or (material.get("size_bytes"), material.get("physical_sha256")) != roster[path]
+                or logical_digest != roster[path][1]):
+            raise ValueError("RESPONSE_PARENT_MATERIAL_BINDING_MISMATCH")
+
+    if document.get("schema") == ArtifactManifestReference.SCHEMA:
+        from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+        from empirical_lawhood.storage.artifact_sidecars import publication_binding_from_reference_bytes
+        from empirical_lawhood.storage.artifact_stream_primitives import ArtifactIdentityConflict
+
+        reference = decode_canonical_bytes(raw, ArtifactManifestReference, maximum_bytes=_MAX_RECORD_BYTES)
+        require_material(_unwrap(reference.materialization.to_document()), reference.logical.content_sha256)
+        marker = project / reference.commit_marker_relative_path
+        if roster.get(marker) != (reference.commit_marker_size_bytes, reference.commit_marker_sha256):
+            raise ValueError("RESPONSE_PARENT_PUBLICATION_MISMATCH")
+        try:
+            if marker not in publications:
+                commit = _read_member(root, marker, maximum_bytes=reference.commit_marker_size_bytes)
+                publications[marker] = publication_binding_from_reference_bytes(reference, commit)
+            reference.resolve(publications[marker])
+        except (TypeError, ValueError, ArtifactIdentityConflict) as error:
+            raise ValueError("RESPONSE_PARENT_PUBLICATION_MISMATCH") from error
+        return marker
+    manifest = _unwrap(document)
+    if not isinstance(manifest, dict):
+        raise TypeError("RESPONSE_PARENT_RECORD_SHAPE_INVALID")
     material = manifest.get("materialization")
     logical = manifest.get("logical")
     publication = manifest.get("publication")
+    if expected_material is None and not isinstance(material, dict):
+        raise TypeError("RESPONSE_PARENT_RECEIPT_MATERIAL_INVALID")
     if not all(isinstance(x, dict) for x in (material, logical, publication)):
         raise ValueError("RESPONSE_PARENT_MATERIAL_MANIFEST_INVALID")
-    if (
-        material != expected_material
-        or material.get("storage_root_id") != expected_storage_root_id
-        or project / material.get("relative_path", "") != path
-        or material.get("physical_sha256") != roster[path][1]
-        or material.get("size_bytes") != roster[path][0]
-        or logical.get("content_sha256") != roster[path][1]
-    ):
-        raise ValueError("RESPONSE_PARENT_MATERIAL_BINDING_MISMATCH")
+    require_material(material, logical.get("content_sha256"))
     marker_relative = publication.get("commit_marker_relative_path")
     if not isinstance(marker_relative, str):
         raise TypeError("RESPONSE_PARENT_PUBLICATION_INVALID")
@@ -377,6 +403,7 @@ def replay_response_parent_custody(
     receipts: set[str] = set()
     roots: set[str] = set()
     successful: set[str] = set()
+    publications = {}
     for raw_attempt in attempts:
         attempt = _unwrap(raw_attempt)
         if not isinstance(attempt, dict) or attempt.get("disposition") != "SUCCEEDED":
@@ -414,20 +441,15 @@ def replay_response_parent_custody(
         receipts.add(roster[receipt_path][1])
         allowed.add(receipt_path)
         allowed.add(Path(str(receipt_path) + ".manifest.json"))
-        receipt_manifest = _read_record(
-            Path(str(receipt_path) + ".manifest.json"), root, roster
-        )
-        receipt_material = receipt_manifest.get("materialization")
-        if not isinstance(receipt_material, dict):
-            raise TypeError("RESPONSE_PARENT_RECEIPT_MATERIAL_INVALID")
         allowed.add(
             _manifest_publication(
                 path=receipt_path,
                 project=project,
                 root=root,
                 roster=roster,
-                expected_material=receipt_material,
+                expected_material=None,
                 expected_storage_root_id=grant.source_storage_root_id,
+                publications=publications,
             )
         )
         materials = receipt.get("output_materializations")
@@ -454,6 +476,7 @@ def replay_response_parent_custody(
                     roster=roster,
                     expected_material=material,
                     expected_storage_root_id=grant.source_storage_root_id,
+                    publications=publications,
                 )
             )
     if not successful or tuple(sorted(roots)) != grant.original_root_ids:

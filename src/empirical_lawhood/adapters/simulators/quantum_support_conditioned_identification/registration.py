@@ -4,16 +4,11 @@ from __future__ import annotations
 
 from hashlib import sha256
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
 
-from .contracts import CAPABILITY_VERSION, DEVELOPMENT_CAPABILITY_KEY, EVALUATOR_CAPABILITY_KEY, NOMINATION_CAPABILITY_KEY, SOURCE_CAPABILITY_KEY
+from empirical_lawhood.domains.quantum.support_conditioned_identification.contracts import CAPABILITY_VERSION, DEVELOPMENT_CAPABILITY_KEY, EVALUATOR_CAPABILITY_KEY, NOMINATION_CAPABILITY_KEY, SOURCE_CAPABILITY_KEY
 
 
 CONFIG_SCHEMA = 'empirical-lawhood/simulators/quantum-support-conditioned-identification/quantum-trajectory-receiver-law'

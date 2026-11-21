@@ -11,7 +11,7 @@ import pytest
 
 from empirical_lawhood.adapters.physical.rubisco_kinetics import plant_structural_scores as source
 from empirical_lawhood.adapters.physical.rubisco_kinetics.workbook import decode_native_workbook
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 FIXTURES = Path(__file__).parent / "fixtures" / "rubisco" / "mcdonald2026_structural"
 

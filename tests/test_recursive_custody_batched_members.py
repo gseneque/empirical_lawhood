@@ -5,13 +5,13 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifacts as artifacts_owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
-from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits, ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.recursive_handoff import RecursiveWaveMember
+from empirical_lawhood.storage import artifacts as artifacts_owner
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane
+from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits, ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.recursive_handoff import RecursiveWaveMember
 from tests.runtime_platform.test_artifact_verification_scope import _publication
 
 
@@ -171,7 +171,7 @@ def test_duplicate_members_refuse_before_verification_and_empty_mapping_stays_em
 
 
 def test_exact_header_version_guard_is_preserved_inside_batch_callback(tmp_path):
-    from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
     import json
     plane, _, _, directory = _case(tmp_path, count=1)
     value = json.loads(ObjectIdentity("exposed.unknown-version", ObjectIdentity.SCHEMA, "1.0.0", "a" * 64).canonical_bytes())

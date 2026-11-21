@@ -18,19 +18,19 @@ from empirical_lawhood.api import matrix_programme_e4_inputs as api
 from empirical_lawhood.api import current_result_custody as current
 from empirical_lawhood.api import recursive_qualified_parents as parents
 from empirical_lawhood.api.matrix_selected_e3_family import selected_e3_product_family
-from empirical_lawhood.infrastructure.provider_input_custody import provider_input_location
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement, CapabilityRegistry
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionPlan, ExecutionTask, ExternalInputSpec, PlanLane, RunPlan, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.storage.provider_input_custody import provider_input_location
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement, CapabilityRegistry
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionPlan, ExecutionTask, ExternalInputSpec, PlanLane, RunPlan, ScientificInputRole, ScientificInputSpec
 from tests.test_matrix_finite_dt_source_assembly import c_backed_source_case, selected_request  # noqa: F401
 from tests.worker_configuration_support import freeze_worker_configuration
 
 
 def _provider_case(case, monkeypatch):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_records import ConfiguredProtectedE3PhysicalForecastConfig
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_preparation import response_task_id
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_records import ConfiguredProtectedE3PhysicalForecastConfig
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_preparation import response_task_id
     assay, criterion = case.assay, case.preparation.mathematical_protocol
     template = case.committed.scientific_design.training_assay.array_artifact
     source_file, = (value for value in case.training.template_files.values() if value.identity == template)
@@ -184,7 +184,8 @@ def test_current_original_refusal_precedes_provider_body_verification(c_backed_s
     assert len(calls) == boundary
 
 
-def test_public_e4_context_passes_resolved_provider_handles_to_real_assay_owner(c_backed_source_case, monkeypatch):
+@pytest.mark.parametrize("reconstruction", ("off", "full"))
+def test_public_e4_context_passes_resolved_provider_handles_to_real_assay_owner(c_backed_source_case, monkeypatch, reconstruction):
     f = _provider_case(c_backed_source_case, monkeypatch)
     request = replace(selected_request(f.case), original_products=f.products)
     locator = request.native_training_locator
@@ -210,7 +211,8 @@ def test_public_e4_context_passes_resolved_provider_handles_to_real_assay_owner(
         seen.append(kwargs["assay_publication"])
         return owning(**kwargs)
     monkeypatch.setattr(api, "authenticate_selected_e3_assay", authenticate)
-    with api.authenticated_programme_e4_banks(artifact_writer=f.plane, input_commitments=request.input_commitments,
+    from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
+    with scientific_reconstruction_operation(reconstruction), api.authenticated_programme_e4_banks(artifact_writer=f.plane, input_commitments=request.input_commitments,
             original_e3=request.original_e3, original_preparation=request.original_preparation,
             original_assay=request.original_assay, original_products=request.original_products,
             native_training_locator=locator, maximum_source_bytes=request.source_budget.source_scan_bytes) as result:

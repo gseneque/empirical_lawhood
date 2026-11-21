@@ -11,26 +11,24 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_acquisition as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_bindings as bindings
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as r
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_science as science
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_custody_records import (
-    NativeUtilityCustodyAssessment,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_custody_science import assess_closed_custody
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_acquisition as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_bindings as bindings
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as r
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_science as science
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_custody_records import NativeUtilityCustodyAssessment
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_custody_science import assess_closed_custody
 from empirical_lawhood.api import matrix_native_utility_custody_read as custody_reader
 from empirical_lawhood.api import matrix_native_utility_read as reader
 from empirical_lawhood.api.experiment_preparation import author_prepared_experiment
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.recursive_authoring import load_authored_wave
 from empirical_lawhood.api.recursive_execution import read_recursive_wave, run_recursive_wave
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, ResourceAdmissionError
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import canonical_json_document_bytes
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-from empirical_lawhood.runtime.recovery import RecoveryTerminalDisposition, TaskRecoveryDisposition
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, ResourceAdmissionError
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import canonical_json_document_bytes
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+from empirical_lawhood.execution.recovery import RecoveryTerminalDisposition, TaskRecoveryDisposition
 from tests.test_matrix_native_utility import utility_case, copied_preparation, _finite_score
 
 ROOT = Path(__file__).parents[1]

@@ -6,10 +6,11 @@ from __future__ import annotations
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import hashlib
-from importlib.metadata import version
+from importlib.metadata import distribution, version
 import json
 import os
 from pathlib import Path
+import runpy
 import subprocess
 import sys
 import tomllib
@@ -134,9 +135,13 @@ def main() -> None:
     assert not Path(empirical_lawhood.__file__).resolve().is_relative_to(checkout)
     selected_version = tomllib.loads((checkout / "pyproject.toml").read_text())["project"]["version"]
     assert version("empirical-lawhood") == empirical_lawhood.__version__ == selected_version
-    from empirical_lawhood.cli.entry import (
-        NUMERICAL_THREAD_ENV_VARS, NUMERICAL_BOOTSTRAP_ENV_VAR, enforce_single_thread_environment,
-    )
+    source_owner = runpy.run_path(str(checkout / "scripts/build_source_metadata.py"))
+    installed = distribution("empirical-lawhood")
+    installed_source = json.loads(installed.read_text("extra_metadata/source.json"))
+    documentation_url = source_owner["verify_documentation_metadata"](
+        installed.read_text("METADATA").encode(),
+        implementation_commit=installed_source["implementation_commit"])
+    from empirical_lawhood.cli.entry import NUMERICAL_THREAD_ENV_VARS, NUMERICAL_BOOTSTRAP_ENV_VAR, enforce_single_thread_environment
     enforce_single_thread_environment()
     from typer.main import get_command
     from empirical_lawhood.cli.app import app
@@ -197,6 +202,23 @@ def main() -> None:
     assert rc_workflow["prerequisites_inspected"] is False
     recursive_workflow = json.loads(invoke(["workflow", "show", "recursive-inquiry", "--format", "json"]).stdout)
     assert recursive_workflow["prerequisites_inspected"] is False
+    rubisco_workflow = json.loads(invoke(["workflow", "show", "rubisco-response", "--format", "json"]).stdout)
+    assert rubisco_workflow["prerequisites_inspected"] is False
+    assert rubisco_workflow["guide"] == "programmes/biology/photosynthesis/workflows/rubisco-response/guide.md"
+    rubisco_directory = checkout / "programmes/biology/photosynthesis/workflows/rubisco-response"
+    for consumer, filename in (("rubisco-response-study", "study.json"),
+                               ("rubisco-response-experiment", "experiment.json")):
+        validated = json.loads(invoke(["config", "validate", "--consumer", consumer,
+            "--config", str(rubisco_directory / filename), "--format", "json"]).stdout)
+        assert validated["canonical_byte_ready"] is True
+    rubisco_preparation = json.loads(invoke(["campaign", "experiment-explain",
+        "--input", str(rubisco_directory / "experiment.json"),
+        "--sources", str(rubisco_directory / "experiment-sources.json")]).stdout)
+    assert rubisco_preparation["native_contact"] == "NONE"
+    assert rubisco_preparation["scientific_execution_performed"] is False
+    assert rubisco_preparation["scientific_authority"] == "NONE"
+    assert rubisco_preparation["qualification"] == "NOT_ESTABLISHED"
+    assert rubisco_preparation["census"]["native_effects"] == 0
     recursive_path = checkout / "programmes/materials/superconductivity/workflows/recursive-materials/materials-partial.json"
     recursive_schema = json.loads(invoke(["config", "schema", "--schema-id", "empirical-lawhood/planning/recursive-study-draft"]).stdout)
     assert recursive_schema["x-consumer"] == "recursive-inquiry"
@@ -306,12 +328,15 @@ def main() -> None:
     assert not (partial_dir / "report.json").exists() and not (partial_dir / "panel.json").exists()
     (output_dir / "smoke-result.json").write_text(json.dumps({
         "status": "PASSED", "installed_module": empirical_lawhood.__file__,
+        "documentation_url": documentation_url,
         "leaf_help_count": len(leaves), "bootstrap_before_numpy": bootstrap,
         "complete_branches": 20, "independent_units": 5, "partial_branches": 1,
         "evidence_ceiling": "exposed demonstration; no scientific qualification",
         "workflow_count": len(workflows["workflows"]), "offline_schema_and_preparation": True,
         "current_analytical_and_frozen_operand_delivery": True,
         "retained_early_refusal": True,
+        "rubisco_offline_preparation": {"canonical_inputs": 2, "native_contact": "NONE",
+            "scientific_authority": "NONE", "qualification": "NOT_ESTABLISHED"},
         "matrix_offline_preparation": matrix_offline,
         "matrix_source_admission_refusals": matrix_source_refusals,
     }, indent=2) + "\n")

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from empirical_lawhood.planning.posthoc import POSTHOC_ANALYSIS_IDS
+from empirical_lawhood.design.posthoc import POSTHOC_ANALYSIS_IDS
 
-from empirical_lawhood.adapters.methods.effective_law_comparison.analysis import execute_analysis, execute_integrated_skeptic, execute_skeptic, synthesize
+from empirical_lawhood.methods.effective_law_comparison.analysis import execute_analysis, execute_integrated_skeptic, execute_skeptic, synthesize
 
 
 def _document(schema: str, value: dict[str, object]) -> dict[str, object]:

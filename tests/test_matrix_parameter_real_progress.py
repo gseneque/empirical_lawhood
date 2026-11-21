@@ -7,11 +7,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history_segments as segments
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import parameter_native
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
-from empirical_lawhood.kernel.time import validate_utc_timestamp
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history_segments as segments
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import parameter_native
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
+from empirical_lawhood.science.models.time import validate_utc_timestamp
 from tests.test_matrix_parameter_compact_history import selected
 from tests.test_matrix_scheduled_history import prefix_case, scheduled as scheduled  # noqa: F401
 from tests.test_matrix_factor_confirmation_eligibility import stock as stock, provenance as provenance  # noqa: F401
@@ -125,7 +125,7 @@ def test_completed_parameter_recovery_enters_no_acquisition_or_progress(schedule
 @pytest.mark.parametrize('phase',('prefix','responses'))
 def test_selected_native_facades_forward_the_actual_task_progress_before_any_helper_entry(monkeypatch,owner_name,phase):
     from importlib import import_module
-    owner=import_module('empirical_lawhood.adapters.methods.matrix_factor_response.'+owner_name)
+    owner=import_module('empirical_lawhood.domains.matrix.matrix_factor_response.'+owner_name)
     runner_type=owner.NativeUtilityNativeRunner if owner_name=='native_utility_bindings' else owner.NativeTrainingNativeRunner
     progress=object();source=object();work=object();prefix=object();frozen=object()
     config=SimpleNamespace(protocol=object(),panels=(),specification=object())

@@ -4,43 +4,33 @@ from dataclasses import fields
 import json
 import platform
 from decimal import Decimal
-from empirical_lawhood.adapters.methods.reactor_causal_response.resource_contract import EmpiricalResourceGuard
+from empirical_lawhood.domains.reactor.reactor_causal_response.resource_contract import EmpiricalResourceGuard
 from typing import Callable
-from empirical_lawhood.adapters.methods.law_assessment import CandidatePayloadReader
-from empirical_lawhood.adapters.methods.reactor_causal_response.campaign_records import EmpiricalStudySource, TimedReactorConfirmationEnvelope
-from empirical_lawhood.adapters.methods.reactor_causal_response.experiment_records import EmpiricalQualificationTerminal
-from .campaign import ControlCustodyPort, acquire_confirmation
+from empirical_lawhood.methods.law_assessment import CandidatePayloadReader
+from empirical_lawhood.domains.reactor.reactor_causal_response.campaign_records import EmpiricalStudySource, TimedReactorConfirmationEnvelope
+from empirical_lawhood.domains.reactor.reactor_causal_response.experiment_records import EmpiricalQualificationTerminal
+from empirical_lawhood.adapters.simulators.reactor_causal_response.campaign import ControlCustodyPort, acquire_confirmation
 import numpy as np
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.execution import (
-    TaskContext,
-    TaskRunner,
-    RunnerResult,
-    TaskOutputPayload,
-    WorkerInputKind,
-    TaskProgressEmitter,
-)
-from empirical_lawhood.runtime.plans import ProtocolExecutionPlan
-from empirical_lawhood.runtime.providers import (
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-    CapabilityOutputSemanticContract,
-)
-from empirical_lawhood.adapters.methods.reactor_causal_response.experiment_records import EmpiricalAcquisitionEnvelope, EmpiricalDiscoveryEnvelope, EmpiricalCalibrationEnvelope
-from empirical_lawhood.adapters.methods.reactor_causal_response.provider import DependencyCustodyReader, validate_dependency
-from empirical_lawhood.adapters.methods.reactor_causal_response.serialization import read_fit
-from empirical_lawhood.adapters.methods.reactor_causal_response.transport import CausalReactorRootEnvelope
-from empirical_lawhood.adapters.methods.reactor_causal_response.controller import NumericalController
-from .config import EmpiricalNativeConfig, NATIVE_TASKS
-from .design import scenario
-from .interface import Actuator
-from .acquisition import acquire_episode, development_root, TapeController, paired_operands
-from .extension_bundle import CAPABILITY
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.execution import TaskContext, TaskRunner, RunnerResult, TaskOutputPayload, WorkerInputKind, TaskProgressEmitter
+from empirical_lawhood.execution.plans import ProtocolExecutionPlan
+from empirical_lawhood.execution.providers import CampaignRuntimeProvider, ExternalInputPayload, CapabilityOutputSemanticContract
+from empirical_lawhood.domains.reactor.reactor_causal_response.experiment_records import EmpiricalAcquisitionEnvelope, EmpiricalDiscoveryEnvelope, EmpiricalCalibrationEnvelope
+from empirical_lawhood.domains.reactor.reactor_causal_response.provider import DependencyCustodyReader, validate_dependency
+from empirical_lawhood.domains.reactor.reactor_causal_response.serialization import read_fit
+from empirical_lawhood.domains.reactor.reactor_causal_response.transport import CausalReactorRootEnvelope
+from empirical_lawhood.domains.reactor.reactor_causal_response.controller import NumericalController
+from empirical_lawhood.domains.reactor.reactor_causal_response.native_config import EmpiricalNativeConfig, NATIVE_TASKS
+from empirical_lawhood.domains.reactor.reactor_causal_response.design import scenario
+from empirical_lawhood.domains.reactor.reactor_causal_response.actuator import Actuator
+from empirical_lawhood.adapters.simulators.reactor_causal_response.acquisition import acquire_episode, development_root
+from empirical_lawhood.domains.reactor.reactor_causal_response.measurements import TapeController, paired_operands
+from empirical_lawhood.adapters.simulators.reactor_causal_response.extension import CAPABILITY
 
 
 class EmpiricalNativeRunner:

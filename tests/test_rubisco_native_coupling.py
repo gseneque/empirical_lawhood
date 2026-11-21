@@ -11,7 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_free_energy import native_coupling as M
+from empirical_lawhood.adapters.rubisco.rubisco_insilico_free_energy import native_coupling as M
 
 PATH = Path(M.__file__)
 
@@ -56,6 +56,7 @@ def fixture():
     return System(f)
 
 
+@pytest.mark.numerical(oracle="Independent charge product .2*(-.3)/(6/5) = -.05 e^2 with unchanged original Lennard-Jones terms")
 def test_independent_exception_products_and_lj_preservation():
     s = fixture()
     old = deepcopy(s.force.exceptions)
@@ -71,6 +72,7 @@ def test_independent_exception_products_and_lj_preservation():
     assert len(result["changed_products"]) == 2
 
 
+@pytest.mark.numerical(oracle="Independent source-scaled1-4 product (-.3)*.4/(6/5) = -.1 e^2 even when the old stored charge product was zero")
 def test_zero_old_charge_product_can_become_active_mm14():
     s = fixture()
     M.correct_coulomb_exceptions(

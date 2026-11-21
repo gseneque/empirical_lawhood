@@ -7,20 +7,16 @@ from hashlib import sha256
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import FactorEventSpec, FactorRootRole
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import measure_trace
-from empirical_lawhood.adapters.methods.matrix_history_analysis import algebra
-from empirical_lawhood.adapters.simulators.six_matrix_response.factor_bridge import (
-    FactorBridge, FactorBridgeChart, decompose, factor_force, factor_frame_sha256,
-    lift, momentum_kick, native_coordinates, norm_matched_complement_force,
-    observe, readout, select_factor_bridge,
-)
-from empirical_lawhood.adapters.simulators.six_matrix_response.model import SixMatrixState, hermitian_part
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import FactorEventSpec, FactorRootRole
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import measure_trace
+from empirical_lawhood.domains.matrix.matrix_history_analysis import algebra
+from empirical_lawhood.domains.matrix.six_matrix_response.factor_bridge import FactorBridge, FactorBridgeChart, decompose, factor_force, factor_frame_sha256, lift, momentum_kick, native_coordinates, norm_matched_complement_force, observe, readout, select_factor_bridge
+from empirical_lawhood.domains.matrix.six_matrix_response.model import SixMatrixState, hermitian_part
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 
 
 def artifact(name, raw):

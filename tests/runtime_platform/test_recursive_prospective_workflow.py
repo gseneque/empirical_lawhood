@@ -8,18 +8,18 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.execution import RunnerResult, TaskOutputPayload
-from empirical_lawhood.runtime.executable_bindings import ExecutableBindingContribution, ExecutableCapabilityProviderFactoryRegistry, ExecutablePlatformPort, LayeredCampaignRuntimeProviderResolver, compose_executable_binding_aggregate
-from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry, ExternalInputPayload
-from empirical_lawhood.runtime.plans import ScientificInputRole
-from empirical_lawhood.runtime.recursive_compiler import RecursiveOperationRegistration, RecursivePortContract, compile_recursive_wave
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort, RecursiveOperationProviderFactory, recursive_input_port_key, recursive_operation_binding
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.execution import RunnerResult, TaskOutputPayload
+from empirical_lawhood.execution.executable_bindings import ExecutableBindingContribution, ExecutableCapabilityProviderFactoryRegistry, ExecutablePlatformPort, LayeredCampaignRuntimeProviderResolver, compose_executable_binding_aggregate
+from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry, ExternalInputPayload
+from empirical_lawhood.execution.plans import ScientificInputRole
+from empirical_lawhood.execution.recursive_compiler import RecursiveOperationRegistration, RecursivePortContract, compile_recursive_wave
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort, RecursiveOperationProviderFactory, recursive_input_port_key, recursive_operation_binding
 from tests.runtime_platform.test_recursive_compiler import Config, prospective_fixture
 
 
@@ -38,7 +38,7 @@ class _TypedFixtureRunner:
     def execute(self, context):
         process_check = ReceiptCheck("synthetic-process-" + str(os.getpid()), True, ())
         if context.task_id == 'evaluate':
-            from empirical_lawhood.adapters.reference_worlds.runtime import ReferenceAdjudicationFixture
+            from empirical_lawhood.domains.reference_worlds.runtime import ReferenceAdjudicationFixture
             sealed = tuple(port for port in context.input_ports if port.payload_schema == ReferenceAdjudicationFixture.SCHEMA)
             assert len(sealed) == 1
             fixture = decode_canonical_bytes(sealed[0].read(), ReferenceAdjudicationFixture, maximum_bytes=3000)
@@ -55,7 +55,7 @@ class _TypedFixtureRunner:
             if port.outcome_access is not OutcomeAccess.EVALUATION_SEALED:
                 port.read(port.size_bytes + 1)
         if context.task_id == 'freeze':
-            from empirical_lawhood.adapters.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
+            from empirical_lawhood.domains.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
             record = self.sealed_fixture or REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
         else:
             record = Config('product.' + context.task_id, 3)
@@ -72,8 +72,8 @@ def _registrations(compilation):
                       edge.maximum_size_bytes) for edge in sorted(compilation.template.graph.edges,
                       key=lambda value: value.consumer_input_id) if edge.consumer_node_id == step.step_id
                       and edge.scientific_role is not ScientificInputRole.CONFIGURATION)
-        from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-        from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
+        from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+        from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
         storage_codecs = MATRIX_STORAGE_CODECS if any(value.payload_schema == MATRIX_ARRAY_SCHEMA
             for value in (*ports, *step.outputs)) else ()
         values.append(RecursiveOperationRegistration(operation.selection, step.stage, Config, ports, step.outputs,
@@ -96,7 +96,7 @@ def _source_external(compilation):
 
 def _actual_source(compilation):
     """Replace deliberate old fixture digest labels with actually measured bytes."""
-    from empirical_lawhood.runtime.source_resolution import SourceMaterializationConfig, SourceReadMode
+    from empirical_lawhood.execution.source_resolution import SourceMaterializationConfig, SourceReadMode
     from tests.experiment_entry_support import standard_authoring_for_draft
     external = _source_external(compilation)
     raw = FixtureCanonicalSource('synthetic common source').canonical_bytes()
@@ -130,7 +130,7 @@ class _FixtureSupplier:
         self.calls = 0
 
     def resolve_input(self, spec):
-        from empirical_lawhood.adapters.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
+        from empirical_lawhood.domains.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
         self.calls += 1
         row = self.configs.get(spec.logical_artifact_id)
         parents = ()
@@ -151,10 +151,10 @@ class _FixtureSupplier:
 
 
 def _factories(compilation, supplier, sealed_fixture=None, *, registrations=None):
-    from empirical_lawhood.adapters.composition.discovery import bundle
-    from empirical_lawhood.adapters.composition.generated_extension_bundles import EXTENSION_BUNDLE_CONTRIBUTIONS
+    from empirical_lawhood.execution.declaration_helpers import bundle
+    from empirical_lawhood.execution.generated_extension_bundles import EXTENSION_BUNDLE_CONTRIBUTIONS
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_BINDING_CONTRIBUTIONS, EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
-    from empirical_lawhood.runtime.extension_bundles import ExtensionContributionKind, compose_extension_bundle_aggregate
+    from empirical_lawhood.execution.extension_bundles import ExtensionContributionKind, compose_extension_bundle_aggregate
     discoveries, factories, ports = [], [], []
     codecs = dict(compilation.output_codecs)
     for registration in _registrations(compilation) if registrations is None else registrations:
@@ -179,7 +179,7 @@ def _factories(compilation, supplier, sealed_fixture=None, *, registrations=None
 
 
 def _issued_fixture(tmp_path, compilation, authoring, context):
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring.executable_binding import REGISTRATION
+    from empirical_lawhood.methods.recursive_scientific_authoring.extension import REGISTRATION
     from tests.issued_study_support import build_issued_study_fixture
     from tests.runtime_platform.test_study_issue import _issue_api_fixture
     return build_issued_study_fixture(tmp_path,
@@ -193,12 +193,12 @@ def _authored_handoff_fixture(tmp_path, monkeypatch, *, sealed_fixture=None, rev
     from empirical_lawhood.api.facade import EmpiricalLawhoodApi
     from empirical_lawhood.api.results import CompileCandidateRequest
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY
-    from empirical_lawhood.adapters.methods.recursive_scientific_authoring.executable_binding import REGISTRATION
-    from empirical_lawhood.adapters.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
-    from empirical_lawhood.infrastructure.candidate_sources import ExternalCandidateInputPublisher
+    from empirical_lawhood.methods.recursive_scientific_authoring.extension import REGISTRATION
+    from empirical_lawhood.domains.reference_worlds.runtime import REFERENCE_NEGATIVE_ADJUDICATION_FIXTURE
+    from empirical_lawhood.storage.candidate_sources import ExternalCandidateInputPublisher
     from tests.prospective_source_capture_fixture import SyntheticSourceInspector, synthetic_capture
-    from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveAuthoringSpec, RecursiveProspectiveOperand
-    from empirical_lawhood.runtime.study_issue import project_standard_study_extensions
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveAuthoringSpec, RecursiveProspectiveOperand
+    from empirical_lawhood.execution.study_issue import project_standard_study_extensions
     from tests.runtime_platform.test_deadline_free_execution_package import _execution_package_fixture, _compile as compile_resource_fixture
     from tests.runtime_platform.test_study_issue import _issue_api_fixture, _publisher
 
@@ -209,8 +209,8 @@ def _authored_handoff_fixture(tmp_path, monkeypatch, *, sealed_fixture=None, rev
     base_dir.mkdir()
     scaffold_api, scaffold_paths, external, custody = _issue_api_fixture(base_dir, standard_fixture=lambda: (standard, formal))
     plane = _publisher(external, custody).artifact_plane
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
-    from empirical_lawhood.runtime.recursive_storage_codecs import storage_codec_census
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.storage.contracts.recursive_storage_codecs import storage_codec_census
     plane.validators = ArtifactProfileValidatorRegistry(binary_codecs=storage_codec_census(_registrations(compilation)))
     resources_dir = tmp_path / 'resource-fixture'
     resources_dir.mkdir()
@@ -311,10 +311,10 @@ def _issue_public_handoff(tmp_path, monkeypatch, *, handoff_parts, namespace='pu
     from empirical_lawhood.api.models import assemble_issued_study_package, assemble_experiment_package
     from empirical_lawhood.api.results import IssueExtensionsRequest
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY
-    from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore
-    from empirical_lawhood.planning.study_issue import StudyAuthorityKind
-    from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCandidate, ExecutableStudyCompilationReport
-    from empirical_lawhood.runtime.study_issue import build_study_approval_proposal
+    from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.design.study_issue import StudyAuthorityKind
+    from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCandidate, ExecutableStudyCompilationReport
+    from empirical_lawhood.execution.study_issue import build_study_approval_proposal
     from tests.approval_support import FixedDecisionClock
     from tests.issued_study_support import _approval_service, _authorize
     from tests.runtime_platform.test_study_issue import _AuthorityStore, _PassthroughSourceInspector, _issue_request
@@ -331,7 +331,7 @@ def _issue_public_handoff(tmp_path, monkeypatch, *, handoff_parts, namespace='pu
     else:
         raise TypeError('public issue scaffold requires its exact executable candidate')
     base_candidate = candidate.base_candidate
-    from empirical_lawhood.planning.study_issue import HumanProposerAttestation, ImplementationSourceClosure
+    from empirical_lawhood.design.study_issue import HumanProposerAttestation, ImplementationSourceClosure
     original = decode_canonical_bytes(paths['attestation'].read_bytes(), HumanProposerAttestation, maximum_bytes=1024**2)
     attestation = replace(original, attestation_id='attestation.' + namespace + '.base', candidate=ObjectIdentity.from_record(base_candidate.candidate_id, base_candidate),
         design_origin_id=base_candidate.base_candidate.design_origin.origin_id,
@@ -422,12 +422,12 @@ def _run_public_handoff(tmp_path, *, issued_parts, exercise_reveal_stop=False, p
     from empirical_lawhood.api.execution import CampaignExecutionService
     from empirical_lawhood.api.results import RunCampaignRequest
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY
-    from empirical_lawhood.infrastructure.execution import DurableExecutionResourceEnvelopeCoordinator
-    from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
-    from empirical_lawhood.infrastructure.study_issue import ExternalIssuedExtensionPayloadSource, ExternalIssuedStudyPublisher
-    from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.runtime.issued_extension_payloads import IssuedExtensionPayloadResolver
+    from empirical_lawhood.execution.local.execution import DurableExecutionResourceEnvelopeCoordinator
+    from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+    from empirical_lawhood.storage.study_issue import ExternalIssuedExtensionPayloadSource, ExternalIssuedStudyPublisher
+    from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.execution.issued_extension_payloads import IssuedExtensionPayloadResolver
     from tests.execution_support import EnforcingTestTaskExecutor
     from tests.runtime_platform.test_study_issue import _PassthroughSourceInspector
 
@@ -442,7 +442,7 @@ def _run_public_handoff(tmp_path, *, issued_parts, exercise_reveal_stop=False, p
     class CountingExecutor(EnforcingTestTaskExecutor):
         invocations = 0
         def __init__(self):
-            from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+            from empirical_lawhood.execution.local.execution import LocalProcessExecutor
             super().__init__(delegate=LocalProcessExecutor(scratch_root=plane.root) if process_workers else None)
             self.prepared_invocations = []
             self.worker_process_ids = []
@@ -535,10 +535,8 @@ def test_public_authored_issue_package_execution_reveal_and_receipt_recovery(tmp
 
 
 def test_public_reveal_terminal_retains_actual_revealed_scientific_scope(tmp_path, monkeypatch):
-    from empirical_lawhood.infrastructure.execution_resource_envelopes import (
-        ExternalExecutionResourceEnvelopeStore, read_execution_launch_event,
-    )
-    from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeEventKind
+    from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore, read_execution_launch_event
+    from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeEventKind
     fixture = _public_run_handoff_fixture(tmp_path, monkeypatch, reveal_terminal=True)
     assert fixture.adjudication.outcome_access is OutcomeAccess.EVALUATION_REVEALED
     assert fixture.adjudication.visibility_ceiling is VisibilityCeiling.OUTCOME_VISIBLE
@@ -557,7 +555,7 @@ def test_public_reveal_terminal_retains_actual_revealed_scientific_scope(tmp_pat
 
 def test_actual_issued_common_graph_reconstructs_without_constructor_capture_and_refuses_missing_authority(tmp_path):
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY
-    from empirical_lawhood.runtime.issued_extension_payloads import IssuedExtensionPayloadResolver, reconstruct_executable_provider, verify_executable_provider_recovery
+    from empirical_lawhood.execution.issued_extension_payloads import IssuedExtensionPayloadResolver, reconstruct_executable_provider, verify_executable_provider_recovery
     original, _, _ = prospective_fixture(typed_outputs=True)
     compilation, authoring, context, raw, _ = _actual_source(original)
     fixture = _issued_fixture(tmp_path, compilation, authoring, context)

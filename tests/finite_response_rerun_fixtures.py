@@ -3,6 +3,7 @@
 The proposer identities, authority records and scientific responses are fictional.
 These records can neither issue a real study nor qualify a real cohort.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import dataclass, replace
 from decimal import Decimal
@@ -10,21 +11,21 @@ import json
 import numpy as np
 from hashlib import sha256
 
-from empirical_lawhood.adapters.composition.finite_response_law.rerun_input import FiniteResponseLawCurrentPublication
-from empirical_lawhood.infrastructure.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.study_issue import AccountableHumanIdentity, HumanProposerAttestation, ImplementationSourceClosure, StudyAuthorityKind, StudyOperationAuthority
-from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCompilationReport
-from empirical_lawhood.runtime.study_issue import prepare_study_issue, prepare_executable_study_issue, build_study_approval_proposal, MAX_COMPOSED_PROGRAMME_CONTROL_BYTES
-from empirical_lawhood.kernel.evidence import VisibilityCeiling
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest, ArtifactStreamWriteRequest, ArtifactProfile, ArtifactLineageParent, CanonicalTaskReceipt, ReceiptCheck, lineage_parent_sort_key
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_artifact_manifest
-from empirical_lawhood.adapters.composition.finite_response_law.rerun_input import FiniteResponseLawCurrentParent
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.rerun_input import FiniteResponseLawCurrentPublication
+from empirical_lawhood.storage.study_issue import ExternalIssuedStudyPublisher, ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.study_issue import AccountableHumanIdentity, HumanProposerAttestation, ImplementationSourceClosure, StudyAuthorityKind, StudyOperationAuthority
+from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCompilationReport
+from empirical_lawhood.execution.study_issue import prepare_study_issue, prepare_executable_study_issue, build_study_approval_proposal
+from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactStreamWriteRequest, ArtifactProfile, ArtifactLineageParent, CanonicalTaskReceipt, ReceiptCheck, lineage_parent_sort_key
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.rerun_input import FiniteResponseLawCurrentParent
 
 
 @dataclass(frozen=True)
@@ -39,8 +40,8 @@ class CurrentIssueFixture:
 
 def _approve_current_publication(plane, published, system, *, label, trust_directory):
     """Obtain structurally real approvals from explicitly synthetic test signers."""
-    from empirical_lawhood.kernel.authority import AuthorityAction, SourceAccessClass
-    from empirical_lawhood.planning.approval import ApprovalCheckerRegistry, AttestationResult, issue_approval_gate_attestation
+    from empirical_lawhood.science.identity.authority import AuthorityAction, SourceAccessClass
+    from empirical_lawhood.design.approval import ApprovalCheckerRegistry, AttestationResult, issue_approval_gate_attestation
     from empirical_lawhood.api.composition import compose_operator_approval_runtime
     from tests.approval_support import FixedDecisionClock, deterministic_approval_signer
     from tests.runtime_platform.test_study_approval import _checker_registrations
@@ -90,7 +91,7 @@ def publish_current_issue(plane, handoff, *, label):
         payloads = bundle.payloads
         registrations = bundle.decoder_registrations
     report = decode_canonical_bytes((directory / "candidate-report.json").read_bytes(),
-        ExecutableStudyCompilationReport, maximum_bytes=MAX_COMPOSED_PROGRAMME_CONTROL_BYTES)
+        ExecutableStudyCompilationReport, maximum_bytes=None)
     closure = decode_canonical_bytes((directory / "source-closure.json").read_bytes(),
         ImplementationSourceClosure, maximum_bytes=65536)
     candidate, base_candidate = report.candidate, report.base_report.candidate
@@ -166,7 +167,7 @@ def publish_current_issue(plane, handoff, *, label):
         execution_authority=execution, execution_resource_envelope_spec=handoff.resources,
         predevelopment_jit_signature_census=None, jit_graph_signature_manifest=None,
         run_plan_id=run_id, grantee_id="operator.execution-service", at_utc=at_utc)
-    from empirical_lawhood.runtime.compiler import compile_run_plan, lower_run_plan
+    from empirical_lawhood.execution.compiler import compile_run_plan, lower_run_plan
     plan = compile_run_plan(run_plan_id=run_id, campaign=base.campaign, system=base.system,
         experiment=package.experiment, frozen_proposal=frozen, authorization=approval,
         template=base.protocol, registry=context.base.registry, implementation_commit=closure.implementation_commit,
@@ -217,8 +218,8 @@ def publish_native_parent(plane, handoff, issue, *, label, native=None):
 
 def publish_current_step_output(plane, issue, *, label, record, task_id=None, input_materialization_ids=()):
     """Retain one typed fictional result and its full issued sibling output census."""
-    from empirical_lawhood.infrastructure.execution import DurableExecutionResourceEnvelopeCoordinator
-    from empirical_lawhood.infrastructure.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
+    from empirical_lawhood.execution.local.execution import DurableExecutionResourceEnvelopeCoordinator
+    from empirical_lawhood.execution.resources.execution_resource_envelopes import ExternalExecutionResourceEnvelopeStore
 
     task = next(task for task in issue.execution_plan.tasks
         if (task_id is None or task.task_id == task_id)
@@ -264,7 +265,7 @@ def publish_current_step_output(plane, issue, *, label, record, task_id=None, in
         outcome_access=OutcomeAccess.EVALUATOR_REVEAL)
     coordinator.observe_receipt(**dispatch, event_id=f"resource-envelope-event.{attempt}.receipt",
         receipt=ObjectIdentity.from_record(receipt.receipt_id, receipt), valid_receipt=True, scientific_terminal=True)
-    manifests = tuple(sorted((decode_artifact_manifest(plane.root.resolve(result.manifest_materialization.relative_path, for_write=False).read_bytes())
+    manifests = tuple(sorted((resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.manifest_materialization.relative_path, for_write=False).read_bytes())
         for result in outputs), key=lambda manifest: manifest.materialization.materialization_id))
     primary = next(result for result in outputs if result.logical.payload_schema == record.SCHEMA)
     return receipt, manifests, primary
@@ -277,9 +278,9 @@ def nominated_synthetic_native(source, nomination, directory):
     from the fixed nomination so this fixture cannot test scientific accuracy.
     """
     from tests.finite_response_custody_fixtures import synthetic_native
-    from empirical_lawhood.adapters.methods.finite_response_law.frozen_package import frozen_development
-    from empirical_lawhood.adapters.methods.finite_response_law.assigned_prediction import before_parent
-    from empirical_lawhood.adapters.methods.finite_response_law.science import PARENTS
+    from empirical_lawhood.domains.matrix.finite_response_law.frozen_package import frozen_development
+    from empirical_lawhood.domains.matrix.finite_response_law.assigned_prediction import before_parent
+    from empirical_lawhood.domains.matrix.finite_response_law.science import PARENTS
 
     points, widths = frozen_development(report_bytes=(directory / "development-report.json").read_bytes(),
         coefficient_bytes=(directory / "coefficients.transport.json").read_bytes(),
@@ -309,13 +310,13 @@ def nominated_synthetic_native(source, nomination, directory):
 
 def qualify_nominated_fixture(plane, config, native, native_receipt, directory):
     """Use the actual sole qualification service on explicitly fictional observations."""
-    from empirical_lawhood.adapters.methods.finite_response_law.calibration_operands import calibration_operands
-    from empirical_lawhood.adapters.methods.finite_response_law.method_records import FiniteResponseLawAssignedCalibrationReport, READOUT_SCHEMA, CALIBRATE
-    from empirical_lawhood.adapters.methods.finite_response_law.terminal import qualify_calibration
-    from empirical_lawhood.adapters.methods.finite_response_law.executable_binding import METHOD_CAPABILITY
-    from empirical_lawhood.adapters.composition.finite_response_law.design import qualification_system
-    from empirical_lawhood.infrastructure.candidate_payloads import ExternalCandidatePayloadPlane
-    from empirical_lawhood.runtime.execution import DependencyReceiptBinding
+    from empirical_lawhood.domains.matrix.finite_response_law.calibration_operands import calibration_operands
+    from empirical_lawhood.domains.matrix.finite_response_law.method_records import FiniteResponseLawAssignedCalibrationReport, READOUT_SCHEMA, CALIBRATE
+    from empirical_lawhood.domains.matrix.finite_response_law.terminal import qualify_calibration
+    from empirical_lawhood.domains.matrix.finite_response_law.extension import METHOD_CAPABILITY
+    from empirical_lawhood.domains.matrix.finite_response_law.authoring.design import qualification_system
+    from empirical_lawhood.storage.candidate_payloads import ExternalCandidatePayloadPlane
+    from empirical_lawhood.execution.execution import DependencyReceiptBinding
 
     report_bytes = (directory / "development-report.json").read_bytes()
     coefficients = (directory / "coefficients.transport.json").read_bytes()

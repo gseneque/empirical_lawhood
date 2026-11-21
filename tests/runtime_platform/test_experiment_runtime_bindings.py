@@ -2,12 +2,13 @@
 """Declared API composition selection, without constructing a runtime or source."""
 
 from dataclasses import replace
+from types import SimpleNamespace
 
 import pytest
 
 from empirical_lawhood.api import generated_experiment_runtime_bindings as generated
 from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding
-from empirical_lawhood.runtime.experiment_preparation import ExperimentProtocolDeclaration, ExperimentRuntimeBinding
+from empirical_lawhood.execution.experiment_preparation import ExperimentProtocolDeclaration, ExperimentRuntimeBinding
 from tests.runtime_platform.test_recursive_compiler import Config
 
 
@@ -55,11 +56,11 @@ def test_installed_protected_protocol_joins_only_its_own_api_and_file_owners():
     from empirical_lawhood.api.experiment_preparation import _file_byte_limit, experiment_protocols
     from empirical_lawhood.api.matrix_protected_experiment import bind_protected_factorial_experiment_handoff
     from empirical_lawhood.api.recursive_operations import operation_storage_codecs
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.compact_records import ScheduledCompactBank
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_reduction import ScheduledProgrammeReduction
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_selection import ScheduledRevisionDataBank
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.protected_factorial_specification import PROTOCOL_ID
-    from empirical_lawhood.kernel.references import ArtifactIdentity
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.compact_records import ScheduledCompactBank
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_reduction import ScheduledProgrammeReduction
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_selection import ScheduledRevisionDataBank
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.protected_factorial_specification import PROTOCOL_ID
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
 
     declared = experiment_protocols()
     from empirical_lawhood.api.experiment_runtime_bindings import validate_experiment_runtime_binding
@@ -102,7 +103,7 @@ def test_retained_development_specification_selects_its_installed_api_binder(mon
     from empirical_lawhood.api.recursive_execution import _development_runtime_supplier
 
     selected = replace(protocol(), requires_development_runtime_binding=True)
-    calls, wrapped = [], object()
+    calls, wrapped = [], SimpleNamespace(resolve_input=forbidden)
     def bind(**values):
         calls.append(values)
         return wrapped

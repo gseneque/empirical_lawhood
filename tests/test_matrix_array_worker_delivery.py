@@ -9,22 +9,19 @@ import shutil
 import numpy as np
 import pytest
 
-from empirical_lawhood.infrastructure.matrix_array_io import encode_matrix_arrays, iter_worker_matrix_array_chunks
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import (
-    MATRIX_ARRAY_SCHEMA, MATRIX_NATIVE_PURPOSES, MatrixAllocation, MatrixPurposeSeed,
-    MatrixRootAllocation, SavedMatrixArrays,
-)
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, ArtifactSemanticValidationRegistry
-from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-from empirical_lawhood.runtime.recursive_handoff import RecursiveWaveMember
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import encode_matrix_arrays, iter_worker_matrix_array_chunks
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA, MATRIX_NATIVE_PURPOSES, MatrixAllocation, MatrixPurposeSeed, MatrixRootAllocation, SavedMatrixArrays
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ArtifactSemanticValidationRegistry
+from empirical_lawhood.execution.execution import VerifiedArtifactInput
+from empirical_lawhood.execution.recursive_handoff import RecursiveWaveMember
 from tests.test_recursive_public_service import _plane as _standard_plane
 
 def _plane(root):
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
 
     plane = _standard_plane(root)
     plane.validators = ArtifactProfileValidatorRegistry(binary_codecs=MATRIX_STORAGE_CODECS)
@@ -87,7 +84,7 @@ def test_actual_npz_port_delivers_complete_complex_census_after_relocation(tmp_p
 
 def test_lazy_authored_npz_member_keeps_exact_raw_identity_and_custody(tmp_path):
     from pathlib import Path
-    from empirical_lawhood.infrastructure.recursive_custody import AuthenticatedRecursivePayloads
+    from empirical_lawhood.storage.recursive_custody import AuthenticatedRecursivePayloads
 
     plane, _, manifest, _, raw, _ = stock(tmp_path)
     member = RecursiveWaveMember("selected.npz", ObjectIdentity("recursive-member.exposed-arrays",
@@ -165,10 +162,11 @@ def test_selected_npz_profile_refuses_unsupported_or_pickle_values(tmp_path, dty
 
 def test_recursive_raw_output_has_capability_semantics_and_exact_port_custody(tmp_path):
     """Use registered output mechanics; this is an exposed software output."""
-    from empirical_lawhood.adapters.methods.analytic_material_inquiry.executable_binding import EXECUTABLE_BINDING_FACTORIES
-    from empirical_lawhood.runtime.plans import OutputTemplate
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationProviderFactory, recursive_operation_binding
-    from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+    from empirical_lawhood.domains.materials.analytic_material_inquiry.extension import EXTENSION as _extension_owner_1
+    EXECUTABLE_BINDING_FACTORIES = _extension_owner_1.factories
+    from empirical_lawhood.execution.plans import OutputTemplate
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationProviderFactory, recursive_operation_binding
+    from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
 
     template = EXECUTABLE_BINDING_FACTORIES[0]
     outputs = (OutputTemplate("arrays", MATRIX_ARRAY_SCHEMA, ArtifactProfile.MATRIX_ARRAY_NPZ,
@@ -180,8 +178,8 @@ def test_recursive_raw_output_has_capability_semantics_and_exact_port_custody(tm
     factory = RecursiveOperationProviderFactory(recursive_operation_binding(registration=registration,
         manifest=capability), registration, capability, template.runner_factory,
         {SavedMatrixArrays.SCHEMA: SavedMatrixArrays})
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationProvider
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationProvider
 
     registry = CapabilityRegistry("registry.exposed.array-output", (capability,))
     provider = RecursiveOperationProvider(registry, registration, capability, factory.runner_factory,
@@ -207,9 +205,10 @@ def test_recursive_raw_output_has_capability_semantics_and_exact_port_custody(tm
 
 @pytest.mark.parametrize("wrong", ("schema", "media", "profile"))
 def test_raw_output_seam_cannot_exempt_another_transport(wrong):
-    from empirical_lawhood.adapters.methods.analytic_material_inquiry.executable_binding import EXECUTABLE_BINDING_FACTORIES
-    from empirical_lawhood.runtime.plans import OutputTemplate
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationProviderFactory, recursive_operation_binding
+    from empirical_lawhood.domains.materials.analytic_material_inquiry.extension import EXTENSION as _extension_owner_2
+    EXECUTABLE_BINDING_FACTORIES = _extension_owner_2.factories
+    from empirical_lawhood.execution.plans import OutputTemplate
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationProviderFactory, recursive_operation_binding
 
     template = EXECUTABLE_BINDING_FACTORIES[0]
     schema = "empirical-lawhood/testing/another-array" if wrong == "schema" else MATRIX_ARRAY_SCHEMA

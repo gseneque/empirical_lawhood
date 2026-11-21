@@ -9,15 +9,15 @@ from typing import ClassVar
 
 import numpy as np
 
-from empirical_lawhood.adapters.methods.finite_response_law.science import FiniteResponseLawScienceSpec
-from empirical_lawhood.adapters.simulators.prepared_response.contracts import PreparedForceWord
-from empirical_lawhood.adapters.simulators.prepared_response.instruments import prepared_receiver
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.domains.matrix.finite_response_law.science import FiniteResponseLawScienceSpec
+from empirical_lawhood.domains.matrix.prepared_response.contracts import PreparedForceWord
+from empirical_lawhood.domains.matrix.prepared_response.instruments import prepared_receiver
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
 
-from .contracts import CANARY_PARENT, FiniteResponseLawNativeConfig, native_invocations
-from .discovery import SOURCE_CAPABILITY
-from .source import execute_native_phase, frozen_prefix_frame
+from empirical_lawhood.domains.matrix.finite_response_law.contracts import CANARY_PARENT, FiniteResponseLawNativeConfig, native_invocations
+from empirical_lawhood.adapters.simulators.finite_response_law.discovery import SOURCE_CAPABILITY
+from empirical_lawhood.domains.matrix.finite_response_law.source import execute_native_phase, frozen_prefix_frame
 
 
 @dataclass(frozen=True, slots=True)

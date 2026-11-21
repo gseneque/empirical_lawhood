@@ -21,8 +21,8 @@ import pytest
 from empirical_lawhood.api import execution as execution_owner
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.results import ResumeCampaignRequest
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.infrastructure.artifacts import ArtifactPlaneError
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.artifacts import ArtifactPlaneError
 from tests import test_reconcile_campaign_history as history
 
 case = history.interrupted

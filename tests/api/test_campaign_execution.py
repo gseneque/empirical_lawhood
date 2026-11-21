@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 # Adapted from the source project; synthetic software conformance only.
 from __future__ import annotations
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 import hashlib
 import json
@@ -13,75 +14,24 @@ import pytest
 from tests.approval_support import approval_service_for_path
 from tests.execution_support import EnforcingTestTaskExecutor
 
-from empirical_lawhood.adapters.reference_worlds.runtime import (
-    ReferenceAdjudicationFixture,
-    ReferenceCampaignRuntimeProvider,
-)
-from empirical_lawhood.api import (
-    CampaignStatusRequest,
-    CompileCampaignRequest,
-    DocumentRequest,
-    ResumeCampaignRequest,
-    RunCampaignRequest,
-    create_api,
-    load_authoring,
-)
-from empirical_lawhood.api.execution import (
-    CampaignExecutionService,
-    CampaignConcurrencyError,
-    CampaignInternalError,
-    CampaignIdentityError,
-    CampaignTaskError,
-    CampaignValidationError,
-)
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane,
-    FilesystemState,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.bounded_process import BoundedProcessResult
-from empirical_lawhood.infrastructure.execution import (
-    DirectTaskExecutor,
-    ExecutionResourceCapacity,
-    LiveLeaseError,
-    LocalExecutionResourceAdmitter,
-    LocalProcessExecutor,
-    ResourceAdmissionError,
-    SchedulerConsistencyError,
-    TaskProcessError,
-    operational_failure_diagnostic,
-)
-from empirical_lawhood.infrastructure.recovery import RunRecoveryError, decode_task_recovery_event
-from empirical_lawhood.infrastructure.sql import create_catalog_engine, upgrade_catalog
-from empirical_lawhood.infrastructure.task_receipts import (
-    ExternalTaskReceiptStore,
-    decode_artifact_manifest,
-)
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactProfile,
-    ExternalRootContract,
-)
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    decode_scientific_adjudication,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityKind
-from empirical_lawhood.runtime.execution import (
-    ExecutionAssuranceProfile,
-    OperationalFailureClass,
-    RunnerResult,
-    StreamedTaskOutput,
-    TaskOutputPayload,
-)
-from empirical_lawhood.runtime.recovery import TaskRecoveryEvent
-from empirical_lawhood.runtime.plans import ScientificStage
-from empirical_lawhood.runtime.providers import (
-    MAX_IN_MEMORY_EXTERNAL_INPUT_BYTES,
-    CampaignRuntimeProviderRegistry,
-    ExternalInputPayload,
-)
+from empirical_lawhood.domains.reference_worlds.runtime import ReferenceAdjudicationFixture, ReferenceCampaignRuntimeProvider
+from empirical_lawhood.api import CampaignStatusRequest, CompileCampaignRequest, DocumentRequest, ResumeCampaignRequest, RunCampaignRequest, create_api, load_authoring
+from empirical_lawhood.api.execution import CampaignExecutionService, CampaignConcurrencyError, CampaignInternalError, CampaignIdentityError, CampaignTaskError, CampaignValidationError
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, FilesystemState, GuardedExternalRoot
+from empirical_lawhood.execution.local.bounded_process import BoundedProcessResult
+from empirical_lawhood.execution.local.execution import DirectTaskExecutor, ExecutionResourceCapacity, LiveLeaseError, LocalExecutionResourceAdmitter, LocalProcessExecutor, ResourceAdmissionError, SchedulerConsistencyError, TaskProcessError, operational_failure_diagnostic
+from empirical_lawhood.storage.recovery import RunRecoveryError, decode_task_recovery_event
+from empirical_lawhood.storage.sql import create_catalog_engine, upgrade_catalog
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ExternalRootContract
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, decode_scientific_adjudication
+from empirical_lawhood.execution.capabilities import CapabilityKind
+from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, OperationalFailureClass, RunnerResult, StreamedTaskOutput, TaskOutputPayload
+from empirical_lawhood.execution.recovery import TaskRecoveryEvent
+from empirical_lawhood.execution.plans import ScientificStage
+from empirical_lawhood.execution.providers import MAX_IN_MEMORY_EXTERNAL_INPUT_BYTES, CampaignRuntimeProviderRegistry, ExternalInputPayload
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -616,9 +566,7 @@ def test_execution_identity_refuses_before_issued_payload_closure(
 
 @pytest.mark.parametrize("confirmed", (False, True))
 def test_missing_publication_validator_refuses_before_run_writes(tmp_path, confirmed):
-    from empirical_lawhood.infrastructure.artifacts import (
-        ArtifactIdentityConflict,
-    )
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
 
     class UnavailableValidator:
         def generic_validation(self, *, profile, payload_schema):
@@ -843,7 +791,7 @@ def test_reference_campaign_runs_with_negative_science_and_successful_operation(
     assert b"reference-negative-adjudication" not in catalog.read_bytes()
     assert external.joinpath('runs/synthetic-reference-run-plan/plans/campaign-package.json').is_file()
     for name in ("campaign-package", "run-plan", "execution-plan"):
-        manifest = decode_artifact_manifest(
+        manifest = resolve_artifact_sidecar_bytes(api._execution_service.artifact_plane,
             external.joinpath(
                 f"runs/synthetic-reference-run-plan/plans/{name}.json.manifest.json"
             ).read_bytes()
@@ -851,7 +799,7 @@ def test_reference_campaign_runs_with_negative_science_and_successful_operation(
         assert manifest.logical.visibility_ceiling is VisibilityCeiling.OUTCOME_VISIBLE
         assert manifest.logical.outcome_access is OutcomeAccess.EVALUATION_REVEALED
         assert manifest.logical.lineage_parents
-    report_manifest = decode_artifact_manifest(
+    report_manifest = resolve_artifact_sidecar_bytes(api._execution_service.artifact_plane,
         external.joinpath(
             'runs/synthetic-reference-run-plan/outputs/report/report.json.manifest.json'
         ).read_bytes()
@@ -1383,7 +1331,6 @@ def test_exhausted_worker_failure_is_operational_not_scientific(
     plan_path = external / 'runs/synthetic-reference-run-plan/plans/execution-plan.json'
     compact_limit = plan_path.stat().st_size - 1
     assert compact_limit > 1024
-    monkeypatch.setattr("empirical_lawhood.api.execution.MAX_CONTROL_PLANE_JSON_BYTES", compact_limit)
     normal_status = api.campaign_status(
         CampaignStatusRequest(
             'synthetic-reference-run-plan',

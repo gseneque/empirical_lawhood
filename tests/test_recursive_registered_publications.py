@@ -5,14 +5,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import commitment as e1_commitment
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import operation_bindings as e1
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import commitment as scheduled_commitment
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import compact_bindings as compact
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import compact_records
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import operation_bindings as scheduled
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.runtime.plans import ScientificStage
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import commitment as e1_commitment
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import operation_bindings as e1
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import commitment as scheduled_commitment
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import compact_bindings as compact
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import compact_records
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import operation_bindings as scheduled
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.execution.plans import ScientificStage
 
 OWNERS = (
     (e1, e1_commitment.E1CommitmentConfig, e1_commitment.authenticate_prior_publications,

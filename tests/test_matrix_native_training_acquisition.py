@@ -6,23 +6,23 @@ from pathlib import Path
 from types import SimpleNamespace
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_records as r
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_acquisition as acquisition
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_bindings import operation_declarations
-from empirical_lawhood.adapters.methods.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import coordinate_identity
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as sr
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import ScheduledExposureAudit, corpus_artifact, exposure_support
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.source_index import ScheduledSourceIndex
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, PreparedExperimentFile
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_records as r
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_acquisition as acquisition
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_bindings import operation_declarations
+from empirical_lawhood.domains.matrix.matrix_history_analysis.records import HISTORY_PURPOSES, MatrixHistorySeed
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import coordinate_identity
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole, MatrixProgrammeRoot
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as sr
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import ScheduledExposureAudit, corpus_artifact, exposure_support
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.source_index import ScheduledSourceIndex
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, PreparedExperimentFile
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
 
 def _whole_training_commitment(*, plane, train, future, candidate, mathematical, protocols, panels, template_publications):
@@ -35,27 +35,23 @@ def _whole_training_commitment(*, plane, train, future, candidate, mathematical,
     """
     from datetime import datetime
     from decimal import Decimal
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation.records import E1AllocationReservation
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.e6_transport_science import build_e6_transport_policy
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.input_records import (
-        ResolvedMatrixProgrammeInputs, ResolvedMatrixProgrammePhaseInputs, validate_programme_input_records,
-    )
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import (
-        PHASE_INPUT_ROLES, MatrixProgrammeInputCommitments, MatrixProgrammePhaseInputs, MatrixProgrammePublishedInput,
-    )
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseAssay, ScheduledResponsePanel
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion, ScheduledResponseSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation.records import E1AllocationReservation
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.e6_transport_science import build_e6_transport_policy
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.input_records import ResolvedMatrixProgrammeInputs, ResolvedMatrixProgrammePhaseInputs, validate_programme_input_records
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import PHASE_INPUT_ROLES, MatrixProgrammeInputCommitments, MatrixProgrammePhaseInputs, MatrixProgrammePublishedInput
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseAssay, ScheduledResponsePanel
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion, ScheduledResponseSelection
     from empirical_lawhood.api.matrix_programme_allocations import _source_plan
-    from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticate_programme_inputs
-    from empirical_lawhood.kernel.time import AvailabilitySpec, CausalPhase
-    from empirical_lawhood.planning.approval import SystemDecisionClock
+    from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticate_programme_inputs
+    from empirical_lawhood.science.models.time import AvailabilitySpec, CausalPhase
+    from empirical_lawhood.design.approval import SystemDecisionClock
     from tests.test_matrix_factor_confirmation_eligibility import publish
     from tests.test_matrix_programme_allocations import MATERIALS
     from tests.test_matrix_programme_scientific_design import build_scientific_design
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_streams import SelectedE4StreamRecipe, STREAM_RULE
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_streams import SelectedE4StreamRecipe, STREAM_RULE
 
     namespace = "native-training.disclosed-whole"
     base = build_scientific_design()
@@ -143,7 +139,7 @@ def _whole_training_commitment(*, plane, train, future, candidate, mathematical,
             publish(plane, value, scalar_owners[pin].artifact_id))
         for index, (pin, value) in enumerate(sorted(definitions.items(), key=lambda row: row[0].object_id)))
     normalization = scientific.full_factor_rule.scalar_closure.normalization_owner
-    source = Path(__file__).parents[1] / "src/empirical_lawhood/adapters/simulators/six_matrix_response/response_observer.py"
+    source = Path(__file__).parents[1] / "src/empirical_lawhood/package_data/scientific_originals/matrix_scalar_response_observer.py.txt"
     raw = source.read_bytes()
     assert (len(raw), sha256(raw).hexdigest()) == (normalization.size_bytes, normalization.sha256)
     normalization_pub = plane.write(ArtifactWriteRequest(normalization.artifact_id,
@@ -266,7 +262,7 @@ def fresh_training_metadata_case(tmp_path, *, training_count=1, exposed_stream_g
     This control does not establish real source qualification or freshness.
     """
     from empirical_lawhood.api import load_authoring
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
     from tests.test_matrix_factor_confirmation_eligibility import stock, provenance, publish
     from tests.test_matrix_scheduled_history import scheduled, CONSTRUCTION
     from tests.test_matrix_e3_protected_source_records import fixture, response_fixture
@@ -398,7 +394,7 @@ def fresh_training_metadata_case(tmp_path, *, training_count=1, exposed_stream_g
 
 @pytest.mark.parametrize("count", (1, 3))
 def test_native_training_contracts_bound_full_request_hashing_and_preserve_all_root_operands(tmp_path, monkeypatch, count):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_bindings import NativeTrainingOperationConfig
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_bindings import NativeTrainingOperationConfig
 
     case = fresh_training_metadata_case(tmp_path, training_count=count)
     expected = case.specification.identity, case.request.identity
@@ -427,7 +423,7 @@ def test_native_training_contracts_bound_full_request_hashing_and_preserve_all_r
 
 def test_public_native_training_preparation_compiles_exact_census_without_native_or_fits(tmp_path, monkeypatch):
     case = fresh_training_metadata_case(tmp_path)
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_training_bindings as bindings
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_training_bindings as bindings
     monkeypatch.setattr(bindings, "execute_parameter_native_work", lambda *a, **k: pytest.fail("metadata entered native prefix"))
     monkeypatch.setattr(bindings, "execute_paired_response_native_work", lambda *a, **k: pytest.fail("metadata entered native futures"))
     bound = acquisition.bind_inputs(case.specification, {"request": case.request}, files=case.template_files)
@@ -462,7 +458,7 @@ def test_native_training_export_preserves_frame_free_nonuse_and_complete_denomin
     feature = r.NativeTrainingFeature("feature.disclosed.native-training", public.root.independent_group_id,
         case.request.identity, public.source, causal, public.root.clock_id, public.coordinate.physical_time(public.policy.cutoff_tick),
         None, "NO_CAUSAL_ORIGIN", (), evidence)
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_methods import MatrixE3ViewOutcome
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_methods import MatrixE3ViewOutcome
     views = tuple(MatrixE3ViewOutcome(view, (None,) * 15, ("UNAVAILABLE",) * 15) for view in ("fine", "primary"))
     outcome = r.NativeTrainingOutcome("outcome.disclosed.native-training", feature.unit_id, feature.source_manifest,
         feature.native_source, feature.origin, feature.clock_id, feature.cutoff, None, views, "UNEVALUABLE", evidence)
@@ -551,7 +547,7 @@ def test_withheld_physics_cannot_be_renamed_into_separate_training_allocation(tm
     source = source_index.resolve(source_index.reference(source_id=case.source.source_id,
         root_id=case.source.root_id, provenance=case.source.provenance.identity))
     old_protocol = case.request.protocols[0]
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
     protocol = replace(old_protocol, public_source=ScheduledPublicSource.from_source(source),
         templates=replace(old_protocol.templates, source=sr.identity(source), producers=(sr.identity(source),)))
     candidate = replace(case.request.candidate_specification, role_coordinates=tuple((role,
@@ -566,9 +562,9 @@ def test_withheld_physics_cannot_be_renamed_into_separate_training_allocation(tm
 def test_configured_e3_public_sources_loader_accepts_exact_native_training_banks(tmp_path):
     """Real public file admission; disclosed nonuse records, no fit or native run."""
     from empirical_lawhood.api.experiment_preparation import load_experiment_inputs, load_experiment_specification
-    from empirical_lawhood.adapters.methods.matrix_factor_response.experiment_methods import MatrixE3ViewOutcome
-    from empirical_lawhood.kernel.references import ArtifactIdentity
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection
+    from empirical_lawhood.domains.matrix.matrix_factor_response.experiment_methods import MatrixE3ViewOutcome
+    from empirical_lawhood.science.identity.references import ArtifactIdentity
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection
 
     case = fresh_training_metadata_case(tmp_path)
     public = case.request.protocols[0].public_source
@@ -616,8 +612,8 @@ def test_configured_e3_public_sources_loader_accepts_exact_native_training_banks
 def test_e4_full_physical_exclusion_accepts_half_double_grid_and_refuses_renamed_t3(tmp_path):
     from itertools import product
     from decimal import Decimal
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import require_e4_reserved_physical_exclusion
-    from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import require_e4_reserved_physical_exclusion
+    from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
     case = fresh_training_metadata_case(tmp_path)
     reservation = case.request.future_manifest.reservation
     nominal = case.source.coordinate

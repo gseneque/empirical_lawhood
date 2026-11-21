@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as owner
 from tests.runtime_platform.test_recursive_compiler import fixture
 from tests.runtime_platform.test_prospective_preparation_contract import prepared  # noqa: F401
 
@@ -67,8 +67,8 @@ def test_operand_discovery_refuses_future_collection_on_native_wave_before_lower
 def test_component_config_merge_obeys_actual_public_sha_roster_guard(prepared,tmp_path,monkeypatch):  # noqa: F811
     """Disclosed roster control only: stop before source capture or admission."""
     from empirical_lawhood.api import prospective_experiment as public
-    from empirical_lawhood.planning.study_authoring import SourceAccessDisposition
-    from empirical_lawhood.runtime.recursive_prospective import RecursiveProspectiveDesignInputs
+    from empirical_lawhood.design.study_authoring import SourceAccessDisposition
+    from empirical_lawhood.execution.recursive_prospective import RecursiveProspectiveDesignInputs
 
     original,=prepared.source_configs
     candidates=tuple(replace(original,config_id='config.roster.'+str(index),

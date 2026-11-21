@@ -19,26 +19,24 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as p
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import parameter_audit as producer
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import preparation_integrity as legacy
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import physical_preparation_geometry as geometry
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import serialized_preparation_assessment as historical
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_contracts import DurableUnitReturn, geometry_keys
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.durable_roster import definitions as preparation_definitions
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import control_contracts as c
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_invocation import build_invocation
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_preparation_admission import decode_plan, validate_operands
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.control_roster import definitions as control_definitions
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.derived_model_admission import (
-    DerivedChemicalForcePlan, DerivedModelSupply, INDEPENDENT_OWNERS,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling.science import hardware_from_stdout
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as p
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import parameter_audit as producer
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import preparation_integrity as legacy
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import physical_preparation_geometry as geometry
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import serialized_preparation_assessment as historical
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_contracts import DurableUnitReturn, geometry_keys
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.durable_roster import definitions as preparation_definitions
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import control_contracts as c
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_invocation import build_invocation
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_preparation_admission import decode_plan, validate_operands
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.control_roster import definitions as control_definitions
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.derived_model_admission import DerivedChemicalForcePlan, DerivedModelSupply, INDEPENDENT_OWNERS
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling.science import hardware_from_stdout
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.native_subwork import NativeSubworkState
 from tests.test_rubisco_geometry_reuse import fresh, original as original  # noqa: F401
 from tests.test_rubisco_preparation_integrity import amber_text, exposed_preparation
 from tests.test_rubisco_serialized_coordinate_assessment import serialized_exposed, topology
@@ -103,8 +101,8 @@ class NoProducer(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in ('numpy','scipy','openmm','parmed','pdbfixer') or fullname.endswith('.parameter_audit'):
             raise AssertionError('producer/backend entered independent reader: '+fullname)
 sys.meta_path.insert(0,NoProducer())
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import amber_parameters as a,serialized_coordinate_assessment as s,contracts as p
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import amber_parameters as a,serialized_coordinate_assessment as s,contracts as p
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 root=Path(sys.argv[1]); selected=json.loads((root/'reader-input.json').read_bytes())
 model=decode_canonical_bytes(selected['model'].encode(),p.PreparedModel,maximum_bytes=None)
 atoms=tuple(SimpleNamespace(**(row|{'occupancy':D(row['occupancy']),'xyz_angstrom':tuple(D(x) for x in row['xyz_angstrom'])})) for row in selected['atoms'])
@@ -129,10 +127,11 @@ class NoBackend(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in ('numpy','scipy','openmm','parmed','pdbfixer') or fullname.endswith('.parameter_audit'):
             raise AssertionError('native producer/backend entered consumer proof: '+fullname)
 sys.meta_path.insert(0,NoBackend())
-from empirical_lawhood.adapters.methods.rubisco_insilico_sampling import control_native_entry as entry,control_preparation_admission as admission
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import science as preparation_science
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition
+from empirical_lawhood.adapters.rubisco.rubisco_insilico_sampling import control_native_entry as entry
+from empirical_lawhood.domains.rubisco.rubisco_insilico_sampling import control_preparation_admission as admission
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import science as preparation_science
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition
 root=Path(sys.argv[1]);data=json.loads((root/'consumer-invocation.json').read_bytes())
 first=decode_canonical_bytes(data['definitions'][0].encode(),NativeSubworkDefinition,maximum_bytes=None)
 observed={'admission_count':0,'roster_count':0}

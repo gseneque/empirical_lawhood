@@ -14,18 +14,13 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import (
-    ACTION_ROLES, PREDICTORS, MatrixFactorAction, MatrixFactorResponseModel,
-)
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import (
-    forecast as public, records as r, response_forecast as f,
-    response_records as rr, science,
-)
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import ACTION_ROLES, PREDICTORS, MatrixFactorAction, MatrixFactorResponseModel
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import forecast as public, records as r, response_forecast as f, response_records as rr, science
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays, encode_matrix_arrays
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 from tests.test_matrix_factor_confirmation_eligibility import (
     provenance as source_provenance, publish, stock as source_stock,
 )
@@ -115,9 +110,9 @@ def case(tmp_path_factory):
 
 def block_cold(monkeypatch):
     import scipy.linalg
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_derivatives, parameter_history_segments, parameter_source
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_derivatives, parameter_history_segments, parameter_source
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
     for owner, names in ((f, ('_hessian',)), (parameter_derivatives, ('hessian_image',)),
         (parameter_history_segments, ('acquire_parameter_segment',)), (parameter_source, ('acquire_parameter_history',)),
         (ExternalNativeEffectContactStore, ('begin',)), (ExternalNativeSubworkStore, ('begin', 'contact')),
@@ -259,17 +254,15 @@ def test_dense_forecast_uses_original_witnesses_and_keeps_three_sample_bytes(e4_
 
 
 def test_amended_seven_method_forecast_seals_all_horizons_and_independent_io_witnesses(e4_dense_case, monkeypatch):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_factor_response.origin_mechanics import (
-        MatrixIO48Construction, MatrixOriginResponseModel, ORIGIN_RESPONSE_PREDICTORS,
-    )
-    from empirical_lawhood.adapters.methods.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_science import validate_frozen_response_arrays
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_science
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_science import mechanical
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as utility
-    from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_science as utility_science
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation
+    from empirical_lawhood.domains.matrix.matrix_factor_response.origin_mechanics import MatrixIO48Construction, MatrixOriginResponseModel, ORIGIN_RESPONSE_PREDICTORS
+    from empirical_lawhood.domains.matrix.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_science import validate_frozen_response_arrays
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_science
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_science import mechanical
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as utility
+    from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_science as utility_science
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
 
     c = e4_dense_case
     mathematical = replace(c.f.bank.forecast_design.criterion_record,
@@ -296,7 +289,7 @@ def test_amended_seven_method_forecast_seals_all_horizons_and_independent_io_wit
         assert np.isfinite(arrays[view + '_io48']).all()
         assert arrays[view + '_factor_memory_curve'].shape == (128 * multiplier,)
         assert arrays[view + '_factor_escape_return'].shape == (2,)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_science import assess_paired_response_arrays
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_science import assess_paired_response_arrays
     responses = replace(c.responses, physical_forecast=ObjectIdentity.from_record(result.forecast_id, result),
         protocol=ObjectIdentity.from_record(protocol.protocol_id, protocol))
     observed = assess_paired_response_arrays(c.source, c.causal, c.prefix, c.prefix_arrays, result, arrays,
@@ -333,8 +326,8 @@ def test_amended_seven_method_forecast_seals_all_horizons_and_independent_io_wit
     assert summary.amended.adequacy.events == (outcome.amended.adequacy,)
     assert summary.amended.structural_advantage.events == (structural,)
     assert decode_canonical_bytes(summary.canonical_bytes(), utility.NativeUtilitySummary, maximum_bytes=None) == summary
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_specification import matched_e3_measurement
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_methods import paired_response_view_values
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_specification import matched_e3_measurement
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_methods import paired_response_view_values
     views, numerical = paired_response_view_values(SimpleNamespace(measurement=matched_e3_measurement()),
         c.source, protocol, c.panels, observed)
     assert numerical == 'SATISFIED' and tuple(view.view_id for view in views) == ('fine', 'primary')
@@ -344,11 +337,11 @@ def test_amended_seven_method_forecast_seals_all_horizons_and_independent_io_wit
             for horizon in DENSE_RESPONSE_HORIZONS)
     # The E4 dense products retain this already dense original score. These
     # publication headers are disclosed software operands, not fresh custody.
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryReadoutSelection
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.paired_target_reduction import paired_targets
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import full_factor_secondary_readout as readout
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as selected
-    from empirical_lawhood.adapters.methods.matrix_factor_response.matched_response_prediction import MATCHED_METHODS
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryReadoutSelection
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.paired_target_reduction import paired_targets
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import full_factor_secondary_readout as readout
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as selected
+    from empirical_lawhood.domains.matrix.matrix_factor_response.matched_response_prediction import MATCHED_METHODS
     from tests.test_matrix_selected_protected import unpublished
     target = replace(c.f.secondary_target, mathematical_protocol=mathematical)
     secondary = MatrixE4SecondaryReadoutSelection('exposed.amended.e4-secondary', mathematical.identity, target.identity,
@@ -402,8 +395,8 @@ def test_amended_seven_method_forecast_seals_all_horizons_and_independent_io_wit
 def test_dense_finite_score_uses_all_actual_branches_and_independent_hs24_norms(e4_dense_case, monkeypatch):  # noqa: F811
     from decimal import localcontext
 
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_science
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import branch_census
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import branch_census
 
     c = e4_dense_case
     before = c.original_score.canonical_bytes()
@@ -468,7 +461,7 @@ def test_dense_finite_score_uses_all_actual_branches_and_independent_hs24_norms(
 
 @pytest.mark.parametrize('member', ('original_forecast', 'dense_forecast', 'response'))
 def test_dense_score_refuses_changed_actual_archive_bytes(e4_dense_case, member):  # noqa: F811
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import response_science
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import response_science
 
     c = e4_dense_case
     arguments = dict(original_forecast_raw=c.original_forecast_raw,

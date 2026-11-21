@@ -6,23 +6,11 @@ SPDX-License-Identifier: MPL-2.0
 from pathlib import Path
 from time import monotonic
 
-from empirical_lawhood.adapters.methods.rc_prerequisite_chain.contracts import (
-    RCChainSummary,
-    RCChainUnitResult,
-    RCPrerequisiteChainConfig,
-)
-from empirical_lawhood.api.matrix_numerical_provenance import (
-    authenticate_recorded_matrix_provenance,
-    capture_matrix_provenance,
-    numerical_package_code_sha256,
-    selected_dependency_lock_sha256,
-)
-from empirical_lawhood.infrastructure.development_native_custody import (
-    DevelopmentNativeCustody,
-    preflight_development_native_store,
-)
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.domains.circuits.rc_prerequisite_chain.contracts import RCChainSummary, RCChainUnitResult, RCPrerequisiteChainConfig
+from empirical_lawhood.api.matrix_numerical_provenance import authenticate_recorded_matrix_provenance, capture_matrix_provenance, numerical_package_code_sha256, selected_dependency_lock_sha256
+from empirical_lawhood.storage.development_native_custody import DevelopmentNativeCustody, preflight_development_native_store
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
 
 
 def rc_chain_run_id(config: RCPrerequisiteChainConfig) -> str:
@@ -31,7 +19,7 @@ def rc_chain_run_id(config: RCPrerequisiteChainConfig) -> str:
 
 def prove_rc_chain(config: RCPrerequisiteChainConfig) -> dict[str, object]:
     """Inspect the complete design without importing numerical solvers or acquiring data."""
-    from empirical_lawhood.adapters.methods.rc_prerequisite_chain.science import prove_chain
+    from empirical_lawhood.domains.circuits.rc_prerequisite_chain.science import prove_chain
 
     proof = prove_chain(config)
     return {
@@ -91,10 +79,7 @@ def _present(config, summary, provenance):
 
 def read_rc_chain(*, config, artifact_writer, implementation_commit=None):
     """Authenticate every assigned unit and recompute only the retained reduction."""
-    from empirical_lawhood.adapters.methods.rc_prerequisite_chain.science import (
-        summarize_chain,
-        verify_unit_result,
-    )
+    from empirical_lawhood.domains.circuits.rc_prerequisite_chain.science import summarize_chain, verify_unit_result
 
     prove_rc_chain(config)
     producing_receipt = _receipt(config, artifact_writer, "producing-provenance")
@@ -128,11 +113,7 @@ def read_rc_chain(*, config, artifact_writer, implementation_commit=None):
 
 def run_rc_chain(*, config, artifact_writer, project_root: Path, implementation_commit, progress=None):
     """Run each assigned unit once; unknown contact refuses automatic repetition."""
-    from empirical_lawhood.adapters.methods.rc_prerequisite_chain.science import (
-        evaluate_unit,
-        summarize_chain,
-        verify_unit_result,
-    )
+    from empirical_lawhood.domains.circuits.rc_prerequisite_chain.science import evaluate_unit, summarize_chain, verify_unit_result
 
     started = monotonic()
     prove_rc_chain(config)

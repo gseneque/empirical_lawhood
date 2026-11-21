@@ -11,20 +11,18 @@ import tracemalloc
 
 import pytest
 
-from empirical_lawhood.adapters.methods.native_subwork_conformance import ExposedNativeSubworkRelayRunner
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.artifacts import STREAM_CHUNK_BYTES
-from empirical_lawhood.infrastructure.bounded_io import BoundedFileIOError
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, ResourceAdmissionError, TaskProcessError
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-from empirical_lawhood.infrastructure.native_subwork_ipc import (
-    NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.execution import StreamedTaskOutput, WorkerOutputPort
-from empirical_lawhood.runtime.execution_envelope import ProgressHeartbeat, ProgressLivenessContract
-from empirical_lawhood.runtime.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.methods.native_subwork_conformance import ExposedNativeSubworkRelayRunner
+from empirical_lawhood.storage.artifact_validation import ArtifactIdentityConflict
+from empirical_lawhood.storage.artifacts import STREAM_CHUNK_BYTES
+from empirical_lawhood.storage.bounded_io import BoundedFileIOError
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, ResourceAdmissionError, TaskProcessError
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.execution import StreamedTaskOutput, WorkerOutputPort
+from empirical_lawhood.execution.execution_envelope import ProgressHeartbeat, ProgressLivenessContract
+from empirical_lawhood.execution.native_subwork import NativeSubworkState, NativeSubworkUncertainContact
 from tests.runtime_platform.test_native_subwork import (
     _complete, _known_unreceipted_return, _plane, _process_context, _publish, _selected, _store,
 )

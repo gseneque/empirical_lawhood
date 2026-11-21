@@ -10,22 +10,22 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as owner, selected_e4_revision_preparation as public
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as owner, selected_e4_revision_preparation as public
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.test_matrix_selected_protected_worker import MemoryReader
 from tests.test_matrix_selected_e4_methods import selected_revision, selected_e4_populations, selected_bridge, transfer, pin  # noqa: F401
 from tests.test_matrix_selected_e4_public import campaign_fixture
-from empirical_lawhood.kernel.authority import ResourceBudget
+from empirical_lawhood.science.identity.authority import ResourceBudget
 
 def invocation(config, values, producers):
     declaration = next(row for row in owner.operation_declarations() if row.capability_key == owner.NAMESPACE + "." + config.operation)
@@ -89,7 +89,7 @@ def fitting_invocation(f):
     draft, _ = public.lower_development(f.editable, inputs)
     declaration = next(row for row in owner.operation_declarations() if row.capability_key.endswith(".revision-fit"))
     operation = next(row for row in draft.operations if row.selection.capability_key == declaration.capability_key)
-    from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+    from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
     config = decode_recursive_config_input(operation, declaration.registration()).record
     return invocation(config, {"programme": f.programme, "bank": f.bank, "acquisition": acquisition,
         "specification": f.specification, "reduction": f.reduction, "data": f.data}, {})

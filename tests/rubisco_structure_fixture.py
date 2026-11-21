@@ -6,8 +6,8 @@ from hashlib import sha256
 import json
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_structure import contracts as c
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import contracts as c
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 
 def historical_products():

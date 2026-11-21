@@ -4,14 +4,14 @@
 The enclosing public read owns current access, original native custody and
 complete denominators. This module creates no authority or scientific receipt.
 """
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
 
 def bound_mechanism(*, protocol, source, causal_record, physical_record, response_record,
         causal_arrays, frozen_arrays, response_arrays, panels, numerical_status, feature,
         score, subject_id, group_id, retain_instrument=False):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.mechanism_readout import same_bank_mechanism, compact_instrument
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_contract import MECHANISM_FEATURES
+    from empirical_lawhood.domains.matrix.matrix_factor_response.mechanism_readout import same_bank_mechanism, compact_instrument
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_contract import MECHANISM_FEATURES
 
     result = same_bank_mechanism(protocol, causal_arrays, frozen_arrays, response_arrays,
         panel_ids=tuple(sorted(panel.panel_id for panel in panels)), numerical_status=numerical_status,
@@ -31,16 +31,14 @@ def bound_mechanism(*, protocol, source, causal_record, physical_record, respons
 
 def configured_e3_mechanism(*, writer, plan, receipts, protocol, outcome, forecast, score, panels, product_reader, retention=None):
     """Follow actual score inputs, including their original consumed materializations."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_prefix_records import ConfiguredProtectedE3CausalPrefix
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_records import (
-        ConfiguredProtectedE3PhysicalForecast, ConfiguredProtectedE3NativeResponse,
-    )
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_response_preparation import response_task_id
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_prefix_records import ConfiguredProtectedE3CausalPrefix
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_records import ConfiguredProtectedE3PhysicalForecast, ConfiguredProtectedE3NativeResponse
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_response_preparation import response_task_id
     from empirical_lawhood.api.recursive_qualified_parents import _output_payload
-    from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_continued_response import ConfiguredE3ContinuedNativeResponse
+    from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_continued_response import ConfiguredE3ContinuedNativeResponse
 
-    from .configured_e3_retained_read import producing_custody
+    from empirical_lawhood.api.configured_e3_retained_read import producing_custody
     score_task = response_task_id(protocol.public_source.root.root_id, 'response-score')
     old = producing_custody(writer, plan, score_task)
     read_writer, read_plan, read_receipts = writer, plan, receipts
@@ -59,7 +57,7 @@ def configured_e3_mechanism(*, writer, plan, receipts, protocol, outcome, foreca
             'causal_feature': forecast.feature, 'response_array': None, 'instrument': None}
 
     def consumed(name):
-        from .configured_e3_retained_read import consumed_parent
+        from empirical_lawhood.api.configured_e3_retained_read import consumed_parent
         edges = tuple(edge for edge in task.scientific_inputs if edge.consumer_input_id == name)
         if len(edges) != 1:
             raise PermissionError('MECHANISM_READ_REQUIRES_ORIGINAL_CONSUMED_PRODUCER')
@@ -110,8 +108,8 @@ def configured_e3_mechanism(*, writer, plan, receipts, protocol, outcome, foreca
 
 def prepared_mechanism_projection(programme, rows):
     """Keep every assigned arm, and report native-frame map changes against HOLD."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.mechanism_readout import instrument_change, compact_instrument
-    from empirical_lawhood.kernel.serialization import canonical_value
+    from empirical_lawhood.domains.matrix.matrix_factor_response.mechanism_readout import instrument_change, compact_instrument
+    from empirical_lawhood.science.records.serialization import canonical_value
 
     fit = programme.selected_package.models.relation_fit
     if fit is None or not fit.selection.is_curve_primary:

@@ -5,19 +5,13 @@ import ast
 from copy import deepcopy
 from decimal import Decimal as D
 import json
-from pathlib import Path
+from importlib.resources import files
 from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import (
-    amber_parameters as parameters,
-    parameter_audit as producer,
-    preparation_integrity as historical,
-    physical_preparation_geometry as geometry,
-    serialized_coordinate_assessment as selected,
-)
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import amber_parameters as parameters, parameter_audit as producer, preparation_integrity as historical, physical_preparation_geometry as geometry, serialized_coordinate_assessment as selected
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_rubisco_coordinate_origin_validation import exposed
 from tests.test_rubisco_preamber_geometry_integrity import ter
 from tests.test_rubisco_physical_preparation_geometry import stock
@@ -70,7 +64,7 @@ def test_actual_producer_call_serializes_permuted_origins_for_independent_reader
     directory = tmp_path
     (directory / 'complete-heavy.pdb').write_text(args[3])
     (directory / 'model.inpcrd').write_text(args[4])
-    source = Path(producer.__file__).with_name(entry_name + '.py')
+    source = files('empirical_lawhood.adapters.rubisco.rubisco_insilico_dynamics').joinpath(entry_name + '.py')
     tree = ast.parse(source.read_text())
     calls = [node for node in ast.walk(tree) if isinstance(node, ast.Assign)
         and any(isinstance(target, ast.Subscript) and isinstance(target.value, ast.Name)

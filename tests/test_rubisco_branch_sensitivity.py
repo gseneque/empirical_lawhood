@@ -10,7 +10,7 @@ import sys
 
 import pytest
 
-from empirical_lawhood.adapters.physical.rubisco_kinetics import branch_sensitivity as b
+from empirical_lawhood.domains.rubisco.kinetics import branch_sensitivity as b
 
 
 def hypothetical(**changes):
@@ -214,7 +214,7 @@ class Refuse(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] in {'numpy', 'scipy', 'pyscf', 'h5py'}:
             raise AssertionError('native import during arithmetic discovery: ' + fullname)
 sys.meta_path.insert(0, Refuse())
-import empirical_lawhood.adapters.physical.rubisco_kinetics.branch_sensitivity
+import empirical_lawhood.domains.rubisco.kinetics.branch_sensitivity
 """
     result = subprocess.run(
         [sys.executable, "-B", "-c", script], cwd=Path(__file__).parent.parent,

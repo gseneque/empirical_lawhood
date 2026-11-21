@@ -1,23 +1,22 @@
 """Publish current RC source/export operands through the existing artifact plane."""
 
 from __future__ import annotations
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 from hashlib import sha256
 from typing import Callable, Mapping
 
-from empirical_lawhood.adapters.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeConfig
-from empirical_lawhood.adapters.simulator_morphism_challenges.numeric_inputs import (
-    RCChallengeExposureCensus, RCChallengeNumericSource, RCChallengeNumericInput,
-    RCChallengeNumericExportReceipt, allocate_numeric_source, export_numeric_source,
-    RCChallengeSourceExportConfig,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
-from empirical_lawhood.runtime.artifacts import ArtifactManifest, ArtifactMaterialization, ArtifactProfile, ArtifactWriter, ArtifactWriteRequest
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
+from empirical_lawhood.domains.history.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeConfig
+from empirical_lawhood.domains.history.simulator_morphism_challenges.numeric_inputs import RCChallengeExposureCensus, RCChallengeNumericSource, RCChallengeNumericExportReceipt, RCChallengeSourceExportConfig
+from empirical_lawhood.domains.history.simulator_morphism_challenges.numeric_publications import RCChallengeNumericInput, export_numeric_source
+from empirical_lawhood.adapters.simulator_morphism_challenges.numeric_inputs import allocate_numeric_source, authenticate_numeric_input
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactManifest, ArtifactMaterialization, ArtifactProfile, ArtifactWriter, ArtifactWriteRequest
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+
+
 
 
 MAXIMUM_RC_NUMERIC_INPUT_BYTES = 8 * 1024**2
@@ -56,8 +55,7 @@ def publish_rc_challenge_numeric_input(*, writer: ArtifactWriter,
     if manifest_reader is None:
         if not isinstance(writer, ExternalArtifactPlane):
             raise ValueError("numeric export requires the existing guarded plane or an explicit bounded manifest reader")
-        manifest_reader = lambda materialization: decode_artifact_manifest(read_bounded_bytes(
-            writer.root.resolve(materialization.relative_path, for_write=False), maximum_bytes=4 * 1024**2))
+        manifest_reader = lambda materialization: read_artifact_sidecar(writer, (writer.root.resolve(materialization.relative_path, for_write=False)).relative_to(writer.root.contract.canonical_path).as_posix(), maximum_bytes=4 * 1024 ** 2)
     authenticate_rc_exposure_census(exposure_census, prior_source_payloads)
     source = allocate_numeric_source(source_id=source_id, config=config, exposure_census=exposure_census,
                                      exposed_seed_hexes=exposed_seed_hexes)
@@ -83,14 +81,14 @@ def publish_rc_challenge_numeric_input(*, writer: ArtifactWriter,
     receipt_publication = writer.write(request("receipt", receipt))
     result = RCChallengeNumericInput(input_id, source, export, receipt, receipt_publication,
         manifest_reader(receipt_publication.manifest_materialization))
-    result.authenticate(writer)
+    authenticate_numeric_input(result, writer)
     return result
 
 
 def read_rc_challenge_numeric_input(payload: bytes, *, writer: ArtifactWriter) -> RCChallengeNumericInput:
     """Bounded typed replay with current payload/manifest custody verification."""
     result = decode_canonical_bytes(payload, RCChallengeNumericInput, maximum_bytes=MAXIMUM_RC_NUMERIC_INPUT_BYTES)
-    result.authenticate(writer)
+    authenticate_numeric_input(result, writer)
     return result
 
 

@@ -8,9 +8,9 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import origin_mechanics as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import science
-from empirical_lawhood.adapters.simulators.six_matrix_response.shooting import hermitian_basis
+from empirical_lawhood.domains.matrix.matrix_factor_response import origin_mechanics as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import science
+from empirical_lawhood.domains.matrix.six_matrix_response.shooting import hermitian_basis
 
 
 POLICY = owner.MatrixIO48Construction('matrix.io48.exposed-control')

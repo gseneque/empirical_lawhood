@@ -16,17 +16,15 @@ from empirical_lawhood.api.experiment_programme import ExperimentProgrammeServic
 from empirical_lawhood.api.experiment_scientific_read import read_prepared_experiment_science
 from empirical_lawhood.api.results import ApiResult, CampaignStatusRequest, OperationStatus
 from empirical_lawhood.api.matrix_training_provenance import fitted_training_provenance
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactProfile, ArtifactSemanticValidationRegistry, ArtifactWriteRequest, CanonicalTaskReceipt,
-)
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactSemanticValidationRegistry, ArtifactWriteRequest, CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort
 from tests.test_matrix_e3_protected_adjudication import prepared as adjudication_prepared
 from tests.test_matrix_e3_statistical_bindings import case as case, fitted as fitted
 from tests.test_matrix_e3_statistical_bindings_independent_review import sequence as sequence
@@ -97,7 +95,7 @@ def test_plain_reader_refuses_actual_declaration_semantics_before_trusted_regist
 
 def test_retained_science_registers_original_semantics_without_current_discovery(case, readout, monkeypatch):
     from empirical_lawhood.api import experiment_preparation, matrix_numerical_provenance, recursive_operations
-    from empirical_lawhood.runtime import compiler, recursive_compiler, recursive_provider
+    from empirical_lawhood.execution import compiler, recursive_compiler, recursive_provider
 
     def forbidden(*args, **kwargs):
         raise AssertionError('retained semantic read attempted current compilation, provider or source discovery')

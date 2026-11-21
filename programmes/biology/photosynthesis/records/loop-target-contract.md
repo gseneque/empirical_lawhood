@@ -1110,8 +1110,8 @@ capability leaves high-confidence nomination unsupported.
 
 ## First installed successor contracts
 
-The additive [kinetic supply](../../../../src/empirical_lawhood/adapters/methods/rubisco_prediction/kinetic_supply.py)
-and [assay join](../../../../src/empirical_lawhood/adapters/methods/rubisco_prediction/kinetic_assay_bridge.py)
+The additive [kinetic supply](../../../../src/empirical_lawhood/domains/rubisco/rubisco_prediction/kinetic_supply.py)
+and [assay join](../../../../src/empirical_lawhood/domains/rubisco/rubisco_prediction/kinetic_assay_bridge.py)
 retain exact material/assay identities, the complete supported-member roster,
 both endpoint bounds and optional complete four-constant kinetics. Missing KO
 or oxygenation kinetics remain unidentified. Covariance is supplied and checked

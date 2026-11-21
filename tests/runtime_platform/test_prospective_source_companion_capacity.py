@@ -10,7 +10,7 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import recursive_prospective_authoring as owner
-from empirical_lawhood.runtime.artifacts import ArtifactCustodyLimits
+from empirical_lawhood.storage.contracts.artifacts import ArtifactCustodyLimits
 from tests.prospective_source_capture_fixture import synthetic_capture
 from tests.test_prospective_source_admission import companions
 from tests import test_recursive_prospective_resource_preview as preview_fixtures
@@ -114,6 +114,6 @@ def test_retained_plan_reader_observes_the_same_selected_allowance(selected, mon
             result = load()
             assert result[2][name] == (directory / name).read_bytes()
         else:
-            with pytest.raises(ValueError, match=name + ".*selected custody runtime-plan byte allowance"):
+            with pytest.raises(ValueError, match=name + " exceeds its selected custody byte allowance control_record_bytes"):
                 load()
             assert name not in reads

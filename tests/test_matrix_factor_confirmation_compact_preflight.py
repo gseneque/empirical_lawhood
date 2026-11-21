@@ -11,25 +11,20 @@ import pytest
 
 from threadpoolctl import threadpool_limits
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import (
-    compact_bindings as owner, compact_preparation as domain, compact_records as records,
-)
-from empirical_lawhood.adapters.methods.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_bindings as owner, compact_preparation as domain, compact_records as records
+from empirical_lawhood.domains.matrix.matrix_response_study.numerical_runtime import MATRIX_PROVENANCE_REQUIREMENT
 from empirical_lawhood.api.recursive_authoring import implementation_binding
-from empirical_lawhood.infrastructure import execution as lifecycle
-from empirical_lawhood.infrastructure.numerical_provenance import selected_worker_environment
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.compiler import compile_run_plan, lower_run_plan
-from empirical_lawhood.runtime.execution import (
-    DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding,
-    ParentPreparedTaskRunner, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort,
-)
-from empirical_lawhood.runtime.plans import ScientificInputRole
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.execution.local import execution as lifecycle
+from empirical_lawhood.storage.numerical_provenance import selected_worker_environment
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.compiler import compile_run_plan, lower_run_plan
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, VerifiedArtifactInput, WorkerInputBinding, ParentPreparedTaskRunner, WorkerInputKind, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.execution.plans import ScientificInputRole
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_matrix_factor_confirmation_compact_declarative import _case
 from tests.test_matrix_factor_confirmation_eligibility import provenance, stock  # noqa: F401
 from tests.test_matrix_factor_confirmation_history import e1  # noqa: F401
@@ -49,7 +44,7 @@ def _context(case, *, compact=True, input_access_changes=()):
         draft, _, input_records = domain._derive(spec, selected)
         qualifications = selected.qualifications
     else:
-        from empirical_lawhood.adapters.methods.matrix_factor_confirmation import operation_bindings
+        from empirical_lawhood.domains.matrix.matrix_factor_confirmation import operation_bindings
         from tests.test_matrix_factor_confirmation_adjudication import prospective
         from tests.test_matrix_factor_confirmation_default_integration import _selected_records
         selected_owner = operation_bindings
@@ -103,7 +98,7 @@ def _context(case, *, compact=True, input_access_changes=()):
     if compact:
         commitment = records.commitment_for(selected.manifest, records.sources_for_manifest(selected.manifest))
     else:
-        from empirical_lawhood.adapters.methods.matrix_factor_confirmation.commitment import committed
+        from empirical_lawhood.domains.matrix.matrix_factor_confirmation.commitment import committed
         commitment_config = next(row.record for row in compiled.config_inputs
             if row.node_id == selected_owner.COMMIT_KEY)
         commitment = committed(commitment_config)
@@ -158,7 +153,7 @@ def test_e1_actual_graph_has_only_direct_native_operands_and_strict_worker_refus
         monkeypatch.setenv(name, value)
     def forbidden(*args, **kwargs):
         raise AssertionError('PURE preparation/readiness entered the native producer')
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
     monkeypatch.setattr(parameter_source, 'acquire_parameter_history', forbidden)
     with threadpool_limits(limits=1):
         case = request.getfixturevalue('e1')
@@ -214,7 +209,7 @@ def actual_e1_case(monkeypatch, request, provenance):  # noqa: F811
         monkeypatch.setenv(name, value)
     def forbidden(*args, **kwargs):
         raise AssertionError('configuration readiness entered native science')
-    from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_source
+    from empirical_lawhood.domains.matrix.six_matrix_response import parameter_source
     monkeypatch.setattr(parameter_source, 'acquire_parameter_history', forbidden)
     with threadpool_limits(limits=1):
         yield request.getfixturevalue('e1')
@@ -223,7 +218,7 @@ def actual_e1_case(monkeypatch, request, provenance):  # noqa: F811
 def _selected_owner(compact):
     if compact:
         return owner
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation import operation_bindings
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation import operation_bindings
     return operation_bindings
 
 

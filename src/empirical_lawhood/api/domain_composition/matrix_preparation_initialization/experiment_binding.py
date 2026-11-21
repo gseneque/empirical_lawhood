@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Explicit deterministic input generation; no provider or scientific authority."""
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_initialization import PROTOCOL_ID
-from empirical_lawhood.runtime.experiment_preparation import ExperimentRuntimeBinding
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_initialization import PROTOCOL_ID
+from empirical_lawhood.execution.experiment_preparation import ExperimentRuntimeBinding
 
 
 def derive_inputs(**kwargs):

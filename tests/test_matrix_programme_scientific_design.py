@@ -12,34 +12,32 @@ import sys
 import pytest
 
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import scientific_design as owner
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import scientific_design as owner
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_records import MatrixCouplingRecipe, original_schedule_recipe
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.records import MatrixFunctionalCriterion
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_prepared_choices import (
-    SelectedPreparedDevelopmentSpecification, SelectedPreparedProtectedSpecification, SelectedPreparedRecipeFamily,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.compact_records import E1CompactCriterion, E1FamilySize
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation.records import E1HistoryAllocation
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
-from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryTarget
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_records import NativeUtilityCriterion
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_factorial import E4_COMPARISONS, ScheduledFactorialComparison, mean_t_requirement
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_selection import ScheduledRevisionTarget, ScheduledRevisionTrigger, ScheduledRevisionTuning
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import coordinate_identity, identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseAssay
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Design
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_choices import SelectedE4FactorialChoices
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4NominationRule
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selection_specification import RevisionCandidateSelection
-from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experimental_factorial import PairInteractionScale
-from empirical_lawhood.runtime.experimental_statistics import PairedMeanTAlternative
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.preparation_records import MatrixCouplingRecipe, original_schedule_recipe
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.records import MatrixFunctionalCriterion
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedDevelopmentSpecification, SelectedPreparedProtectedSpecification, SelectedPreparedRecipeFamily
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.compact_records import E1CompactCriterion, E1FamilySize
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.records import E1HistoryAllocation
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
+from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryTarget
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_records import NativeUtilityCriterion
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_factorial import E4_COMPARISONS, ScheduledFactorialComparison, mean_t_requirement
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_selection import ScheduledRevisionTarget, ScheduledRevisionTrigger, ScheduledRevisionTuning
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import coordinate_identity, identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseAssay
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Design
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_choices import SelectedE4FactorialChoices
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4NominationRule
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selection_specification import RevisionCandidateSelection
+from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experimental_factorial import PairInteractionScale
+from empirical_lawhood.methods.statistics.experimental_statistics import PairedMeanTAlternative
 
 EXPERIMENTS = Path(__file__).parents[1] / 'programmes/foundations/emergent-structure/workflows'
 FAMILY = ('e1.recurrence-survival', 'e2.utility', 'e3.model', 'e4.aggregate-curvature',
@@ -121,7 +119,7 @@ def build_scientific_design():
     nomination = SelectedE4NominationRule('nomination-rule.software.e4', ('REVISION', 'ORIGINAL_E3'), D(0), 3, 3, D(1),
         ('e4.revision-baseline',), 'WHOLE_GROUP_MAX_ABSOLUTE_PAIRED_LOG_PREDICTION_LOSS_NINE_COORDINATES_ALL30', 4,
         PairedMeanTAlternative.LESS)
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.e4_structural_prediction import selected_structural_prediction
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.e4_structural_prediction import selected_structural_prediction
     structure = owner.MatrixE4StructuralChoices('structure.software.e4', protocol.full_factor_rule,
         policy.factor_numerical_design, ('PRIMARY', 'FINE'),
         'COMPLETE_ORIGINAL_LATTICE_ASSOCIATIVE_LIE_FACTOR_TRANSPORT_ORIGIN_FIXED_SCALAR_CONTRAST',
@@ -182,8 +180,8 @@ def matched_scientific_design():
 
 def test_amended_public_design_retains_exact_complete_counts_and_temperature_slice(matched_scientific_design):
     from empirical_lawhood.api.configuration import validate_configuration
-    from empirical_lawhood.adapters.methods.matrix_primary_family import AMENDED_PRIMARY_FAMILY
-    from empirical_lawhood.adapters.methods.matrix_factor_response.origin_mechanics import MatrixOriginResponseModel
+    from empirical_lawhood.domains.matrix.matrix_primary_family import AMENDED_PRIMARY_FAMILY
+    from empirical_lawhood.domains.matrix.matrix_factor_response.origin_mechanics import MatrixOriginResponseModel
     design = matched_scientific_design
     assert validate_configuration(EXPERIMENTS / 'matrix-programme/scientific-design.example.json',
         consumer='matrix-programme-scientific-design')['status'] == 'VALIDATED'
@@ -427,9 +425,9 @@ assert not any(forbidden(name) for name in sys.modules)
 guard = PureImports()
 sys.meta_path.insert(0, guard)
 try:
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme import scientific_design
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedDevelopmentSpecification
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_choices import SelectedE4FactorialChoices
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme import scientific_design
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedDevelopmentSpecification
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_choices import SelectedE4FactorialChoices
     assert scientific_design.MatrixProgrammeScientificDesign.VERSION == '3.0.0'
     assert SelectedPreparedDevelopmentSpecification.__module__.endswith('.selected_prepared_choices')
     assert SelectedE4FactorialChoices.__module__.endswith('.selected_e4_choices')

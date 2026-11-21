@@ -12,15 +12,12 @@ from dataclasses import dataclass
 from hashlib import sha256
 from types import MappingProxyType
 
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import (
-    ArtifactLineageParent, ArtifactManifest, ArtifactProfile, CanonicalTaskReceipt,
-    artifact_publication_member, lineage_parent_sort_key,
-)
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactManifest, ArtifactProfile, CanonicalTaskReceipt, artifact_publication_member, lineage_parent_sort_key
 
 _DEV = OutcomeAccess.DEVELOPMENT_VISIBLE, VisibilityCeiling.DEVELOPMENT_ONLY
 _BLIND = OutcomeAccess.OUTCOME_BLIND, VisibilityCeiling.PROSPECTIVE
@@ -141,15 +138,15 @@ class _Metadata:
 class _Packet(Mapping):
     """Exact packet-pinned canonical controls; binary members remain metadata."""
     def __init__(self, metadata, directory, packet):
-        from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_records import NativeTrainingAcquisitionSpecification
-        from empirical_lawhood.kernel.experimental_design import UnitAllocation
-        from empirical_lawhood.planning.recursive_authoring import RecursiveScientificSelection, RecursiveStudyDraft
-        from empirical_lawhood.runtime.candidate_compiler import StudyTemplate
-        from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-        from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-        from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
-        from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
-        from empirical_lawhood.runtime.scientific_graph_preservation import DevelopmentGraphPreservationReceipt
+        from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_records import NativeTrainingAcquisitionSpecification
+        from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+        from empirical_lawhood.design.recursive_authoring import RecursiveScientificSelection, RecursiveStudyDraft
+        from empirical_lawhood.execution.candidate_compiler import StudyTemplate
+        from empirical_lawhood.execution.capabilities import CapabilityRegistry
+        from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+        from empirical_lawhood.execution.plans import DevelopmentExecutionPlan, DevelopmentRunPlan
+        from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
+        from empirical_lawhood.execution.scientific_graph_preservation import DevelopmentGraphPreservationReceipt
         self.metadata, self.directory, self.packet = metadata, directory, packet
         self._readable = {
             'draft.json': RecursiveStudyDraft, 'implementation.json': RecursiveImplementationBinding,
@@ -165,7 +162,7 @@ class _Packet(Mapping):
                 expected=member.identity, width=member.size_bytes)
 
     def select_request(self, instance):
-        from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_records import NativeTrainingAcquisitionRequest
+        from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_records import NativeTrainingAcquisitionRequest
         kind=NativeTrainingAcquisitionRequest
         if len(instance.sources)!=1:
             raise PermissionError('native TRAIN metadata requires its sole exact current request source')
@@ -215,8 +212,8 @@ class _Packet(Mapping):
 def _external_metadata(metadata, packet, draft, plan):
     """Same frozen path/body/lineage contract as ordinary DEV _external_inputs."""
     from empirical_lawhood.api.recursive_authoring import _external_storage_contract
-    from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-    from .recursive_operations import operation_storage_codecs
+    from empirical_lawhood.execution.execution import VerifiedArtifactInput
+    from empirical_lawhood.api.recursive_operations import operation_storage_codecs
     storage_codecs = operation_storage_codecs()
     selected = {}
     for task in plan.tasks:
@@ -253,8 +250,8 @@ def _external_metadata(metadata, packet, draft, plan):
 
 
 def _receipt(metadata, index, task, candidate):
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
     store = ExternalTaskReceiptStore(metadata.writer)
     envelope = store._read_envelope(index.run_id, task.task_id, candidate.attempt_id)
     if envelope is None:
@@ -271,18 +268,15 @@ def _receipt(metadata, index, task, candidate):
 
 
 def _native_metadata(metadata, plan, index, task, receipt, by_task, inputs, source):
-    from empirical_lawhood.infrastructure.execution import LocalScheduler
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.native_parent_finalization import _native_parent_definitions
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.runtime.execution import VerifiedArtifactInput
-    from empirical_lawhood.runtime.native_effects import NativeEffectContact
-    from empirical_lawhood.runtime.native_subwork import (
-        NativeSubworkBegin, NativeSubworkContact, NativeSubworkDefinition, NativeSubworkRoster,
-        NativeSubworkCallEntry, NativeSubworkCallReturn, NativeSubworkCompletion,
-    )
-    from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract
+    from empirical_lawhood.execution.local.execution import LocalScheduler
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_parent_finalization import _native_parent_definitions
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.execution.execution import VerifiedArtifactInput
+    from empirical_lawhood.execution.native_effects import NativeEffectContact
+    from empirical_lawhood.execution.native_subwork import NativeSubworkBegin, NativeSubworkContact, NativeSubworkDefinition, NativeSubworkRoster, NativeSubworkCallEntry, NativeSubworkCallReturn, NativeSubworkCompletion
+    from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract
     dependencies = {key: tuple(VerifiedArtifactInput(logical, material) for logical, material in
         zip(row.output_logical_artifacts, row.output_materializations, strict=True)) for key, row in by_task.items()}
     actual = (*LocalScheduler._dependency_outputs(task, dependencies), *(inputs[row.logical_artifact_id] for row in task.external_inputs))
@@ -395,10 +389,10 @@ def _native_metadata(metadata, plan, index, task, receipt, by_task, inputs, sour
 
 def _operational_metadata(metadata, plan, index, by_task):
     """Reuse the real immutable recovery/event census, with no output reads."""
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.infrastructure.recursive_custody import _operational_census
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex, DevelopmentRunRecoveryTerminalEvent, TaskRecoveryEvent
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.recursive_custody import _operational_census
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex, DevelopmentRunRecoveryTerminalEvent, TaskRecoveryEvent
     metadata.control(index.index_relative_path,DevelopmentRunRecoveryIndex,expected_record=index)
     for binding in index.tasks:
         for path in (*(row.event_relative_path for row in binding.attempts),binding.nonattempt_event_relative_path):
@@ -431,19 +425,19 @@ def _operational_metadata(metadata, plan, index, by_task):
 
 def _source_publications(metadata, request):
     """Only exact original C/manifest handles; no body or source replay shortcut."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_publications import _manifest_publications
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammeInputCommitments
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.scientific_design import MatrixProgrammeScientificDesign
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation.records import E1AllocationReservation
-    from empirical_lawhood.adapters.methods.matrix_factor_response.eligibility import MatrixFactorExposureCensus
-    from empirical_lawhood.adapters.methods.matrix_parameter_factor.records import MatrixParameterScalarDefinition
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import ScheduledExposureAudit
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledResponseSelection
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.e6_transport_records import MatrixE6EmpiricalTransportPolicy
-    from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-    from empirical_lawhood.kernel.time import AvailabilitySpec
-    from empirical_lawhood.runtime.artifacts import ArtifactWriteResult
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_publications import _manifest_publications
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammeInputCommitments
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.scientific_design import MatrixProgrammeScientificDesign
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation.records import E1AllocationReservation
+    from empirical_lawhood.domains.matrix.matrix_factor_response.eligibility import MatrixFactorExposureCensus
+    from empirical_lawhood.domains.matrix.matrix_parameter_factor.records import MatrixParameterScalarDefinition
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import ScheduledExposureAudit
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledResponseSelection
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.e6_transport_records import MatrixE6EmpiricalTransportPolicy
+    from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+    from empirical_lawhood.science.models.time import AvailabilitySpec
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteResult
     selected=request.input_commitments
     original,_=metadata.control(selected.publication.materialization.relative_path,MatrixProgrammeInputCommitments,
         expected=selected.record,pair=_BLIND)
@@ -478,16 +472,16 @@ def authenticated_native_training_read_scope(*, artifact_writer, locator):
     never disable an inherited guard. This context authenticates membership only.
     Its returned callback cannot survive the actual writer lifetime.
     """
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_records import MatrixFiniteDtTrainingLocator
     from empirical_lawhood.api.current_task_custody import _development_receipt_output_metadata
     from empirical_lawhood.api.native_training_banks import _read_instance
     from empirical_lawhood.api.recursive_authoring import _authenticate_experiment_instance
     from empirical_lawhood.api.recursive_execution import _retained_plans
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.infrastructure.recursive_custody import _require_no_orphaned_native_custody
-    from empirical_lawhood.planning.recursive_authoring import RecursiveStudyDraft
-    from empirical_lawhood.runtime.plans import DevelopmentExecutionPlan
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave,RecursiveImplementationBinding
+    from empirical_lawhood.storage.recursive_custody import _require_no_orphaned_native_custody
+    from empirical_lawhood.design.recursive_authoring import RecursiveStudyDraft
+    from empirical_lawhood.execution.plans import DevelopmentExecutionPlan
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveImplementationBinding
     if type(locator) is not MatrixFiniteDtTrainingLocator:
         raise TypeError('native TRAIN read scope requires its exact current locator')
     locator.__post_init__()
@@ -503,7 +497,7 @@ def authenticated_native_training_read_scope(*, artifact_writer, locator):
                 or draft.development_study is None or draft.prospective_draft is not None
                 or draft.contribution_parents):
             raise PermissionError('native TRAIN metadata changes its actual original development root')
-        from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
+        from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
         instance=decode_canonical_bytes(payloads['experiment-instance.json'],ExperimentInstanceBinding,maximum_bytes=None)
         payloads.select_request(instance)
         specification,request,_=_read_instance(payloads)
@@ -512,7 +506,7 @@ def authenticated_native_training_read_scope(*, artifact_writer, locator):
         if (type(plan) is not DevelopmentExecutionPlan or run.run_plan_id!=locator.run_id
                 or ObjectIdentity.from_record(plan.execution_plan_id,plan)!=locator.execution_plan):
             raise PermissionError('native TRAIN metadata changes its exact locator run/plan')
-        from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
+        from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
         provenance,_=metadata.control('runs/'+run.run_plan_id+'/inputs/producing-provenance.json',
             NumericalProducingProvenance,parents=())
         if (provenance.package_sources,provenance.code_sources_sha256,provenance.dependency_lock_sha256,
@@ -542,7 +536,7 @@ def authenticated_native_training_read_scope(*, artifact_writer, locator):
                 if registration.native_effect:
                     _native_metadata(metadata,plan,index,task,by_task[task.task_id],by_task,inputs,source)
                 else:
-                    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
+                    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
                     path=writer.root.resolve(ExternalNativeEffectContactStore._path(index.run_id,task.task_id),for_write=False)
                     if path.exists() or path.with_name(path.name+'.manifest.json').exists():
                         raise PermissionError('pure TRAIN task has foreign native parent contact custody')

@@ -1,0 +1,577 @@
+{
+  "label": "Frozen targeted physical-time observation confirmation; support is assessed",
+  "roots": [
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710201
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710202
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710203
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710204
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710205
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710206
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710207
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710208
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710209
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710210
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710211
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710212
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710213
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710214
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710215
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710216
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710217
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710218
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710219
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710220
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710221
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710222
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710223
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710224
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710225
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710226
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710227
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710228
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710229
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710230
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710231
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710232
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710233
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710234
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710235
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710236
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710237
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710238
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710239
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710240
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710241
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710242
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710243
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710244
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710245
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710246
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710247
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710248
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710249
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710250
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710251
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710252
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710253
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710254
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710255
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710256
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710257
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710258
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710259
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710260
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710261
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710262
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710263
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710264
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710265
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710266
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710267
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710268
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710269
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710270
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710271
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710272
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710273
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710274
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710275
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710276
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710277
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710278
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710279
+    },
+    {
+      "modules": [
+        "M2"
+      ],
+      "role": "confirmation",
+      "seed": 1710280
+    }
+  ],
+  "schema": "model-free-matrix-definition.v1",
+  "settings": {
+    "evidence_scope": "FRESH_CONFIRMATION",
+    "memory": {
+      "protocol_age_ticks": [
+        16384
+      ]
+    },
+    "response": {
+      "selection_tick": 32
+    }
+  }
+}

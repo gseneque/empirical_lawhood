@@ -7,12 +7,10 @@ import time
 
 import pytest
 
-from empirical_lawhood.infrastructure.execution import (
-    CampaignElapsedBoundaryReached, LocalProcessExecutor, ProgressStalledError,
-)
-from empirical_lawhood.infrastructure.native_subwork_ipc import NativeSubworkPipeService
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.execution_envelope import ProgressHeartbeat, ProgressLivenessContract
+from empirical_lawhood.execution.local.execution import CampaignElapsedBoundaryReached, LocalProcessExecutor, ProgressStalledError
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.execution_envelope import ProgressHeartbeat, ProgressLivenessContract
 from tests.runtime_platform.test_native_subwork import ExposedInput, _store
 from tests.runtime_platform.test_worker_preflight import ExposedPidRunner, _case, _native_work
 

@@ -4,11 +4,11 @@ from dataclasses import replace
 from decimal import Decimal as D, localcontext
 from types import SimpleNamespace
 import pytest
-from empirical_lawhood.adapters.methods.matrix_factor_response import response_consumer as consumer
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import PREDICTORS
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_frontier import MatrixResponseRootFrontier
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_population_statistics import HORIZONS, ROOT_IDS, population_statistics
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_response import response_consumer as consumer
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import PREDICTORS
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_frontier import MatrixResponseRootFrontier
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_population_statistics import HORIZONS, ROOT_IDS, population_statistics
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_response_population_statistics import report, spec as spec  # noqa: F401
 
 

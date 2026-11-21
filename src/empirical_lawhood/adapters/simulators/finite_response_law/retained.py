@@ -2,14 +2,14 @@
 
 from hashlib import sha256
 
-from empirical_lawhood.adapters.simulators.prepared_response.contracts import PARENTS, PreparedNativeSpec, prepared_native_member, prepared_numerical_view
+from empirical_lawhood.domains.matrix.prepared_response.contracts import PARENTS, PreparedNativeSpec, prepared_native_member, prepared_numerical_view
 from empirical_lawhood.adapters.simulators.prepared_response.native_pair import decode_prepared_native_pair
-from empirical_lawhood.adapters.simulators.prepared_response.source import PreparedNativePhaseData
+from empirical_lawhood.domains.matrix.prepared_response.source import PreparedNativePhaseData
 from empirical_lawhood.adapters.simulators.prepared_response.source_outputs import PreparedNativeTaskResult
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.source_qualification import SourceQualificationRetainedPredecessor
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.source_qualification import validate_retained_qualification_receipt
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.source_qualification import SourceQualificationRetainedPredecessor
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.source_qualification import validate_retained_qualification_receipt
 
 
 def authenticate_retained_handoff(

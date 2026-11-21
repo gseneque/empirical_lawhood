@@ -12,7 +12,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     arguments = parser.parse_args()
-    root = Path(__file__).resolve().parents[1] / "src/empirical_lawhood/resources/config_schemas"
+    root = Path(__file__).resolve().parents[1] / "src/empirical_lawhood/package_data/config_schemas"
     resources = generated_resources()
     actual = {path.name for path in root.glob("*.json")}
     if arguments.check and actual != set(resources):

@@ -14,16 +14,10 @@ import re
 from typing import ClassVar
 import xml.etree.ElementTree as ET
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_sha256
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_sha256
 
-from .records import (
-    HistoricalFeatureSliceV1,
-    HistoricalLabelSliceV1,
-    HistoricalTrainingSliceV1,
-    ReportedEndpointsV1,
-    ReportedSubstitutionV1,
-)
+from empirical_lawhood.domains.rubisco.kinetics.records import HistoricalFeatureSliceV1, HistoricalLabelSliceV1, HistoricalTrainingSliceV1, ReportedEndpointsV1, ReportedSubstitutionV1
 
 DOI = "10.1038/s41598-018-23869-3"
 SOURCE_SHA256 = "5dc1ccfa4239bc530842cd6d904a4b1b775ac3098c4fba139a263fa9844bffa0"

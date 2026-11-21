@@ -7,20 +7,21 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as owner, selected_e4_methods as science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_revision_preparation as public
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as owner, selected_e4_methods as science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_revision_preparation as public
 from empirical_lawhood.api.experiment_preparation import author_prepared_experiment, load_experiment_inputs, prepare_experiment
 from empirical_lawhood.api.recursive_authoring import implementation_binding, load_authored_wave
 from empirical_lawhood.api.recursive_execution import _retained_plans
 from empirical_lawhood.api.current_task_custody import CurrentDevelopmentTaskCustody
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, ExperimentInstanceBinding
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentInputSelection
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, ExperimentInstanceBinding
 from tests.test_matrix_selected_e4_methods import selected_revision, selected_e4_populations, selected_bridge, transfer, pin  # noqa: F401
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 from tests.test_matrix_selected_e4_revision_transition import _real_plane
+from tests.numerical_provenance_fixtures import selected_test_mount
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -32,7 +33,6 @@ def test_actual_public_files_prepare_author_coldload_and_runtime_binding(selecte
     editable = replace(f.editable, trigger=replace(f.editable.trigger, threshold=Decimal("999")))
     assert editable != f.editable
     selected_root = tmp_path / "selected-e4-revision-public"
-    assert selected_root.resolve().is_relative_to(Path("/media/chevre/EL/empirical-lawhood"))
     writer = _real_plane(selected_root)
     resources = owner.SelectedE4MethodResources("resources.public", tuple((phase, ResourceBudget(1, 1024**3, 0, None, None, None))
         for phase in ("revision-fit", "revision-freeze")))
@@ -64,7 +64,7 @@ def test_actual_public_files_prepare_author_coldload_and_runtime_binding(selecte
     assert report["status"] == "AUTHORED" and report["native_contact"] == "none"
     packet, draft, _, payloads = load_authored_wave(directory=directory, artifact_writer=writer, lazy_payloads=True)
     assert draft == preparation.draft and len(draft.operations) == 2
-    from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+    from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
     declarations = {row.capability_key: row for row in owner.operation_declarations()}
     fit = next(row for row in draft.operations if row.selection.capability_key.endswith(".revision-fit"))
     fit_config = decode_recursive_config_input(fit, declarations[fit.selection.capability_key].registration()).record
@@ -81,7 +81,7 @@ def test_actual_public_files_prepare_author_coldload_and_runtime_binding(selecte
     # Initialize exact committed run inputs through the stock owner only. This
     # performs no scheduler, worker, native acquisition or completed-study act.
     from empirical_lawhood.api.recursive_execution import _external_inputs
-    from empirical_lawhood.runtime.execution import VerifiedArtifactInput
+    from empirical_lawhood.execution.execution import VerifiedArtifactInput
     initialized = _external_inputs(plane=writer, plan=plan, draft=draft,
         payloads=payloads, read_only=False)
     expected_inputs = {value.logical_artifact_id: value
@@ -116,7 +116,7 @@ def test_actual_public_files_prepare_author_coldload_and_runtime_binding(selecte
 
 def test_editable_phase_resources_validate_without_native_prerequisite_contacts(tmp_path, monkeypatch):
     from empirical_lawhood.api.configuration import validate_configuration
-    assert tmp_path.resolve().is_relative_to(Path("/media/chevre/EL/empirical-lawhood"))
+    selected_test_mount(tmp_path)
     resources = owner.SelectedE4MethodResources("resources.offline", tuple((name, ResourceBudget(1, 1024**3, 0, None, None, None))
         for name in ("revision-fit", "revision-freeze")))
     path = tmp_path / "method-resources.json"

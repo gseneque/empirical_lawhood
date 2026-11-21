@@ -49,18 +49,20 @@ def _selected_entries(root: Path, revision: str | None = None):
     return result
 
 
-def release_input_paths(root: Path, *, revision: str | None = None) -> tuple[str, ...]:
+def release_input_paths(root: Path, *, revision: str | None = None,
+                        require_exportable: bool = False) -> tuple[str, ...]:
     """Select code, tests, maintained guides, copied inputs and build controls."""
-    from empirical_lawhood.infrastructure.source_policy import (
-        MAINTAINED_ROOT_MARKDOWN, is_work_plan_path,
-    )
+    from empirical_lawhood.storage.source_policy import MAINTAINED_ROOT_MARKDOWN, is_release_excluded_path
 
     entries = _selected_entries(root, revision)
+    excluded = {name for name in entries if is_release_excluded_path(name)}
+    if require_exportable and excluded:
+        raise ValueError(f"Release tree includes working plans or private directories: {sorted(excluded)}")
     unclassified = sorted(name for name in entries if "/" not in name and name.endswith(".md")
-                          and name not in MAINTAINED_ROOT_MARKDOWN and not is_work_plan_path(name))
+                          and name not in MAINTAINED_ROOT_MARKDOWN and name not in excluded)
     if unclassified:
         raise ValueError(f"Release root Markdown requires a documentation or work-plan classification: {unclassified}")
-    return tuple(sorted(name for name in entries if not is_work_plan_path(name)
+    return tuple(sorted(name for name in entries if name not in excluded
                         and (name in RELEASE_INPUT_FILES or name.startswith(RELEASE_INPUT_ROOTS)
                              or name.startswith("LICENSES/") or name.endswith(".md"))))
 
@@ -73,7 +75,7 @@ def candidate_inventory(root: Path, *, selected_paths: tuple[str, ...] | None = 
     if (type(names) is not tuple or names != tuple(sorted(set(names)))
             or any(name not in entries for name in names)):
         raise ValueError("Release source selection is not an exact tracked path census")
-    from empirical_lawhood.infrastructure.repository_identity import _descriptor_identity, _open_relative_read_only
+    from empirical_lawhood.storage.repository_identity import _descriptor_identity, _open_relative_read_only
     result = []
     selected_bytes = 0
     for path in names:

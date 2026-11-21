@@ -3,13 +3,13 @@
 from dataclasses import replace
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as domain
 from empirical_lawhood.api.authoring_handoff import preflight_authoring_output_directory
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from .prospective_experiment import preview_prepared_prospective_experiment_candidate
-from empirical_lawhood.runtime.experiment_preparation import ExperimentPreparation
-from empirical_lawhood.runtime.experiment_resources import bind_execution_resources
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.api.prospective_experiment import preview_prepared_prospective_experiment_candidate
+from empirical_lawhood.execution.experiment_preparation import ExperimentPreparation
+from empirical_lawhood.execution.experiment_resources import bind_execution_resources
 
 
 def _component_selection(source_records):
@@ -25,7 +25,7 @@ def _component_selection(source_records):
 
 def require_selected_e4_original_access(writer,upstream_products,calibration_product,*,produced_input_parents):
     """Check current original permissions using bounded locator metadata only."""
-    from .selected_prepared_access import selected_e4_original_input_access
+    from empirical_lawhood.api.selected_prepared_access import selected_e4_original_input_access
     actual=selected_e4_original_input_access(artifact_writer=writer,upstream_products=upstream_products,
         calibration_product=calibration_product).parents
     if not set(actual)<=set(produced_input_parents):
@@ -34,7 +34,7 @@ def require_selected_e4_original_access(writer,upstream_products,calibration_pro
 
 def require_selected_e4_plan_access(writer,plan):
     """Refresh actual original and DEV custody; never retain permission."""
-    from .selected_prepared_access import selected_e4_original_input_access
+    from empirical_lawhood.api.selected_prepared_access import selected_e4_original_input_access
     evidence=plan.evidence
     actual=selected_e4_original_input_access(artifact_writer=writer,upstream_products=evidence.upstream_products,
         calibration_product=evidence.calibration_product,
@@ -45,7 +45,7 @@ def require_selected_e4_plan_access(writer,plan):
 
 def resolve_published_component_inputs(writer,selection,*,specification):
     """Resolve the actual shared publication inside the caller's read lifetime."""
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
     selection.__post_init__()
     require_selected_e4_original_access(writer,selection.upstream_products,selection.calibration_product,
         produced_input_parents=selection.plan_publication.logical.lineage_parents)
@@ -99,7 +99,7 @@ def prepare_selected_e4_authoring(preparation,*,project_root,artifact_writer,out
 
 
 def bind_selected_e4_component(handoff,*,specification,allocation,source_records,artifact_writer,reveal_authority_id=None):
-    from .selected_e4_native_runtime import bind_selected_e4_handoff
+    from empirical_lawhood.api.selected_e4_native_runtime import bind_selected_e4_handoff
     authenticate_selected_e4_component_instance(specification=specification,allocation=allocation,
         draft=handoff.compilation.draft,source_records=source_records,artifact_writer=artifact_writer)
     return bind_selected_e4_handoff(handoff,writer=artifact_writer,reveal_authority_id=reveal_authority_id)
@@ -108,9 +108,9 @@ def bind_selected_e4_component(handoff,*,specification,allocation,source_records
 def read_selected_e4_component(*,selected,artifact_writer,**kwargs):
     """Authenticate the shared plan without rebuilding the retained workflow."""
     from empirical_lawhood.api.selected_e4_native_read import read_selected_e4_component as read
-    from empirical_lawhood.kernel.experimental_design import UnitAllocation
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
-    from empirical_lawhood.runtime.prospective_experiment import ALLOCATION_FILENAME,SPECIFICATION_FILENAME,source_filename
+    from empirical_lawhood.science.experiments.experimental_design import UnitAllocation
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
+    from empirical_lawhood.execution.prospective_experiment import ALLOCATION_FILENAME, SPECIFICATION_FILENAME, source_filename
     if len(selected.instance.sources)!=1:
         raise ValueError("selected E4 read requires one exact published-plan component reference")
     reference,=selected.instance.sources

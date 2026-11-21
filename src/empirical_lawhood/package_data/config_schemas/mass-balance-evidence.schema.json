@@ -1,0 +1,206 @@
+{
+  "$defs": {
+    "MassEvidence_462895b7105f": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/mass-balance/evidence"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "evidence_scope": {
+              "description": "evidence scope; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "independent_unit_ids": {
+              "description": "independent unit ids; constructor checks semantics and units.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "observations": {
+              "description": "observations; constructor checks semantics and units.",
+              "items": {
+                "$ref": "#/$defs/MassObservation_d8448a586118"
+              },
+              "type": "array"
+            },
+            "record_id": {
+              "description": "record id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "scope": {
+              "$ref": "#/$defs/MassScope_505d84b13f3c",
+              "description": "scope; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "record_id",
+            "scope",
+            "independent_unit_ids",
+            "observations",
+            "evidence_scope"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MassObservation_d8448a586118": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/mass-balance/observation"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "added_kg": {
+              "additionalProperties": false,
+              "description": "added kg; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "final_kg": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "decimal": {
+                      "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "decimal"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "final kg; constructor checks semantics and units."
+            },
+            "initial_kg": {
+              "additionalProperties": false,
+              "description": "initial kg; constructor checks semantics and units.",
+              "properties": {
+                "decimal": {
+                  "description": "Exact finite Decimal text; no binary float. Runtime bounds expansion and decides lexical/semantic acceptance.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "decimal"
+              ],
+              "type": "object"
+            },
+            "unit_id": {
+              "description": "unit id; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "unit_id",
+            "initial_kg",
+            "added_kg",
+            "final_kg"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "MassScope_505d84b13f3c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/mass-balance/scope"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "clock_id": {
+              "description": "clock id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "condition": {
+              "description": "condition; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "population_id": {
+              "description": "population id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "receiver_id": {
+              "description": "receiver id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "source_id": {
+              "description": "source id; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "units": {
+              "description": "units; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "population_id",
+            "source_id",
+            "receiver_id",
+            "clock_id",
+            "units",
+            "condition"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:mass-balance-evidence",
+  "$ref": "#/$defs/MassEvidence_462895b7105f",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Mass Balance Evidence",
+  "x-consumer": "mass-balance-evidence",
+  "x-consumer-maximum-bytes": 131072,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

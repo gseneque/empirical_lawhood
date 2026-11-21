@@ -5,11 +5,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_input_origins import (
-    RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins, contribution_graph_role,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins, contribution_graph_role
 from empirical_lawhood.api.recursive_contributions import authenticate_recursive_contribution, contribution_input_bindings
 from tests.test_recursive_contribution_custody import portable_a  # noqa: F401, F811
 
@@ -70,9 +68,9 @@ def test_unexported_parent_checkpoint_cannot_be_source_at_authoring_or_retained_
     from pathlib import Path
     from empirical_lawhood.api import recursive_authoring as author
     from empirical_lawhood.api.recursive_contributions import _publish
-    from empirical_lawhood.adapters.methods.battery_recursive_construction.contracts import BatteryProcedureContribution
-    from empirical_lawhood.adapters.methods.battery_recursive_construction.examples import battery_wave_b_draft
-    from empirical_lawhood.runtime.recursive_handoff import AuthoredRecursiveWave, RecursiveParentClosureBinding, RecursiveWaveMember
+    from empirical_lawhood.domains.battery.battery_recursive_construction.contracts import BatteryProcedureContribution
+    from empirical_lawhood.domains.battery.battery_recursive_construction.examples import battery_wave_b_draft
+    from empirical_lawhood.execution.recursive_handoff import AuthoredRecursiveWave, RecursiveParentClosureBinding, RecursiveWaveMember
 
     from empirical_lawhood.api import recursive_contributions as contributions
     import shutil
@@ -148,8 +146,8 @@ def test_unexported_parent_checkpoint_cannot_be_source_at_authoring_or_retained_
 
 
 def test_portable_roles_project_to_existing_graph_roles_without_changing_origin_bytes():
-    from empirical_lawhood.kernel.recursive_requirements import ContributionRole
-    from empirical_lawhood.runtime.plans import ScientificInputRole
+    from empirical_lawhood.science.inquiry.recursive_requirements import ContributionRole
+    from empirical_lawhood.execution.plans import ScientificInputRole
     expected = ((ContributionRole.DESIGN_OPERAND, ScientificInputRole.MODEL),
                 (ContributionRole.QUALIFIED_EVIDENTIAL_PARENT, ScientificInputRole.QUALIFICATION),
                 (ContributionRole.RETAINED_ANALYSIS_INPUT, ScientificInputRole.HISTORY),

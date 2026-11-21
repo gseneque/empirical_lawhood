@@ -5,30 +5,22 @@ from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.frontier import (
-    METADATA_PHASES, PHASES, MatrixProgrammeObservation, programme_frontier,
-)
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import (
-    PREPARATION_CONTEXT, MatrixProgrammeOperationSelection, MatrixProgrammePhaseBinding,
-    MatrixProgrammeRunBinding, MatrixResearchProgrammePlan, MatrixResearchProgrammeSpecification,
-    MatrixContinuedProgrammeSpecification, MatrixCurveAmendedProgrammeSpecification, programme_protocol,
-)
-from empirical_lawhood.api.experiment_preparation import (
-    _protocol, load_experiment_inputs, prepare_experiment,
-)
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.frontier import METADATA_PHASES, PHASES, MatrixProgrammeObservation, programme_frontier
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import PREPARATION_CONTEXT, MatrixProgrammeOperationSelection, MatrixProgrammePhaseBinding, MatrixProgrammeRunBinding, MatrixResearchProgrammePlan, MatrixResearchProgrammeSpecification, MatrixContinuedProgrammeSpecification, MatrixCurveAmendedProgrammeSpecification, programme_protocol
+from empirical_lawhood.api.experiment_preparation import _protocol, load_experiment_inputs, prepare_experiment
 from empirical_lawhood.api.matrix_programme_projection import MatrixProgrammePrerequisite, MatrixProgrammeProjectionContext
 from empirical_lawhood.api.matrix_researcher_programme_lineage import read_published_record, run_binding_relative
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticated_programme_inputs
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
-from empirical_lawhood.runtime.experiment_programme import PROGRAMME_DESCRIPTOR_FILENAME, ExperimentProgrammeDescriptor
-from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_enabled
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticated_programme_inputs
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.execution.experiment_programme import PROGRAMME_DESCRIPTOR_FILENAME, ExperimentProgrammeDescriptor
+from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_enabled
 
 PLAN_FILENAME = 'matrix-programme.json'
 MAX_SELECTION_BYTES = 64 * 1024**2
@@ -190,8 +182,8 @@ class MatrixResearchProgrammeService:
         byte proof. The outer scope owns the complete final snapshot check.
         Execution continues to use its separate ordinary context.
         """
-        from .selected_e3_access import original_e3_authority_read_context
-        from .retained_e3_evidence import retained_e3_reader
+        from empirical_lawhood.api.selected_e3_access import original_e3_authority_read_context
+        from empirical_lawhood.api.retained_e3_evidence import retained_e3_reader
         with original_e3_authority_read_context(self.writer), retained_e3_reader(self.writer).read_context() as writer:
             service = replace(self.service, artifact_writer=writer)
             owner = type(self)(service=service, descriptor=self.descriptor)
@@ -202,16 +194,16 @@ class MatrixResearchProgrammeService:
     def _context(self, plan, *, operation=None):
         if plan.output_root != self.writer.root.contract.canonical_path:
             raise PermissionError('Matrix programme substitutes its selected artifact root')
-        from .retained_e3_evidence import retained_e3_evidence_context, retained_e3_reader
+        from empirical_lawhood.api.retained_e3_evidence import retained_e3_evidence_context, retained_e3_reader
         evidence = nullcontext() if scientific_reconstruction_enabled() else retained_e3_evidence_context(self.writer)
         input_reader = authenticated_programme_inputs
         if not scientific_reconstruction_enabled():
-            from empirical_lawhood.infrastructure.matrix_recorded_inputs import recorded_programme_inputs
+            from empirical_lawhood.adapters.matrix_storage.matrix_recorded_inputs import recorded_programme_inputs
             input_reader = recorded_programme_inputs
         with evidence, input_reader(writer=retained_e3_reader(self.writer), commitment=plan.specification.input_commitments,
                 maximum_source_bytes=plan.specification.operations.metadata_budget.source_scan_bytes) as inputs, ExitStack() as lifetime:
-            from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_assembly import require_computability_scope
-            from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import coordinate_identity
+            from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_assembly import require_computability_scope
+            from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import coordinate_identity
             nominal_pin = dict(inputs.scientific_design.e3.role_coordinates)['CALIBRATION']
             nominal, = (coordinate for coordinate in inputs.scientific_design.training_protocol.coordinates
                 if coordinate_identity(coordinate) == nominal_pin)
@@ -220,19 +212,17 @@ class MatrixResearchProgrammeService:
             context = MatrixProgrammeProjectionContext(self.service, plan, inputs, self._home(plan), {}, {}, operation,
                 _read_lifetime=lifetime)
             self._load_bindings(context)
-            from empirical_lawhood.adapters.methods.matrix_researcher_programme.source_continuation import (
-                CONTINUATION_FILENAME,
-            )
+            from empirical_lawhood.domains.matrix.matrix_researcher_programme.source_continuation import CONTINUATION_FILENAME
             continuation_path = context.directory / CONTINUATION_FILENAME
             present = continuation_path.exists() or continuation_path.is_symlink()
-            from empirical_lawhood.adapters.methods.matrix_researcher_programme import retained_training_continuation as retained_domain
+            from empirical_lawhood.domains.matrix.matrix_researcher_programme import retained_training_continuation as retained_domain
             retained_path = context.directory / retained_domain.CONTINUATION_FILENAME
             retained_present = retained_path.exists() or retained_path.is_symlink()
             retained_selected = (type(plan.specification) is MatrixContinuedProgrammeSpecification
                 and plan.specification.continuation_request.object_schema
                     == retained_domain.MatrixProgrammeRetainedTrainingContinuationSpecification.SCHEMA)
-            from empirical_lawhood.adapters.methods.matrix_researcher_programme import retained_e3_continuation as e3_domain
-            from empirical_lawhood.adapters.methods.matrix_researcher_programme import e3_closeout as e3_closeout_domain
+            from empirical_lawhood.domains.matrix.matrix_researcher_programme import retained_e3_continuation as e3_domain
+            from empirical_lawhood.domains.matrix.matrix_researcher_programme import e3_closeout as e3_closeout_domain
             e3_path = context.directory / e3_domain.CONTINUATION_FILENAME
             e3_present = e3_path.exists() or e3_path.is_symlink()
             e3_selected = (type(plan.specification) is MatrixContinuedProgrammeSpecification
@@ -250,23 +240,23 @@ class MatrixResearchProgrammeService:
                     if schema not in kinds:
                         raise PermissionError('continued programme changes its retained E3 record contract')
                     record = read_published_record(self.writer, relative, kinds[schema], MAX_SELECTION_BYTES)
-                    from .matrix_programme_retained_e3_continuation import continued_context
+                    from empirical_lawhood.api.matrix_programme_retained_e3_continuation import continued_context
                 elif retained_selected:
                     if not retained_present or present:
                         raise PermissionError('continued programme requires its exact retained TRAIN continuation publication')
                     record = read_published_record(self.writer, _relative(self.writer, retained_path),
                         retained_domain.MatrixProgrammeRetainedTrainingContinuation, MAX_SELECTION_BYTES)
-                    from .matrix_programme_retained_training_continuation import continued_context
+                    from empirical_lawhood.api.matrix_programme_retained_training_continuation import continued_context
                 else:
                     if not present:
                         raise PermissionError('continued programme requires its exact original source-continuation publication')
-                    from .matrix_programme_completed_continuation import read_source_continuation
+                    from empirical_lawhood.api.matrix_programme_completed_continuation import read_source_continuation
                     record = read_source_continuation(self.writer, _relative(self.writer, continuation_path),
                         MAX_SELECTION_BYTES)
-                    from .matrix_programme_source_continuation import continued_context
+                    from empirical_lawhood.api.matrix_programme_source_continuation import continued_context
                 if (not scientific_reconstruction_enabled()
                         and (not e3_selected or 'e3' in context.bindings)):
-                    from .matrix_programme_recorded_lineage import recorded_continuation_context
+                    from empirical_lawhood.api.matrix_programme_recorded_lineage import recorded_continuation_context
                     continued_context = recorded_continuation_context
                 lifetime.enter_context(continued_context(self, context, record))
             elif present:
@@ -275,9 +265,7 @@ class MatrixResearchProgrammeService:
                 raise PermissionError('programme cannot acquire an unselected retained TRAIN continuation file')
             if e3_present and not e3_selected:
                 raise PermissionError('programme cannot acquire an unselected retained E3 continuation file')
-            from empirical_lawhood.adapters.methods.matrix_researcher_programme.curve_amendment import (
-                AMENDMENT_FILENAME, MatrixProgrammeCurveAmendment,
-            )
+            from empirical_lawhood.domains.matrix.matrix_researcher_programme.curve_amendment import AMENDMENT_FILENAME, MatrixProgrammeCurveAmendment
             amendment_path = context.directory / AMENDMENT_FILENAME
             present = amendment_path.exists() or amendment_path.is_symlink()
             if type(plan.specification) is MatrixCurveAmendedProgrammeSpecification:
@@ -285,9 +273,9 @@ class MatrixResearchProgrammeService:
                     raise PermissionError('amended programme requires its exact prospective curve-amendment publication')
                 record = read_published_record(self.writer, _relative(self.writer, amendment_path),
                     MatrixProgrammeCurveAmendment, MAX_SELECTION_BYTES)
-                from .matrix_programme_curve_amendment import amended_context
+                from empirical_lawhood.api.matrix_programme_curve_amendment import amended_context
                 if not scientific_reconstruction_enabled():
-                    from .matrix_programme_recorded_lineage import recorded_continuation_context
+                    from empirical_lawhood.api.matrix_programme_recorded_lineage import recorded_continuation_context
                     amended_context = recorded_continuation_context
                 lifetime.enter_context(amended_context(self, context, record))
             elif present:
@@ -296,7 +284,7 @@ class MatrixResearchProgrammeService:
 
     @staticmethod
     def _require_preparation(preparation):
-        from empirical_lawhood.runtime.experiment_preparation import ExperimentPreparation
+        from empirical_lawhood.execution.experiment_preparation import ExperimentPreparation
         if type(preparation) is not ExperimentPreparation:
             raise TypeError('Matrix preparation requires its exact typed preparation')
         preparation.__post_init__()
@@ -323,7 +311,7 @@ class MatrixResearchProgrammeService:
             return self._refine_context(preparation, context)
 
     def _load_bindings(self, context):
-        from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
+        from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
         for phase in PHASES:
             relative = (context.directory / 'bindings' / (phase + '.json')).relative_to(
                 self.writer.root.contract.canonical_path).as_posix()
@@ -353,7 +341,7 @@ class MatrixResearchProgrammeService:
         selector = result.source_selection
         sources = ExperimentInputBinding('sources', ObjectIdentity.from_record(selector.selection_id, selector),
             _relative(self.writer, result.source_selection_path), len(selector.canonical_bytes()))
-        from empirical_lawhood.infrastructure.publication_metadata import consume_published_materializations
+        from empirical_lawhood.storage.publication_metadata import consume_published_materializations
         with self._phase_scope(context, phase):
             def reconstruct(members):
                 # The closed-roster owner checks every exact handle, sidecar,
@@ -395,7 +383,7 @@ class MatrixResearchProgrammeService:
         # Protected model-bearing derived records are decoded only while the
         # actual original reader holds current reveal and complete custody.
         if phase.startswith(('e4.', 'e5.', 'e6')) and phase in context.bindings and not scientific_reconstruction_enabled():
-            from .selected_e3_access import original_e3_authority_read_context
+            from empirical_lawhood.api.selected_e3_access import original_e3_authority_read_context
             # Authored/input readers own fresh original access before protected
             # bytes. Scheduling does not reopen the E3 numerical read.
             scope = original_e3_authority_read_context(self.writer)
@@ -415,8 +403,8 @@ class MatrixResearchProgrammeService:
             if phase in ('e4.calibration', 'e4.confirmation'):
                 # The ordinary declarative author authenticates copied intent
                 # and hands off once to the existing native E4 lifecycle.
-                from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_declarative as declarative
-                from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_preparation import PROGRAMME_PROTOCOL_ID
+                from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_declarative as declarative
+                from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_preparation import PROGRAMME_PROTOCOL_ID
                 if type(specification) is not declarative.SelectedE4DeclarativeSpecification:
                     raise TypeError('programme protected E4 requires its exact current declarative specification')
                 actual = context.method_inputs(phase)
@@ -444,7 +432,7 @@ class MatrixResearchProgrammeService:
 
     def _read_phase(self, context, phase, *, allow_partial=False, execution_only=False, observe_controls=None):
         if execution_only:
-            from .matrix_programme_recorded_lineage import phase_execution
+            from empirical_lawhood.api.matrix_programme_recorded_lineage import phase_execution
             return phase_execution(context, phase, observe_controls=observe_controls)
         with self._phase_scope(context, phase):
             _, specification = context.bound_specification(context.binding(phase))
@@ -589,7 +577,7 @@ class MatrixResearchProgrammeService:
                         or preparation.execution != context.execution):
                     raise PermissionError('Matrix authoring changes its live derived input preparation')
             from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding
-            from empirical_lawhood.runtime.experiment_preparation import DependencyKind
+            from empirical_lawhood.execution.experiment_preparation import DependencyKind
             binding = experiment_runtime_binding(_protocol(specification))
             deferred = (preparation.programme is None and binding is not None
                 and callable(binding.prepare_authoring) and bool(preparation.dependencies)
@@ -598,12 +586,12 @@ class MatrixResearchProgrammeService:
                 raise MatrixProgrammePrerequisite(phase, 'ORDINARY_AUTHORING_PREREQUISITES_REQUIRED',
                     '; '.join(row.code + ': ' + row.detail for row in preparation.dependencies))
             if _protocol(specification).requires_prospective_runtime_binding:
-                from .composite_experiment_programme import prepared_component_source_snapshot
+                from empirical_lawhood.api.composite_experiment_programme import prepared_component_source_snapshot
                 snapshot = prepared_component_source_snapshot(self.service.project_root, preparation)
                 preparation = replace(preparation, execution=replace(preparation.execution, source_snapshot=snapshot))
             report = self.service.author(preparation=preparation, output_dir=context.child_directory(phase))
             if observe_authoring and phase in ('e2', 'train'):
-                from .experiment_execution_read import observed_development_authoring
+                from empirical_lawhood.api.experiment_execution_read import observed_development_authoring
                 context.authored_reports[phase] = context._read_lifetime.enter_context(
                     observed_development_authoring(directory=context.child_directory(phase),
                         artifact_writer=self.writer, authoring_report=report,
@@ -668,10 +656,10 @@ class MatrixResearchProgrammeService:
             return operation(directory=context.child_directory(phase), **options)
 
     def _report(self, context, *, dependencies=(), allow_partial=False, operational=False, structural_prediction=None):
-        from .matrix_programme_structural_prediction import programme_structural_prediction
+        from empirical_lawhood.api.matrix_programme_structural_prediction import programme_structural_prediction
         frontier = programme_frontier(context.observations, downstream_account=context.design.downstream_account,
             operational=operational)
-        from .matrix_programme_recorded_lineage import operational_report
+        from empirical_lawhood.api.matrix_programme_recorded_lineage import operational_report
         exhaustive = scientific_reconstruction_enabled()
         phases = tuple({'phase': phase, 'binding': context.bindings[phase].identity.to_document(),
             'producing_programme': context.phase_origins.get(phase, context).plan.identity.to_document(),
@@ -706,7 +694,7 @@ class MatrixResearchProgrammeService:
     def _advance_report(self, context, dependencies):
         # An operation report describes its owning reads, not a new full read
         # of all science. Current permission still bounds returned outcomes.
-        from .matrix_programme_products import _current_grants
+        from empirical_lawhood.api.matrix_programme_products import _current_grants
         with self.writer.read_context() as authorities:
             current = _current_grants(context, authorities)
             report = self._report(context, dependencies=dependencies, operational=True)
@@ -802,7 +790,7 @@ class MatrixResearchProgrammeService:
         plan = preparation.programme
         if type(plan) is not MatrixResearchProgrammePlan or Path(output_dir) != self._home(plan):
             raise ValueError('Matrix authoring requires the one selected programme home')
-        from .selected_e3_access import original_e3_authority_read_context
+        from empirical_lawhood.api.selected_e3_access import original_e3_authority_read_context
         with original_e3_authority_read_context(self.writer), self._context(plan) as context:
             preparation = self._refine_context(preparation, context)
             if not preparation.executable:
@@ -830,7 +818,7 @@ class MatrixResearchProgrammeService:
         if type(confirmed) is not bool or workers != plan.workers:
             raise ValueError('Matrix operation requires its exact selected concurrency and explicit confirmation value')
         operation = self._request(plan, request_path)
-        from .selected_e3_access import original_e3_authority_read_context
+        from empirical_lawhood.api.selected_e3_access import original_e3_authority_read_context
         with original_e3_authority_read_context(self.writer), self._context(plan, operation=operation) as context:
             return self._advance(context, mode=mode, confirmed=confirmed)
 
@@ -844,7 +832,7 @@ class MatrixResearchProgrammeService:
             return self._report(context, allow_partial=allow_partial, operational=operational)
 
     def export_products(self, *, directory, selection_path, programme_request_path=None):
-        from .matrix_programme_products import export_programme_products
+        from empirical_lawhood.api.matrix_programme_products import export_programme_products
         return export_programme_products(self, directory=directory, selection_path=selection_path,
             programme_request_path=programme_request_path)
 

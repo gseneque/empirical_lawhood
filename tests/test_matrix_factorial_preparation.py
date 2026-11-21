@@ -9,10 +9,10 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import experiment_preparation as public, load_authoring
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import factorial_preparation as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_factorial as method
-from empirical_lawhood.runtime.experiment_preparation import DependencyKind, ExecutionSelection
-from empirical_lawhood.runtime.experimental_factorial import PairInteractionScale
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import factorial_preparation as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_factorial as method
+from empirical_lawhood.execution.experiment_preparation import DependencyKind, ExecutionSelection
+from empirical_lawhood.execution.experimental_factorial import PairInteractionScale
 from tests.test_matrix_programme_factorial import exposed as exposed_builder, polynomial as polynomial_builder
 from tests.test_matrix_programme_selection import pin
 
@@ -32,7 +32,7 @@ def case():
 @pytest.fixture(autouse=True)
 def no_effects(monkeypatch):
     from empirical_lawhood.api import recursive_authoring
-    from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+    from empirical_lawhood.execution.local.execution import LocalProcessExecutor
 
     def forbidden(*args, **kwargs):
         pytest.fail("pure factorial preparation entered assessment, custody publication or an actual worker")

@@ -9,8 +9,8 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import authoring_handoff, composition, reactor_source_provenance
-from empirical_lawhood.kernel.serialization import CanonicalizationError
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan
+from empirical_lawhood.science.records.serialization import CanonicalizationError
+from empirical_lawhood.execution.plans import CandidateExecutionPlan
 
 
 ROOT = Path(__file__).resolve().parents[1]

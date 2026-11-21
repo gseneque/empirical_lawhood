@@ -4,16 +4,13 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import e3_closeout as domain
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.retained_e3_continuation import MatrixProgrammeRetainedE3ContinuationSpecification
-from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import (
-    MatrixContinuedProgrammeSpecification, MatrixProgrammePhaseBinding, MatrixProgrammeRunBinding,
-    MatrixResearchProgrammePlan, MatrixResearchProgrammeSpecification, PREPARATION_CONTEXT,
-)
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import e3_closeout as domain
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.retained_e3_continuation import MatrixProgrammeRetainedE3ContinuationSpecification
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import MatrixContinuedProgrammeSpecification, MatrixProgrammePhaseBinding, MatrixProgrammeRunBinding, MatrixResearchProgrammePlan, MatrixResearchProgrammeSpecification, PREPARATION_CONTEXT
 from empirical_lawhood.api.experiment_preparation import prepare_experiment
 from empirical_lawhood.api.matrix_programme_retained_e3_continuation import _training_source
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_e3_cal_closeout import (  # noqa: F401
     closeout_case, unfinished_case, continuation_case, public_case,
 )

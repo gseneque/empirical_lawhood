@@ -10,12 +10,12 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as bindings
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as records
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_workers as worker
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import identity
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_native_source import selected_stream_operands
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as bindings
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as records
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_workers as worker
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import identity
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_native_source import selected_stream_operands
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
 from tests.test_matrix_selected_e3_e4_workers import invocation
 from tests.test_matrix_selected_e3_e4_bridge import selected_bridge, transfer  # noqa: F401
 

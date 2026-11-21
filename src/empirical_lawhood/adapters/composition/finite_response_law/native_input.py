@@ -1,44 +1,22 @@
 """Exact Tier 1 calibration roster preflight, without native acquisition."""
 
 from __future__ import annotations
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.native_input import FiniteResponseLawCalibrationInput as _science_FiniteResponseLawCalibrationInput
 
-from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
-from typing import ClassVar
 
 from empirical_lawhood.adapters._strict_json import loads_external_json
-from empirical_lawhood.adapters.composition.finite_response_law.assignment import FiniteResponseLawCohortAssignment, assigned_native_seed_ids
-from empirical_lawhood.adapters.composition.finite_response_law.exposure import native_seed_ids, native_seed_collisions
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.assignment import FiniteResponseLawCohortAssignment, assigned_native_seed_ids
+from empirical_lawhood.domains.matrix.finite_response_law.authoring.exposure import native_seed_ids, native_seed_collisions
 from empirical_lawhood.adapters.composition.prepared_response.native_authoring import _read_external, _read_plan
-from empirical_lawhood.adapters.methods.finite_response_law.science import FiniteResponseLawScienceSpec
+from empirical_lawhood.domains.matrix.finite_response_law.science import FiniteResponseLawScienceSpec
 from empirical_lawhood.adapters.simulators.finite_response_law.calibration.discovery import SOURCE_CAPABILITY
-from empirical_lawhood.adapters.simulators.finite_response_law.fresh_contracts import FiniteResponseLawCalibrationConfig, calibration_invocations
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    require_sorted_unique_strings,
-    validate_stable_id,
-)
+from empirical_lawhood.domains.matrix.finite_response_law.fresh_contracts import FiniteResponseLawCalibrationConfig, calibration_invocations
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import require_sorted_unique_strings, validate_stable_id
 
 
-@dataclass(frozen=True, slots=True)
-class FiniteResponseLawCalibrationInput(CanonicalRecord):
-    SCHEMA: ClassVar[str] = 'empirical-lawhood/composition/finite-response-law/finite-response-law-calibration-input'
-    config_id: str
-    stage: str = "calibration"
-    evidence_role: str = "EXPOSED_DEVELOPMENT_NONPROMOTABLE"
-
-    def __post_init__(self) -> None:
-        validate_stable_id(self.config_id, field_name="config_id")
-        if (
-            not self.config_id.startswith("empirical-lawhood-finite-response-law-calibration-")
-            or self.stage != "calibration"
-            or self.evidence_role != "EXPOSED_DEVELOPMENT_NONPROMOTABLE"
-        ):
-            raise ValueError(
-                "finite response-law calibration input changes its target development role"
-            )
 
 
 def _census(raw: bytes) -> tuple[tuple[str, ...], tuple[str, ...]]:
@@ -72,7 +50,7 @@ def _census(raw: bytes) -> tuple[tuple[str, ...], tuple[str, ...]]:
 
 
 def check_finite_calibration_input(
-    config: FiniteResponseLawCalibrationInput,
+    config: _science_FiniteResponseLawCalibrationInput,
     *,
     source_root: Path | None,
     plan: Path | None,
@@ -166,4 +144,4 @@ def check_finite_calibration_input(
     }
 
 
-__all__ = ['FiniteResponseLawCalibrationInput', "check_finite_calibration_input"]
+__all__ = ['check_finite_calibration_input']

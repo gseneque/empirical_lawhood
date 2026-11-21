@@ -8,9 +8,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure import study_issue as owner
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict, ExternalRootUnavailable
-from empirical_lawhood.runtime.study_issue import IssuedStudyManifest, StudyIssuePayload, StudyIssuePreparation
+from empirical_lawhood.storage import study_issue as owner
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalRootUnavailable
+from empirical_lawhood.execution.study_issue import IssuedStudyManifest, StudyIssuePayload, StudyIssuePreparation
 from tests.runtime_platform.test_study_issue import _issue_api_fixture, _issue_request, _publisher
 
 

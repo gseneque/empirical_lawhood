@@ -6,13 +6,13 @@ import json
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import contracts as c, science, native
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry import science as old_science
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import BatteryInquirySource, SOURCE_MEMBERS
-from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic.contracts import ADDITIONAL_SOURCE_MEMBERS
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.domains.battery.battery_refined_inquiry import contracts as c, science, native
+from empirical_lawhood.domains.battery.battery_thermal_inquiry import science as old_science
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquirySource, SOURCE_MEMBERS
+from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic.contracts import ADDITIONAL_SOURCE_MEMBERS
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
 from tests.test_battery_thermal_inquiry import _exposed_trace
 
 
@@ -105,8 +105,8 @@ def test_new_typed_factories_carry_explicit_settings_no_native(selected, monkeyp
 
 def test_canonical_protocol_and_actual_diagnostic_lineage_before_native(selected, monkeypatch):
     from tests.test_battery_dfn_precision_diagnostic import config_rows, exposed as diagnostic_trace
-    from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic import science as diagnostic_science
-    from empirical_lawhood.adapters.methods.battery_dfn_precision_diagnostic.contracts import DiagnosticResult
+    from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic import science as diagnostic_science
+    from empirical_lawhood.domains.battery.battery_dfn_precision_diagnostic.contracts import DiagnosticResult
 
     traces = tuple(diagnostic_trace(config) for config in config_rows())
     # A retained unresolved diagnosis remains history; it does not assert a

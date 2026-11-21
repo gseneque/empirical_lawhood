@@ -1,27 +1,28 @@
 # SPDX-License-Identifier: MPL-2.0
 """Original DEV to revision composition over existing component lifecycle owners."""
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_experiment as acquisition_owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_revision_transition as domain
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_revision_preparation as component
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_experiment as acquisition_owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_revision_transition as domain
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_revision_preparation as component
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
 from empirical_lawhood.api.composite_experiment_programme import write_experiment_programme_descriptor
 from empirical_lawhood.api.recursive_authoring import load_authored_wave
 from empirical_lawhood.api.recursive_execution import _retained_plans
 from empirical_lawhood.api.selected_e4_method_runtime import export_selected_e4_revision_inputs_from_acquisition, read_selected_e4_revision
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, artifact_custody_limits
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInstanceBinding
-from empirical_lawhood.runtime.experiment_programme import ExperimentProgrammeDescriptor
-from empirical_lawhood.runtime.recursive_compiler import decode_recursive_config_input
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, artifact_custody_limits
+from empirical_lawhood.execution.experiment_preparation import ExperimentInstanceBinding
+from empirical_lawhood.execution.experiment_programme import ExperimentProgrammeDescriptor
+from empirical_lawhood.execution.recursive_compiler import decode_recursive_config_input
 
 
 PARENT_FILENAME = "revision-acquisition-programme.json"
@@ -95,8 +96,7 @@ class SelectedE4RevisionAcquisitionService:
         writer = self.service.artifact_writer
         relative, path = _location(writer, directory, PARENT_FILENAME, for_write=False)
         limit = artifact_custody_limits(writer).manifest_bytes
-        manifest = decode_artifact_manifest(read_bounded_bytes(writer.root.resolve(relative + ".manifest.json", for_write=False),
-            maximum_bytes=limit), maximum_bytes=limit)
+        manifest = read_artifact_sidecar(writer, (writer.root.resolve(relative + '.manifest.json', for_write=False)).relative_to(writer.root.contract.canonical_path).as_posix(), maximum_bytes=limit)
         if (manifest.materialization.relative_path != relative or manifest.materialization.storage_root_id != writer.root.contract.storage_root_id
                 or manifest.logical.payload_schema != domain.SelectedE4RevisionAcquisitionProgramme.SCHEMA
                 or manifest.logical.media_type != "application/json"

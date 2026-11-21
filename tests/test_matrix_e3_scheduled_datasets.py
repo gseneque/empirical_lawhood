@@ -12,13 +12,13 @@ import tracemalloc
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_dataset_readers import bridge_saved_arrays, verified_array_mappings
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_science as prefix
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseArrays
-from empirical_lawhood.infrastructure.dataset_readers import ArrayDatasetReader, ArrayTransformWriter, DatasetFDMember, PhysicalFDByteSource
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.matrix_inputs import MAXIMUM_MATRIX_ARRAY_BYTES
-from empirical_lawhood.kernel.provenance import ObjectIdentity
+from empirical_lawhood.domains.matrix.matrix_dataset_readers import bridge_saved_arrays, verified_array_mappings
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_science as prefix
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseArrays
+from empirical_lawhood.storage.dataset_readers import ArrayDatasetReader, ArrayTransformWriter, DatasetFDMember, PhysicalFDByteSource
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.domains.matrix.input_contracts import MAXIMUM_MATRIX_ARRAY_BYTES
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from tests.test_matrix_e3_protected_feature import finite_case, project
 from tests.test_matrix_e3_protected_prefix_science import case as case, context, forbid_native as forbid_native  # noqa: F401
 

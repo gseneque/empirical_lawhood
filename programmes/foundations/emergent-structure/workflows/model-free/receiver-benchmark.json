@@ -1,0 +1,323 @@
+{
+  "schema": "model-free-matrix-definition.v1",
+  "label": "Complete signed H64 finite-frame benchmark for priced estimators",
+  "roots": [
+    {
+      "seed": 1800501,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800502,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800503,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800504,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800505,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800506,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800507,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800508,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800509,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800510,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800511,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800512,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800513,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800514,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800515,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800516,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800517,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800518,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800519,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800520,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800521,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800522,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800523,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800524,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800525,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800526,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800527,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800528,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800529,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800530,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800531,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    },
+    {
+      "seed": 1800532,
+      "modules": [
+        "M1",
+        "M5"
+      ],
+      "role": "development"
+    }
+  ],
+  "settings": {
+    "resources": {
+      "memory_bytes": 4294967296,
+      "wall_time_seconds": 14400,
+      "output_bytes": 2147483648
+    },
+    "alpha": "0.05",
+    "inference": {
+      "module_alpha_weights": {
+        "M0": "0.01",
+        "M1": "0.04",
+        "M2": "0.01",
+        "M3": "0.01",
+        "M4": "0.01",
+        "M5": "0.90",
+        "M6": "0.01",
+        "M7": "0.01"
+      }
+    },
+    "native": {
+      "coordinates": [
+        {
+          "id": "nominal",
+          "temperature": "1",
+          "friction": "1",
+          "cross_coupling": "1"
+        }
+      ],
+      "horizon_ticks": 64
+    },
+    "population": {
+      "mode": "reveal_all",
+      "frame_size": 32,
+      "audit_size": 8,
+      "sampling_seed": 2026111805,
+      "auxiliary_rank": 4
+    },
+    "response": {
+      "selection_tick": 32
+    },
+    "receiver_study": {
+      "revision": "matrix-receiver-study.v2",
+      "instrument": "SELECT_ORIGINAL_SCI02C",
+      "M1": {
+        "structural_service": false
+      },
+      "M5": {
+        "individual_halfwidth_actuator": "0.001",
+        "numerical_allowance_actuator": "0.0001",
+        "mean_rms_budget_actuator": "0.00025",
+        "mean_halfwidth_actuator": "0.00025",
+        "mean_error_risk": "0.05",
+        "panels": [
+          5000,
+          5001
+        ],
+        "sparse_use": "DISJOINT_DEVELOPMENT_AUDIT",
+        "sparse_supplier": "auxiliary"
+      }
+    }
+  }
+}

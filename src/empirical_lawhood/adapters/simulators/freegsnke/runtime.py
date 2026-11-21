@@ -9,12 +9,12 @@ import os
 from pathlib import Path
 from typing import Final
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
 
-from .contracts import FreeGsnkeProcessRequest, FreeGsnkeProcessResponse, FreeGsnkeSavedPreparation, FreeGsnkeTargetActionObservation, FreeGsnkeTargetCurrentSnapshot, FreeGsnkeTargetEpisodeStatus, FreeGsnkeTargetEpisode, FreeGsnkeTargetProcessResponse, FreeGsnkeTargetReceiverSnapshot, FreeGsnkeTargetWorkerInput
-from .worker_process import FreeGsnkeProgressSink, run_freegsnke_canonical_process
+from empirical_lawhood.domains.fusion.freegsnke.contracts import FreeGsnkeProcessRequest, FreeGsnkeProcessResponse, FreeGsnkeSavedPreparation, FreeGsnkeTargetActionObservation, FreeGsnkeTargetCurrentSnapshot, FreeGsnkeTargetEpisodeStatus, FreeGsnkeTargetEpisode, FreeGsnkeTargetProcessResponse, FreeGsnkeTargetReceiverSnapshot, FreeGsnkeTargetWorkerInput
+from empirical_lawhood.adapters.simulators.freegsnke.worker_process import FreeGsnkeProgressSink, run_freegsnke_canonical_process
 
 
 FREEGSNKE_MAX_REQUEST_BYTES: Final = 2 * 1024**2

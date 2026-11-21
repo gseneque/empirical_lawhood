@@ -1,33 +1,18 @@
-"""Read-only target predecessor compatibility.
-
-Historical bytes require a separately verified external export/import mapping
-to current descriptors, exact source interpretation and target custody. This
-reader transfers no original qualification or receipt grant.
-"""
+"""Native acquisition and external-format binding for the domain science."""
 
 from __future__ import annotations
-
-from dataclasses import dataclass
 from hashlib import sha256
 import json
 from pathlib import Path
 from typing import Mapping
+from empirical_lawhood.domains.quantum.finite_grammar_identification.contracts import MAXIMUM_JSON_BYTES, Verdict
+from empirical_lawhood.domains.quantum.response_control.contracts import Verdict as ResponseControlVerdict
+from empirical_lawhood.domains.quantum.marked_record_identification.compatibility_records import PredecessorInputs
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
 
-from .contracts import MAXIMUM_JSON_BYTES, Verdict
-from ..quantum_response_control.contracts import Verdict as ResponseControlVerdict
-
-
-from empirical_lawhood.adapters.simulators.quantum_marked_record_identification.compatibility import PredecessorInputs
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-
-
-@dataclass(frozen=True, slots=True)
-class CompatibilityResult:
-    verdict: Verdict
-    checked_sha256: Mapping[str, str]
-    reason_codes: tuple[str, ...]
-    field_classification: Mapping[str, str]
-
+from empirical_lawhood.domains.quantum.finite_grammar_identification.compatibility_records import (
+    CompatibilityResult as _science_CompatibilityResult,
+)
 
 def _bounded_json(path: Path) -> tuple[Mapping[str, object], bytes]:
     payload = read_bounded_bytes(path, maximum_bytes=MAXIMUM_JSON_BYTES)
@@ -56,7 +41,7 @@ def _validate_receipt(path: Path, payload_path: Path) -> None:
 
 def compare_predecessors(
     storage_root: Path, *, inputs: PredecessorInputs
-) -> CompatibilityResult:
+) -> _science_CompatibilityResult:
     checked: dict[str, str] = {}
     reasons: list[str] = []
     try:
@@ -103,7 +88,7 @@ def compare_predecessors(
         ):
             reasons.append("quantum-response-control-terminal-semantics-differ")
     except (OSError, ValueError, TypeError, json.JSONDecodeError) as error:
-        return CompatibilityResult(
+        return _science_CompatibilityResult(
             verdict=Verdict.COMPATIBILITY_UNEVALUABLE,
             checked_sha256=checked,
             reason_codes=(f"bounded-predecessor-read-failed:{type(error).__name__}",),
@@ -125,16 +110,9 @@ def compare_predecessors(
         if reasons
         else Verdict.COMPATIBLE_RECEIVER_IDENTIFICATION_SOURCE_READY
     )
-    return CompatibilityResult(
+    return _science_CompatibilityResult(
         verdict=verdict,
         checked_sha256=checked,
         reason_codes=tuple(reasons),
         field_classification=classification,
     )
-
-
-__all__ = [
-    "CompatibilityResult",
-    'PredecessorInputs',
-    "compare_predecessors",
-]

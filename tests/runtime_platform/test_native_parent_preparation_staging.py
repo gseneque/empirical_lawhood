@@ -8,13 +8,13 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.infrastructure import execution as owner
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity
-from empirical_lawhood.runtime.execution import ParentPreparedTaskRunner, WorkerInputBinding, WorkerInputKind, WorkerInputPort
-from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition, NativeSubworkOutput, NativeSubworkRoster
-from empirical_lawhood.runtime.plans import ExternalInputSpec
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedNativeInputContract, PreparedNativeWork
+from empirical_lawhood.execution.local import execution as owner
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity
+from empirical_lawhood.execution.execution import ParentPreparedTaskRunner, WorkerInputBinding, WorkerInputKind, WorkerInputPort
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition, NativeSubworkOutput, NativeSubworkRoster
+from empirical_lawhood.execution.plans import ExternalInputSpec
+from empirical_lawhood.execution.prepared_native_invocation import PreparedNativeInputContract, PreparedNativeWork
 from tests.runtime_platform.test_native_parent_preparation_contract import NativeRunner, native_context
 
 
@@ -76,7 +76,7 @@ def test_initializer_does_not_project_native_work_on_unprepared_parent(protocol_
     wrapper = ParentPreparedTaskRunner(manifest, lambda value: pytest.fail("initializer called custody callback"), native_effect=True)
     monkeypatch.setattr(owner, "observe_worker_environment", lambda: SimpleNamespace(interpreter_path="/exposed/python",
         interpreter_sha256="4" * 64, prefix="/exposed"))
-    monkeypatch.setattr(owner, "_select_worker_environment", lambda selector: ())
+    monkeypatch.setattr(owner, "_select_worker_environment", lambda selector, **kwargs: ())
     result = owner.prepare_worker_invocation(wrapper, context, (), implementation=initial.implementation,
         execution_plan=initial.execution_plan, execution_task=initial.execution_task,
         execution_task_record=initial.execution_task_record, native_effect=True,

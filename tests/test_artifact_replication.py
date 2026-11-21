@@ -7,8 +7,8 @@ import json
 
 import pytest
 
-from empirical_lawhood.infrastructure import artifact_replication as owner
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage import artifact_replication as owner
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
 from tests.test_artifact_publication_admission import _plane, _requests
 
 
@@ -36,7 +36,7 @@ def copy(case, **changes):
 def test_replica_preserves_complete_publication_and_original_control_bytes(case, monkeypatch, compact):
     source, target, manifests, extra, receipt_path = case
     if compact:
-        from empirical_lawhood.infrastructure.artifact_sidecars import encode_artifact_manifest_reference
+        from empirical_lawhood.storage.artifact_sidecars import encode_artifact_manifest_reference
 
         for manifest in manifests:
             path = source.root.resolve(manifest.materialization.relative_path + ".manifest.json", for_write=False)

@@ -4,6 +4,7 @@
 Fixtures do not qualify scientific sources. Original history/factor byte
 packages are consumed only when explicitly selected and are never recreated.
 """
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import replace
 from decimal import Decimal as D
@@ -16,37 +17,26 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.eligibility import MatrixFactorStream
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import MatrixFactorAction, MatrixFactorResponseModel
-from empirical_lawhood.adapters.methods.matrix_parameter_factor.records import (
-    MatrixParameterFactorAssessment, MatrixParameterFactorProduct, MatrixParameterFactorSource,
-    MatrixParameterFactorSupply, expected_members as factor_members, identity as factor_identity, prefix,
-)
-from empirical_lawhood.adapters.methods.matrix_parameter_history.records import (
-    MatrixParameterHistorySource, expected_members as history_members, identity as history_identity,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import eligible_origins
-from empirical_lawhood.adapters.methods.matrix_parameter_response import independent, science
-from empirical_lawhood.adapters.methods.matrix_parameter_response.operation_bindings import (
-    MatrixParameterResponseForecastConfig, MatrixParameterResponseRunner, NAMESPACE,
-    development_draft, operation_factories, operation_registrations, output_codecs,
-)
-from empirical_lawhood.adapters.methods.matrix_parameter_response.records import (
-    CONTINUATION, MatrixParameterResponseAllocation, MatrixParameterResponseCausalSource,
-    MatrixParameterResponseDesign, MatrixParameterResponseRoot, MatrixParameterResponseSource, identity,
-)
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_history import initial_parameter_state
-from empirical_lawhood.adapters.simulators.six_matrix_response.parameter_response import native_constant_response_branch
-from empirical_lawhood.adapters.simulators.six_matrix_response.shooting import hermitian_basis
+from empirical_lawhood.domains.matrix.matrix_factor_response.eligibility import MatrixFactorStream
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import MatrixFactorAction, MatrixFactorResponseModel
+from empirical_lawhood.domains.matrix.matrix_parameter_factor.records import MatrixParameterFactorAssessment, MatrixParameterFactorProduct, MatrixParameterFactorSource, MatrixParameterFactorSupply, expected_members as factor_members, identity as factor_identity, prefix
+from empirical_lawhood.domains.matrix.matrix_parameter_history.records import MatrixParameterHistorySource, expected_members as history_members, identity as history_identity
+from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import eligible_origins
+from empirical_lawhood.domains.matrix.matrix_parameter_response import independent, science
+from empirical_lawhood.domains.matrix.matrix_parameter_response.operation_bindings import MatrixParameterResponseForecastConfig, MatrixParameterResponseRunner, NAMESPACE, development_draft, operation_factories, operation_registrations, output_codecs
+from empirical_lawhood.domains.matrix.matrix_parameter_response.records import CONTINUATION, MatrixParameterResponseAllocation, MatrixParameterResponseCausalSource, MatrixParameterResponseDesign, MatrixParameterResponseRoot, MatrixParameterResponseSource, identity
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_history import initial_parameter_state
+from empirical_lawhood.domains.matrix.six_matrix_response.parameter_response import native_constant_response_branch
+from empirical_lawhood.domains.matrix.six_matrix_response.shooting import hermitian_basis
 from empirical_lawhood.api.matrix_numerical_provenance import capture_matrix_provenance
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_matrix_parameter_factor import absent_case
 
 
@@ -152,7 +142,7 @@ def test_cold_forecast_witness_all_modes_and_force_roles_without_producer_or_eig
 
 def test_supplied_innovation_branch_preserves_full192_both_kicks_and_actual_clocks(mathematical):
     _, d, _, _, _, past, *_ = mathematical
-    from empirical_lawhood.adapters.simulators.six_matrix_response.model import SixMatrixState
+    from empirical_lawhood.domains.matrix.six_matrix_response.model import SixMatrixState
     state = SixMatrixState(2, past['positions'][-1], past['momenta'][-1], d.origin_tick, float(d.alpha_x), float(d.alpha_y))
     noise = np.zeros((4, 2, 3, 4, 4), dtype='<c16')
     result = native_constant_response_branch(state, member=d.member, numerical_view=d.view, direction=past['forces'][1],
@@ -244,7 +234,7 @@ def test_actual_retained_supplier_receipts_root_compile_and_exact_source_refusal
     result = compile_recursive_wave(draft=draft, registrations=operation_registrations(), registry=registry,
         implementation_commit=source.provenance.observed_git_head, output_codecs=output_codecs())
     assert len(result.execution_plan.tasks) == 4
-    for changes in ({'world_kind': __import__('empirical_lawhood.kernel.worlds', fromlist=['WorldKind']).WorldKind.ANALYTIC_REFERENCE},
+    for changes in ({'world_kind': __import__('empirical_lawhood.science.models.worlds', fromlist=['WorldKind']).WorldKind.ANALYTIC_REFERENCE},
                     {'system': obj('foreign-system')}, {'numerical_view_ids': ()}):
         altered = replace(draft.development_study, **changes)
         with pytest.raises(ValueError):
@@ -286,28 +276,23 @@ def test_genuine_four_phase_exposed_native_receipts_cold_and_portable(retained, 
     if completed := os.environ.get('MATRIX_PARAMETER_RESPONSE_COMPLETED_FIXTURE'):
         return _completed_fixture_cold(Path(completed), tmp_path, monkeypatch)
     from empirical_lawhood.api.execution import _StaticInputResolver
-    from empirical_lawhood.infrastructure.execution import DirectTaskExecutor, LocalScheduler
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-    from empirical_lawhood.infrastructure.recovery import ExternalRunRecoveryStore
-    from empirical_lawhood.infrastructure.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
-    from empirical_lawhood.infrastructure.task_receipts import ExternalTaskReceiptStore, decode_artifact_manifest
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.status import OperationalStatus
-    from empirical_lawhood.kernel.matrix_inputs import MATRIX_ARRAY_SCHEMA
-    from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-    from empirical_lawhood.runtime.execution import ExecutionAssuranceProfile, RunnerRegistry, VerifiedArtifactInput
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkState
-    from empirical_lawhood.runtime.plans import PlanLane
-    from empirical_lawhood.runtime.recovery import DevelopmentRunRecoveryIndex
-    from empirical_lawhood.adapters.methods.matrix_parameter_response.operation_bindings import operands
-    from empirical_lawhood.adapters.methods.matrix_parameter_response.records import (
-        MatrixParameterResponseOrigin, MatrixParameterResponseForecast, MatrixParameterNativeResponses,
-        MatrixParameterResponseAssessment,
-    )
-    from empirical_lawhood.adapters.methods.matrix_parameter_response.frontier import (
-        protocol_for_source, reduce_parameter_frontier,
-    )
+    from empirical_lawhood.execution.local.execution import DirectTaskExecutor, LocalScheduler
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
+    from empirical_lawhood.storage.sql import SQLiteOperationalRepository, create_catalog_engine, upgrade_catalog
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.records.status import OperationalStatus
+    from empirical_lawhood.domains.matrix.input_contracts import MATRIX_ARRAY_SCHEMA
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.execution.execution import ExecutionAssuranceProfile, RunnerRegistry, VerifiedArtifactInput
+    from empirical_lawhood.execution.native_subwork import NativeSubworkState
+    from empirical_lawhood.execution.plans import PlanLane
+    from empirical_lawhood.execution.recovery import DevelopmentRunRecoveryIndex
+    from empirical_lawhood.domains.matrix.matrix_parameter_response.operation_bindings import operands
+    from empirical_lawhood.domains.matrix.matrix_parameter_response.records import MatrixParameterResponseOrigin, MatrixParameterResponseForecast, MatrixParameterNativeResponses, MatrixParameterResponseAssessment
+    from empirical_lawhood.domains.matrix.matrix_parameter_response.frontier import protocol_for_source, reduce_parameter_frontier
     from tests.runtime_platform.test_native_subwork import _plane
     import shutil
 
@@ -339,7 +324,7 @@ def test_genuine_four_phase_exposed_native_receipts_cold_and_portable(retained, 
             spec.expected_payload_schema, ArtifactProfile.MATRIX_ARRAY_NPZ if array else ArtifactProfile.CANONICAL_JSON,
             spec.expected_media_type, 'software.parameter-response.fixture', 'inputs', raw,
             VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE))
-        manifest = decode_artifact_manifest(plane.root.resolve(published.manifest_materialization.relative_path, for_write=False).read_bytes())
+        manifest = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(published.manifest_materialization.relative_path, for_write=False).read_bytes())
         inputs.append(VerifiedArtifactInput(manifest.logical, manifest.materialization))
     runners = RunnerRegistry(tuple(sorted((f.runner_factory() for f in factories), key=lambda r: r.manifest.registry_id)),
         registry_sha256=compiled.registry.fingerprint())
@@ -415,15 +400,12 @@ def test_genuine_four_phase_exposed_native_receipts_cold_and_portable(retained, 
 
 def _completed_fixture_cold(root, tmp_path, monkeypatch):
     """Authenticate previously completed exposed children without any replay."""
-    from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.adapters.methods.matrix_parameter_response.records import (
-        MatrixParameterResponseOrigin, MatrixParameterResponseForecast, MatrixParameterNativeResponses,
-        MatrixParameterResponseAssessment,
-    )
-    from empirical_lawhood.adapters.methods.matrix_parameter_response.frontier import protocol_for_source, reduce_parameter_frontier
-    from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-    from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-    from empirical_lawhood.runtime.native_subwork import NativeSubworkState
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.domains.matrix.matrix_parameter_response.records import MatrixParameterResponseOrigin, MatrixParameterResponseForecast, MatrixParameterNativeResponses, MatrixParameterResponseAssessment
+    from empirical_lawhood.domains.matrix.matrix_parameter_response.frontier import protocol_for_source, reduce_parameter_frontier
+    from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+    from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+    from empirical_lawhood.execution.native_subwork import NativeSubworkState
     from tests.runtime_platform.test_native_subwork import _plane
     import shutil
 

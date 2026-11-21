@@ -7,52 +7,27 @@ from dataclasses import fields, replace
 from hashlib import sha256
 from typing import Final
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experiments import ExperimentSpec
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    ScientificAdjudicationOutputContract,
-    ScientificAdjudicationRecord,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityConfigRef,
-    CapabilityKind,
-    CapabilityManifest,
-    CapabilityPermission,
-    CapabilityRegistry,
-)
-from empirical_lawhood.runtime.candidate_compiler import CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole, required_candidate_obligation_ids
-from empirical_lawhood.runtime.candidate_composition import CandidateCapabilityRegistration
-from empirical_lawhood.runtime.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
-from empirical_lawhood.runtime.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
-from empirical_lawhood.runtime.providers import (
-    CapabilityOutputSemanticContract,
-    CampaignRuntimeProvider,
-    ExternalInputPayload,
-)
-from empirical_lawhood.runtime.source_resolution import CandidateCapabilityConfigDecoder
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experiments import ExperimentSpec
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityKind, CapabilityManifest, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.candidate_compiler import CandidateGraphEdge, CandidateGraphExternalInput, CandidateGraphNode, CandidateScientificGraph, ContentIdentityPolicy, ObligationCoverage, ObligationCoverageBinding, StudyTemplate, ScientificInputRole, required_candidate_obligation_ids
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityRegistration
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, TaskOutputPayload, TaskRunner
+from empirical_lawhood.execution.plans import BarrierKind, ProtocolExecutionPlan, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, CampaignRuntimeProvider, ExternalInputPayload
+from empirical_lawhood.execution.source_resolution import CandidateCapabilityConfigDecoder
 
-from .contracts import FreeGsnkePhase, FreeGsnkeProcessRequest, FreeGsnkeSavedPreparation, FreeGsnkeSourceBinding, FreeGsnkeTargetProcessResponse
-from .generation_protocol import (
-    FREEGSNKE_SOURCE_ARTIFACT_ID,
-    FreeGsnkeEpisodeExecutor,
-    build_freegsnke_generation_protocol,
-    freegsnke_generation_registry,
-    freegsnke_generation_runners,
-    freegsnke_generation_scientific_graph,
-)
-from .registry import (
-    FREEGSNKE_CAPABILITY_VERSION,
-    FREEGSNKE_DEVELOPMENT_CAPABILITY_KEY,
-    FREEGSNKE_EVALUATION_CAPABILITY_KEY,
-)
-from .source_qualification import FreeGsnkeSourceQualificationConfig, FreeGsnkeSourceQualificationDisposition, FreeGsnkeSourceQualificationResult, reduce_freegsnke_source_qualification
+from empirical_lawhood.domains.fusion.freegsnke.contracts import FreeGsnkePhase, FreeGsnkeProcessRequest, FreeGsnkeSavedPreparation, FreeGsnkeSourceBinding, FreeGsnkeTargetProcessResponse
+from empirical_lawhood.adapters.simulators.freegsnke.generation_protocol import FREEGSNKE_SOURCE_ARTIFACT_ID, FreeGsnkeEpisodeExecutor, build_freegsnke_generation_protocol, freegsnke_generation_registry, freegsnke_generation_runners, freegsnke_generation_scientific_graph
+from empirical_lawhood.adapters.simulators.freegsnke.registry import FREEGSNKE_CAPABILITY_VERSION, FREEGSNKE_DEVELOPMENT_CAPABILITY_KEY, FREEGSNKE_EVALUATION_CAPABILITY_KEY
+from empirical_lawhood.domains.fusion.freegsnke.source_qualification import FreeGsnkeSourceQualificationConfig, FreeGsnkeSourceQualificationDisposition, FreeGsnkeSourceQualificationResult, reduce_freegsnke_source_qualification
 
 
 FREEGSNKE_SOURCE_QUALIFICATION_REDUCER_KEY: Final = "freegsnke.reduce-source-action-qualification"

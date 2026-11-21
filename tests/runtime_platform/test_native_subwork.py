@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 """Independent exposed crash/replay probes; no native solver or scientific authority."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from dataclasses import dataclass, replace
 from decimal import Decimal
@@ -11,31 +12,26 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.infrastructure.artifact_validation import ArtifactIdentityConflict
-from empirical_lawhood.infrastructure.native_effect_custody import ExternalNativeEffectContactStore
-from empirical_lawhood.infrastructure.native_subwork import ExternalNativeSubworkStore
-from empirical_lawhood.infrastructure.native_subwork_ipc import (
-    NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress,
-)
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, TaskProcessError
-from empirical_lawhood.adapters.methods.native_subwork_conformance import ExposedDerivedOperand, ExposedNativeSubworkRunner
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.numerical_provenance import NumericalProducingProvenance
-from empirical_lawhood.kernel.recursive_inquiry import InquiryCost
-from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_json_bytes
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract, ReceiptCheck
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef
-from empirical_lawhood.runtime.execution import RunnerResult, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile
-from empirical_lawhood.runtime.native_effects import NativeEffectContact
-from empirical_lawhood.runtime.native_subwork import (
-    NativeSubworkDefinition, NativeSubworkOutput, NativeSubworkPartialOutput, NativeSubworkRoster,
-    NativeSubworkState, NativeSubworkUncertainContact,
-)
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.artifact_validation import ArtifactIdentityConflict
+from empirical_lawhood.storage.native_effect_custody import ExternalNativeEffectContactStore
+from empirical_lawhood.storage.native_subwork import ExternalNativeSubworkStore
+from empirical_lawhood.execution.local.native_subwork_ipc import NativeSubworkPipeService, NativeSubworkRequest, PipeNativeSubworkProgress
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, TaskProcessError
+from empirical_lawhood.methods.native_subwork_conformance import ExposedDerivedOperand, ExposedNativeSubworkRunner
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
+from empirical_lawhood.science.inquiry.recursive_inquiry import InquiryCost
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, ExternalRootContract, ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef
+from empirical_lawhood.execution.execution import RunnerResult, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerIsolationProfile
+from empirical_lawhood.execution.native_effects import NativeEffectContact
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition, NativeSubworkOutput, NativeSubworkPartialOutput, NativeSubworkRoster, NativeSubworkState, NativeSubworkUncertainContact
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 
 
 @dataclass(frozen=True, slots=True)
@@ -49,7 +45,7 @@ def _plane(path, *, binary_codecs=()):
     path.mkdir(exist_ok=True)
     path = path.resolve(strict=True)
     mount = next(candidate for candidate in (path, *path.parents) if candidate.is_mount())
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
     return ExternalArtifactPlane(GuardedExternalRoot(ExternalRootContract(
         "synthetic.subwork", "exposed conformance only", str(path), str(mount),
         OperatorStorageProfile.SCHEMA, 0, None, None, (),
@@ -79,9 +75,8 @@ def _selected(tmp_path, *, freeze=True, extra_outputs=()):
             ArtifactProfile.CANONICAL_JSON, "application/json", "selected.inputs", "inputs",
             record.canonical_bytes(), VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE,
         ))
-        from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-        manifests.append(decode_artifact_manifest(plane.root.resolve(
-            result.materialization.relative_path + ".manifest.json", for_write=False).read_bytes()))
+
+        manifests.append(resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.materialization.relative_path + '.manifest.json', for_write=False).read_bytes()))
     parent = NativeEffectContact("synthetic.run", "native.parent", "synthetic.run.native.parent.attempt-001",
         ObjectIdentity("plan.selected", "empirical-lawhood/runtime/development-execution-plan", "1.0.0", "1" * 64),
         ObjectIdentity("native.parent", "empirical-lawhood/runtime/execution-task", "1.0.0", "2" * 64),
@@ -273,9 +268,9 @@ def test_new_process_finalizes_known_return_and_owned_receipt_publication(select
 from pathlib import Path
 import os
 import sys
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.native_subwork import NativeSubworkDefinition
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.native_subwork import NativeSubworkDefinition
 from tests.runtime_platform.test_native_subwork import _plane, _store
 raw = bytes.fromhex(sys.argv[2])
 definition = decode_canonical_bytes(raw, NativeSubworkDefinition, maximum_bytes=len(raw))
@@ -921,6 +916,33 @@ def test_transport_rechunking_does_not_relax_original_source_chunk_allowance(sel
         assert recovered.completion.operational_status is OperationalStatus.FAILED
         assert recovered.outputs == ()
         assert recovered.partial_output_records[0].received_size_bytes == 2
+
+
+def test_output_close_refuses_changed_size_and_preserves_a_mismatched_digest(selected, tmp_path):
+    store, definition, inputs = selected
+    context = _process_context(store, definition, inputs)
+    service = NativeSubworkPipeService(store, context, tmp_path)
+    try:
+        handle = service._dispatch("begin", (definition, None))
+        service._dispatch("contact", (handle,))
+        output = "result.output.native"
+        service._dispatch("output-open", (handle, output, 8, 8, None, None))
+        service._dispatch("output-chunk", (handle, output, b"abcd"))
+        with pytest.raises(ValueError, match="received size"):
+            service._dispatch("output-close", (handle, output, 3, sha256(b"abc").hexdigest()))
+        wrong = sha256(b"abce").hexdigest()
+        with pytest.raises((ValueError, ArtifactIdentityConflict)):
+            service._dispatch("output-close", (handle, output, 4, wrong))
+    finally:
+        service.close()
+        for port in context.input_ports:
+            port.close()
+    observed = store.inspect(definition)
+    assert observed.outputs == () and observed.receipt is None
+    partial, = observed.partial_output_records
+    assert partial.reason_codes == ("native-output-publication-refused",)
+    assert partial.expected_physical_sha256 == wrong
+    assert partial.received_physical_sha256 == sha256(b"abcd").hexdigest()
 
 
 @pytest.mark.parametrize("parameters", [

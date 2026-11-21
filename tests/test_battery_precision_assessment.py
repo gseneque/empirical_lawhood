@@ -7,10 +7,10 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_observation_inquiry import precision_assessment as consumer
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_science as science
-from empirical_lawhood.adapters.methods.battery_segmented_inquiry import evidence_stream as stream
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.battery.battery_observation_inquiry import precision_assessment as consumer
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_science as science
+from empirical_lawhood.domains.battery.battery_segmented_inquiry import evidence_stream as stream
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_battery_precision_control import control as control_fixture, witness
 from tests.test_battery_segmented_science import prepared as prepared_fixture, _segment_fixture
 

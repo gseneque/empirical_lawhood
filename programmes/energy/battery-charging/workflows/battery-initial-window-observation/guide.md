@@ -65,7 +65,7 @@ observed parameter assignment is ACTUAL. No scientific output is thinned.
 
 ## Inputs and operational prerequisites
 
-The [PURE authoring function](../../../../../src/empirical_lawhood/adapters/methods/battery_observation_inquiry/recursive_translation.py)
+The [PURE authoring function](../../../../../src/empirical_lawhood/domains/battery/battery_observation_inquiry/recursive_translation.py)
 requires the actual portable adverse-history parent, complete frozen observation,
 three preparation protocols, three entry declarations, producing provenance,
 selected storage contract and full-state control protocol. Original import-only

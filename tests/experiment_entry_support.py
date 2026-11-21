@@ -6,33 +6,15 @@ from __future__ import annotations
 
 from dataclasses import replace
 
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.status import ReadinessStatus
-from empirical_lawhood.kernel.worlds import EvidenceUnitScope, WorldKind
-from empirical_lawhood.planning.experiment_entry import ExperimentEntryChecklist, ExperimentEntryPackage, ExperimentEntryRequirement, ExperimentEntryRequirementBinding, ExperimentEntryTransition, ExperimentTerminalClass, StudyDefinition
-from empirical_lawhood.planning.formal_analysis import (
-    FormalGapSourceCapabilityInventory,
-    FormalMethodBinding,
-    FormalMethodCatalog,
-    FormalMethodRole,
-    derive_formal_gap_applicability,
-)
-from empirical_lawhood.planning.formal_gaps import (
-    FormalDomain,
-    FormalGapApplicability,
-    FormalGapCoverage,
-    FormalGapCoverageAssignment,
-    FormalGapCoverageDisposition,
-    FormalGapEvidenceWorld,
-    FormalGapRegister,
-    FormalGapSpec,
-)
-from empirical_lawhood.planning.study_authoring import StudyDraft
-from empirical_lawhood.runtime.candidate_compiler import (
-    CandidateCompilationContext,
-    StandardCandidateCompilationContext,
-)
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.status import ReadinessStatus
+from empirical_lawhood.science.models.worlds import EvidenceUnitScope, WorldKind
+from empirical_lawhood.design.experiment_entry import ExperimentEntryChecklist, ExperimentEntryPackage, ExperimentEntryRequirement, ExperimentEntryRequirementBinding, ExperimentEntryTransition, ExperimentTerminalClass, StudyDefinition
+from empirical_lawhood.design.formal_analysis import FormalGapSourceCapabilityInventory, FormalMethodBinding, FormalMethodCatalog, FormalMethodRole, derive_formal_gap_applicability
+from empirical_lawhood.design.formal_gaps import FormalDomain, FormalGapApplicability, FormalGapCoverage, FormalGapCoverageAssignment, FormalGapCoverageDisposition, FormalGapEvidenceWorld, FormalGapRegister, FormalGapSpec
+from empirical_lawhood.design.study_authoring import StudyDraft
+from empirical_lawhood.execution.candidate_compiler import CandidateCompilationContext, StandardCandidateCompilationContext
 
 
 def _portfolio_world(draft: StudyDraft) -> FormalGapEvidenceWorld:

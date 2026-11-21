@@ -12,14 +12,14 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_structure import structural_measurement
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_structure import structural_measurement
 from empirical_lawhood.api import selected_e4_structure as ordinary
 from empirical_lawhood.api import matrix_full_factor_custody as custody
 from empirical_lawhood.api import matrix_full_factor_authoring as author
 from empirical_lawhood.api import matrix_full_factor_runtime as runtime
 from empirical_lawhood.api import matrix_full_factor_read as reader
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor
-from empirical_lawhood.runtime.operational_configuration import scientific_reconstruction_operation
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor
+from empirical_lawhood.execution.operational_configuration import scientific_reconstruction_operation
 from tests.matrix_e4_structure_support import disclosed_structure, publish_secondary
 from tests.test_matrix_e4_full_factor_public import ROOT, _real_plane, _development_access_seam, selected  # noqa: F401
 from tests.test_matrix_e4_full_factor_values import scopes  # noqa: F401
@@ -50,7 +50,6 @@ def _files(directory):
 @scientific_reconstruction_operation('full')
 def test_ordinary_dev_produces_reads_and_reuses_structure_without_operator_closeout(selected, tmp_path, monkeypatch):  # noqa: F811
     root = tmp_path / "ordinary-e4-structure-disclosed"
-    assert root.is_relative_to(Path("/media/chevre/EL/empirical-lawhood"))
     plane = _real_plane(root)
     directory = root / "ordinary-phase"
     directory.mkdir()
@@ -149,7 +148,7 @@ def test_protected_structure_reuses_complete_inputs_after_preauthor_interruption
     original metadata reuse and public authoring, with no worker or scientific
     completion claim from its final routing-only report seam.
     """
-    from empirical_lawhood.api import experiment_programme,selected_e4_access
+    from empirical_lawhood.api import experiment_programme, selected_e4_access
     from tests import test_matrix_e4_full_factor_exposed_public as protected
     protected_values=protected._selected(scopes,literal_recipe_source_inputs,monkeypatch)
     actual_author_guard=protected.author.validate_authoring_read_access

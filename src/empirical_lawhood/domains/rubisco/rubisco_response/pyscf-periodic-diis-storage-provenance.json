@@ -1,0 +1,13 @@
+{
+  "project": "PySCF",
+  "upstream_version": "2.14.0",
+  "license": "Apache-2.0",
+  "previous_provenance_path": "pyscf-periodic-provenance.json",
+  "previous_provenance_sha256": "31fddbb2a9a06d0ffe302320f129cdda5186f8136012619d334002fa19ec8d37",
+  "previous_derivative_sha256": "19950e908cbc25392869669dcce18bba640f9d712dddc60a3dae2f6076fc0727",
+  "local_path": "pyscf_periodic_diis.py",
+  "local_sha256": "51100b03b4f25297af7c18392a9a97aaa512ea75d012081983d664b86fb7b9bf",
+  "original_implementing_commit": "c4233170f33ad3bcbf1410fcf87367f6056bf966",
+  "modifications": "Store complete CDIIS error and Fock vectors in selected temporary HDF5 storage, preserving vector order, exact mixing and the checked eigensolver recovery. The preceding provenance and all original source identities remain unchanged.",
+  "qualification": "Software source provenance only; no enzyme, GPU, rate or biological qualification."
+}

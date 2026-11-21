@@ -5,12 +5,12 @@ from typing import ClassVar
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_produced_inputs as owner
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord
-from empirical_lawhood.planning.recursive_authoring import RecursiveExternalInput
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent, lineage_parent_sort_key
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_produced_inputs as owner
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord
+from empirical_lawhood.design.recursive_authoring import RecursiveExternalInput
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, lineage_parent_sort_key
 
 
 @dataclass(frozen=True, slots=True)
@@ -138,7 +138,7 @@ def test_history_role_requires_exact_canonical_parent_binding_and_custody(damage
 
 def test_retained_history_has_no_ordinary_qualification_but_physical_sources_still_require_it():
     from types import SimpleNamespace
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import selected_declarative_preparation as domain
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import selected_declarative_preparation as domain
     _, pin, parents = _case()
     record = _Consumer("consumer.retained", pin)
     history, = owner.inherit_external_inputs((_external("model", record),), (("model", record),), parents, retained_history=True)
@@ -156,7 +156,7 @@ def test_retained_history_has_no_ordinary_qualification_but_physical_sources_sti
 
 
 def test_external_history_link_projection_keeps_internal_edges_and_exact_source_census():
-    from empirical_lawhood.planning.recursive_authoring import RecursiveInputLink
+    from empirical_lawhood.design.recursive_authoring import RecursiveInputLink
     _, pin, parents = _case()
     record = _Consumer("consumer.retained", pin)
     history, = owner.inherit_external_inputs((_external("model", record),), (("model", record),), parents, retained_history=True)

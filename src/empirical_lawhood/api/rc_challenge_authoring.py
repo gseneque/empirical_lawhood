@@ -4,37 +4,37 @@ from decimal import Decimal
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-from empirical_lawhood.adapters.composition.task_resources import progress_resource_envelope
-from empirical_lawhood.adapters.simulator_morphism_challenges.authoring import SimulatorMorphismChallengeExternalRecord
+from empirical_lawhood.execution.task_resources import progress_resource_envelope
+from empirical_lawhood.domains.history.simulator_morphism_challenges.authoring import SimulatorMorphismChallengeExternalRecord
 from empirical_lawhood.adapters.simulator_morphism_challenges.composition import RCChallengeCandidateContextProvider, SimulatorMorphismChallengePhaseComposition, compose_simulator_morphism_challenges_phase, runtime_platform_ports
-from empirical_lawhood.adapters.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeConfig
-from empirical_lawhood.adapters.simulator_morphism_challenges.numeric_inputs import RCChallengeNumericInput
-from empirical_lawhood.adapters.simulator_morphism_challenges.issued_inputs import RCChallengeIssuedInputs
-from empirical_lawhood.adapters.simulator_morphism_challenges.retained_results import RCChallengeRetainedResult
+from empirical_lawhood.domains.history.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeConfig
+from empirical_lawhood.domains.history.simulator_morphism_challenges.numeric_publications import RCChallengeNumericInput
+from empirical_lawhood.domains.history.simulator_morphism_challenges.issued_inputs import RCChallengeIssuedInputs
+from empirical_lawhood.domains.history.simulator_morphism_challenges.retained_results import RCChallengeRetainedResult
 from empirical_lawhood.adapters.simulator_morphism_challenges.runtime_provider import SIMULATOR_MORPHISM_CHALLENGE_SOURCE_CLOSURE_PATHS
-from empirical_lawhood.adapters.simulator_morphism_challenges.specification import current_rc_challenge_formal_register, current_rc_challenge_specification
+from empirical_lawhood.domains.history.simulator_morphism_challenges.specification import current_rc_challenge_formal_register, current_rc_challenge_specification
 from empirical_lawhood.api.authoring_handoff import create_authoring_api, write_exclusive_record, resolve_authoring_directory, preflight_authoring_output_directory
 from empirical_lawhood.api.authoring_output import report_incomplete_output
 from empirical_lawhood.api.results import CompileCandidateRequest
 from empirical_lawhood.api.rc_challenge_results import authenticate_rc_challenge_result_authority
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes, MAX_RUNTIME_PLAN_JSON_BYTES
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
 from empirical_lawhood.api.recursive_prospective_authoring import _capture_prospective_source, _publish_source_provenance
-from empirical_lawhood.infrastructure.study_issue import GitStudySourceClosureInspector
-from empirical_lawhood.infrastructure.source_closure import capture_clean_target_closure
+from empirical_lawhood.storage.study_issue import GitStudySourceClosureInspector
+from empirical_lawhood.storage.source_closure import capture_clean_target_closure
 from empirical_lawhood.api.authoring_handoff import authenticate_selected_authoring_source, require_authoring_source_kind_layout
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
 from empirical_lawhood.api.integration_artifact_profiles import INTEGRATION_ARTIFACT_PROFILE_VALIDATORS
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
-from empirical_lawhood.runtime.artifacts import ArtifactWriter
-from empirical_lawhood.runtime.compiler import compile_preissue_run_plan, lower_run_plan
-from empirical_lawhood.runtime.study_issue import MAX_COMPOSED_PROGRAMME_CONTROL_BYTES, project_standard_study_extensions
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort, LayeredCampaignRuntimeProviderResolver
-from empirical_lawhood.runtime.providers import CampaignRuntimeProviderRegistry
-from empirical_lawhood.runtime.execution_envelope import ExecutionResourceEnvelopeSpec
-from empirical_lawhood.runtime.plans import CandidateExecutionPlan
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriter
+from empirical_lawhood.execution.compiler import compile_preissue_run_plan, lower_run_plan
+from empirical_lawhood.execution.study_issue import project_standard_study_extensions
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort, LayeredCampaignRuntimeProviderResolver
+from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
+from empirical_lawhood.execution.execution_envelope import ExecutionResourceEnvelopeSpec
+from empirical_lawhood.execution.plans import CandidateExecutionPlan
 
 
 RC_CHALLENGE_ARTIFACT_PROFILE_VALIDATORS = INTEGRATION_ARTIFACT_PROFILE_VALIDATORS
@@ -119,7 +119,7 @@ def _project_phase(composition, closure, report):
     resources = progress_resource_envelope(
         prefix=config.config_id, design=config, protocol=protocol,
         issued_extensions=ObjectIdentity.from_record(extensions.issued_extension_set_id, extensions),
-        cpu_seconds=sum(step.resource_budget.wall_time_seconds for step in protocol.steps),
+        summed_wall_time_ceiling_seconds=sum(step.resource_budget.wall_time_seconds for step in protocol.steps),
         native_preparations=tuple((step.step_id,
             next((unit for unit in config.unit_ids if step.step_id.endswith(unit)), config.config_id),
             f"{config.config_id}.bounded-task.{step.step_id}") for step in protocol.steps),
@@ -181,7 +181,7 @@ def load_rc_challenge_handoff(*, directory: Path, root: Path,
     if composition.issued_inputs != issued:
         raise ValueError("retained RC phase source/input reconstruction differs from the exact current owners")
     def require_record(filename, record):
-        limit = MAX_RUNTIME_PLAN_JSON_BYTES if filename in ("preissue-run-plan.json", "preissue-execution-plan.json") else MAX_COMPOSED_PROGRAMME_CONTROL_BYTES
+        limit = None if filename in ("preissue-run-plan.json", "preissue-execution-plan.json") else None
         raw = read_bounded_bytes(selected / filename, maximum_bytes=limit)
         if decode_canonical_bytes(raw, type(record), maximum_bytes=limit) != record:
             raise ValueError("RC retained authoring or exact projection reconstruction differs")

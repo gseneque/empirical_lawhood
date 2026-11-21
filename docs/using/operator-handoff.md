@@ -19,8 +19,7 @@ census or seeds. Release-roster issuance needs the owner review specified in the
 
 Select explicit input, artifact and scratch roots on suitable storage.
 Verify its actual mount, access mode and capacity before use.
-The [local storage guide](../development/maintainer-environment.md#storage-and-retained-evidence)
-records the maintainer's EL selection; it is not a default in the engine.
+Use the [environment and storage guide](environments.md#select-storage-and-reuse-an-environment) to select operational paths for a new run.
 
 Run an external script with the documented `scripts/run_operator.py` launcher.
 `scripts.operator_records.make_storage_profile` requires the selected external

@@ -42,7 +42,7 @@ def test_original_f_public_export_authenticate_and_refuse_evidence_preparation(t
 def test_meaningful_allocation_edit_prepares_actual_current_source_without_native_contact(tmp_path, monkeypatch):
     def forbidden(*args, **kwargs):
         raise AssertionError('configuration contacted native acquisition')
-    monkeypatch.setattr('empirical_lawhood.adapters.methods.finite_response_law.transient_bridge_source.acquire_current_preparation_root', forbidden)
+    monkeypatch.setattr('empirical_lawhood.domains.matrix.finite_response_law.transient_bridge_source.acquire_current_preparation_root', forbidden)
     document = json.loads((ROOT / 'programmes/foundations/emergent-structure/workflows/matrix-inputs/allocation.json').read_bytes())
     seeds = document['value']['roots'][0]['value']['scientific_seeds']
     seeds[0]['value']['seed'] += 1
@@ -130,9 +130,9 @@ def test_output_writer_rechecks_parent_after_noncreating_preflight(tmp_path):
 
 
 def _rc_cli_plane(tmp_path, monkeypatch):
-    from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-    from empirical_lawhood.runtime.artifacts import ExternalRootContract
-    from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+    from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+    from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+    from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 
     store = tmp_path / 'synthetic-rc-cli-store'
     store.mkdir()
@@ -147,7 +147,7 @@ def _rc_cli_plane(tmp_path, monkeypatch):
 
 def test_rc_canary_cli_authors_new_directory_and_loads_public_handoff(tmp_path, monkeypatch):
     from empirical_lawhood.api import rc_challenge_authoring, integration_handoffs
-    from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
+    from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
 
     plane, store = _rc_cli_plane(tmp_path, monkeypatch)
     closure = ImplementationSourceClosure('synthetic.rc-cli-source', SourceClosureKind.CLEAN_GIT_COMMIT,

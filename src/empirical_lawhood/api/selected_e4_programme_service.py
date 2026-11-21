@@ -14,19 +14,19 @@ from typing import ClassVar
 
 from empirical_lawhood.api import composite_experiment_programme as programme_source
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_preparation as d
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as r
-from empirical_lawhood.adapters.methods.matrix_storage_codecs import MATRIX_STORAGE_CODECS
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess,VisibilityCeiling,inherited_visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord,validate_stable_id,validate_relative_locator
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest,ArtifactWriteResult,ArtifactProfile,derived_outcome_access
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection,PreparedExperimentFile
-from empirical_lawhood.runtime.experiment_programme import ExperimentProgrammeDescriptor
-from empirical_lawhood.api.results import RunCampaignRequest,ResumeCampaignRequest,CampaignStatusRequest
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_preparation as d
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as r
+from empirical_lawhood.domains.matrix.matrix_storage_codecs import MATRIX_STORAGE_CODECS
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling, inherited_visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id, validate_relative_locator
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactWriteResult, ArtifactProfile, derived_outcome_access
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_entry import MatrixSelectedOriginalProduct
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, PreparedExperimentFile
+from empirical_lawhood.execution.experiment_programme import ExperimentProgrammeDescriptor
+from empirical_lawhood.api.results import RunCampaignRequest, ResumeCampaignRequest, CampaignStatusRequest
 
 MAX_PLAN_BYTES=64*1024**2
 PLAN_FILENAME="selected-e4-programme-plan.json"
@@ -96,8 +96,8 @@ class SelectedE4ProgrammeAuthoring(CanonicalRecord):
                 or self.plan_publication.materialization.physical_sha256!=self.programme.object_fingerprint):
             raise ValueError("selected E4 state needs its actual published complete programme plan")
         self.plan_publication.__post_init__()
-        from empirical_lawhood.planning.study_issue import ImplementationSourceClosure
-        from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+        from empirical_lawhood.design.study_issue import ImplementationSourceClosure
+        from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
         if (type(self.source_snapshot) is not ObjectIdentity or
                 (self.source_snapshot.object_schema,self.source_snapshot.object_version) not in
                 {(kind.SCHEMA,kind.VERSION) for kind in (ImplementationSourceClosure,RecursiveImplementationBinding)}):
@@ -185,9 +185,9 @@ def _files(writer,inputs,specification):
 
 
 def _locator(writer,selection,declaration):
-    from empirical_lawhood.api.recursive_qualified_parents import _actual_package,_replay_parent_authority
+    from empirical_lawhood.api.recursive_qualified_parents import _actual_package, _replay_parent_authority
     from empirical_lawhood.api.current_result_custody import authenticate_current_execution_plan
-    from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
+    from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
     package=_actual_package(writer,selection.run_id)
     reveal=ExternalStudyOperationAuthorityStore(writer).load(selection.reveal_authority_id)
     locator=SimpleNamespace(package=r.pin(package,"package_id"),issued_study=r.pin(package.issued_study,"issue_id"),
@@ -243,7 +243,7 @@ class SelectedE4ProgrammeService:
 
     def _state(self,directory):
         state=_load(self.writer,directory,STATE_FILENAME,SelectedE4ProgrammeAuthoring)
-        from .selected_e4_native_preparation import require_selected_e4_original_access,require_selected_e4_plan_access
+        from empirical_lawhood.api.selected_e4_native_preparation import require_selected_e4_original_access, require_selected_e4_plan_access
         require_selected_e4_original_access(self.writer,state.upstream_products,state.calibration_product,
             produced_input_parents=state.plan_publication.logical.lineage_parents)
         plan=_load(self.writer,directory,PLAN_FILENAME,d.SelectedE4ProtectedProgrammePlan,publication=state.plan_publication)
@@ -297,7 +297,7 @@ class SelectedE4ProgrammeService:
 
     def retain_unentered(self,*,preparation,output_dir):
         """Retain the actual adverse DEV decision without issuing/entering CAL."""
-        from empirical_lawhood.runtime.experiment_preparation import DependencyKind
+        from empirical_lawhood.execution.experiment_preparation import DependencyKind
         if (tuple((value.code,value.kind) for value in preparation.dependencies)
                 != (("matrix.selected-e4.revision-eligibility",DependencyKind.SCIENTIFIC_EVIDENCE),)
                 or type(preparation.programme) is not d.SelectedE4ProtectedProgrammePlan
@@ -307,7 +307,7 @@ class SelectedE4ProgrammeService:
                 or preparation.execution.output_root!=self.writer.root.contract.canonical_path):
             raise ValueError("Selected E4 unentered retention permits only its actual revision-eligibility decision")
         plan=preparation.programme
-        from .selected_e4_native_preparation import require_selected_e4_plan_access
+        from empirical_lawhood.api.selected_e4_native_preparation import require_selected_e4_plan_access
         require_selected_e4_plan_access(self.writer,plan)
         plan.__post_init__()
         # Reopen the ordinary DEV products before any operational metadata write.
@@ -321,7 +321,7 @@ class SelectedE4ProgrammeService:
         if type(preparation.programme) is not d.SelectedE4ProtectedProgrammePlan or preparation.execution is None:
             raise TypeError("selected E4 author requires full typed programme and actual source selection")
         plan=preparation.programme
-        from .selected_e4_native_preparation import require_selected_e4_plan_access
+        from empirical_lawhood.api.selected_e4_native_preparation import require_selected_e4_plan_access
         require_selected_e4_plan_access(self.writer,plan)
         plan.__post_init__()
         if preparation.execution.workers!=plan.declaration.maximum_parallel_tasks:raise ValueError("selected E4 author changes declared concurrency")
@@ -353,7 +353,7 @@ class SelectedE4ProgrammeService:
         from empirical_lawhood.api.selected_e4_native_runtime import development_products
         (development,nomination),(original,frozen)=development_products(self.writer,
             ((plan.evidence.development_nomination,'revision-fit'),(plan.evidence.development_freeze,'revision-freeze')),_codecs())
-        from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_programme import SelectedE4PublicRevisionDecision,validate_phase_separation
+        from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_programme import SelectedE4PublicRevisionDecision, validate_phase_separation
         decision=SelectedE4PublicRevisionDecision.from_products(development,nomination,frozen,record_id=plan.declaration.decision.record_id)
         validate_phase_separation(development,plan.declaration.programme)
         if original!=development or decision!=plan.declaration.decision or decision.fit_available:
@@ -364,8 +364,8 @@ class SelectedE4ProgrammeService:
             "structure":{"state":"NOT_ENTERED","scientific_completion":"NOT_ESTABLISHED","new_native_contact_count":0}}
 
     def _structure(self,*,directory,plan,state,request,produce,maximum_parallel_tasks=None):
-        from empirical_lawhood.api.selected_e4_structure import produce_selected_e4_structure,read_selected_e4_structure,structure_projection
-        from empirical_lawhood.kernel.decoding import decode_canonical_record
+        from empirical_lawhood.api.selected_e4_structure import produce_selected_e4_structure, read_selected_e4_structure, structure_projection
+        from empirical_lawhood.science.records.decoding import decode_canonical_record
         rows=() if request is None else tuple(value for value in request.components if value.component_id!=d.ASSESSMENT_COMPONENT_ID)
         locators=tuple(_locator(self.writer,value,plan.declaration) for value in rows)
         if tuple(value.wave_id for value in locators)!=tuple(value.wave_id for value in plan.declaration.programme.waves):
@@ -513,8 +513,8 @@ class SelectedE4ProgrammeService:
 
     def read_execution(self, *, directory, programme_request_path=None, request=None):
         """Inspect every retained component without reconstructing wave outcomes."""
-        from .selected_e4_structure import read_structural_execution
-        from .selected_e4_access import SelectedE4CurrentAccess
+        from empirical_lawhood.api.selected_e4_structure import read_structural_execution
+        from empirical_lawhood.api.selected_e4_access import SelectedE4CurrentAccess
         plan, _ = self._state(directory)
         request = self._request(programme_request_path, plan, request=request)
         unentered = self._unentered(plan)

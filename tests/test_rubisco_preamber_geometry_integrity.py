@@ -7,18 +7,14 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as c
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.preamber_geometry_integrity import (
-    PreAmberGeometryIntegrity, assess, validate_geometry_origins,
-)
-from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.serialized_heavy_pdb import (
-    read_heavy_pdb, read_serialized_heavy_pdb,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition as A
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
-from empirical_lawhood.runtime.native_subwork import NativeSubworkCompletion, NativeSubworkDefinition
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as c
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.preamber_geometry_integrity import PreAmberGeometryIntegrity, assess, validate_geometry_origins
+from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.serialized_heavy_pdb import read_heavy_pdb, read_serialized_heavy_pdb
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition as A
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.execution.native_subwork import NativeSubworkCompletion, NativeSubworkDefinition
 from tests.test_rubisco_preparation_integrity import full_exposed_origins
 
 

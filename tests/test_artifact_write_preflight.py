@@ -5,7 +5,7 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
 from tests.test_artifact_publication_admission import _census, _plane, _requests
 
 
@@ -27,7 +27,7 @@ def _forbid_effects(plane, monkeypatch):
         monkeypatch.setattr(type(plane), name, refused)
 
 
-def _interrupted(plane, request, monkeypatch, *, compact=False):
+def _interrupted(plane, request, monkeypatch):
     """Retain the actual writer's durable intent, before any destination write."""
     captured = []
     publish = plane._publish_staged_batch
@@ -45,7 +45,7 @@ def _interrupted(plane, request, monkeypatch, *, compact=False):
         patch.setattr(plane, "_publish_staged_batch", capture)
         patch.setattr(plane, "_write_publication_intent", interrupt)
         with pytest.raises(KeyboardInterrupt, match="durable intent"):
-            plane.write_batch((request,), compact_manifests=compact)
+            plane.write_batch((request,))
     batch, sidecar = captured[0]
     assert batch.intent_path.is_file() and not batch.commit_path.exists()
     return batch, sidecar
@@ -70,13 +70,12 @@ def test_fresh_admission_validates_payload_without_creating_directories_or_files
     assert _snapshot(root) == before
 
 
-@pytest.mark.parametrize("compact", (False, True))
 @pytest.mark.parametrize("damage", (None, "payload", "missing-sidecar"))
-def test_committed_admission_authenticates_custody_without_effects(tmp_path, monkeypatch, damage, compact):
+def test_committed_admission_authenticates_custody_without_effects(tmp_path, monkeypatch, damage):
     root = tmp_path / "committed-admission"
     plane = _plane(root)
     request, = _requests(1)
-    initial, = plane.write_batch((request,), compact_manifests=compact)
+    initial, = plane.write_batch((request,))
     if damage == "payload":
         plane.root.resolve(request.relative_path, for_write=False).write_bytes(b"foreign")
     elif damage == "missing-sidecar":
@@ -93,13 +92,12 @@ def test_committed_admission_authenticates_custody_without_effects(tmp_path, mon
     assert _snapshot(root) == before
 
 
-@pytest.mark.parametrize("compact", (False, True))
 @pytest.mark.parametrize("partial", ("primary", "sidecar"))
-def test_owned_prefix_admission_preserves_bytes_and_leaves_recovery_to_writer(tmp_path, monkeypatch, partial, compact):
+def test_owned_prefix_admission_preserves_bytes_and_leaves_recovery_to_writer(tmp_path, monkeypatch, partial):
     root = tmp_path / "owned-admission"
     plane = _plane(root)
     request, = _requests(1)
-    batch, sidecar = _interrupted(plane, request, monkeypatch, compact=compact)
+    batch, sidecar = _interrupted(plane, request, monkeypatch)
     member, = batch.members
     member.artifact_path.write_bytes(request.payload[:17] if partial == "primary" else request.payload)
     if partial == "sidecar":

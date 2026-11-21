@@ -8,12 +8,12 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api.integration_proof import prove_provider_projection
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.plans import ExternalInputSpec
-from empirical_lawhood.runtime.providers import CapabilityOutputSemanticContract, ExternalInputPayload
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.plans import ExternalInputSpec
+from empirical_lawhood.execution.providers import CapabilityOutputSemanticContract, ExternalInputPayload
 
 
 class TrackingSource:
@@ -188,8 +188,8 @@ def test_neutral_proof_and_profile_owners_preserve_the_exact_public_contract():
     from empirical_lawhood.api.integration_handoffs import prove_provider_projection as public_proof
     from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
     from empirical_lawhood.api.rc_challenge_authoring import RC_CHALLENGE_ARTIFACT_PROFILE_VALIDATORS
-    from empirical_lawhood.adapters.simulator_morphism_challenges.authoring import ARRAY_PAYLOAD_SCHEMA
-    from empirical_lawhood.infrastructure.artifact_validation import ArtifactProfileValidatorRegistry, NumpyArrayContract, ArtifactIdentityConflict
+    from empirical_lawhood.domains.history.simulator_morphism_challenges.authoring import ARRAY_PAYLOAD_SCHEMA
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry, NumpyArrayContract, ArtifactIdentityConflict
 
     assert public_proof is prove_provider_projection
     registry = integration_artifact_profile_validators()

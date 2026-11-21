@@ -10,29 +10,29 @@ from hashlib import sha256
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_bindings as native
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_native_records as records
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_method_bindings as methods
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_methods as science
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e4_programme as public
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import programme_selection as selection
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_records as e3bridge
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.planning.recursive_authoring import RecursiveInputLink
-from empirical_lawhood.runtime.adjudication import AdjudicationEvaluability, ScientificAdjudicationContext, ScientificAdjudicationRecord
-from empirical_lawhood.runtime.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity
-from empirical_lawhood.runtime.capabilities import CapabilityConfigRef, CapabilityRequirement
-from empirical_lawhood.runtime.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
-from empirical_lawhood.runtime.experimental_statistics import StandardizedRidgeParameters, calibration_rank
-from empirical_lawhood.runtime.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_bindings as native
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_native_records as records
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_method_bindings as methods
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_methods as science
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e4_programme as public
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import programme_selection as selection
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_records as e3bridge
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.design.recursive_authoring import RecursiveInputLink
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationContext, ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactGenericValidation, ArtifactProfile, LogicalArtifactIdentity
+from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityRequirement
+from empirical_lawhood.execution.execution import DependencyReceiptBinding, TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerIsolationProfile, WorkerOutputPort
+from empirical_lawhood.methods.statistics.experimental_statistics import StandardizedRidgeParameters, calibration_rank
+from empirical_lawhood.execution.plans import ArtifactOutputSpec, BarrierKind, ExecutionTask, ExternalInputSpec, ScientificInputRole, ScientificInputSpec
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, PreparedNativeInputContract, PreparedWorkerEnvironment
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
 from tests.test_matrix_selected_protected_worker import MemoryReader
 from tests.test_matrix_selected_e4_fixtures import selected_e4_populations, selected_bridge, transfer  # noqa: F401
 
@@ -135,7 +135,7 @@ def _prepared(literals, *, authority=True, output=True, forbid_reads=False):
                 "scientific."+name,logical.logical_artifact_id,value.SCHEMA,"application/json",len(raw),lane,Visibility.PROSPECTIVE,
                 BarrierKind.NONE))
         else:
-            from empirical_lawhood.runtime.recursive_compiler import configuration_edge_id, configuration_input_id
+            from empirical_lawhood.execution.recursive_compiler import configuration_edge_id, configuration_input_id
             edges.append(ScientificInputSpec(configuration_edge_id(task_id), 'config', ScientificInputRole.CONFIGURATION,
                 None, None, configuration_input_id(config.config_id), config.config_id, config.config_id,
                 config.SCHEMA, 'application/json', len(raw), lane, Visibility.PROSPECTIVE, BarrierKind.NONE))

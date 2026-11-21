@@ -9,23 +9,15 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response.records import (
-    PREDICTORS, MatrixFactorResponseScore, identity,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_frontier import (
-    MatrixResponseActionScale, MatrixResponseFrontierProtocol, MatrixResponseRootFrontier,
-    MatrixResponseFactorRuleCompatibility,
-    assess_receiver_metric as _assess_receiver_metric, reduce_response_frontier as _reduce_response_frontier, root_frontier_census,
-)
-from empirical_lawhood.adapters.methods.matrix_factor_response.response_contracts import (
-    MatrixResponsePopulationPolicy, select_population_origins,
-)
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
+from empirical_lawhood.domains.matrix.matrix_factor_response.records import PREDICTORS, MatrixFactorResponseScore, identity
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_frontier import MatrixResponseActionScale, MatrixResponseFrontierProtocol, MatrixResponseRootFrontier, MatrixResponseFactorRuleCompatibility, assess_receiver_metric as _assess_receiver_metric, reduce_response_frontier as _reduce_response_frontier, root_frontier_census
+from empirical_lawhood.domains.matrix.matrix_factor_response.response_contracts import MatrixResponsePopulationPolicy, select_population_origins
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
 from tests.test_matrix_factor_response import object_id, product, mechanical_case, mechanical_origin
 from tests.test_matrix_factor_confirmation_eligibility import provenance as provenance  # noqa: F401
-from empirical_lawhood.adapters.methods.matrix_factor_response.eligibility import MatrixFactorStream
+from empirical_lawhood.domains.matrix.matrix_factor_response.eligibility import MatrixFactorStream
 
 
 def replace(value, **changes):
@@ -37,8 +29,8 @@ def replace(value, **changes):
 
 def bind_numerical_identities(monkeypatch, *operands):
     """Only these exact arithmetic inputs get literal, non-authority test PINs."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response import records, response_frontier
-    from empirical_lawhood.adapters.methods.matrix_factor_response import response_error_joint_bindings_v2, response_error_pooled_bindings
+    from empirical_lawhood.domains.matrix.matrix_factor_response import records, response_frontier
+    from empirical_lawhood.domains.matrix.matrix_factor_response import response_error_joint_bindings_v2, response_error_pooled_bindings
     canonical_identity = records.identity
     def projected(value):
         for operand in operands:
@@ -54,7 +46,7 @@ def bind_numerical_identities(monkeypatch, *operands):
 
 def numerical_origin(source, past, *, artifact_id):
     """A supplied numerical view, with no source record, publication or authority."""
-    from empirical_lawhood.adapters.simulators.six_matrix_response.factor_bridge import factor_frame_sha256
+    from empirical_lawhood.domains.matrix.six_matrix_response.factor_bridge import factor_frame_sha256
     _, arrays = product(past, artifact_id, (source._numerical_identity, identity(source.design)))
     return SimpleNamespace(origin_id="numerical.origin", source=source._numerical_identity, design=source.design,
         root_id=source.root.root_id, independent_group_id=source.root.independent_group_id,
@@ -270,10 +262,8 @@ def test_realized_origin_fields_cannot_substitute_actual_source(complete_frontie
 
 
 def test_origin_selection_retains_negative_uncertain_and_ambiguous_roots(complete_frontier_input):
-    from empirical_lawhood.adapters.methods.matrix_factor_lifetime.records import (
-        FactorObservation, FactorPopulation, FactorPopulationResult, FactorTrace,
-    )
-    from empirical_lawhood.adapters.methods.matrix_factor_lifetime.science import lifetime
+    from empirical_lawhood.domains.matrix.matrix_factor_lifetime.records import FactorObservation, FactorPopulation, FactorPopulationResult, FactorTrace
+    from empirical_lawhood.domains.matrix.matrix_factor_lifetime.science import lifetime
     from tests.test_matrix_factor_lifetime import artifact, root, spec
     rule = spec()
     roots = tuple(root("test.origin." + suffix) for suffix in ("ambiguous", "negative", "selected", "unknown"))

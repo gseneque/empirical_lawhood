@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: MPL-2.0
 
 """Finite response law ports over authenticated input inventories and target stores."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
+from empirical_lawhood.storage.artifact_sidecars import read_artifact_sidecar
 
 import json
 from collections.abc import Iterator
@@ -9,26 +11,19 @@ from hashlib import sha256
 from pathlib import Path
 from typing import ClassVar
 
-from empirical_lawhood.adapters.methods.finite_response_law.runtime_ports import FiniteResponseLawControlRuntimeBinding, FiniteResponseLawPreparedStorePort
-from empirical_lawhood.infrastructure.artifacts import (
-    ExternalArtifactPlane,
-    GuardedExternalRoot,
-)
-from empirical_lawhood.infrastructure.bounded_io import read_bounded_bytes
-from empirical_lawhood.infrastructure.candidate_payloads import (
-    ExternalCandidatePayloadPlane,
-)
-from empirical_lawhood.infrastructure.candidate_sources import (
-    ExternalContentAddressedInputResolver,
-)
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import CanonicalRecord, validate_stable_id
-from empirical_lawhood.runtime.artifacts import ArtifactLineageParent
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.domains.matrix.finite_response_law.runtime_ports import FiniteResponseLawControlRuntimeBinding, FiniteResponseLawPreparedStorePort
+from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.storage.bounded_io import read_bounded_bytes
+from empirical_lawhood.storage.candidate_payloads import ExternalCandidatePayloadPlane
+from empirical_lawhood.storage.candidate_sources import ExternalContentAddressedInputResolver
+
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
 
 
 @dataclass(frozen=True)
@@ -71,7 +66,7 @@ class FiniteResponseLawRuntimeContext(CanonicalRecord):
     reveal_authority_id: str | None = None
 
     def __post_init__(self) -> None:
-        from empirical_lawhood.kernel.serialization import validate_sha256
+        from empirical_lawhood.science.records.serialization import validate_sha256
 
         validate_sha256(self.source_sha256)
         for value in (
@@ -120,7 +115,7 @@ class FiniteResponseLawAuthenticatedSources:
 
 
 def retained_sources(
-    artifacts: tuple[ArtifactIdentity, ...], manifests: tuple[Path, ...]
+    artifacts: tuple[ArtifactIdentity, ...], manifests: tuple[Path, ...], *, plane: ExternalArtifactPlane
 ) -> FiniteResponseLawAuthenticatedSources:
     """The caller must first replay every complete inventory and all three grants."""
     roster = [
@@ -141,9 +136,7 @@ def retained_sources(
             sidecar = Path(str(path) + ".manifest.json")
             if not sidecar.is_file() or sidecar.is_symlink():
                 continue
-            manifest = decode_artifact_manifest(
-                read_bounded_bytes(sidecar, maximum_bytes=8 * 1024**2)
-            )
+            manifest = resolve_artifact_sidecar_bytes(plane, read_bounded_bytes(sidecar, maximum_bytes=8 * 1024 ** 2))
             if (
                 manifest.logical.logical_artifact_id,
                 manifest.logical.payload_schema,
@@ -173,9 +166,7 @@ def load_control_runtime(
     sidecar = plane.root.resolve(relative + ".manifest.json", for_write=False)
     if not path.is_file() or not sidecar.is_file():
         raise ValueError("FINITE_RESPONSE_LAW_PUBLISHED_RUNTIME_CONTEXT_REQUIRED")
-    manifest = decode_artifact_manifest(
-        read_bounded_bytes(sidecar, maximum_bytes=1024**2)
-    )
+    manifest = read_artifact_sidecar(plane, (sidecar).relative_to(plane.root.contract.canonical_path).as_posix(), maximum_bytes=1024 ** 2)
     if (
         manifest.publication is None
         or manifest.materialization.relative_path != relative
@@ -224,10 +215,10 @@ def consumer_ports(
 ) -> tuple[ExecutablePlatformPort, ...]:
     if packet.stage == "preparation-screening":
         raise ValueError("FINITE_RESPONSE_LAW_CURRENT_PREPARATION_ELIGIBILITY_EXPORT_REQUIRED")
-    from empirical_lawhood.adapters.methods.finite_response_law.control_ports import CONTROL_RUNTIME_PORT, REVEAL_CONTROL_PORT, SEALED_CONTROL_PORT, SOURCE_CONTROL_PORT
-    from empirical_lawhood.adapters.methods.finite_response_law.method_provider import CANDIDATE_PAYLOAD_PORT, INPUT_RESOLVER_PORT
-    from empirical_lawhood.adapters.methods.finite_response_law.preparation_policy_provider import PREPARATION_POLICY_EVIDENCE_PORT
-    from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.executable_binding import IMPORT_RESOLVER_PORT
+    from empirical_lawhood.domains.matrix.finite_response_law.control_ports import CONTROL_RUNTIME_PORT, REVEAL_CONTROL_PORT, SEALED_CONTROL_PORT, SOURCE_CONTROL_PORT
+    from empirical_lawhood.domains.matrix.finite_response_law.method_provider import CANDIDATE_PAYLOAD_PORT, INPUT_RESOLVER_PORT
+    from empirical_lawhood.domains.matrix.finite_response_law.preparation_policy_provider import PREPARATION_POLICY_EVIDENCE_PORT
+    from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.extension import IMPORT_RESOLVER_PORT
     from empirical_lawhood.adapters.simulators.finite_response_law.provider import RETAINED_SOURCE_PORT
     from empirical_lawhood.adapters.simulators.finite_response_law.preparation_policy_provider import PREPARATION_POLICY_RETAINED_SOURCE_PORT
 
@@ -256,7 +247,7 @@ def consumer_ports(
                 key=lambda a: a.artifact_id,
             )
         )
-        ports[RETAINED_SOURCE_PORT] = retained_sources(artifacts, manifests)
+        ports[RETAINED_SOURCE_PORT] = retained_sources(artifacts, manifests, plane=plane)
     if packet.stage == "preparation-screening":
         artifacts = tuple(
             sorted(
@@ -268,7 +259,7 @@ def consumer_ports(
                 key=lambda a: a.artifact_id,
             )
         )
-        ports[PREPARATION_POLICY_RETAINED_SOURCE_PORT] = retained_sources(artifacts, manifests)
+        ports[PREPARATION_POLICY_RETAINED_SOURCE_PORT] = retained_sources(artifacts, manifests, plane=plane)
         screen = packet.screen
         evidence = tuple(
             sorted(
@@ -281,7 +272,7 @@ def consumer_ports(
                 key=lambda a: a.artifact_id,
             )
         )
-        ports[PREPARATION_POLICY_EVIDENCE_PORT] = retained_sources(evidence, manifests)
+        ports[PREPARATION_POLICY_EVIDENCE_PORT] = retained_sources(evidence, manifests, plane=plane)
     if packet.control is not None and packet.completion is None:
         if packet.runtime_context is None:
             raise ValueError("FINITE_RESPONSE_LAW_CONTROL_RUNTIME_CONTEXT_REQUIRED")

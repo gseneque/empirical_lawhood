@@ -12,13 +12,13 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_prefix_science as owner
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_source_records as sources
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import science
-from empirical_lawhood.adapters.simulators.six_matrix_response import parameter_history, parameter_history_segments, parameter_source
-from empirical_lawhood.infrastructure.matrix_array_io import decode_matrix_arrays
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_prefix_science as owner
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_source_records as sources
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import science
+from empirical_lawhood.domains.matrix.six_matrix_response import parameter_history, parameter_history_segments, parameter_source
+from empirical_lawhood.adapters.matrix_storage.matrix_array_io import decode_matrix_arrays
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from tests.test_matrix_e3_prefix_records import current_case
 from tests.test_matrix_factor_confirmation_eligibility import stock
 from tests.test_matrix_parameter_history import source as parameter_template

@@ -1,13 +1,6 @@
-"""Synchronous two-decision bridge around the unmodified native simulate loop.
-
-The worker waits at each native callback. A delivery returns only after the
-plant has consumed the requested sample and reached the following callback.
-Instrumentation reads native locals; it never calculates actuator behavior or
-advances an independent model. This is a bounded prefix, not a completed batch.
-"""
+"""Native acquisition, external-format translation and custody integration."""
 
 from __future__ import annotations
-
 import ast
 from dataclasses import dataclass, replace
 from decimal import Decimal
@@ -19,30 +12,22 @@ from threading import Event, Thread
 from types import FrameType, ModuleType, SimpleNamespace
 from typing import Any, Callable
 from uuid import uuid4
+from empirical_lawhood.domains.reactor.reactor_prefix_response.contracts import PARAMS_SHA256, PLANT_SHA256, PUBLIC_SCENARIOS_SHA256, ReactorCommand, ReactorDelivery, ReactorExposure, ReactorFinalDelivery, ReactorMeasurement
 
-from .contracts import PARAMS_SHA256, PLANT_SHA256, PUBLIC_SCENARIOS_SHA256, ReactorCommand, ReactorDelivery, ReactorExposure, ReactorFinalDelivery, ReactorMeasurement
-
-
-def _decimal(value: object) -> Decimal:
-    result = Decimal(str(value))
-    if not result.is_finite():
-        raise ValueError("native reactor emitted a nonfinite value")
-    return result
-
+from empirical_lawhood.domains.reactor.reactor_prefix_response.numeric_values import (
+    _decimal,
+)
 
 class _PrefixClosed(Exception):
     """Stop at a callback without authoring another request or a batch result."""
 
-
 class ReactorWorkerStopError(RuntimeError):
     """Abort the task if native work cannot be joined; do not start another branch."""
-
 
 @dataclass(frozen=True, slots=True)
 class _Boundary:
     measurement: ReactorMeasurement | None
     delivery: ReactorDelivery | ReactorFinalDelivery | None
-
 
 class ReactorBridge:
     """Task-local native session; construction alone does not start simulation.

@@ -7,32 +7,13 @@ from hashlib import sha256
 from typing import ClassVar, Protocol
 from urllib.parse import urlsplit
 
-from empirical_lawhood.kernel.authority import AuthorityAction, ResourceBudget
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.serialization import (
-    CanonicalRecord,
-    canonical_json_bytes,
-    require_sorted_unique_ids,
-    require_sorted_unique_strings,
-    validate_nonempty,
-    validate_relative_locator,
-    validate_sha256,
-    validate_stable_id,
-)
+from empirical_lawhood.science.identity.authority import AuthorityAction, ResourceBudget
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes, require_sorted_unique_ids, require_sorted_unique_strings, validate_nonempty, validate_relative_locator, validate_sha256, validate_stable_id
 
-from .contracts import (
-    FAIR_MAST_LICENSE_ID,
-    FAIR_MAST_SHOTS_METADATA_SHA256,
-    FAIR_MAST_SOURCES_METADATA_SHA256,
-    FairMastChunkReceipt,
-    FairMastMaterializationReceipt,
-    FairMastSignalSpec,
-    FairMastSourceDeclaration,
-    MastCampaign,
-    MastMaterializationState,
-)
+from empirical_lawhood.domains.fusion.mast_archive.contracts import FAIR_MAST_LICENSE_ID, FAIR_MAST_SHOTS_METADATA_SHA256, FAIR_MAST_SOURCES_METADATA_SHA256, FairMastChunkReceipt, FairMastMaterializationReceipt, FairMastSignalSpec, FairMastSourceDeclaration, MastCampaign, MastMaterializationState
 
 
 MAX_OPERATOR_CONFIG_BYTES = 64 * 1024

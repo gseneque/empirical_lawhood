@@ -11,14 +11,14 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings as owner
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_experiment as public
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings as owner
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_experiment as public
 from empirical_lawhood.api.experiment_preparation import author_prepared_experiment, load_experiment_inputs, prepare_experiment
 from empirical_lawhood.api.recursive_authoring import implementation_binding
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection, PreparedExperimentFile
-from empirical_lawhood.planning.experiment_inputs import ExperimentInputBinding, ExperimentFileInputBinding, ExperimentFileInputSelection
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection, PreparedExperimentFile
+from empirical_lawhood.design.experiment_inputs import ExperimentInputBinding, ExperimentFileInputBinding, ExperimentFileInputSelection
 from tests.runtime_platform.test_recursive_compiler import fixture as campaign_fixture
 from tests.test_matrix_selected_e3_e4_bridge import selected_bridge, transfer, disclosed_operational_resources  # noqa: F401 - disclosed shared fixture
 from tests.test_rubisco_gas_contrast import _real_plane
@@ -33,7 +33,6 @@ def test_actual_public_prepare_preserves_science_and_refuses_unpublished_parents
         f.evidence.identity, ObjectIdentity.from_record(campaign.campaign_id, campaign),
         *disclosed_structure(f.bank, budget=dict(disclosed_operational_resources().phase_budgets)["collect"]))
     selected_root = tmp_path / "actual-selected-e4-development-custody"
-    assert selected_root.resolve().is_relative_to(Path("/media/chevre/EL/empirical-lawhood"))
     plane = _real_plane(selected_root)
     _, secondary = publish_secondary(plane, f.bank, selected_root / "early-secondary")
     template = selected_root / "literal-templates.npz"

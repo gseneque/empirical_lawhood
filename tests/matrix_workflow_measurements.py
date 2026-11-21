@@ -10,7 +10,7 @@ from pathlib import Path
 from threading import Event, Thread
 from time import perf_counter
 
-from empirical_lawhood.infrastructure import bounded_io
+from empirical_lawhood.storage import bounded_io
 
 
 def _resident_bytes(pid):
@@ -151,9 +151,9 @@ def _observations(monkeypatch, callbacks):
 
 
 def matrix_observation_callbacks():
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_original_publications
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_original_publications
     from empirical_lawhood.api import recursive_qualified_parents
-    from empirical_lawhood.infrastructure import source_closure
+    from empirical_lawhood.storage import source_closure
 
     return (
         (source_closure, "capture_admitted_target_source", "source_capture_calls"),
@@ -252,8 +252,8 @@ class WorkflowMeasurements:
 
 def measure_complete_retained_e3(measurements, *, writer, package, plan, specification, allocation, reveal_authority_id):
     """Recompute complete saved statistics after original current reveal checks."""
-    from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as science
-    from empirical_lawhood.adapters.methods.matrix_factor_response.protected_statistical_bindings import statistical_task_id
+    from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as science
+    from empirical_lawhood.domains.matrix.matrix_factor_response.protected_statistical_bindings import statistical_task_id
     from empirical_lawhood.api.domain_composition.matrix_protected_response import scientific_read
     from empirical_lawhood.api.current_result_custody import authenticate_current_execution_plan
 

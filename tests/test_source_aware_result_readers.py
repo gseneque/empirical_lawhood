@@ -15,9 +15,9 @@ import pytest
 from empirical_lawhood.api.domain_composition.matrix_protected_response import scientific_read as owner
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.results import ApiResult, CampaignStatusRequest, OperationStatus
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest
 from tests.test_matrix_e3_protected_scientific_read import (
     case as case, fitted as fitted, readout as readout, sequence as sequence,
 )

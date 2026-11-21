@@ -7,11 +7,9 @@ import os
 
 import pytest
 
-from empirical_lawhood.infrastructure.execution import LocalProcessExecutor, ResourceAdmissionError
-from empirical_lawhood.runtime.artifacts import ReceiptCheck
-from empirical_lawhood.runtime.execution import (
-    ParentPreparedTaskRunner, RunnerResult, TaskContext, WorkerIsolationProfile, prepare_task_runner,
-)
+from empirical_lawhood.execution.local.execution import LocalProcessExecutor, ResourceAdmissionError
+from empirical_lawhood.storage.contracts.artifacts import ReceiptCheck
+from empirical_lawhood.execution.execution import ParentPreparedTaskRunner, RunnerResult, TaskContext, WorkerIsolationProfile, prepare_task_runner
 from tests.numerical_provenance_fixtures import numerical_plane
 
 
@@ -153,10 +151,10 @@ def test_prepared_runner_cannot_add_native_or_progress_interfaces(task_context, 
 
 
 def test_recursive_factory_defaults_and_proof_do_not_prepare_authority():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.operation_bindings import operation_factories
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort, recursive_input_port_key
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.operation_bindings import operation_factories
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort, recursive_input_port_key
 
     class Supplier:
         def resolve_input(self, spec):
@@ -190,10 +188,10 @@ def test_recursive_factory_defaults_and_proof_do_not_prepare_authority():
 
 @pytest.mark.parametrize('invalid', ('not-callable', 'wrong-wrapper'))
 def test_recursive_preparation_factory_rejects_invalid_installed_product(invalid):
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.operation_bindings import operation_factories
-    from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-    from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-    from empirical_lawhood.runtime.recursive_provider import RecursiveOperationInputPort, recursive_input_port_key
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.operation_bindings import operation_factories
+    from empirical_lawhood.execution.capabilities import CapabilityRegistry
+    from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+    from empirical_lawhood.execution.recursive_provider import RecursiveOperationInputPort, recursive_input_port_key
 
     factory = next(value for value in operation_factories() if not value.registration.native_effect)
     if invalid == 'not-callable':
@@ -215,7 +213,7 @@ def test_recursive_preparation_factory_rejects_invalid_installed_product(invalid
 
 
 def test_native_parent_preparation_declaration_does_not_execute_its_callback():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.operation_bindings import operation_factories
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.operation_bindings import operation_factories
 
     factory = next(value for value in operation_factories() if value.registration.native_effect)
     def forbidden(*args, **kwargs):
@@ -227,7 +225,7 @@ def test_native_parent_preparation_declaration_does_not_execute_its_callback():
 
 
 def test_pure_parent_preparation_cannot_add_native_slots():
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.operation_bindings import operation_factories
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.operation_bindings import operation_factories
 
     factory = next(value for value in operation_factories() if not value.registration.native_effect)
     factory = replace(factory, registration=replace(factory.registration,

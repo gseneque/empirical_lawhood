@@ -19,7 +19,7 @@ import stat
 import sys
 from types import CodeType, FunctionType, ModuleType
 
-from .contracts import MetricContract, VirtualCellContractError
+from empirical_lawhood.domains.biology.virtual_cell.contracts import MetricContract, VirtualCellContractError
 
 SOURCE_ARCHIVE_SHA256 = (
     "799adf3a40103fe74457887f207c5552aea9c9d81d06295c69926664a19bb011"

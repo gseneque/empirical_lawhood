@@ -18,9 +18,9 @@ import pytest
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.prospective_experiment import load_prepared_prospective_experiment
 from empirical_lawhood.api.results import CampaignStatusRequest, ResumeCampaignRequest, RunCampaignRequest
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.artifacts import CanonicalTaskReceipt
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
 from tests.test_prospective_experiment import selected as prospective_selection  # noqa: F401
 from tests.runtime_platform.test_recursive_prospective_workflow import _issue_public_handoff, _run_public_handoff
 

@@ -4,13 +4,10 @@ from pathlib import Path
 import subprocess
 import sys
 import pytest
-from empirical_lawhood.infrastructure import (
-    CatalogMutationLockUnavailable, CatalogRebuildError,
-    production_catalog_mutation_lock, production_catalog_mutation_lock_path,
-    rebuild_production_catalog,
-)
-from empirical_lawhood.infrastructure.catalog_projection import encode_catalog_snapshot
-from empirical_lawhood.runtime.catalog import CatalogSnapshot
+from empirical_lawhood.storage.catalog_mutation import CatalogMutationLockUnavailable, production_catalog_mutation_lock, production_catalog_mutation_lock_path
+from empirical_lawhood.storage.catalog_rebuild import CatalogRebuildError, rebuild_production_catalog
+from empirical_lawhood.storage.catalog_projection import encode_catalog_snapshot
+from empirical_lawhood.storage.contracts.catalog import CatalogSnapshot
 
 def test_production_catalog_mutation_lock_refuses_same_and_second_process(
     tmp_path: Path,
@@ -20,7 +17,7 @@ def test_production_catalog_mutation_lock_refuses_same_and_second_process(
     child_program = """
 from pathlib import Path
 import sys
-from empirical_lawhood.infrastructure import (
+from empirical_lawhood.storage.catalog_mutation import (
     CatalogMutationLockUnavailable,
     production_catalog_mutation_lock,
 )

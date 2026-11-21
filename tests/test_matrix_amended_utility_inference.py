@@ -9,9 +9,9 @@ from types import SimpleNamespace
 import pytest
 from scipy.stats import binom
 
-from empirical_lawhood.runtime.experimental_statistics import assigned_binomial_inference
-from empirical_lawhood.adapters.methods.matrix_factor_response import native_utility_records as r
-from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_science import amended_primary_report
+from empirical_lawhood.methods.statistics.experimental_statistics import assigned_binomial_inference
+from empirical_lawhood.domains.matrix.matrix_factor_response import native_utility_records as r
+from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_science import amended_primary_report
 
 
 @pytest.mark.parametrize('n,p,critical', ((96, Fraction(4, 5), 87), (96, Fraction(1, 2), 61),

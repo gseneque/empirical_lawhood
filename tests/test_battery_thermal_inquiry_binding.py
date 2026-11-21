@@ -9,17 +9,18 @@ from types import SimpleNamespace as N
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry import native, science
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry import operation_bindings as owner, recursive_translation as drafts
-from empirical_lawhood.adapters.methods.battery_thermal_inquiry.contracts import BatteryInquirySource, BatteryInquirySupply
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import AssessmentDisposition, AssessmentPhase, ContributionRole
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.execution import WorkerInputKind
-from empirical_lawhood.runtime.recursive_compiler import project_recursive_assessments
+from empirical_lawhood.adapters.battery.battery_thermal_inquiry import native
+from empirical_lawhood.domains.battery.battery_thermal_inquiry import science
+from empirical_lawhood.domains.battery.battery_thermal_inquiry import operation_bindings as owner, recursive_translation as drafts
+from empirical_lawhood.domains.battery.battery_thermal_inquiry.contracts import BatteryInquirySource, BatteryInquirySupply
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import AssessmentDisposition, AssessmentPhase, ContributionRole
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.execution import WorkerInputKind
+from empirical_lawhood.execution.recursive_compiler import project_recursive_assessments
 from tests.test_battery_thermal_inquiry import _exposed_trace
 from tests.test_inquiry_successor_compilation import compile_complete_draft
 
@@ -65,7 +66,7 @@ def _payloads(draft, records):
 
 
 def test_cold_discovery_never_imports_native_library_or_executes_provider():
-    subprocess.run([sys.executable, '-c', "import sys; from empirical_lawhood.adapters.methods.battery_thermal_inquiry import native; native.acquire=lambda *a,**k: (_ for _ in ()).throw(AssertionError('native contact')); from empirical_lawhood.adapters.methods.battery_thermal_inquiry.executable_binding import EXECUTABLE_BINDING_FACTORIES; assert len(EXECUTABLE_BINDING_FACTORIES)==3; assert 'pybamm' not in sys.modules"], check=True)
+    subprocess.run([sys.executable, '-c', "import sys; from empirical_lawhood.adapters.battery.battery_thermal_inquiry import native; native.acquire=lambda *a,**k: (_ for _ in ()).throw(AssertionError('native contact')); from empirical_lawhood.domains.battery.battery_thermal_inquiry.extension import EXTENSION; assert len(EXTENSION.factories)==3; assert 'pybamm' not in sys.modules"], check=True)
 
 
 def test_all_three_singleton_scientific_graphs_and_native_slots_compile(episode):
@@ -155,7 +156,7 @@ def test_census_retains_failed_subsolve_and_counts_multiple_calls_per_forecast(e
 
 
 def test_repaired_binding_versions_refuse_relabelled_exact_guard_source_without_native(monkeypatch):
-    from empirical_lawhood.kernel.serialization import canonical_json_bytes
+    from empirical_lawhood.science.records.serialization import canonical_json_bytes
     source = BatteryInquirySource()
     original = source.to_document()
     original['version'] = '1.0.0'
@@ -302,7 +303,7 @@ def test_missing_reference_refusal_preserves_zero_new_native_census(monkeypatch)
 
 
 def test_contribution_origins_keep_instance_product_outcome_role(episode):
-    from empirical_lawhood.planning.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
+    from empirical_lawhood.design.recursive_input_origins import RecursiveInputOrigin, RecursiveInputOriginKind, RecursiveInputOrigins
     supplier, later, _, _ = episode
     use = drafts.use_draft(supplier)
     parent = drafts.describe_contributions(use, _products(use, later))[0]

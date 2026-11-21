@@ -7,23 +7,20 @@ from pathlib import Path
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_recursive_construction import science
-from empirical_lawhood.adapters.methods.battery_recursive_construction.contracts import BatteryOperationConfig
-from empirical_lawhood.adapters.methods.battery_recursive_construction.examples import (
-    battery_wave_a_draft, battery_wave_b_draft,
-)
-from empirical_lawhood.adapters.methods.battery_recursive_construction.executable_binding import (
-    operation_manifests, operation_registrations, output_codecs, project_battery_assessment,
-)
+from empirical_lawhood.adapters.battery.battery_recursive_construction import science as native_science
+import empirical_lawhood.domains.battery.battery_recursive_construction.assessment as science
+from empirical_lawhood.domains.battery.battery_recursive_construction.contracts import BatteryOperationConfig
+from empirical_lawhood.domains.battery.battery_recursive_construction.examples import battery_wave_a_draft, battery_wave_b_draft
+from empirical_lawhood.domains.battery.battery_recursive_construction.extension import operation_manifests, operation_registrations, output_codecs, project_battery_assessment
 from empirical_lawhood.api.recursive_authoring import author_recursive_wave
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.recursive_requirements import ConditionRole, ContributionRole
-from empirical_lawhood.kernel.time import CausalPhase, InformationCutoff
-from empirical_lawhood.kernel.worlds import WorldKind
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.inquiry.recursive_requirements import ConditionRole, ContributionRole
+from empirical_lawhood.science.models.time import CausalPhase, InformationCutoff
+from empirical_lawhood.science.models.worlds import WorldKind
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 from tests.test_battery_recursive_construction import _a_products, _b_products, _test_manifest
 from tests.test_recursive_public_service import _plane
 
@@ -75,7 +72,7 @@ def no_native_contact(monkeypatch):
         pytest.fail("scientific binding contacted the native simulator")
 
     for name in ("_runtime", "_phase", "capture_checkpoint", "continue_checkpoint", "source_preflight"):
-        monkeypatch.setattr(science, name, forbidden)
+        monkeypatch.setattr(native_science, name, forbidden)
 
 
 @pytest.mark.parametrize("wave,tasks", [("A", 11), ("B", 21)])

@@ -5,10 +5,8 @@ from decimal import Decimal as D
 
 import pytest
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.experimental_statistics import (
-    StandardizedRidgeParameters, fit_standardized_ridge, predict_standardized_ridge,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.methods.statistics.experimental_statistics import StandardizedRidgeParameters, fit_standardized_ridge, predict_standardized_ridge
 
 
 def test_independent_two_row_equations_and_unpenalized_intercept():

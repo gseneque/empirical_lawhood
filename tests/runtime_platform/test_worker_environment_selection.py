@@ -7,9 +7,9 @@ from types import MappingProxyType
 
 import pytest
 
-from empirical_lawhood.infrastructure.execution import _select_worker_environment, prepare_worker_invocation
-from empirical_lawhood.infrastructure.numerical_provenance import selected_worker_environment
-from empirical_lawhood.runtime.recursive_provider import RecursiveExecutionProperties
+from empirical_lawhood.execution.local.execution import _select_worker_environment, prepare_worker_invocation
+from empirical_lawhood.storage.numerical_provenance import selected_worker_environment
+from empirical_lawhood.execution.recursive_provider import RecursiveExecutionProperties
 from tests.runtime_platform.test_worker_preflight import _case
 
 
@@ -78,8 +78,8 @@ def test_selector_cannot_replace_settings_or_add_undeclared_process_configuratio
 
 
 def test_invalid_registered_selector_refuses_cold_and_single_declaration_derives_same_callback():
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry.controlled_operation_bindings_v1_1 import operation_declaration
-    from empirical_lawhood.adapters.methods.battery_refined_inquiry.prepared_native import native_worker_environment
+    from empirical_lawhood.domains.battery.battery_refined_inquiry.controlled_operation_bindings_v1_1 import operation_declaration
+    from empirical_lawhood.adapters.battery.battery_refined_inquiry.prepared_native import native_worker_environment
     declaration = operation_declaration()
     assert declaration.execution_properties.worker_environment_selector is native_worker_environment
     assert declaration.registration().worker_environment_selector is native_worker_environment

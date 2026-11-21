@@ -9,15 +9,13 @@ from types import SimpleNamespace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_thermal_service.contracts import (
-    BatteryThermalConfig, BatteryThermalTrace, EVENTS, PROTOCOL_SHA256,
-)
-from empirical_lawhood.adapters.methods.battery_thermal_service.examples import thermal_service_draft
-from empirical_lawhood.adapters.methods.battery_thermal_service.executable_binding import operation_manifests, operation_registrations, output_codecs
-from empirical_lawhood.adapters.methods.battery_thermal_service.science import assess
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.runtime.capabilities import CapabilityRegistry
-from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+from empirical_lawhood.domains.battery.battery_thermal_service.contracts import BatteryThermalConfig, BatteryThermalTrace, EVENTS, PROTOCOL_SHA256
+from empirical_lawhood.domains.battery.battery_thermal_service.examples import thermal_service_draft
+from empirical_lawhood.domains.battery.battery_thermal_service.extension import operation_manifests, operation_registrations, output_codecs
+from empirical_lawhood.domains.battery.battery_thermal_service.assessment import assess
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.execution.capabilities import CapabilityRegistry
+from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
 D = Decimal
 
@@ -40,7 +38,7 @@ def _assess(trace):
 
 
 def test_selected_route_compiles_without_native_import_or_contact():
-    script = "from empirical_lawhood.adapters.methods.battery_thermal_service.examples import thermal_service_draft; import sys; thermal_service_draft(); print('pybamm' in sys.modules)"
+    script = "from empirical_lawhood.domains.battery.battery_thermal_service.examples import thermal_service_draft; import sys; thermal_service_draft(); print('pybamm' in sys.modules)"
     assert subprocess.check_output([sys.executable, "-c", script], text=True).strip() == "False"
     draft = thermal_service_draft()
     result = compile_recursive_wave(draft=draft, registrations=operation_registrations(),
@@ -51,6 +49,7 @@ def test_selected_route_compiles_without_native_import_or_contact():
 
 
 @pytest.mark.parametrize(("temperature", "unit"), ((D("296.15"), "23c"), (D("300.15"), "27c")))
+@pytest.mark.numerical(oracle='Independent exact constant-current rectangle I*t/3600 = 0.36375 Ah checks the trapezoidal charge assessor')
 def test_exact_charge_and_event_checks_do_not_manufacture_continuous_certificate(temperature, unit):
     trace = _trace()
     offset = temperature - trace.config.initial_temperature_k
@@ -151,7 +150,7 @@ def test_preparation_source_and_native_clock_mutations_refuse():
 
 def test_native_stage_reads_are_independent_using_exposed_recorded_source(monkeypatch, tmp_path):
     """An in-memory stand-in returns differing readings, with no native solve."""
-    from empirical_lawhood.adapters.methods.battery_thermal_service import science
+    from empirical_lawhood.adapters.battery.battery_thermal_service import science
     root = tmp_path / "pybamm"
     for member, constant in (("input/parameters/lithium_ion/Chen2020.py", "PARAMETER_SHA256"),
                              ("parameters/geometric_parameters.py", "GEOMETRY_SHA256")):
@@ -229,7 +228,7 @@ def test_native_stage_reads_are_independent_using_exposed_recorded_source(monkey
 
 
 def test_effect_identity_excludes_labels_but_preserves_native_operands():
-    from empirical_lawhood.adapters.methods.battery_thermal_service.executable_binding import _slots
+    from empirical_lawhood.domains.battery.battery_thermal_service.extension import _slots
     config = _trace().config
     assert _slots(replace(config, config_id="test.other-label")) == _slots(config)
     assert _slots(replace(config, initial_soc=D("0.300"), initial_temperature_k=D("296.150"))) == _slots(config)

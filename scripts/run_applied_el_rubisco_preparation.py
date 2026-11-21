@@ -63,10 +63,10 @@ def retain_history(programme, args, prior):
 
 
 def authenticate_structure(programme, prior):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_structure import contracts as c, recursive_translation as rt
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_structure import contracts as c, recursive_translation as rt
     from empirical_lawhood.api.recursive_authoring import load_authored_wave
     from empirical_lawhood.api.recursive_execution import read_recursive_wave
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
 
     directory = programme.root / 'insilico-structure-inventory'
     original = prior['waves']['insilico-structure-inventory']
@@ -94,8 +94,8 @@ def authenticate_structure(programme, prior):
 
 
 def selected_preparation(programme, args, dossier, inventory, coordinates, parents):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics import contracts as c, recursive_translation as rt, science
-    from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics import contracts as c, recursive_translation as rt, science
+    from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
     raw = archived_bytes(programme, args.source_selection)
     source = decode_canonical_bytes(raw, c.PreparationSelection, maximum_bytes=None)
@@ -112,7 +112,7 @@ def selected_preparation(programme, args, dossier, inventory, coordinates, paren
 
 
 def run(programme, args):
-    from empirical_lawhood.adapters.methods.rubisco_insilico_dynamics.contracts import PreparationAssessment
+    from empirical_lawhood.domains.rubisco.rubisco_insilico_dynamics.contracts import PreparationAssessment
 
     archived_bytes(programme, Path(__file__))
     archived_bytes(programme, programme.project / 'scripts/run_applied_el_rubisco_insilico.py')

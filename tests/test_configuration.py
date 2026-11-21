@@ -14,7 +14,7 @@ from empirical_lawhood.api import configuration
 from empirical_lawhood.api.configuration import ConfigurationError, prepare_configuration, validate_configuration
 from empirical_lawhood.api.configuration_registry import CONSUMERS, consumer_by_id
 from empirical_lawhood.cli.configuration import config_app
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 RC = ROOT / "programmes/foundations/measurement-and-response/workflows/rc-ladder-response/model.json"

@@ -6,11 +6,11 @@ identify their declared contracts; neither edition establishes data origin,
 freshness or scientific qualification by itself.
 """
 
-from empirical_lawhood.adapters.methods.matrix_factor_response import configured_protected_methods as configured
-from empirical_lawhood.adapters.methods.matrix_factor_response import protected_experiment_methods as legacy
+from empirical_lawhood.domains.matrix.matrix_factor_response import configured_protected_methods as configured
+from empirical_lawhood.domains.matrix.matrix_factor_response import protected_experiment_methods as legacy
 from empirical_lawhood.api.matrix_selected_e3_family import selected_e3_product_family
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_value
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_value
 
 
 def fitted_training_provenance(specification, allocation, models, frozen):

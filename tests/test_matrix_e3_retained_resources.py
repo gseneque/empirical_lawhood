@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api.configured_e3_retained_custody import _resources
-from empirical_lawhood.runtime.execution_envelope import RunExecutionResourceEnvelopeMachine as Machine
+from empirical_lawhood.execution.execution_envelope import RunExecutionResourceEnvelopeMachine as Machine
 from tests.recovery_support import case as case
 
 

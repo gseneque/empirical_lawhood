@@ -7,10 +7,10 @@ import os
 
 import pytest
 
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_evidence_stream as stream
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_consumer as consumer
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import lossless_segment_records as records
-from empirical_lawhood.adapters.methods.battery_refined_inquiry import segmented_fidelity as local
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_evidence_stream as stream
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_consumer as consumer
+from empirical_lawhood.domains.battery.battery_refined_inquiry import lossless_segment_records as records
+from empirical_lawhood.domains.battery.battery_refined_inquiry import segmented_fidelity as local
 from tests.test_battery_lossless_segment_integration import new_operand
 from tests.test_battery_lossless_segment_records import encoded_original
 from tests.test_battery_segmented_fidelity import _operand, prepared as prepared_fixture

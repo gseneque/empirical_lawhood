@@ -1,4 +1,5 @@
 """Exposed software fixtures for V3 custody/reconstruction and scientific controls."""
+from empirical_lawhood.storage.artifact_sidecars import resolve_artifact_sidecar_bytes
 
 from tests.prospective_source_capture_fixture import install_historical_source_capture
 from dataclasses import replace
@@ -11,40 +12,44 @@ from time import perf_counter
 import numpy as np
 import pytest
 
-from empirical_lawhood.adapters.methods.simulator_morphism_challenges.observer import DenseObserverOperator, _rank_forecast
-from empirical_lawhood.adapters.simulator_morphism_challenges.authoring import simulator_morphism_challenges_phase_registry
+from empirical_lawhood.domains.history.simulator_morphism_challenges.observer import DenseObserverOperator, _rank_forecast
+from empirical_lawhood.domains.history.simulator_morphism_challenges.authoring import simulator_morphism_challenges_phase_registry
 from empirical_lawhood.adapters.simulator_morphism_challenges.composition import compose_simulator_morphism_challenges_phase, RCChallengeCandidateContextProvider
-from empirical_lawhood.adapters.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeDisorderFamily as Family, SimulatorMorphismChallengePhase as Phase
-from empirical_lawhood.adapters.simulator_morphism_challenges.descriptors import default_config, generate_descriptor
-from empirical_lawhood.adapters.simulator_morphism_challenges.executable_binding import BINDINGS, EXECUTABLE_BINDING_FACTORIES
-from empirical_lawhood.adapters.simulator_morphism_challenges.extension_bundle import INSTALLED_IMPLEMENTATION_SHA256
-from empirical_lawhood.adapters.simulator_morphism_challenges.issued_inputs import CAPABILITY_INPUT_TYPES, RCChallengeIssuedInputs, RCChallengeRuntimeInputPort, capability_port_key
-from empirical_lawhood.adapters.simulator_morphism_challenges.capability_configs import CAPABILITY_CONFIG_TYPES
-from empirical_lawhood.adapters.simulator_morphism_challenges.numeric_inputs import RCChallengeExposureCensus, RCChallengeNumericSource, RCChallengeOriginalNumericRecipe, allocate_numeric_source, original_descriptor_bytes, original_numeric_definition
+from empirical_lawhood.domains.history.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeDisorderFamily as Family, SimulatorMorphismChallengePhase as Phase
+from empirical_lawhood.domains.history.simulator_morphism_challenges.descriptors import default_config, generate_descriptor
+from empirical_lawhood.adapters.simulator_morphism_challenges.extension import BINDINGS
+from empirical_lawhood.adapters.simulator_morphism_challenges.extension import EXTENSION as _extension_owner_1
+EXECUTABLE_BINDING_FACTORIES = _extension_owner_1.factories
+from empirical_lawhood.adapters.simulator_morphism_challenges.extension import INSTALLED_IMPLEMENTATION_SHA256
+from empirical_lawhood.domains.history.simulator_morphism_challenges.issued_inputs import CAPABILITY_INPUT_TYPES, RCChallengeIssuedInputs, capability_port_key
+from empirical_lawhood.adapters.simulator_morphism_challenges.input_custody import RCChallengeRuntimeInputPort
+from empirical_lawhood.domains.history.simulator_morphism_challenges.capability_configs import CAPABILITY_CONFIG_TYPES
+from empirical_lawhood.domains.history.simulator_morphism_challenges.numeric_inputs import RCChallengeExposureCensus, RCChallengeNumericSource, RCChallengeOriginalNumericRecipe, original_descriptor_bytes, original_numeric_definition
+from empirical_lawhood.adapters.simulator_morphism_challenges.numeric_inputs import allocate_numeric_source
 from empirical_lawhood.adapters.simulator_morphism_challenges.runtime_provider import SIMULATOR_MORPHISM_CHALLENGE_SOURCE_CLOSURE_PATHS, source_closure_sha256
-from empirical_lawhood.adapters.simulator_morphism_challenges.specification import current_rc_challenge_formal_register
-from empirical_lawhood.adapters.simulator_morphism_challenges.retained_results import RCChallengeResultAuthorityContext
-from empirical_lawhood.adapters.simulator_morphism_challenges.prerequisites import phase_external_records
-from empirical_lawhood.adapters.simulator_morphism_challenges.runtime_contracts import SimulatorMorphismChallengeCanaryReport, SimulatorMorphismChallengeEvaluationDesignFreeze
-from empirical_lawhood.adapters.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeMethodFreeze
+from empirical_lawhood.domains.history.simulator_morphism_challenges.specification import current_rc_challenge_formal_register
+from empirical_lawhood.domains.history.simulator_morphism_challenges.retained_results import RCChallengeResultAuthorityContext
+from empirical_lawhood.domains.history.simulator_morphism_challenges.prerequisites import phase_external_records
+from empirical_lawhood.domains.history.simulator_morphism_challenges.runtime_contracts import SimulatorMorphismChallengeCanaryReport, SimulatorMorphismChallengeEvaluationDesignFreeze
+from empirical_lawhood.domains.history.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeMethodFreeze
 from empirical_lawhood.adapters.simulator_morphism_challenges.workflow import create_seed_roster
 from empirical_lawhood.adapters.simulator_morphism_challenges.runtime_provider import implementation_closures
 from empirical_lawhood.api import rc_challenge_authoring as application
 from empirical_lawhood.api.rc_challenge_results import bind_rc_challenge_retained_result, bind_rc_challenge_selected_output, read_rc_challenge_result
 from empirical_lawhood.api.rc_challenge_inputs import publish_rc_challenge_numeric_input, read_rc_challenge_numeric_input, authenticate_rc_exposure_census
-from empirical_lawhood.infrastructure.artifacts import ExternalArtifactPlane, GuardedExternalRoot
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.references import ArtifactIdentity
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.status import OperationalStatus
-from empirical_lawhood.planning.study_issue import ImplementationSourceClosure, SourceClosureKind
-from empirical_lawhood.runtime.artifacts import ArtifactWriteRequest, ArtifactProfile, CanonicalTaskReceipt, ReceiptCheck
-from empirical_lawhood.infrastructure.task_receipts import decode_artifact_manifest, ExternalTaskReceiptStore
-from empirical_lawhood.runtime.artifacts import ExternalRootContract
-from empirical_lawhood.runtime.executable_bindings import ExecutablePlatformPort
-from empirical_lawhood.runtime.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerOutputPort, WorkerIsolationProfile, DependencyReceiptBinding
-from empirical_lawhood.runtime.operator_profile import OperatorStorageProfile
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.identity.references import ArtifactIdentity
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.records.status import OperationalStatus
+from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactProfile, CanonicalTaskReceipt, ReceiptCheck
+from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
+from empirical_lawhood.execution.executable_bindings import ExecutablePlatformPort
+from empirical_lawhood.execution.execution import TaskContext, WorkerInputBinding, WorkerInputKind, WorkerInputPort, WorkerOutputPort, WorkerIsolationProfile, DependencyReceiptBinding
+from empirical_lawhood.execution.operator_profile import OperatorStorageProfile
 from tests.finite_response_rerun_fixtures import publish_current_issue, publish_current_step_output
 
 
@@ -110,7 +115,7 @@ def test_original_random_fibre_recipe_is_independent_of_current_schema_namespace
 
 
 def test_known_development_preserves_opaque_original_numeric_reference_without_historical_custody(development_input):
-    from empirical_lawhood.adapters.history_budget_fixed_scientific_inputs import _DESCRIPTOR_ROWS
+    from empirical_lawhood.domains.history.history_budget_fixed_scientific_inputs import _DESCRIPTOR_ROWS
 
     rows = {(row[1], row[2]): row for row in _DESCRIPTOR_ROWS if row[0] == 0}
     for exported in development_input.export.descriptors:
@@ -251,7 +256,7 @@ def _retained(plane, record, name, *, status=OperationalStatus.SUCCEEDED, access
             payload=value.canonical_bytes(), visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY,
             parent_visibility_ceilings=(), outcome_access=access, minimum_free_bytes=1,
         ))
-        manifest = decode_artifact_manifest(plane.root.resolve(result.manifest_materialization.relative_path, for_write=False).read_bytes())
+        manifest = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(result.manifest_materialization.relative_path, for_write=False).read_bytes())
         return result, manifest
     output, manifest = publish(record, "output")
     attempt = f"synthetic-run.{name}.attempt-001"
@@ -260,7 +265,7 @@ def _retained(plane, record, name, *, status=OperationalStatus.SUCCEEDED, access
         status, () if status is OperationalStatus.SUCCEEDED else ("SYNTHETIC_CANCELLED",))
     receipt_publication = ExternalTaskReceiptStore(plane, minimum_free_bytes=1).commit(receipt,
         visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY, outcome_access=access)
-    receipt_manifest = decode_artifact_manifest(plane.root.resolve(receipt_publication.manifest_materialization.relative_path, for_write=False).read_bytes())
+    receipt_manifest = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(receipt_publication.manifest_materialization.relative_path, for_write=False).read_bytes())
     return bind_rc_challenge_retained_result(result_id=f"synthetic.{name}.retained", record_payload=record.canonical_bytes(),
         output_manifest=manifest, task_receipt=receipt, receipt_manifest=receipt_manifest, writer=plane)
 
@@ -364,7 +369,7 @@ def test_full_phase_public_authoring_projection_and_installed_factory_proof(phas
         assert len(config.unit_ids) == 36 and config.scale_cells == (64, 128, 256)
         assert len(handoff.composition.runtime_provider.scientific_inputs) == 36
         assert sum(len(row.descriptor_inputs) for row in handoff.composition.runtime_provider.scientific_inputs) == 108
-        from empirical_lawhood.adapters.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeCellRecurrence, SimulatorMorphismChallengeRecurrenceResult
+        from empirical_lawhood.domains.history.simulator_morphism_challenges.contracts import SimulatorMorphismChallengeCellRecurrence, SimulatorMorphismChallengeRecurrenceResult
         cells = tuple(sorted((SimulatorMorphismChallengeCellRecurrence(
             f"synthetic.{family.value.lower().replace('_', '-')}.{scale}.{endpoint}", family, scale, endpoint,
             12, 0, 0, 0, 0, 0, 0, 12, None, Decimal(0), False, False)
@@ -389,7 +394,7 @@ def test_full_phase_public_authoring_projection_and_installed_factory_proof(phas
         assert view.summary["run_id"] == receipt.run_id
         assert len({(cell["family"], cell["scale_cells"], cell["endpoint_id"]) for cell in view.summary["cells"]}) == 18
         assert all(cell["requested_count"] == cell["unevaluable_count"] == 12 for cell in view.summary["cells"])
-        from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
+        from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
         store = ExternalStudyOperationAuthorityStore(plane)
         expired = replace(store.load(authority.reveal_authority.object_id),
             authority_id='synthetic.expired.rc-reveal', issued_at_utc='2026-09-01T00:00:00Z',
@@ -425,7 +430,7 @@ def test_full_phase_public_authoring_projection_and_installed_factory_proof(phas
         with pytest.raises(PermissionError, match="CURRENT_ISSUED_TASK_OUTPUT_MISMATCH"):
             _authenticate_result_access(context=authority, receipt=receipt,
                 logical=replace(published.logical, logical_artifact_id="synthetic.foreign-output"), writer=plane)
-        with pytest.raises((OSError, ValueError, PermissionError)):
+        with pytest.raises(ArtifactIdentityConflict, match="artifact sidecar metadata is invalid"):
             _authenticate_result_access(context=authority, receipt=replace(receipt, run_id="synthetic.foreign-run"),
                 logical=published.logical, writer=plane)
 
@@ -452,7 +457,7 @@ def test_phase_prerequisites_require_receipts_and_current_method_source(phase_in
             register=current_rc_challenge_formal_register(), numeric_input=packet, artifact_writer=plane)
     composition = compose_simulator_morphism_challenges_phase(config=config, external_records=external, source_files=_sources(),
         register=current_rc_challenge_formal_register(), numeric_input=packet, artifact_writer=plane, prerequisite_custody=prerequisites)
-    changed = {**_sources(), "src/empirical_lawhood/adapters/methods/simulator_morphism_challenges/observer.py": b"new observer source"}
+    changed = {**_sources(), "src/empirical_lawhood/domains/history/simulator_morphism_challenges/observer.py": b"new observer source"}
     forged = replace(composition.issued_inputs, implementation_source_closure_sha256=source_closure_sha256(changed))
     with pytest.raises(ValueError, match="design/method freeze"):
         RCChallengeRuntimeInputPort(changed, plane).authenticate(forged)
@@ -508,7 +513,7 @@ def test_authoring_destination_refuses_before_source_or_prerequisite_reads(desti
 
 def test_installed_codec_registry_remains_closed_at_declared_upper_bound():
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY
-    from empirical_lawhood.runtime.static_codecs import CanonicalRecordCodecRegistry, MAX_STATIC_CODEC_REGISTRATIONS
+    from empirical_lawhood.execution.static_codecs import CanonicalRecordCodecRegistry, MAX_STATIC_CODEC_REGISTRATIONS
 
     installed = EXECUTABLE_CANONICAL_RECORD_CODEC_REGISTRY
     assert len(installed.registrations) <= MAX_STATIC_CODEC_REGISTRATIONS
@@ -530,7 +535,7 @@ def test_authoring_requires_actual_guarded_plane_before_source_reads(writer, tmp
 
 def test_actual_numeric_export_through_registered_provider_measurement_and_retained_result(phase_inputs, plane, monkeypatch):
     """One exposed development unit, three fixed views; no phase or qualification run."""
-    from empirical_lawhood.adapters.simulator_morphism_challenges.runtime_contracts import SimulatorMorphismChallengeDenominatorBundle, SimulatorMorphismChallengeHistoryBundle, SimulatorMorphismChallengeArrayManifest
+    from empirical_lawhood.domains.history.simulator_morphism_challenges.runtime_contracts import SimulatorMorphismChallengeDenominatorBundle, SimulatorMorphismChallengeHistoryBundle, SimulatorMorphismChallengeArrayManifest
     from empirical_lawhood.adapters.simulator_morphism_challenges import runtime_provider
 
     plane = ExternalArtifactPlane(plane.root, validators=application.RC_CHALLENGE_ARTIFACT_PROFILE_VALIDATORS)
@@ -616,7 +621,7 @@ def test_actual_numeric_export_through_registered_provider_measurement_and_retai
             publication_scope_id="synthetic.bounded-provider-measurement", publication_scope_relative_root="synthetic/provider-smoke",
             payload=outputs[output.output_id], visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY,
             parent_visibility_ceilings=(), outcome_access=OutcomeAccess.OUTCOME_BLIND, minimum_free_bytes=1))
-        publication = decode_artifact_manifest(plane.root.resolve(written.manifest_materialization.relative_path, for_write=False).read_bytes())
+        publication = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(written.manifest_materialization.relative_path, for_write=False).read_bytes())
         publications.append((written, publication))
     attempt = f"synthetic-run.{history_step.step_id}.attempt-001"
     receipt = CanonicalTaskReceipt(f"receipt.{attempt}", "synthetic-run", history_step.step_id, attempt, "0" * 40,
@@ -626,7 +631,7 @@ def test_actual_numeric_export_through_registered_provider_measurement_and_retai
         result.checks, OperationalStatus.SUCCEEDED, ())
     receipt_publication = ExternalTaskReceiptStore(plane, minimum_free_bytes=1).commit(receipt,
         visibility_ceiling=VisibilityCeiling.DEVELOPMENT_ONLY, outcome_access=OutcomeAccess.OUTCOME_BLIND)
-    receipt_manifest = decode_artifact_manifest(plane.root.resolve(receipt_publication.manifest_materialization.relative_path, for_write=False).read_bytes())
+    receipt_manifest = resolve_artifact_sidecar_bytes(plane, plane.root.resolve(receipt_publication.manifest_materialization.relative_path, for_write=False).read_bytes())
     history_manifest = next(publication for _, publication in publications if publication.logical.payload_schema == history.SCHEMA)
     retained_history = bind_rc_challenge_retained_result(result_id="synthetic.bounded-provider-history", record_payload=history.canonical_bytes(),
         output_manifest=history_manifest, task_receipt=receipt, receipt_manifest=receipt_manifest, writer=plane)

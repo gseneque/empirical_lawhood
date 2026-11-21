@@ -9,18 +9,18 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.recursive_authoring import RecursiveInputLink, RecursiveOperationSpec, RecursiveStudyDraft
-from empirical_lawhood.runtime.adjudication import ScientificAdjudicationRecord
-from empirical_lawhood.runtime.artifacts import ArtifactProfile
-from empirical_lawhood.runtime.capabilities import CapabilityKind, CapabilityPermission, CapabilityRegistry
-from empirical_lawhood.runtime.compiler import compile_run_plan, lower_run_plan
-from empirical_lawhood.runtime.plans import BarrierKind, OutputTemplate, ScientificStage
-from empirical_lawhood.runtime.preexecution_contract import validate_experiment_contract_closure
-from empirical_lawhood.runtime.recursive_compiler import RecursivePortContract, compile_recursive_wave
-from empirical_lawhood.runtime.recursive_provider import RecursiveExecutionProperties, RecursiveOperationDeclaration, RecursiveScientificHooks
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import EvidenceCeiling, OutcomeAccess as Access, VisibilityCeiling as Visibility
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.recursive_authoring import RecursiveInputLink, RecursiveOperationSpec, RecursiveStudyDraft
+from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
+from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityPermission, CapabilityRegistry
+from empirical_lawhood.execution.compiler import compile_run_plan, lower_run_plan
+from empirical_lawhood.execution.plans import BarrierKind, OutputTemplate, ScientificStage
+from empirical_lawhood.execution.preexecution_contract import validate_experiment_contract_closure
+from empirical_lawhood.execution.recursive_compiler import RecursivePortContract, compile_recursive_wave
+from empirical_lawhood.execution.recursive_provider import RecursiveExecutionProperties, RecursiveOperationDeclaration, RecursiveScientificHooks
 from tests.runtime_platform.test_recursive_compiler import Config, prospective_fixture
 from tests.runtime_platform.test_recursive_prospective_workflow import FixtureCanonicalSource
 

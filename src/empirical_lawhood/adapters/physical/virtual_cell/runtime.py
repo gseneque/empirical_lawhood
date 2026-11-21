@@ -1,6 +1,7 @@
 """Path-bounded runners for the frozen 2025 Tier-L0 scientific DAG."""
 
 from __future__ import annotations
+from abc import ABC, abstractmethod
 
 from collections.abc import Iterator
 from dataclasses import fields
@@ -11,128 +12,31 @@ from typing import Any, BinaryIO, TypeVar, cast
 
 import numpy as np
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes
-from empirical_lawhood.kernel.evidence import OutcomeAccess
-from empirical_lawhood.kernel.serialization import CanonicalRecord, canonical_json_bytes
-from empirical_lawhood.kernel.status import AdmissionStatus, ScientificStatus
-from empirical_lawhood.runtime.adjudication import (
-    AdjudicationEvaluability,
-    ScientificAdjudicationRecord,
-    encode_scientific_adjudication,
-)
-from empirical_lawhood.runtime.artifacts import ReceiptCheck
-from empirical_lawhood.runtime.capabilities import (
-    CapabilityManifest,
-    CapabilityPermission,
-)
-from empirical_lawhood.runtime.execution import (
-    RunnerResult,
-    StreamedTaskOutput,
-    TaskContext,
-    TaskOutputPayload,
-    TaskOutputSource,
-    WorkerInputPort,
-    WorkerOutputPort,
-)
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess
+from empirical_lawhood.science.records.serialization import CanonicalRecord, canonical_json_bytes
+from empirical_lawhood.science.records.status import AdmissionStatus, ScientificStatus
+from empirical_lawhood.execution.adjudication import AdjudicationEvaluability, ScientificAdjudicationRecord, encode_scientific_adjudication
+from empirical_lawhood.storage.contracts.artifacts import ReceiptCheck
+from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityPermission
+from empirical_lawhood.execution.execution import RunnerResult, StreamedTaskOutput, TaskContext, TaskOutputPayload, TaskOutputSource, WorkerInputPort, WorkerOutputPort
 
-from .analysis import (
-    FalsifierResult,
-    LinearResponseModel,
-    ModelFamily,
-    TargetFeatureMatrix,
-    adjudicate_placement,
-    augment_basal_target_expression,
-    collapse_target_batch_responses,
-    evaluate_prediction,
-    predict_response,
-)
-from .codecs import (
-    decode_control_reservoir,
-    decode_linear_model,
-    decode_response_summary,
-    decode_target_features,
-    encode_control_reservoir,
-    encode_linear_model,
-    encode_predicted_means,
-    encode_response_summary,
-    extract_h5ad_envelope,
-    write_h5ad_envelope,
-)
-from .config import (
-    CAPABILITY_VERSION,
-    EVALUATOR_CAPABILITY_KEY,
-    FALSIFIER_CAPABILITY_KEY,
-    HISTORICAL_INFORMATION_CUTOFF_UTC,
-    MODEL_CAPABILITY_KEY,
-    PLACEMENT_CAPABILITY_KEY,
-    PREDICTION_CAPABILITY_KEY,
-    REPORTER_CAPABILITY_KEY,
-    SELECTION_CAPABILITY_KEY,
-    SOURCE_CAPABILITY_KEY,
-    SUMMARY_CAPABILITY_KEY,
-    decode_pipeline_config,
-)
-from .contracts import (
-    LeaderboardSnapshot,
-    PlacementAdjudication,
-    PredictionCommitment,
-    VirtualCellContractError,
-    ProvenanceBoundVirtualCellPipelineConfig,
-    VirtualCellSourceManifest,
-    VirtualCellSourceObject,
-    VirtualCellSplit,
-)
-from .dataset import (
-    ControlReservoirArrays,
-    ResponseSummaryArrays,
-    extract_control_reservoir_h5ad,
-    require_response_summary_support,
-    summarize_h5ad,
-)
-from .development import (
-    CandidateOfficialValidation,
-    TierL0Development,
-    competition_selection_integrity_failures,
-    finalize_tier_l0_development,
-    fit_tier_l0_candidates,
-)
-from .evaluation import (
-    bootstrap_official_score_standard_error,
-    evaluate_official_2025,
-    read_anndata_h5ad_stream,
-)
-from .features import virtual_cell_feature_ids
-from .ports import (
-    VirtualCellScratchPort,
-    VirtualCellScratchWorkspace,
-    VirtualCellSourcePort,
-)
-from .prediction import (
-    build_prediction_roster,
-    compile_absolute_prediction_means,
-    write_prediction_h5ad,
-)
-from .records import (
-    CONTROL_RESERVOIR_TABLE_SCHEMA,
-    CandidateValidationMetricsBinding,
-    FalsifierPanel,
-    MODEL_SAFETENSORS_SCHEMA,
-    ModelArtifactBinding,
-    ModelDevelopmentRecord,
-    ModelSelectionRecord,
-    OFFICIAL_METRICS_TABLE_SCHEMA,
-    OfficialEvaluationRecord,
-    PREDICTED_MEAN_TABLE_SCHEMA,
-    PREDICTION_H5AD_ENVELOPE_SCHEMA,
-    PreparedSourceRecord,
-    PredictionFreezeRecord,
-    RESPONSE_SUMMARY_TABLE_SCHEMA,
-    ResponseSummaryRecord,
-    TARGET_FEATURE_TABLE_SCHEMA,
-    TEST_ROSTER_TEXT_SCHEMA,
-    VirtualCellDevelopmentCloseout,
-    VirtualCellRunCloseout,
-)
+from empirical_lawhood.domains.biology.virtual_cell.analysis import FalsifierResult, LinearResponseModel, ModelFamily, TargetFeatureMatrix, adjudicate_placement, augment_basal_target_expression, collapse_target_batch_responses, evaluate_prediction, predict_response
+from empirical_lawhood.adapters.physical.virtual_cell.codecs import decode_control_reservoir, decode_linear_model, decode_response_summary, decode_target_features, encode_control_reservoir, encode_linear_model, encode_predicted_means, encode_response_summary, extract_h5ad_envelope, write_h5ad_envelope
+from empirical_lawhood.domains.biology.virtual_cell.config import EVALUATOR_CAPABILITY_KEY, FALSIFIER_CAPABILITY_KEY, HISTORICAL_INFORMATION_CUTOFF_UTC, MODEL_CAPABILITY_KEY, PLACEMENT_CAPABILITY_KEY, PREDICTION_CAPABILITY_KEY, REPORTER_CAPABILITY_KEY, SELECTION_CAPABILITY_KEY, SOURCE_CAPABILITY_KEY, SUMMARY_CAPABILITY_KEY
+from empirical_lawhood.domains.biology.virtual_cell.contracts import LeaderboardSnapshot, PlacementAdjudication, PredictionCommitment, VirtualCellContractError, ProvenanceBoundVirtualCellPipelineConfig, VirtualCellSourceManifest, VirtualCellSourceObject, VirtualCellSplit
+from empirical_lawhood.adapters.physical.virtual_cell.dataset import extract_control_reservoir_h5ad, summarize_h5ad
+from empirical_lawhood.domains.biology.virtual_cell.response_summary import ControlReservoirArrays
+from empirical_lawhood.domains.biology.virtual_cell.response_summary import ResponseSummaryArrays
+from empirical_lawhood.domains.biology.virtual_cell.response_summary import require_response_summary_support
+from empirical_lawhood.domains.biology.virtual_cell.development import CandidateOfficialValidation, TierL0Development, competition_selection_integrity_failures, finalize_tier_l0_development, fit_tier_l0_candidates
+from empirical_lawhood.domains.biology.virtual_cell.evaluation_statistics import bootstrap_official_score_standard_error
+from empirical_lawhood.adapters.physical.virtual_cell.evaluation import read_anndata_h5ad_stream
+from empirical_lawhood.domains.biology.virtual_cell.features import virtual_cell_feature_ids
+from empirical_lawhood.adapters.physical.virtual_cell.ports import VirtualCellScratchPort, VirtualCellScratchWorkspace, VirtualCellSourcePort
+from empirical_lawhood.adapters.physical.virtual_cell.prediction import build_prediction_roster
+from empirical_lawhood.domains.biology.virtual_cell.prediction import compile_absolute_prediction_means
+from empirical_lawhood.domains.biology.virtual_cell.records import CONTROL_RESERVOIR_TABLE_SCHEMA, CandidateValidationMetricsBinding, FalsifierPanel, MODEL_SAFETENSORS_SCHEMA, ModelArtifactBinding, ModelDevelopmentRecord, ModelSelectionRecord, OFFICIAL_METRICS_TABLE_SCHEMA, OfficialEvaluationRecord, PREDICTED_MEAN_TABLE_SCHEMA, PREDICTION_H5AD_ENVELOPE_SCHEMA, PreparedSourceRecord, PredictionFreezeRecord, RESPONSE_SUMMARY_TABLE_SCHEMA, ResponseSummaryRecord, TARGET_FEATURE_TABLE_SCHEMA, TEST_ROSTER_TEXT_SCHEMA, VirtualCellDevelopmentCloseout, VirtualCellRunCloseout
 
 
 _RecordT = TypeVar("_RecordT", bound=CanonicalRecord)
@@ -288,8 +192,24 @@ class _WorkspaceOutputSource(TaskOutputSource):
         self._workspace.close()
 
 
-class VirtualCellTaskRunner:
+class VirtualCellTaskExecutionBase(ABC):
     """One statically registered VCC implementation, dispatched by capability key."""
+
+    @abstractmethod
+    def _validate_context(self, context):
+        """Validate the selected executable revision and exact worker payloads."""
+
+    @abstractmethod
+    def _before_stage(self, context):
+        """Admit selected software and current custody before source access."""
+
+    @abstractmethod
+    def _write_prediction_file(self, **operands):
+        """Write the selected compiler's explicitly versioned prediction."""
+
+    @abstractmethod
+    def _evaluate_arrays(self, **operands):
+        """Run the selected evaluator under its exact metric gauge."""
 
     def __init__(
         self,
@@ -306,20 +226,6 @@ class VirtualCellTaskRunner:
         self.source_port = source_port
         self.scratch_port = scratch_port
 
-    def _validate_context(self, context: TaskContext) -> None:
-        if self.manifest.capability_version != CAPABILITY_VERSION:
-            raise ValueError("Virtual Cell runner version differs")
-        port = _one_input(
-            context, payload_schema=ProvenanceBoundVirtualCellPipelineConfig.SCHEMA
-        )
-        observed = decode_pipeline_config(port.read())
-        if (
-            observed != self.config
-            or context.config.content_sha256 != self.config.fingerprint()
-        ):
-            raise ValueError(
-                "Virtual Cell worker config differs from the frozen provider"
-            )
 
     def execute(self, context: TaskContext) -> RunnerResult:
         self._validate_context(context)
@@ -341,17 +247,6 @@ class VirtualCellTaskRunner:
             raise NotImplementedError("unregistered Virtual Cell capability") from error
         return execute(context)
 
-    def _before_stage(self, context):
-        if self.manifest.capability_key in {
-            SUMMARY_CAPABILITY_KEY,
-            MODEL_CAPABILITY_KEY,
-            PREDICTION_CAPABILITY_KEY,
-            EVALUATOR_CAPABILITY_KEY,
-        }:
-            raise VirtualCellContractError(
-                "SOFTWARE: the historical v1 compiler/evaluator route requires an explicit v2 runtime selection "
-                "before validation/test H5AD or scratch access"
-            )
 
     def _input_record(self, context, record_type):
         return _canonical_input(context, record_type)
@@ -397,48 +292,7 @@ class VirtualCellTaskRunner:
             uncertainty=uncertainty,
         )
 
-    def _write_prediction_file(
-        self,
-        *,
-        path,
-        roster,
-        gene_ids,
-        prediction_action,
-        control_reservoir,
-        control_reservoir_sha256,
-    ):
-        compiler = self._compiler_contract()
-        return write_prediction_h5ad(
-            path=path,
-            roster=roster,
-            gene_ids=gene_ids,
-            predicted_means=prediction_action,
-            control_reservoir=control_reservoir,
-            control_reservoir_sha256=control_reservoir_sha256,
-            seed=compiler.compiler_seed,
-            mean_tolerance=float(compiler.mean_tolerance),
-            maximum_value=float(compiler.maximum_value),
-        )
 
-    def _evaluate_arrays(
-        self, *, predicted, real, scratch_directory, num_threads, validation
-    ):
-        from .receiver_observation_v2 import ReceiverObservation
-
-        run = evaluate_official_2025(
-            predicted=predicted,
-            real=real,
-            metric_contract=(
-                self.config.model_selection.validation_metric_contract
-                if validation
-                else self.config.metric_contract
-            ),
-            scratch_directory=scratch_directory,
-            num_threads=num_threads,
-            control_label=self.config.response_summary.comparator_label,
-            perturbation_column=self.config.response_summary.target_field,
-        )
-        return ReceiverObservation.from_historical_run(run)
 
     def _candidate_validation(self, *, candidate_id, receiver, score_standard_error):
         if receiver.metrics_schema != OFFICIAL_METRICS_TABLE_SCHEMA:
@@ -1850,6 +1704,6 @@ def canonical_json_record_value_keys(
 
 
 __all__ = [
-    "VirtualCellTaskRunner",
+    "VirtualCellTaskExecutionBase",
     "canonical_json_record_value_keys",
 ]

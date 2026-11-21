@@ -6,11 +6,7 @@ from dataclasses import dataclass, replace
 import shlex
 from typing import Iterable
 
-from empirical_lawhood.cli.introspection import (
-    CliCommandFact,
-    CliParameterFact,
-    tree_by_path,
-)
+from empirical_lawhood.cli.introspection import CliCommandFact, CliParameterFact, tree_by_path
 from empirical_lawhood.cli.metadata import CommandMetadata
 
 

@@ -9,27 +9,24 @@ from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_bindings as bindings
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_preparation as compact
-from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_records as records
-from empirical_lawhood.adapters.methods.matrix_researcher_programme import e1_assembly as domain
-from empirical_lawhood.infrastructure.matrix_programme_inputs import authenticated_programme_inputs
-from empirical_lawhood.kernel.authority import ResourceBudget
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.kernel.experiments import ExperimentSpec, RevealBarrierSpec
-from empirical_lawhood.kernel.obligations import ObligationStatus
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.kernel.status import LifecycleStatus, ReadinessStatus
-from empirical_lawhood.kernel.worlds import NumericalCoordinateKind
-from empirical_lawhood.planning.campaigns import CampaignLane, CampaignNode, CampaignNodeKind
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.planning.study_authoring import (
-    DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, SourceAccessDisposition,
-    SourceMaterializationRef, StudyDraft, StudyDraftLifecycle,
-)
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_bindings as bindings
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_preparation as compact
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_records as records
+from empirical_lawhood.domains.matrix.matrix_researcher_programme import e1_assembly as domain
+from empirical_lawhood.adapters.matrix_storage.matrix_programme_inputs import authenticated_programme_inputs
+from empirical_lawhood.science.identity.authority import ResourceBudget
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.science.experiments.experiments import ExperimentSpec, RevealBarrierSpec
+from empirical_lawhood.science.evidence.obligations import ObligationStatus
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.science.records.status import LifecycleStatus, ReadinessStatus
+from empirical_lawhood.science.models.worlds import NumericalCoordinateKind
+from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.design.study_authoring import DesignInputRecord, DesignInputRole, DesignOrigin, DesignOriginKind, SourceAccessDisposition, SourceMaterializationRef, StudyDraft, StudyDraftLifecycle
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
 
 def _require_science(selection, resolved):
@@ -152,14 +149,12 @@ def _partial_selection(selection, resolved, manifest):
 def assemble_programme_e1(*, specification, selection, project_root, artifact_writer,
         metadata_directory, output_selection_path, execution, maximum_source_bytes):
     """Authenticate C and publish the existing compact experiment's actual inputs."""
-    from empirical_lawhood.api.derived_array_access import (
-        DerivedInputAccess, derive_matrix_input_access_batch, supports_derived_input_access_batch,
-    )
+    from empirical_lawhood.api.derived_array_access import DerivedInputAccess, derive_matrix_input_access_batch, supports_derived_input_access_batch
     from empirical_lawhood.api.derived_metadata_access import derive_canonical_metadata_access
     from empirical_lawhood.api.recursive_authoring import implementation_binding
     from empirical_lawhood.api.recursive_operations import operation_catalog
-    from empirical_lawhood.infrastructure.source_origin import require_selected_implementation
-    from empirical_lawhood.runtime.recursive_compiler import compile_recursive_wave
+    from empirical_lawhood.storage.source_origin import require_selected_implementation
+    from empirical_lawhood.execution.recursive_compiler import compile_recursive_wave
 
     domain.bind_inputs(specification, {'selection': selection})
     execution.__post_init__()
@@ -220,7 +215,7 @@ def assemble_programme_e1(*, specification, selection, project_root, artifact_wr
         operand_index = dict(operands)
         requests = tuple(request('operands/' + sha256(external.input_id.encode()).hexdigest(),
             external.logical_artifact_id, operand_index[external.input_id]) for external in draft.external_inputs)
-        actual_publications = artifact_writer.write_compact_batch(requests)
+        actual_publications = artifact_writer.write_batch(requests)
         publications.extend(actual_publications)
         inputs = tuple(DerivedInputAccess(replace(publication, created=False), operand_index[external.input_id], external)
             for publication, external in zip(actual_publications, draft.external_inputs, strict=True))
@@ -283,7 +278,7 @@ def assemble_programme_e1(*, specification, selection, project_root, artifact_wr
 def derive_inputs(*, specification, source_selection_path, project_root, artifact_writer,
         metadata_directory, output_selection_path, execution, read_access=None):
     """Ordinary public derive hook; it never invokes a native runner."""
-    from .experiment_preparation import load_experiment_inputs
+    from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
     selected = load_experiment_inputs(specification, source_selection_path, artifact_writer=artifact_writer, read_access=read_access).method_inputs
     if selected is None:
         raise ValueError('programme E1 derivation requires its exact current input selection')

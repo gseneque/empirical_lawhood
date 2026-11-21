@@ -9,13 +9,13 @@ from types import SimpleNamespace
 import pytest
 
 from empirical_lawhood.api import current_task_custody as owner
-from empirical_lawhood.infrastructure.study_issue import ExternalStudyOperationAuthorityStore
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.runtime.prepared_native_invocation import PreparedInvocationContract, PreparedWorkerEnvironment
-from empirical_lawhood.runtime.recursive_handoff import RecursiveImplementationBinding
-from empirical_lawhood.runtime.execution import WorkerOutputPort
-from empirical_lawhood.runtime.plans import BarrierKind
+from empirical_lawhood.storage.study_issue import ExternalStudyOperationAuthorityStore
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.execution.prepared_native_invocation import PreparedInvocationContract, PreparedWorkerEnvironment
+from empirical_lawhood.execution.recursive_handoff import RecursiveImplementationBinding
+from empirical_lawhood.execution.execution import WorkerOutputPort
+from empirical_lawhood.execution.plans import BarrierKind
 from tests.test_current_result_custody import actual_issued_current_task_controls as actual_issued_current_task_controls
 
 

@@ -8,21 +8,18 @@ from contextlib import contextmanager
 from hashlib import sha256
 from pathlib import Path
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import preparation_initialization as domain
-from empirical_lawhood.adapters.methods.matrix_experimental_programme.preparation_initialization_science import initialize_source
-from empirical_lawhood.adapters.methods.matrix_scheduled_history import records as scheduled
-from empirical_lawhood.adapters.methods.matrix_scheduled_history.forecast import ScheduledPublicSource
-from empirical_lawhood.adapters.methods.matrix_prospective.records import MatrixProgrammeRole
-from .matrix_prepared_source_runtime import (
-    _committed_e4_selections, _e4_phases, _native_training_prerequisite, _read_development_controls, _require_current_exposure_subset,
-    _future_source_selections,
-)
-from empirical_lawhood.infrastructure.source_origin import require_selected_implementation
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling, inherited_visibility
-from empirical_lawhood.kernel.serialization import canonical_json_bytes
-from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
-from empirical_lawhood.runtime.artifacts import ArtifactProfile, ArtifactWriteRequest, derived_outcome_access
-from empirical_lawhood.runtime.experiment_preparation import ExperimentInputDerivationResult
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import preparation_initialization as domain
+from empirical_lawhood.adapters.simulators.matrix_preparation.preparation_io import initialize_source
+from empirical_lawhood.domains.matrix.matrix_scheduled_history import records as scheduled
+from empirical_lawhood.domains.matrix.matrix_scheduled_history.forecast import ScheduledPublicSource
+from empirical_lawhood.domains.matrix.matrix_prospective.records import MatrixProgrammeRole
+from empirical_lawhood.api.matrix_prepared_source_runtime import _committed_e4_selections, _e4_phases, _native_training_prerequisite, _read_development_controls, _require_current_exposure_subset, _future_source_selections
+from empirical_lawhood.storage.source_origin import require_selected_implementation
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling, inherited_visibility
+from empirical_lawhood.science.records.serialization import canonical_json_bytes
+from empirical_lawhood.design.experiment_inputs import ExperimentFileInputBinding, ExperimentFileInputSelection, ExperimentInputBinding
+from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest, derived_outcome_access
+from empirical_lawhood.execution.experiment_preparation import ExperimentInputDerivationResult
 
 
 @contextmanager
@@ -47,8 +44,8 @@ def authenticate_initialization_request(*, writer, request, maximum_source_bytes
 
 
 def _authenticate_initialization_sources(*, writer, request, original, future, e4_phases, inputs):
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_originals import _authenticate_artifact
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.commitment import authenticate_publication
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_originals import _authenticate_artifact
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.commitment import authenticate_publication
     sources = request.sources
     for artifact, custody in request.exposure_support:
         _authenticate_artifact(writer, artifact, custody)
@@ -136,7 +133,7 @@ def _authenticate_initialization_sources(*, writer, request, original, future, e
         # A shared original allocation may also reserve future CONF roots.
         # Actual DEV controls establish only their complete selected sources;
         # the full allocation remains an authenticated custody parent.
-        from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_revision_programme import MatrixRevisionPreparedProgramme
+        from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_revision_programme import MatrixRevisionPreparedProgramme
         selected_development = (programme.source_arms() if type(programme) is MatrixRevisionPreparedProgramme
             else tuple((None, value) for value in programme.sources.sources))
         for _, source in selected_development:
@@ -170,7 +167,7 @@ def publish_initialization(*, specification, request, project_root, writer, meta
     require_selected_implementation(root)
     specification.__post_init__(); request.__post_init__(); execution.__post_init__()
     source_binding = implementation_binding(root)
-    from empirical_lawhood.kernel.provenance import ObjectIdentity
+    from empirical_lawhood.science.identity.provenance import ObjectIdentity
     if (execution.source_snapshot != ObjectIdentity.from_record("recursive-member.implementation", source_binding)
             or execution.workers is None or execution.environment_id is None or execution.output_root is None):
         raise ValueError("initialization requires the actual selected source and explicit worker/environment/output selections")
@@ -254,7 +251,7 @@ def publish_initialization(*, specification, request, project_root, writer, meta
 
 
 def derive_inputs(*, specification, source_selection_path, project_root, artifact_writer, metadata_directory, output_selection_path, execution, read_access=None):
-    from .experiment_preparation import load_experiment_inputs
+    from empirical_lawhood.api.experiment_preparation import load_experiment_inputs
     inputs = load_experiment_inputs(specification, source_selection_path, artifact_writer=artifact_writer, read_access=read_access)
     request, bank = inputs.method_inputs
     if request is None:

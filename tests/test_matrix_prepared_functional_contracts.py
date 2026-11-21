@@ -5,11 +5,11 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_functional_bindings as method
-from empirical_lawhood.adapters.methods.matrix_experimental_programme import prepared_functional_experiment as public
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.planning.campaigns import CampaignSpec
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_functional_bindings as method
+from empirical_lawhood.domains.matrix.matrix_experimental_programme import prepared_functional_experiment as public
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.design.campaigns import CampaignSpec
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
 
 def reference(name, kind):

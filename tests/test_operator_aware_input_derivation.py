@@ -8,7 +8,7 @@ import pytest
 from empirical_lawhood.api.experiment_preparation import load_experiment_specification, _protocol
 from empirical_lawhood.api.experiment_programme import ExperimentProgrammeService
 from empirical_lawhood.api.experiment_runtime_bindings import experiment_runtime_binding
-from empirical_lawhood.runtime.experiment_preparation import ExecutionSelection
+from empirical_lawhood.execution.experiment_preparation import ExecutionSelection
 
 ROOT = Path(__file__).parents[1]
 

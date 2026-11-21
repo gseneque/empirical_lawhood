@@ -30,10 +30,13 @@ def test_catalogue_accounts_for_every_bundle_and_input():
     # These are domain introductions to the same shared workflow, or a source
     # acquisition guide whose commands have their own source-selection owner.
     supporting_guides = {"recursive-rc", "recursive-battery", "recursive-materials", "fair-mast-source"}
-    expected = {p.parent.name for p in programme_guides if p.parent.name not in supporting_guides}
-    expected.add("recursive-inquiry")
+    expected = {p.parent for p in programme_guides if p.parent.name not in supporting_guides}
+    # Several public identifiers share a programme directory or use a different
+    # name (SCI02-B/C/D). Validate actual guide ownership, not an inferred ID.
+    declared_programmes = {(ROOT / w.guide).parent for w in workflows if w.guide.startswith("programmes/")}
     assert len(ids) == len(set(ids))
-    assert set(ids) == expected
+    assert declared_programmes == expected
+    assert "recursive-inquiry" in ids
     declared = {item.path: item for workflow in workflows for item in workflow.inputs}
     source_selection = ROOT / "programmes/energy/fusion/workflows/fair-mast-source/fair-mast-level2.json"
     files = sorted(p for p in (ROOT / "programmes").glob("*/*/workflows/**/*.json")
@@ -80,6 +83,8 @@ def test_command_effects_and_invocation_requirements_have_existing_owners():
         ["list", "--format", "json"],
         ["show", "rc-ladder-response"],
         ["show", "rc-ladder-response", "--format", "json"],
+        ["show", "rubisco-response"],
+        ["show", "rubisco-response", "--format", "json"],
     ),
 )
 def test_discovery_from_unrelated_directory_reads_no_inputs_and_writes_nothing(
@@ -132,7 +137,8 @@ def test_unknown_workflow_is_a_closed_lookup_refusal(identifier):
 def test_fresh_discovery_does_not_import_optional_native_packages(tmp_path):
     script = """
 import builtins, json
-blocked = {'pybamm', 'brian2', 'cantera', 'fipy', 'grid2op', 'torax', 'gymtorax', 'jax', 'jaxlib'}
+blocked = {'pybamm', 'brian2', 'cantera', 'fipy', 'grid2op', 'torax', 'gymtorax', 'jax', 'jaxlib',
+           'pyscf', 'openmm', 'parmed', 'pdbfixer', 'cupy', 'gpu4pyscf', 'sky'}
 old_import = builtins.__import__
 def guarded(name, *args, **kwargs):
     if name.split('.')[0] in blocked:

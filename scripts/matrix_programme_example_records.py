@@ -10,9 +10,9 @@ import json
 from pathlib import Path
 from matrix_example_handles import example_input_bytes
 
-from empirical_lawhood.kernel.decoding import decode_canonical_bytes, decode_canonical_record
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.time import AvailabilitySpec
+from empirical_lawhood.science.records.decoding import decode_canonical_bytes, decode_canonical_record
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.models.time import AvailabilitySpec
 
 
 def _read(root, relative, kind):
@@ -22,22 +22,18 @@ def _read(root, relative, kind):
 
 
 def _context(coordinates, choices, namespace):
-    from empirical_lawhood.adapters.methods.matrix_factor_confirmation import compact_bindings
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.e1_assembly import MatrixProgrammeE1ScientificContext
-    from empirical_lawhood.kernel.authority import AuthorityAction, AuthorityPolicy, ResourceBudget, SourceAccessClass
-    from empirical_lawhood.kernel.evidence import ClaimSpec, EvidenceCeiling, EvidenceRung, OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.kernel.experiments import AssignmentKind, AssignmentSpec, ControlKind, ControlSpec, PrecisionGoal
-    from empirical_lawhood.kernel.obligations import (
-        ClosureSpec, ComputabilityEvidence, FalsifierKind, FalsifierSpec, ObligationStatus,
-        ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec)
-    from empirical_lawhood.kernel.quantities import QuantityKind, QuantitySpec, ResponseDirection
-    from empirical_lawhood.kernel.status import LifecycleStatus, ReadinessStatus
-    from empirical_lawhood.kernel.systems import IndependentUnitSpec, RelationalIdentity, SystemBoundaryKind, SystemSpec
-    from empirical_lawhood.kernel.time import CausalPhase, ClockLabelSemantics, ClockSpec, HoldSemantics, HorizonSpec, SamplingSemantics
-    from empirical_lawhood.kernel.worlds import (
-        ComputabilityEnvelope, NumericalCoordinateKind, NumericalCoordinateSpec, NumericalViewSpec,
-        RandomnessSemantics, WorldKind, WorldSpec)
-    from empirical_lawhood.planning.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
+    from empirical_lawhood.domains.matrix.matrix_factor_confirmation import compact_bindings
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.e1_assembly import MatrixProgrammeE1ScientificContext
+    from empirical_lawhood.science.identity.authority import AuthorityAction, AuthorityPolicy, ResourceBudget, SourceAccessClass
+    from empirical_lawhood.science.evidence.evidence import ClaimSpec, EvidenceCeiling, EvidenceRung, OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.science.experiments.experiments import AssignmentKind, AssignmentSpec, ControlKind, ControlSpec, PrecisionGoal
+    from empirical_lawhood.science.evidence.obligations import ClosureSpec, ComputabilityEvidence, FalsifierKind, FalsifierSpec, ObligationStatus, ScientificObligations, StructuralConvergenceSpec, SupportSpec, UncertaintySpec, ValiditySpec
+    from empirical_lawhood.science.models.quantities import QuantityKind, QuantitySpec, ResponseDirection
+    from empirical_lawhood.science.records.status import LifecycleStatus, ReadinessStatus
+    from empirical_lawhood.science.models.systems import IndependentUnitSpec, RelationalIdentity, SystemBoundaryKind, SystemSpec
+    from empirical_lawhood.science.models.time import CausalPhase, ClockLabelSemantics, ClockSpec, HoldSemantics, HorizonSpec, SamplingSemantics
+    from empirical_lawhood.science.models.worlds import ComputabilityEnvelope, NumericalCoordinateKind, NumericalCoordinateSpec, NumericalViewSpec, RandomnessSemantics, WorldKind, WorldSpec
+    from empirical_lawhood.design.campaigns import CampaignLane, CampaignNode, CampaignNodeKind, CampaignSpec, DecisionRight
 
     prefix = 'example.current-e1'
     coordinate = coordinates[0]
@@ -110,25 +106,25 @@ def _context(coordinates, choices, namespace):
 
 
 def generated_programme_examples(root: Path, allocation_outputs):
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_operational_resources import MatrixSelectedOperationalResources
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_assembly import ConfiguredProtectedE3AssemblyRequest
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_assembly import NativeTrainingAssemblyRequest
-    from empirical_lawhood.adapters.methods.matrix_finite_dt_source_assembly import MatrixFiniteDtSourceAssemblyRequest
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme import e1_assembly, e2_assembly
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.e1_allocation import MatrixProgrammeE1AllocationRequest
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.e4_operations import MatrixProgrammeE4Operations
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.operations import MatrixProgrammeE3Operations, MatrixProgrammeOperations
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.prepared_operations import MatrixProgrammePreparedOperations
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.selection import PROTOCOL_ID, MatrixResearchProgrammePlan, MatrixResearchProgrammeSpecification
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.product_export import MatrixProgrammeProductExportSelection
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.source_operations import MatrixProgrammeSourceOperations
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import selected_e3_e4_bindings, selected_e4_method_bindings, selected_e4_native_bindings
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorResources
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4OperationalSelection
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_native_records import SelectedE4NativeBudgets
-    from empirical_lawhood.kernel.authority import ResourceBudget
-    from empirical_lawhood.planning.experiment_inputs import ExperimentFileInputSelection
-    from empirical_lawhood.runtime.execution_envelope import NonTimeResourceBudget
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_operational_resources import MatrixSelectedOperationalResources
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_assembly import ConfiguredProtectedE3AssemblyRequest
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_assembly import NativeTrainingAssemblyRequest
+    from empirical_lawhood.domains.matrix.matrix_finite_dt_source_assembly import MatrixFiniteDtSourceAssemblyRequest
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme import e1_assembly, e2_assembly
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.e1_allocation import MatrixProgrammeE1AllocationRequest
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.e4_operations import MatrixProgrammeE4Operations
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.operations import MatrixProgrammeE3Operations, MatrixProgrammeOperations
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.prepared_operations import MatrixProgrammePreparedOperations
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.selection import PROTOCOL_ID, MatrixResearchProgrammePlan, MatrixResearchProgrammeSpecification
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.product_export import MatrixProgrammeProductExportSelection
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.source_operations import MatrixProgrammeSourceOperations
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import selected_e3_e4_bindings, selected_e4_method_bindings, selected_e4_native_bindings
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.full_factor_followup_records import ScheduledFullFactorResources
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_experiment import SelectedE3E4OperationalSelection
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_native_records import SelectedE4NativeBudgets
+    from empirical_lawhood.science.identity.authority import ResourceBudget
+    from empirical_lawhood.design.experiment_inputs import ExperimentFileInputSelection
+    from empirical_lawhood.execution.execution_envelope import NonTimeResourceBudget
 
     def read(name, kind):
         return _read(root, 'programmes/foundations/emergent-structure/workflows/matrix-response-experiment/' + name, kind)
@@ -172,8 +168,8 @@ def generated_programme_examples(root: Path, allocation_outputs):
     delivery = MatrixProgrammeProductExportSelection('export.disclosed-matrix-programme',
         ObjectIdentity('plan.disclosed-unwritten-programme', MatrixResearchProgrammePlan.SCHEMA,
             MatrixResearchProgrammePlan.VERSION, 'a' * 64), 'exports/disclosed-matrix-programme')
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme import source_continuation
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme import source_continuation
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.known_inputs import MatrixProgrammePublishedInput
     # Exposed, unwritten selection only. The real deriver requires the complete
     # original publication and cannot use these placeholders as custody.
     pin = ObjectIdentity('plan.replace-with-original-unwritten', MatrixResearchProgrammePlan.SCHEMA,
@@ -192,7 +188,7 @@ def generated_programme_examples(root: Path, allocation_outputs):
         'continuation.replace-with-original-programme', MatrixProgrammePublishedInput(pin, publication),
         'programmes/replace-with-continued-programme')
     continuation_sources = ExperimentFileInputSelection('sources.example.source-continuation', source_continuation.PROTOCOL_ID, (), ())
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme import retained_training_continuation
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme import retained_training_continuation
     retained = retained_training_continuation.MatrixProgrammeRetainedTrainingContinuationSpecification(
         'continuation.replace-with-completed-training-programme', continuation.predecessor,
         'programmes/replace-with-retained-training-programme')
@@ -215,35 +211,31 @@ def generated_matched_design(root: Path, allocation_outputs, prepared_outputs):
     A researcher must replace the E1 criterion with their public allocation
     result and bind their own complete exposure census before compiling C.
     """
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme import e6_transport_records as transport
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
-    from empirical_lawhood.adapters.methods.matrix_experimental_programme.selected_prepared_choices import (
-        SelectedPreparedDevelopmentSpecification, SelectedPreparedProtectedSpecification, SelectedPreparedRecipeFamily,
-    )
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryTarget
-    from empirical_lawhood.adapters.methods.matrix_factor_response.curve_contract import CURVE_IMPROVEMENT_RULE, CURVE_RELATION_LOSS_RULE
-    from empirical_lawhood.adapters.methods.matrix_factor_response.configured_specification import (
-        ConfiguredE3Assessment, ConfiguredE3Protocol, matched_e3_estimators, matched_e3_measurement,
-    )
-    from empirical_lawhood.adapters.methods.matrix_factor_response.eligibility import MatrixFactorExposureCensus
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
-    from empirical_lawhood.adapters.methods.matrix_factor_response.native_utility_records import NativeAmendedUtilityCriterion
-    from empirical_lawhood.adapters.methods.matrix_factor_response.origin_mechanics import MatrixIO48Construction, MatrixOriginResponseModel
-    from empirical_lawhood.adapters.methods.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
-    from empirical_lawhood.adapters.methods.matrix_primary_family import AMENDED_PRIMARY_FAMILY
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme import scientific_design as owner
-    from empirical_lawhood.adapters.methods.matrix_researcher_programme.e1_allocation import MatrixProgrammeE1AllocationRequest, e1_allocation
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history import e4_structural_prediction as relation
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.records import coordinate_identity, identity
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_records import ScheduledResponseAssay
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Design
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_choices import SelectedE4FactorialChoices
-    from empirical_lawhood.adapters.methods.matrix_scheduled_history.selected_e4_methods import SelectedE4MatchedRelationRule
-    from empirical_lawhood.adapters.simulators.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
-    from empirical_lawhood.runtime.experimental_factorial import PairInteractionScale
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme import e6_transport_records as transport
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.prepared_assay_method import MatrixPreparedAssayMethod
+    from empirical_lawhood.domains.matrix.matrix_experimental_programme.selected_prepared_choices import SelectedPreparedDevelopmentSpecification, SelectedPreparedProtectedSpecification, SelectedPreparedRecipeFamily
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_protected_specification import ConfiguredProtectedE3Specification
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_secondary_readout import MatrixE4SecondaryTarget
+    from empirical_lawhood.domains.matrix.matrix_factor_response.curve_contract import CURVE_IMPROVEMENT_RULE, CURVE_RELATION_LOSS_RULE
+    from empirical_lawhood.domains.matrix.matrix_factor_response.configured_specification import ConfiguredE3Assessment, ConfiguredE3Protocol, matched_e3_estimators, matched_e3_measurement
+    from empirical_lawhood.domains.matrix.matrix_factor_response.eligibility import MatrixFactorExposureCensus
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_training_protocol import NativeTrainingScientificProtocol
+    from empirical_lawhood.domains.matrix.matrix_factor_response.native_utility_records import NativeAmendedUtilityCriterion
+    from empirical_lawhood.domains.matrix.matrix_factor_response.origin_mechanics import MatrixIO48Construction, MatrixOriginResponseModel
+    from empirical_lawhood.domains.matrix.matrix_factor_response.response_scoring import DENSE_RESPONSE_HORIZONS
+    from empirical_lawhood.domains.matrix.matrix_primary_family import AMENDED_PRIMARY_FAMILY
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme import scientific_design as owner
+    from empirical_lawhood.domains.matrix.matrix_researcher_programme.e1_allocation import MatrixProgrammeE1AllocationRequest, e1_allocation
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history import e4_structural_prediction as relation
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.programme_records import ScheduledProgrammeFactor
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.records import coordinate_identity, identity
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_records import ScheduledResponseAssay
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.response_selection import ScheduledCalibrationCriterion
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e3_e4_records import SelectedE3E4Design
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_choices import SelectedE4FactorialChoices
+    from empirical_lawhood.domains.matrix.matrix_scheduled_history.selected_e4_methods import SelectedE4MatchedRelationRule
+    from empirical_lawhood.domains.matrix.six_matrix_response.history_preparation import FOUR_FAMILY_PREPARATION_IDS
+    from empirical_lawhood.execution.experimental_factorial import PairInteractionScale
 
     def read(name, kind):
         return _read(root, 'programmes/foundations/emergent-structure/workflows/matrix-response-experiment/' + name, kind)

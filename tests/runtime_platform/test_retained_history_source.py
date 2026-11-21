@@ -5,12 +5,12 @@ from dataclasses import replace
 
 import pytest
 
-from empirical_lawhood.kernel.provenance import ObjectIdentity
-from empirical_lawhood.kernel.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.planning.study_authoring import SourceMaterializationRole
-from empirical_lawhood.runtime.candidate_compiler import ContentIdentityPolicy, _source_diagnostics
-from empirical_lawhood.runtime.capabilities import CapabilityPermission
-from empirical_lawhood.runtime.plans import ScientificInputRole
+from empirical_lawhood.science.identity.provenance import ObjectIdentity
+from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+from empirical_lawhood.design.study_authoring import SourceMaterializationRole
+from empirical_lawhood.execution.candidate_compiler import ContentIdentityPolicy, _source_diagnostics
+from empirical_lawhood.execution.capabilities import CapabilityPermission
+from empirical_lawhood.execution.plans import ScientificInputRole
 from tests.runtime_platform.test_candidate_compiler import _fixture
 
 

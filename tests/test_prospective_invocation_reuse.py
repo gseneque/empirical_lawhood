@@ -7,8 +7,8 @@ import pytest
 
 from empirical_lawhood.api import prospective_experiment as owner
 from empirical_lawhood.api import recursive_prospective_authoring as prospective
-from empirical_lawhood.infrastructure.artifacts import ArtifactIdentityConflict
-from empirical_lawhood.runtime.candidate_compiler import ExecutableStudyCandidate
+from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+from empirical_lawhood.execution.candidate_compiler import ExecutableStudyCandidate
 from tests.test_prospective_experiment import _load, selected  # noqa: F401
 
 
